@@ -1,0 +1,598 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Maximum Likelihood Mastery</title>
+<style>
+:root{--bg:#0b0e17;--panel:#121726;--panel2:#171d30;--line:#232a3d;--fg:#e8ebf5;--mu:#8a93ab;--a:#6ea8ff;--r:#ff6b81;--y:#ffd166;--g:#4ade80;--p:#c084fc;--t:#5eead4}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;background:var(--bg);color:var(--fg);font:16px/1.7 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+a{color:var(--a)}
+#prog{position:fixed;top:0;left:0;height:3px;background:linear-gradient(90deg,var(--a),var(--p),var(--r));width:0;z-index:50}
+.side{position:fixed;left:0;top:0;bottom:0;width:290px;background:#0e1220;border-right:1px solid var(--line);overflow:auto;padding:18px 14px 90px;z-index:40;transition:transform .25s}
+.side h1{font-size:15px;margin:0 0 2px}
+.side small{color:var(--mu)}
+.side .pt{margin:16px 0 4px;font-size:11px;text-transform:uppercase;letter-spacing:1.3px;color:var(--p)}
+.side a{display:block;color:var(--mu);text-decoration:none;padding:5px 9px;border-radius:7px;font-size:13.5px;line-height:1.35}
+.side a:hover{background:var(--panel);color:var(--fg)}
+.side a.on{background:var(--panel2);color:var(--fg);box-shadow:inset 3px 0 var(--a)}
+.side a.back{color:var(--t);padding-left:0;margin-bottom:6px}
+.meter{position:fixed;left:0;bottom:0;width:290px;background:#0e1220;border-top:1px solid var(--line);padding:10px 16px;z-index:41;font-size:12px;color:var(--mu)}
+.meter .bar{height:7px;background:var(--line);border-radius:6px;margin-top:5px;overflow:hidden}
+.meter .bar i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--g),var(--t));transition:width .4s}
+#menu{display:none;position:fixed;top:10px;left:10px;z-index:60;background:var(--panel2);color:var(--fg);border:1px solid var(--line);border-radius:9px;padding:7px 12px;font-size:14px;cursor:pointer}
+main{margin-left:290px;padding:0 34px 120px;max-width:1090px}
+.hero{padding:70px 0 30px}
+.hero h1{font-size:clamp(32px,5vw,56px);line-height:1.08;margin:0 0 14px;background:linear-gradient(100deg,#fff,var(--y) 40%,var(--r));-webkit-background-clip:text;background-clip:text;color:transparent}
+.hero p{font-size:19px;color:#c3c9dc;max-width:780px}
+.chips{display:flex;flex-wrap:wrap;gap:8px;margin:18px 0}
+.chip{border:1px solid var(--line);background:var(--panel);padding:5px 12px;border-radius:99px;font-size:13px;color:var(--mu)}
+.chip b{color:var(--fg)}
+.part{margin:90px 0 0;padding-top:22px;border-top:1px solid var(--line);font-size:12px;letter-spacing:2px;text-transform:uppercase;color:var(--p)}
+section.ch{padding-top:30px}
+h2{font-size:30px;line-height:1.2;margin:10px 0 8px;display:flex;gap:12px;align-items:center;flex-wrap:wrap}
+h2 .num{display:inline-grid;place-items:center;width:40px;height:40px;border-radius:12px;background:var(--panel2);border:1px solid var(--line);font-size:18px;color:var(--a)}
+.lvl{font-size:11px;font-weight:600;letter-spacing:.8px;text-transform:uppercase;padding:3px 9px;border-radius:99px;border:1px solid}
+.lvl.b{color:var(--g);border-color:#1f5c3a}.lvl.i{color:var(--a);border-color:#244a85}.lvl.a{color:var(--y);border-color:#6b5420}.lvl.e{color:var(--r);border-color:#7a2c3a}
+h3{font-size:19px;margin:30px 0 6px;color:#fff}
+p{margin:10px 0}li{margin:5px 0}
+code,.f{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace}
+code{background:var(--panel2);padding:1px 6px;border-radius:5px;font-size:.9em}
+.f{display:block;white-space:pre-wrap;background:#0e1322;border:1px solid var(--line);border-left:3px solid var(--a);padding:12px 16px;border-radius:9px;margin:14px 0;overflow-x:auto;font-size:15px;color:#dbe4ff;line-height:1.8}
+.co{border-radius:12px;padding:13px 17px;margin:16px 0;border:1px solid var(--line);background:var(--panel)}
+.co>b:first-child{display:block;margin-bottom:2px;font-size:12px;letter-spacing:1px;text-transform:uppercase}
+.co.def{border-left:4px solid var(--a)}.co.def>b:first-child{color:var(--a)}
+.co.warn{border-left:4px solid var(--r)}.co.warn>b:first-child{color:var(--r)}
+.co.tip{border-left:4px solid var(--g)}.co.tip>b:first-child{color:var(--g)}
+.co.key{border-left:4px solid var(--y);background:#171608}.co.key>b:first-child{color:var(--y)}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:18px 20px;margin:22px 0;box-shadow:0 8px 30px rgba(0,0,0,.25)}
+.card>h4{margin:0 0 3px;font-size:13px;letter-spacing:1.2px;text-transform:uppercase;color:var(--t)}
+.card>p.sub{margin:0 0 12px;color:var(--mu);font-size:14.5px}
+.ctl{display:flex;flex-wrap:wrap;gap:10px 22px;align-items:center;margin:8px 0 10px}
+.ctl label{display:flex;gap:8px;align-items:center;font-size:14px;color:#c3c9dc}
+.ctl output{min-width:38px;font-family:ui-monospace,monospace;color:var(--y);font-size:13px}
+input[type=range]{accent-color:var(--a);width:150px}
+input[type=checkbox]{accent-color:var(--a)}
+select,input[type=number],input[type=text]{background:#0e1322;color:var(--fg);border:1px solid var(--line);border-radius:8px;padding:6px 9px;font:inherit;font-size:14px}
+button{background:linear-gradient(180deg,#2c4a80,#233b68);color:#fff;border:1px solid #3a5a98;border-radius:9px;padding:7px 14px;font:inherit;font-size:14px;cursor:pointer}
+button:hover{filter:brightness(1.15)}
+button.alt{background:var(--panel2);border-color:var(--line);color:var(--fg)}
+canvas{width:100%;height:270px;display:block;background:#0e1322;border:1px solid var(--line);border-radius:10px;margin-top:6px}
+canvas.sm{height:210px}canvas.tl{height:330px}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(125px,1fr));gap:9px;margin:12px 0}
+.stat{background:#0e1322;border:1px solid var(--line);border-radius:10px;padding:8px 11px}
+.stat b{display:block;font-size:17px;font-family:ui-monospace,monospace}
+.stat span{font-size:11.5px;color:var(--mu);text-transform:uppercase;letter-spacing:.7px}
+.stat.hot b{color:var(--r)}.stat.ok b{color:var(--g)}.stat.warn b{color:var(--y)}.stat.in b{color:var(--a)}
+.read{margin:8px 0 0;padding:10px 14px;background:#0e1322;border:1px dashed #33406a;border-radius:10px;font-size:14.5px;color:#d3dbf3}
+table{border-collapse:collapse;width:100%;margin:12px 0;font-size:14px}
+th,td{border:1px solid var(--line);padding:7px 10px;text-align:left;vertical-align:top}
+th{background:var(--panel2);font-size:12px;text-transform:uppercase;letter-spacing:.6px;color:var(--mu)}
+td.n{font-family:ui-monospace,monospace;text-align:right}
+.tw{overflow-x:auto}
+.pill{display:inline-block;padding:1px 9px;border-radius:99px;font-size:12px;font-weight:600}
+.pill.r{background:#3a1520;color:var(--r)}.pill.g{background:#10321f;color:var(--g)}.pill.y{background:#3a2f0e;color:var(--y)}.pill.m{background:#202637;color:var(--mu)}
+details{background:var(--panel);border:1px solid var(--line);border-radius:11px;padding:9px 15px;margin:9px 0}
+details summary{cursor:pointer;font-weight:600}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.q{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:14px 18px;margin:14px 0}
+.q .qh{font-size:12px;letter-spacing:1px;text-transform:uppercase;color:var(--mu)}
+.q .opt{display:block;width:100%;text-align:left;margin:6px 0;background:#0e1322;border:1px solid var(--line);color:var(--fg);border-radius:9px;padding:9px 12px}
+.q .opt.good{border-color:var(--g);background:#0e2418}.q .opt.bad{border-color:var(--r);background:#2a1119}
+.q .ex{display:none;margin-top:8px;font-size:14.5px;color:#c3c9dc}
+.q.done .ex{display:block}
+.chk label{display:flex;gap:10px;align-items:flex-start;padding:6px 0;cursor:pointer}
+.chk input{margin-top:6px;accent-color:var(--g);width:17px;height:17px}
+.sigrow{display:grid;grid-template-columns:minmax(170px,2fr) 1fr 1fr auto;gap:8px 14px;align-items:center;padding:6px 0;border-top:1px dashed #1b2236}
+.sigrow:first-of-type{border-top:0}
+.sigrow label{display:flex;gap:6px;align-items:center;font-size:13.5px;color:#c3c9dc}
+@media(max-width:900px){
+ .side{transform:translateX(-100%)}.side.open{transform:none}.meter{display:none}
+ #menu{display:block}main{margin-left:0;padding:0 16px 100px}.two{grid-template-columns:1fr}.hero{padding-top:60px}
+ .sigrow{grid-template-columns:1fr 1fr}
+}
+</style>
+</head>
+<body>
+<div id="prog"></div>
+<button id="menu">☰ Contents</button>
+<nav class="side" id="side"><a class="back" href="index.html">← All courses</a><h1>Maximum Likelihood</h1><small>12 chapters · 11 labs · exam</small><div id="nav"></div></nav>
+<div class="meter"><div id="mtxt">Mastery: 0%</div><div class="bar"><i id="mbar"></i></div></div>
+
+<main>
+<header class="hero">
+ <h1>Maximum likelihood estimation.</h1>
+ <p>Maximum likelihood (ML) is the general recipe behind logistic regression, Poisson and survival models, GARCH, mixed models and most of what you fit in practice. Write down a probability model, ask which parameter value makes the observed data most probable, and then use the <em>curvature</em> of that peak to say how uncertain you are. This page builds the idea from the likelihood function itself, derives the standard error from Fisher information, shows how to compute and test with it, and then breaks it on purpose: multimodal likelihoods, perfect separation, overdispersed counts and censored data.</p>
+ <div class="chips"><span class="chip"><b>Part I</b> The likelihood</span><span class="chip"><b>Part II</b> Computing the MLE</span><span class="chip"><b>Part III</b> Testing and trouble</span></div>
+ <div class="co tip"><b>How to use this</b>Every lab uses real random data generated in your browser; press the re-sample buttons often. Before touching a slider, sketch what you expect the curve to do. Prerequisites: the Sampling Distributions page (bias, variance, SE, Cramér–Rao) and the distributions page.</div>
+</header>
+
+<div class="part">Part I · The likelihood</div>
+
+<section class="ch" id="c1">
+<h2><span class="num">1</span>The likelihood function <span class="lvl b">Beginner</span></h2>
+<p>A probability model gives the chance of any data for a <em>given</em> parameter: P(data | θ). Once the data are observed, flip your point of view: the data are fixed, and θ varies. The result, viewed as a function of θ, is the <b>likelihood</b>:</p>
+<div class="f">L(θ) = P(observed data | θ)          for iid data:  L(θ) = Π f(xᵢ; θ)</div>
+<p>The <b>maximum likelihood estimate</b> (MLE) is the θ that maximises L(θ), the parameter value under which the data you saw were least surprising. For k successes in n trials, L(p) = C(n,k) pᵏ(1−p)ⁿ⁻ᵏ and the peak is at p̂ = k/n.</p>
+<div class="co warn"><b>A likelihood is not a probability distribution over θ</b>It does not integrate to 1 (for the binomial, ∫L(p)dp = 1/(n+1)), and it says nothing about how probable each θ is. It compares θ values <em>against each other</em> using the same data. Turning it into a distribution requires a prior (Bayes page).</div>
+<div class="card"><h4>Lab 1 · The likelihood of a coin</h4>
+ <p class="sub">k successes in n trials. Left: relative likelihood L(p)/L(p̂). Right: log-likelihood below its peak, with the quadratic (Wald) approximation. The dashed horizontal lines mark the 95% likelihood-ratio cutoff.</p>
+ <div class="ctl"><label>trials n <input type="range" id="c1n" min="1" max="200" step="1" value="20"><output id="c1nv"></output></label><label>successes k <input type="range" id="c1k" min="0" max="20" step="1" value="6"><output id="c1kv"></output></label></div>
+ <div class="ctl"><button class="alt" data-p="10,0">0 of 10</button><button class="alt" data-p="10,3">3 of 10</button><button class="alt" data-p="100,30">30 of 100</button><button class="alt" data-p="100,0">0 of 100</button><button class="alt" data-p="1000,300">300 of 1,000</button></div>
+ <div class="two"><canvas class="sm" id="c1cv"></canvas><canvas class="sm" id="c1cv2"></canvas></div><div class="stats" id="c1st"></div><div class="read" id="c1rd"></div></div>
+<p>Notice how the peak narrows as n grows (more data, sharper likelihood), and how with k = 0 the maximum sits on the boundary, where the quadratic approximation on the right is useless.</p>
+</section>
+
+<section class="ch" id="c2">
+<h2><span class="num">2</span>Log-likelihood, the score and the MLE <span class="lvl b">Beginner</span></h2>
+<p>Products are awkward, sums are easy. Work with the <b>log-likelihood</b> ℓ(θ) = Σ log f(xᵢ; θ); it has the same maximiser. Its slope is the <b>score</b> S(θ) = ℓ′(θ), and the MLE solves S(θ̂) = 0. Its curvature, ℓ″, tells you how sharply peaked the likelihood is.</p>
+<div class="tw"><table>
+<tr><th>Model</th><th>ℓ(θ) up to a constant</th><th>Score S(θ)</th><th>MLE</th></tr>
+<tr><td>Exponential rate λ</td><td>n log λ − λ Σxᵢ</td><td>n/λ − Σxᵢ</td><td>1 / x̄</td></tr>
+<tr><td>Poisson rate λ</td><td>Σxᵢ log λ − nλ</td><td>Σxᵢ/λ − n</td><td>x̄</td></tr>
+<tr><td>Normal mean μ (σ known)</td><td>−½ Σ(xᵢ − μ)²</td><td>n(x̄ − μ)</td><td>x̄</td></tr>
+<tr><td>Normal variance σ² (μ unknown)</td><td>−(n/2) log σ² − SS/(2σ²)</td><td>…</td><td>SS/n (note: divisor n, biased)</td></tr>
+</table></div>
+<div class="card"><h4>Lab 2 · The score is the slope of the log-likelihood</h4>
+ <p class="sub">The curve is ℓ(θ) − ℓ(θ̂) for one simulated sample. Choose a test value θ: the yellow line is the tangent there, whose slope is the score. At the MLE the tangent is flat. The Newton step shows where the next iteration would go.</p>
+ <div class="ctl"><label>model <select id="c2m"><option value="0">Exponential (true λ = 1.5)</option><option value="1">Poisson (true λ = 1.5)</option><option value="2">Normal mean (σ = 1, true μ = 0.5)</option></select></label><label>n <input type="range" id="c2n" min="3" max="100" step="1" value="12"><output id="c2nv"></output></label><label>test value θ <input type="range" id="c2t" min="0" max="100" step="1" value="25"><output id="c2tv"></output></label><button id="c2go">New sample</button></div>
+ <canvas class="tl" id="c2cv"></canvas><div class="stats" id="c2st"></div><div class="read" id="c2rd"></div></div>
+<div class="co key"><b>Invariance</b>If θ̂ is the MLE of θ, then g(θ̂) is the MLE of g(θ) for any function g. The MLE of an odds p/(1−p) is p̂/(1−p̂); the MLE of a mean lifetime 1/λ is 1/λ̂. (This is convenient, and the source of the small-sample bias you saw in the Sampling Distributions page.)</div>
+</section>
+
+<section class="ch" id="c3">
+<h2><span class="num">3</span>Fisher information and standard errors <span class="lvl i">Intermediate</span></h2>
+<p>How uncertain is the MLE? A sharply peaked log-likelihood pins the parameter down; a flat one does not. <b>Fisher information</b> measures the expected sharpness of one observation:</p>
+<div class="f">I(θ) = −E[ ∂² log f(X; θ) / ∂θ² ] = Var(score)          SE(θ̂) ≈ 1 / √( n · I(θ̂) )</div>
+<p>This is the Cramér–Rao bound from the previous page: no unbiased estimator can have a smaller variance than 1/(nI(θ)), and the MLE reaches it in large samples. The <b>observed information</b> −ℓ″(θ̂) is the actual curvature of your data's log-likelihood and is what software reports; the two agree as n grows.</p>
+<div class="tw"><table>
+<tr><th>Model</th><th>I(θ) per observation</th><th>Resulting SE of the MLE</th></tr>
+<tr><td>Bernoulli p</td><td>1 / (p(1−p))</td><td>√(p(1−p)/n)</td></tr>
+<tr><td>Poisson λ</td><td>1 / λ</td><td>√(λ/n)</td></tr>
+<tr><td>Exponential λ</td><td>1 / λ²</td><td>λ / √n</td></tr>
+<tr><td>Normal σ (mean known)</td><td>2 / σ²</td><td>σ / √(2n)</td></tr>
+</table></div>
+<div class="card"><h4>Lab 3 · Does 1/√(nI) match the real spread of the MLE?</h4>
+ <p class="sub">4,000 simulated samples; for each, the MLE is computed. The curve is N(θ, 1/(nI(θ))). The Wald coverage uses the plug-in SE 1/√(nI(θ̂)) of each sample.</p>
+ <div class="ctl"><label>model <select id="c3m"><option value="0">Bernoulli p</option><option value="1">Poisson λ</option><option value="2">Exponential λ</option><option value="3">Normal σ (mean known)</option></select></label><label>true value <input type="range" id="c3t" min="1" max="99" step="1" value="30"><output id="c3tv"></output></label><label>n <input type="range" id="c3n" min="0" max="5" step="1" value="2"><output id="c3nv"></output></label></div>
+ <canvas class="tl" id="c3cv"></canvas><div class="stats" id="c3st"></div><div class="read" id="c3rd"></div></div>
+</section>
+
+<section class="ch" id="c4">
+<h2><span class="num">4</span>Confidence intervals: Wald, likelihood-ratio and score <span class="lvl a">Advanced</span></h2>
+<p>Large-sample theory says θ̂ is approximately N(θ, 1/(nI)). There are three standard ways to turn that into an interval, and they differ greatly in small samples.</p>
+<div class="tw"><table>
+<tr><th>Method</th><th>Interval</th><th>Character</th></tr>
+<tr><td><b>Wald</b></td><td>θ̂ ± 1.96·SE(θ̂)</td><td>Simplest; symmetric; not invariant to reparameterisation; poor near boundaries (collapses at p̂ = 0)</td></tr>
+<tr><td><b>Likelihood ratio</b></td><td>{θ : 2[ℓ(θ̂) − ℓ(θ)] ≤ 3.84}</td><td>Uses the true shape of the log-likelihood; invariant; usually the best behaved; asymmetric</td></tr>
+<tr><td><b>Score (Wilson)</b></td><td>{θ : |S(θ)|/√(nI(θ)) ≤ 1.96}</td><td>Evaluates the standard error at the <em>tested</em> θ, not at θ̂; excellent for proportions</td></tr>
+</table></div>
+<p>Coverage is not a single number. For a discrete model it is a <em>function of the true parameter</em> and jumps up and down as p moves, because the interval endpoints are tied to the integer k. Lab 4 computes that function exactly (no simulation noise).</p>
+<div class="card"><h4>Lab 4 · Exact coverage of the three 95% intervals for a binomial proportion</h4>
+ <p class="sub">For each true p, coverage = total probability of the k values whose interval contains p. The target is 95% (green line).</p>
+ <div class="ctl"><label>sample size n <input type="range" id="c4n" min="10" max="200" step="5" value="30"><output id="c4nv"></output></label><label>read off at p = <input type="range" id="c4p" min="1" max="99" step="1" value="5"><output id="c4pv"></output></label></div>
+ <canvas class="tl" id="c4cv"></canvas><div class="stats" id="c4st"></div><div class="read" id="c4rd"></div></div>
+</section>
+
+<div class="part">Part II · Computing the MLE</div>
+
+<section class="ch" id="c5">
+<h2><span class="num">5</span>Newton–Raphson and when it fails <span class="lvl a">Advanced</span></h2>
+<p>For most models S(θ) = 0 has no closed form, so the MLE is found numerically. The workhorse is <b>Newton–Raphson</b>: approximate ℓ by a parabola at the current point and jump to its peak.</p>
+<div class="f">θ(new) = θ(old) − S(θ(old)) / ℓ″(θ(old))</div>
+<p>When ℓ is concave and you start near the peak, convergence is very fast (the number of correct digits roughly doubles each step). Replacing ℓ″ by its expectation, −nI(θ), gives <b>Fisher scoring</b>, which is what GLM software (IRLS) uses. Two things can go wrong: the likelihood can have <em>several peaks</em> (Newton finds whichever is nearest), and a step can <em>leave the parameter space</em> (a negative rate).</p>
+<div class="card"><h4>Lab 5 · Newton iterations on two likelihoods</h4>
+ <p class="sub">The curve is the log-likelihood (relative to its maximum). Dots are the Newton iterates from your starting value. The exponential likelihood is well behaved but a bad start can overshoot; the Cauchy-location likelihood has several local peaks.</p>
+ <div class="ctl"><label>model <select id="c5m"><option value="0">Cauchy location (true θ = 0)</option><option value="1">Exponential rate (true λ = 1)</option></select></label><label>n <input type="range" id="c5n" min="3" max="15" step="1" value="5"><output id="c5nv"></output></label><label>starting value <input type="range" id="c5s" min="0" max="100" step="1" value="50"><output id="c5sv"></output></label><button id="c5go">New sample</button></div>
+ <canvas class="tl" id="c5cv"></canvas><div class="stats" id="c5st"></div><div class="read" id="c5rd"></div></div>
+<div class="co tip"><b>Practical rule</b>Always start from a sensible value (the sample median for a Cauchy location, 1/x̄ for a rate), try several starts for a likelihood that may be multimodal, and check the optimiser's convergence flag and the Hessian at the answer. Standard software silently returns local optima.</div>
+</section>
+
+<section class="ch" id="c6">
+<h2><span class="num">6</span>Logistic regression is maximum likelihood <span class="lvl a">Advanced</span></h2>
+<p>For a binary outcome with P(y = 1 | x) = σ(β₀ + β₁x), the log-likelihood is ℓ(β) = Σ [ yᵢ log pᵢ + (1 − yᵢ) log(1 − pᵢ) ]. It is concave, and Newton–Raphson (equivalently IRLS) gives the fit. The covariance of β̂ is the inverse of the observed information matrix, whose entries are Σ wᵢ xᵢxⱼ with weights wᵢ = pᵢ(1 − pᵢ).</p>
+<p>The weights are largest where pᵢ is near ½ and tiny in the tails, so rare events carry little information per row: with few events the slope's standard error is large however many non-events you have. This is why “10 events per variable” rules of thumb exist.</p>
+<div class="card"><h4>Lab 6 · Fit a one-variable logistic regression by Newton's method</h4>
+ <p class="sub">Dots are the data (jittered). Yellow: the true curve; blue: the fitted curve. The table compares estimates with the truth, and a repeated-sampling check reports how often the Wald interval for the slope covers it, and how often the fit fails.</p>
+ <div class="ctl"><label>n <input type="range" id="c6n" min="0" max="5" step="1" value="2"><output id="c6nv"></output></label><label>intercept β₀ <input type="range" id="c6a" min="-6" max="0" step="0.1" value="-3"><output id="c6av"></output></label><label>slope β₁ <input type="range" id="c6b" min="0" max="4" step="0.1" value="1"><output id="c6bv"></output></label><button id="c6go">New sample</button></div>
+ <canvas class="tl" id="c6cv"></canvas><div class="tw" id="c6tb"></div><div class="stats" id="c6st"></div><div class="read" id="c6rd"></div></div>
+</section>
+
+<section class="ch" id="c7">
+<h2><span class="num">7</span>What the MLE guarantees, and what it does not <span class="lvl a">Advanced</span></h2>
+<p>Under regularity conditions the MLE is <b>consistent</b>, <b>asymptotically normal</b> with variance 1/(nI(θ)), <b>asymptotically efficient</b> (it attains the Cramér–Rao bound) and <b>invariant</b> to reparameterisation. All of these are statements about <em>large n</em>. In small samples the MLE can be biased (typically by an amount of order 1/n, while its SE is of order 1/√n) and its distribution can be skewed.</p>
+<p>A good example is the shape α of a gamma distribution (used for loss severities and waiting times). The MLE solves log α − ψ(α) = log x̄ − mean(log xᵢ), where ψ is the digamma function; it has no closed form but is easy to find numerically. Its asymptotic variance is α / (n(αψ′(α) − 1)).</p>
+<div class="card"><h4>Lab 7 · Small-sample bias of the gamma shape MLE</h4>
+ <p class="sub">1,500 samples at each n from a Gamma(α, 1). The histogram is the sampling distribution of α̂ at the selected n; the curve is the asymptotic normal. The table shows how bias and SE evolve with n.</p>
+ <div class="ctl"><label>true shape α <input type="range" id="c7a" min="0.5" max="5" step="0.1" value="2"><output id="c7av"></output></label><label>n <input type="range" id="c7n" min="0" max="5" step="1" value="1"><output id="c7nv"></output></label><button id="c7go">Re-simulate</button></div>
+ <canvas class="tl" id="c7cv"></canvas><div class="tw" id="c7tb"></div><div class="read" id="c7rd"></div></div>
+</section>
+
+<div class="part">Part III · Testing and trouble</div>
+
+<section class="ch" id="c8">
+<h2><span class="num">8</span>The likelihood-ratio test and Wilks' theorem <span class="lvl a">Advanced</span></h2>
+<p>To test a restriction (H₀: θ = θ₀, or a smaller nested model) compare the maximised log-likelihoods:</p>
+<div class="f">Λ = 2 [ ℓ(θ̂) − ℓ(θ̂₀) ]   →   χ²_q  under H₀          q = number of restrictions</div>
+<p>This is <b>Wilks' theorem</b>. It works for any model with a likelihood, which is why it underlies deviance tests in GLMs, nested-model comparisons and AIC (AIC = −2ℓ̂ + 2·(number of parameters)). It needs large n and regularity conditions; the parameter must not sit on the boundary under H₀.</p>
+<div class="card"><h4>Lab 8 · Does −2 log Λ follow a χ² when the null is true?</h4>
+ <p class="sub">4,000 data sets simulated <em>under</em> the null. The histogram is the LR statistic; the curve is the χ²₁ density. Type I error is the share beyond the 3.841 cutoff (nominal 5%).</p>
+ <div class="ctl"><label>test <select id="c8m"><option value="0">Binomial: H₀ p = p₀</option><option value="1">Normal: H₀ σ² = 1 (mean unknown)</option><option value="2">Exponential vs gamma: H₀ shape = 1</option></select></label><label>n <input type="range" id="c8n" min="0" max="4" step="1" value="1"><output id="c8nv"></output></label><label>p₀ % (binomial) <input type="range" id="c8p" min="2" max="50" step="1" value="10"><output id="c8pv"></output></label></div>
+ <canvas class="tl" id="c8cv"></canvas><div class="stats" id="c8st"></div><div class="read" id="c8rd"></div></div>
+</section>
+
+<section class="ch" id="c9">
+<h2><span class="num">9</span>When the model is wrong: quasi-likelihood and the sandwich <span class="lvl e">Expert</span></h2>
+<p>ML assumes the model is right. If it is only approximately right, the estimate often still converges to the best-fitting parameter, but the <em>standard errors</em> computed from the information matrix can be badly wrong. The fix is the <b>sandwich (robust) estimator</b>:</p>
+<div class="f">Var(θ̂) ≈ A⁻¹ B A⁻¹          A = −ℓ″ (the “bread”),   B = Σ (scoreᵢ)² (the “meat”)</div>
+<p>If the model is correct, A = B and it collapses to the usual 1/(nI). Classic case: modelling counts as Poisson (variance = mean) when they are overdispersed (variance = φ · mean, φ > 1). The mean λ̂ = x̄ is still consistent, but the model-based SE √(x̄/n) is too small by a factor √φ.</p>
+<div class="card"><h4>Lab 9 · Poisson model, overdispersed data</h4>
+ <p class="sub">Counts from a negative binomial with mean m and variance φ·m. Blue curve: the sampling distribution implied by the Poisson model; red curve: the truth. Coverage of the 95% intervals is measured over 3,000 data sets.</p>
+ <div class="ctl"><label>mean m <input type="range" id="c9m" min="2" max="20" step="1" value="5"><output id="c9mv"></output></label><label>dispersion φ <input type="range" id="c9f" min="1" max="10" step="0.5" value="4"><output id="c9fv"></output></label><label>n <input type="range" id="c9n" min="0" max="3" step="1" value="1"><output id="c9nv"></output></label></div>
+ <canvas class="tl" id="c9cv"></canvas><div class="stats" id="c9st"></div><div class="read" id="c9rd"></div></div>
+<div class="co warn"><b>Practical consequence</b>In fraud and claims counts, overdispersion is the norm (clustered events, heterogeneous accounts). Use robust standard errors, a negative binomial model, or at least check the Pearson dispersion statistic. Model-based p-values from a Poisson fit are usually far too small.</div>
+</section>
+
+<section class="ch" id="c10">
+<h2><span class="num">10</span>Censoring: when the likelihood is the right tool <span class="lvl e">Expert</span></h2>
+<p>Time-to-default, churn and recovery data are <b>right-censored</b>: for accounts that have not yet defaulted you only know that the time exceeds the observation window. The likelihood handles this naturally. An observed event at time t contributes the density f(t); a censored observation contributes the survival probability S(c) = P(T &gt; c). For an exponential lifetime:</p>
+<div class="f">ℓ(λ) = d · log λ − λ Σ tᵢ          λ̂ = d / Σ tᵢ = (number of events) / (total exposure)</div>
+<p>Two tempting shortcuts are both wrong: treating censored times as event times, and dropping the censored accounts. Each throws away or misreads exactly the information that the account survived.</p>
+<div class="card"><h4>Lab 10 · Three ways to estimate a default rate from censored data</h4>
+ <p class="sub">Lifetimes are exponential with rate λ; observation stops at time c. The MLE uses events ÷ exposure; “naive 1” treats censored accounts as events; “naive 2” drops them. 3,000 simulated cohorts.</p>
+ <div class="ctl"><label>true rate λ <input type="range" id="c10l" min="0.2" max="3" step="0.1" value="1"><output id="c10lv"></output></label><label>follow-up c (in mean lifetimes) <input type="range" id="c10f" min="0.2" max="5" step="0.1" value="1"><output id="c10fv"></output></label><label>n <input type="range" id="c10n" min="0" max="4" step="1" value="2"><output id="c10nv"></output></label></div>
+ <canvas class="tl" id="c10cv"></canvas><div class="tw" id="c10tb"></div><div class="read" id="c10rd"></div></div>
+</section>
+
+<section class="ch" id="c11">
+<h2><span class="num">11</span>When the MLE does not exist: separation and penalised likelihood <span class="lvl e">Expert</span></h2>
+<p>If a predictor <em>perfectly separates</em> the two classes (every event has x above some value and every non-event below it), the logistic log-likelihood keeps increasing as the slope grows: the maximum is at infinity. Software typically reports a huge coefficient with an enormous standard error or a convergence warning. It happens routinely with rare events, small samples, or a categorical level with no events.</p>
+<p>The cure is to add a penalty, which makes the maximiser finite: maximise ℓ(β) − (λ/2)β₁². This is <b>ridge</b>-penalised likelihood, which equals <b>MAP estimation</b> under a Gaussian prior on the slope (Bayes page), and it is also a bias–variance trade-off (Sampling Distributions, Chapter 9): it biases the slope toward 0 in return for a finite, stable estimate. Firth's bias-reduced logistic regression is another standard fix.</p>
+<div class="card"><h4>Lab 11 · A separable data set and the ridge path</h4>
+ <p class="sub">Twelve points. Left: the data with the fitted probability curve. Right: how the slope estimate depends on the penalty λ (log scale); at λ = 0 on separable data it runs off to infinity.</p>
+ <div class="ctl"><label>data <select id="c11d"><option value="0">perfectly separable</option><option value="1">overlapping (two labels swapped)</option></select></label><label>penalty λ <input type="range" id="c11l" min="0" max="7" step="1" value="3"><output id="c11lv"></output></label></div>
+ <div class="two"><canvas class="sm" id="c11cv"></canvas><canvas class="sm" id="c11cv2"></canvas></div><div class="stats" id="c11st"></div><div class="read" id="c11rd"></div></div>
+</section>
+
+<section class="ch" id="c12">
+<h2><span class="num">12</span>Final exam, mastery checklist, cheat sheet <span class="lvl e">Expert</span></h2>
+<h3>Exam (18 questions — click an answer)</h3>
+<div id="quiz"></div>
+<div class="card"><h4>Score</h4><div class="stats" id="qscore"></div><button class="alt" id="qreset">Reset exam</button></div>
+<h3>Mastery checklist — tick when you can do it without notes</h3>
+<div class="card chk" id="chk"></div>
+<h3>Cheat sheet</h3>
+<div class="tw"><table>
+<tr><th>Idea</th><th>One line</th></tr>
+<tr><td>Likelihood</td><td>L(θ) = P(data | θ), as a function of θ; not a distribution over θ</td></tr>
+<tr><td>Score and MLE</td><td>S(θ) = ℓ′(θ); the MLE solves S(θ̂) = 0</td></tr>
+<tr><td>Fisher information</td><td>I(θ) = −E[ℓ″] per observation; SE ≈ 1/√(nI(θ̂))</td></tr>
+<tr><td>Closed-form MLEs</td><td>Bernoulli k/n; Poisson x̄; exponential 1/x̄; normal μ = x̄, σ² = SS/n</td></tr>
+<tr><td>Invariance</td><td>MLE of g(θ) is g(θ̂)</td></tr>
+<tr><td>Large-n properties</td><td>Consistent, asymptotically normal and efficient; small-sample bias O(1/n)</td></tr>
+<tr><td>Wald / LR / score</td><td>LR and score are better near boundaries and are invariant (Wald is not)</td></tr>
+<tr><td>Wilks</td><td>2[ℓ(θ̂) − ℓ(θ̂₀)] → χ²_q; 3.84 for one restriction at 5%</td></tr>
+<tr><td>Newton</td><td>θ ← θ − S/ℓ″; needs a good start; may find local maxima or leave the parameter space</td></tr>
+<tr><td>Logistic regression</td><td>Concave log-likelihood, fitted by Newton/IRLS; Cov = (X′WX)⁻¹ with W = p(1−p)</td></tr>
+<tr><td>Separation</td><td>MLE at infinity; use penalty (ridge/MAP) or Firth</td></tr>
+<tr><td>Sandwich</td><td>A⁻¹BA⁻¹ gives valid SEs under misspecification; Poisson with overdispersion φ has SE too small by √φ</td></tr>
+<tr><td>Censoring</td><td>Events contribute f(t), censored contribute S(c); rate = events/exposure</td></tr>
+<tr><td>AIC</td><td>−2ℓ̂ + 2k: likelihood penalised for the number of parameters</td></tr>
+</table></div>
+<div class="co tip"><b>Next on the roadmap</b>Item 7, confidence intervals in depth (exact, Wilson, profile-likelihood and bootstrap), and then item 8, the bootstrap and resampling. Chapter 4 already previewed three of the intervals; the next page treats interval construction as a subject in its own right.</div>
+</section>
+</main>
+
+<script>
+/*MATH*/
+function lgamma(x){const c=[76.18009172947146,-86.50532032941677,24.01409824083091,-1.231739572450155,0.1208650973866179e-2,-0.5395239384953e-5];let y=x,t=x+5.5;t-=(x+.5)*Math.log(t);let s=1.000000000190015;for(let j=0;j<6;j++)s+=c[j]/++y;return -t+Math.log(2.5066282746310005*s/x);}
+function gser(a,x){let ap=a,sum=1/a,del=sum;for(let n=0;n<1000;n++){ap++;del*=x/ap;sum+=del;if(Math.abs(del)<Math.abs(sum)*1e-15)break;}return sum*Math.exp(-x+a*Math.log(x)-lgamma(a));}
+function gcf(a,x){let b=x+1-a,c=1/1e-300,d=1/b,h=d;for(let i=1;i<1000;i++){const an=-i*(i-a);b+=2;d=an*d+b;if(Math.abs(d)<1e-300)d=1e-300;c=b+an/c;if(Math.abs(c)<1e-300)c=1e-300;d=1/d;const del=d*c;h*=del;if(Math.abs(del-1)<1e-15)break;}return Math.exp(-x+a*Math.log(x)-lgamma(a))*h;}
+function gammaQ(a,x){if(x<=0)return 1;return x<a+1?1-gser(a,x):gcf(a,x);}
+function betacf(a,b,x){const qab=a+b,qap=a+1,qam=a-1;let c=1,d=1-qab*x/qap;if(Math.abs(d)<1e-300)d=1e-300;d=1/d;let h=d;for(let m=1;m<=1000;m++){const m2=2*m;let aa=m*(b-m)*x/((qam+m2)*(a+m2));d=1+aa*d;if(Math.abs(d)<1e-300)d=1e-300;c=1+aa/c;if(Math.abs(c)<1e-300)c=1e-300;d=1/d;h*=d*c;aa=-(a+m)*(qab+m)*x/((a+m2)*(qap+m2));d=1+aa*d;if(Math.abs(d)<1e-300)d=1e-300;c=1+aa/c;if(Math.abs(c)<1e-300)c=1e-300;d=1/d;const del=d*c;h*=del;if(Math.abs(del-1)<1e-15)break;}return h;}
+function betai(a,b,x){if(x<=0)return 0;if(x>=1)return 1;const bt=Math.exp(lgamma(a+b)-lgamma(a)-lgamma(b)+a*Math.log(x)+b*Math.log(1-x));return x<(a+1)/(a+b+2)?bt*betacf(a,b,x)/a:1-bt*betacf(b,a,1-x)/b;}
+function normSf(z){const q=0.5*gammaQ(.5,z*z/2);return z>=0?q:1-q;}
+function normCdf(z){return normSf(-z);}
+function npdf(x){return Math.exp(-x*x/2)/2.5066282746310002;}
+function lbin(n,k){return lgamma(n+1)-lgamma(k+1)-lgamma(n-k+1);}
+function binom(n,k,p){return Math.exp(lbin(n,k)+k*Math.log(p)+(n-k)*Math.log(1-p));}
+function betapdf(x,a,b){return x<=0||x>=1?0:Math.exp(lgamma(a+b)-lgamma(a)-lgamma(b)+(a-1)*Math.log(x)+(b-1)*Math.log(1-x));}
+function betacdf(x,a,b){return betai(a,b,x);}
+function gampdf(x,a,r){return x<=0?0:Math.exp(a*Math.log(r)+(a-1)*Math.log(x)-r*x-lgamma(a));}
+function gamcdf(x,a,r){return x<=0?0:1-gammaQ(a,r*x);}
+function randn(){let u=0;while(!u)u=Math.random();return Math.sqrt(-2*Math.log(u))*Math.cos(2*Math.PI*Math.random());}
+function gammaS(a){if(a<1)return gammaS(a+1)*Math.pow(Math.random(),1/a);const d=a-1/3,c=1/Math.sqrt(9*d);for(;;){let x,v;do{x=randn();v=1+c*x}while(v<=0);v=v*v*v;const u=Math.random();if(Math.log(u)<.5*x*x+d-d*v+d*Math.log(v))return d*v;}}
+function betaS(a,b){const x=gammaS(a),y=gammaS(b);return x/(x+y);}
+function binS(n,p){let k=0;for(let i=0;i<n;i++)if(Math.random()<p)k++;return k;}
+function mean(a){let s=0;for(const v of a)s+=v;return s/a.length;}
+function qc(cdf,lo,hi,p,it){for(let i=0;i<(it||100);i++){const m=(lo+hi)/2;if(cdf(m)<p)lo=m;else hi=m}return(lo+hi)/2;}
+function qb(a,b,p){return qc(x=>betai(a,b,x),0,1,p,50);}
+function tcdf(x,v){const t=.5*betai(v/2,.5,v/(v+x*x));return x>0?1-t:t}
+function qn(p){return qc(normCdf,-9,9,p,70)}
+function pois(k,l){return Math.exp(-l+k*Math.log(l)-lgamma(k+1))}
+function binF(n,p){let k=0;for(;;){if(n<=0||p<=0)return k;if(p>=1)return k+n;if(n<=40){for(let i=0;i<n;i++)if(Math.random()<p)k++;return k}const a=1+(n>>1),bb=1+n-a,x=betaS(a,bb);if(x>=p){n=a-1;p=p/x}else{k+=a;n=bb-1;p=(p-x)/(1-x)}}}
+/*ENDMATH*/
+
+const $=id=>document.getElementById(id), val=id=>+$(id).value;
+const C={fg:'#e8ebf5',mu:'#8a93ab',gr:'#232a3d',a:'#6ea8ff',r:'#ff6b81',y:'#ffd166',g:'#4ade80',p:'#c084fc',t:'#5eead4'};
+const store={get(k,d){try{const v=JSON.parse(localStorage.getItem(k));return v==null?d:v}catch(e){return d}},set(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}};
+function stat(l,v,c){return `<div class="stat ${c||''}"><b>${v}</b><span>${l}</span></div>`}
+function f3(x){if(!isFinite(x))return String(x);const a=Math.abs(x);if(a!==0&&(a<1e-3||a>=1e6))return x.toExponential(2);return String(+x.toFixed(a<1?4:a<100?3:a<1000?2:0))}
+function pc(x){return f3(100*x)+'%'}
+const resizers=[];
+function reg(fn){fn();resizers.push(fn)}
+function on(ids,fn){ids.split(' ').forEach(i=>{const e=$(i);e.addEventListener('input',fn);e.addEventListener('change',fn)})}
+let rt;window.addEventListener('resize',()=>{clearTimeout(rt);rt=setTimeout(()=>resizers.forEach(f=>f()),150)});
+document.querySelectorAll('input[type=range]').forEach(i=>{const o=$(i.id+'v');if(!o)return;const f=()=>{o.textContent=i.value};i.addEventListener('input',f);f()});
+
+function nice(x){const e=Math.pow(10,Math.floor(Math.log10(x))),f=x/e;return (f<1.5?1:f<3?2:f<7?5:10)*e}
+function mk(cv,x0,x1,ymax,o){o=o||{};const y0=o.y0||0,dpr=window.devicePixelRatio||1,r=cv.getBoundingClientRect(),w=r.width||600,h=r.height||270;
+ cv.width=w*dpr;cv.height=h*dpr;const g=cv.getContext('2d');g.setTransform(dpr,0,0,dpr,0,0);g.clearRect(0,0,w,h);
+ const L=o.L||42,R=12,T=14,B=28,X=x=>L+(x-x0)/(x1-x0)*(w-L-R),Y=y=>h-B-(y-y0)/(ymax-y0)*(h-T-B);
+ g.font='11px system-ui';g.lineWidth=1;g.strokeStyle=C.gr;g.fillStyle=C.mu;
+ if(!o.noGrid){const sx=nice((x1-x0)/7);for(let x=Math.ceil(x0/sx-1e-9)*sx;!o.noX&&x<=x1+1e-9;x+=sx){g.beginPath();g.moveTo(X(x),T);g.lineTo(X(x),h-B);g.stroke();g.textAlign='center';g.fillText(String(+x.toFixed(6)),X(x),h-B+15)}
+ const sy=nice((ymax-y0)/4);for(let y=Math.ceil(y0/sy-1e-9)*sy;y<=ymax+1e-9;y+=sy){g.beginPath();g.moveTo(L,Y(y));g.lineTo(w-R,Y(y));g.stroke();g.textAlign='right';g.fillText(String(+y.toFixed(4)),L-5,Y(y)+3)}}
+ return{g,w,h,X,Y,L,R,T,B,
+  line(f,col,lw,a,b,n,dash){a=a==null?x0:a;b=b==null?x1:b;n=n||260;g.save();if(dash)g.setLineDash([5,4]);g.beginPath();g.strokeStyle=col;g.lineWidth=lw||2;let st=false;for(let i=0;i<=n;i++){const x=a+(b-a)*i/n,y=f(x);if(!isFinite(y)){st=false;continue}st?g.lineTo(X(x),Y(y)):g.moveTo(X(x),Y(y));st=true}g.stroke();g.restore()},
+  area(f,a,b,col,n){a=Math.max(a,x0);b=Math.min(b,x1);if(b<=a)return;n=n||200;g.beginPath();g.moveTo(X(a),Y(0));for(let i=0;i<=n;i++){const x=a+(b-a)*i/n;g.lineTo(X(x),Y(f(x)))}g.lineTo(X(b),Y(0));g.closePath();g.fillStyle=col;g.fill()},
+  vline(x,col,lab,dash){g.save();g.strokeStyle=col;g.lineWidth=1.6;if(dash)g.setLineDash([5,4]);g.beginPath();g.moveTo(X(x),T);g.lineTo(X(x),h-B);g.stroke();g.restore();if(lab){g.fillStyle=col;g.textAlign='center';g.fillText(lab,Math.min(Math.max(X(x),34),w-34),T+10)}},
+  hline(y,col,lab){g.save();g.strokeStyle=col;g.lineWidth=1.4;g.setLineDash([5,4]);g.beginPath();g.moveTo(L,Y(y));g.lineTo(w-R,Y(y));g.stroke();g.restore();if(lab){g.fillStyle=col;g.textAlign='right';g.fillText(lab,w-R-3,Y(y)-4)}},
+  text(s,x,y,col,al){g.fillStyle=col||C.fg;g.textAlign=al||'left';g.fillText(s,x,y)}};}
+
+/* ---------- shared helpers for this page ---------- */
+const D={
+ norm:{n:'Normal(0,1)',s:()=>randn(),mu:0,sd:1,sk:0},
+ unif:{n:'Uniform(0,1)',s:()=>Math.random(),mu:.5,sd:Math.sqrt(1/12),sk:0},
+ expo:{n:'Exponential(1)',s:()=>-Math.log(1-Math.random()),mu:1,sd:1,sk:2},
+ logn:{n:'Lognormal(0,1)',s:()=>Math.exp(randn()),mu:Math.exp(.5),sd:Math.sqrt((Math.E-1)*Math.E),sk:(Math.E+2)*Math.sqrt(Math.E-1),disc:0},
+ b05:{n:'Bernoulli(0.5)',s:()=>Math.random()<.5?1:0,mu:.5,sd:.5,sk:0,disc:1},
+ b05s:{n:'Bernoulli(0.05)',s:()=>Math.random()<.05?1:0,mu:.05,sd:Math.sqrt(.0475),sk:.9/Math.sqrt(.0475),disc:1},
+ bimo:{n:'Two humps',s:()=>(Math.random()<.5?-2:2)+.5*randn(),mu:0,sd:Math.sqrt(4.25),sk:0},
+ par5:{n:'Pareto(α=5)',s:()=>Math.pow(1-Math.random(),-.2),mu:1.25,sd:Math.sqrt(5/48),sk:6*Math.sqrt(.6)},
+ cauchy:{n:'Cauchy (no mean)',s:()=>Math.tan(Math.PI*(Math.random()-.5)),mu:NaN,sd:Infinity,sk:NaN}
+};
+function fillSel(id,keys,def){const e=$(id);e.innerHTML=keys.map(k=>`<option value="${k}">${D[k].n}</option>`).join('');e.value=def}
+const PAL=[C.a,C.r,C.y,C.g,C.p,C.t,'#ff9f43','#9aa4bf'];
+function tgrid(N,M){const T=[];let prev=0;for(let i=0;i<M;i++){let n=Math.round(Math.pow(10,Math.log10(N)*i/(M-1)));if(i===M-1)n=N;n=Math.max(prev+1,n);if(n>N)break;T.push(n);prev=n}if(T[T.length-1]!==N)T[T.length-1]=N;return T}
+function nlab(n){return n>=1e6?(n/1e6)+'M':n>=1000?(n/1000)+'k':String(n)}
+function customGrid(P,xt,yt){const g=P.g;g.save();g.strokeStyle=C.gr;g.fillStyle=C.mu;g.font='11px system-ui';g.lineWidth=1;
+ xt.forEach(([v,l])=>{g.beginPath();g.moveTo(P.X(v),P.T);g.lineTo(P.X(v),P.h-P.B);g.stroke();g.textAlign='center';g.fillText(l,P.X(v),P.h-P.B+15)});
+ yt.forEach(([v,l])=>{g.beginPath();g.moveTo(P.L,P.Y(v));g.lineTo(P.w-P.R,P.Y(v));g.stroke();g.textAlign='right';g.fillText(l,P.L-5,P.Y(v)+3)});g.restore()}
+function clip(P,fn){const g=P.g;g.save();g.beginPath();g.rect(P.L,P.T,P.w-P.L-P.R,P.h-P.T-P.B);g.clip();fn();g.restore()}
+function poly(P,pts,col,lw,dash){const g=P.g;g.save();if(dash)g.setLineDash([5,4]);g.strokeStyle=col;g.lineWidth=lw||2;g.beginPath();pts.forEach(([x,y],i)=>i?g.lineTo(P.X(x),P.Y(y)):g.moveTo(P.X(x),P.Y(y)));g.stroke();g.restore()}
+function dots(P,pts,col,r){const g=P.g;g.fillStyle=col;pts.forEach(([x,y])=>{g.beginPath();g.arc(P.X(x),P.Y(y),r||3,0,7);g.fill()})}
+function niceTicks(lo,hi,k){const st=nice((hi-lo)/(k||5)),a=[];for(let v=Math.ceil(lo/st-1e-9)*st;v<=hi+1e-9;v+=st)a.push([v,String(+v.toFixed(6))]);return a}
+function logTicks(lo,hi){const a=[];for(let e=Math.ceil(lo-1e-9);e<=hi+1e-9;e++)a.push([e,nlab(Math.pow(10,e))]);return a}
+function mom(a){const n=a.length;let m=0;for(const v of a)m+=v;m/=n;let v2=0,v3=0,v4=0;for(const v of a){const d=v-m;v2+=d*d;v3+=d*d*d;v4+=d*d*d*d}v2/=n;v3/=n;v4/=n;const sd=Math.sqrt(v2);return{n,m,sd,sk:sd>0?v3/(sd*sd*sd):0,ku:v2>0?v4/(v2*v2)-3:0}}
+function ksN(z){const a=Array.from(z).sort((x,y)=>x-y),n=a.length;let d=0;for(let i=0;i<n;i++){const F=normCdf(a[i]);d=Math.max(d,Math.abs((i+1)/n-F),Math.abs(i/n-F))}return d}
+/* histogram of data as density with optional overlay curves [{f,col,lw,dash}] */
+function hist(cv,data,lo,hi,bins,ov,col){const cnt=new Float64Array(bins),bw=(hi-lo)/bins;let n=0;for(const v of data){if(v<lo||v>=hi)continue;cnt[Math.floor((v-lo)/bw)]++;n++}
+ const N=data.length;let ym=0;for(let i=0;i<bins;i++){cnt[i]/=N*bw;ym=Math.max(ym,cnt[i])}
+ (ov||[]).forEach(o=>{for(let i=0;i<=80;i++)ym=Math.max(ym,o.f(lo+(hi-lo)*i/80)||0)});
+ const P=mk(cv,lo,hi,ym*1.12);
+ P.g.fillStyle=col||'rgba(110,168,255,.5)';for(let i=0;i<bins;i++){if(cnt[i]<=0)continue;const a=P.X(lo+i*bw),b=P.X(lo+(i+1)*bw);P.g.fillRect(a,P.Y(cnt[i]),Math.max(1,b-a-1),P.Y(0)-P.Y(cnt[i]))}
+ (ov||[]).forEach(o=>P.line(o.f,o.col,o.lw||2.4,lo,hi,200,o.dash));return P}
+const fmt=x=>f3(x);
+
+/* ---------- shared for this page ---------- */
+const POPS=['norm','unif','expo','logn','bimo','par5'];
+D.norm.med=0;D.norm.q90=1.2815516;D.unif.med=.5;D.unif.q90=.9;D.expo.med=Math.LN2;D.expo.q90=Math.log(10);D.logn.med=1;D.logn.q90=Math.exp(1.2815516);
+D.bimo.med=0;D.bimo.q90=qc(x=>.5*normCdf((x+2)/.5)+.5*normCdf((x-2)/.5),-10,10,.9,80);D.par5.med=Math.pow(2,.2);D.par5.q90=Math.pow(10,.2);
+const SF={mean:a=>mean(a),median:a=>{const b=Float64Array.from(a).sort(),n=b.length;return n%2?b[(n-1)/2]:(b[n/2-1]+b[n/2])/2},sd:a=>{const n=a.length,m=mean(a);let s=0;for(const v of a)s+=(v-m)*(v-m);return Math.sqrt(s/(n-1))},q90:a=>{const b=Float64Array.from(a).sort();return b[Math.round(.9*(b.length-1))]}};
+function truth(key,st){const d=D[key];return st==='mean'?d.mu:st==='median'?d.med:st==='sd'?d.sd:d.q90}
+const SNAME={mean:'sample mean',median:'sample median',sd:'sample SD',q90:'90th percentile'};
+const N10=[2,3,5,10,20,50,100,200,500,1000];
+function pct(a,p){const b=Float64Array.from(a).sort();return b[Math.min(b.length-1,Math.max(0,Math.floor(p*b.length)))]}
+function histLines(cv,arrs,cols,lo,hi,bins,vl){const bw=(hi-lo)/bins,dens=arrs.map(a=>{const c=new Float64Array(bins);for(const v of a){if(v<lo||v>=hi)continue;c[Math.floor((v-lo)/bw)]++}for(let i=0;i<bins;i++)c[i]/=a.length*bw;return c});let ym=0;dens.forEach(c=>c.forEach(v=>ym=Math.max(ym,v)));const P=mk(cv,lo,hi,ym*1.15||1);
+ dens.forEach((c,k)=>{const pts=[];for(let i=0;i<bins;i++){pts.push([lo+i*bw,c[i]]);pts.push([lo+(i+1)*bw,c[i]])}clip(P,()=>poly(P,pts,cols[k],2.2))});(vl||[]).forEach(v=>P.vline(v[0],v[1],v[2],v[3]));return P}
+function sdOf(a){return mom(a).sd}
+
+/* ---------- ML helpers ---------- */
+function digamma(x){let r=0;while(x<6){r-=1/x;x++}const f=1/(x*x);return r+Math.log(x)-.5/x-f*(1/12-f*(1/120-f/252))}
+function trigamma(x){let r=0;while(x<6){r+=1/(x*x);x++}const f=1/(x*x);return r+1/x+.5*f+f/x*(1/6-f*(1/30-f/42))}
+function poisS(l){if(l<=0)return 0;if(l<30){const L=Math.exp(-l);let k=0,p=1;do{k++;p*=Math.random()}while(p>L);return k-1}const m=Math.floor(.875*l),g=gammaS(m);return g<l?m+poisS(l-g):binF(m-1,l/g)}
+function llb(k,n,p){return(k?k*Math.log(p):0)+(n-k?(n-k)*Math.log(1-p):0)}
+function lrInt(k,n,cut){const ph=k/n,l0=llb(k,n,ph),g=p=>2*(l0-llb(k,n,p))-cut;let lo=0,hi=1;
+ if(k>0){let a=1e-12,b=ph;for(let i=0;i<70;i++){const m=(a+b)/2;if(g(m)>0)a=m;else b=m}lo=(a+b)/2}
+ if(k<n){let a=ph,b=1-1e-12;for(let i=0;i<70;i++){const m=(a+b)/2;if(g(m)>0)b=m;else a=m}hi=(a+b)/2}return[lo,hi]}
+function solveAlpha(s){if(!(s>1e-9))return 1e6;let a=(3-s+Math.sqrt((3-s)*(3-s)+24*s))/(12*s);for(let i=0;i<8;i++){const f=Math.log(a)-digamma(a)-s,fp=1/a-trigamma(a);let n=a-f/fp;if(!(n>0))n=a/2;a=n}return a}
+function normPdfAt(x,m,s){return Math.exp(-(x-m)*(x-m)/(2*s*s))/(s*2.5066282746)}
+
+/* ---------- Ch1 likelihood of a coin ---------- */
+(function(){function draw(){const n=val('c1n'),ks=$('c1k');ks.max=n;if(+ks.value>n)ks.value=n;const k=val('c1k');$('c1kv').textContent=k;$('c1nv').textContent=n;
+  const ph=k/n,l0=llb(k,n,ph),se=Math.sqrt(ph*(1-ph)/n),[lo,hi]=lrInt(k,n,3.8415),wl=ph-1.96*se,wh=ph+1.96*se,eps=1e-6,rel=p=>Math.exp(llb(k,n,Math.min(1-eps,Math.max(eps,p)))-l0);
+  const P=mk($('c1cv'),0,1,1.08);P.area(rel,lo,hi,'rgba(74,222,128,.25)',200);P.line(rel,C.a,2.6,0,1,400);P.hline(Math.exp(-1.9207),C.g,'0.147');P.vline(ph,C.y,'p̂ = '+fmt(ph),true);P.text('relative likelihood',P.L+8,P.T+14,C.mu);
+  const Q=mk($('c1cv2'),0,1,.4,{y0:-6});Q.line(p=>llb(k,n,Math.min(1-eps,Math.max(eps,p)))-l0,C.a,2.6,0,1,400);if(se>0)Q.line(p=>-(p-ph)*(p-ph)/(2*se*se),C.r,2,0,1,300,true);Q.hline(-1.9207,C.g,'−1.92');Q.vline(ph,C.y,null,true);Q.text('log-likelihood − max   (dashed: quadratic approx)',Q.L+8,Q.T+14,C.mu);
+  let area=0;const M=2000;for(let i=0;i<M;i++){const p=(i+.5)/M;area+=binom(n,k,p)/M}
+  $('c1st').innerHTML=stat('MLE p̂ = k/n',fmt(ph),'ok')+stat('area under L(p)',fmt(area),'hot')+stat('1/(n+1)',fmt(1/(n+1)),'in')+stat('95% LR interval',`[${fmt(lo)}, ${fmt(hi)}]`,'ok')+stat('95% Wald interval',k===0||k===n?'degenerate':`[${fmt(Math.max(0,wl))}, ${fmt(Math.min(1,wh))}]`,k===0||k===n?'hot':'warn')+stat('L(0.5)/L(p̂)',fmt(rel(.5)),'');
+  $('c1rd').innerHTML=`The likelihood peaks at p̂ = ${fmt(ph)}. The area under it is ${fmt(area)}, equal to 1/(n+1) and nowhere near 1, so it is not a probability density for p. The values of p whose likelihood stays within a factor 0.147 of the peak form the 95% likelihood-ratio interval [${fmt(lo)}, ${fmt(hi)}]. ${k===0||k===n?'At the boundary the Wald interval collapses to a single point, while the likelihood interval remains sensible.':'The quadratic approximation (red dashed) is a good fit near the peak; the gap away from it is why Wald and LR intervals differ.'}`}
+ document.querySelectorAll('[data-p]').forEach(b=>b.onclick=()=>{const[n,k]=b.dataset.p.split(',');$('c1n').value=n;$('c1k').max=n;$('c1k').value=k;draw()});
+ on('c1n c1k',draw);reg(draw);})();
+
+/* ---------- Ch2 score ---------- */
+(function(){let st=null;const RNG=[[.2,4],[.2,4],[-3,3]];
+ function gen(){const m=+$('c2m').value,n=val('c2n');$('c2nv').textContent=n;let o;
+  if(m===0){const S=gammaS(n)/1.5;o={ll:t=>n*Math.log(t)-t*S,sc:t=>n/t-S,h:t=>-n/(t*t),mle:n/S,info:t=>n/(t*t)}}
+  else if(m===1){const S=poisS(1.5*n);o={ll:t=>(S?S*Math.log(t):0)-n*t,sc:t=>S/t-n,h:t=>-S/(t*t),mle:Math.max(S/n,1e-9),info:t=>S/(t*t)}}
+  else{const xb=.5+randn()/Math.sqrt(n);o={ll:t=>-n*(t-xb)*(t-xb)/2,sc:t=>n*(xb-t),h:t=>-n,mle:xb,info:t=>n}}
+  st=o;draw()}
+ function draw(){if(!st)return;const m=+$('c2m').value,[lo,hi]=RNG[m],t=lo+(hi-lo)*val('c2t')/100,o=st,l0=o.ll(o.mle);$('c2tv').textContent=fmt(t);
+  const P=mk($('c2cv'),lo,hi,.8,{y0:-7});const r=x=>o.ll(x)-l0;P.line(r,C.a,2.8,lo+1e-3,hi,400);P.vline(o.mle,C.g,'MLE '+fmt(o.mle),true);P.vline(t,C.y,'θ = '+fmt(t),true);
+  const w=(hi-lo)*.14,s=o.sc(t);clip(P,()=>{poly(P,[[t-w,r(t)-s*w],[t+w,r(t)+s*w]],C.y,2.4)});dots(P,[[t,r(t)]],C.y,5);P.text('log-likelihood minus its maximum;  yellow: tangent at θ (slope = score)',P.L+8,P.T+14,C.mu);
+  const inf=-o.h(o.mle),step=t-o.sc(t)/o.h(t);
+  $('c2st').innerHTML=stat('MLE θ̂',fmt(o.mle),'ok')+stat('score S(θ)',fmt(s),Math.abs(s)<.01?'ok':'warn')+stat('observed info at MLE',fmt(inf),'in')+stat('SE = 1/√info',fmt(1/Math.sqrt(inf)),'')+stat('Newton step lands at',fmt(step),'in');
+  $('c2rd').innerHTML=`At θ = ${fmt(t)} the score is ${fmt(s)}: ${Math.abs(s)<.02?'essentially zero, so you are at the maximum.':s>0?'positive, so the log-likelihood is still rising to the right of here.':'negative, so the log-likelihood is rising to the left.'} The curvature at the peak (observed information ${fmt(inf)}) gives SE ≈ ${fmt(1/Math.sqrt(inf))}. One Newton step from here lands at ${fmt(step)}${m===2?' (exactly the MLE, because a normal log-likelihood is a perfect parabola)':''}.`}
+ $('c2go').onclick=gen;on('c2m c2n',gen);on('c2t',draw);gen();resizers.push(draw);})();
+
+/* ---------- Ch3 Fisher information ---------- */
+(function(){const NL=[10,20,50,100,200,500];
+ const M=[{n:'p',map:t=>t/100,I:t=>1/(t*(1-t)),draw:(n,t)=>binF(n,t)/n,se:(n,h)=>Math.sqrt(h*(1-h)/n)},
+ {n:'λ',map:t=>t/10,I:t=>1/t,draw:(n,t)=>poisS(n*t)/n,se:(n,h)=>Math.sqrt(h/n)},
+ {n:'λ',map:t=>t/10,I:t=>1/(t*t),draw:(n,t)=>t*n/gammaS(n),se:(n,h)=>h/Math.sqrt(n)},
+ {n:'σ',map:t=>t/50,I:t=>2/(t*t),draw:(n,t)=>t*Math.sqrt(2*gammaS(n/2)/n),se:(n,h)=>h/Math.sqrt(2*n)}];
+ function draw(){const mi=+$('c3m').value,m=M[mi],n=NL[val('c3n')],th=m.map(val('c3t')),R=4000,v=new Float64Array(R);$('c3nv').textContent=n;$('c3tv').textContent=fmt(th);
+  let cov=0,sse=0,nse=0;for(let r=0;r<R;r++){const h=m.draw(n,th);v[r]=h;const s=m.se(n,h);if(isFinite(s)&&s>0){sse+=s;nse++}if(Math.abs(h-th)<=1.96*m.se(n,h))cov++}
+  const mm=mom(v),asd=1/Math.sqrt(n*m.I(th)),w=4*Math.max(mm.sd,asd);
+  hist($('c3cv'),v,th-w,th+w,45,[{f:x=>normPdfAt(x,th,asd),col:C.a}]);
+  $('c3st').innerHTML=stat('true '+m.n,fmt(th),'in')+stat('average MLE',fmt(mm.m),'')+stat('bias',fmt(mm.m-th),Math.abs(mm.m-th)>.1*asd?'warn':'ok')+stat('simulated SE',fmt(mm.sd),'warn')+stat('1/√(n·I(θ))',fmt(asd),'ok')+stat('average plug-in SE',nse?fmt(sse/nse):'—','')+stat('Wald 95% coverage',pc(cov/R),cov/R<.93?'hot':'ok');
+  $('c3rd').innerHTML=`Fisher information predicts SE ${fmt(asd)}; the simulated spread of the MLE is ${fmt(mm.sd)}. The Wald interval built from the plug-in SE covers ${pc(cov/R)} of the time. ${cov/R<.93?'Coverage is below 95% here: at this n and parameter the large-sample approximation is not yet accurate (small counts or a skewed sampling distribution).':'The Cramér–Rao calculation is accurate at this n.'}`}
+ on('c3m c3t c3n',draw);reg(draw);})();
+
+/* ---------- Ch4 coverage of intervals ---------- */
+(function(){function draw(){const n=val('c4n'),pr=val('c4p')/100;$('c4nv').textContent=n;$('c4pv').textContent=fmt(pr);const z=1.96,iv=[[],[],[]];
+  for(let k=0;k<=n;k++){const ph=k/n,se=Math.sqrt(ph*(1-ph)/n);iv[0].push([ph-z*se,ph+z*se]);const d=1+z*z/n,c=(ph+z*z/(2*n))/d,h=z*Math.sqrt(ph*(1-ph)/n+z*z/(4*n*n))/d;iv[1].push([c-h,c+h]);iv[2].push(lrInt(k,n,3.8415))}
+  const cov=p=>iv.map(a=>{let s=0;for(let k=0;k<=n;k++){if(a[k][0]<=p&&p<=a[k][1])s+=binom(n,k,p)}return s});
+  const grid=[];for(let p=.005;p<.9951;p+=.005)grid.push(p);const cc=grid.map(cov);let mn=1;cc.forEach(c=>c.forEach(v=>mn=Math.min(mn,v)));const y0=Math.max(0,Math.floor((mn-.03)*20)/20);
+  const P=mk($('c4cv'),0,1,1.02,{y0});const cols=[C.r,C.g,C.a];[0,1,2].forEach(j=>poly(P,grid.map((p,i)=>[p,cc[i][j]]),cols[j],1.8));P.hline(.95,C.fg,'95%');P.vline(pr,C.y,null,true);
+  P.text('— Wald',P.L+8,P.h-P.B-46,C.r);P.text('— likelihood ratio',P.L+8,P.h-P.B-30,C.g);P.text('— Wilson (score)',P.L+8,P.h-P.B-14,C.a);P.text('true p',P.w/2,P.h-2,C.mu,'center');
+  const here=cov(pr),mean_=j=>mean(cc.map(c=>c[j])),mid=j=>Math.min(...cc.filter((c,i)=>grid[i]>=.05&&grid[i]<=.95).map(c=>c[j]));
+  $('c4st').innerHTML=stat('Wald at p',pc(here[0]),here[0]<.92?'hot':'ok')+stat('LR at p',pc(here[1]),'ok')+stat('Wilson at p',pc(here[2]),'ok')+stat('mean coverage: Wald / LR / Wilson',pc(mean_(0))+' / '+pc(mean_(1))+' / '+pc(mean_(2)),'in')+stat('worst case, p ∈ [.05,.95]',pc(mid(0))+' / '+pc(mid(1))+' / '+pc(mid(2)),'warn');
+  $('c4rd').innerHTML=`At n = ${n} and p = ${fmt(pr)}: Wald covers <b>${pc(here[0])}</b>, likelihood-ratio <b>${pc(here[1])}</b>, Wilson <b>${pc(here[2])}</b>. The saw-tooth is real: because k is an integer the coverage jumps as p crosses interval endpoints, so “95%” is an average over p, not a guarantee at each p. The Wald interval is worst for small p and near 0 or 1, where it can fall far below nominal.`}
+ on('c4n c4p',draw);reg(draw);})();
+
+/* ---------- Ch5 Newton ---------- */
+(function(){let xs=null,m=0;
+ function gen(){m=+$('c5m').value;const n=val('c5n');$('c5nv').textContent=n;xs=[];for(let i=0;i<n;i++)xs.push(m===0?D.cauchy.s():-Math.log(1-Math.random()));draw()}
+ function fns(){const n=xs.length;if(m===0)return{ll:t=>{let s=0;for(const x of xs)s-=Math.log(1+(x-t)*(x-t));return s},sc:t=>{let s=0;for(const x of xs){const u=x-t;s+=2*u/(1+u*u)}return s},h:t=>{let s=0;for(const x of xs){const u=x-t;s-=2*(1-u*u)/Math.pow(1+u*u,2)}return s}};
+  let S=0;for(const x of xs)S+=x;return{ll:t=>n*Math.log(t)-t*S,sc:t=>n/t-S,h:t=>-n/(t*t)}}
+ function draw(){if(!xs)return;const f=fns(),n=xs.length;let lo,hi;if(m===0){lo=Math.min(...xs)-2;hi=Math.max(...xs)+2}else{lo=.05;hi=4}
+  const t0=lo+(hi-lo)*val('c5s')/100;$('c5sv').textContent=fmt(t0);
+  let best=-Infinity,bt=lo;const G=2000;for(let i=0;i<=G;i++){const t=lo+(hi-lo)*i/G,v=f.ll(t);if(v>best){best=v;bt=t}}
+  const it=[t0];let th=t0,status='did not converge in 12 steps';for(let i=0;i<12;i++){const tn=th-f.sc(th)/f.h(th);if(!isFinite(tn)){status='diverged (non-finite step)';break}if(m===1&&tn<=0){status='step left the parameter space (rate ≤ 0)';it.push(tn);break}it.push(tn);if(Math.abs(tn-th)<1e-9){status='converged';th=tn;break}th=tn}
+  const fin=it[it.length-1];let ymin=0;for(let i=0;i<=200;i++){const v=f.ll(lo+(hi-lo)*i/200)-best;if(isFinite(v))ymin=Math.min(ymin,v)}ymin=Math.max(ymin,-20)-.5;
+  const P=mk($('c5cv'),lo,hi,1,{y0:ymin});P.line(t=>f.ll(t)-best,C.a,2.6,lo,hi,500);P.vline(bt,C.g,'global max '+fmt(bt),true);
+  const pts=it.filter(v=>v>=lo&&v<=hi&&isFinite(f.ll(v))).map(v=>[v,f.ll(v)-best]);clip(P,()=>{poly(P,pts,'rgba(255,209,102,.6)',1.4,true)});dots(P,pts,C.y,4.5);pts.forEach((p,i)=>P.text(String(i),P.X(p[0])+6,P.Y(p[1])-6,C.y));
+  const conv=status==='converged',glob=conv&&Math.abs(fin-bt)<.02*(hi-lo);const med=SF.median(Float64Array.from(xs));
+  $('c5st').innerHTML=stat('start θ₀',fmt(t0),'in')+stat('iterations',it.length-1,'')+stat('final θ',fmt(fin),conv?(glob?'ok':'hot'):'hot')+stat('global maximiser (grid)',fmt(bt),'ok')+stat('status',glob?'global max':conv?'local max':'failed',glob?'ok':'hot')+stat(m===0?'sample median':'1/x̄',m===0?fmt(med):fmt(n/xs.reduce((a,b)=>a+b,0)),'warn');
+  $('c5rd').innerHTML=`Starting at ${fmt(t0)}, Newton ${conv?'converged to '+fmt(fin)+(glob?', the global maximum.':', which is only a <b>local</b> maximum (the global one is at '+fmt(bt)+').'):'<b>failed</b>: '+status+'.'} ${m===0?'The Cauchy log-likelihood has several bumps, so the answer depends on the start; the sample median is a robust starting value.':'The exponential log-likelihood is concave, but the Newton step is 2θ − x̄θ², which becomes negative for any start above 2/x̄: a poor start can leave the parameter space.'}`}
+ $('c5go').onclick=gen;on('c5m c5n',gen);on('c5s',draw);gen();resizers.push(draw);})();
+
+/* ---------- Ch6 logistic regression ---------- */
+function fitLogit(x,y,lam){const n=x.length;let ym=0;for(const v of y)ym+=v;ym/=n;if(ym<=0||ym>=1)return{ok:false};let a=Math.log(ym/(1-ym)),b=0,it,ok=false;lam=lam||0;
+ for(it=1;it<=40;it++){let g0=0,g1=0,h00=0,h01=0,h11=0;for(let i=0;i<n;i++){const p=1/(1+Math.exp(-(a+b*x[i]))),w=p*(1-p),r=y[i]-p;g0+=r;g1+=r*x[i];h00+=w;h01+=w*x[i];h11+=w*x[i]*x[i]}g1-=lam*b;h11+=lam;const det=h00*h11-h01*h01;if(!(det>1e-14))return{ok:false,a,b,it,diverged:true};const da=(h11*g0-h01*g1)/det,db=(-h01*g0+h00*g1)/det;a+=da;b+=db;if(Math.abs(b)>25)return{ok:false,a,b,it,diverged:true};if(Math.abs(da)+Math.abs(db)<1e-9){ok=true;break}}
+ let h00=0,h01=0,h11=0,ll=0;for(let i=0;i<n;i++){const e=a+b*x[i],p=1/(1+Math.exp(-e)),w=p*(1-p);h00+=w;h01+=w*x[i];h11+=w*x[i]*x[i]+0;ll+=y[i]*e-(e>0?e+Math.log1p(Math.exp(-e)):Math.log1p(Math.exp(e)))}
+ h11+=lam;const det=h00*h11-h01*h01;return{ok,a,b,it,se0:Math.sqrt(h11/det),se1:Math.sqrt(h00/det),ll}}
+(function(){const NL=[50,100,200,500,1000,2000];let cache=null;const sg=z=>1/(1+Math.exp(-z));
+ function sim(){const n=NL[val('c6n')],a=val('c6a'),b=val('c6b');$('c6nv').textContent=n;
+  const x=new Float64Array(n),y=new Float64Array(n),jit=new Float64Array(n);let ev=0;for(let i=0;i<n;i++){x[i]=randn();y[i]=Math.random()<sg(a+b*x[i])?1:0;ev+=y[i];jit[i]=(Math.random()-.5)*.08}
+  const fit=fitLogit(x,y),R=300,nn=Math.min(n,1000);let cov=0,okc=0,bad=0;
+  for(let r=0;r<R;r++){const xx=new Float64Array(nn),yy=new Float64Array(nn);for(let i=0;i<nn;i++){xx[i]=randn();yy[i]=Math.random()<sg(a+b*xx[i])?1:0}const f=fitLogit(xx,yy);if(!f.ok){bad++;continue}okc++;if(Math.abs(f.b-b)<=1.96*f.se1)cov++}
+  cache={n,a,b,x,y,jit,ev,fit,cov:okc?cov/okc:NaN,bad:bad/R,nn};draw()}
+ function draw(){if(!cache)return;const{n,a,b,x,y,jit,ev,fit,cov,bad,nn}=cache,P=mk($('c6cv'),-3.5,3.5,1.15,{y0:-.15});
+  P.g.fillStyle='rgba(160,170,200,.35)';const lim=Math.min(n,1500);for(let i=0;i<lim;i++){P.g.beginPath();P.g.arc(P.X(x[i]),P.Y(y[i]+jit[i]),2,0,7);P.g.fill()}
+  P.line(z=>sg(a+b*z),C.y,2.6,-3.5,3.5,200);if(fit.ok)P.line(z=>sg(fit.a+fit.b*z),C.a,2.6,-3.5,3.5,200);P.text('— true curve   — fitted (MLE)',P.L+8,P.T+14,C.mu);
+  if(!fit.ok){$('c6tb').innerHTML='';$('c6st').innerHTML=stat('fit','failed','hot');$('c6rd').innerHTML=`The Newton fit did not converge: ${ev===0||ev===n?'there are no events (or no non-events) in this sample.':'the data are (nearly) separable or have too few events, so the MLE is at infinity.'}`;return}
+  const rows=[['β₀ (intercept)',a,fit.a,fit.se0],['β₁ (slope)',b,fit.b,fit.se1]];
+  $('c6tb').innerHTML='<table><tr><th>parameter</th><th>true</th><th>MLE</th><th>SE (inverse information)</th><th>95% Wald interval</th></tr>'+rows.map(r=>`<tr><td>${r[0]}</td><td class="n">${fmt(r[1])}</td><td class="n">${fmt(r[2])}</td><td class="n">${fmt(r[3])}</td><td class="n">[${fmt(r[2]-1.96*r[3])}, ${fmt(r[2]+1.96*r[3])}]</td></tr>`).join('')+'</table>';
+  $('c6st').innerHTML=stat('events',ev+' of '+n,ev<30?'hot':'ok')+stat('Newton iterations',fit.it,'in')+stat('log-likelihood',fmt(fit.ll),'')+stat('slope Wald coverage (n='+nn+')',pc(cov),Math.abs(cov-.95)<.03?'ok':'warn')+stat('fits that failed',pc(bad),bad>0?'hot':'ok');
+  $('c6rd').innerHTML=`${ev} events in ${n} rows. The slope estimate is ${fmt(fit.b)} ± ${fmt(fit.se1)} (true ${fmt(b)}). Newton converged in ${fit.it} iterations because the log-likelihood is concave. ${ev<30?'With so few events the slope is poorly determined (wide interval) however many rows you have: information comes from events, weighted by p(1−p).':''}${bad>0?' In '+pc(bad)+' of repeated samples the fit failed outright.':''}`}
+ $('c6go').onclick=sim;on('c6n c6a c6b',sim);sim();resizers.push(draw);})();
+
+/* ---------- Ch7 gamma shape MLE ---------- */
+(function(){const NL=[10,20,50,100,200,500];let cache=null;
+ function sim(){const a=val('c7a'),R=1500,res=NL.map(n=>{const v=new Float64Array(R);for(let r=0;r<R;r++){let s=0,sl=0;for(let i=0;i<n;i++){const x=gammaS(a);s+=x;sl+=Math.log(x)}v[r]=solveAlpha(Math.log(s/n)-sl/n)}return v});cache={a,res};draw()}
+ function draw(){if(!cache)return;const{a,res}=cache,k=val('c7n'),n=NL[k];$('c7nv').textContent=n;const asd=n=>Math.sqrt(a/(n*(a*trigamma(a)-1))),mm=res.map(mom),w=4*Math.max(mm[k].sd,asd(n));
+  hist($('c7cv'),res[k],Math.max(0,a-w),a+w*1.4,45,[{f:x=>normPdfAt(x,a,asd(n)),col:C.a}]).vline(a,C.y,'true α = '+fmt(a));
+  $('c7tb').innerHTML='<table><tr><th>n</th><th>average α̂</th><th>bias</th><th>bias (% of α)</th><th>simulated SE</th><th>asymptotic SE</th><th>sim ÷ asymptotic</th></tr>'+NL.map((nn,i)=>`<tr${i===k?' style="background:#171d30"':''}><td>${nn}</td><td class="n">${fmt(mm[i].m)}</td><td class="n">${fmt(mm[i].m-a)}</td><td class="n">${fmt(100*(mm[i].m-a)/a)}%</td><td class="n">${fmt(mm[i].sd)}</td><td class="n">${fmt(asd(nn))}</td><td class="n">${fmt(mm[i].sd/asd(nn))}</td></tr>`).join('')+'</table>';
+  $('c7rd').innerHTML=`At n = ${n} the MLE of the shape averages ${fmt(mm[k].m)} against a true ${fmt(a)}: a bias of ${fmt(100*(mm[k].m-a)/a)}%, upward, and the sampling distribution is right-skewed (skew ${fmt(mm[k].sk)}). Down the table, the bias falls roughly like 1/n and the SE like 1/√n, so the bias becomes negligible next to the SE once n is large. The MLE's guarantees are asymptotic, not small-sample, statements.`}
+ $('c7go').onclick=sim;$('c7a').addEventListener('change',sim);on('c7n',draw);sim();resizers.push(draw);})();
+
+/* ---------- Ch8 likelihood-ratio test ---------- */
+(function(){const NL=[10,20,50,100,200];
+ function draw(){const m=+$('c8m').value,n=NL[val('c8n')],p0=val('c8p')/100,R=4000,v=new Float64Array(R);$('c8nv').textContent=n;$('c8p').disabled=m!==0;
+  for(let r=0;r<R;r++){let L;
+   if(m===0){const k=binF(n,p0);L=2*(llb(k,n,k/n)-llb(k,n,p0))}
+   else if(m===1){const SS=2*gammaS((n-1)/2),s=SS/n;L=n*(s-1-Math.log(s))}
+   else{let sx=0,sl=0;for(let i=0;i<n;i++){const x=-Math.log(1-Math.random());sx+=x;sl+=Math.log(x)}const xb=sx/n,ml=sl/n,al=solveAlpha(Math.log(xb)-ml);L=2*n*((al*Math.log(al/xb)-lgamma(al)+(al-1)*ml-al)-(-Math.log(xb)-1))}
+   v[r]=Math.max(0,L)}
+  let rej=0;for(const x of v)if(x>3.8415)rej++;const mm=mom(v),hi=Math.max(pct(v,.995),6),srt=Float64Array.from(v).sort();let ks=0;for(let i=0;i<R;i++){const F=gamcdf(srt[i],.5,.5);ks=Math.max(ks,Math.abs((i+1)/R-F),Math.abs(i/R-F))}
+  const P=hist($('c8cv'),v,0,hi,40,[{f:x=>x<=0?0:gampdf(x,.5,.5),col:C.r}]);P.vline(3.8415,C.y,'3.84',true);
+  $('c8st').innerHTML=stat('type I error at 5% cutoff',pc(rej/R),Math.abs(rej/R-.05)<.012?'ok':'hot')+stat('mean of −2 log Λ',fmt(mm.m),'in')+stat('χ²₁ mean',1,'')+stat('95th percentile',fmt(pct(v,.95)),'warn')+stat('χ²₁ 95th percentile','3.841','')+stat('KS distance to χ²₁',fmt(ks),ks<.03?'ok':'hot');
+  $('c8rd').innerHTML=`Under the null the LR statistic has mean ${fmt(mm.m)} (χ²₁ says 1) and exceeds 3.841 in <b>${pc(rej/R)}</b> of data sets (nominal 5%). ${Math.abs(rej/R-.05)<.012?'Wilks’ approximation is working at this n.':'The approximation is poor here: '+(m===0?'with a discrete count and small n (or p₀ near the edge) the statistic is lumpy and the χ² is only roughly right.':'increase n.')}`}
+ on('c8m c8n c8p',draw);reg(draw);})();
+
+/* ---------- Ch9 sandwich ---------- */
+(function(){const NL=[20,50,100,500];
+ function draw(){const m=val('c9m'),f=val('c9f'),n=NL[val('c9n')],R=2000;$('c9nv').textContent=n;const xb=new Float64Array(R);let ms=0,rs=0,c1=0,c2=0;
+  for(let r=0;r<R;r++){let s=0,ss=0;for(let i=0;i<n;i++){const lam=f>1?gammaS(m/(f-1))*(f-1):m,x=poisS(lam);s+=x;ss+=x*x}const mean_=s/n,me=Math.sqrt(Math.max(mean_,1e-9)/n),rb=Math.sqrt(Math.max(0,(ss/n-mean_*mean_))/n);xb[r]=mean_;ms+=me;rs+=rb;if(Math.abs(mean_-m)<=1.96*me)c1++;if(Math.abs(mean_-m)<=1.96*rb)c2++}
+  const tsd=Math.sqrt(m*f/n),msd=Math.sqrt(m/n),w=4*Math.max(tsd,msd);
+  hist($('c9cv'),xb,m-w,m+w,45,[{f:x=>normPdfAt(x,m,msd),col:C.a},{f:x=>normPdfAt(x,m,tsd),col:C.r}]);
+  $('c9st').innerHTML=stat('true SD of the mean',fmt(tsd),'ok')+stat('average model-based SE',fmt(ms/R),'warn')+stat('average robust SE',fmt(rs/R),'ok')+stat('√φ',fmt(Math.sqrt(f)),'in')+stat('model-based coverage',pc(c1/R),c1/R<.9?'hot':'ok')+stat('robust coverage',pc(c2/R),Math.abs(c2/R-.95)<.03?'ok':'warn');
+  $('c9rd').innerHTML=f===1?'With φ = 1 the data really are Poisson, so the model-based and robust SEs agree. Now raise the dispersion.':`With φ = ${fmt(f)} the Poisson-model SE (${fmt(ms/R)}) is too small by about √φ = ${fmt(Math.sqrt(f))}: the “95%” interval built from it covers only <b>${pc(c1/R)}</b>. The sandwich SE (${fmt(rs/R)}) uses the observed variability instead of assuming variance = mean, and covers ${pc(c2/R)}. The estimate of the mean is the same in both; only the claimed uncertainty differs.`}
+ on('c9m c9f c9n',draw);reg(draw);})();
+
+/* ---------- Ch10 censoring ---------- */
+(function(){const NL=[20,50,100,200,500];
+ function draw(){const lam=val('c10l'),cm=val('c10f'),n=NL[val('c10n')],R=3000,c=cm/lam;$('c10nv').textContent=n;
+  const A=new Float64Array(R),B=new Float64Array(R),Cc=new Float64Array(R);
+  for(let r=0;r<R;r++){let d=0,exp_=0,expE=0;for(let i=0;i<n;i++){const T=-Math.log(1-Math.random())/lam;if(T<=c){d++;exp_+=T;expE+=T}else exp_+=c}A[r]=exp_>0?d/exp_:0;B[r]=exp_>0?n/exp_:0;Cc[r]=expE>0?d/expE:0}
+  const arrs=[A,B,Cc],nm=['MLE: events ÷ exposure','naive 1: treat censored as events','naive 2: drop censored accounts'],cols=[C.g,C.r,C.a],ms=arrs.map(mom),sdm=Math.max(...ms.map(m=>m.sd)),w=4*Math.max(sdm,.05*lam);
+  const hiX=Math.max(lam+w,...ms.map(m=>m.m+3*m.sd));histLines($('c10cv'),arrs,cols,0,hiX,70,[[lam,C.y,'true λ = '+fmt(lam)]]);
+  $('c10tb').innerHTML='<table><tr><th>estimator</th><th>average</th><th>bias</th><th>SD</th><th>RMSE</th></tr>'+ms.map((m,i)=>{const b=m.m-lam;return`<tr><td><span style="color:${cols[i]}">■</span> ${nm[i]}</td><td class="n">${fmt(m.m)}</td><td class="n">${fmt(b)}</td><td class="n">${fmt(m.sd)}</td><td class="n">${fmt(Math.sqrt(b*b+m.sd*m.sd))}</td></tr>`}).join('')+'</table>';
+  const pc_=Math.exp(-lam*c),th=lam/Math.sqrt(n*(1-pc_));
+  $('c10rd').innerHTML=`About ${pc(pc_)} of accounts are censored. The MLE (events ÷ total exposure) is centred on λ = ${fmt(lam)} with SD ${fmt(ms[0].sd)} (Fisher information with censoring predicts ${fmt(th)}). Treating censored accounts as if they had defaulted at the end of follow-up gives ${fmt(ms[1].m)}: <b>${ms[1].m>lam?'too high':'too low'}</b>. Dropping them keeps only the short lifetimes and gives ${fmt(ms[2].m)}: <b>${ms[2].m>lam?'too high':'too low'}</b>. Lengthen the follow-up and the shortcuts converge to the truth, because there is less censoring to mishandle.`}
+ on('c10l c10f c10n',draw);reg(draw);})();
+
+/* ---------- Ch11 separation and penalty ---------- */
+(function(){const X=[-2.2,-1.7,-1.3,-.9,-.6,-.2,.3,.7,1.1,1.5,1.9,2.4],LAM=[0,.01,.03,.1,.3,1,3,10],sg=z=>1/(1+Math.exp(-z));
+ function fit(x,y,lam){let a=0,b=0,conv=false;for(let it=0;it<30;it++){let g0=0,g1=0,h00=0,h01=0,h11=0;for(let i=0;i<x.length;i++){const p=sg(a+b*x[i]),w=Math.max(p*(1-p),1e-12),r=y[i]-p;g0+=r;g1+=r*x[i];h00+=w;h01+=w*x[i];h11+=w*x[i]*x[i]}g1-=lam*b;h11+=lam;const det=h00*h11-h01*h01;if(!(det>0))break;let da=(h11*g0-h01*g1)/det,db=(-h01*g0+h00*g1)/det;a+=da;b+=db;if(Math.abs(b)>40){b=Math.sign(b)*40;break}if(Math.abs(da)+Math.abs(db)<1e-9){conv=true;break}}
+  let ll=0;for(let i=0;i<x.length;i++){const e=a+b*x[i];ll+=y[i]*e-(e>0?e+Math.log1p(Math.exp(-e)):Math.log1p(Math.exp(e)))}return{a,b,ll,conv}}
+ function draw(){const ds=+$('c11d').value,y=[0,0,0,0,0,0,1,1,1,1,1,1];if(ds===1){y[5]=1;y[6]=0}const li=val('c11l'),lam=LAM[li];$('c11lv').textContent=lam;
+  const f=fit(X,y,lam),P=mk($('c11cv'),-3,3,1.15,{y0:-.15});
+  P.line(z=>sg(f.a+f.b*z),C.a,2.6,-3,3,200);dots(P,X.map((x,i)=>[x,y[i]]),C.y,4.5);P.text('data and fitted probability',P.L+8,P.T+14,C.mu);
+  const path=LAM.slice(1).map(l=>[Math.log10(l),fit(X,y,l).b]),f0=fit(X,y,0),ymax=Math.max(...path.map(p=>p[1]),1)*1.15;
+  const Q=mk($('c11cv2'),-2.3,1.3,ymax,{noGrid:true});customGrid(Q,[[-2,'0.01'],[-1,'0.1'],[0,'1'],[1,'10']],niceTicks(0,ymax,4));poly(Q,path,C.a,2.4);dots(Q,path,C.a,3.5);
+  if(lam>0)dots(Q,[[Math.log10(lam),f.b]],C.y,6);Q.text('fitted slope vs penalty λ (log scale)',Q.L+8,Q.T+14,C.mu);
+  const mleFinite=ds===1;Q.text(mleFinite?'λ = 0 MLE: '+fmt(f0.b):'λ = 0: slope → ∞ (diverges)',Q.w-14,Q.T+30,mleFinite?C.g:C.r,'right');
+  const dis=lam===0&&!mleFinite;
+  $('c11st').innerHTML=stat('penalty λ',lam,'in')+stat('slope β₁',dis?'→ ∞ (reached '+fmt(f.b)+')':fmt(f.b),dis?'hot':'ok')+stat('intercept β₀',fmt(f.a),'')+stat('log-likelihood',fmt(f.ll),'')+stat('mean log-loss',fmt(-f.ll/12),'warn')+stat('Newton converged',f.conv?'yes':'no',f.conv?'ok':'hot');
+  $('c11rd').innerHTML=dis?`The two classes are perfectly separated, so the likelihood keeps rising as the slope grows: Newton's iterations never settle (here stopped at ${fmt(f.b)}). Software typically reports a huge coefficient with an enormous SE. Raise the penalty: the slope becomes finite at ${fmt(fit(X,y,.01).b)} already for λ = 0.01.`:`With λ = ${lam} the slope is ${fmt(f.b)}${ds===1&&lam===0?' (a genuine MLE exists because the classes overlap)':''}. Larger penalties shrink the slope toward 0 (flatter curve, higher training loss), exactly the bias–variance trade of ridge / MAP estimation. The slope estimate when λ → 0 on separable data is only limited by how long you let the optimiser run.`}
+ on('c11d c11l',draw);reg(draw);})();
+
+const QZ=[
+{l:'Beginner',q:'What is the likelihood function?',o:['The probability of the parameter given the data','The probability (density) of the observed data viewed as a function of the parameter','The posterior distribution','The sampling distribution of the estimator'],a:1,e:'L(θ) = P(data | θ) with the data held fixed and θ varying.'},
+{l:'Beginner',q:'Does a likelihood function integrate to 1 over the parameter?',o:['Yes, always','No. It need not integrate to 1 and is not a probability distribution over θ','Only for the normal model','Only when n is large'],a:1,e:'For the binomial, ∫L(p)dp = 1/(n+1). Converting to a distribution over θ needs a prior.'},
+{l:'Intermediate',q:'You observe 7 successes in 20 Bernoulli trials. The MLE of p is…',o:['0.30','0.35','0.40','0.50'],a:1,e:'p̂ = k/n = 7/20 = 0.35.'},
+{l:'Intermediate',q:'The MLE of the normal variance σ² (mean unknown) divides the sum of squares by…',o:['n − 1','n','n + 1','n − 2'],a:1,e:'The MLE is SS/n. It is biased downward (by σ²/n), though consistent; the unbiased version uses n − 1.'},
+{l:'Intermediate',q:'Exponential data have x̄ = 4. The MLE of the rate λ is…',o:['4','2','0.25','0.5'],a:2,e:'λ̂ = 1/x̄ = 0.25.'},
+{l:'Intermediate',q:'What is the value of the score function at the MLE?',o:['1','The Fisher information','0','The log-likelihood'],a:2,e:'The MLE solves S(θ̂) = 0: the slope of the log-likelihood is flat at its maximum.'},
+{l:'Intermediate',q:'n = 100 Bernoulli trials, p̂ = 0.1. The SE from Fisher information is…',o:['0.01','0.03','0.09','0.30'],a:1,e:'√(p̂(1−p̂)/n) = √(0.09/100) = 0.03.'},
+{l:'Advanced',q:'The MLE of a Bernoulli p is 0.2. By invariance, the MLE of the odds p/(1−p) is…',o:['0.20','0.25','0.80','Cannot be determined'],a:1,e:'g(θ̂) = 0.2/0.8 = 0.25.'},
+{l:'Advanced',q:'Which statement about confidence intervals for a proportion is correct?',o:['The Wald interval is invariant under reparameterisation','The likelihood-ratio and Wilson intervals behave well near 0 or 1, while the Wald interval collapses at p̂ = 0','All three always have exactly 95% coverage','The Wald interval is always the widest'],a:1,e:'Wald uses the SE at p̂, which is 0 when p̂ = 0. LR and score intervals use the likelihood or the SE at the tested value.'},
+{l:'Advanced',q:'Wilks’ theorem: under H₀ with one restriction, 2[ℓ(θ̂) − ℓ(θ̂₀)] is approximately…',o:['Normal(0,1)','χ² with 1 degree of freedom (cutoff 3.84 at 5%)','t with n − 1 degrees of freedom','Uniform'],a:1,e:'It is asymptotically χ²_q with q equal to the number of restrictions.'},
+{l:'Advanced',q:'Newton–Raphson on the Cauchy location likelihood may fail because…',o:['The log-likelihood is convex','The log-likelihood has several local maxima, so the answer depends on the starting value','The Cauchy has no density','Newton never converges for the Cauchy'],a:1,e:'Use a robust start such as the sample median and try several starts.'},
+{l:'Advanced',q:'In logistic regression, perfect separation means…',o:['The MLE is exactly zero','The MLE does not exist (the slope diverges to infinity); use a penalty or Firth’s method','The model fits perfectly and is therefore ideal','The standard errors are unusually small and trustworthy'],a:1,e:'The log-likelihood increases without bound as the slope grows.'},
+{l:'Advanced',q:'Which is true of the MLE?',o:['It is always unbiased','It is consistent, asymptotically normal and efficient, but can be biased in small samples','It is efficient in every sample size','It never depends on the model'],a:1,e:'Its guarantees are large-n. The gamma shape MLE, for example, is biased upward at small n.'},
+{l:'Expert',q:'Counts are modelled as Poisson but are overdispersed with variance = 4 × mean. The model-based SE of the mean is too small by a factor of about…',o:['1','2','4','16'],a:1,e:'SE scales with the square root of the variance: √4 = 2. The sandwich (robust) SE fixes this.'},
+{l:'Expert',q:'With right-censored exponential lifetimes, the MLE of the rate is…',o:['n divided by the sum of observed times, treating censored times as events','The number of events divided by the total observed exposure time','The mean of the event times only','The reciprocal of the largest time'],a:1,e:'ℓ(λ) = d log λ − λΣtᵢ gives λ̂ = d/Σtᵢ: events over exposure.'},
+{l:'Expert',q:'Observed information, compared with expected (Fisher) information, is…',o:['The curvature of the actual sample log-likelihood at the MLE; the two agree asymptotically','Always identical to Fisher information','Unrelated to the standard error','Only defined for discrete data'],a:0,e:'Observed information is −ℓ″(θ̂) from your data; its inverse square root is the usual reported SE.'},
+{l:'Expert',q:'Adding a ridge penalty (λ/2)β² to a logistic log-likelihood is equivalent to…',o:['Removing the intercept','MAP estimation under a Gaussian prior on β: it shrinks the estimate toward 0 and keeps it finite under separation','Maximum likelihood with more data','Ignoring the weak predictors'],a:1,e:'The penalised maximiser is the posterior mode under a normal prior, a bias–variance trade-off.'},
+{l:'Expert',q:'The MLE of an exponential rate is λ̂ = 1/X̄. For n = 11 its expected value is about…',o:['λ','1.1 λ','0.9 λ','2 λ'],a:1,e:'E[1/X̄] = λ n/(n−1) = λ × 11/10 = 1.1 λ: the MLE is biased upward at small n.'}
+];
+(function(){const st=store.get('ml_quiz',{});
+ function render(){const box=$('quiz');box.innerHTML='';
+  QZ.forEach((q,i)=>{const d=document.createElement('div');d.className='q'+(st[i]!=null?' done':'');d.innerHTML=`<div class="qh">Q${i+1} · ${q.l}</div><div style="margin:4px 0 6px"><b>${q.q}</b></div>`;
+   q.o.forEach((o,j)=>{const b=document.createElement('button');b.className='opt';b.textContent=o;if(st[i]!=null){if(j===q.a)b.classList.add('good');else if(j===st[i])b.classList.add('bad')}b.onclick=()=>{if(st[i]!=null)return;st[i]=j;store.set('ml_quiz',st);render();meter()};d.appendChild(b)});
+   const e=document.createElement('div');e.className='ex';e.innerHTML=(st[i]===q.a?'✅ ':'❌ ')+q.e;d.appendChild(e);box.appendChild(d)});
+  const ans=Object.keys(st).length,ok=QZ.filter((q,i)=>st[i]===q.a).length;
+  $('qscore').innerHTML=stat('answered',ans+' / '+QZ.length,'in')+stat('correct',ok,'ok')+stat('score',ans?Math.round(100*ok/ans)+'%':'—',ok/Math.max(ans,1)>=.8?'ok':'warn')+stat('verdict',ans<QZ.length?'keep going':ok>=16?'likelihood master':ok>=13?'strong':'review ch. 2–8','')}
+ $('qreset').onclick=()=>{Object.keys(st).forEach(k=>delete st[k]);store.set('ml_quiz',st);render();meter()};
+ window.__qst=st;render();})();
+const CHK=['Define the likelihood and explain why it is not a probability distribution over θ.','Write ℓ(θ), the score and the MLE for Bernoulli, Poisson, exponential and normal models.','Explain invariance of the MLE and use it for an odds or a mean lifetime.','Define Fisher information and derive SE ≈ 1/√(nI(θ̂)).','Distinguish observed from expected information.','Build Wald, likelihood-ratio and score (Wilson) intervals and say when they differ.','Explain the saw-tooth in the coverage of discrete intervals.','Run Newton–Raphson by hand for one step and name two ways it fails.','Fit a logistic regression by IRLS and say where the SEs come from.','Recognise perfect separation and name the fixes (penalty, Firth).','State the large-n properties of the MLE and its small-sample bias.','State Wilks’ theorem and use the 3.84 cutoff; connect it to AIC.','Explain the sandwich estimator and when model-based SEs are too small.','Write the censored likelihood and explain why the naive shortcuts are biased.'];
+(function(){const st=store.get('ml_chk',{}),box=$('chk');CHK.forEach((t,i)=>{const l=document.createElement('label'),c=document.createElement('input');c.type='checkbox';c.checked=!!st[i];c.onchange=()=>{st[i]=c.checked;store.set('ml_chk',st);meter()};l.appendChild(c);const s=document.createElement('span');s.textContent=t;l.appendChild(s);box.appendChild(l)});window.__cst=st;})();
+function meter(){const q=window.__qst||{},c=window.__cst||{};const ok=QZ.filter((x,i)=>q[i]===x.a).length,ck=Object.values(c).filter(Boolean).length;const p=Math.round(100*(.6*ok/QZ.length+.4*ck/CHK.length));$('mtxt').textContent='Mastery: '+p+'%  (exam + checklist)';$('mbar').style.width=p+'%';store.set('mastery_ml',p)}
+meter();
+
+
+/* ---------- Navigation ---------- */
+(function(){const nav=$('nav');let html='';
+ document.querySelectorAll('main .part, main section.ch').forEach(el=>{if(el.classList.contains('part'))html+=`<div class="pt">${el.textContent}</div>`;else{const h=el.querySelector('h2'),num=h.querySelector('.num').textContent,t=Array.from(h.childNodes).filter(n=>n.nodeType===3).map(n=>n.textContent).join('').trim();html+=`<a href="#${el.id}" data-id="${el.id}">${num}. ${t}</a>`}});
+ nav.innerHTML=html;const links=nav.querySelectorAll('a'),io=new IntersectionObserver(es=>{es.forEach(e=>{if(e.isIntersecting)links.forEach(a=>a.classList.toggle('on',a.dataset.id===e.target.id))})},{rootMargin:'-20% 0px -70% 0px'});
+ document.querySelectorAll('section.ch').forEach(s=>io.observe(s));
+ $('menu').onclick=()=>$('side').classList.toggle('open');nav.addEventListener('click',e=>{if(e.target.tagName==='A')$('side').classList.remove('open')});
+ window.addEventListener('scroll',()=>{const h=document.documentElement;$('prog').style.width=(100*h.scrollTop/(h.scrollHeight-h.clientHeight))+'%'},{passive:true});})();
+</script>
+</body>
+</html>
