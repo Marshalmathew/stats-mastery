@@ -1,0 +1,916 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>P-Value Mastery — from zero to expert</title>
+<style>
+:root{--bg:#0b0e17;--panel:#121726;--panel2:#171d30;--line:#232a3d;--fg:#e8ebf5;--mu:#8a93ab;--a:#6ea8ff;--r:#ff6b81;--y:#ffd166;--g:#4ade80;--p:#c084fc;--t:#5eead4}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;background:var(--bg);color:var(--fg);font:16px/1.7 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+a{color:var(--a)}
+#prog{position:fixed;top:0;left:0;height:3px;background:linear-gradient(90deg,var(--a),var(--p),var(--r));width:0;z-index:50}
+.side{position:fixed;left:0;top:0;bottom:0;width:282px;background:#0e1220;border-right:1px solid var(--line);overflow:auto;padding:18px 14px 90px;z-index:40;transition:transform .25s}
+.side h1{font-size:15px;margin:0 0 2px;letter-spacing:.3px}
+.side small{color:var(--mu)}
+.side .pt{margin:16px 0 4px;font-size:11px;text-transform:uppercase;letter-spacing:1.3px;color:var(--p)}
+.side a{display:block;color:var(--mu);text-decoration:none;padding:5px 9px;border-radius:7px;font-size:13.5px;line-height:1.35}
+.side a:hover{background:var(--panel);color:var(--fg)}
+.side a.on{background:var(--panel2);color:var(--fg);box-shadow:inset 3px 0 var(--a)}
+.meter{position:fixed;left:0;bottom:0;width:282px;background:#0e1220;border-top:1px solid var(--line);padding:10px 16px;z-index:41;font-size:12px;color:var(--mu)}
+.meter .bar{height:7px;background:var(--line);border-radius:6px;margin-top:5px;overflow:hidden}
+.meter .bar i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--g),var(--t));transition:width .4s}
+#menu{display:none;position:fixed;top:10px;left:10px;z-index:60;background:var(--panel2);color:var(--fg);border:1px solid var(--line);border-radius:9px;padding:7px 12px;font-size:14px;cursor:pointer}
+main{margin-left:282px;padding:0 34px 120px;max-width:1080px}
+.hero{padding:70px 0 30px}
+.hero h1{font-size:clamp(34px,5vw,58px);line-height:1.08;margin:0 0 14px;background:linear-gradient(100deg,#fff,var(--a) 45%,var(--p));-webkit-background-clip:text;background-clip:text;color:transparent}
+.hero p{font-size:19px;color:#c3c9dc;max-width:760px}
+.chips{display:flex;flex-wrap:wrap;gap:8px;margin:18px 0}
+.chip{border:1px solid var(--line);background:var(--panel);padding:5px 12px;border-radius:99px;font-size:13px;color:var(--mu)}
+.chip b{color:var(--fg)}
+.part{margin:90px 0 0;padding-top:22px;border-top:1px solid var(--line);font-size:12px;letter-spacing:2px;text-transform:uppercase;color:var(--p)}
+section.ch{padding-top:30px;scroll-margin-top:10px}
+h2{font-size:30px;line-height:1.2;margin:10px 0 8px;display:flex;gap:12px;align-items:center;flex-wrap:wrap}
+h2 .num{display:inline-grid;place-items:center;width:40px;height:40px;border-radius:12px;background:var(--panel2);border:1px solid var(--line);font-size:18px;color:var(--a)}
+.lvl{font-size:11px;font-weight:600;letter-spacing:.8px;text-transform:uppercase;padding:3px 9px;border-radius:99px;border:1px solid}
+.lvl.b{color:var(--g);border-color:#1f5c3a}.lvl.i{color:var(--a);border-color:#244a85}.lvl.a{color:var(--y);border-color:#6b5420}.lvl.e{color:var(--r);border-color:#7a2c3a}
+h3{font-size:19px;margin:30px 0 6px;color:#fff}
+p{margin:10px 0}
+li{margin:5px 0}
+code,.f{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace}
+code{background:var(--panel2);padding:1px 6px;border-radius:5px;font-size:.9em}
+.f{display:block;background:#0e1322;border:1px solid var(--line);border-left:3px solid var(--a);padding:12px 16px;border-radius:9px;margin:14px 0;overflow-x:auto;font-size:15px;color:#dbe4ff}
+.co{border-radius:12px;padding:13px 17px;margin:16px 0;border:1px solid var(--line);background:var(--panel)}
+.co>b:first-child{display:block;margin-bottom:2px;font-size:12px;letter-spacing:1px;text-transform:uppercase}
+.co.def{border-left:4px solid var(--a)}.co.def>b:first-child{color:var(--a)}
+.co.warn{border-left:4px solid var(--r)}.co.warn>b:first-child{color:var(--r)}
+.co.tip{border-left:4px solid var(--g)}.co.tip>b:first-child{color:var(--g)}
+.co.key{border-left:4px solid var(--y);background:#171608}.co.key>b:first-child{color:var(--y)}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:18px 20px;margin:22px 0;box-shadow:0 8px 30px rgba(0,0,0,.25)}
+.card>h4{margin:0 0 3px;font-size:13px;letter-spacing:1.2px;text-transform:uppercase;color:var(--t)}
+.card>p.sub{margin:0 0 12px;color:var(--mu);font-size:14.5px}
+.ctl{display:flex;flex-wrap:wrap;gap:10px 22px;align-items:center;margin:8px 0 10px}
+.ctl label{display:flex;gap:8px;align-items:center;font-size:14px;color:#c3c9dc}
+.ctl output{min-width:38px;font-family:ui-monospace,monospace;color:var(--y);font-size:13px}
+input[type=range]{accent-color:var(--a);width:150px}
+select,input[type=number],input[type=text],textarea{background:#0e1322;color:var(--fg);border:1px solid var(--line);border-radius:8px;padding:6px 9px;font:inherit;font-size:14px}
+textarea{width:100%;font-family:ui-monospace,monospace;font-size:13px}
+button{background:linear-gradient(180deg,#2c4a80,#233b68);color:#fff;border:1px solid #3a5a98;border-radius:9px;padding:7px 14px;font:inherit;font-size:14px;cursor:pointer}
+button:hover{filter:brightness(1.15)}
+button.alt{background:var(--panel2);border-color:var(--line);color:var(--fg)}
+canvas{width:100%;height:270px;display:block;background:#0e1322;border:1px solid var(--line);border-radius:10px;margin-top:6px}
+canvas.sm{height:200px}canvas.tl{height:330px}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(118px,1fr));gap:9px;margin:12px 0}
+.stat{background:#0e1322;border:1px solid var(--line);border-radius:10px;padding:8px 11px}
+.stat b{display:block;font-size:19px;font-family:ui-monospace,monospace}
+.stat span{font-size:11.5px;color:var(--mu);text-transform:uppercase;letter-spacing:.7px}
+.stat.hot b{color:var(--r)}.stat.ok b{color:var(--g)}.stat.warn b{color:var(--y)}.stat.in b{color:var(--a)}
+.read{margin:8px 0 0;padding:10px 14px;background:#0e1322;border:1px dashed #33406a;border-radius:10px;font-size:14.5px;color:#d3dbf3}
+table{border-collapse:collapse;width:100%;margin:12px 0;font-size:14px}
+th,td{border:1px solid var(--line);padding:7px 10px;text-align:left;vertical-align:top}
+th{background:var(--panel2);font-size:12px;text-transform:uppercase;letter-spacing:.6px;color:var(--mu)}
+td.n{font-family:ui-monospace,monospace;text-align:right}
+.tw{overflow-x:auto}
+.pill{display:inline-block;padding:1px 9px;border-radius:99px;font-size:12px;font-weight:600}
+.pill.r{background:#3a1520;color:var(--r)}.pill.g{background:#10321f;color:var(--g)}.pill.y{background:#3a2f0e;color:var(--y)}.pill.m{background:#202637;color:var(--mu)}
+details{background:var(--panel);border:1px solid var(--line);border-radius:11px;padding:9px 15px;margin:9px 0}
+details summary{cursor:pointer;font-weight:600}
+details[open] summary{margin-bottom:5px}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.three{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+.q{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:14px 18px;margin:14px 0}
+.q .qh{font-size:12px;letter-spacing:1px;text-transform:uppercase;color:var(--mu)}
+.q .opt{display:block;width:100%;text-align:left;margin:6px 0;background:#0e1322;border:1px solid var(--line);color:var(--fg);border-radius:9px;padding:9px 12px}
+.q .opt.good{border-color:var(--g);background:#0e2418}.q .opt.bad{border-color:var(--r);background:#2a1119}
+.q .ex{display:none;margin-top:8px;font-size:14.5px;color:#c3c9dc}
+.q.done .ex{display:block}
+.chk label{display:flex;gap:10px;align-items:flex-start;padding:6px 0;cursor:pointer}
+.chk input{margin-top:6px;accent-color:var(--g);width:17px;height:17px}
+.legend{display:flex;gap:14px;flex-wrap:wrap;font-size:13px;color:var(--mu);margin-top:6px}
+.legend i{display:inline-block;width:11px;height:11px;border-radius:50%;margin-right:5px;vertical-align:-1px}
+@media(max-width:900px){
+ .side{transform:translateX(-100%)}.side.open{transform:none}.meter{display:none}
+ #menu{display:block}main{margin-left:0;padding:0 16px 100px}.two,.three{grid-template-columns:1fr}
+ .hero{padding-top:60px}
+}
+</style>
+</head>
+<body>
+<div id="prog"></div>
+<button id="menu" aria-label="Contents">☰ Contents</button>
+<nav class="side" id="side">
+ <a href="index.html" style="color:#5eead4;padding-left:0;margin-bottom:6px">← All courses</a><h1>P-Value Mastery</h1><small>zero → expert · 19 chapters · 20 labs</small>
+ <div id="nav"></div>
+</nav>
+<div class="meter"><div id="mtxt">Mastery: 0%</div><div class="bar"><i id="mbar"></i></div></div>
+
+<main>
+<header class="hero">
+ <h1>The P-Value, completely.</h1>
+ <p>From “what even is this number?” to false-positive risk, Bayes factors, sequential testing and the traps that fool experienced analysts. Everything runs in your browser — every concept has a lab you can break.</p>
+ <div class="chips">
+  <span class="chip"><b>Level 1</b> Foundations</span><span class="chip"><b>Level 2</b> Everyday tests</span><span class="chip"><b>Level 3</b> Errors &amp; power</span>
+  <span class="chip"><b>Level 4</b> How p-values fail</span><span class="chip"><b>Level 5</b> Expert toolkit</span>
+ </div>
+ <div class="co tip"><b>How to use this</b>Read each chapter, then <em>touch the lab before moving on</em>. The labs are the course; the text just tells you what to look for. Chapter 19 has a graded exam and a mastery checklist — your progress saves in this browser.</div>
+</header>
+
+<!-- ============ PART I ============ -->
+<div class="part">Part I · Foundations</div>
+
+<section class="ch" id="c1">
+<h2><span class="num">1</span>The big idea: surprise under a skeptic’s assumption <span class="lvl b">Beginner</span></h2>
+<p>A friend hands you a coin and swears it’s fair. You flip it 20 times and get <b>15 heads</b>. Suspicious? Probably a bit. But how suspicious? Fair coins don’t give exactly 10 heads every time — randomness wiggles. We need a way to measure <em>how surprising</em> the result is <em>if the coin really were fair</em>.</p>
+<p>That is the entire idea of a p-value:</p>
+<div class="co def"><b>Definition (plain English)</b>The p-value is the probability of seeing a result <u>at least as extreme as the one you got</u>, <u>assuming the skeptic’s hypothesis (the “null”) is true</u>.</div>
+<p>Notice the two moving parts. <b>“Assuming the null is true”</b> — we build an imaginary world where nothing interesting is happening. <b>“At least as extreme”</b> — we count the observed result <em>and everything more dramatic</em>, because any single outcome is improbable (one exact sequence of 20 flips has probability ≈ 1 in a million, even a perfectly typical one).</p>
+
+<div class="card">
+ <h4>Lab 1 · Is this coin fair?</h4>
+ <p class="sub">Bars are the probability of each head-count if the coin is fair. Red bars = outcomes at least as extreme as yours. The p-value is the red area.</p>
+ <div class="ctl">
+  <label>Flips <input type="range" id="c1n" min="5" max="200" value="20"><output id="c1nv"></output></label>
+  <label>Heads observed <input type="range" id="c1k" min="0" max="20" value="15"><output id="c1kv"></output></label>
+  <label>Test <select id="c1m"><option value="two">two-sided (different from fair)</option><option value="greater">one-sided (too many heads)</option><option value="less">one-sided (too few heads)</option></select></label>
+  <button id="c1sim">Flip a truly fair coin</button>
+ </div>
+ <canvas id="c1cv"></canvas>
+ <div class="stats" id="c1st"></div><div class="read" id="c1rd"></div>
+</div>
+
+<p><b>Things to try.</b> (1) 20 flips: 14 heads gives p ≈ 0.115 — unremarkable. 15 heads gives p ≈ 0.041, 16 gives ≈ 0.012. (2) Set 200 flips and 110 heads: that’s the same 55% heads rate but p ≈ 0.18 — <em>more data would make the same rate convincing</em>. (3) Press “Flip a truly fair coin” many times — notice how often a perfectly fair coin yields p &lt; 0.05 (about 1 time in 20).</p>
+<div class="co key"><b>The sentence to tattoo on your brain</b>A p-value is about <em>the data, given a hypothesis</em>: P(data this extreme | H₀). It is <u>not</u> “the probability H₀ is true” — that would be P(H₀ | data), a different quantity (Chapter 14 shows the gap can be huge).</div>
+</section>
+
+<section class="ch" id="c2">
+<h2><span class="num">2</span>The formal machinery <span class="lvl b">Beginner</span></h2>
+<p>Every p-value, from a coin flip to a Cox regression, comes from the same six-step recipe:</p>
+<ol>
+ <li><b>State the hypotheses.</b> H₀ (the null: no effect, no difference, coefficient = 0) and H₁ (the alternative).</li>
+ <li><b>Pick a test statistic T</b> — one number that summarises how far the data are from H₀ (a difference in means, a z-score, a χ²…).</li>
+ <li><b>Know the null distribution of T</b> — how T behaves across repeated experiments <em>if H₀ were true</em>. This is the heart of the whole thing.</li>
+ <li><b>Compute T from your data</b>: t<sub>obs</sub>.</li>
+ <li><b>Compute the p-value</b> as the tail area of the null distribution beyond t<sub>obs</sub>.</li>
+ <li><b>Decide and report</b>: compare with a pre-chosen α, <em>and</em> report the effect size and a confidence interval.</li>
+</ol>
+<div class="f">right-tailed:  p = P( T ≥ t_obs | H₀ )<br>left-tailed:   p = P( T ≤ t_obs | H₀ )<br>two-sided:     p = P( |T| ≥ |t_obs| | H₀ )   (= 2 × one tail for a symmetric T)</div>
+<h3>The usual test statistics and their null worlds</h3>
+<div class="tw"><table>
+<tr><th>Statistic</th><th>Formula</th><th>Null distribution</th><th>Typical use</th></tr>
+<tr><td>z</td><td><code>(x̄ − μ₀) / (σ/√n)</code></td><td>Normal(0,1)</td><td>Known σ, large n, proportions</td></tr>
+<tr><td>t</td><td><code>(x̄ − μ₀) / (s/√n)</code></td><td>Student t, df = n−1</td><td>Means with estimated σ</td></tr>
+<tr><td>χ²</td><td><code>Σ (O−E)²/E</code></td><td>Chi-square, df=(r−1)(c−1)</td><td>Counts, tables, goodness of fit</td></tr>
+<tr><td>F</td><td><code>MS<sub>between</sub> / MS<sub>within</sub></code></td><td>F(d₁,d₂)</td><td>ANOVA, comparing nested regressions</td></tr>
+<tr><td>LR</td><td><code>2(ℓ₁ − ℓ₀)</code></td><td>χ² (asymptotically)</td><td>Maximum-likelihood models</td></tr>
+</table></div>
+<div class="co tip"><b>Mental model</b>Statistic = “signal ÷ noise”. A big signal relative to the noise you’d expect from randomness alone → far out in the tail → small p. Everything in statistics is about getting the <em>noise</em> (the null distribution) right.</div>
+</section>
+
+<section class="ch" id="c3">
+<h2><span class="num">3</span>Seeing the p-value: the null world <span class="lvl b">Beginner</span></h2>
+<p>Here is the most useful way to understand p-values: <b>simulate the null world</b>. Run 10,000 imaginary experiments where H₀ is true, compute the test statistic each time, and ask what fraction look at least as extreme as yours. That fraction <em>is</em> the p-value — the formulas are just a shortcut for this simulation.</p>
+<div class="card">
+ <h4>Lab 2 · The null distribution and its tails</h4>
+ <p class="sub">Drag your observed z-score. The curve is how z behaves when H₀ is true. Then simulate 10,000 null experiments and compare the empirical fraction with the exact tail area.</p>
+ <div class="ctl">
+  <label>Observed z <input type="range" id="c2z" min="-4" max="4" step="0.01" value="2.1"><output id="c2zv"></output></label>
+  <label>Tail <select id="c2m"><option value="two">two-sided</option><option value="right">right</option><option value="left">left</option></select></label>
+  <button id="c2sim">Simulate 10,000 null experiments</button><button class="alt" id="c2clr">Clear</button>
+ </div>
+ <canvas id="c2cv"></canvas><div class="stats" id="c2st"></div><div class="read" id="c2rd"></div>
+</div>
+<h3>Landmarks worth memorising</h3>
+<div class="tw"><table>
+<tr><th>|z|</th><th>two-sided p</th><th>feel</th></tr>
+<tr><td class="n">1.00</td><td class="n">0.317</td><td>Nothing to see — happens 1 time in 3</td></tr>
+<tr><td class="n">1.645</td><td class="n">0.100</td><td>Mild</td></tr>
+<tr><td class="n">1.96</td><td class="n">0.050</td><td>The famous 5% line</td></tr>
+<tr><td class="n">2.58</td><td class="n">0.010</td><td>1 in 100</td></tr>
+<tr><td class="n">3.29</td><td class="n">0.001</td><td>1 in 1,000</td></tr>
+<tr><td class="n">5.00</td><td class="n">5.7×10⁻⁷</td><td>“5 sigma” (physics discovery standard uses the one-sided 2.9×10⁻⁷)</td></tr>
+</table></div>
+</section>
+
+<section class="ch" id="c4">
+<h2><span class="num">4</span>One-sided, two-sided, α, and decisions <span class="lvl b">Beginner</span></h2>
+<h3>One-sided vs two-sided</h3>
+<p>If you ask “is the new fraud rule <em>different</em> from the old one?” extremes in <b>both</b> directions count as evidence → two-sided. If you ask only “is it <em>better</em>?” and a worse result would be treated the same as no result → one-sided. When the observed direction agrees with your prediction, <code>p<sub>one</sub> = p<sub>two</sub> / 2</code>. That halving is tempting, which is exactly why you must choose the direction <u>before</u> looking. Switching to one-sided after seeing the data is a quiet form of p-hacking. Default to two-sided unless there’s a genuine, pre-declared reason.</p>
+<h3>The significance level α and the decision rule</h3>
+<p>In the Neyman–Pearson framework you fix <b>α</b> in advance (commonly 0.05) — the long-run false-alarm rate you’re willing to tolerate — and then: <b>if p ≤ α, reject H₀</b>; otherwise <b>fail to reject</b>. Never “accept H₀”: not finding evidence isn’t finding evidence of absence (Chapter 11).</p>
+<div class="co def"><b>Two traditions, often mashed together</b><b style="display:inline;color:var(--fg);text-transform:none;letter-spacing:0">Fisher (1925):</b> p is a continuous measure of evidence against H₀ — report it, interpret it, no hard cutoff. <b style="display:inline;color:var(--fg);text-transform:none;letter-spacing:0">Neyman–Pearson (1933):</b> fix α and power, make a binary decision, control long-run error rates. Modern practice blends both, which is the source of much confusion. Be explicit about which one you’re doing.</div>
+<h3>Reporting well</h3>
+<ul>
+ <li>Give the <b>exact p</b> (“p = 0.031”), not just “p &lt; 0.05” — and “p &lt; 0.0001” rather than “p = 0.0000”.</li>
+ <li>Always accompany it with the <b>effect size and a confidence interval</b>.</li>
+ <li>State α, the test, one/two-sided, and any multiplicity correction <b>before</b> seeing results.</li>
+ <li>Prefer “the data are/are not compatible with H₀ at the 5% level” over “proved/disproved”.</li>
+</ul>
+<div class="co warn"><b>The 0.05 line is a convention, not a law of nature</b>Fisher suggested it as a convenient rough guide. A proposal in 2018 (Benjamin et al.) argued for 0.005 for <em>new discoveries</em>. Physics uses ~3×10⁻⁷. The right threshold depends on the cost of errors and the prior plausibility of the claim.</div>
+</section>
+
+<!-- ============ PART II ============ -->
+<div class="part">Part II · Everyday tests</div>
+
+<section class="ch" id="c5">
+<h2><span class="num">5</span>The t-test lab <span class="lvl i">Intermediate</span></h2>
+<p>When σ is unknown you estimate it with <code>s</code>, which adds uncertainty, so the null distribution of the statistic has <b>heavier tails</b> than the normal — the Student t. Fewer degrees of freedom = heavier tails = you need a bigger statistic to be “significant”.</p>
+<div class="card">
+ <h4>Lab 3a · t versus normal</h4>
+ <div class="ctl"><label>Degrees of freedom <input type="range" id="c3d" min="1" max="100" value="5"><output id="c3dv"></output></label></div>
+ <canvas class="sm" id="c3dcv"></canvas><div class="read" id="c3drd"></div>
+</div>
+<p>Three flavours to know: <b>one-sample</b> (mean vs a fixed value), <b>two-sample</b> (use <em>Welch’s</em> version — it doesn’t assume equal variances and costs almost nothing), and <b>paired</b> (take within-pair differences, then it’s a one-sample test). Assumptions that actually matter: <b>independent observations</b> (violations are the most dangerous), and roughly well-behaved means (CLT helps with large n; heavy skew/outliers hurt at small n).</p>
+<div class="card">
+ <h4>Lab 3b · Two groups, live</h4>
+ <p class="sub">Group A has mean 100. Group B has mean 100 + true difference. Samples are drawn fresh with the button; sliders reuse the same random draws so you can watch one dataset change.</p>
+ <div class="ctl">
+  <label>True difference <input type="range" id="c3m" min="-10" max="10" step="0.5" value="4"><output id="c3mv"></output></label>
+  <label>Noise (SD) <input type="range" id="c3s" min="1" max="20" step="0.5" value="8"><output id="c3sv"></output></label>
+  <label>n per group <input type="range" id="c3n" min="3" max="200" value="15"><output id="c3nv"></output></label>
+  <button id="c3new">Draw new samples</button>
+ </div>
+ <canvas class="sm" id="c3cv"></canvas><canvas class="sm" id="c3tcv"></canvas>
+ <div class="stats" id="c3st"></div><div class="read" id="c3rd"></div>
+</div>
+<p><b>Experiments.</b> Set the true difference to 0 and press “Draw new samples” 20 times: expect ≈1 “significant” result, <em>purely by luck</em>. Now set a true difference of 4 with small n: the p-value jumps around wildly between draws — p-values are <b>noisy statistics</b>, not stable properties of the world.</p>
+</section>
+
+<section class="ch" id="c6">
+<h2><span class="num">6</span>Counts and tables: χ² and Fisher’s exact test <span class="lvl i">Intermediate</span></h2>
+<p>For categorical outcomes (confirmed-fraud vs not, churned vs retained) the test compares <b>observed</b> counts with the counts <b>expected under independence</b>. Large χ² → the table is far from what independence predicts. Fisher’s exact test calculates the p-value directly from the hypergeometric distribution (no large-sample approximation), so it’s the safe choice when any expected count is small (&lt; 5).</p>
+<div class="card">
+ <h4>Lab 4 · 2×2 table: two alert rules, confirmed-mule rate</h4>
+ <div class="ctl">
+  <label>Rule v1: confirmed <input type="number" id="c4a" value="18" min="0" style="width:75px"></label>
+  <label>not confirmed <input type="number" id="c4b" value="82" min="0" style="width:75px"></label>
+  <label>Rule v2: confirmed <input type="number" id="c4c" value="8" min="0" style="width:75px"></label>
+  <label>not confirmed <input type="number" id="c4d" value="92" min="0" style="width:75px"></label>
+ </div>
+ <div class="stats" id="c4st"></div><div class="tw" id="c4tb"></div><div class="read" id="c4rd"></div>
+</div>
+<p>Notice the p-value answers “could this table arise if both rules had the same confirmation rate?”, while the <b>odds ratio</b> (with its CI) and <b>Cramér’s V</b> answer “how big is the difference?”. You need both.</p>
+</section>
+
+<section class="ch" id="c7">
+<h2><span class="num">7</span>Models: Wald, likelihood-ratio and score tests <span class="lvl i">Intermediate</span></h2>
+<p>In regression (logistic credit-risk models, Cox models, GLMs) each coefficient’s p-value usually comes from a <b>Wald test</b>: <code>z = β̂ / SE(β̂)</code>, compared with a normal (or t) distribution. Two siblings test the same null with different geometry:</p>
+<ul>
+ <li><b>Wald</b> — uses only the fitted model: how many standard errors is β̂ from 0? Quick, what your software prints.</li>
+ <li><b>Likelihood-ratio (LR)</b> — compares the log-likelihood with and without the term: <code>2(ℓ₁−ℓ₀) ~ χ²<sub>df</sub></code>. Usually the most trustworthy in small/moderate samples, and the one for testing several coefficients at once.</li>
+ <li><b>Score (Rao)</b> — uses only the null-fitted model; the basis of many classical tests (log-rank, Cochran–Armitage).</li>
+</ul>
+<p>All three agree asymptotically; with small samples, rare events or large coefficients they can disagree materially. Beware the <b>Hauck–Donner effect</b>: with very large effects (or quasi-separation) the Wald SE inflates faster than β̂, so the Wald p-value gets <em>larger</em> while the evidence gets stronger. Prefer LR there.</p>
+<div class="card">
+ <h4>Lab 5 · Wald and LR calculators</h4>
+ <div class="ctl">
+  <label>β̂ <input type="number" id="c5b" value="0.45" step="0.01" style="width:80px"></label>
+  <label>SE <input type="number" id="c5se" value="0.20" step="0.01" min="0.0001" style="width:80px"></label>
+  <span style="color:var(--mu)">|</span>
+  <label>logLik (null) <input type="number" id="c5l0" value="-512.4" step="0.1" style="width:90px"></label>
+  <label>logLik (full) <input type="number" id="c5l1" value="-509.9" step="0.1" style="width:90px"></label>
+  <label>df <input type="number" id="c5df" value="1" min="1" style="width:55px"></label>
+ </div>
+ <div class="stats" id="c5st"></div><div class="read" id="c5rd"></div>
+</div>
+<div class="co warn"><b>A coefficient’s p-value is not feature importance</b>It measures evidence that β ≠ 0 <em>conditional on every other variable in the model</em>. With correlated predictors the SEs balloon and genuinely predictive features show big p-values. And with millions of rows, trivially weak features get tiny p-values. Rank features by out-of-sample contribution and effect magnitude, not p.</div>
+</section>
+
+<!-- ============ PART III ============ -->
+<div class="part">Part III · Errors and evidence</div>
+
+<section class="ch" id="c8">
+<h2><span class="num">8</span>Type I &amp; II errors, power and sample size <span class="lvl i">Intermediate</span></h2>
+<div class="tw"><table>
+<tr><th></th><th>H₀ true (no effect)</th><th>H₁ true (real effect)</th></tr>
+<tr><td><b>Reject H₀</b></td><td><span class="pill r">Type I error</span> prob = α</td><td><span class="pill g">Correct</span> prob = power = 1−β</td></tr>
+<tr><td><b>Don’t reject</b></td><td><span class="pill g">Correct</span> prob = 1−α</td><td><span class="pill y">Type II error</span> prob = β</td></tr>
+</table></div>
+<p>α is <b>what you choose</b> (a property of the procedure when H₀ is true). Power is <b>what you must earn</b>: it depends on the true effect size, the noise, the sample size and α. Underpowered studies are the root of most evidence problems — they miss real effects <em>and</em> make the “significant” ones exaggerated (Chapter 14).</p>
+<div class="card">
+ <h4>Lab 6 · Power, α and β on one picture</h4>
+ <p class="sub">Two-sample comparison; effect d in SD units (Cohen’s d). Grey curve = null world. Blue curve = the real world with effect d. Red = α, yellow = β (missed effects), green = power.</p>
+ <div class="ctl">
+  <label>Effect d <input type="range" id="c6d" min="0" max="1.5" step="0.05" value="0.5"><output id="c6dv"></output></label>
+  <label>n per group <input type="range" id="c6n" min="2" max="400" value="32"><output id="c6nv"></output></label>
+  <label>α <select id="c6a"><option>0.001</option><option>0.01</option><option selected>0.05</option><option>0.10</option></select></label>
+  <label>Test <select id="c6t"><option value="two">two-sided</option><option value="one">one-sided</option></select></label>
+ </div>
+ <canvas id="c6cv"></canvas><canvas class="sm" id="c6pcv"></canvas>
+ <div class="stats" id="c6st"></div><div class="read" id="c6rd"></div>
+</div>
+<div class="f">n per group ≈ 2 · ( z<sub>1−α/2</sub> + z<sub>power</sub> )² / d²      (80% power, α=.05 → n ≈ 15.7 / d²)</div>
+<p><b>Rules of thumb:</b> halving the detectable effect needs ~4× the sample. Going from 80% to 90% power costs ~34% more data. <b>Minimum detectable effect (MDE)</b> — the smallest effect your design can reliably detect — is the honest way to describe a study’s limits. And <i>never</i> compute “observed power” after the fact: it is just a re-expression of the p-value and tells you nothing new.</p>
+</section>
+
+<section class="ch" id="c9">
+<h2><span class="num">9</span>The p-value is itself a random variable <span class="lvl i">Intermediate</span></h2>
+<p>This chapter contains the most clarifying fact in the course. If H₀ is true and the test statistic is continuous, then <b>the p-value is uniformly distributed on [0,1]</b>. Every value is equally likely; p = 0.03 is exactly as probable as p = 0.83. That is <em>why</em> a 0.05 threshold gives a 5% false-positive rate: P(p ≤ 0.05) = 0.05 by construction (the probability integral transform).</p>
+<p>When H₁ is true, p-values pile up near 0 — and the stronger the effect/sample, the stronger the pile. This is the signature (“p-curve”) that distinguishes real effects from noise.</p>
+<div class="card">
+ <h4>Lab 7 · 2,000 experiments, 2,000 p-values</h4>
+ <p class="sub">Each run simulates 2,000 two-sample t-tests. Start at d = 0 (null true): flat histogram. Then raise d.</p>
+ <div class="ctl">
+  <label>True effect d <input type="range" id="c7d" min="0" max="1" step="0.05" value="0"><output id="c7dv"></output></label>
+  <label>n per group <input type="range" id="c7n" min="5" max="100" value="20"><output id="c7nv"></output></label>
+  <button id="c7go">Re-run</button>
+ </div>
+ <canvas id="c7cv"></canvas><div class="stats" id="c7st"></div><div class="read" id="c7rd"></div>
+</div>
+<div class="co def"><b>Validity</b>A p-value is <em>valid</em> if P(p ≤ u | H₀) ≤ u for all u. Discrete tests (Fisher’s exact, binomial) are usually conservative: their p-values are “super-uniform”, so the actual error rate is below α. Mid-p corrections reduce that conservatism.</div>
+</section>
+
+<section class="ch" id="c10">
+<h2><span class="num">10</span>Effect size, confidence intervals, and the big-n trap <span class="lvl i">Intermediate</span></h2>
+<p>A p-value mixes two things: <b>how big the effect is</b> and <b>how precisely you measured it</b> (sample size). Roughly, <code>z ≈ effect ÷ standard error</code>, and the SE shrinks like 1/√n. So <b>with enough data any non-zero effect becomes “significant”</b>. Significance answers “is it distinguishable from exactly zero?”, never “does it matter?”</p>
+<div class="card">
+ <h4>Lab 8 · Same tiny effect, ever larger samples</h4>
+ <p class="sub">Fix a true standardised effect and watch p collapse as n grows, while the effect never gets bigger. The bar at right shows whether the effect clears your “smallest effect of interest”.</p>
+ <div class="ctl">
+  <label>True effect d <input type="range" id="c8d" min="0" max="0.5" step="0.005" value="0.02"><output id="c8dv"></output></label>
+  <label>Smallest effect that matters <input type="range" id="c8s" min="0.05" max="0.5" step="0.01" value="0.2"><output id="c8sv"></output></label>
+ </div>
+ <div class="tw" id="c8tb"></div><canvas class="sm" id="c8cv"></canvas><div class="read" id="c8rd"></div>
+</div>
+<p>This is the daily reality with bank-scale data: millions of rows make everything “significant”. The fix is to decide in advance the <b>smallest effect of interest (SESOI)</b> and ask whether the <em>confidence interval</em> lies above it. Reverse trap: a wide CI that spans both “nothing” and “huge” (p = 0.12) is <em>inconclusive</em>, not evidence of no effect.</p>
+<div class="co key"><b>CI ↔ p-value duality</b>A 95% CI contains exactly the parameter values that a two-sided α = 0.05 test would <em>not</em> reject. So “CI excludes 0” ⇔ “p &lt; 0.05” (same test). The CI is richer: it shows magnitude and precision. Remember that “95%” describes the long-run behaviour of the procedure, not a 95% probability for this particular interval.</div>
+<p>Effect-size cheat: Cohen’s d (0.2 small, 0.5 medium, 0.8 large — conventions, and context-dependent), odds ratio, risk difference, Cramér’s V, R². Always translate to units a stakeholder understands (“2.1 percentage points fewer false alerts”).</p>
+</section>
+
+<!-- ============ PART IV ============ -->
+<div class="part">Part IV · How p-values go wrong</div>
+
+<section class="ch" id="c11">
+<h2><span class="num">11</span>Ten misconceptions <span class="lvl a">Advanced</span></h2>
+<p>Decades of surveys show that large fractions of researchers — and statistics teachers — endorse some of these. Try to explain why each is wrong <em>before</em> opening it.</p>
+<details><summary>1. “p = 0.03 means there’s a 3% chance the null hypothesis is true.”</summary>No. p is computed <em>assuming</em> H₀ is true, so it can’t also be the probability of H₀. P(data | H₀) ≠ P(H₀ | data). Getting the latter needs a prior (Bayes’ theorem) — see Chapters 14 and 16.</details>
+<details><summary>2. “1 − p is the probability the effect is real.”</summary>No, same reason. With p = 0.03 and a skeptical prior (say only 10% of ideas pan out), the chance the “discovery” is false can be 30% or more.</details>
+<details><summary>3. “p &gt; 0.05 means there is no effect / the groups are equal.”</summary>No. “Absence of evidence is not evidence of absence.” A non-significant result with a wide CI is simply inconclusive. To <em>claim</em> equivalence you need an equivalence test (TOST, Chapter 17).</details>
+<details><summary>4. “p &lt; 0.05 means the effect is important.”</summary>No. Significance depends on n. Tiny effects with big samples are significant (Lab 8). Importance is judged by effect size against a domain-defined threshold.</details>
+<details><summary>5. “A smaller p means a bigger effect.”</summary>No. p = effect × precision mixed together. p = 1e-9 with n = 5 million can be a smaller effect than p = 0.03 with n = 50.</details>
+<details><summary>6. “p = 0.05 means there’s a 95% chance the result will replicate.”</summary>No. If the true effect equals your observed one, the replication’s power is only ~50% at p = 0.05. Replication probability depends on the true effect and the replication’s power, not 1 − p.</details>
+<details><summary>7. “If I use α = 0.05, only 5% of my significant findings are false.”</summary>No. α is P(reject | H₀ true) — conditioned on the null. The share of false findings among discoveries (false-positive risk / FDR) depends on the prior and power; it’s often much larger than 5% (Lab 12).</details>
+<details><summary>8. “p = 0.049 and p = 0.051 are fundamentally different.”</summary>No. They are practically identical evidence. As Gelman &amp; Stern put it, “the difference between significant and not significant is not itself statistically significant.” If group A is significant and group B isn’t, you must test A vs B directly.</details>
+<details><summary>9. “The p-value is the probability that the result was due to chance.”</summary>It is calculated <em>under the assumption that chance alone is operating</em>, so it can’t be the probability of that assumption. It also silently assumes every other model assumption (independence, distribution, no p-hacking…) is correct.</details>
+<details><summary>10. “A statistically significant result means the research hypothesis is true.”</summary>It means the data are unusual under H₀ <em>and its auxiliary assumptions</em>. Confounding, measurement error, selection, leakage or a violated independence assumption can all produce a small p with a false scientific conclusion.</details>
+<div class="co key"><b>The ASA’s six principles (Wasserstein &amp; Lazar, 2016)</b>(1) P-values can indicate how incompatible the data are with a specified model. (2) They do not measure the probability that the hypothesis is true or that data were produced by chance alone. (3) Decisions should not rest only on whether p passes a threshold. (4) Proper inference needs full reporting and transparency. (5) A p-value does not measure effect size or importance. (6) By itself, a p-value is not a good measure of evidence about a model or hypothesis.</div>
+</section>
+
+<section class="ch" id="c12">
+<h2><span class="num">12</span>Multiple testing <span class="lvl a">Advanced</span></h2>
+<p>Each test at α = 0.05 has a 5% false-alarm chance when H₀ is true. Run many tests and the chances compound. With 100 true-null features you expect <b>5</b> “significant” ones; with 20 independent tests the probability of at least one false positive is 1 − 0.95²⁰ ≈ <b>64%</b>. This is exactly what happens in feature screening, segment-level monitoring, rule-by-rule performance reviews and any “look at everything” analysis.</p>
+<p>Two notions of error control:</p>
+<ul>
+ <li><b>FWER</b> (family-wise error rate): P(at least one false discovery). Controlled by <b>Bonferroni</b> (reject if p ≤ α/m) and the uniformly more powerful <b>Holm</b> step-down. Use when a single false claim is costly.</li>
+ <li><b>FDR</b> (false discovery rate): expected <em>proportion</em> of false discoveries among the discoveries. Controlled by <b>Benjamini–Hochberg (BH)</b>: sort p<sub>(1)</sub> ≤ … ≤ p<sub>(m)</sub>, find the largest i with p<sub>(i)</sub> ≤ (i/m)·q, reject all up to i. Far more powerful; ideal for exploratory screening. (Valid under independence/positive dependence; <b>BY</b> handles arbitrary dependence at a cost.)</li>
+</ul>
+<div class="card">
+ <h4>Lab 9 · 100 features, a few of which are real</h4>
+ <p class="sub">The first k features carry a real signal of strength μ (in z units); the rest are pure noise. The plot sorts the p-values; points below the BH line are discoveries. We know the truth, so we can score each method.</p>
+ <div class="ctl">
+  <label>Features m <input type="range" id="c9m" min="20" max="500" value="100"><output id="c9mv"></output></label>
+  <label>Truly real k <input type="range" id="c9k" min="0" max="100" value="10"><output id="c9kv"></output></label>
+  <label>Signal μ <input type="range" id="c9u" min="1" max="6" step="0.1" value="3.5"><output id="c9uv"></output></label>
+  <label>α / q <select id="c9a"><option>0.01</option><option selected>0.05</option><option>0.10</option></select></label>
+  <button id="c9re">Resample noise</button>
+ </div>
+ <canvas class="tl" id="c9cv"></canvas><div class="legend"><span><i style="background:#4ade80"></i>truly real</span><span><i style="background:#ff6b81"></i>pure noise</span><span style="color:#ffd166">— BH line (i/m·q)</span><span style="color:#c084fc">— Bonferroni (α/m)</span><span>— α</span></div>
+ <div class="tw" id="c9tb"></div><div class="read" id="c9rd"></div>
+</div>
+<p>Try m = 500, k = 20, μ = 3: uncorrected testing floods you with false positives; Bonferroni is clean but misses most real features; BH keeps the false-discovery proportion near q while finding far more. Also useful: <b>q-values</b> (the FDR analogue of p-values) and <b>hierarchical/gatekeeping</b> procedures for pre-specified primary-then-secondary hypotheses.</p>
+</section>
+
+<section class="ch" id="c13">
+<h2><span class="num">13</span>Peeking, p-hacking and the garden of forking paths <span class="lvl a">Advanced</span></h2>
+<p>The p-value’s guarantee holds only if the analysis was fixed <em>before seeing the data</em>. Anything that makes the analysis depend on the data breaks it:</p>
+<ul>
+ <li><b>Optional stopping</b> — checking the p-value repeatedly and stopping when it crosses 0.05 (the classic A/B-test sin).</li>
+ <li><b>Subgroup slicing</b>, outcome switching, flexible outlier exclusion, transforming until something works, switching to one-sided, <b>HARKing</b> (hypothesising after results are known).</li>
+ <li><b>Forking paths</b> (Gelman &amp; Loken): even <em>without</em> conscious hacking, if you’d have analysed the data differently had it looked different, the effective number of tests is much larger than the number you ran.</li>
+</ul>
+<div class="card">
+ <h4>Lab 10a · Peeking at a true null</h4>
+ <p class="sub">There is <b>no effect</b>. Collect data in batches; after each batch compute p and stop the moment p &lt; 0.05. One path is shown, then the false-positive rate over 3,000 simulated studies.</p>
+ <div class="ctl">
+  <label>Max n per group <input type="range" id="c10n" min="20" max="500" step="10" value="200"><output id="c10nv"></output></label>
+  <label>Peek every <input type="range" id="c10b" min="5" max="100" step="5" value="20"><output id="c10bv"></output> obs</label>
+  <button id="c10p">Run one study</button><button id="c10a">Run 3,000 studies</button>
+ </div>
+ <canvas class="sm" id="c10cv"></canvas><div class="stats" id="c10st"></div><div class="read" id="c10rd"></div>
+</div>
+<div class="card">
+ <h4>Lab 10b · Forking paths calculator</h4>
+ <div class="ctl"><label>Independent tests / analysis variants <input type="range" id="c10k" min="1" max="100" value="12"><output id="c10kv"></output></label>
+ <label>α <select id="c10al"><option>0.01</option><option selected>0.05</option><option>0.10</option></select></label></div>
+ <div class="stats" id="c10fs"></div>
+</div>
+<h3>What actually fixes it</h3>
+<ul>
+ <li><b>Pre-specify</b> the analysis (hypothesis, test, α, exclusions, n or stopping rule) — write it down before touching outcome data.</li>
+ <li><b>Hold-out / validation data</b>: explore on one part, confirm once on another. Essential in predictive modelling.</li>
+ <li><b>Group-sequential designs</b> with alpha-spending if you must peek. Stricter early boundaries keep the overall error at α:</li>
+</ul>
+<div class="tw"><table>
+<tr><th>5 equally spaced looks, overall two-sided α = 0.05</th><th>Look 1</th><th>2</th><th>3</th><th>4</th><th>5</th></tr>
+<tr><td>Naive |z| &gt; 1.96 each time (true α ≈ 14%)</td><td class="n">1.96</td><td class="n">1.96</td><td class="n">1.96</td><td class="n">1.96</td><td class="n">1.96</td></tr>
+<tr><td>Pocock (constant boundary)</td><td class="n">2.41</td><td class="n">2.41</td><td class="n">2.41</td><td class="n">2.41</td><td class="n">2.41</td></tr>
+<tr><td>O’Brien–Fleming (very strict early)</td><td class="n">4.56</td><td class="n">3.23</td><td class="n">2.63</td><td class="n">2.28</td><td class="n">2.04</td></tr>
+</table></div>
+<p>Modern alternatives: <b>always-valid / anytime-valid p-values</b>, mixture sequential probability ratio tests (mSPRT) and <b>e-values</b>, which remain valid under continuous monitoring and optional stopping.</p>
+</section>
+
+<section class="ch" id="c14">
+<h2><span class="num">14</span>False-positive risk and the winner’s curse <span class="lvl a">Advanced</span></h2>
+<p>What most people <em>want</em> from a p-value is P(H₀ | significant). To get it you need two things the p-value doesn’t contain: the <b>prior plausibility</b> of real effects and the <b>power</b>. If you test 1,000 ideas where only 10% truly work, with 80% power and α = 0.05:</p>
+<div class="f">true positives = 100 × 0.80 = 80      false positives = 900 × 0.05 = 45<br>false-positive risk = 45 / (80 + 45) = <b>36%</b>   — not 5%</div>
+<div class="card">
+ <h4>Lab 11 · 1,000 hypotheses</h4>
+ <div class="ctl">
+  <label>% of tested ideas that are truly real <input type="range" id="c11p" min="1" max="90" value="10"><output id="c11pv"></output></label>
+  <label>Power % <input type="range" id="c11w" min="10" max="99" value="80"><output id="c11wv"></output></label>
+  <label>α <select id="c11a"><option>0.005</option><option>0.01</option><option selected>0.05</option></select></label>
+ </div>
+ <canvas class="sm" id="c11cv"></canvas>
+ <div class="legend"><span><i style="background:#4ade80"></i>real &amp; detected</span><span><i style="background:#ffd166"></i>real &amp; missed</span><span><i style="background:#ff6b81"></i>false alarm</span><span><i style="background:#3a4260"></i>null, correctly quiet</span></div>
+ <div class="stats" id="c11st"></div><div class="read" id="c11rd"></div>
+</div>
+<h3>The winner’s curse (Type M and Type S errors)</h3>
+<p>Conditioning on “p &lt; 0.05” selects for <em>lucky overestimates</em>. In an underpowered study, the only estimates big enough to clear the bar are exaggerated — and occasionally have the wrong sign. Gelman &amp; Carlin call these <b>Type M</b> (magnitude) and <b>Type S</b> (sign) errors. It is one reason published effects shrink on replication, and why “significant” coefficients in small segments overstate reality.</p>
+<div class="card">
+ <h4>Lab 12 · What do significant results look like?</h4>
+ <p class="sub">5,000 studies with the same true effect. Red = significant, blue = not. The dashed yellow line is the truth.</p>
+ <div class="ctl">
+  <label>True effect d <input type="range" id="c12d" min="0" max="1" step="0.01" value="0.2"><output id="c12dv"></output></label>
+  <label>n per group <input type="range" id="c12n" min="10" max="500" value="30"><output id="c12nv"></output></label>
+  <button id="c12re">Resample</button>
+ </div>
+ <canvas id="c12cv"></canvas><div class="stats" id="c12st"></div><div class="read" id="c12rd"></div>
+</div>
+</section>
+
+<!-- ============ PART V ============ -->
+<div class="part">Part V · Expert toolkit</div>
+
+<section class="ch" id="c15">
+<h2><span class="num">15</span>Resampling: permutation tests and the bootstrap <span class="lvl e">Expert</span></h2>
+<p>You don’t need a textbook formula if you can simulate the null. A <b>permutation test</b> asks: <em>if group labels were meaningless (exchangeable), how often would randomly relabelled data show a difference this large?</em> Shuffle labels thousands of times, recompute the statistic, and count. Any statistic works (median difference, AUC, KS distance), and no normality is required — validity rests on <b>exchangeability</b> under H₀, ideal for randomised experiments.</p>
+<div class="f">p = ( #{ |T*| ≥ |T_obs| } + 1 ) / ( B + 1 )     ← the “+1”: the observed labelling is itself one permutation, so p is never 0</div>
+<p>The <b>bootstrap</b> resamples <em>with replacement</em> within each group to estimate the sampling variability of a statistic; it’s the workhorse for <b>confidence intervals</b> of awkward statistics (Gini, KS, ratios of percentiles). Caveats for both: they assume independent (or properly blocked) units. With clustered data (many transactions per customer) or time series, shuffle/resample <em>whole clusters or blocks</em>.</p>
+<div class="card">
+ <h4>Lab 13 · Your own data</h4>
+ <p class="sub">Edit the numbers (days to resolve an alert under two workflows), pick a statistic, run.</p>
+ <div class="two">
+  <div><b>Workflow A</b><textarea id="c13a" rows="3">12, 15, 9, 20, 14, 11, 18, 13, 16, 10</textarea></div>
+  <div><b>Workflow B</b><textarea id="c13b" rows="3">22, 19, 25, 17, 30, 21, 16, 28, 14, 24</textarea></div>
+ </div>
+ <div class="ctl"><label>Statistic <select id="c13s"><option value="mean">difference in means</option><option value="median">difference in medians</option></select></label>
+ <label>Shuffles <select id="c13B"><option>2000</option><option selected>10000</option><option>50000</option></select></label><button id="c13go">Run</button></div>
+ <canvas class="sm" id="c13cv"></canvas><div class="stats" id="c13st"></div><div class="read" id="c13rd"></div>
+</div>
+</section>
+
+<section class="ch" id="c16">
+<h2><span class="num">16</span>The Bayesian lens: how much evidence is a p-value, really? <span class="lvl e">Expert</span></h2>
+<p>A Bayes factor (BF₀₁) says how much the data shift the <em>odds</em> between H₀ and H₁: posterior odds = prior odds × BF. A p-value can’t do this, but there’s a famous calibration: for any “reasonable” prior on the alternative, the <b>most</b> evidence p can represent against H₀ is bounded:</p>
+<div class="f">BF₀₁ (minimum) ≥ −e · p · ln(p)      for p &lt; 1/e   (Sellke, Bayarri &amp; Berger, 2001)</div>
+<p>At p = 0.05 this gives ≥ 0.41: the data can raise the odds of H₁ by <em>at most ≈ 2.5×</em>. Starting from 50/50, that’s a floor of ~29% on P(H₀). A <b>surprisal</b> view (Greenland) agrees: s = −log₂ p bits; p = 0.05 is only 4.3 bits — about as surprising as <b>4 heads in a row</b> from a fair coin. Not so dramatic.</p>
+<div class="card">
+ <h4>Lab 14a · Calibrating a p-value</h4>
+ <div class="ctl"><label>p-value <input type="number" id="c14p" value="0.05" step="0.001" min="0.0000001" max="0.99" style="width:100px"></label>
+ <label>Prior P(H₀) % <input type="range" id="c14q" min="1" max="99" value="50"><output id="c14qv"></output></label></div>
+ <div class="stats" id="c14st"></div><div class="read" id="c14rd"></div>
+</div>
+<h3>Lindley’s paradox</h3>
+<p>Hold p fixed at exactly 0.05 and increase n. The effect that produced p = 0.05 shrinks toward zero, and a Bayesian with a diffuse alternative increasingly prefers the <em>null</em>. Frequentist “reject H₀!” and Bayesian “H₀ is now more probable” can both be correct at once, because they ask different questions. Practical lesson: <b>for very large n, p just under 0.05 is weak evidence</b>; use stricter thresholds and effect sizes.</p>
+<div class="card">
+ <h4>Lab 14b · Same p, growing n</h4>
+ <p class="sub">z-test with prior θ ~ N(0, τ²) under H₁; τ is the prior SD relative to the noise SD (σ=1).</p>
+ <div class="ctl"><label>Observed |z| <input type="range" id="c14z" min="1" max="5" step="0.01" value="1.96"><output id="c14zv"></output></label>
+ <label>Prior scale τ <input type="range" id="c14t" min="0.1" max="3" step="0.1" value="1"><output id="c14tv"></output></label></div>
+ <div class="tw" id="c14tb"></div><div class="read" id="c14rd2"></div>
+</div>
+</section>
+
+<section class="ch" id="c17">
+<h2><span class="num">17</span>Equivalence tests, combining p-values, and choosing a test <span class="lvl e">Expert</span></h2>
+<h3>Proving “no meaningful difference”: TOST</h3>
+<p>To show a new model/process is <em>equivalent</em> to the old (within ±Δ), flip the question: make “the difference is outside [−Δ, Δ]” the null, and test <b>two one-sided hypotheses</b> (difference ≤ −Δ, and difference ≥ +Δ). Equivalence is claimed if <u>both</u> are rejected; the TOST p-value is the larger of the two. Equivalent to checking whether the <b>90% CI</b> sits inside the margins. Δ must be chosen from domain knowledge <em>before</em> looking.</p>
+<div class="card">
+ <h4>Lab 15 · TOST</h4>
+ <div class="ctl">
+  <label>Observed difference <input type="range" id="c15d" min="-3" max="3" step="0.05" value="0.3"><output id="c15dv"></output></label>
+  <label>Std error <input type="range" id="c15s" min="0.05" max="2" step="0.05" value="0.25"><output id="c15sv"></output></label>
+  <label>Margin Δ <input type="range" id="c15m" min="0.1" max="3" step="0.05" value="1"><output id="c15mv"></output></label>
+ </div>
+ <canvas class="sm" id="c15cv"></canvas><div class="stats" id="c15st"></div><div class="read" id="c15rd"></div>
+</div>
+<h3>Combining independent p-values (Fisher’s method)</h3>
+<p>If several independent studies/segments test the same null, <code>X² = −2 Σ ln pᵢ ~ χ²<sub>2k</sub></code> under H₀. Many modest p-values can combine into strong evidence — but remember the independence requirement and the risk of including only the studies you liked.</p>
+<div class="card">
+ <h4>Lab 16 · Fisher’s combined test</h4>
+ <div class="ctl"><label>p-values (comma separated) <input type="text" id="c16p" value="0.08, 0.12, 0.03, 0.20" style="width:280px"></label></div>
+ <div class="stats" id="c16st"></div>
+</div>
+<h3>Choosing the right test</h3>
+<div class="tw"><table>
+<tr><th>Question</th><th>Default test</th><th>If assumptions fail</th></tr>
+<tr><td>Mean vs fixed value</td><td>One-sample t</td><td>Wilcoxon signed-rank; bootstrap</td></tr>
+<tr><td>Two group means</td><td>Welch t</td><td>Mann–Whitney (not a pure test of means!), permutation</td></tr>
+<tr><td>Paired before/after</td><td>Paired t</td><td>Wilcoxon signed-rank</td></tr>
+<tr><td>≥3 group means</td><td>ANOVA (then Tukey/Holm post-hoc)</td><td>Kruskal–Wallis, permutation ANOVA</td></tr>
+<tr><td>Proportions / tables</td><td>χ², z for proportions</td><td>Fisher exact, Wilson/exact CIs</td></tr>
+<tr><td>Two distributions equal</td><td>Kolmogorov–Smirnov, Anderson–Darling</td><td>Permutation with a chosen statistic</td></tr>
+<tr><td>Association (continuous)</td><td>Pearson (linear), Spearman (monotone)</td><td>Permutation, bootstrap</td></tr>
+<tr><td>Model coefficient / nested models</td><td>Wald, LR, F</td><td>Profile likelihood, robust/cluster SEs, bootstrap</td></tr>
+<tr><td>Survival curves</td><td>Log-rank (score test)</td><td>Weighted log-rank, RMST</td></tr>
+</table></div>
+<div class="co tip"><b>Composite nulls &amp; nuisance parameters</b>When H₀ doesn’t pin down the whole distribution (unknown variance), p is computed with a statistic whose null distribution is free of the nuisance parameter (the t-statistic is “pivotal”), by conditioning (Fisher’s exact), or via the supremum of p over the null (“worst case”).</div>
+</section>
+
+<section class="ch" id="c18">
+<h2><span class="num">18</span>Practitioner playbook: modelling with big, messy, regulated data <span class="lvl e">Expert</span></h2>
+<div class="two">
+<div class="co def"><b>Huge n ⇒ everything is significant</b>Drift tests (KS, χ²) on millions of rows flag trivial shifts. Use <em>effect-size monitors</em> (PSI bands, KS statistic magnitude, standardised differences) with thresholds tied to business impact; keep p-values as secondary context.</div>
+<div class="co def"><b>Dependent observations ⇒ p-values too small</b>Multiple accounts per customer, transactions per account, repeated months: naive SEs assume independence and overstate evidence. Use cluster-robust SEs, mixed models, or block/cluster bootstrap and permutation.</div>
+<div class="co def"><b>Screening hundreds of features</b>Selecting variables by p-value then reporting that same model’s p-values is invalid (post-selection inference). Use a hold-out set, stability selection, FDR control, and judge features by incremental out-of-sample performance.</div>
+<div class="co def"><b>Rule / threshold tuning</b>Comparing many thresholds, segments or rule variants is multiple testing in disguise. Pre-register the candidate set, correct (BH for screening, Holm for confirmatory), then validate on untouched later-period data.</div>
+<div class="co def"><b>Rare events</b>Fraud and default counts can be tiny; normal approximations break. Use exact or Wilson intervals, Fisher/binomial exact tests, or profile likelihood. Report the MDE for the sample you have.</div>
+<div class="co def"><b>Time ordering &amp; leakage</b>Random shuffles of time series data leak the future and produce absurdly small p-values. Respect temporal order; use out-of-time tests.</div>
+</div>
+<div class="co key"><b>Documentation checklist (validators, auditors and regulators appreciate this)</b>
+1) Hypothesis and test chosen <i>before</i> analysis · 2) α, one/two-sided, multiplicity method · 3) Power / MDE justification for the sample · 4) Effect sizes with confidence intervals, not only p · 5) Assumption checks (independence, distribution, stability) and robustness runs · 6) Every comparison you ran, including the ones that failed · 7) Out-of-sample confirmation of any selected result · 8) Plain-language statement of the practical (business/risk) significance.</div>
+</section>
+
+<section class="ch" id="c19">
+<h2><span class="num">19</span>Final exam, mastery checklist and cheat sheet <span class="lvl e">Expert</span></h2>
+<h3>Exam (18 questions — click an answer)</h3>
+<div id="quiz"></div>
+<div class="card"><h4>Score</h4><div class="stats" id="qscore"></div><button class="alt" id="qreset">Reset exam</button></div>
+
+<h3>Mastery checklist — tick when you can do it <em>without notes</em></h3>
+<div class="card chk" id="chk"></div>
+
+<h3>Cheat sheet</h3>
+<div class="tw"><table>
+<tr><th>Concept</th><th>One line</th></tr>
+<tr><td>p-value</td><td>P(statistic at least this extreme | H₀ and all model assumptions true)</td></tr>
+<tr><td>Under H₀</td><td>p ~ Uniform(0,1) (continuous statistics); P(p ≤ α) = α</td></tr>
+<tr><td>Two-sided</td><td>2 × min(tail); decide direction before seeing data</td></tr>
+<tr><td>CI duality</td><td>95% CI excludes null value ⇔ two-sided p &lt; 0.05</td></tr>
+<tr><td>z ≈ effect / SE</td><td>Large n shrinks SE → tiny effects become significant</td></tr>
+<tr><td>Power</td><td>1 − β; ∝ effect·√n/σ; n ≈ 15.7/d² per group for 80% / α=.05</td></tr>
+<tr><td>m tests</td><td>P(≥1 false positive) = 1 − (1−α)<sup>m</sup>; Bonferroni α/m; Holm; BH for FDR</td></tr>
+<tr><td>False-positive risk</td><td>α(1−π) / [α(1−π) + power·π]</td></tr>
+<tr><td>Min Bayes factor</td><td>BF₀₁ ≥ −e·p·ln p; p = .05 → ≥ 0.41</td></tr>
+<tr><td>Surprisal</td><td>s = −log₂ p bits (p=.05 → 4.3 bits ≈ 4 heads in a row)</td></tr>
+<tr><td>Permutation p</td><td>(count + 1) / (B + 1)</td></tr>
+<tr><td>Equivalence</td><td>TOST: both one-sided tests reject ⇔ 90% CI inside ±Δ</td></tr>
+<tr><td>Fisher combine</td><td>−2 Σ ln pᵢ ~ χ²<sub>2k</sub></td></tr>
+<tr><td>Never</td><td>say “probability H₀ is true”, “accept H₀”, or report only “p &lt; 0.05”</td></tr>
+</table></div>
+<h3>Where to go next (real, readable, free-to-find)</h3>
+<ul>
+ <li>Wasserstein &amp; Lazar (2016), <i>The ASA statement on p-values</i>, The American Statistician.</li>
+ <li>Greenland et al. (2016), <i>Statistical tests, P values, confidence intervals, and power: a guide to misinterpretations</i>, Eur. J. Epidemiol.</li>
+ <li>Sellke, Bayarri &amp; Berger (2001), <i>Calibration of p values for testing precise null hypotheses</i>.</li>
+ <li>Benjamini &amp; Hochberg (1995), <i>Controlling the false discovery rate</i>.</li>
+ <li>Gelman &amp; Loken (2013), <i>The garden of forking paths</i>; Gelman &amp; Carlin (2014), <i>Beyond power calculations</i> (Type S/M).</li>
+ <li>Ioannidis (2005), <i>Why most published research findings are false</i>; Benjamin et al. (2018), <i>Redefine statistical significance</i>.</li>
+ <li>Lakens (2017), <i>Equivalence tests</i>; Ramdas et al. on e-values and anytime-valid inference.</li>
+</ul>
+<div class="co tip"><b>You’ve got the whole map.</b> If you can explain Lab 7 (why p is uniform under the null), Lab 11 (why α ≠ false-positive risk) and Lab 10a (why peeking breaks everything) to a colleague, you understand p-values better than most people who use them daily.</div>
+</section>
+</main>
+
+<script>
+/*MATH*/
+function lgamma(x){const c=[76.18009172947146,-86.50532032941677,24.01409824083091,-1.231739572450155,0.1208650973866179e-2,-0.5395239384953e-5];let y=x,t=x+5.5;t-=(x+.5)*Math.log(t);let s=1.000000000190015;for(let j=0;j<6;j++)s+=c[j]/++y;return -t+Math.log(2.5066282746310005*s/x);}
+function gser(a,x){let ap=a,sum=1/a,del=sum;for(let n=0;n<1000;n++){ap++;del*=x/ap;sum+=del;if(Math.abs(del)<Math.abs(sum)*1e-15)break;}return sum*Math.exp(-x+a*Math.log(x)-lgamma(a));}
+function gcf(a,x){let b=x+1-a,c=1/1e-300,d=1/b,h=d;for(let i=1;i<1000;i++){const an=-i*(i-a);b+=2;d=an*d+b;if(Math.abs(d)<1e-300)d=1e-300;c=b+an/c;if(Math.abs(c)<1e-300)c=1e-300;d=1/d;const del=d*c;h*=del;if(Math.abs(del-1)<1e-15)break;}return Math.exp(-x+a*Math.log(x)-lgamma(a))*h;}
+function gammaQ(a,x){if(x<=0)return 1;return x<a+1?1-gser(a,x):gcf(a,x);}
+function betacf(a,b,x){const qab=a+b,qap=a+1,qam=a-1;let c=1,d=1-qab*x/qap;if(Math.abs(d)<1e-300)d=1e-300;d=1/d;let h=d;for(let m=1;m<=1000;m++){const m2=2*m;let aa=m*(b-m)*x/((qam+m2)*(a+m2));d=1+aa*d;if(Math.abs(d)<1e-300)d=1e-300;c=1+aa/c;if(Math.abs(c)<1e-300)c=1e-300;d=1/d;h*=d*c;aa=-(a+m)*(qab+m)*x/((a+m2)*(qap+m2));d=1+aa*d;if(Math.abs(d)<1e-300)d=1e-300;c=1+aa/c;if(Math.abs(c)<1e-300)c=1e-300;d=1/d;const del=d*c;h*=del;if(Math.abs(del-1)<1e-15)break;}return h;}
+function betai(a,b,x){if(x<=0)return 0;if(x>=1)return 1;const bt=Math.exp(lgamma(a+b)-lgamma(a)-lgamma(b)+a*Math.log(x)+b*Math.log(1-x));return x<(a+1)/(a+b+2)?bt*betacf(a,b,x)/a:1-bt*betacf(b,a,1-x)/b;}
+function normSf(z){const q=0.5*gammaQ(.5,z*z/2);return z>=0?q:1-q;}
+function normCdf(z){return normSf(-z);}
+function zUp(a){let lo=0,hi=40;for(let i=0;i<100;i++){const m=(lo+hi)/2;if(normSf(m)>a)lo=m;else hi=m;}return (lo+hi)/2;}
+function tTwo(t,df){if(!isFinite(t))return 0;return betai(df/2,.5,df/(df+t*t));}
+function tSf(t,df){const p=tTwo(t,df)/2;return t>=0?p:1-p;}
+function tUp(a,df){let lo=0,hi=1e4;for(let i=0;i<120;i++){const m=(lo+hi)/2;if(tSf(m,df)>a)lo=m;else hi=m;}return (lo+hi)/2;}
+function tpdf(x,v){return Math.exp(lgamma((v+1)/2)-lgamma(v/2))/Math.sqrt(v*Math.PI)*Math.pow(1+x*x/v,-(v+1)/2);}
+function npdf(x){return Math.exp(-x*x/2)/2.5066282746310002;}
+function lbin(n,k){return lgamma(n+1)-lgamma(k+1)-lgamma(n-k+1);}
+function binom(n,k,p){return Math.exp(lbin(n,k)+k*Math.log(p)+(n-k)*Math.log(1-p));}
+function chi2Sf(x,k){return gammaQ(k/2,x/2);}
+function randn(){let u=0;while(!u)u=Math.random();return Math.sqrt(-2*Math.log(u))*Math.cos(2*Math.PI*Math.random());}
+function mean(a){let s=0;for(const v of a)s+=v;return s/a.length;}
+function vr(a){const m=mean(a);let s=0;for(const v of a)s+=(v-m)*(v-m);return s/(a.length-1);}
+function median(a){const b=a.slice().sort((x,y)=>x-y),n=b.length;return n%2?b[(n-1)/2]:(b[n/2-1]+b[n/2])/2;}
+function welch(a,b){const na=a.length,nb=b.length,ma=mean(a),mb=mean(b),va=vr(a),vb=vr(b);const se=Math.sqrt(va/na+vb/nb);const t=(mb-ma)/se;const df=Math.pow(va/na+vb/nb,2)/(Math.pow(va/na,2)/(na-1)+Math.pow(vb/nb,2)/(nb-1));return{t,df,p:isFinite(t)?tTwo(t,df):1,diff:mb-ma,se,ma,mb,va,vb};}
+/*ENDMATH*/
+
+const $=id=>document.getElementById(id), val=id=>+$(id).value;
+const C={fg:'#e8ebf5',mu:'#8a93ab',gr:'#232a3d',a:'#6ea8ff',r:'#ff6b81',y:'#ffd166',g:'#4ade80',p:'#c084fc',t:'#5eead4'};
+const store={get(k,d){try{const v=JSON.parse(localStorage.getItem(k));return v==null?d:v}catch(e){return d}},set(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}};
+function fp(p){if(p===0||p<1e-300)return '<1e-300';if(p<1e-4)return p.toExponential(2);return p.toFixed(p<.01?4:3)}
+function stat(l,v,c){return `<div class="stat ${c||''}"><b>${v}</b><span>${l}</span></div>`}
+function verdict(p){return p<.001?'extremely surprising':p<.01?'very surprising':p<.05?'surprising enough to cross the conventional 0.05 line':p<.1?'only mildly surprising (suggestive at best)':'not surprising at all'}
+const resizers=[];
+function reg(fn){fn();resizers.push(fn)}
+function on(ids,fn){ids.split(' ').forEach(i=>{const e=$(i);e.addEventListener('input',fn);e.addEventListener('change',fn)})}
+let rt;window.addEventListener('resize',()=>{clearTimeout(rt);rt=setTimeout(()=>resizers.forEach(f=>f()),150)});
+document.querySelectorAll('input[type=range]').forEach(i=>{const o=$(i.id+'v');const f=()=>{if(o)o.textContent=i.value};i.addEventListener('input',f);f()});
+
+function nice(x){const e=Math.pow(10,Math.floor(Math.log10(x))),f=x/e;return (f<1.5?1:f<3?2:f<7?5:10)*e}
+function mk(cv,x0,x1,ymax,o){o=o||{};const dpr=window.devicePixelRatio||1,r=cv.getBoundingClientRect(),w=r.width||600,h=r.height||270;
+ cv.width=w*dpr;cv.height=h*dpr;const g=cv.getContext('2d');g.setTransform(dpr,0,0,dpr,0,0);g.clearRect(0,0,w,h);
+ const L=o.L||40,R=12,T=14,B=28;const X=x=>L+(x-x0)/(x1-x0)*(w-L-R),Y=y=>h-B-y/ymax*(h-T-B);
+ g.font='11px system-ui';g.lineWidth=1;g.strokeStyle=C.gr;g.fillStyle=C.mu;
+ const sx=nice((x1-x0)/7);for(let x=Math.ceil(x0/sx)*sx;x<=x1+1e-9;x+=sx){g.beginPath();g.moveTo(X(x),T);g.lineTo(X(x),h-B);g.stroke();g.textAlign='center';g.fillText(String(+x.toFixed(6)),X(x),h-B+15)}
+ if(!o.noY){const sy=nice(ymax/4);for(let y=0;y<=ymax+1e-9;y+=sy){g.beginPath();g.moveTo(L,Y(y));g.lineTo(w-R,Y(y));g.stroke();g.textAlign='right';g.fillText(String(+y.toFixed(4)),L-5,Y(y)+3)}}
+ return{g,w,h,X,Y,L,R,T,B,
+  line(f,col,lw,a,b,n){a=a==null?x0:a;b=b==null?x1:b;n=n||260;g.beginPath();g.strokeStyle=col;g.lineWidth=lw||2;for(let i=0;i<=n;i++){const x=a+(b-a)*i/n,y=f(x);i?g.lineTo(X(x),Y(y)):g.moveTo(X(x),Y(y))}g.stroke()},
+  area(f,a,b,col,n){a=Math.max(a,x0);b=Math.min(b,x1);if(b<=a)return;n=n||180;g.beginPath();g.moveTo(X(a),Y(0));for(let i=0;i<=n;i++){const x=a+(b-a)*i/n;g.lineTo(X(x),Y(f(x)))}g.lineTo(X(b),Y(0));g.closePath();g.fillStyle=col;g.fill()},
+  vline(x,col,lab,dash){g.save();g.strokeStyle=col;g.lineWidth=1.6;if(dash)g.setLineDash([5,4]);g.beginPath();g.moveTo(X(x),T);g.lineTo(X(x),h-B);g.stroke();g.restore();if(lab){g.fillStyle=col;g.textAlign='center';g.fillText(lab,Math.min(Math.max(X(x),34),w-34),T+10)}},
+  hline(y,col,lab){g.save();g.strokeStyle=col;g.lineWidth=1.4;g.setLineDash([5,4]);g.beginPath();g.moveTo(L,Y(y));g.lineTo(w-R,Y(y));g.stroke();g.restore();if(lab){g.fillStyle=col;g.textAlign='right';g.fillText(lab,w-R-3,Y(y)-4)}},
+  text(s,x,y,col,al){g.fillStyle=col||C.fg;g.textAlign=al||'left';g.fillText(s,x,y)}};}
+function histo(cv,data,x0,x1,nb,o){o=o||{};const cnt=new Array(nb).fill(0),bw=(x1-x0)/nb;
+ data.forEach(v=>{if(v>=x0&&v<=x1){cnt[Math.min(nb-1,Math.floor((v-x0)/bw))]++}});
+ const dens=cnt.map(c=>c/data.length/bw);const ymax=Math.max(Math.max.apply(null,dens),o.ymin||0)*1.15||1;
+ const P=mk(cv,x0,x1,ymax);
+ dens.forEach((d,i)=>{const xa=x0+i*bw;P.g.fillStyle=o.color?o.color(xa+bw/2):'rgba(110,168,255,.6)';P.g.fillRect(P.X(xa)+1,P.Y(d),Math.max(1,P.X(xa+bw)-P.X(xa)-1),P.Y(0)-P.Y(d))});
+ return P;}
+
+/* ---------- Ch1 coin ---------- */
+(function(){
+ function draw(){const n=val('c1n'),kI=$('c1k');kI.max=n;if(+kI.value>n)kI.value=n;$('c1kv').textContent=kI.value;const k=+kI.value,mode=$('c1m').value;
+  const pm=[];for(let i=0;i<=n;i++)pm.push(binom(n,i,.5));
+  const inT=i=>mode==='greater'?i>=k:mode==='less'?i<=k:pm[i]<=pm[k]*(1+1e-9);
+  let p=0;for(let i=0;i<=n;i++)if(inT(i))p+=pm[i];
+  const P=mk($('c1cv'),-.5,n+.5,Math.max.apply(null,pm)*1.15);
+  pm.forEach((v,i)=>{P.g.fillStyle=inT(i)?'rgba(255,107,129,.85)':'rgba(110,168,255,.55)';const w=Math.max(1,(P.X(1)-P.X(0))*.8);P.g.fillRect(P.X(i)-w/2,P.Y(v),w,P.Y(0)-P.Y(v))});
+  P.vline(k,C.y,'observed: '+k);
+  $('c1st').innerHTML=stat('p-value',fp(Math.min(1,p)),p<.05?'hot':'ok')+stat('observed heads',k+' / '+n,'in')+stat('heads rate',(100*k/n).toFixed(1)+'%','warn')+stat('red area','= p','');
+  $('c1rd').innerHTML=`If the coin were fair, a result at least this ${mode==='two'?'lopsided (either direction)':'extreme'} would occur about <b>${(100*p).toFixed(2)}%</b> of the time (1 in ${p>0?Math.round(1/p):'∞'}). That’s <b>${verdict(p)}</b>.`;}
+ on('c1n c1k c1m',draw);reg(draw);
+ $('c1sim').onclick=()=>{const n=val('c1n');let k=0;for(let i=0;i<n;i++)if(Math.random()<.5)k++;$('c1k').value=k;draw()};
+})();
+
+/* ---------- Ch3 null world ---------- */
+(function(){let sim=null;
+ function draw(){const z=val('c2z'),mode=$('c2m').value,P=mk($('c2cv'),-4.5,4.5,.45);
+  if(sim){const nb=60,bw=9/nb,cnt=Array(nb).fill(0);sim.forEach(v=>{const i=Math.floor((v+4.5)/bw);if(i>=0&&i<nb)cnt[i]++});
+   cnt.forEach((c,i)=>{const xa=-4.5+i*bw,xc=xa+bw/2;const ext=mode==='two'?Math.abs(xc)>=Math.abs(z):mode==='right'?xc>=z:xc<=z;const d=c/sim.length/bw;P.g.fillStyle=ext?'rgba(255,107,129,.5)':'rgba(110,168,255,.3)';P.g.fillRect(P.X(xa)+1,P.Y(d),P.X(xa+bw)-P.X(xa)-1,P.Y(0)-P.Y(d))})}
+  const red='rgba(255,107,129,.45)',a=Math.abs(z);
+  if(mode==='two'){P.area(npdf,-4.5,-a,red);P.area(npdf,a,4.5,red)}else if(mode==='right')P.area(npdf,z,4.5,red);else P.area(npdf,-4.5,z,red);
+  P.line(npdf,C.fg,2);P.vline(z,C.y,'z = '+z.toFixed(2));if(mode==='two')P.vline(-z,C.y,null,true);
+  const p=mode==='two'?2*normSf(a):mode==='right'?normSf(z):normCdf(z);
+  let h=`<b>Exact p</b> = area of the red tail(s) under the curve = <b>${fp(p)}</b>.`;let emp='—';
+  if(sim){const c=sim.filter(v=>mode==='two'?Math.abs(v)>=a:mode==='right'?v>=z:v<=z).length;emp=(c/sim.length).toFixed(4);h+=` Of ${sim.length.toLocaleString()} simulated null experiments, ${c.toLocaleString()} were this extreme → empirical p = <b>${emp}</b>.`}
+  else h+=' Press “Simulate” to watch the same number emerge from brute force.';
+  $('c2st').innerHTML=stat('z',z.toFixed(2),'in')+stat('exact p',fp(p),p<.05?'hot':'ok')+stat('simulated p',emp,'warn');$('c2rd').innerHTML=h;}
+ on('c2z c2m',draw);reg(draw);
+ $('c2sim').onclick=()=>{sim=Array.from({length:10000},randn);draw()};$('c2clr').onclick=()=>{sim=null;draw()};
+})();
+
+/* ---------- Ch5 t dist ---------- */
+(function(){function draw(){const df=val('c3d'),P=mk($('c3dcv'),-5,5,.45);
+ P.line(npdf,C.mu,1.5);P.line(x=>tpdf(x,df),C.a,2.4);const tc=tUp(.025,df);P.vline(tc,C.y,null,true);P.vline(-tc,C.y,null,true);
+ P.text('Normal',P.X(1.3),P.Y(.3),C.mu);P.text('t, df = '+df,P.X(.9),P.Y(.38),C.a);
+ $('c3drd').innerHTML=`Two-sided 5% critical value: <b>|t| &gt; ${tc.toFixed(3)}</b> (normal: 1.960). With only ${df} df you need a noticeably bigger statistic; by df ≈ 30 the gap is small.`}
+ on('c3d',draw);reg(draw);})();
+
+/* ---------- Ch5 two-group lab ---------- */
+(function(){let zA=Array.from({length:200},randn),zB=Array.from({length:200},randn);
+ function draw(){const dm=val('c3m'),s=val('c3s'),n=val('c3n');
+  const A=zA.slice(0,n).map(z=>100+s*z),B=zB.slice(0,n).map(z=>100+dm+s*z),w=welch(A,B);
+  const all=A.concat(B),lo=Math.min.apply(null,all)-3,hi=Math.max.apply(null,all)+3;
+  const P=mk($('c3cv'),lo,hi,1,{noY:true,L:30});
+  const dots=(arr,yc,col)=>arr.forEach((v,i)=>{const j=((i*0.6180339)%1)-.5;P.g.fillStyle=col;P.g.globalAlpha=.8;P.g.beginPath();P.g.arc(P.X(v),P.Y(yc+j*.24),4,0,7);P.g.fill();P.g.globalAlpha=1});
+  dots(A,.72,C.a);dots(B,.3,C.r);
+  [[w.ma,.9,.52,C.a],[w.mb,.48,.1,C.r]].forEach(([m,y1,y2,c])=>{P.g.strokeStyle=c;P.g.lineWidth=2.5;P.g.beginPath();P.g.moveTo(P.X(m),P.Y(y1));P.g.lineTo(P.X(m),P.Y(y2));P.g.stroke()});
+  P.text('A',34,P.Y(.72)+4,C.a);P.text('B',34,P.Y(.3)+4,C.r);
+  const tr=Math.max(4,Math.abs(w.t)+1),Q=mk($('c3tcv'),-tr,tr,.45),pd=x=>tpdf(x,w.df),red='rgba(255,107,129,.5)',a=Math.abs(w.t);
+  Q.area(pd,-tr,-a,red);Q.area(pd,a,tr,red);Q.line(pd,C.fg,2);Q.vline(w.t,C.y,'t = '+w.t.toFixed(2));
+  const tc=tUp(.025,w.df),ci=[w.diff-tc*w.se,w.diff+tc*w.se],d=w.diff/Math.sqrt((w.va+w.vb)/2);
+  $('c3st').innerHTML=stat('mean A',w.ma.toFixed(1),'in')+stat('mean B',w.mb.toFixed(1),'hot')+stat('difference',w.diff.toFixed(2),'warn')+stat('Welch t',w.t.toFixed(2),'')+stat('df',w.df.toFixed(1),'')+stat('p-value',fp(w.p),w.p<.05?'hot':'ok')+stat('95% CI',`[${ci[0].toFixed(1)}, ${ci[1].toFixed(1)}]`,'')+stat("Cohen's d",d.toFixed(2),'');
+  $('c3rd').innerHTML=`The difference is ${w.diff.toFixed(2)} ± ${(tc*w.se).toFixed(2)}. ${ci[0]>0||ci[1]<0?'The CI <b>excludes 0</b>, matching p &lt; 0.05.':'The CI <b>contains 0</b>, matching p ≥ 0.05 — but note it also contains moderately large effects: “not significant” ≠ “no effect”.'} The true difference is ${dm}.`;}
+ on('c3m c3s c3n',draw);reg(draw);
+ $('c3new').onclick=()=>{zA=Array.from({length:200},randn);zB=Array.from({length:200},randn);draw()};
+})();
+
+/* ---------- Ch6 2x2 ---------- */
+(function(){function draw(){let a=val('c4a'),b=val('c4b'),c=val('c4c'),d=val('c4d');const n=a+b+c+d;if(n<=0||a<0||b<0||c<0||d<0){$('c4rd').textContent='Enter non-negative counts.';return}
+ const r1=a+b,r2=c+d,c1=a+c,c2=b+d,O=[a,b,c,d],E=[r1*c1/n,r1*c2/n,r2*c1/n,r2*c2/n];
+ let x2=0,y2=0;O.forEach((o,i)=>{if(E[i]>0){x2+=(o-E[i])**2/E[i];y2+=Math.max(0,Math.abs(o-E[i])-.5)**2/E[i]}});
+ const lc=(N,K)=>lbin(N,K),hyp=x=>Math.exp(lc(r1,x)+lc(n-r1,c1-x)-lc(n,c1));
+ const lo=Math.max(0,c1-(n-r1)),hi=Math.min(r1,c1),p0=hyp(a);let pf=0;for(let x=lo;x<=hi;x++){const h=hyp(x);if(h<=p0*(1+1e-7))pf+=h}
+ const hz=(a===0||b===0||c===0||d===0)?.5:0,OR=((a+hz)*(d+hz))/((b+hz)*(c+hz)),se=Math.sqrt(1/(a+hz)+1/(b+hz)+1/(c+hz)+1/(d+hz));
+ const ci=[Math.exp(Math.log(OR)-1.96*se),Math.exp(Math.log(OR)+1.96*se)],px=chi2Sf(x2,1),py=chi2Sf(y2,1),V=Math.sqrt(x2/n);
+ $('c4st').innerHTML=stat('rate v1',(100*a/r1).toFixed(1)+'%','in')+stat('rate v2',(100*c/r2).toFixed(1)+'%','hot')+stat('χ² (df 1)',x2.toFixed(2),'')+stat('p (χ²)',fp(px),px<.05?'hot':'ok')+stat('p (Yates)',fp(py),'')+stat('p (Fisher exact)',fp(Math.min(1,pf)),pf<.05?'hot':'ok')+stat('odds ratio',OR.toFixed(2),'warn')+stat('95% CI (OR)',`[${ci[0].toFixed(2)}, ${ci[1].toFixed(2)}]`,'')+stat('Cramér’s V',V.toFixed(3),'');
+ $('c4tb').innerHTML=`<table><tr><th></th><th>Confirmed (obs / expected)</th><th>Not confirmed (obs / expected)</th><th>Total</th></tr><tr><td>Rule v1</td><td class="n">${a} / ${E[0].toFixed(1)}</td><td class="n">${b} / ${E[1].toFixed(1)}</td><td class="n">${r1}</td></tr><tr><td>Rule v2</td><td class="n">${c} / ${E[2].toFixed(1)}</td><td class="n">${d} / ${E[3].toFixed(1)}</td><td class="n">${r2}</td></tr></table>`;
+ const small=Math.min.apply(null,E)<5;
+ $('c4rd').innerHTML=`${small?'<b>Some expected counts are below 5</b> → trust Fisher’s exact test over χ². ':'All expected counts ≥ 5, so χ² and Fisher should roughly agree. '}Rule v1 confirms ${(100*a/r1).toFixed(1)}% vs ${(100*c/r2).toFixed(1)}% for v2: odds ratio ${OR.toFixed(2)} — ${ci[0]>1||ci[1]<1?'the OR interval excludes 1':'the OR interval includes 1 (inconclusive)'}.`}
+ on('c4a c4b c4c c4d',draw);reg(draw);})();
+
+/* ---------- Ch7 Wald / LR ---------- */
+(function(){function draw(){const b=val('c5b'),se=val('c5se'),l0=val('c5l0'),l1=val('c5l1'),df=Math.max(1,Math.round(val('c5df')));
+ const z=b/se,pw=2*normSf(Math.abs(z)),lr=2*(l1-l0),plr=lr>0?chi2Sf(lr,df):1;
+ $('c5st').innerHTML=stat('Wald z',z.toFixed(3),'in')+stat('Wald p',fp(pw),pw<.05?'hot':'ok')+stat('95% CI β',`[${(b-1.96*se).toFixed(3)}, ${(b+1.96*se).toFixed(3)}]`,'')+stat('odds ratio e^β',Math.exp(b).toFixed(3),'warn')+stat('LR = 2Δℓ',lr.toFixed(3),'in')+stat('LR p (χ² df '+df+')',fp(plr),plr<.05?'hot':'ok');
+ $('c5rd').innerHTML=`Wald and LR examine the same hypothesis through different lenses; with these inputs they give p = ${fp(pw)} vs ${fp(plr)}. Edit β̂/SE and the log-likelihoods separately to see when they diverge (try a large β̂ with a huge SE — the Hauck–Donner regime).`}
+ on('c5b c5se c5l0 c5l1 c5df',draw);reg(draw);})();
+
+/* ---------- Ch8 power ---------- */
+(function(){
+ function pw(d,n,al,two){const nc=d*Math.sqrt(n/2);if(two){const zc=zUp(al/2);return normSf(zc-nc)+normCdf(-zc-nc)}const zc=zUp(al);return normSf(zc-nc)}
+ function draw(){const d=val('c6d'),n=val('c6n'),al=+$('c6a').value,two=$('c6t').value==='two',nc=d*Math.sqrt(n/2),zc=two?zUp(al/2):zUp(al);
+  const x1=Math.max(4.5,nc+4),P=mk($('c6cv'),-4.5,x1,.45);const alt=x=>npdf(x-nc);
+  const yel='rgba(255,209,102,.45)',grn='rgba(74,222,128,.5)',red='rgba(255,107,129,.65)';
+  if(two){P.area(alt,-zc,zc,yel);P.area(alt,zc,x1,grn);P.area(alt,-4.5,-zc,grn);P.area(npdf,zc,x1,red);P.area(npdf,-4.5,-zc,red);P.vline(-zc,C.fg,null,true)}else{P.area(alt,-4.5,zc,yel);P.area(alt,zc,x1,grn);P.area(npdf,zc,x1,red)}
+  P.line(npdf,C.mu,2);P.line(alt,C.a,2);P.vline(zc,C.fg,'critical '+zc.toFixed(2),true);
+  const power=pw(d,n,al,two);
+  const Q=mk($('c6pcv'),0,400,1);Q.line(x=>pw(d,x,al,two),C.g,2.4,2,400,200);Q.hline(.8,C.y,'80%');Q.vline(n,C.a,'n = '+n,true);
+  const zb=(p)=>zUp(1-p),nreq=p=>d>0?Math.ceil(2*Math.pow((two?zUp(al/2):zUp(al))+zb(p),2)/(d*d)):'∞';
+  $('c6st').innerHTML=stat('α (Type I)',al,'hot')+stat('power 1−β',(100*power).toFixed(1)+'%','ok')+stat('β (Type II)',(100*(1-power)).toFixed(1)+'%','warn')+stat('n for 80% power',nreq(.8),'in')+stat('n for 90% power',nreq(.9),'in');
+  $('c6rd').innerHTML=d===0?'With d = 0 the two curves coincide and “power” equals α: you can’t detect an effect that isn’t there.':`With n = ${n} per group you catch an effect of d = ${d} <b>${(100*power).toFixed(0)}%</b> of the time. ${power<.8?'That is <b>underpowered</b> by the usual 80% standard — a non-significant result here would be uninformative.':'That meets the usual 80% standard.'} Try lowering α to 0.001: the red area shrinks but so does the green.`}
+ on('c6d c6n c6a c6t',draw);reg(draw);})();
+
+/* ---------- Ch9 p-dist ---------- */
+(function(){let pd=null;
+ function run(){const n=val('c7n'),d=val('c7d'),S=2000,ps=[];
+  for(let s=0;s<S;s++){let sa=0,sb=0,qa=0,qb=0;for(let i=0;i<n;i++){const x=randn(),y=randn()+d;sa+=x;sb+=y;qa+=x*x;qb+=y*y}
+   const ma=sa/n,mb=sb/n,sp2=((qa-n*ma*ma)+(qb-n*mb*mb))/(2*n-2),t=(mb-ma)/Math.sqrt(sp2*2/n);ps.push(tTwo(t,2*n-2))}
+  pd=ps;draw()}
+ function draw(){if(!pd)return;const d=val('c7d'),P=histo($('c7cv'),pd,0,1,20,{ymin:1,color:c=>c<.05?'rgba(255,107,129,.8)':'rgba(110,168,255,.6)'});
+  P.hline(1,C.y,'uniform (what H₀ predicts)');const f05=pd.filter(p=>p<.05).length/pd.length,f01=pd.filter(p=>p<.01).length/pd.length;
+  $('c7st').innerHTML=stat('p &lt; 0.05',(100*f05).toFixed(1)+'%',d===0?'hot':'ok')+stat('p &lt; 0.01',(100*f01).toFixed(1)+'%','')+stat('p &gt; 0.5',(100*pd.filter(p=>p>.5).length/pd.length).toFixed(1)+'%','in');
+  $('c7rd').innerHTML=d===0?`H₀ is true, yet <b>${(100*f05).toFixed(1)}%</b> of experiments are “significant” — exactly the α you set. The histogram is flat: <b>every p-value is equally likely</b>, so p = 0.03 carries no special meaning when nothing is going on.`:`With a real effect the histogram leans left. The fraction below 0.05 (${(100*f05).toFixed(1)}%) is the <b>power</b> of this design. Notice that many p-values still land above 0.05 — even real effects often fail to “reach significance” when power is modest.`}
+ on('c7d c7n',run);resizers.push(draw);run();$('c7go').onclick=run;})();
+
+/* ---------- Ch10 big n ---------- */
+(function(){function draw(){const d=val('c8d'),sesoi=val('c8s'),ns=[50,200,1000,1e4,1e5,1e6];let rows='';
+ ns.forEach(n=>{const z=d*Math.sqrt(n/2),p=Math.max(2*normSf(z),1e-300),hw=1.96*Math.sqrt(2/n);const sig=p<.05,big=d>=sesoi;
+  const lab=!sig?'<span class="pill m">not significant</span>':big?'<span class="pill g">significant &amp; meaningful</span>':'<span class="pill r">significant but trivial</span>';
+  rows+=`<tr><td class="n">${n.toLocaleString()}</td><td class="n">${z.toFixed(2)}</td><td class="n">${fp(p)}</td><td class="n">[${(d-hw).toFixed(3)}, ${(d+hw).toFixed(3)}]</td><td>${lab}</td></tr>`});
+ $('c8tb').innerHTML=`<table><tr><th>n per group</th><th>z</th><th>p-value</th><th>95% CI for d</th><th>verdict</th></tr>${rows}</table>`;
+ const P=mk($('c8cv'),1,7,Math.max(3,Math.min(30,-Math.log10(Math.max(2*normSf(d*Math.sqrt(1e7/2)),1e-300)))*1.1));
+ P.line(x=>Math.min(30,-Math.log10(Math.max(2*normSf(d*Math.sqrt(Math.pow(10,x)/2)),1e-300))),C.a,2.4,1,7,120);P.hline(-Math.log10(.05),C.r,'p = 0.05');
+ P.text('x: log₁₀(n per group)   y: −log₁₀(p)',P.L+6,P.T+12,C.mu);
+ $('c8rd').innerHTML=`The effect is fixed at d = ${d}. It never grows — but −log₁₀ p rises steadily with n. Your smallest effect of interest is ${sesoi}. <b>Ask “is the whole CI above what matters?” not “is p &lt; 0.05?”</b>`}
+ on('c8d c8s',draw);reg(draw);})();
+
+/* ---------- Ch12 multiple testing ---------- */
+(function(){let E=Array.from({length:500},randn);
+ function draw(){const m=val('c9m'),kI=$('c9k');kI.max=Math.floor(m/2);if(+kI.value>kI.max)kI.value=kI.max;$('c9kv').textContent=kI.value;const k=+kI.value,mu=val('c9u'),al=+$('c9a').value;
+  const arr=[];for(let i=0;i<m;i++){const real=i<k,z=(real?mu:0)+E[i];arr.push({p:2*normSf(Math.abs(z)),real})}
+  arr.sort((a,b)=>a.p-b.p);
+  let bh=0;for(let i=0;i<m;i++)if(arr[i].p<=(i+1)/m*al)bh=i+1;
+  let holm=0;for(let i=0;i<m;i++){if(arr[i].p<=al/(m-i))holm=i+1;else break}
+  let bon=0;for(let i=0;i<m;i++)if(arr[i].p<=al/m)bon=i+1;
+  let unc=0;for(let i=0;i<m;i++)if(arr[i].p<=al)unc=i+1;
+  const tp=r=>arr.slice(0,r).filter(x=>x.real).length;
+  const rows=[['Uncorrected p ≤ α',unc],['Bonferroni',bon],['Holm',holm],['Benjamini–Hochberg',bh]].map(([nm,r])=>{const t=tp(r),f=r-t;return `<tr><td>${nm}</td><td class="n">${r}</td><td class="n">${t} / ${k}</td><td class="n">${f}</td><td class="n">${r?(100*f/r).toFixed(0)+'%':'—'}</td></tr>`}).join('');
+  $('c9tb').innerHTML=`<table><tr><th>Method</th><th>Discoveries</th><th>Real found</th><th>False positives</th><th>False-discovery proportion</th></tr>${rows}</table>`;
+  const R=Math.min(m,Math.max(40,3*k+10)),ymax=Math.min(.3,al*3);const P=mk($('c9cv'),0,R+1,ymax);
+  P.line(x=>x/m*al,C.y,2,0,R+1,2);P.hline(al/m,C.p);P.hline(al,C.mu);
+  arr.slice(0,R).forEach((x,i)=>{if(x.p>ymax)return;P.g.fillStyle=x.real?C.g:C.r;P.g.beginPath();P.g.arc(P.X(i+1),P.Y(x.p),3.6,0,7);P.g.fill()});
+  P.text('rank of p-value (sorted ascending) →  y: p-value',P.L+6,P.T+12,C.mu);
+  $('c9rd').innerHTML=`Uncorrected testing “finds” ${unc} features, ${unc-tp(unc)} of them noise. BH finds ${bh} with ${bh-tp(bh)} false. Bonferroni is safest per-claim but finds only ${bon}. <b>Pick the error rate that matches the cost of a wrong claim.</b>`}
+ on('c9m c9k c9u c9a',draw);reg(draw);$('c9re').onclick=()=>{E=Array.from({length:500},randn);draw()};})();
+
+/* ---------- Ch13 peeking ---------- */
+(function(){let path=null,agg=null;
+ function draw(){const N=val('c10n');const P=mk($('c10cv'),0,N,1);P.hline(.05,C.r,'0.05');
+  if(path){P.g.strokeStyle=C.a;P.g.lineWidth=1.8;P.g.beginPath();path.forEach((q,i)=>{i?P.g.lineTo(P.X(q.n),P.Y(q.p)):P.g.moveTo(P.X(q.n),P.Y(q.p))});P.g.stroke();
+   const hit=path.find(q=>q.p<.05);path.forEach(q=>{P.g.fillStyle=q.p<.05?C.r:C.a;P.g.beginPath();P.g.arc(P.X(q.n),P.Y(q.p),3.2,0,7);P.g.fill()});
+   $('c10rd').innerHTML=hit?`Even though there is <b>no effect</b>, this study crossed p &lt; 0.05 at n = ${hit.n} per group (p = ${fp(hit.p)}) — and an analyst who stops there reports a “discovery”.`:`This particular study never crossed 0.05. Run more — roughly ${agg?(100*agg.ever).toFixed(0)+'%':'a good share'} will.`}
+  else P.text('Press “Run one study”',P.X(N/2),P.Y(.5),C.mu,'center');
+  if(agg)$('c10st').innerHTML=stat('false-positive rate, fixed n (look once)',(100*agg.fin).toFixed(1)+'%','ok')+stat('false-positive rate, stop when p&lt;.05',(100*agg.ever).toFixed(1)+'%','hot')+stat('number of looks',agg.looks,'in');}
+ function runPath(){const N=val('c10n'),b=val('c10b');path=[];let S=0;for(let i=1;i<=N;i++){S+=randn()*Math.SQRT2;if(i%b===0)path.push({n:i,p:2*normSf(Math.abs(S)/Math.sqrt(2*i))})}draw()}
+ function runAgg(){const N=val('c10n'),b=val('c10b'),R=3000;let ever=0,fin=0;
+  for(let r=0;r<R;r++){let S=0,hit=false,z=0;for(let i=1;i<=N;i++){S+=randn()*Math.SQRT2;if(i%b===0){z=Math.abs(S)/Math.sqrt(2*i);if(z>1.959964)hit=true}}if(hit)ever++;if(z>1.959964)fin++}
+  agg={ever:ever/R,fin:fin/R,looks:Math.floor(N/b)};draw();
+  $('c10rd').innerHTML=`Looking only once keeps the false-positive rate at ≈ 5%. Peeking ${agg.looks} times and stopping at the first p &lt; 0.05 pushes it to <b>${(100*agg.ever).toFixed(1)}%</b>. More looks → worse; with unlimited looks it approaches 100%.`}
+ $('c10p').onclick=runPath;$('c10a').onclick=runAgg;on('c10n c10b',()=>{path=null;draw()});reg(draw);
+ function fk(){const k=val('c10k'),a=+$('c10al').value,pr=1-Math.pow(1-a,k);$('c10fs').innerHTML=stat('tests / variants',k,'in')+stat('P(≥1 false positive)',(100*pr).toFixed(1)+'%',pr>.2?'hot':'warn')+stat('expected false positives',(k*a).toFixed(2),'')+stat('Bonferroni α per test',(a/k).toFixed(5),'ok')}
+ on('c10k c10al',fk);fk();})();
+
+/* ---------- Ch14 FPR dots & winner's curse ---------- */
+(function(){function draw(){const pi=val('c11p')/100,pw=val('c11w')/100,al=+$('c11a').value;
+ const R=Math.round(1000*pi),TP=Math.round(R*pw),FN=R-TP,FP=Math.round((1000-R)*al),TN=1000-R-FP;
+ const cv=$('c11cv'),dpr=window.devicePixelRatio||1,r=cv.getBoundingClientRect(),w=r.width||600,h=r.height||200;cv.width=w*dpr;cv.height=h*dpr;const g=cv.getContext('2d');g.setTransform(dpr,0,0,dpr,0,0);g.clearRect(0,0,w,h);
+ const cols=50,rows=20,cell=Math.min((w-16)/cols,(h-10)/rows),ox=(w-cell*cols)/2,oy=(h-cell*rows)/2;
+ const seq=[[TP,C.g],[FN,C.y],[FP,C.r],[TN,'#3a4260']];let idx=0;
+ seq.forEach(([cnt,col])=>{for(let j=0;j<cnt;j++){const rr=Math.floor(idx/cols),cc=idx%cols;g.fillStyle=col;g.beginPath();g.arc(ox+cc*cell+cell/2,oy+rr*cell+cell/2,cell*.36,0,7);g.fill();idx++}});
+ const fprisk=TP+FP?FP/(TP+FP):0;
+ $('c11st').innerHTML=stat('significant results',TP+FP,'in')+stat('of which false',FP,'hot')+stat('false-positive risk',(100*fprisk).toFixed(0)+'%',fprisk>.2?'hot':'ok')+stat('real effects missed',FN,'warn');
+ $('c11rd').innerHTML=`Of the ${TP+FP} “significant” findings, <b>${FP}</b> are false — a false-positive risk of <b>${(100*fprisk).toFixed(0)}%</b>, even though α = ${al}. Lower the share of real ideas (a more exploratory field) and watch it explode; raise power or tighten α to bring it down.`}
+ on('c11p c11w c11a',draw);reg(draw);})();
+(function(){let Z=Array.from({length:5000},randn);
+ function draw(){const d=val('c12d'),n=val('c12n'),se=Math.sqrt(2/n),est=Z.map(z=>d+se*z);
+  const x0=d-4.5*se,x1=d+4.5*se,P=histo($('c12cv'),est,x0,x1,60,{color:c=>Math.abs(c)/se>1.96?'rgba(255,107,129,.75)':'rgba(110,168,255,.5)'});
+  P.vline(d,C.y,'true d = '+d,true);if(x0<0&&x1>0)P.vline(0,C.mu,null,true);
+  const sig=est.filter(e=>Math.abs(e)/se>1.96),pw=sig.length/est.length;
+  let exg='—',ts='—';if(d>0&&sig.length){exg=(mean(sig.map(Math.abs))/d).toFixed(2)+'×';ts=(100*sig.filter(e=>e<0).length/sig.length).toFixed(1)+'%'}
+  $('c12st').innerHTML=stat('power',(100*pw).toFixed(1)+'%','in')+stat('avg |estimate| among significant ÷ truth',exg,'hot')+stat('significant with wrong sign (Type S)',ts,'warn');
+  $('c12rd').innerHTML=pw<.5&&d>0?`Power is only ${(100*pw).toFixed(0)}%: the studies that “work” are exactly the ones that overshot the truth — significant estimates are exaggerated by <b>${exg}</b> on average. Increase n and the distortion fades.`:'Move toward a small effect with small n to see severe exaggeration; at high power significant estimates are close to the truth.'}
+ on('c12d c12n',draw);reg(draw);$('c12re').onclick=()=>{Z=Array.from({length:5000},randn);draw()};})();
+
+/* ---------- Ch15 permutation ---------- */
+(function(){
+ function nums(id){return $(id).value.split(/[\s,;]+/).filter(x=>x!=='').map(Number).filter(v=>isFinite(v))}
+ let res=null;
+ function run(){const a=nums('c13a'),b=nums('c13b');if(a.length<2||b.length<2){$('c13rd').textContent='Need at least 2 numbers in each group.';return}
+  const st=$('c13s').value==='mean'?mean:median,Bn=+$('c13B').value,obs=st(b)-st(a),pool=a.concat(b),na=a.length;let cnt=0;const sims=[];
+  for(let r=0;r<Bn;r++){for(let i=pool.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));const t=pool[i];pool[i]=pool[j];pool[j]=t}
+   const d=st(pool.slice(na))-st(pool.slice(0,na));sims.push(d);if(Math.abs(d)>=Math.abs(obs)-1e-12)cnt++}
+  const pp=(cnt+1)/(Bn+1),w=welch(a,b),bs=[];
+  for(let r=0;r<4000;r++){const ra=a.map(()=>a[Math.floor(Math.random()*a.length)]),rb=b.map(()=>b[Math.floor(Math.random()*b.length)]);bs.push(st(rb)-st(ra))}
+  bs.sort((x,y)=>x-y);const ci=[bs[Math.floor(.025*bs.length)],bs[Math.floor(.975*bs.length)]];res={sims,obs,pp,w,ci,Bn,cnt};draw()}
+ function draw(){if(!res)return;const{sims,obs,pp,w,ci,Bn,cnt}=res;const lim=Math.max(Math.abs(obs)*1.3,Math.max.apply(null,sims.map(Math.abs)));
+  const P=histo($('c13cv'),sims,-lim,lim,50,{color:c=>Math.abs(c)>=Math.abs(obs)?'rgba(255,107,129,.75)':'rgba(110,168,255,.5)'});P.vline(obs,C.y,'observed '+obs.toFixed(2));P.vline(-obs,C.y,null,true);
+  $('c13st').innerHTML=stat('observed B − A',obs.toFixed(2),'in')+stat('permutation p',fp(pp),pp<.05?'hot':'ok')+stat('Welch t-test p (for comparison)',fp(w.p),'')+stat('bootstrap 95% CI',`[${ci[0].toFixed(1)}, ${ci[1].toFixed(1)}]`,'warn');
+  $('c13rd').innerHTML=`${cnt.toLocaleString()} of ${Bn.toLocaleString()} random relabellings were at least as extreme (red bars) → p = (${cnt}+1)/(${Bn}+1) = <b>${fp(pp)}</b>. No distributional assumption was used.`}
+ resizers.push(draw);$('c13go').onclick=run;run();})();
+
+/* ---------- Ch16 Bayes ---------- */
+(function(){function draw(){const p=val('c14p'),q=val('c14q')/100;if(!(p>0&&p<1)){return}
+ const bf=p<1/Math.E?-Math.E*p*Math.log(p):1,post=q*bf/(q*bf+(1-q)),bits=-Math.log2(p);
+ $('c14st').innerHTML=stat('minimum BF₀₁',bf.toFixed(3),'in')+stat('max odds boost for H₁',(1/bf).toFixed(1)+'×','warn')+stat('min P(H₀ | data)',(100*post).toFixed(1)+'%',post>.1?'hot':'ok')+stat('surprisal',bits.toFixed(1)+' bits','')+stat('≈ all-heads run of',Math.round(bits)+' flips','');
+ $('c14rd').innerHTML=`Even in the <i>best case for the alternative</i>, p = ${p} corresponds to at least a <b>${(100*post).toFixed(1)}%</b> chance H₀ is still true when you began at ${(100*q).toFixed(0)}% — far from the “${(100*p).toFixed(1)}%” people read into it. It’s about as surprising as ${Math.round(bits)} fair-coin flips all landing heads.`}
+ on('c14p c14q',draw);reg(draw);})();
+(function(){function draw(){const z=val('c14z'),tau=val('c14t'),p=2*normSf(z);let rows='';
+ [10,100,1e3,1e4,1e5,1e6,1e8].forEach(n=>{const r=n*tau*tau,bf=Math.sqrt(1+r)*Math.exp(-z*z/2*r/(1+r)),post=bf/(1+bf);
+  rows+=`<tr><td class="n">${n.toLocaleString()}</td><td class="n">${fp(p)}</td><td class="n">${bf<100?bf.toFixed(2):bf.toExponential(1)}</td><td class="n">${(100*post).toFixed(1)}%</td><td>${bf<1/3?'<span class="pill g">favours H₁</span>':bf>3?'<span class="pill r">favours H₀</span>':'<span class="pill y">ambiguous</span>'}</td></tr>`});
+ $('c14tb').innerHTML=`<table><tr><th>n</th><th>p (constant!)</th><th>BF₀₁ (evidence for H₀)</th><th>P(H₀ | data), prior 50%</th><th>verdict</th></tr>${rows}</table>`;
+ $('c14rd2').innerHTML=`The p-value is pinned at ${fp(p)} on every row, yet the Bayes factor swings toward the null as n grows. <b>Same p-value, opposite meaning</b> — evidence depends on sample size and the alternative being tested.`}
+ on('c14z c14t',draw);reg(draw);})();
+
+/* ---------- Ch17 TOST & Fisher ---------- */
+(function(){function draw(){const d=val('c15d'),se=val('c15s'),D=val('c15m'),p1=normSf((d+D)/se),p2=normSf((D-d)/se),pt=Math.max(p1,p2),p0=2*normSf(Math.abs(d/se)),ci=[d-1.645*se,d+1.645*se];
+ const xr=Math.max(D*1.6,Math.abs(d)+3*se,1),P=mk($('c15cv'),-xr,xr,1,{noY:true,L:14});
+ P.g.fillStyle='rgba(74,222,128,.16)';P.g.fillRect(P.X(-D),P.T,P.X(D)-P.X(-D),P.h-P.B-P.T);P.vline(-D,C.g,'−Δ');P.vline(D,C.g,'+Δ');P.vline(0,C.mu,null,true);
+ const y=P.Y(.5);P.g.strokeStyle=pt<.05?C.g:C.r;P.g.lineWidth=4;P.g.beginPath();P.g.moveTo(P.X(ci[0]),y);P.g.lineTo(P.X(ci[1]),y);P.g.stroke();P.g.fillStyle=C.fg;P.g.beginPath();P.g.arc(P.X(d),y,6,0,7);P.g.fill();
+ P.text('90% CI of the difference',P.X(0),y-16,C.mu,'center');
+ $('c15st').innerHTML=stat('ordinary test vs 0: p',fp(p0),'')+stat('lower one-sided p',fp(p1),'in')+stat('upper one-sided p',fp(p2),'in')+stat('TOST p = max',fp(pt),pt<.05?'ok':'hot')+stat('90% CI',`[${ci[0].toFixed(2)}, ${ci[1].toFixed(2)}]`,'');
+ $('c15rd').innerHTML=pt<.05?`Both one-sided tests reject → <b>statistically equivalent</b> within ±${D}.`:`TOST p = ${fp(pt)} ≥ .05 → equivalence <b>not established</b>${p0>=.05?' — and the ordinary test is also non-significant, which on its own would <i>not</i> have proven equivalence':''}. Shrink the SE (more data) or widen Δ only if justified <i>beforehand</i>.`}
+ on('c15d c15s c15m',draw);reg(draw);})();
+(function(){function draw(){const ps=$('c16p').value.split(/[\s,;]+/).filter(x=>x!=='').map(Number).filter(v=>v>0&&v<=1);if(!ps.length){$('c16st').innerHTML='';return}
+ const x2=-2*ps.reduce((s,p)=>s+Math.log(p),0),k=ps.length,p=chi2Sf(x2,2*k);
+ $('c16st').innerHTML=stat('studies k',k,'in')+stat('X² = −2Σln p',x2.toFixed(2),'')+stat('df = 2k',2*k,'')+stat('combined p',fp(p),p<.05?'hot':'ok')+stat('smallest single p',fp(Math.min.apply(null,ps)),'warn')}
+ on('c16p',draw);draw();})();
+
+/* ---------- Quiz ---------- */
+const QZ=[
+{l:'Beginner',q:'A test gives p = 0.03. Which statement is correct?',o:['There is a 3% chance the null hypothesis is true.','If the null were true, data at least this extreme would occur about 3% of the time.','There is a 97% chance the effect is real.','The effect is large.'],a:1,e:'p is P(data this extreme | H₀). It is not about the probability of H₀ itself, nor about effect size.'},
+{l:'Beginner',q:'When H₀ is true and the test statistic is continuous, the distribution of p-values is…',o:['Concentrated near 0','Concentrated near 1','Uniform on [0,1]','Normal, centred at 0.5'],a:2,e:'The probability integral transform makes p uniform under H₀, which is why P(p ≤ 0.05) = 5%.'},
+{l:'Beginner',q:'You run 20 independent tests at α = 0.05 and every null is true. Roughly what’s the chance of at least one “significant” result?',o:['5%','20%','64%','95%'],a:2,e:'1 − 0.95²⁰ ≈ 0.64. Expected number of false positives is 1.'},
+{l:'Beginner',q:'For a symmetric statistic, when the observed direction matches your pre-declared prediction, the one-sided p is…',o:['The same as two-sided','Half the two-sided p','Double the two-sided p','Unrelated'],a:1,e:'One tail instead of two. But choosing one-sided after seeing the data is p-hacking.'},
+{l:'Intermediate',q:'A 95% confidence interval for a difference is [0.4, 3.1]. What can you say about the two-sided test of “difference = 0” at α = 0.05?',o:['p > 0.05','p < 0.05','Nothing without the data','p = 0.05 exactly'],a:1,e:'CI/test duality: the interval excludes 0, so the same test rejects at 5%.'},
+{l:'Intermediate',q:'A fraud model comparison on 5 million accounts gives p = 1e-9 for a 0.01-percentage-point improvement in precision. Best conclusion?',o:['Huge improvement','Statistically detectable; whether it matters needs effect size and cost context','The test is wrong because p is too small','Accept H₀'],a:1,e:'With enormous n, tiny effects are significant. Compare the CI to a smallest effect of interest.'},
+{l:'Intermediate',q:'p = 0.20 with a wide CI that includes both zero and a large effect. What follows?',o:['The effect is zero','The groups are equivalent','The study is inconclusive — absence of evidence is not evidence of absence','The null is 80% likely true'],a:2,e:'To claim equivalence you need an equivalence test (TOST) against a pre-specified margin.'},
+{l:'Intermediate',q:'Which change, with everything else fixed, DEcreases the power of a test?',o:['Larger sample size','Larger true effect','Lowering α from 0.05 to 0.01','Lower measurement noise'],a:2,e:'A stricter α demands a bigger statistic; power falls (Lab 6).'},
+{l:'Intermediate',q:'Why is a permutation p-value computed as (count + 1) / (B + 1)?',o:['To make it look larger','The observed labelling is itself one valid permutation, so p can never be exactly 0','To adjust for multiple testing','Because B is always odd'],a:1,e:'The +1 keeps the test valid (super-uniform) and avoids reporting p = 0 from a finite simulation.'},
+{l:'Advanced',q:'You check an A/B test daily and stop as soon as p < 0.05, though there is truly no effect. What happens to your false-positive rate?',o:['Stays at 5%','Falls below 5%','Rises well above 5%','Becomes exactly 0'],a:2,e:'Repeated looks give repeated chances to cross the threshold (Lab 10a). Use pre-set n or a group-sequential/alpha-spending design.'},
+{l:'Advanced',q:'Bonferroni vs Benjamini–Hochberg: which statement is right?',o:['Both control FDR','Bonferroni controls FWER; BH controls FDR and is usually more powerful','BH controls FWER; Bonferroni controls FDR','Neither requires p-values'],a:1,e:'FWER = chance of any false discovery; FDR = expected proportion of false discoveries among discoveries.'},
+{l:'Advanced',q:'Only 10% of tested ideas are truly effective; power is 80%, α = 0.05. About what share of “significant” results are false?',o:['5%','10%','36%','80%'],a:2,e:'FP = 900×0.05 = 45; TP = 100×0.8 = 80; 45/125 = 36%.'},
+{l:'Advanced',q:'A small study finds a “significant” effect whose estimated size is far bigger than anything plausible. The most likely explanation is…',o:['The effect is genuinely huge','Winner’s curse: conditioning on significance in an underpowered study selects exaggerated estimates','The p-value was calculated wrongly','Type II error'],a:1,e:'Type M error (Gelman & Carlin): significant estimates from low-power designs overstate the truth.'},
+{l:'Advanced',q:'In a logistic model, a strongly predictive feature has a large p-value after adding a near-duplicate feature. Most plausible reason?',o:['The feature stopped being predictive','Multicollinearity inflated its standard error; p-values are conditional on other terms','The test is one-sided','The data are paired'],a:1,e:'Coefficient p-values measure evidence of a non-zero partial effect. Correlated predictors split the signal and inflate SEs.'},
+{l:'Expert',q:'For p = 0.05, the minimum Bayes factor bound −e·p·ln(p) is about 0.41. What does that mean?',o:['H₀ is 41% likely','At most the data raise the odds of H₁ by ≈ 2.5×, so p = 0.05 is modest evidence','H₁ is 59% likely','The result is replicable 59% of the time'],a:1,e:'1/0.41 ≈ 2.5. From 50/50 priors, P(H₀) is at least ~29%.'},
+{l:'Expert',q:'Lindley’s paradox says that with a fixed p just under 0.05 and a very large n…',o:['The effect must be huge','A Bayes factor can favour the null even though the test rejects it','The p-value is invalid','The test loses all power'],a:1,e:'The effect behind a p of 0.05 shrinks as n grows; a diffuse alternative becomes relatively less plausible than the point null.'},
+{l:'Expert',q:'To CLAIM that a new scoring model performs equivalently to the old one within ±Δ, you should…',o:['Show p > 0.05 in a standard test','Run TOST: reject both one-sided nulls (90% CI inside ±Δ)','Use a one-sided test','Report R²'],a:1,e:'Non-significance isn’t equivalence. TOST flips the null to “difference ≥ Δ”.'},
+{l:'Expert',q:'Many transactions per customer are treated as independent rows in a t-test. The likely consequence?',o:['p-values too large','p-values too small (anti-conservative) because SEs ignore within-customer correlation','No effect on p','The test becomes exact'],a:1,e:'Positive within-cluster correlation shrinks the effective sample size. Use cluster-robust SEs or cluster bootstrap/permutation.'}
+];
+(function(){const st=store.get('pv_quiz',{});
+ function render(){const box=$('quiz');box.innerHTML='';
+  QZ.forEach((q,i)=>{const d=document.createElement('div');d.className='q'+(st[i]!=null?' done':'');
+   d.innerHTML=`<div class="qh">Q${i+1} · ${q.l}</div><div style="margin:4px 0 6px"><b>${q.q}</b></div>`;
+   q.o.forEach((o,j)=>{const b=document.createElement('button');b.className='opt';b.textContent=o;
+    if(st[i]!=null){if(j===q.a)b.classList.add('good');else if(j===st[i])b.classList.add('bad')}
+    b.onclick=()=>{if(st[i]!=null)return;st[i]=j;store.set('pv_quiz',st);render();meter()};d.appendChild(b)});
+   const e=document.createElement('div');e.className='ex';e.innerHTML=(st[i]===q.a?'✅ ':'❌ ')+q.e;d.appendChild(e);box.appendChild(d)});
+  const ans=Object.keys(st).length,ok=QZ.filter((q,i)=>st[i]===q.a).length;
+  $('qscore').innerHTML=stat('answered',ans+' / '+QZ.length,'in')+stat('correct',ok,'ok')+stat('score',ans?Math.round(100*ok/ans)+'%':'—',ok/Math.max(ans,1)>=.8?'ok':'warn')+stat('verdict',ans<QZ.length?'keep going':ok>=16?'p-value master':ok>=13?'strong':'review ch. 11–14','')}
+ $('qreset').onclick=()=>{Object.keys(st).forEach(k=>delete st[k]);store.set('pv_quiz',st);render();meter()};
+ window.__qst=st;window.__qrender=render;render();})();
+
+/* ---------- Checklist ---------- */
+const CHK=['Define a p-value in one sentence, including “at least as extreme” and “assuming H₀”.','Explain why p is uniform under H₀ and what that implies for α.','Convert between one-sided and two-sided p and state when each is legitimate.','Explain the CI ↔ p-value duality.','Compute (or estimate) power and sample size from an effect size.','Explain why big n makes trivial effects significant, and what to report instead.','Apply Bonferroni, Holm and BH, and say which controls what.','Explain how optional stopping inflates Type I error and what to do instead.','Compute false-positive risk from prior, power and α.','Explain the winner’s curse / Type M error.','Run and interpret a permutation test and bootstrap CI.','Explain minimum Bayes factors / Lindley’s paradox in a sentence each.','Design an equivalence test (TOST) and choose a margin.','Identify when observations are not independent and name a fix.'];
+(function(){const st=store.get('pv_chk',{}),box=$('chk');
+ CHK.forEach((t,i)=>{const l=document.createElement('label'),c=document.createElement('input');c.type='checkbox';c.checked=!!st[i];c.onchange=()=>{st[i]=c.checked;store.set('pv_chk',st);meter()};l.appendChild(c);const s=document.createElement('span');s.textContent=t;l.appendChild(s);box.appendChild(l)});window.__cst=st;})();
+function meter(){const q=window.__qst||{},c=window.__cst||{};const ok=QZ.filter((x,i)=>q[i]===x.a).length,ck=Object.values(c).filter(Boolean).length;const pct=Math.round(100*(.6*ok/QZ.length+.4*ck/CHK.length));$('mtxt').textContent='Mastery: '+pct+'%  (exam + checklist)';$('mbar').style.width=pct+'%';try{localStorage.setItem('mastery_pv',JSON.stringify(pct))}catch(e){}}
+meter();
+
+/* ---------- Navigation, progress ---------- */
+(function(){const nav=$('nav');let html='';
+ document.querySelectorAll('main .part, main section.ch').forEach(el=>{
+  if(el.classList.contains('part'))html+=`<div class="pt">${el.textContent}</div>`;
+  else{const h=el.querySelector('h2'),num=h.querySelector('.num').textContent,lv=h.querySelector('.lvl');const t=Array.from(h.childNodes).filter(n=>n.nodeType===3).map(n=>n.textContent).join('').trim();html+=`<a href="#${el.id}" data-id="${el.id}">${num}. ${t}</a>`}});
+ nav.innerHTML=html;
+ const links=nav.querySelectorAll('a'),io=new IntersectionObserver(es=>{es.forEach(e=>{if(e.isIntersecting){links.forEach(a=>a.classList.toggle('on',a.dataset.id===e.target.id))}})},{rootMargin:'-20% 0px -70% 0px'});
+ document.querySelectorAll('section.ch').forEach(s=>io.observe(s));
+ $('menu').onclick=()=>$('side').classList.toggle('open');
+ nav.addEventListener('click',e=>{if(e.target.tagName==='A')$('side').classList.remove('open')});
+ window.addEventListener('scroll',()=>{const h=document.documentElement;$('prog').style.width=(100*h.scrollTop/(h.scrollHeight-h.clientHeight))+'%'},{passive:true});})();
+</script>
+</body>
+</html>

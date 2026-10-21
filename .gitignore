@@ -1,0 +1,11 @@
+# Archives & snapshot backups
+.snapshots/
+*.zip
+
+# OS artifacts
+.DS_Store
+Thumbs.db
+
+# Editor configurations
+.vscode/
+.idea/

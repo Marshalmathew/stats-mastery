@@ -1,0 +1,546 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Conditional Probability &amp; Bayes Mastery</title>
+<style>
+:root{--bg:#0b0e17;--panel:#121726;--panel2:#171d30;--line:#232a3d;--fg:#e8ebf5;--mu:#8a93ab;--a:#6ea8ff;--r:#ff6b81;--y:#ffd166;--g:#4ade80;--p:#c084fc;--t:#5eead4}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;background:var(--bg);color:var(--fg);font:16px/1.7 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+a{color:var(--a)}
+#prog{position:fixed;top:0;left:0;height:3px;background:linear-gradient(90deg,var(--a),var(--p),var(--r));width:0;z-index:50}
+.side{position:fixed;left:0;top:0;bottom:0;width:290px;background:#0e1220;border-right:1px solid var(--line);overflow:auto;padding:18px 14px 90px;z-index:40;transition:transform .25s}
+.side h1{font-size:15px;margin:0 0 2px}
+.side small{color:var(--mu)}
+.side .pt{margin:16px 0 4px;font-size:11px;text-transform:uppercase;letter-spacing:1.3px;color:var(--p)}
+.side a{display:block;color:var(--mu);text-decoration:none;padding:5px 9px;border-radius:7px;font-size:13.5px;line-height:1.35}
+.side a:hover{background:var(--panel);color:var(--fg)}
+.side a.on{background:var(--panel2);color:var(--fg);box-shadow:inset 3px 0 var(--a)}
+.side a.back{color:var(--t);padding-left:0;margin-bottom:6px}
+.meter{position:fixed;left:0;bottom:0;width:290px;background:#0e1220;border-top:1px solid var(--line);padding:10px 16px;z-index:41;font-size:12px;color:var(--mu)}
+.meter .bar{height:7px;background:var(--line);border-radius:6px;margin-top:5px;overflow:hidden}
+.meter .bar i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--g),var(--t));transition:width .4s}
+#menu{display:none;position:fixed;top:10px;left:10px;z-index:60;background:var(--panel2);color:var(--fg);border:1px solid var(--line);border-radius:9px;padding:7px 12px;font-size:14px;cursor:pointer}
+main{margin-left:290px;padding:0 34px 120px;max-width:1090px}
+.hero{padding:70px 0 30px}
+.hero h1{font-size:clamp(32px,5vw,56px);line-height:1.08;margin:0 0 14px;background:linear-gradient(100deg,#fff,var(--y) 40%,var(--r));-webkit-background-clip:text;background-clip:text;color:transparent}
+.hero p{font-size:19px;color:#c3c9dc;max-width:780px}
+.chips{display:flex;flex-wrap:wrap;gap:8px;margin:18px 0}
+.chip{border:1px solid var(--line);background:var(--panel);padding:5px 12px;border-radius:99px;font-size:13px;color:var(--mu)}
+.chip b{color:var(--fg)}
+.part{margin:90px 0 0;padding-top:22px;border-top:1px solid var(--line);font-size:12px;letter-spacing:2px;text-transform:uppercase;color:var(--p)}
+section.ch{padding-top:30px}
+h2{font-size:30px;line-height:1.2;margin:10px 0 8px;display:flex;gap:12px;align-items:center;flex-wrap:wrap}
+h2 .num{display:inline-grid;place-items:center;width:40px;height:40px;border-radius:12px;background:var(--panel2);border:1px solid var(--line);font-size:18px;color:var(--a)}
+.lvl{font-size:11px;font-weight:600;letter-spacing:.8px;text-transform:uppercase;padding:3px 9px;border-radius:99px;border:1px solid}
+.lvl.b{color:var(--g);border-color:#1f5c3a}.lvl.i{color:var(--a);border-color:#244a85}.lvl.a{color:var(--y);border-color:#6b5420}.lvl.e{color:var(--r);border-color:#7a2c3a}
+h3{font-size:19px;margin:30px 0 6px;color:#fff}
+p{margin:10px 0}li{margin:5px 0}
+code,.f{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace}
+code{background:var(--panel2);padding:1px 6px;border-radius:5px;font-size:.9em}
+.f{display:block;white-space:pre-wrap;background:#0e1322;border:1px solid var(--line);border-left:3px solid var(--a);padding:12px 16px;border-radius:9px;margin:14px 0;overflow-x:auto;font-size:15px;color:#dbe4ff;line-height:1.8}
+.co{border-radius:12px;padding:13px 17px;margin:16px 0;border:1px solid var(--line);background:var(--panel)}
+.co>b:first-child{display:block;margin-bottom:2px;font-size:12px;letter-spacing:1px;text-transform:uppercase}
+.co.def{border-left:4px solid var(--a)}.co.def>b:first-child{color:var(--a)}
+.co.warn{border-left:4px solid var(--r)}.co.warn>b:first-child{color:var(--r)}
+.co.tip{border-left:4px solid var(--g)}.co.tip>b:first-child{color:var(--g)}
+.co.key{border-left:4px solid var(--y);background:#171608}.co.key>b:first-child{color:var(--y)}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:18px 20px;margin:22px 0;box-shadow:0 8px 30px rgba(0,0,0,.25)}
+.card>h4{margin:0 0 3px;font-size:13px;letter-spacing:1.2px;text-transform:uppercase;color:var(--t)}
+.card>p.sub{margin:0 0 12px;color:var(--mu);font-size:14.5px}
+.ctl{display:flex;flex-wrap:wrap;gap:10px 22px;align-items:center;margin:8px 0 10px}
+.ctl label{display:flex;gap:8px;align-items:center;font-size:14px;color:#c3c9dc}
+.ctl output{min-width:38px;font-family:ui-monospace,monospace;color:var(--y);font-size:13px}
+input[type=range]{accent-color:var(--a);width:150px}
+input[type=checkbox]{accent-color:var(--a)}
+select,input[type=number],input[type=text]{background:#0e1322;color:var(--fg);border:1px solid var(--line);border-radius:8px;padding:6px 9px;font:inherit;font-size:14px}
+button{background:linear-gradient(180deg,#2c4a80,#233b68);color:#fff;border:1px solid #3a5a98;border-radius:9px;padding:7px 14px;font:inherit;font-size:14px;cursor:pointer}
+button:hover{filter:brightness(1.15)}
+button.alt{background:var(--panel2);border-color:var(--line);color:var(--fg)}
+canvas{width:100%;height:270px;display:block;background:#0e1322;border:1px solid var(--line);border-radius:10px;margin-top:6px}
+canvas.sm{height:210px}canvas.tl{height:330px}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(125px,1fr));gap:9px;margin:12px 0}
+.stat{background:#0e1322;border:1px solid var(--line);border-radius:10px;padding:8px 11px}
+.stat b{display:block;font-size:17px;font-family:ui-monospace,monospace}
+.stat span{font-size:11.5px;color:var(--mu);text-transform:uppercase;letter-spacing:.7px}
+.stat.hot b{color:var(--r)}.stat.ok b{color:var(--g)}.stat.warn b{color:var(--y)}.stat.in b{color:var(--a)}
+.read{margin:8px 0 0;padding:10px 14px;background:#0e1322;border:1px dashed #33406a;border-radius:10px;font-size:14.5px;color:#d3dbf3}
+table{border-collapse:collapse;width:100%;margin:12px 0;font-size:14px}
+th,td{border:1px solid var(--line);padding:7px 10px;text-align:left;vertical-align:top}
+th{background:var(--panel2);font-size:12px;text-transform:uppercase;letter-spacing:.6px;color:var(--mu)}
+td.n{font-family:ui-monospace,monospace;text-align:right}
+.tw{overflow-x:auto}
+.pill{display:inline-block;padding:1px 9px;border-radius:99px;font-size:12px;font-weight:600}
+.pill.r{background:#3a1520;color:var(--r)}.pill.g{background:#10321f;color:var(--g)}.pill.y{background:#3a2f0e;color:var(--y)}.pill.m{background:#202637;color:var(--mu)}
+details{background:var(--panel);border:1px solid var(--line);border-radius:11px;padding:9px 15px;margin:9px 0}
+details summary{cursor:pointer;font-weight:600}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.q{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:14px 18px;margin:14px 0}
+.q .qh{font-size:12px;letter-spacing:1px;text-transform:uppercase;color:var(--mu)}
+.q .opt{display:block;width:100%;text-align:left;margin:6px 0;background:#0e1322;border:1px solid var(--line);color:var(--fg);border-radius:9px;padding:9px 12px}
+.q .opt.good{border-color:var(--g);background:#0e2418}.q .opt.bad{border-color:var(--r);background:#2a1119}
+.q .ex{display:none;margin-top:8px;font-size:14.5px;color:#c3c9dc}
+.q.done .ex{display:block}
+.chk label{display:flex;gap:10px;align-items:flex-start;padding:6px 0;cursor:pointer}
+.chk input{margin-top:6px;accent-color:var(--g);width:17px;height:17px}
+.sigrow{display:grid;grid-template-columns:minmax(170px,2fr) 1fr 1fr auto;gap:8px 14px;align-items:center;padding:6px 0;border-top:1px dashed #1b2236}
+.sigrow:first-of-type{border-top:0}
+.sigrow label{display:flex;gap:6px;align-items:center;font-size:13.5px;color:#c3c9dc}
+@media(max-width:900px){
+ .side{transform:translateX(-100%)}.side.open{transform:none}.meter{display:none}
+ #menu{display:block}main{margin-left:0;padding:0 16px 100px}.two{grid-template-columns:1fr}.hero{padding-top:60px}
+ .sigrow{grid-template-columns:1fr 1fr}
+}
+</style>
+</head>
+<body>
+<div id="prog"></div>
+<button id="menu">☰ Contents</button>
+<nav class="side" id="side"><a class="back" href="index.html">← All courses</a><h1>Conditional Probability &amp; Bayes</h1><small>11 chapters · 12 labs · exam</small><div id="nav"></div></nav>
+<div class="meter"><div id="mtxt">Mastery: 0%</div><div class="bar"><i id="mbar"></i></div></div>
+
+<main>
+<header class="hero">
+ <h1>Conditional probability &amp; Bayes' theorem.</h1>
+ <p>Probability is how you reason when you don't know everything. <em>Conditional</em> probability is how you reason after you learn something. Bayes' theorem is the rule for turning “how likely is this evidence if X were true?” into the question you actually care about: “how likely is X, given this evidence?” This page builds that rule from nothing and then points it at fraud alerts, PD estimation, shrinkage and the classic traps.</p>
+ <div class="chips"><span class="chip"><b>Part I</b> Conditioning</span><span class="chip"><b>Part II</b> Bayes at work</span><span class="chip"><b>Part III</b> Updating beliefs with data</span><span class="chip"><b>Part IV</b> Traps &amp; the big picture</span></div>
+ <div class="co tip"><b>How to use this</b>Every chapter has a lab. The two habits that make Bayes feel easy: (1) think in <b>natural frequencies</b> — “out of 10,000 accounts…” — instead of fractions; (2) before each lab, <em>guess</em> the answer, then check. Almost everyone's first guess about a rare-event alert is far too high. Prerequisites: the Random Variables and Core Distributions pages.</div>
+</header>
+
+<!-- ============ PART I ============ -->
+<div class="part">Part I · Conditioning</div>
+
+<section class="ch" id="c1">
+<h2><span class="num">1</span>Conditional probability is zooming in <span class="lvl b">Beginner</span></h2>
+<p>P(A | B) reads “the probability of A <em>given</em> B”. When you learn that B happened, every outcome outside B is ruled out. What is left is a smaller world, and you re-measure A inside it:</p>
+<div class="f">P(A | B) = P(A ∩ B) / P(B)          (needs P(B) &gt; 0)</div>
+<p>Numerator: the part of the world where both happen. Denominator: the whole of the new, smaller world. Conditioning is <b>restriction and renormalisation</b>: cut away what no longer applies, rescale so the remainder sums to 1.</p>
+<div class="co warn"><b>The most common mistake in all of probability</b>P(A | B) ≠ P(B | A). “Most fraudsters trigger rule R” (P(R | fraud) high) does <em>not</em> mean “most accounts that trigger rule R are fraudsters” (P(fraud | R) may be tiny). The two are linked by Bayes' theorem, and the link depends on how common A and B are.</div>
+<div class="card"><h4>Lab 1 · The probability rectangle</h4>
+ <p class="sub">The whole rectangle is all accounts. Width splits A (fraud) from ¬A (legitimate); height inside each slab splits B (rule fires, bottom) from ¬B. Area = probability. Conditioning on B means keeping only the two bottom bands: P(A | B) is the red area divided by (red + yellow).</p>
+ <div class="ctl"><label>P(A) fraud % <input type="range" id="c1a" min="0.5" max="60" step="0.5" value="10"><output id="c1av"></output></label>
+ <label>P(B | A) fires on fraud % <input type="range" id="c1b" min="1" max="100" step="1" value="80"><output id="c1bv"></output></label>
+ <label>P(B | ¬A) fires on legit % <input type="range" id="c1c" min="0" max="60" step="0.5" value="8"><output id="c1cv"></output></label></div>
+ <canvas class="tl" id="c1cvs"></canvas><div class="tw" id="c1tb"></div><div class="stats" id="c1st"></div><div class="read" id="c1rd"></div></div>
+<p>Try making fraud rarer (P(A) = 1%) with the other sliders fixed. P(B | A) stays at 80% — the rule still catches the same share of fraud — but P(A | B), the share of alerts that are real, collapses. That is Chapter 3 in miniature.</p>
+</section>
+
+<section class="ch" id="c2">
+<h2><span class="num">2</span>Chain rule, total probability and independence <span class="lvl b">Beginner</span></h2>
+<p>Rearrange the definition and you get the <b>multiplication (chain) rule</b>: P(A ∩ B) = P(B) · P(A | B) = P(A) · P(B | A). Stringing events along a path multiplies the conditional probabilities at each step:</p>
+<div class="f">P(E₁ ∩ E₂ ∩ E₃) = P(E₁) · P(E₂ | E₁) · P(E₃ | E₁ ∩ E₂)</div>
+<p>The <b>law of total probability</b> adds up the routes: if E₁ and its complement ¬E₁ partition the world,</p>
+<div class="f">P(E₂) = P(E₂ | E₁)·P(E₁) + P(E₂ | ¬E₁)·P(¬E₁)</div>
+<p>Two events are <b>independent</b> when learning one tells you nothing about the other: P(A | B) = P(A), equivalently P(A ∩ B) = P(A)·P(B). The ratio P(A ∩ B) / (P(A)·P(B)) is the <b>lift</b>: 1 under independence, above 1 when they attract, below 1 when they repel.</p>
+<div class="card"><h4>Lab 2 · A two-step risk tree</h4>
+ <p class="sub">E₁ = “new beneficiary added”, E₂ = “large transfer within 24 hours”. Read off every path probability, the total probability of E₂, and whether the events are independent.</p>
+ <div class="ctl"><label>P(E₁) % <input type="range" id="c2a" min="0.5" max="60" step="0.5" value="20"><output id="c2av"></output></label>
+ <label>P(E₂ | E₁) % <input type="range" id="c2b" min="0" max="100" step="1" value="40"><output id="c2bv"></output></label>
+ <label>P(E₂ | ¬E₁) % <input type="range" id="c2c" min="0" max="100" step="1" value="5"><output id="c2cv"></output></label></div>
+ <div class="tw" id="c2tb"></div><div class="stats" id="c2st"></div><div class="read" id="c2rd"></div></div>
+<p>Set P(E₂ | E₁) equal to P(E₂ | ¬E₁): the lift snaps to exactly 1.00 and the events are independent — knowing E₁ no longer moves your belief about E₂.</p>
+</section>
+
+<!-- ============ PART II ============ -->
+<div class="part">Part II · Bayes at work</div>
+
+<section class="ch" id="c3">
+<h2><span class="num">3</span>Bayes' theorem and the base-rate fallacy <span class="lvl b">Beginner</span></h2>
+<p>Put P(A ∩ B) = P(B | A)P(A) = P(A | B)P(B) together and solve for the conditional you want:</p>
+<div class="f">P(A | B) = P(B | A) · P(A) / P(B)       with P(B) = P(B | A)P(A) + P(B | ¬A)P(¬A)</div>
+<p>Vocabulary: P(A) is the <b>prior</b> (before the evidence), P(B | A) is the <b>likelihood</b> (how expected the evidence is if A is true), P(A | B) is the <b>posterior</b> (after the evidence). Bayes is the exchange rate between the two directions of conditioning.</p>
+<h3>Natural frequencies make it trivial</h3>
+<p>Picture 10,000 accounts. With 0.1% fraud prevalence, 80% sensitivity and a 2% false-positive rate: 10 are fraud, 8 of them alert. Of the 9,990 legitimate accounts, 2% = 200 alert. Total alerts: 208, of which 8 are real. <b>P(fraud | alert) = 8/208 = 3.8%</b>. The headline number “the rule catches 80% of fraud” says nothing about the 96% of alerts that are false.</p>
+<div class="co key"><b>The base-rate fallacy</b>People anchor on the likelihood (80%, 2%) and ignore the base rate (0.1%). When the thing you're hunting is rare, even a small false-positive rate applied to the huge legitimate population swamps the true detections. Precision is controlled as much by prevalence as by model quality.</div>
+<div class="card"><h4>Lab 3 · 10,000 accounts</h4>
+ <p class="sub">Each dot is one account. Top rows: fraud that alerted (green) and fraud that was missed (yellow). Next: legitimate accounts that alerted (red, the false alarms). The rest: correctly quiet. Use the presets or move the sliders.</p>
+ <div class="ctl"><label>prevalence % <input type="range" id="c3p" min="0.01" max="30" step="0.01" value="0.1"><output id="c3pv"></output></label>
+ <label>sensitivity (TPR) % <input type="range" id="c3s" min="1" max="100" step="1" value="80"><output id="c3sv"></output></label>
+ <label>false-positive rate % <input type="range" id="c3f" min="0" max="30" step="0.1" value="2"><output id="c3fv"></output></label></div>
+ <div class="ctl"><button class="alt" data-pre="0.1,80,2">AML rule (0.1% / 80% / 2%)</button><button class="alt" data-pre="1,90,9">Classic screening (1% / 90% / 9%)</button><button class="alt" data-pre="0.05,95,0.5">Strong fraud model (0.05% / 95% / 0.5%)</button><button class="alt" data-pre="30,80,2">Common event (30% / 80% / 2%)</button></div>
+ <canvas class="tl" id="c3cv"></canvas><div class="stats" id="c3st"></div><div class="read" id="c3rd"></div></div>
+</section>
+
+<section class="ch" id="c4">
+<h2><span class="num">4</span>Odds form, likelihood ratios and stacking evidence <span class="lvl i">Intermediate</span></h2>
+<p>Bayes is multiplication in disguise once you use odds (odds = p/(1−p)):</p>
+<div class="f">posterior odds = prior odds × likelihood ratio        LR = P(evidence | A) / P(evidence | ¬A)</div>
+<p>For a signal that fires: LR⁺ = sensitivity / false-positive rate. For a signal that stays silent: LR⁻ = (1 − sensitivity) / (1 − FPR). An LR of 10 means the evidence is ten times more expected if the account is fraudulent. <b>The prior stays separate from the evidence</b>: the same evidence moves a 0.1% prior to 1% but moves a 20% prior to 71%. Taking logs makes updates additive: log-odds posterior = log-odds prior + Σ log LRs.</p>
+<p>If signals are <b>conditionally independent given the class</b>, their LRs multiply: that is the engine of <b>naive Bayes</b> classifiers and of scorecard-style logistic models. The big caveat: correlated signals double-count the same information.</p>
+<div class="card"><h4>Lab 4 · Stack four signals</h4>
+ <p class="sub">Set a prior, set each signal's sensitivity and false-positive rate, then tick which signals fired. Each fired signal multiplies the odds by LR⁺; each silent one by LR⁻. Then check the box to see what happens if signals 2 and 3 are really the same information in two costumes.</p>
+ <div class="ctl"><label>prior P(fraud) % <input type="range" id="c4p" min="0.01" max="20" step="0.01" value="0.5"><output id="c4pv"></output></label><label><input type="checkbox" id="c4d"> signals 2 and 3 are the same information (fully dependent)</label></div>
+ <div id="c4rows"></div>
+ <canvas class="sm" id="c4cv"></canvas><div class="stats" id="c4st"></div><div class="read" id="c4rd"></div></div>
+</section>
+
+<section class="ch" id="c5">
+<h2><span class="num">5</span>Alert thresholds: precision, recall and the cost of errors <span class="lvl a">Advanced</span></h2>
+<p>A detection model outputs a score. Fraudulent accounts tend to score higher, but the two populations overlap. Choosing the alert threshold t is a Bayesian decision: you trade false alarms (analyst time) against missed fraud (losses), <em>weighted by how rare fraud is</em>.</p>
+<div class="f">precision = P(fraud | alert) = π·TPR / (π·TPR + (1−π)·FPR)           recall = TPR = P(alert | fraud)<br>posterior odds at score s = [π/(1−π)] × f_fraud(s) / f_legit(s)</div>
+<p>The decision-theoretic rule: alert on an account when its posterior fraud probability exceeds <code>c<sub>FP</sub> / (c<sub>FP</sub> + c<sub>FN</sub>)</code>, where c<sub>FP</sub> is the cost of a false alarm and c<sub>FN</sub> the cost of a miss. If a miss is 150× as costly as a false alarm, alert even when the account is only 0.7% likely to be fraud. The model here: legitimate scores ~ Normal(0, 1), fraud scores ~ Normal(d, 1), where d measures how well the model separates them.</p>
+<div class="card"><h4>Lab 5 · Pick the threshold for 100,000 accounts</h4>
+ <p class="sub">Top: the two score distributions (each normalised) with your threshold (yellow) and the cost-minimising threshold (green dashed). Bottom: precision and recall as the threshold moves.</p>
+ <div class="ctl"><label>separation d <input type="range" id="c5d" min="1" max="5" step="0.1" value="2.5"><output id="c5dv"></output></label>
+ <label>fraud prevalence % <input type="range" id="c5p" min="0.01" max="10" step="0.01" value="0.2"><output id="c5pv"></output></label>
+ <label>threshold t <input type="range" id="c5t" min="-1" max="7" step="0.05" value="3"><output id="c5tv"></output></label></div>
+ <div class="ctl"><label>cost of a false alarm <input type="number" id="c5cf" value="1" min="0" step="any" style="width:70px"></label><label>cost of a missed fraud <input type="number" id="c5cn" value="150" min="0" step="any" style="width:70px"></label></div>
+ <canvas id="c5cv"></canvas><canvas class="sm" id="c5cv2"></canvas><div class="stats" id="c5st"></div><div class="read" id="c5rd"></div></div>
+<p>Experiments: (1) With prevalence 0.2%, raise the threshold until recall drops to about 50% — precision is still modest. (2) Set prevalence to 5% and precision jumps even though the model hasn't changed. (3) Make a miss cost 1,000 and watch the optimal threshold fall: you tolerate far more false alarms.</p>
+</section>
+
+<!-- ============ PART III ============ -->
+<div class="part">Part III · Updating beliefs with data</div>
+
+<section class="ch" id="c6">
+<h2><span class="num">6</span>Bayesian updating: Beta–Binomial <span class="lvl i">Intermediate</span></h2>
+<p>Treat an unknown probability θ (a PD, a response rate) as a quantity with a distribution representing your uncertainty. Start with a prior, observe data, get a posterior. With a Beta(a, b) prior and k successes in n trials,</p>
+<div class="f">posterior = Beta(a + k, b + n − k)        posterior mean = (a + k) / (a + b + n)</div>
+<p>Read a and b as pseudo-counts of earlier “defaults” and “non-defaults”. Two beautiful properties: <b>order doesn't matter</b> (updating one loan at a time gives exactly the same posterior as updating on all of them at once), and <b>the prior's influence fades</b> as n grows. The 95% <b>credible interval</b> is the central range holding 95% of the posterior probability — a direct statement about θ.</p>
+<div class="card"><h4>Lab 6 · Learn a default rate one loan at a time</h4>
+ <p class="sub">The hidden truth θ is set below. Feed in loans (each defaults with probability θ) or click outcomes yourself. Watch the posterior sharpen and the posterior mean (bottom chart) converge — and compare how different priors behave in the early, data-poor phase.</p>
+ <div class="ctl"><label>prior <select id="c6pr"><option value="1,1">flat Beta(1,1)</option><option value="0.5,0.5">Jeffreys Beta(½,½)</option><option value="2,98" selected>skeptical PD ≈ 2% Beta(2,98)</option><option value="30,970">strong prior PD ≈ 3% Beta(30,970)</option><option value="20,80">wrong & confident PD ≈ 20% Beta(20,80)</option></select></label>
+ <label>true θ % <input type="range" id="c6t" min="0.5" max="20" step="0.5" value="4"><output id="c6tv"></output></label></div>
+ <div class="ctl"><button id="c6a1">+1 simulated loan</button><button id="c6a10">+10</button><button id="c6a100">+100</button><button class="alt" id="c6d">Observe a default</button><button class="alt" id="c6r">Observe a repayment</button><button class="alt" id="c6x">Reset data</button></div>
+ <canvas class="sm" id="c6cv"></canvas><canvas class="sm" id="c6cv2"></canvas><div class="stats" id="c6st"></div><div class="read" id="c6rd"></div></div>
+<p>Pick the “wrong &amp; confident” prior and feed in 100 loans at θ = 4%: the posterior is still dragged toward 20%. A strong wrong prior needs lots of data to be overturned. Flat or weak priors let the data speak quickly but give noisy early estimates. <b>That trade-off is the whole art of prior choice.</b></p>
+</section>
+
+<section class="ch" id="c7">
+<h2><span class="num">7</span>Conjugate pairs: Normal–Normal and Gamma–Poisson <span class="lvl a">Advanced</span></h2>
+<p>A prior is <b>conjugate</b> to a likelihood when the posterior has the same form as the prior, so updating is just parameter arithmetic. Besides Beta–Binomial, two workhorses:</p>
+<ul>
+ <li><b>Normal–Normal</b> (estimating a mean with known noise σ): the posterior mean is a <b>precision-weighted average</b> of the prior mean and the sample mean. Precision = 1/variance, and precisions add: <code>1/τ² = 1/τ₀² + n/σ²</code>, <code>μ = (μ₀/τ₀² + n·x̄/σ²) · τ²</code>.</li>
+ <li><b>Gamma–Poisson</b> (estimating an event rate λ, e.g. alerts per day): prior Gamma(a, rate b), data k events in n days → posterior Gamma(a + k, b + n). Posterior mean (a+k)/(b+n) is a weighted average of the prior mean a/b and the observed rate k/n.</li>
+</ul>
+<div class="card"><h4>Lab 7 · Prior, likelihood, posterior</h4>
+ <div class="ctl"><label>Model <select id="c7m"><option value="nn">Normal–Normal (mean of a quantity)</option><option value="gp">Gamma–Poisson (event rate per day)</option></select></label></div>
+ <div class="ctl" id="c7nn"><label>prior mean μ₀ <input type="range" id="c7a" min="0" max="100" step="1" value="50"><output id="c7av"></output></label><label>prior SD τ₀ <input type="range" id="c7b" min="1" max="40" step="1" value="10"><output id="c7bv"></output></label><label>sample mean x̄ <input type="range" id="c7c" min="0" max="100" step="1" value="65"><output id="c7cv"></output></label><label>noise σ <input type="range" id="c7d" min="1" max="50" step="1" value="20"><output id="c7dv"></output></label><label>n <input type="range" id="c7n" min="1" max="200" step="1" value="10"><output id="c7nv"></output></label></div>
+ <div class="ctl" id="c7gp" style="display:none"><label>prior shape a <input type="range" id="c7ga" min="1" max="100" step="1" value="20"><output id="c7gav"></output></label><label>prior rate b <input type="range" id="c7gb" min="1" max="30" step="1" value="4"><output id="c7gbv"></output></label><label>total events k <input type="range" id="c7gk" min="0" max="300" step="1" value="60"><output id="c7gkv"></output></label><label>days n <input type="range" id="c7gn" min="1" max="60" step="1" value="10"><output id="c7gnv"></output></label></div>
+ <canvas class="sm" id="c7cvs"></canvas><div class="stats" id="c7st"></div><div class="read" id="c7rd"></div></div>
+</section>
+
+<section class="ch" id="c8">
+<h2><span class="num">8</span>Shrinkage: borrowing strength across segments <span class="lvl a">Advanced</span></h2>
+<p>You have 15 customer segments and want each one's default rate. A segment with 20 loans and 0 defaults has a raw rate of 0% — but surely the true rate isn't exactly zero. The Bayesian answer treats the segment rates as draws from a common Beta distribution (a prior learned from the whole book), and estimates each one by the posterior mean:</p>
+<div class="f">shrunk rate = (a + kᵢ) / (a + b + nᵢ)        = weighted average of the book-wide mean and the segment's own rate</div>
+<p>The weight on the segment's own data is nᵢ/(a+b+nᵢ): large segments keep their own rate, small segments are pulled toward the book average. This is <b>partial pooling</b> — the idea behind hierarchical models, empirical Bayes, credibility theory in insurance, and the cure for the winner's curse from the p-value course.</p>
+<div class="card"><h4>Lab 8 · Raw vs shrunk estimates, with the truth known</h4>
+ <p class="sub">True segment rates are drawn from a Beta prior; defaults are simulated; we then compare raw rate k/n and shrunk estimate with the truth (yellow). Green dots are closer to yellow than red dots, especially for small segments.</p>
+ <div class="ctl"><label>segments <input type="range" id="c8m" min="6" max="40" step="1" value="16"><output id="c8mv"></output></label><label>book-wide PD % <input type="range" id="c8u" min="1" max="15" step="0.5" value="4"><output id="c8uv"></output></label><label>prior strength a+b <input type="range" id="c8k" min="5" max="500" step="5" value="80"><output id="c8kv"></output></label><label>avg loans per segment <input type="range" id="c8n" min="10" max="600" step="10" value="60"><output id="c8nv"></output></label><button class="alt" id="c8go">Re-simulate</button></div>
+ <canvas class="tl" id="c8cv"></canvas><div class="stats" id="c8st"></div><div class="read" id="c8rd"></div></div>
+</section>
+
+<!-- ============ PART IV ============ -->
+<div class="part">Part IV · Traps and the big picture</div>
+
+<section class="ch" id="c9">
+<h2><span class="num">9</span>Classic traps: Monty Hall and the prosecutor's fallacy <span class="lvl a">Advanced</span></h2>
+<h3>Monty Hall</h3>
+<p>Three doors, one car. You pick a door; the host, who <em>knows</em> where the car is, opens another door with a goat and offers a switch. Switching wins with probability <b>2/3</b>: your first pick was right 1/3 of the time and the host's action does not change that, so the remaining 2/3 is concentrated on the one other closed door. If the host <em>doesn't</em> know and merely happens to reveal a goat, the same observation gives 1/2 — the host's <em>process</em> is part of the evidence, which is why Bayes requires you to think about how the data were generated.</p>
+<div class="card"><h4>Lab 9a · Simulate the game</h4>
+ <div class="ctl"><label>games <input type="range" id="c9n" min="500" max="50000" step="500" value="10000"><output id="c9nv"></output></label><button id="c9go">Play</button></div>
+ <div class="tw" id="c9tb"></div><div class="read" id="c9rd"></div></div>
+<h3>The prosecutor's fallacy</h3>
+<p>“The chance of such a DNA match by coincidence is 1 in a million, so the chance the defendant is innocent is 1 in a million.” This confuses P(match | innocent) with P(innocent | match). If the pool of possible sources is 5 million people, you'd <em>expect</em> about 5 innocent matches; the defendant is one of ~6 matching people, so on the DNA alone the chance of guilt is about 1 in 6. The same error appears in fraud analytics whenever “the pattern is rare among legitimate accounts” is read as “accounts with the pattern are probably fraudulent”.</p>
+<div class="card"><h4>Lab 9b · Match evidence vs. guilt</h4>
+ <div class="ctl"><label>random-match odds 1 in 10^ <input type="range" id="c9x" min="3" max="10" step="0.1" value="6"><output id="c9xv"></output></label><label>people who could be the source, 10^ <input type="range" id="c9y" min="3" max="9.5" step="0.1" value="6.7"><output id="c9yv"></output></label><label>other evidence multiplies odds by 10^ <input type="range" id="c9z" min="0" max="5" step="0.1" value="0"><output id="c9zv"></output></label></div>
+ <div class="stats" id="c9st"></div><div class="read" id="c9rd"></div></div>
+</section>
+
+<section class="ch" id="c10">
+<h2><span class="num">10</span>Bayesian vs frequentist, side by side <span class="lvl e">Expert</span></h2>
+<div class="tw"><table>
+<tr><th></th><th>Frequentist</th><th>Bayesian</th></tr>
+<tr><td>Parameter θ</td><td>Fixed unknown constant</td><td>Random variable describing uncertainty</td></tr>
+<tr><td>Probability means</td><td>Long-run frequency over repeated samples</td><td>Degree of belief given the data and prior</td></tr>
+<tr><td>Main outputs</td><td>p-value, 95% confidence interval</td><td>Posterior, credible interval, P(θ &gt; c | data), Bayes factor</td></tr>
+<tr><td>“95% interval”</td><td>Procedure covers θ in 95% of repeated experiments; this interval either does or doesn't</td><td>θ lies in this interval with 95% probability, given the model and prior</td></tr>
+<tr><td>Needs a prior?</td><td>No (but needs a sampling model and a stopping rule)</td><td>Yes — and the result depends on it, visibly</td></tr>
+<tr><td>Small samples</td><td>Intervals can be wide or erratic</td><td>Prior stabilises estimates (shrinkage)</td></tr>
+<tr><td>Peeking at data</td><td>Breaks error guarantees</td><td>Posterior is valid at any stopping time (given the model)</td></tr>
+</table></div>
+<p>They often agree numerically when the sample is large and the prior is weak. They disagree most when data are scarce or the null is a sharp point value. Lab 10 puts one dataset through both lenses.</p>
+<div class="card"><h4>Lab 10 · Coin / conversion data through four lenses</h4>
+ <p class="sub">n trials, k successes. Null: θ = 0.5. Prior for the Bayesian columns: flat Beta(1,1) for θ; for the Bayes factor, a 50/50 prior on “θ = 0.5 exactly” versus “θ is uniform on [0,1]”.</p>
+ <div class="ctl"><label>n <input type="range" id="c10n" min="5" max="20000" step="5" value="100"><output id="c10nv"></output></label><label>k <input type="range" id="c10k" min="0" max="100" step="1" value="61"><output id="c10kv"></output></label></div>
+ <div class="ctl"><button class="alt" data-p="10,7">7 of 10</button><button class="alt" data-p="100,61">61 of 100</button><button class="alt" data-p="1000,540">540 of 1,000</button><button class="alt" data-p="10000,5100">5,100 of 10,000 (p ≈ .046)</button></div>
+ <canvas class="sm" id="c10cv"></canvas><div class="stats" id="c10st"></div><div class="read" id="c10rd"></div></div>
+<p>The last preset is the punchline: p = 0.046 is “significant”, but with 10,000 trials the Bayes factor is about 11 <em>in favour of θ = 0.5</em>, and the estimated θ is 0.51 — practically nothing. This is Lindley's paradox from the p-value course, now from the other side.</p>
+</section>
+
+<section class="ch" id="c11">
+<h2><span class="num">11</span>Final exam, mastery checklist, cheat sheet <span class="lvl e">Expert</span></h2>
+<h3>Exam (16 questions — click an answer)</h3>
+<div id="quiz"></div>
+<div class="card"><h4>Score</h4><div class="stats" id="qscore"></div><button class="alt" id="qreset">Reset exam</button></div>
+<h3>Mastery checklist — tick when you can do it without notes</h3>
+<div class="card chk" id="chk"></div>
+<h3>Cheat sheet</h3>
+<div class="tw"><table>
+<tr><th>Idea</th><th>One line</th></tr>
+<tr><td>Conditional probability</td><td>P(A|B) = P(A∩B)/P(B): restrict to B, renormalise</td></tr>
+<tr><td>Chain rule</td><td>P(A∩B∩C) = P(A)·P(B|A)·P(C|A∩B)</td></tr>
+<tr><td>Total probability</td><td>P(B) = Σ P(B|Aᵢ)P(Aᵢ) over a partition</td></tr>
+<tr><td>Independence</td><td>P(A∩B) = P(A)P(B); lift = 1</td></tr>
+<tr><td>Bayes</td><td>P(A|B) = P(B|A)P(A)/P(B)</td></tr>
+<tr><td>Odds form</td><td>posterior odds = prior odds × LR; LR⁺ = sens/FPR; LR⁻ = (1−sens)/(1−FPR)</td></tr>
+<tr><td>Precision</td><td>πTPR / (πTPR + (1−π)FPR): driven by prevalence π as much as by the model</td></tr>
+<tr><td>Decision threshold</td><td>Act when P(event | data) &gt; c_FP / (c_FP + c_FN)</td></tr>
+<tr><td>Beta–Binomial</td><td>Beta(a,b) + k of n → Beta(a+k, b+n−k)</td></tr>
+<tr><td>Gamma–Poisson</td><td>Gamma(a,b) + k events in n periods → Gamma(a+k, b+n)</td></tr>
+<tr><td>Normal–Normal</td><td>Precisions add; posterior mean is precision-weighted</td></tr>
+<tr><td>Shrinkage</td><td>(a+k)/(a+b+n): small segments pulled toward the book mean</td></tr>
+<tr><td>Prosecutor's fallacy</td><td>P(match|innocent) ≠ P(innocent|match); expect (N−1)/X other matches</td></tr>
+<tr><td>Credible vs confidence interval</td><td>Credible: probability statement about θ. Confidence: statement about the procedure.</td></tr>
+</table></div>
+<div class="co tip"><b>Next on the roadmap</b>Item 4 is the law of large numbers and the CLT in depth, then stage 2: maximum likelihood, confidence intervals and the bootstrap. MLE is the frequentist twin of what you just built: posterior ∝ likelihood × prior, so with a flat prior the posterior mode <em>is</em> the MLE.</div>
+</section>
+</main>
+
+<script>
+/*MATH*/
+function lgamma(x){const c=[76.18009172947146,-86.50532032941677,24.01409824083091,-1.231739572450155,0.1208650973866179e-2,-0.5395239384953e-5];let y=x,t=x+5.5;t-=(x+.5)*Math.log(t);let s=1.000000000190015;for(let j=0;j<6;j++)s+=c[j]/++y;return -t+Math.log(2.5066282746310005*s/x);}
+function gser(a,x){let ap=a,sum=1/a,del=sum;for(let n=0;n<1000;n++){ap++;del*=x/ap;sum+=del;if(Math.abs(del)<Math.abs(sum)*1e-15)break;}return sum*Math.exp(-x+a*Math.log(x)-lgamma(a));}
+function gcf(a,x){let b=x+1-a,c=1/1e-300,d=1/b,h=d;for(let i=1;i<1000;i++){const an=-i*(i-a);b+=2;d=an*d+b;if(Math.abs(d)<1e-300)d=1e-300;c=b+an/c;if(Math.abs(c)<1e-300)c=1e-300;d=1/d;const del=d*c;h*=del;if(Math.abs(del-1)<1e-15)break;}return Math.exp(-x+a*Math.log(x)-lgamma(a))*h;}
+function gammaQ(a,x){if(x<=0)return 1;return x<a+1?1-gser(a,x):gcf(a,x);}
+function betacf(a,b,x){const qab=a+b,qap=a+1,qam=a-1;let c=1,d=1-qab*x/qap;if(Math.abs(d)<1e-300)d=1e-300;d=1/d;let h=d;for(let m=1;m<=1000;m++){const m2=2*m;let aa=m*(b-m)*x/((qam+m2)*(a+m2));d=1+aa*d;if(Math.abs(d)<1e-300)d=1e-300;c=1+aa/c;if(Math.abs(c)<1e-300)c=1e-300;d=1/d;h*=d*c;aa=-(a+m)*(qab+m)*x/((a+m2)*(qap+m2));d=1+aa*d;if(Math.abs(d)<1e-300)d=1e-300;c=1+aa/c;if(Math.abs(c)<1e-300)c=1e-300;d=1/d;const del=d*c;h*=del;if(Math.abs(del-1)<1e-15)break;}return h;}
+function betai(a,b,x){if(x<=0)return 0;if(x>=1)return 1;const bt=Math.exp(lgamma(a+b)-lgamma(a)-lgamma(b)+a*Math.log(x)+b*Math.log(1-x));return x<(a+1)/(a+b+2)?bt*betacf(a,b,x)/a:1-bt*betacf(b,a,1-x)/b;}
+function normSf(z){const q=0.5*gammaQ(.5,z*z/2);return z>=0?q:1-q;}
+function normCdf(z){return normSf(-z);}
+function npdf(x){return Math.exp(-x*x/2)/2.5066282746310002;}
+function lbin(n,k){return lgamma(n+1)-lgamma(k+1)-lgamma(n-k+1);}
+function binom(n,k,p){return Math.exp(lbin(n,k)+k*Math.log(p)+(n-k)*Math.log(1-p));}
+function betapdf(x,a,b){return x<=0||x>=1?0:Math.exp(lgamma(a+b)-lgamma(a)-lgamma(b)+(a-1)*Math.log(x)+(b-1)*Math.log(1-x));}
+function betacdf(x,a,b){return betai(a,b,x);}
+function gampdf(x,a,r){return x<=0?0:Math.exp(a*Math.log(r)+(a-1)*Math.log(x)-r*x-lgamma(a));}
+function gamcdf(x,a,r){return x<=0?0:1-gammaQ(a,r*x);}
+function randn(){let u=0;while(!u)u=Math.random();return Math.sqrt(-2*Math.log(u))*Math.cos(2*Math.PI*Math.random());}
+function gammaS(a){if(a<1)return gammaS(a+1)*Math.pow(Math.random(),1/a);const d=a-1/3,c=1/Math.sqrt(9*d);for(;;){let x,v;do{x=randn();v=1+c*x}while(v<=0);v=v*v*v;const u=Math.random();if(Math.log(u)<.5*x*x+d-d*v+d*Math.log(v))return d*v;}}
+function betaS(a,b){const x=gammaS(a),y=gammaS(b);return x/(x+y);}
+function binS(n,p){let k=0;for(let i=0;i<n;i++)if(Math.random()<p)k++;return k;}
+function mean(a){let s=0;for(const v of a)s+=v;return s/a.length;}
+function qc(cdf,lo,hi,p,it){for(let i=0;i<(it||100);i++){const m=(lo+hi)/2;if(cdf(m)<p)lo=m;else hi=m}return(lo+hi)/2;}
+function qb(a,b,p){return qc(x=>betai(a,b,x),0,1,p,50);}
+/*ENDMATH*/
+
+const $=id=>document.getElementById(id), val=id=>+$(id).value;
+const C={fg:'#e8ebf5',mu:'#8a93ab',gr:'#232a3d',a:'#6ea8ff',r:'#ff6b81',y:'#ffd166',g:'#4ade80',p:'#c084fc',t:'#5eead4'};
+const store={get(k,d){try{const v=JSON.parse(localStorage.getItem(k));return v==null?d:v}catch(e){return d}},set(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}};
+function stat(l,v,c){return `<div class="stat ${c||''}"><b>${v}</b><span>${l}</span></div>`}
+function f3(x){if(!isFinite(x))return String(x);const a=Math.abs(x);if(a!==0&&(a<1e-3||a>=1e6))return x.toExponential(2);return String(+x.toFixed(a<1?4:a<100?3:a<1000?2:0))}
+function pc(x){return f3(100*x)+'%'}
+const resizers=[];
+function reg(fn){fn();resizers.push(fn)}
+function on(ids,fn){ids.split(' ').forEach(i=>{const e=$(i);e.addEventListener('input',fn);e.addEventListener('change',fn)})}
+let rt;window.addEventListener('resize',()=>{clearTimeout(rt);rt=setTimeout(()=>resizers.forEach(f=>f()),150)});
+document.querySelectorAll('input[type=range]').forEach(i=>{const o=$(i.id+'v');if(!o)return;const f=()=>{o.textContent=i.value};i.addEventListener('input',f);f()});
+
+function nice(x){const e=Math.pow(10,Math.floor(Math.log10(x))),f=x/e;return (f<1.5?1:f<3?2:f<7?5:10)*e}
+function mk(cv,x0,x1,ymax,o){o=o||{};const y0=o.y0||0,dpr=window.devicePixelRatio||1,r=cv.getBoundingClientRect(),w=r.width||600,h=r.height||270;
+ cv.width=w*dpr;cv.height=h*dpr;const g=cv.getContext('2d');g.setTransform(dpr,0,0,dpr,0,0);g.clearRect(0,0,w,h);
+ const L=o.L||42,R=12,T=14,B=28,X=x=>L+(x-x0)/(x1-x0)*(w-L-R),Y=y=>h-B-(y-y0)/(ymax-y0)*(h-T-B);
+ g.font='11px system-ui';g.lineWidth=1;g.strokeStyle=C.gr;g.fillStyle=C.mu;
+ if(!o.noGrid){const sx=nice((x1-x0)/7);for(let x=Math.ceil(x0/sx-1e-9)*sx;x<=x1+1e-9;x+=sx){g.beginPath();g.moveTo(X(x),T);g.lineTo(X(x),h-B);g.stroke();g.textAlign='center';g.fillText(String(+x.toFixed(6)),X(x),h-B+15)}
+ const sy=nice((ymax-y0)/4);for(let y=Math.ceil(y0/sy-1e-9)*sy;y<=ymax+1e-9;y+=sy){g.beginPath();g.moveTo(L,Y(y));g.lineTo(w-R,Y(y));g.stroke();g.textAlign='right';g.fillText(String(+y.toFixed(4)),L-5,Y(y)+3)}}
+ return{g,w,h,X,Y,L,R,T,B,
+  line(f,col,lw,a,b,n,dash){a=a==null?x0:a;b=b==null?x1:b;n=n||260;g.save();if(dash)g.setLineDash([5,4]);g.beginPath();g.strokeStyle=col;g.lineWidth=lw||2;let st=false;for(let i=0;i<=n;i++){const x=a+(b-a)*i/n,y=f(x);if(!isFinite(y)){st=false;continue}st?g.lineTo(X(x),Y(y)):g.moveTo(X(x),Y(y));st=true}g.stroke();g.restore()},
+  area(f,a,b,col,n){a=Math.max(a,x0);b=Math.min(b,x1);if(b<=a)return;n=n||200;g.beginPath();g.moveTo(X(a),Y(0));for(let i=0;i<=n;i++){const x=a+(b-a)*i/n;g.lineTo(X(x),Y(f(x)))}g.lineTo(X(b),Y(0));g.closePath();g.fillStyle=col;g.fill()},
+  vline(x,col,lab,dash){g.save();g.strokeStyle=col;g.lineWidth=1.6;if(dash)g.setLineDash([5,4]);g.beginPath();g.moveTo(X(x),T);g.lineTo(X(x),h-B);g.stroke();g.restore();if(lab){g.fillStyle=col;g.textAlign='center';g.fillText(lab,Math.min(Math.max(X(x),34),w-34),T+10)}},
+  hline(y,col,lab){g.save();g.strokeStyle=col;g.lineWidth=1.4;g.setLineDash([5,4]);g.beginPath();g.moveTo(L,Y(y));g.lineTo(w-R,Y(y));g.stroke();g.restore();if(lab){g.fillStyle=col;g.textAlign='right';g.fillText(lab,w-R-3,Y(y)-4)}},
+  text(s,x,y,col,al){g.fillStyle=col||C.fg;g.textAlign=al||'left';g.fillText(s,x,y)}};}
+
+/* ---------- Ch1 rectangle ---------- */
+(function(){function draw(){const pA=val('c1a')/100,pBA=val('c1b')/100,pBN=val('c1c')/100;
+ const jAB=pA*pBA,jAn=pA*(1-pBA),jNB=(1-pA)*pBN,jNn=(1-pA)*(1-pBN),pB=jAB+jNB,post=pB>0?jAB/pB:NaN;
+ const cv=$('c1cvs'),dpr=window.devicePixelRatio||1,r=cv.getBoundingClientRect(),w=r.width||600,h=r.height||330;cv.width=w*dpr;cv.height=h*dpr;const g=cv.getContext('2d');g.setTransform(dpr,0,0,dpr,0,0);g.clearRect(0,0,w,h);
+ const L=14,T=34,W=w-28,H=h-T-32;const xA=L+W*pA;
+ function rect(x,y,wd,ht,col,lab,lc){g.fillStyle=col;g.fillRect(x,y,wd,ht);if(lab&&wd>38&&ht>16){g.fillStyle=lc||'#fff';g.font='12px system-ui';g.textAlign='center';g.fillText(lab,x+wd/2,y+ht/2+4)}}
+ const hB1=H*pBA,hB2=H*pBN;
+ rect(L,T,W*pA,H-hB1,'rgba(255,107,129,.18)','A ∩ ¬B');rect(L,T+H-hB1,W*pA,hB1,'rgba(255,107,129,.85)','A ∩ B');
+ rect(xA,T,W*(1-pA),H-hB2,'rgba(110,168,255,.14)','¬A ∩ ¬B');rect(xA,T+H-hB2,W*(1-pA),hB2,'rgba(255,209,102,.85)','¬A ∩ B','#111');
+ g.strokeStyle='#e8ebf5';g.lineWidth=1.5;g.strokeRect(L,T,W,H);g.setLineDash([5,4]);g.beginPath();g.moveTo(xA,T);g.lineTo(xA,T+H);g.stroke();g.setLineDash([]);
+ g.fillStyle=C.mu;g.font='12px system-ui';g.textAlign='left';g.fillText('A: fraud ('+pc(pA)+')',L,T-12);g.textAlign='right';g.fillText('¬A: legitimate ('+pc(1-pA)+')',L+W,T-12);
+ g.fillStyle=C.y;g.textAlign='center';g.fillText('Bottom bands = B (rule fires). Conditioning on B keeps only these.',L+W/2,T+H+16);
+ const N=10000,t=[Math.round(N*jAB),Math.round(N*jAn),Math.round(N*jNB),Math.round(N*jNn)];
+ $('c1tb').innerHTML=`<table><tr><th>per 10,000 accounts</th><th>B: alert</th><th>¬B: no alert</th><th>total</th></tr><tr><td>A: fraud</td><td class="n">${t[0]}</td><td class="n">${t[1]}</td><td class="n">${t[0]+t[1]}</td></tr><tr><td>¬A: legitimate</td><td class="n">${t[2]}</td><td class="n">${t[3]}</td><td class="n">${t[2]+t[3]}</td></tr><tr><td>total</td><td class="n">${t[0]+t[2]}</td><td class="n">${t[1]+t[3]}</td><td class="n">${N}</td></tr></table>`;
+ $('c1st').innerHTML=stat('P(B) alert rate',pc(pB),'in')+stat('P(B | A) catch rate',pc(pBA),'ok')+stat('P(A | B) precision',pc(post),'hot')+stat('P(A | ¬B) miss share',pc(jAn/(1-pB)),'warn')+stat('P(A)',pc(pA),'');
+ $('c1rd').innerHTML=`Out of every ${f3(1/pB)} accounts one alerts. Among alerts, only <b>${pc(post)}</b> are fraud (red area ÷ red+yellow), even though the rule catches <b>${pc(pBA)}</b> of all fraud. The two conditionals P(B|A) = ${pc(pBA)} and P(A|B) = ${pc(post)} answer different questions.`}
+ on('c1a c1b c1c',draw);reg(draw);})();
+
+/* ---------- Ch2 tree ---------- */
+(function(){function draw(){const a=val('c2a')/100,b=val('c2b')/100,c=val('c2c')/100;
+ const j11=a*b,j10=a*(1-b),j01=(1-a)*c,j00=(1-a)*(1-c),p2=j11+j01,lift=p2>0?b/p2:NaN,post=p2>0?j11/p2:NaN,N=1e6;
+ $('c2tb').innerHTML=`<table><tr><th>path</th><th>how computed</th><th>probability</th><th>per 1,000,000</th></tr>
+ <tr><td>E₁ then E₂</td><td>P(E₁)·P(E₂|E₁)</td><td class="n">${f3(j11)}</td><td class="n">${f3(j11*N)}</td></tr>
+ <tr><td>E₁ then not E₂</td><td>P(E₁)·(1−P(E₂|E₁))</td><td class="n">${f3(j10)}</td><td class="n">${f3(j10*N)}</td></tr>
+ <tr><td>not E₁, then E₂</td><td>P(¬E₁)·P(E₂|¬E₁)</td><td class="n">${f3(j01)}</td><td class="n">${f3(j01*N)}</td></tr>
+ <tr><td>not E₁, not E₂</td><td>P(¬E₁)·(1−P(E₂|¬E₁))</td><td class="n">${f3(j00)}</td><td class="n">${f3(j00*N)}</td></tr></table>`;
+ const indep=Math.abs(b-c)<1e-9;
+ $('c2st').innerHTML=stat('P(E₂) total probability',pc(p2),'in')+stat('lift P(E₂|E₁)/P(E₂)',f3(lift),indep?'ok':'warn')+stat('P(E₁ | E₂) by Bayes',pc(post),'hot')+stat('independent?',indep?'yes':'no',indep?'ok':'hot');
+ $('c2rd').innerHTML=`Total probability: P(E₂) = ${pc(b)}·${pc(a)} + ${pc(c)}·${pc(1-a)} = <b>${pc(p2)}</b>. The lift is ${f3(lift)}: E₂ is ${f3(lift)}× as likely once E₁ has happened${indep?' — i.e. no change, the events are independent':''}. Reversing the question (Bayes): given a large transfer, the chance a new beneficiary was added is ${pc(post)}.`}
+ on('c2a c2b c2c',draw);reg(draw);})();
+
+/* ---------- Ch3 dots ---------- */
+(function(){function draw(){const pi=val('c3p')/100,se=val('c3s')/100,fp=val('c3f')/100,N=10000;
+ const P=Math.round(N*pi),TP=Math.round(P*se),FN=P-TP,FP=Math.round((N-P)*fp),TN=N-P-FP;
+ const cv=$('c3cv'),dpr=window.devicePixelRatio||1,r=cv.getBoundingClientRect(),w=r.width||600,h=r.height||330;cv.width=w*dpr;cv.height=h*dpr;const g=cv.getContext('2d');g.setTransform(dpr,0,0,dpr,0,0);g.clearRect(0,0,w,h);
+ const cols=125,rows=80,cell=Math.min((w-16)/cols,(h-12)/rows),ox=(w-cell*cols)/2,oy=(h-cell*rows)/2;let idx=0;
+ [[TP,C.g],[FN,C.y],[FP,C.r],[TN,'#2f3752']].forEach(([cnt,col])=>{g.fillStyle=col;for(let j=0;j<cnt;j++){const rr=Math.floor(idx/cols),cc=idx%cols;g.beginPath();g.arc(ox+cc*cell+cell/2,oy+rr*cell+cell/2,cell*.38,0,7);g.fill();idx++}});
+ const al=TP+FP,ppv=al?TP/al:NaN,npv=(TN+FN)?TN/(TN+FN):NaN;
+ $('c3st').innerHTML=stat('real fraud',P,'in')+stat('alerts',al,'warn')+stat('true alerts (green)',TP,'ok')+stat('false alarms (red)',FP,'hot')+stat('P(fraud | alert)',pc(ppv),'hot')+stat('P(fraud | no alert)',pc(FN/(TN+FN)),'warn')+stat('false alarms per real catch',TP?f3(FP/TP):'∞','');
+ $('c3rd').innerHTML=`Of ${N.toLocaleString()} accounts, ${P} are fraud and the rule catches ${TP}. It also flags ${FP} legitimate accounts. So of ${al} alerts only <b>${TP}</b> are real: <b>P(fraud | alert) = ${pc(ppv)}</b> — Bayes' theorem: ${f3(pi)}×${f3(se)} ÷ (${f3(pi)}×${f3(se)} + ${f3(1-pi)}×${f3(fp)}). Raise the prevalence slider and watch the red stripe become a small part of the alerts.`}
+ on('c3p c3s c3f',draw);reg(draw);
+ document.querySelectorAll('[data-pre]').forEach(b=>b.onclick=()=>{const[p,s,f]=b.dataset.pre.split(',');$('c3p').value=p;$('c3s').value=s;$('c3f').value=f;['c3p','c3s','c3f'].forEach(i=>$(i+'v').textContent=$(i).value);draw()});})();
+
+/* ---------- Ch4 stacking ---------- */
+(function(){const SIG=[['new beneficiary added',70,10],['login from a new device',60,8],['transfer > 5× the usual amount',55,6],['rapid in-and-out within 1 hour',80,2]];
+ const box=$('c4rows');SIG.forEach((s,i)=>{const d=document.createElement('div');d.className='sigrow';d.innerHTML=`<span>${i+1}. ${s[0]}</span><label>sens % <input type="number" min="1" max="99" step="1" value="${s[1]}" id="c4s${i}" style="width:62px"></label><label>FPR % <input type="number" min="0.1" max="99" step="0.1" value="${s[2]}" id="c4f${i}" style="width:62px"></label><label><input type="checkbox" id="c4x${i}" ${i<2?'checked':''}> fired</label>`;box.appendChild(d)});
+ function odds(p){return p/(1-p)}function prob(o){return o/(1+o)}
+ function run(dep){let o=odds(val('c4p')/100);const out=[prob(o)],lrs=[];for(let i=0;i<4;i++){const se=val('c4s'+i)/100,fp=val('c4f'+i)/100,fired=$('c4x'+i).checked;let lr=fired?se/fp:(1-se)/(1-fp);if(dep&&i===2)lr=1;lrs.push(lr);o*=lr;out.push(prob(o))}return{out,lrs}}
+ function draw(){const dep=$('c4d').checked,naive=run(false),cor=run(true),res=dep?cor:naive,prior=val('c4p')/100;
+  const P=mk($('c4cv'),-.6,4.6,1.05,{});const lab=['prior','+signal 1','+signal 2','+signal 3','+signal 4'];
+  res.out.forEach((v,i)=>{P.g.fillStyle=i?C.a:C.mu;P.g.globalAlpha=.75;P.g.fillRect(P.X(i-.32),P.Y(v),P.X(i+.32)-P.X(i-.32),P.Y(0)-P.Y(v));P.g.globalAlpha=1;P.text(pc(v),P.X(i),P.Y(v)-6,C.fg,'center');P.text(lab[i],P.X(i),P.h-8,C.mu,'center')});
+  P.text('posterior P(fraud) after each signal',P.L+6,P.T+12,C.mu);
+  const tl=res.lrs.reduce((a,b)=>a*b,1);
+  $('c4st').innerHTML=stat('prior',pc(prior),'in')+stat('combined LR',f3(tl),'warn')+stat('posterior (shown)',pc(res.out[4]),'hot')+stat('if independent (naive)',pc(naive.out[4]),'')+stat('with dependence fix',pc(cor.out[4]),'ok')+stat('prior odds → posterior odds',`1:${f3(1/odds(prior))} → ${f3(odds(res.out[4]))}:1`,'');
+  $('c4rd').innerHTML=`LRs: ${res.lrs.map((l,i)=>`signal ${i+1}: ×${f3(l)}`).join(' · ')}. Multiplying them, the odds move by a factor of ${f3(tl)}. ${$('c4d').checked?'Signal 3 is treated as carrying no <i>extra</i> information (LR = 1), so the posterior is lower than the naive product would claim.':'Tick the dependence box to see how much the naive multiplication overstates the evidence when signals overlap.'} Silent signals matter too: they multiply by LR⁻ &lt; 1 and pull the probability down.`}
+ on('c4p c4d',draw);for(let i=0;i<4;i++){['c4s','c4f','c4x'].forEach(p=>$(p+i).addEventListener('input',draw));$('c4x'+i).addEventListener('change',draw)}reg(draw);})();
+
+/* ---------- Ch5 thresholds ---------- */
+(function(){const N=1e5;
+ function calc(d,pi,t,cf,cn){const fpr=normSf(t),tpr=normSf(t-d),F=N*pi,Lg=N-F,TP=F*tpr,FP=Lg*fpr,al=TP+FP;return{fpr,tpr,TP,FP,al,prec:al>1e-9?TP/al:NaN,cost:FP*cf+(F-TP)*cn}}
+ function draw(){const d=val('c5d'),pi=val('c5p')/100,t=val('c5t'),cf=val('c5cf'),cn=val('c5cn'),r=calc(d,pi,t,cf,cn);
+  let best=null,bt=0;for(let x=-2;x<=d+5;x+=.01){const c=calc(d,pi,x,cf,cn).cost;if(best===null||c<best){best=c;bt=x}}
+  const P=mk($('c5cv'),-3.5,d+4.5,.45);P.line(npdf,C.a,2.2);P.line(x=>npdf(x-d),C.r,2.2);P.text('legitimate',P.X(-.5),P.Y(.38),C.a,'right');P.text('fraud',P.X(d+.5),P.Y(.38),C.r);
+  P.area(npdf,t,d+4.5,'rgba(255,107,129,.35)');P.area(x=>npdf(x-d),-3.5,t,'rgba(255,209,102,.3)');
+  P.vline(t,C.y,'t = '+t.toFixed(2));P.vline(bt,C.g,'cost-optimal '+bt.toFixed(2),true);
+  const lo=-2,hi=d+5,Q=mk($('c5cv2'),lo,hi,1.05);
+  Q.line(x=>{const q=calc(d,pi,x,cf,cn);return q.prec},C.r,2.4,lo,hi,220);Q.line(x=>normSf(x-d),C.g,2.4,lo,hi,220);Q.vline(t,C.y,null);Q.text('precision',Q.X(lo+.2),Q.Y(.12),C.r);Q.text('recall',Q.X(lo+.2),Q.Y(.95),C.g);
+  const ro=calc(d,pi,bt,cf,cn),llr=d*t-d*d/2,po=pi/(1-pi)*Math.exp(llr),pp=po/(1+po);
+  $('c5st').innerHTML=stat('alerts per 100k',f3(r.al),'in')+stat('real catches',f3(r.TP),'ok')+stat('false alarms',f3(r.FP),'hot')+stat('precision',pc(r.prec),'hot')+stat('recall',pc(r.tpr),'ok')+stat('reviews per catch',r.TP>0?f3(r.al/r.TP):'∞','warn')+stat('total cost at t',f3(r.cost),'')+stat('optimal t / cost',bt.toFixed(2)+' / '+f3(best),'ok')+stat('P(fraud | score = t)',pc(pp),'warn');
+  $('c5rd').innerHTML=`At t = ${t.toFixed(2)} the model alerts on ${f3(r.al)} of ${N.toLocaleString()} accounts: ${f3(r.TP)} real, ${f3(r.FP)} false. <b>Precision ${pc(r.prec)}</b> because fraud is only ${pc(pi)} of the population. An account scoring exactly t has a posterior fraud probability of ${pc(pp)}; the cost-optimal threshold ${bt.toFixed(2)} is where that posterior reaches ≈ c<sub>FP</sub>/(c<sub>FP</sub>+c<sub>FN</sub>) = ${pc(cf/(cf+cn||1))}. Total cost at your threshold is ${f3(r.cost)} versus ${f3(best)} at the optimum.`}
+ on('c5d c5p c5t c5cf c5cn',draw);reg(draw);})();
+
+/* ---------- Ch6 beta updating ---------- */
+(function(){let obs=[];
+ function draw(){const[a,b]=$('c6pr').value.split(',').map(Number),th=val('c6t')/100,n=obs.length,k=obs.reduce((s,v)=>s+v,0),a2=a+k,b2=b+n-k;
+  const hi=Math.min(1,Math.max(qb(a,b,.99),qb(a2,b2,.995))*1.2);
+  let mx=0;for(let i=1;i<=250;i++){const x=hi*i/250;mx=Math.max(mx,Math.min(betapdf(x,a,b),1e9),Math.min(betapdf(x,a2,b2),1e9))}
+  const P=mk($('c6cv'),0,hi,mx*1.15||1);P.area(x=>betapdf(x,a2,b2),0,hi,'rgba(255,107,129,.22)',250);
+  P.line(x=>Math.min(betapdf(x,a,b),mx*1.4),C.a,2.2,hi*1e-4,hi,250);P.line(x=>Math.min(betapdf(x,a2,b2),mx*1.4),C.r,2.6,hi*1e-4,hi,250);P.vline(th,C.y,'true θ',true);
+  P.text('blue: prior   red: posterior',P.w-P.R-6,P.T+12,C.mu,'right');
+  const cps=[];const M=Math.min(n,60);for(let i=0;i<=M;i++){const m=M?Math.round(n*i/M):0;let kk=0;for(let j=0;j<m;j++)kk+=obs[j];cps.push({m,mean:(a+kk)/(a+b+m),lo:qb(a+kk,b+m-kk,.025),hi:qb(a+kk,b+m-kk,.975)})}
+  const nmax=Math.max(10,n),ym=Math.min(1,Math.max(th*3,...cps.map(c=>c.hi))*1.1);
+  const Q=mk($('c6cv2'),0,nmax,ym);Q.g.fillStyle='rgba(255,107,129,.2)';Q.g.beginPath();cps.forEach((c,i)=>i?Q.g.lineTo(Q.X(c.m),Q.Y(c.hi)):Q.g.moveTo(Q.X(c.m),Q.Y(c.hi)));for(let i=cps.length-1;i>=0;i--)Q.g.lineTo(Q.X(cps[i].m),Q.Y(cps[i].lo));Q.g.closePath();Q.g.fill();
+  Q.g.strokeStyle=C.r;Q.g.lineWidth=2;Q.g.beginPath();cps.forEach((c,i)=>i?Q.g.lineTo(Q.X(c.m),Q.Y(c.mean)):Q.g.moveTo(Q.X(c.m),Q.Y(c.mean)));Q.g.stroke();Q.hline(th,C.y,'true θ');Q.text('x: loans observed   line: posterior mean   band: 95% credible interval',Q.L+6,Q.T+12,C.mu);
+  const pm=a2/(a2+b2),lo=qb(a2,b2,.025),up=qb(a2,b2,.975),w=(a+b)/(a+b+n);
+  $('c6st').innerHTML=stat('loans n',n,'in')+stat('defaults k',k,'warn')+stat('raw rate k/n',n?pc(k/n):'—','')+stat('prior mean',pc(a/(a+b)),'in')+stat('posterior mean',pc(pm),'hot')+stat('95% credible interval',`[${pc(lo)}, ${pc(up)}]`,'ok')+stat('weight on prior',pc(w),'');
+  $('c6rd').innerHTML=`Posterior = Beta(${f3(a2)}, ${f3(b2)}). Weight on the prior is ${pc(w)}: prior pseudo-sample size ${f3(a+b)} vs ${n} real loans. ${n===0?'No data yet — the posterior is the prior.':(th>=lo&&th<=up?'The true θ lies inside the credible interval.':'The true θ lies <b>outside</b> the 95% interval — the prior is pulling the estimate away; more data will fix it.')}`}
+ function add(m,def){for(let i=0;i<m;i++)obs.push(def===undefined?(Math.random()<val('c6t')/100?1:0):def);draw()}
+ $('c6a1').onclick=()=>add(1);$('c6a10').onclick=()=>add(10);$('c6a100').onclick=()=>add(100);$('c6d').onclick=()=>add(1,1);$('c6r').onclick=()=>add(1,0);$('c6x').onclick=()=>{obs=[];draw()};
+ on('c6pr c6t',draw);reg(draw);})();
+
+/* ---------- Ch7 conjugate ---------- */
+(function(){function draw(){const mode=$('c7m').value;$('c7nn').style.display=mode==='nn'?'flex':'none';$('c7gp').style.display=mode==='gp'?'flex':'none';let curves,lo,hi,st,rd;
+ if(mode==='nn'){const m0=val('c7a'),t0=val('c7b'),xb=val('c7c'),s=val('c7d'),n=val('c7n'),pp=1/(t0*t0),pd=n/(s*s),prec=pp+pd,pm=(m0*pp+xb*pd)/prec,ps=Math.sqrt(1/prec),ls=s/Math.sqrt(n);
+  const nd=(m,sd)=>x=>npdf((x-m)/sd)/sd;curves=[[nd(m0,t0),C.a],[nd(xb,ls),C.y],[nd(pm,ps),C.r]];lo=Math.min(m0-3.5*t0,xb-3.5*ls,pm-4*ps);hi=Math.max(m0+3.5*t0,xb+3.5*ls,pm+4*ps);
+  st=stat('prior mean',f3(m0),'in')+stat('sample mean',f3(xb),'warn')+stat('posterior mean',f3(pm),'hot')+stat('posterior SD',f3(ps),'')+stat('weight on data',pc(pd/prec),'ok')+stat('95% credible interval',`[${f3(pm-1.96*ps)}, ${f3(pm+1.96*ps)}]`,'');
+  rd=`Precisions add: ${f3(pp)} (prior) + ${f3(pd)} (data, n/σ²) = ${f3(prec)}. The posterior mean ${f3(pm)} sits ${pc(pd/prec)} of the way from the prior mean toward the sample mean. More data (n↑) or less noise (σ↓) shifts weight to the data; a vaguer prior (τ₀↑) does too. The posterior is always narrower than both the prior and the likelihood.`}
+ else{const a=val('c7ga'),b=val('c7gb'),k=val('c7gk'),n=val('c7gn'),a2=a+k,b2=b+n;curves=[[x=>gampdf(x,a,b),C.a],[x=>gampdf(x,k+1,n),C.y],[x=>gampdf(x,a2,b2),C.r]];
+  const q=(aa,bb,p)=>qc(x=>gamcdf(x,aa,bb),0,1e4,p,60);lo=0;hi=Math.max(q(a,b,.995),q(k+1,n,.995),q(a2,b2,.995))*1.1;
+  st=stat('prior mean a/b',f3(a/b),'in')+stat('observed k/n',f3(k/n),'warn')+stat('posterior mean',f3(a2/b2),'hot')+stat('weight on data n/(b+n)',pc(n/(b+n)),'ok')+stat('95% credible interval',`[${f3(q(a2,b2,.025))}, ${f3(q(a2,b2,.975))}]`,'')+stat('posterior Gamma',`(${a2}, ${b2})`,'');
+  rd=`Prior belief: ${f3(a/b)} alerts per day with strength b = ${b} days of pseudo-data. Observed ${k} alerts in ${n} days = ${f3(k/n)}/day. Posterior mean ${f3(a2/b2)} = weighted average with weight ${pc(n/(b+n))} on the data. Blue = prior, yellow = likelihood (as a Gamma(k+1, n) curve), red = posterior.`}
+ let mx=0;curves.forEach(([f])=>{for(let i=1;i<=250;i++){const v=f(lo+(hi-lo)*i/250);if(isFinite(v))mx=Math.max(mx,v)}});
+ const P=mk($('c7cvs'),lo,hi,mx*1.15);P.area(curves[2][0],lo,hi,'rgba(255,107,129,.2)',250);curves.forEach(([f,c],i)=>P.line(f,c,i===2?2.8:2.1,lo+(hi-lo)*1e-4,hi,300));P.text('blue prior · yellow likelihood · red posterior',P.w-P.R-6,P.T+12,C.mu,'right');
+ $('c7st').innerHTML=st;$('c7rd').innerHTML=rd}
+ on('c7m c7a c7b c7c c7d c7n c7ga c7gb c7gk c7gn',draw);reg(draw);})();
+
+/* ---------- Ch8 shrinkage ---------- */
+(function(){let res=null;
+ function run(){const m=val('c8m'),mu=val('c8u')/100,kap=val('c8k'),nb=val('c8n'),a=mu*kap,b=(1-mu)*kap,seg=[];
+  for(let i=0;i<m;i++){const p=betaS(a,b),n=Math.max(5,Math.round(nb*(.3+1.4*Math.random()))),k=binS(n,p);seg.push({p,n,k,raw:k/n,sh:(a+k)/(a+b+n)})}
+  seg.sort((x,y)=>x.p-y.p);res={seg,mu,a,b};draw()}
+ function draw(){if(!res)return;const{seg,mu}=res,m=seg.length,ym=Math.max(...seg.map(s=>Math.max(s.raw,s.p,s.sh)))*1.12;
+  const P=mk($('c8cv'),0,m+1,ym);P.hline(mu,C.mu,'book PD');
+  seg.forEach((s,i)=>{const x=P.X(i+1);P.g.strokeStyle='rgba(138,147,171,.5)';P.g.lineWidth=1;P.g.beginPath();P.g.moveTo(x,P.Y(s.raw));P.g.lineTo(x,P.Y(s.sh));P.g.stroke();
+   P.g.fillStyle=C.r;P.g.beginPath();P.g.arc(x,P.Y(s.raw),4,0,7);P.g.fill();P.g.fillStyle=C.g;P.g.beginPath();P.g.arc(x,P.Y(s.sh),4,0,7);P.g.fill();
+   P.g.fillStyle=C.y;P.g.fillRect(x-7,P.Y(s.p)-1.5,14,3);P.text('n='+s.n,x,P.h-8,C.mu,'center')});
+  P.text('segments sorted by true rate   ■ yellow = truth   ● red = raw k/n   ● green = shrunk',P.L+6,P.T+12,C.mu);
+  const rm=Math.sqrt(mean(seg.map(s=>(s.raw-s.p)**2))),sm=Math.sqrt(mean(seg.map(s=>(s.sh-s.p)**2))),zeros=seg.filter(s=>s.k===0).length;
+  $('c8st').innerHTML=stat('RMSE raw k/n',pc(rm),'hot')+stat('RMSE shrunk',pc(sm),'ok')+stat('error reduction',pc(1-sm/rm),'in')+stat('segments with 0 defaults',zeros,'warn')+stat('closer to truth (shrunk)',seg.filter(s=>Math.abs(s.sh-s.p)<Math.abs(s.raw-s.p)).length+' / '+m,'');
+  $('c8rd').innerHTML=`Raw rates are noisy, especially for small n (extreme red dots); shrinkage pulls them toward the book PD and lowers the average error by ${pc(1-sm/rm)}. ${zeros?`${zeros} segment${zeros>1?'s have':' has'} zero observed defaults — a raw rate of 0% would be dangerous in a capital model, while the shrunk estimate stays positive. `:''}Reduce the prior strength a+b and the green dots move back toward the red; at a+b = 5 shrinkage is almost gone. Here the prior is the <i>true</i> generating Beta (empirical-Bayes ideal); in practice you estimate a and b from the data.`}
+ on('c8m c8u c8k c8n',run);$('c8go').onclick=run;resizers.push(draw);run();})();
+
+/* ---------- Ch9 Monty & prosecutor ---------- */
+(function(){function run(){const n=val('c9n');let stay=0,sw=0,ig=0,igStay=0,igSw=0;
+ for(let i=0;i<n;i++){const car=Math.floor(Math.random()*3),pick=Math.floor(Math.random()*3);
+  const opts=[0,1,2].filter(d=>d!==pick&&d!==car),host=opts[Math.floor(Math.random()*opts.length)],other=[0,1,2].find(d=>d!==pick&&d!==host);if(pick===car)stay++;if(other===car)sw++;
+  const oth=[0,1,2].filter(d=>d!==pick),h2=oth[Math.floor(Math.random()*2)];if(h2!==car){ig++;if(pick===car)igStay++;if(3-pick-h2===car)igSw++}}
+ $('c9tb').innerHTML=`<table><tr><th>host…</th><th>games counted</th><th>stay wins</th><th>switch wins</th></tr><tr><td>knows where the car is (opens a goat on purpose)</td><td class="n">${n}</td><td class="n">${pc(stay/n)}</td><td class="n">${pc(sw/n)}</td></tr><tr><td>doesn't know, happened to reveal a goat</td><td class="n">${ig}</td><td class="n">${pc(igStay/ig)}</td><td class="n">${pc(igSw/ig)}</td></tr></table>`;
+ $('c9rd').innerHTML=`Informed host: switching wins about 2/3 of the time. Ignorant host: after discarding the games where he accidentally reveals the car, switching and staying are equal (1/2 each). The observation “a goat was shown” is the same; the <b>process that produced it</b> is different — and Bayes' theorem needs P(observation | hypothesis), which depends on that process.`}
+ $('c9go').onclick=run;on('c9n',()=>{});run();
+ function pf(){const X=Math.pow(10,val('c9x')),N=Math.pow(10,val('c9y')),f=Math.pow(10,val('c9z')),others=(N-1)/X,po=f/(N-1)*X,post=po/(1+po);
+  $('c9st').innerHTML=stat('P(match | innocent)',f3(1/X),'in')+stat('expected innocent matches',f3(others),'warn')+stat('P(guilty | match)',pc(post),'ok')+stat('P(innocent | match)',pc(1-post),'hot')+stat('what the “1 in X” claim implies',pc(1/X),'');
+  $('c9rd').innerHTML=`A random-match probability of 1 in ${f3(X)} sounds damning, but in a pool of ${f3(N)} possible sources you'd expect ${f3(others)} innocent people to match as well. On the match alone the probability of guilt is <b>${pc(post)}</b>, not ${pc(1-1/X)}. Strong non-DNA evidence (the multiplier slider) raises the prior odds — only then does the posterior approach certainty. Same logic: “this pattern is rare among legitimate accounts” is not “accounts with this pattern are fraudulent”.`}
+ on('c9x c9y c9z',pf);pf();})();
+
+/* ---------- Ch10 lenses ---------- */
+(function(){function draw(){const n=val('c10n'),kI=$('c10k');kI.max=n;if(+kI.value>n)kI.value=n;$('c10kv').textContent=kI.value;const k=+kI.value,a=k+1,b=n-k+1;
+ const pm=binom(n,k,.5);let p=0;for(let i=0;i<=n;i++){const q=binom(n,i,.5);if(q<=pm*(1+1e-9))p+=q}p=Math.min(1,p);
+ const pgt=1-betacdf(.5,a,b),lo=qb(a,b,.025),hi=qb(a,b,.975),ph=k/n,z=1.96,cen=(ph+z*z/(2*n))/(1+z*z/n),hw=z*Math.sqrt(ph*(1-ph)/n+z*z/(4*n*n))/(1+z*z/n);
+ const bf01=(n+1)*pm,ph0=bf01/(1+bf01),mu=a/(a+b),sd=Math.sqrt(a*b/((a+b)**2*(a+b+1)));
+ let x0=Math.max(0,mu-5*sd),x1=Math.min(1,mu+5*sd);x0=Math.min(x0,.5-.03);x1=Math.max(x1,.5+.03);x0=Math.max(0,x0);x1=Math.min(1,x1);
+ let mx=0;for(let i=1;i<=250;i++)mx=Math.max(mx,betapdf(x0+(x1-x0)*i/250,a,b));
+ const P=mk($('c10cv'),x0,x1,mx*1.15);P.area(x=>betapdf(x,a,b),Math.max(.5,x0),x1,'rgba(255,107,129,.3)',250);P.line(x=>betapdf(x,a,b),C.r,2.6,x0,x1,300);P.vline(.5,C.y,'null θ = 0.5',true);
+ P.g.strokeStyle=C.g;P.g.lineWidth=5;P.g.beginPath();P.g.moveTo(P.X(lo),P.Y(mx*.07));P.g.lineTo(P.X(hi),P.Y(mx*.07));P.g.stroke();P.text('95% credible interval',P.X((lo+hi)/2),P.Y(mx*.07)-8,C.g,'center');
+ $('c10st').innerHTML=stat('exact two-sided p',f3(p),p<.05?'hot':'ok')+stat('estimate k/n',f3(ph),'in')+stat('Wilson 95% CI',`[${f3(cen-hw)}, ${f3(cen+hw)}]`,'')+stat('credible interval (flat prior)',`[${f3(lo)}, ${f3(hi)}]`,'ok')+stat('P(θ > 0.5 | data)',f3(pgt),'warn')+stat('Bayes factor BF₀₁ (null : alt)',f3(bf01),bf01>1?'hot':'ok')+stat('P(θ = 0.5 | data), 50/50 prior',pc(ph0),'');
+ $('c10rd').innerHTML=`The p-value (${f3(p)}) is a statement about data under the null; the credible interval and P(θ&gt;0.5) are statements about θ; the Bayes factor ${f3(bf01)} compares “exactly 0.5” with “anything in [0,1]”. ${p<.05&&bf01>1?'<b>Here they disagree:</b> the result is “significant” yet the data favour the null over a diffuse alternative (Lindley\'s paradox) — and the estimated effect '+f3(ph)+' is tiny.':p<.05?(bf01<1/10?'They agree: strong evidence against θ = 0.5.':'Both lean against θ = 0.5, but the Bayes factor shows the evidence is only '+(bf01<1/3?'moderate':'weak')+' (P(θ = 0.5 | data) is still '+pc(ph0)+') — a p-value just under .05 is weaker evidence than it sounds.'):'Not significant, and the Bayes factor '+(bf01>3?'moderately supports the null.':'is not decisive either way.')}`}
+ on('c10n c10k',draw);reg(draw);
+ document.querySelectorAll('[data-p]').forEach(b=>b.onclick=()=>{const[n,k]=b.dataset.p.split(',');$('c10n').value=n;$('c10nv').textContent=n;$('c10k').max=n;$('c10k').value=k;draw()});})();
+
+/* ---------- Quiz ---------- */
+const QZ=[
+{l:'Beginner',q:'Which statement defines P(A | B)?',o:['P(A) · P(B)','P(A ∩ B) / P(B)','P(A ∩ B) / P(A)','P(B | A)'],a:1,e:'Restrict to the part of the world where B holds and renormalise by P(B).'},
+{l:'Beginner',q:'A fraud rule catches 90% of fraud (P(alert | fraud) = 0.9). Can you conclude that 90% of alerts are fraud?',o:['Yes','No — that is P(fraud | alert), which depends on prevalence and the false-positive rate','Yes if the sample is large','Only if fraud is rare'],a:1,e:'P(A|B) ≠ P(B|A). They are linked by Bayes: P(A|B) = P(B|A)P(A)/P(B).'},
+{l:'Beginner',q:'P(B | A) = 0.9 and P(B | ¬A) = 0.2, P(A) = 0.3. What is P(B)?',o:['0.27','0.41','0.55','0.90'],a:1,e:'Total probability: 0.9×0.3 + 0.2×0.7 = 0.27 + 0.14 = 0.41.'},
+{l:'Beginner',q:'Events A and B are independent if and only if…',o:['They cannot happen together','P(A ∩ B) = P(A)·P(B)','P(A) = P(B)','P(A | B) = P(B | A)'],a:1,e:'Equivalently P(A | B) = P(A): learning B doesn\'t change the probability of A.'},
+{l:'Intermediate',q:'Prevalence 1%, sensitivity 90%, false-positive rate 9%. About what share of positives are true?',o:['90%','50%','9%','1%'],a:2,e:'Per 10,000: 90 true positives, 891 false positives → 90/981 ≈ 9.2%.'},
+{l:'Intermediate',q:'AML rule: 0.1% of accounts are mules, 80% detected, 2% false-positive rate. Roughly what fraction of alerts are mules?',o:['80%','40%','4%','0.1%'],a:2,e:'Per 10,000: 8 TP, ≈200 FP → 8/208 ≈ 3.8%.'},
+{l:'Intermediate',q:'Prior odds 1:99. A signal has likelihood ratio 20. The posterior probability is about…',o:['20%','17%','5%','1%'],a:1,e:'Posterior odds = (1/99)×20 = 20/99 ≈ 0.202 → probability ≈ 16.8%.'},
+{l:'Intermediate',q:'Two signals, with LRs 5 and 4, are conditionally independent given fraud status. Together they multiply the odds by…',o:['9','20','1','Cannot be computed'],a:1,e:'Independent LRs multiply: 5×4 = 20. If the signals are dependent, 20 overstates the evidence.'},
+{l:'Intermediate',q:'Costs: a false alarm costs 1, a missed fraud costs 99. You should alert when P(fraud | data) exceeds…',o:['50%','10%','1%','0.1%'],a:2,e:'c_FP/(c_FP+c_FN) = 1/100 = 1%.'},
+{l:'Advanced',q:'Beta(2, 98) prior on a PD; you observe 3 defaults in 50 loans. The posterior is…',o:['Beta(5, 145)','Beta(3, 50)','Beta(5, 148)','Beta(2, 98)'],a:0,e:'Beta(a+k, b+n−k) = Beta(5, 145); posterior mean 5/150 ≈ 3.3%.'},
+{l:'Advanced',q:'Gamma(20, rate 4) prior on alerts/day; observe 60 alerts in 10 days. The posterior mean rate is…',o:['5','6','5.71','15'],a:2,e:'Gamma(80, 14): mean 80/14 ≈ 5.71 — between the prior mean 5 and the observed 6.'},
+{l:'Advanced',q:'Normal–Normal: prior N(50, 10²), data mean 70 from n = 4 with σ = 20. The posterior mean is…',o:['50','60','70','55'],a:1,e:'Prior precision 1/100 = 0.01; data precision 4/400 = 0.01. Equal weights → (50+70)/2 = 60.'},
+{l:'Advanced',q:'Why does shrinkage help most for small segments?',o:['Small segments have more data','Their raw rates are noisiest, so pulling toward the book mean removes the most error','It always reduces the prior weight','It is unrelated to n'],a:1,e:'Weight on a segment\'s own data is n/(a+b+n): small n → more pooling.'},
+{l:'Expert',q:'Monty Hall (host knows the car): the probability of winning by switching is…',o:['1/3','1/2','2/3','1'],a:2,e:'The first pick is right with probability 1/3 and the host\'s action doesn\'t change that.'},
+{l:'Expert',q:'A DNA profile has a 1-in-1,000,000 random match probability and could belong to any of 5 million people. On the match alone, P(guilty) for a matching suspect is about…',o:['99.9999%','50%','1/6 ≈ 17%','1 in a million'],a:2,e:'About 5 other innocent matches are expected; the suspect is 1 of ~6 matching people. Prosecutor\'s fallacy = reading 1/1,000,000 as P(innocent).'},
+{l:'Expert',q:'n = 10,000 trials, 5,100 successes (p ≈ .046 against θ = 0.5). Which is most accurate?',o:['Overwhelming evidence that θ ≠ 0.5','Statistically significant but the effect is tiny and a Bayes factor with a diffuse alternative favours θ = 0.5','The p-value is wrong','θ is exactly 0.51'],a:1,e:'Lindley\'s paradox: BF₀₁ ≈ 11, estimate 0.51 with a narrow interval around it.'}
+];
+(function(){const st=store.get('by_quiz',{});
+ function render(){const box=$('quiz');box.innerHTML='';
+  QZ.forEach((q,i)=>{const d=document.createElement('div');d.className='q'+(st[i]!=null?' done':'');d.innerHTML=`<div class="qh">Q${i+1} · ${q.l}</div><div style="margin:4px 0 6px"><b>${q.q}</b></div>`;
+   q.o.forEach((o,j)=>{const b=document.createElement('button');b.className='opt';b.textContent=o;if(st[i]!=null){if(j===q.a)b.classList.add('good');else if(j===st[i])b.classList.add('bad')}b.onclick=()=>{if(st[i]!=null)return;st[i]=j;store.set('by_quiz',st);render();meter()};d.appendChild(b)});
+   const e=document.createElement('div');e.className='ex';e.innerHTML=(st[i]===q.a?'✅ ':'❌ ')+q.e;d.appendChild(e);box.appendChild(d)});
+  const ans=Object.keys(st).length,ok=QZ.filter((q,i)=>st[i]===q.a).length;
+  $('qscore').innerHTML=stat('answered',ans+' / '+QZ.length,'in')+stat('correct',ok,'ok')+stat('score',ans?Math.round(100*ok/ans)+'%':'—',ok/Math.max(ans,1)>=.8?'ok':'warn')+stat('verdict',ans<QZ.length?'keep going':ok>=14?'Bayes master':ok>=11?'strong':'review ch. 3–6','')}
+ $('qreset').onclick=()=>{Object.keys(st).forEach(k=>delete st[k]);store.set('by_quiz',st);render();meter()};
+ window.__qst=st;render();})();
+const CHK=['Define P(A|B) as restriction-and-renormalisation and explain why it differs from P(B|A).','Use the chain rule and the law of total probability on a two-step tree.','Test independence with P(A∩B) = P(A)P(B) and interpret lift.','Derive Bayes\' theorem and compute a posterior with natural frequencies.','Explain the base-rate fallacy using a rare-event alert example.','Work in odds form: prior odds × likelihood ratio, and compute LR⁺ and LR⁻.','Explain why correlated signals break the “multiply the LRs” rule.','Compute precision from prevalence, sensitivity and false-positive rate.','Choose an alert threshold from the costs of false alarms and misses.','Do a Beta–Binomial update and interpret pseudo-counts and credible intervals.','Do Gamma–Poisson and Normal–Normal updates (precision-weighted average).','Explain shrinkage / partial pooling and when it helps most.','Explain Monty Hall and the prosecutor\'s fallacy in terms of P(data | hypothesis).','Contrast a credible interval with a confidence interval, and a Bayes factor with a p-value.'];
+(function(){const st=store.get('by_chk',{}),box=$('chk');CHK.forEach((t,i)=>{const l=document.createElement('label'),c=document.createElement('input');c.type='checkbox';c.checked=!!st[i];c.onchange=()=>{st[i]=c.checked;store.set('by_chk',st);meter()};l.appendChild(c);const s=document.createElement('span');s.textContent=t;l.appendChild(s);box.appendChild(l)});window.__cst=st;})();
+function meter(){const q=window.__qst||{},c=window.__cst||{};const ok=QZ.filter((x,i)=>q[i]===x.a).length,ck=Object.values(c).filter(Boolean).length;const p=Math.round(100*(.6*ok/QZ.length+.4*ck/CHK.length));$('mtxt').textContent='Mastery: '+p+'%  (exam + checklist)';$('mbar').style.width=p+'%';store.set('mastery_by',p)}
+meter();
+
+/* ---------- Navigation ---------- */
+(function(){const nav=$('nav');let html='';
+ document.querySelectorAll('main .part, main section.ch').forEach(el=>{if(el.classList.contains('part'))html+=`<div class="pt">${el.textContent}</div>`;else{const h=el.querySelector('h2'),num=h.querySelector('.num').textContent,t=Array.from(h.childNodes).filter(n=>n.nodeType===3).map(n=>n.textContent).join('').trim();html+=`<a href="#${el.id}" data-id="${el.id}">${num}. ${t}</a>`}});
+ nav.innerHTML=html;const links=nav.querySelectorAll('a'),io=new IntersectionObserver(es=>{es.forEach(e=>{if(e.isIntersecting)links.forEach(a=>a.classList.toggle('on',a.dataset.id===e.target.id))})},{rootMargin:'-20% 0px -70% 0px'});
+ document.querySelectorAll('section.ch').forEach(s=>io.observe(s));
+ $('menu').onclick=()=>$('side').classList.toggle('open');nav.addEventListener('click',e=>{if(e.target.tagName==='A')$('side').classList.remove('open')});
+ window.addEventListener('scroll',()=>{const h=document.documentElement;$('prog').style.width=(100*h.scrollTop/(h.scrollHeight-h.clientHeight))+'%'},{passive:true});})();
+</script>
+</body>
+</html>

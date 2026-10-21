@@ -1,0 +1,101 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Statistics Mastery — course index</title>
+<style>
+:root{--bg:#0b0e17;--panel:#121726;--panel2:#171d30;--line:#232a3d;--fg:#e8ebf5;--mu:#8a93ab;--a:#6ea8ff;--r:#ff6b81;--y:#ffd166;--g:#4ade80;--p:#c084fc;--t:#5eead4}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--fg);font:16px/1.7 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+a{color:var(--a)}
+.wrap{max-width:1020px;margin:0 auto;padding:0 22px 100px}
+.hero{padding:64px 0 18px}
+.hero h1{font-size:clamp(34px,5.5vw,60px);line-height:1.06;margin:0 0 12px;background:linear-gradient(100deg,#fff,var(--a) 40%,var(--p) 75%,var(--t));-webkit-background-clip:text;background-clip:text;color:transparent}
+.hero p{font-size:18px;color:#c3c9dc;max-width:760px;margin:0}
+h2{font-size:13px;letter-spacing:2px;text-transform:uppercase;color:var(--p);margin:46px 0 14px}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(290px,1fr));gap:16px}
+.course{display:flex;flex-direction:column;background:var(--panel);border:1px solid var(--line);border-radius:18px;padding:20px 22px;text-decoration:none;color:var(--fg);box-shadow:0 8px 30px rgba(0,0,0,.25);transition:transform .15s,border-color .15s}
+.course:hover{transform:translateY(-3px);border-color:#3a5a98}
+.course .tag{font-size:11px;letter-spacing:1.4px;text-transform:uppercase;color:var(--t)}
+.course h3{margin:6px 0 6px;font-size:21px;line-height:1.25}
+.course p{margin:0 0 14px;color:#b6bdd2;font-size:14.5px;flex:1}
+.meta{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:12px}
+.meta span{font-size:12px;border:1px solid var(--line);background:var(--panel2);border-radius:99px;padding:2px 10px;color:var(--mu)}
+.bar{height:7px;background:var(--line);border-radius:6px;overflow:hidden}
+.bar i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--g),var(--t))}
+.prog{font-size:12px;color:var(--mu);margin-top:5px}
+.stage{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:12px 18px;margin:10px 0}
+.stage h4{margin:2px 0 6px;font-size:15px}
+.stage h4 small{color:var(--mu);font-weight:400;margin-left:8px}
+.item{display:flex;gap:10px;align-items:baseline;padding:4px 0;border-top:1px dashed #1b2236;font-size:14.5px}
+.item:first-of-type{border-top:0}
+.item .n{min-width:26px;color:var(--mu);font-family:ui-monospace,monospace;font-size:12.5px}
+.item .t{flex:1}
+.pill{display:inline-block;padding:1px 9px;border-radius:99px;font-size:11.5px;font-weight:600;white-space:nowrap}
+.pill.done{background:#10321f;color:var(--g);text-decoration:none}
+.pill.part{background:#3a2f0e;color:var(--y);text-decoration:none}
+.pill.plan{background:#202637;color:var(--mu)}
+.legend{font-size:13px;color:var(--mu);margin:0 0 6px}
+.note{margin-top:34px;padding:14px 18px;border:1px solid var(--line);border-left:4px solid var(--g);background:var(--panel);border-radius:12px;font-size:14.5px;color:#c3c9dc}
+</style>
+</head>
+<body>
+<div class="wrap">
+<header class="hero">
+ <h1>Statistics Mastery</h1>
+ <p>A learning path for a top data scientist: 36 concepts in the order they build on each other, each one taught as a single interactive page you can open offline. Start at the top of the roadmap and tick things off as you go.</p>
+</header>
+
+<h2>Courses available now</h2>
+<div class="grid" id="courses"></div>
+
+<h2>The full roadmap</h2>
+<p class="legend"><span class="pill done">ready</span> a dedicated page exists &nbsp; <span class="pill part">partial</span> covered inside another page (link goes to that chapter) &nbsp; <span class="pill plan">planned</span> next pages to build</p>
+<div id="road"></div>
+
+<div class="note"><b>Keep the files together.</b> This index links to the other pages by file name, so leave all the .html files in the same folder. Progress (exam score and checklist) is stored in your browser per page; the bars above show it when your browser shares storage between the files.</div>
+</div>
+
+<script>
+const COURSES=[
+ {f:'random-variables-mastery.html',key:'mastery_rv',tag:'Stage 1 · item 1',t:'Random variables, expectation, variance & covariance',d:'The grammar of everything else: distributions, linearity, variance of sums, conditional expectation, Simpson’s paradox, covariance matrices and correlated-default loss.',m:['15 chapters','14 labs','16-question exam']},
+ {f:'core-distributions.html',key:'mastery_cd',tag:'Stage 1 · item 2',t:'Core distributions and how they relate',d:'Binomial, Poisson, exponential, gamma, normal, lognormal, χ², t, F and beta as one connected family, with simulations that verify every identity.',m:['14 chapters','17 labs','16-question exam']},
+ {f:'sampling-estimators-mastery.html',key:'mastery_se',tag:'Stage 2 · item 5',t:'Sampling distributions, standard errors and estimators',d:'Estimates as random variables, SD vs SE, finite-population correction, MSE and bias–variance, Jensen bias, German tank, efficiency, shrinkage, exact normal results, bootstrap and jackknife, and clustered-data design effects.',m:['13 chapters','12 labs','18-question exam']},
+ {f:'lln-clt-mastery.html',key:'mastery_lc',tag:'Stage 1 · item 4',t:'Law of large numbers and the central limit theorem',d:'Why averages settle, how fast, and when they do not: gambler’s fallacy, Chebyshev, Monte Carlo, heavy tails, dependence, convolution proof sketch, Berry–Esseen, delta method, rare-event proportions and correlated loan portfolios.',m:['14 chapters','14 labs','18-question exam']},
+ {f:'bayes-conditional-probability.html',key:'mastery_by',tag:'Stage 1 · item 3',t:'Conditional probability and Bayes’ theorem',d:'Zooming in, the base-rate fallacy with 10,000 dots, odds and likelihood ratios, alert thresholds and cost, Beta–Binomial updating, shrinkage, Monty Hall, the prosecutor’s fallacy and Bayes vs p-values.',m:['11 chapters','12 labs','16-question exam']},
+ {f:'p-value-mastery.html',key:'mastery_pv',tag:'Stage 2 · item 9',t:'P-values from scratch to expert',d:'Definition, tests, power, multiple testing, peeking, false-positive risk, permutation tests, Bayes factors, equivalence testing and a regulator-ready checklist.',m:['19 chapters','20 labs','18-question exam']}
+];
+const ST=[
+ ['Stage 1 · Probability foundations',[
+  ['Random variables, expectation, variance, covariance',{f:'random-variables-mastery.html'}],
+  ['Core distributions: normal, binomial, Poisson, exponential, beta, gamma, lognormal, t, χ², F',{f:'core-distributions.html'}],
+  ['Conditional probability and Bayes’ theorem',{f:'bayes-conditional-probability.html'}],
+  ['Law of large numbers and the central limit theorem',{f:'lln-clt-mastery.html'}]]],
+ ['Stage 2 · Estimation and inference',[
+  ['Sampling distributions, standard errors, bias vs variance of estimators',{f:'sampling-estimators-mastery.html'}],
+  ['Maximum likelihood estimation',{}],
+  ['Confidence intervals (exact, Wilson, bootstrap)',{p:'p-value-mastery.html#c10',note:'CI ↔ p-value'}],
+  ['Bootstrap and resampling',{p:'p-value-mastery.html#c15',note:'permutation + bootstrap'}],
+  ['Hypothesis testing and p-values',{f:'p-value-mastery.html'}],
+  ['Power, effect sizes and experimental design',{p:'p-value-mastery.html#c8',note:'power lab'}]]],
+ ['Stage 3 · Regression, the workhorse',[
+  ['Linear regression done properly',{}],['Multicollinearity, interactions, nonlinearity',{}],['Generalised linear models',{}],['Regularisation (ridge, lasso, elastic net)',{}],['Model selection: AIC/BIC, cross-validation, bias–variance',{}]]],
+ ['Stage 4 · Applied modelling that real data demands',[
+  ['Calibration and proper scoring rules',{}],['Imbalanced data and rare events',{}],['Survival and time-to-event analysis',{}],['Missing data',{}],['Dependent data: time series, panels, mixed models',{}],
+  ['Multiple testing and selective inference',{p:'p-value-mastery.html#c12',note:'FDR, Holm, BH'}]]],
+ ['Stage 5 · Causal thinking',[
+  ['Confounding, selection bias, colliders, Simpson’s paradox',{p:'random-variables-mastery.html#c6',note:'Simpson’s paradox'}],['Potential outcomes, A/B testing, CUPED, sequential testing',{p:'p-value-mastery.html#c13',note:'peeking'}],['Observational causal methods (matching, IPW, DiD, IV, RDD)',{}],['Uplift and heterogeneous treatment effects',{}]]],
+ ['Stage 6 · Bayesian and probabilistic modelling',[
+  ['Bayesian inference',{p:'bayes-conditional-probability.html#c6',note:'conjugate updating, shrinkage'}],['MCMC and variational inference',{}],['Hierarchical (partial pooling) models',{}],['Bayesian decision theory',{}]]],
+ ['Stage 7 · Specialist depth',[
+  ['Multivariate methods (PCA, factor analysis, mixtures, Mahalanobis)',{p:'random-variables-mastery.html#c11',note:'covariance geometry'}],['Extreme value theory and heavy tails',{}],['Copulas and dependence modelling',{}],['Anomaly and drift detection theory',{}],['Graph and network statistics',{}],['Uncertainty quantification for ML (conformal prediction)',{}],['Interpretability and its statistical limits',{}]]]
+];
+function pct(k){try{const v=JSON.parse(localStorage.getItem(k));return typeof v==='number'?v:null}catch(e){return null}}
+document.getElementById('courses').innerHTML=COURSES.map(c=>{const p=pct(c.key);return `<a class="course" href="${c.f}"><div class="tag">${c.tag}</div><h3>${c.t}</h3><p>${c.d}</p><div class="meta">${c.m.map(x=>`<span>${x}</span>`).join('')}</div><div class="bar"><i style="width:${p||0}%"></i></div><div class="prog">${p===null?'Mastery: open the page to start':'Mastery: '+p+'%'}</div></a>`}).join('');
+let n=0,html='';
+ST.forEach(([title,items])=>{html+=`<div class="stage"><h4>${title}</h4>`;items.forEach(([t,o])=>{n++;const pill=o.f?`<a class="pill done" href="${o.f}">ready →</a>`:o.p?`<a class="pill part" href="${o.p}">partial: ${o.note}</a>`:'<span class="pill plan">planned</span>';html+=`<div class="item"><span class="n">${n}</span><span class="t">${t}</span>${pill}</div>`});html+='</div>'});
+document.getElementById('road').innerHTML=html;
+</script>
+</body>
+</html>

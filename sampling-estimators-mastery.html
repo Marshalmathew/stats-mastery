@@ -1,0 +1,608 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Sampling Distributions &amp; Estimators Mastery</title>
+<style>
+:root{--bg:#0b0e17;--panel:#121726;--panel2:#171d30;--line:#232a3d;--fg:#e8ebf5;--mu:#8a93ab;--a:#6ea8ff;--r:#ff6b81;--y:#ffd166;--g:#4ade80;--p:#c084fc;--t:#5eead4}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;background:var(--bg);color:var(--fg);font:16px/1.7 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+a{color:var(--a)}
+#prog{position:fixed;top:0;left:0;height:3px;background:linear-gradient(90deg,var(--a),var(--p),var(--r));width:0;z-index:50}
+.side{position:fixed;left:0;top:0;bottom:0;width:290px;background:#0e1220;border-right:1px solid var(--line);overflow:auto;padding:18px 14px 90px;z-index:40;transition:transform .25s}
+.side h1{font-size:15px;margin:0 0 2px}
+.side small{color:var(--mu)}
+.side .pt{margin:16px 0 4px;font-size:11px;text-transform:uppercase;letter-spacing:1.3px;color:var(--p)}
+.side a{display:block;color:var(--mu);text-decoration:none;padding:5px 9px;border-radius:7px;font-size:13.5px;line-height:1.35}
+.side a:hover{background:var(--panel);color:var(--fg)}
+.side a.on{background:var(--panel2);color:var(--fg);box-shadow:inset 3px 0 var(--a)}
+.side a.back{color:var(--t);padding-left:0;margin-bottom:6px}
+.meter{position:fixed;left:0;bottom:0;width:290px;background:#0e1220;border-top:1px solid var(--line);padding:10px 16px;z-index:41;font-size:12px;color:var(--mu)}
+.meter .bar{height:7px;background:var(--line);border-radius:6px;margin-top:5px;overflow:hidden}
+.meter .bar i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--g),var(--t));transition:width .4s}
+#menu{display:none;position:fixed;top:10px;left:10px;z-index:60;background:var(--panel2);color:var(--fg);border:1px solid var(--line);border-radius:9px;padding:7px 12px;font-size:14px;cursor:pointer}
+main{margin-left:290px;padding:0 34px 120px;max-width:1090px}
+.hero{padding:70px 0 30px}
+.hero h1{font-size:clamp(32px,5vw,56px);line-height:1.08;margin:0 0 14px;background:linear-gradient(100deg,#fff,var(--y) 40%,var(--r));-webkit-background-clip:text;background-clip:text;color:transparent}
+.hero p{font-size:19px;color:#c3c9dc;max-width:780px}
+.chips{display:flex;flex-wrap:wrap;gap:8px;margin:18px 0}
+.chip{border:1px solid var(--line);background:var(--panel);padding:5px 12px;border-radius:99px;font-size:13px;color:var(--mu)}
+.chip b{color:var(--fg)}
+.part{margin:90px 0 0;padding-top:22px;border-top:1px solid var(--line);font-size:12px;letter-spacing:2px;text-transform:uppercase;color:var(--p)}
+section.ch{padding-top:30px}
+h2{font-size:30px;line-height:1.2;margin:10px 0 8px;display:flex;gap:12px;align-items:center;flex-wrap:wrap}
+h2 .num{display:inline-grid;place-items:center;width:40px;height:40px;border-radius:12px;background:var(--panel2);border:1px solid var(--line);font-size:18px;color:var(--a)}
+.lvl{font-size:11px;font-weight:600;letter-spacing:.8px;text-transform:uppercase;padding:3px 9px;border-radius:99px;border:1px solid}
+.lvl.b{color:var(--g);border-color:#1f5c3a}.lvl.i{color:var(--a);border-color:#244a85}.lvl.a{color:var(--y);border-color:#6b5420}.lvl.e{color:var(--r);border-color:#7a2c3a}
+h3{font-size:19px;margin:30px 0 6px;color:#fff}
+p{margin:10px 0}li{margin:5px 0}
+code,.f{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace}
+code{background:var(--panel2);padding:1px 6px;border-radius:5px;font-size:.9em}
+.f{display:block;white-space:pre-wrap;background:#0e1322;border:1px solid var(--line);border-left:3px solid var(--a);padding:12px 16px;border-radius:9px;margin:14px 0;overflow-x:auto;font-size:15px;color:#dbe4ff;line-height:1.8}
+.co{border-radius:12px;padding:13px 17px;margin:16px 0;border:1px solid var(--line);background:var(--panel)}
+.co>b:first-child{display:block;margin-bottom:2px;font-size:12px;letter-spacing:1px;text-transform:uppercase}
+.co.def{border-left:4px solid var(--a)}.co.def>b:first-child{color:var(--a)}
+.co.warn{border-left:4px solid var(--r)}.co.warn>b:first-child{color:var(--r)}
+.co.tip{border-left:4px solid var(--g)}.co.tip>b:first-child{color:var(--g)}
+.co.key{border-left:4px solid var(--y);background:#171608}.co.key>b:first-child{color:var(--y)}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:18px 20px;margin:22px 0;box-shadow:0 8px 30px rgba(0,0,0,.25)}
+.card>h4{margin:0 0 3px;font-size:13px;letter-spacing:1.2px;text-transform:uppercase;color:var(--t)}
+.card>p.sub{margin:0 0 12px;color:var(--mu);font-size:14.5px}
+.ctl{display:flex;flex-wrap:wrap;gap:10px 22px;align-items:center;margin:8px 0 10px}
+.ctl label{display:flex;gap:8px;align-items:center;font-size:14px;color:#c3c9dc}
+.ctl output{min-width:38px;font-family:ui-monospace,monospace;color:var(--y);font-size:13px}
+input[type=range]{accent-color:var(--a);width:150px}
+input[type=checkbox]{accent-color:var(--a)}
+select,input[type=number],input[type=text]{background:#0e1322;color:var(--fg);border:1px solid var(--line);border-radius:8px;padding:6px 9px;font:inherit;font-size:14px}
+button{background:linear-gradient(180deg,#2c4a80,#233b68);color:#fff;border:1px solid #3a5a98;border-radius:9px;padding:7px 14px;font:inherit;font-size:14px;cursor:pointer}
+button:hover{filter:brightness(1.15)}
+button.alt{background:var(--panel2);border-color:var(--line);color:var(--fg)}
+canvas{width:100%;height:270px;display:block;background:#0e1322;border:1px solid var(--line);border-radius:10px;margin-top:6px}
+canvas.sm{height:210px}canvas.tl{height:330px}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(125px,1fr));gap:9px;margin:12px 0}
+.stat{background:#0e1322;border:1px solid var(--line);border-radius:10px;padding:8px 11px}
+.stat b{display:block;font-size:17px;font-family:ui-monospace,monospace}
+.stat span{font-size:11.5px;color:var(--mu);text-transform:uppercase;letter-spacing:.7px}
+.stat.hot b{color:var(--r)}.stat.ok b{color:var(--g)}.stat.warn b{color:var(--y)}.stat.in b{color:var(--a)}
+.read{margin:8px 0 0;padding:10px 14px;background:#0e1322;border:1px dashed #33406a;border-radius:10px;font-size:14.5px;color:#d3dbf3}
+table{border-collapse:collapse;width:100%;margin:12px 0;font-size:14px}
+th,td{border:1px solid var(--line);padding:7px 10px;text-align:left;vertical-align:top}
+th{background:var(--panel2);font-size:12px;text-transform:uppercase;letter-spacing:.6px;color:var(--mu)}
+td.n{font-family:ui-monospace,monospace;text-align:right}
+.tw{overflow-x:auto}
+.pill{display:inline-block;padding:1px 9px;border-radius:99px;font-size:12px;font-weight:600}
+.pill.r{background:#3a1520;color:var(--r)}.pill.g{background:#10321f;color:var(--g)}.pill.y{background:#3a2f0e;color:var(--y)}.pill.m{background:#202637;color:var(--mu)}
+details{background:var(--panel);border:1px solid var(--line);border-radius:11px;padding:9px 15px;margin:9px 0}
+details summary{cursor:pointer;font-weight:600}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.q{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:14px 18px;margin:14px 0}
+.q .qh{font-size:12px;letter-spacing:1px;text-transform:uppercase;color:var(--mu)}
+.q .opt{display:block;width:100%;text-align:left;margin:6px 0;background:#0e1322;border:1px solid var(--line);color:var(--fg);border-radius:9px;padding:9px 12px}
+.q .opt.good{border-color:var(--g);background:#0e2418}.q .opt.bad{border-color:var(--r);background:#2a1119}
+.q .ex{display:none;margin-top:8px;font-size:14.5px;color:#c3c9dc}
+.q.done .ex{display:block}
+.chk label{display:flex;gap:10px;align-items:flex-start;padding:6px 0;cursor:pointer}
+.chk input{margin-top:6px;accent-color:var(--g);width:17px;height:17px}
+.sigrow{display:grid;grid-template-columns:minmax(170px,2fr) 1fr 1fr auto;gap:8px 14px;align-items:center;padding:6px 0;border-top:1px dashed #1b2236}
+.sigrow:first-of-type{border-top:0}
+.sigrow label{display:flex;gap:6px;align-items:center;font-size:13.5px;color:#c3c9dc}
+@media(max-width:900px){
+ .side{transform:translateX(-100%)}.side.open{transform:none}.meter{display:none}
+ #menu{display:block}main{margin-left:0;padding:0 16px 100px}.two{grid-template-columns:1fr}.hero{padding-top:60px}
+ .sigrow{grid-template-columns:1fr 1fr}
+}
+</style>
+</head>
+<body>
+<div id="prog"></div>
+<button id="menu">☰ Contents</button>
+<nav class="side" id="side"><a class="back" href="index.html">← All courses</a><h1>Sampling Distributions &amp; Estimators</h1><small>13 chapters · 12 labs · exam</small><div id="nav"></div></nav>
+<div class="meter"><div id="mtxt">Mastery: 0%</div><div class="bar"><i id="mbar"></i></div></div>
+
+<main>
+<header class="hero">
+ <h1>Sampling distributions, standard errors &amp; the bias–variance of estimators.</h1>
+ <p>Every number you compute from data (a mean, a default rate, a Gini, a model coefficient) is a <em>random variable</em>: draw a different sample and you get a different value. Stage 2 of the roadmap is about reasoning honestly about that randomness. This page covers the distribution of an estimate, its standard error, what makes an estimator good (bias, variance, MSE, efficiency), why “unbiased” is not the same as “best”, and how to get a trustworthy standard error when your data are finite, clustered or too awkward for a formula.</p>
+ <div class="chips"><span class="chip"><b>Part I</b> Estimates are random</span><span class="chip"><b>Part II</b> Bias, variance, trade-offs</span><span class="chip"><b>Part III</b> Standard errors in practice</span></div>
+ <div class="co tip"><b>How to use this</b>Each lab simulates thousands of repeated samples in your browser: that is the whole idea of a sampling distribution made concrete. Predict, then press the re-sample button a few times and notice which numbers are stable (the standard error) and which wobble (any single estimate). Prerequisites: the Random Variables, Core Distributions and LLN/CLT pages.</div>
+</header>
+
+<div class="part">Part I · Estimates are random variables</div>
+
+<section class="ch" id="c1">
+<h2><span class="num">1</span>The sampling distribution <span class="lvl b">Beginner</span></h2>
+<p>A <b>parameter</b> is a fixed but unknown feature of the population (its mean μ, median, standard deviation σ). An <b>estimator</b> is a rule that turns a sample into a guess, and the number it gives you is an <b>estimate</b>. Because the sample is random, the estimator is a random variable. Its distribution across all possible samples of size n is its <b>sampling distribution</b>.</p>
+<div class="f">estimate θ̂ = T(X₁, …, Xₙ)         bias = E[θ̂] − θ         standard error = SD(θ̂)</div>
+<p>You only ever see one draw from that distribution. Everything in Stage 2 is about what the unseen distribution looks like and how to infer its width from the one draw you have.</p>
+<div class="card"><h4>Lab 1 · Draw thousands of samples, watch the estimate move</h4>
+ <p class="sub">4,000 samples of size n from the chosen population. The histogram is the sampling distribution of the chosen statistic; the yellow line is the true parameter; the green line is the average of the estimates.</p>
+ <div class="ctl"><label>population <select id="c1d"></select></label><label>statistic <select id="c1s"><option value="mean">sample mean</option><option value="median">sample median</option><option value="sd">sample SD</option><option value="q90">90th percentile</option></select></label><label>sample size n <input type="range" id="c1n" min="0" max="9" step="1" value="3"><output id="c1nv"></output></label><button id="c1go">Re-sample</button></div>
+ <canvas class="tl" id="c1cv"></canvas><div class="stats" id="c1st"></div><div class="read" id="c1rd"></div></div>
+<p>Compare the statistics: the sample mean is centred on the truth for every population; the median of a skewed population is centred on the <em>population median</em>, not the mean; the sample SD and 90th percentile are slightly off-centre at small n. That off-centre gap is <b>bias</b>, and the width is the <b>standard error</b>.</p>
+</section>
+
+<section class="ch" id="c2">
+<h2><span class="num">2</span>Standard deviation vs standard error <span class="lvl b">Beginner</span></h2>
+<p>These two are confused constantly, even in regulatory documents. The <b>standard deviation</b> σ describes the spread of <em>individual observations</em>. The <b>standard error</b> describes the spread of an <em>estimate</em>. For the mean:</p>
+<div class="f">SD(data) = σ  (does not shrink with n)          SE(X̄) = σ / √n  (shrinks)</div>
+<p>In practice σ is unknown, so you use the plug-in estimate SE-hat = s/√n. That is itself a random quantity: with small samples it can be quite far off, which is why small-sample intervals use the t distribution (wider than the normal).</p>
+<div class="card"><h4>Lab 2 · Spread of the data vs spread of the mean</h4>
+ <p class="sub">Left: individual observations. Middle: sample means, on the <em>same horizontal scale</em>. Right: the estimated standard error s/√n across 3,000 samples, with the true SE marked.</p>
+ <div class="ctl"><label>population <select id="c2d"></select></label><label>sample size n <input type="range" id="c2n" min="0" max="9" step="1" value="2"><output id="c2nv"></output></label><button id="c2go">Re-sample</button></div>
+ <div class="two"><canvas class="sm" id="c2cv"></canvas><canvas class="sm" id="c2cv2"></canvas></div><canvas class="sm" id="c2cv3"></canvas><div class="stats" id="c2st"></div><div class="read" id="c2rd"></div></div>
+</section>
+
+<section class="ch" id="c3">
+<h2><span class="num">3</span>Finite populations: the correction factor <span class="lvl i">Intermediate</span></h2>
+<p>The σ/√n formula assumes the draws are independent, as if sampling <em>with</em> replacement from a huge population. If you audit 400 of 1,000 accounts <em>without</em> replacement, each pick tells you something about what remains, and the estimate is more precise than σ/√n suggests:</p>
+<div class="f">SE(X̄) = (σ/√n) · √((N − n)/(N − 1))          σ² = population variance (divisor N)</div>
+<p>The factor √((N−n)/(N−1)) is the <b>finite population correction</b> (FPC). It is negligible when the sampling fraction n/N is below ~5%, and it goes to 0 as you sample everything (a census has no sampling error).</p>
+<div class="card"><h4>Lab 3 · Sampling without replacement from 2,000 accounts</h4>
+ <p class="sub">A fixed population of N = 2,000 skewed balances. Curves: the SE of the sample mean with and without the FPC; dots are simulated SEs at several n; the vertical line is your chosen n.</p>
+ <div class="ctl"><label>sample size n <input type="range" id="c3n" min="10" max="1990" step="10" value="500"><output id="c3nv"></output></label><button id="c3go">New population</button></div>
+ <canvas class="tl" id="c3cv"></canvas><div class="stats" id="c3st"></div><div class="read" id="c3rd"></div></div>
+</section>
+
+<section class="ch" id="c4">
+<h2><span class="num">4</span>Standard errors you should know by heart <span class="lvl i">Intermediate</span></h2>
+<div class="tw"><table>
+<tr><th>Estimate</th><th>Standard error (large n)</th><th>Note</th></tr>
+<tr><td>Mean</td><td>σ/√n</td><td>exact if the data are independent</td></tr>
+<tr><td>Proportion p̂</td><td>√(p(1−p)/n)</td><td>largest at p = ½; precision is driven by events for rare p</td></tr>
+<tr><td>Difference of two independent means</td><td>√(σ₁²/n₁ + σ₂²/n₂)</td><td>variances add, even for a difference</td></tr>
+<tr><td>Difference of proportions (A/B test)</td><td>√(p₁q₁/n₁ + p₂q₂/n₂)</td><td>the basis of the two-proportion z-test</td></tr>
+<tr><td>Median (normal data)</td><td>≈ 1.2533 σ/√n</td><td>25% larger than the mean's SE: efficiency 2/π ≈ 64%</td></tr>
+<tr><td>Standard deviation (normal data)</td><td>≈ σ/√(2(n−1))</td><td>relative SE of s is only ~1/√(2n)</td></tr>
+<tr><td>Correlation r (normal data)</td><td>≈ (1 − ρ²)/√n</td><td>shrinks as |ρ| → 1; use Fisher's z for intervals</td></tr>
+</table></div>
+<p>Lab 4 checks every row against brute-force simulation.</p>
+<div class="card"><h4>Lab 4 · Formula vs simulation</h4>
+ <p class="sub">4,000 simulated samples. The histogram is the sampling distribution; the blue curve is the normal implied by the formula SE.</p>
+ <div class="ctl"><label>estimate <select id="c4s"><option value="mean">mean (σ = 1)</option><option value="prop">proportion</option><option value="diff">difference of two means (σ₁ = 1)</option><option value="median">median (normal)</option><option value="sd">standard deviation (normal)</option><option value="corr">correlation (bivariate normal)</option></select></label><label><span id="c4ql">parameter</span> <input type="range" id="c4q" min="5" max="95" step="5" value="30"><output id="c4qv"></output></label><label>n <input type="range" id="c4n" min="0" max="9" step="1" value="4"><output id="c4nv"></output></label></div>
+ <canvas class="tl" id="c4cv"></canvas><div class="stats" id="c4st"></div><div class="read" id="c4rd"></div></div>
+</section>
+
+<div class="part">Part II · Bias, variance and trade-offs</div>
+
+<section class="ch" id="c5">
+<h2><span class="num">5</span>Bias, variance and mean squared error <span class="lvl i">Intermediate</span></h2>
+<p>How good is an estimator? Averaged over repeated samples, its typical squared miss is the <b>mean squared error</b>, which splits cleanly:</p>
+<div class="f">MSE(θ̂) = E[(θ̂ − θ)²] = Bias² + Variance</div>
+<p>Unbiasedness alone is not the goal. An estimator with a small bias and a much smaller variance beats an unbiased noisy one. A famous example: for the variance of normal data, dividing the sum of squares by n−1 is unbiased; dividing by n has a bias of −σ²/n (the sample mean is closer to the data than the true mean is, so deviations are too small); dividing by n+1 is biased more but has the <em>lowest MSE</em>.</p>
+<div class="card"><h4>Lab 5 · Three divisors for the variance</h4>
+ <p class="sub">6,000 samples. For each divisor (n−1, n, n+1) the bars show Bias² (red), Variance (blue) and MSE (yellow) of the variance estimate, in units of σ⁴.</p>
+ <div class="ctl"><label>population <select id="c5d"></select></label><label>sample size n <input type="range" id="c5n" min="0" max="6" step="1" value="2"><output id="c5nv"></output></label><button id="c5go">Re-sample</button></div>
+ <canvas class="tl" id="c5cv"></canvas><div class="tw" id="c5tb"></div><div class="read" id="c5rd"></div></div>
+<div class="co key"><b>Why n−1 is still the default</b>Because it is unbiased for any distribution with a variance, it is what software reports, and the MSE difference is small for realistic n. Know the others exist: the choice of divisor is a bias–variance trade-off, not a law.</div>
+</section>
+
+<section class="ch" id="c6">
+<h2><span class="num">6</span>Unbiased is not preserved by transformations <span class="lvl a">Advanced</span></h2>
+<p>If θ̂ is unbiased for θ, then g(θ̂) is generally <em>not</em> unbiased for g(θ). Jensen's inequality says that for a convex g, E[g(θ̂)] ≥ g(E[θ̂]), and for a concave g the inequality reverses. Consequences you meet every day:</p>
+<ul>
+<li>s² is unbiased for σ², so s is biased <em>low</em> for σ (square root is concave).</li>
+<li>X̄ is unbiased for the mean time between events 1/λ, so 1/X̄ is biased <em>high</em> for the rate λ: E[1/X̄] = λ·n/(n−1).</li>
+<li>exp(X̄) overestimates e^μ; log(X̄) underestimates log μ.</li>
+</ul>
+<p>This matters when you convert an estimate into a different scale (an average to a rate, a log-odds to an odds ratio, a log-loss back to a loss) and when you report maximum-likelihood estimates, which are generally biased in small samples but consistent.</p>
+<div class="card"><h4>Lab 6 · Bias from a nonlinear transformation</h4>
+ <p class="sub">6,000 replications of the estimator, drawn exactly from the relevant sampling distribution. Yellow: the true value; green: the average of the estimates.</p>
+ <div class="ctl"><label>quantity <select id="c6c"><option value="0">s as an estimate of σ (normal data, σ = 1)</option><option value="1">1/X̄ as an estimate of the rate λ = 1 (exponential data)</option><option value="2">exp(X̄) as an estimate of e^μ (normal, μ = 0, σ = 1)</option><option value="3">log X̄ as an estimate of log μ (exponential, μ = 1)</option></select></label><label>sample size n <input type="range" id="c6n" min="0" max="8" step="1" value="2"><output id="c6nv"></output></label><button id="c6go">Re-sample</button></div>
+ <canvas class="tl" id="c6cv"></canvas><div class="stats" id="c6st"></div><div class="read" id="c6rd"></div></div>
+</section>
+
+<section class="ch" id="c7">
+<h2><span class="num">7</span>Several unbiased estimators: the German tank problem <span class="lvl a">Advanced</span></h2>
+<p>During World War II the Allies estimated German tank production from the serial numbers of captured tanks. Suppose tanks are numbered 1, …, N and you capture n of them at random without replacement, seeing a largest serial number M. Three natural estimators of N:</p>
+<div class="tw"><table>
+<tr><th>Estimator</th><th>Formula</th><th>Bias</th></tr>
+<tr><td>Sample maximum</td><td>M</td><td>always too low (biased)</td></tr>
+<tr><td>Corrected maximum</td><td>(1 + 1/n)·M − 1</td><td>unbiased, smallest variance among unbiased estimators (UMVU)</td></tr>
+<tr><td>Method of moments</td><td>2·X̄ − 1</td><td>unbiased but much noisier</td></tr>
+</table></div>
+<p>Two unbiased estimators can have wildly different variances; being unbiased does not tell you which to use. The best one uses the <em>sufficient statistic</em> (here, the maximum), which squeezes out all the information the sample holds about N.</p>
+<div class="card"><h4>Lab 7 · Estimating the population size</h4>
+ <p class="sub">5,000 simulated captures. The yellow line is the true N. Compare where each estimator is centred and how wide it is.</p>
+ <div class="ctl"><label>true N <input type="range" id="c7N" min="50" max="2000" step="10" value="500"><output id="c7Nv"></output></label><label>tanks seen n <input type="range" id="c7n" min="2" max="25" step="1" value="5"><output id="c7nv"></output></label><button id="c7go">Re-sample</button></div>
+ <canvas class="tl" id="c7cv"></canvas><div class="tw" id="c7tb"></div><div class="read" id="c7rd"></div></div>
+</section>
+
+<section class="ch" id="c8">
+<h2><span class="num">8</span>Consistency, efficiency and the best estimator of the centre <span class="lvl a">Advanced</span></h2>
+<p>Two further properties complete the toolkit.</p>
+<ul>
+<li><b>Consistency:</b> θ̂ₙ → θ in probability as n → ∞. A biased estimator can be consistent (variance with divisor n), and an unbiased one can fail to be (using only the first observation).</li>
+<li><b>Efficiency:</b> among estimators with the same bias, the one with smaller variance wins. The Cramér–Rao bound gives a floor, Var(θ̂) ≥ 1/(n·I(θ)), where I is the Fisher information. Estimators that reach it are <b>efficient</b>.</li>
+</ul>
+<p>Efficiency is relative to the data's distribution. For normal data the sample mean is efficient and the median needs about 57% more data to match it. For heavy-tailed data the ranking flips: the median (or a trimmed mean) can be far better than the mean. For contaminated data (mostly normal with a few wild values) the mean is destroyed by a handful of outliers, which is why robust statistics exist.</p>
+<div class="card"><h4>Lab 8 · Mean vs median vs trimmed mean vs midrange</h4>
+ <p class="sub">All four estimate the centre (0) of a symmetric population. The table shows n·Var for each (smaller is better) and relative efficiency versus the best of the four.</p>
+ <div class="ctl"><label>population <select id="c8d"><option value="norm">Normal</option><option value="lap">Laplace (double exponential)</option><option value="t3">t with 3 d.f.</option><option value="unif">Uniform(−1,1)</option><option value="cont">95% N(0,1) + 5% N(0,10²)</option></select></label><label>sample size n <input type="range" id="c8n" min="0" max="4" step="1" value="2"><output id="c8nv"></output></label><button id="c8go">Re-sample</button></div>
+ <canvas class="tl" id="c8cv"></canvas><div class="tw" id="c8tb"></div><div class="read" id="c8rd"></div></div>
+</section>
+
+<section class="ch" id="c9">
+<h2><span class="num">9</span>The bias–variance trade-off and shrinkage <span class="lvl e">Expert</span></h2>
+<p>Deliberately accepting a little bias can buy a large cut in variance. The simplest case: shrink the sample mean toward zero, θ̂_c = c·X̄ with 0 ≤ c ≤ 1. With X̄ ~ N(μ, σ²/n):</p>
+<div class="f">Bias² = (c − 1)² μ²          Variance = c² σ²/n          MSE(c) = (c − 1)² μ² + c² σ²/n</div>
+<p>Setting the derivative to zero gives the optimal shrinkage factor c* = μ² / (μ² + σ²/n): the signal-to-noise ratio of the estimate. When the noise σ²/n is large compared with μ², c* is small and shrinking helps a lot. The catch is that c* depends on the unknown μ. Empirical-Bayes and James–Stein methods estimate it from many parallel problems (this is the shrinkage lab of the Bayes page), and ridge/lasso regression (Stage 3) use the same idea for coefficients.</p>
+<div class="card"><h4>Lab 9 · MSE as a function of the shrinkage factor</h4>
+ <p class="sub">Red dashed: Bias²; blue dashed: variance; yellow: MSE. The unbiased estimator is c = 1. The green marker is the optimum c*. A simulation of 4,000 samples confirms the formula.</p>
+ <div class="ctl"><label>true mean μ <input type="range" id="c9m" min="0" max="5" step="0.1" value="1"><output id="c9mv"></output></label><label>σ <input type="range" id="c9s" min="1" max="10" step="0.5" value="3"><output id="c9sv"></output></label><label>n <input type="range" id="c9n" min="1" max="200" step="1" value="9"><output id="c9nv"></output></label></div>
+ <canvas class="tl" id="c9cv"></canvas><div class="stats" id="c9st"></div><div class="read" id="c9rd"></div></div>
+</section>
+
+<div class="part">Part III · Standard errors in practice</div>
+
+<section class="ch" id="c10">
+<h2><span class="num">10</span>Exact sampling distributions for normal data <span class="lvl a">Advanced</span></h2>
+<p>If the data are iid N(μ, σ²) then three exact facts hold, and they are the foundation of the t-test and of the t and χ² families you met on the Distributions page:</p>
+<div class="f">X̄ ~ N(μ, σ²/n)          (n−1)s²/σ² ~ χ²ₙ₋₁          X̄ and s² are independent</div>
+<p>From these, (X̄ − μ)/(s/√n) ~ t with n−1 degrees of freedom. The <em>independence</em> of X̄ and s is special to the normal. For skewed data they are correlated (a few large values push both the mean and the spread up), which is one reason t-intervals can misbehave for skewed data at moderate n.</p>
+<div class="card"><h4>Lab 10 · Are the mean and the SD independent? Is (n−1)s²/σ² a χ²?</h4>
+ <p class="sub">Left: 1,200 (X̄, s) pairs. Right: the histogram of (n−1)s²/σ² against the χ²ₙ₋₁ density.</p>
+ <div class="ctl"><label>population <select id="c10d"></select></label><label>sample size n <input type="range" id="c10n" min="0" max="4" step="1" value="2"><output id="c10nv"></output></label><button id="c10go">Re-sample</button></div>
+ <div class="two"><canvas class="sm" id="c10cv"></canvas><canvas class="sm" id="c10cv2"></canvas></div><div class="stats" id="c10st"></div><div class="read" id="c10rd"></div></div>
+</section>
+
+<section class="ch" id="c11">
+<h2><span class="num">11</span>When there is no formula: bootstrap and jackknife <span class="lvl a">Advanced</span></h2>
+<p>For a median, a 90th percentile, a Gini or a model's AUC the SE has no tidy formula. The <b>bootstrap</b> treats your sample as a stand-in for the population: resample n observations <em>with replacement</em> B times, recompute the statistic each time, and take the standard deviation of the B values as the SE. The <b>jackknife</b> instead leaves out one observation at a time. (Item 8 of the roadmap gives the bootstrap its full treatment; this is the first look.)</p>
+<div class="f">SE_boot = SD( T(X*₁), …, T(X*_B) )          SE_jack = √( (n−1)/n · Σ (Tᵢ − T̄)² )</div>
+<div class="card"><h4>Lab 11 · Bootstrap and jackknife standard errors</h4>
+ <p class="sub">One sample is drawn from the population. The histogram shows 1,000 bootstrap replicates of the statistic. The true SE is computed by brute force from 2,000 fresh samples. “Repeat 100×” shows how much the bootstrap SE itself varies from sample to sample.</p>
+ <div class="ctl"><label>population <select id="c11d"></select></label><label>statistic <select id="c11s"><option value="mean">mean</option><option value="median">median</option><option value="sd">SD</option><option value="q90">90th percentile</option></select></label><label>n <input type="range" id="c11n" min="0" max="3" step="1" value="1"><output id="c11nv"></output></label><button id="c11go">Draw new sample</button><button class="alt" id="c11rep">Repeat 100×</button></div>
+ <canvas class="tl" id="c11cv"></canvas><div class="stats" id="c11st"></div><div class="read" id="c11rd"></div></div>
+</section>
+
+<section class="ch" id="c12">
+<h2><span class="num">12</span>Clustered data: the design effect <span class="lvl e">Expert</span></h2>
+<p>Customers within a branch, transactions within a customer, loans within an industry: observations in the same cluster resemble each other. If the intraclass correlation (ICC) is ρ and each cluster has m observations, the variance of the overall mean is inflated by the <b>design effect</b>:</p>
+<div class="f">DEFF = 1 + (m − 1) ρ          SE_true = SE_iid · √DEFF          n_eff = (K·m) / DEFF</div>
+<p>Even a small ρ matters when m is large: with ρ = 0.05 and m = 100 the DEFF is almost 6, so 10,000 rows carry the information of about 1,700 independent ones. The practical fix is a <b>cluster-robust</b> SE: treat each cluster as one observation and use the spread of cluster means.</p>
+<div class="card"><h4>Lab 12 · Naive vs cluster-robust standard errors</h4>
+ <p class="sub">K clusters of m observations each (cluster effect variance ρ, noise variance 1−ρ). 1,500 simulated datasets. Blue curve: the naive iid SE; red curve: the true spread.</p>
+ <div class="ctl"><label>clusters K <input type="range" id="c12k" min="5" max="200" step="5" value="30"><output id="c12kv"></output></label><label>per cluster m <input type="range" id="c12m" min="1" max="50" step="1" value="20"><output id="c12mv"></output></label><label>ICC ρ <input type="range" id="c12r" min="0" max="0.5" step="0.01" value="0.1"><output id="c12rv"></output></label></div>
+ <canvas class="tl" id="c12cv"></canvas><div class="stats" id="c12st"></div><div class="read" id="c12rd"></div></div>
+<div class="co warn"><b>Regulatory angle</b>If a model-validation sample contains many accounts per customer or per branch, confidence intervals on a default rate or AUC computed as if rows were independent are too narrow, and the overstated precision shows up as unexplained “instability” out of sample. Always state the unit of independence.</div>
+</section>
+
+<section class="ch" id="c13">
+<h2><span class="num">13</span>Final exam, mastery checklist, cheat sheet <span class="lvl e">Expert</span></h2>
+<h3>Exam (18 questions — click an answer)</h3>
+<div id="quiz"></div>
+<div class="card"><h4>Score</h4><div class="stats" id="qscore"></div><button class="alt" id="qreset">Reset exam</button></div>
+<h3>Mastery checklist — tick when you can do it without notes</h3>
+<div class="card chk" id="chk"></div>
+<h3>Cheat sheet</h3>
+<div class="tw"><table>
+<tr><th>Idea</th><th>One line</th></tr>
+<tr><td>Sampling distribution</td><td>Distribution of a statistic over repeated samples; you see one draw</td></tr>
+<tr><td>SD vs SE</td><td>SD: spread of data (σ). SE: spread of an estimate (σ/√n for a mean)</td></tr>
+<tr><td>FPC</td><td>× √((N−n)/(N−1)) when sampling without replacement from a finite population</td></tr>
+<tr><td>Common SEs</td><td>√(pq/n); √(σ₁²/n₁+σ₂²/n₂); median 1.2533σ/√n; (1−ρ²)/√n</td></tr>
+<tr><td>MSE</td><td>Bias² + Variance</td></tr>
+<tr><td>Variance divisors</td><td>n−1 unbiased; n+1 minimises MSE for normal data</td></tr>
+<tr><td>Jensen</td><td>Unbiasedness does not survive nonlinear maps (s is low for σ, 1/X̄ is high for λ)</td></tr>
+<tr><td>UMVU</td><td>Best unbiased estimator uses the sufficient statistic (German tank: (1+1/n)max − 1)</td></tr>
+<tr><td>Efficiency</td><td>Relative to the data: mean for normal, median/trimmed for heavy tails; CRLB gives the floor</td></tr>
+<tr><td>Shrinkage</td><td>c* = μ²/(μ² + σ²/n): trade a little bias for a lot of variance</td></tr>
+<tr><td>Normal sampling</td><td>X̄ ⟂ s; (n−1)s²/σ² ~ χ²ₙ₋₁; t = (X̄−μ)/(s/√n) ~ tₙ₋₁</td></tr>
+<tr><td>Bootstrap</td><td>SD of statistic over resamples with replacement; jackknife leaves one out</td></tr>
+<tr><td>Design effect</td><td>DEFF = 1 + (m−1)ρ; n_eff = rows/DEFF; use cluster-robust SEs</td></tr>
+</table></div>
+<div class="co tip"><b>Next on the roadmap</b>Item 6, maximum likelihood estimation: the general recipe for building estimators that are consistent, asymptotically normal and asymptotically efficient. Its standard errors come from the Fisher information, which is the quantity in the Cramér–Rao bound you met in Chapter 8.</div>
+</section>
+</main>
+
+<script>
+/*MATH*/
+function lgamma(x){const c=[76.18009172947146,-86.50532032941677,24.01409824083091,-1.231739572450155,0.1208650973866179e-2,-0.5395239384953e-5];let y=x,t=x+5.5;t-=(x+.5)*Math.log(t);let s=1.000000000190015;for(let j=0;j<6;j++)s+=c[j]/++y;return -t+Math.log(2.5066282746310005*s/x);}
+function gser(a,x){let ap=a,sum=1/a,del=sum;for(let n=0;n<1000;n++){ap++;del*=x/ap;sum+=del;if(Math.abs(del)<Math.abs(sum)*1e-15)break;}return sum*Math.exp(-x+a*Math.log(x)-lgamma(a));}
+function gcf(a,x){let b=x+1-a,c=1/1e-300,d=1/b,h=d;for(let i=1;i<1000;i++){const an=-i*(i-a);b+=2;d=an*d+b;if(Math.abs(d)<1e-300)d=1e-300;c=b+an/c;if(Math.abs(c)<1e-300)c=1e-300;d=1/d;const del=d*c;h*=del;if(Math.abs(del-1)<1e-15)break;}return Math.exp(-x+a*Math.log(x)-lgamma(a))*h;}
+function gammaQ(a,x){if(x<=0)return 1;return x<a+1?1-gser(a,x):gcf(a,x);}
+function betacf(a,b,x){const qab=a+b,qap=a+1,qam=a-1;let c=1,d=1-qab*x/qap;if(Math.abs(d)<1e-300)d=1e-300;d=1/d;let h=d;for(let m=1;m<=1000;m++){const m2=2*m;let aa=m*(b-m)*x/((qam+m2)*(a+m2));d=1+aa*d;if(Math.abs(d)<1e-300)d=1e-300;c=1+aa/c;if(Math.abs(c)<1e-300)c=1e-300;d=1/d;h*=d*c;aa=-(a+m)*(qab+m)*x/((a+m2)*(qap+m2));d=1+aa*d;if(Math.abs(d)<1e-300)d=1e-300;c=1+aa/c;if(Math.abs(c)<1e-300)c=1e-300;d=1/d;const del=d*c;h*=del;if(Math.abs(del-1)<1e-15)break;}return h;}
+function betai(a,b,x){if(x<=0)return 0;if(x>=1)return 1;const bt=Math.exp(lgamma(a+b)-lgamma(a)-lgamma(b)+a*Math.log(x)+b*Math.log(1-x));return x<(a+1)/(a+b+2)?bt*betacf(a,b,x)/a:1-bt*betacf(b,a,1-x)/b;}
+function normSf(z){const q=0.5*gammaQ(.5,z*z/2);return z>=0?q:1-q;}
+function normCdf(z){return normSf(-z);}
+function npdf(x){return Math.exp(-x*x/2)/2.5066282746310002;}
+function lbin(n,k){return lgamma(n+1)-lgamma(k+1)-lgamma(n-k+1);}
+function binom(n,k,p){return Math.exp(lbin(n,k)+k*Math.log(p)+(n-k)*Math.log(1-p));}
+function betapdf(x,a,b){return x<=0||x>=1?0:Math.exp(lgamma(a+b)-lgamma(a)-lgamma(b)+(a-1)*Math.log(x)+(b-1)*Math.log(1-x));}
+function betacdf(x,a,b){return betai(a,b,x);}
+function gampdf(x,a,r){return x<=0?0:Math.exp(a*Math.log(r)+(a-1)*Math.log(x)-r*x-lgamma(a));}
+function gamcdf(x,a,r){return x<=0?0:1-gammaQ(a,r*x);}
+function randn(){let u=0;while(!u)u=Math.random();return Math.sqrt(-2*Math.log(u))*Math.cos(2*Math.PI*Math.random());}
+function gammaS(a){if(a<1)return gammaS(a+1)*Math.pow(Math.random(),1/a);const d=a-1/3,c=1/Math.sqrt(9*d);for(;;){let x,v;do{x=randn();v=1+c*x}while(v<=0);v=v*v*v;const u=Math.random();if(Math.log(u)<.5*x*x+d-d*v+d*Math.log(v))return d*v;}}
+function betaS(a,b){const x=gammaS(a),y=gammaS(b);return x/(x+y);}
+function binS(n,p){let k=0;for(let i=0;i<n;i++)if(Math.random()<p)k++;return k;}
+function mean(a){let s=0;for(const v of a)s+=v;return s/a.length;}
+function qc(cdf,lo,hi,p,it){for(let i=0;i<(it||100);i++){const m=(lo+hi)/2;if(cdf(m)<p)lo=m;else hi=m}return(lo+hi)/2;}
+function qb(a,b,p){return qc(x=>betai(a,b,x),0,1,p,50);}
+function tcdf(x,v){const t=.5*betai(v/2,.5,v/(v+x*x));return x>0?1-t:t}
+function qn(p){return qc(normCdf,-9,9,p,70)}
+function pois(k,l){return Math.exp(-l+k*Math.log(l)-lgamma(k+1))}
+function binF(n,p){let k=0;for(;;){if(n<=0||p<=0)return k;if(p>=1)return k+n;if(n<=40){for(let i=0;i<n;i++)if(Math.random()<p)k++;return k}const a=1+(n>>1),bb=1+n-a,x=betaS(a,bb);if(x>=p){n=a-1;p=p/x}else{k+=a;n=bb-1;p=(p-x)/(1-x)}}}
+/*ENDMATH*/
+
+const $=id=>document.getElementById(id), val=id=>+$(id).value;
+const C={fg:'#e8ebf5',mu:'#8a93ab',gr:'#232a3d',a:'#6ea8ff',r:'#ff6b81',y:'#ffd166',g:'#4ade80',p:'#c084fc',t:'#5eead4'};
+const store={get(k,d){try{const v=JSON.parse(localStorage.getItem(k));return v==null?d:v}catch(e){return d}},set(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}};
+function stat(l,v,c){return `<div class="stat ${c||''}"><b>${v}</b><span>${l}</span></div>`}
+function f3(x){if(!isFinite(x))return String(x);const a=Math.abs(x);if(a!==0&&(a<1e-3||a>=1e6))return x.toExponential(2);return String(+x.toFixed(a<1?4:a<100?3:a<1000?2:0))}
+function pc(x){return f3(100*x)+'%'}
+const resizers=[];
+function reg(fn){fn();resizers.push(fn)}
+function on(ids,fn){ids.split(' ').forEach(i=>{const e=$(i);e.addEventListener('input',fn);e.addEventListener('change',fn)})}
+let rt;window.addEventListener('resize',()=>{clearTimeout(rt);rt=setTimeout(()=>resizers.forEach(f=>f()),150)});
+document.querySelectorAll('input[type=range]').forEach(i=>{const o=$(i.id+'v');if(!o)return;const f=()=>{o.textContent=i.value};i.addEventListener('input',f);f()});
+
+function nice(x){const e=Math.pow(10,Math.floor(Math.log10(x))),f=x/e;return (f<1.5?1:f<3?2:f<7?5:10)*e}
+function mk(cv,x0,x1,ymax,o){o=o||{};const y0=o.y0||0,dpr=window.devicePixelRatio||1,r=cv.getBoundingClientRect(),w=r.width||600,h=r.height||270;
+ cv.width=w*dpr;cv.height=h*dpr;const g=cv.getContext('2d');g.setTransform(dpr,0,0,dpr,0,0);g.clearRect(0,0,w,h);
+ const L=o.L||42,R=12,T=14,B=28,X=x=>L+(x-x0)/(x1-x0)*(w-L-R),Y=y=>h-B-(y-y0)/(ymax-y0)*(h-T-B);
+ g.font='11px system-ui';g.lineWidth=1;g.strokeStyle=C.gr;g.fillStyle=C.mu;
+ if(!o.noGrid){const sx=nice((x1-x0)/7);for(let x=Math.ceil(x0/sx-1e-9)*sx;!o.noX&&x<=x1+1e-9;x+=sx){g.beginPath();g.moveTo(X(x),T);g.lineTo(X(x),h-B);g.stroke();g.textAlign='center';g.fillText(String(+x.toFixed(6)),X(x),h-B+15)}
+ const sy=nice((ymax-y0)/4);for(let y=Math.ceil(y0/sy-1e-9)*sy;y<=ymax+1e-9;y+=sy){g.beginPath();g.moveTo(L,Y(y));g.lineTo(w-R,Y(y));g.stroke();g.textAlign='right';g.fillText(String(+y.toFixed(4)),L-5,Y(y)+3)}}
+ return{g,w,h,X,Y,L,R,T,B,
+  line(f,col,lw,a,b,n,dash){a=a==null?x0:a;b=b==null?x1:b;n=n||260;g.save();if(dash)g.setLineDash([5,4]);g.beginPath();g.strokeStyle=col;g.lineWidth=lw||2;let st=false;for(let i=0;i<=n;i++){const x=a+(b-a)*i/n,y=f(x);if(!isFinite(y)){st=false;continue}st?g.lineTo(X(x),Y(y)):g.moveTo(X(x),Y(y));st=true}g.stroke();g.restore()},
+  area(f,a,b,col,n){a=Math.max(a,x0);b=Math.min(b,x1);if(b<=a)return;n=n||200;g.beginPath();g.moveTo(X(a),Y(0));for(let i=0;i<=n;i++){const x=a+(b-a)*i/n;g.lineTo(X(x),Y(f(x)))}g.lineTo(X(b),Y(0));g.closePath();g.fillStyle=col;g.fill()},
+  vline(x,col,lab,dash){g.save();g.strokeStyle=col;g.lineWidth=1.6;if(dash)g.setLineDash([5,4]);g.beginPath();g.moveTo(X(x),T);g.lineTo(X(x),h-B);g.stroke();g.restore();if(lab){g.fillStyle=col;g.textAlign='center';g.fillText(lab,Math.min(Math.max(X(x),34),w-34),T+10)}},
+  hline(y,col,lab){g.save();g.strokeStyle=col;g.lineWidth=1.4;g.setLineDash([5,4]);g.beginPath();g.moveTo(L,Y(y));g.lineTo(w-R,Y(y));g.stroke();g.restore();if(lab){g.fillStyle=col;g.textAlign='right';g.fillText(lab,w-R-3,Y(y)-4)}},
+  text(s,x,y,col,al){g.fillStyle=col||C.fg;g.textAlign=al||'left';g.fillText(s,x,y)}};}
+
+/* ---------- shared helpers for this page ---------- */
+const D={
+ norm:{n:'Normal(0,1)',s:()=>randn(),mu:0,sd:1,sk:0},
+ unif:{n:'Uniform(0,1)',s:()=>Math.random(),mu:.5,sd:Math.sqrt(1/12),sk:0},
+ expo:{n:'Exponential(1)',s:()=>-Math.log(1-Math.random()),mu:1,sd:1,sk:2},
+ logn:{n:'Lognormal(0,1)',s:()=>Math.exp(randn()),mu:Math.exp(.5),sd:Math.sqrt((Math.E-1)*Math.E),sk:(Math.E+2)*Math.sqrt(Math.E-1),disc:0},
+ b05:{n:'Bernoulli(0.5)',s:()=>Math.random()<.5?1:0,mu:.5,sd:.5,sk:0,disc:1},
+ b05s:{n:'Bernoulli(0.05)',s:()=>Math.random()<.05?1:0,mu:.05,sd:Math.sqrt(.0475),sk:.9/Math.sqrt(.0475),disc:1},
+ bimo:{n:'Two humps',s:()=>(Math.random()<.5?-2:2)+.5*randn(),mu:0,sd:Math.sqrt(4.25),sk:0},
+ par5:{n:'Pareto(α=5)',s:()=>Math.pow(1-Math.random(),-.2),mu:1.25,sd:Math.sqrt(5/48),sk:6*Math.sqrt(.6)},
+ cauchy:{n:'Cauchy (no mean)',s:()=>Math.tan(Math.PI*(Math.random()-.5)),mu:NaN,sd:Infinity,sk:NaN}
+};
+function fillSel(id,keys,def){const e=$(id);e.innerHTML=keys.map(k=>`<option value="${k}">${D[k].n}</option>`).join('');e.value=def}
+const PAL=[C.a,C.r,C.y,C.g,C.p,C.t,'#ff9f43','#9aa4bf'];
+function tgrid(N,M){const T=[];let prev=0;for(let i=0;i<M;i++){let n=Math.round(Math.pow(10,Math.log10(N)*i/(M-1)));if(i===M-1)n=N;n=Math.max(prev+1,n);if(n>N)break;T.push(n);prev=n}if(T[T.length-1]!==N)T[T.length-1]=N;return T}
+function nlab(n){return n>=1e6?(n/1e6)+'M':n>=1000?(n/1000)+'k':String(n)}
+function customGrid(P,xt,yt){const g=P.g;g.save();g.strokeStyle=C.gr;g.fillStyle=C.mu;g.font='11px system-ui';g.lineWidth=1;
+ xt.forEach(([v,l])=>{g.beginPath();g.moveTo(P.X(v),P.T);g.lineTo(P.X(v),P.h-P.B);g.stroke();g.textAlign='center';g.fillText(l,P.X(v),P.h-P.B+15)});
+ yt.forEach(([v,l])=>{g.beginPath();g.moveTo(P.L,P.Y(v));g.lineTo(P.w-P.R,P.Y(v));g.stroke();g.textAlign='right';g.fillText(l,P.L-5,P.Y(v)+3)});g.restore()}
+function clip(P,fn){const g=P.g;g.save();g.beginPath();g.rect(P.L,P.T,P.w-P.L-P.R,P.h-P.T-P.B);g.clip();fn();g.restore()}
+function poly(P,pts,col,lw,dash){const g=P.g;g.save();if(dash)g.setLineDash([5,4]);g.strokeStyle=col;g.lineWidth=lw||2;g.beginPath();pts.forEach(([x,y],i)=>i?g.lineTo(P.X(x),P.Y(y)):g.moveTo(P.X(x),P.Y(y)));g.stroke();g.restore()}
+function dots(P,pts,col,r){const g=P.g;g.fillStyle=col;pts.forEach(([x,y])=>{g.beginPath();g.arc(P.X(x),P.Y(y),r||3,0,7);g.fill()})}
+function niceTicks(lo,hi,k){const st=nice((hi-lo)/(k||5)),a=[];for(let v=Math.ceil(lo/st-1e-9)*st;v<=hi+1e-9;v+=st)a.push([v,String(+v.toFixed(6))]);return a}
+function logTicks(lo,hi){const a=[];for(let e=Math.ceil(lo-1e-9);e<=hi+1e-9;e++)a.push([e,nlab(Math.pow(10,e))]);return a}
+function mom(a){const n=a.length;let m=0;for(const v of a)m+=v;m/=n;let v2=0,v3=0,v4=0;for(const v of a){const d=v-m;v2+=d*d;v3+=d*d*d;v4+=d*d*d*d}v2/=n;v3/=n;v4/=n;const sd=Math.sqrt(v2);return{n,m,sd,sk:sd>0?v3/(sd*sd*sd):0,ku:v2>0?v4/(v2*v2)-3:0}}
+function ksN(z){const a=Array.from(z).sort((x,y)=>x-y),n=a.length;let d=0;for(let i=0;i<n;i++){const F=normCdf(a[i]);d=Math.max(d,Math.abs((i+1)/n-F),Math.abs(i/n-F))}return d}
+/* histogram of data as density with optional overlay curves [{f,col,lw,dash}] */
+function hist(cv,data,lo,hi,bins,ov,col){const cnt=new Float64Array(bins),bw=(hi-lo)/bins;let n=0;for(const v of data){if(v<lo||v>=hi)continue;cnt[Math.floor((v-lo)/bw)]++;n++}
+ const N=data.length;let ym=0;for(let i=0;i<bins;i++){cnt[i]/=N*bw;ym=Math.max(ym,cnt[i])}
+ (ov||[]).forEach(o=>{for(let i=0;i<=80;i++)ym=Math.max(ym,o.f(lo+(hi-lo)*i/80)||0)});
+ const P=mk(cv,lo,hi,ym*1.12);
+ P.g.fillStyle=col||'rgba(110,168,255,.5)';for(let i=0;i<bins;i++){if(cnt[i]<=0)continue;const a=P.X(lo+i*bw),b=P.X(lo+(i+1)*bw);P.g.fillRect(a,P.Y(cnt[i]),Math.max(1,b-a-1),P.Y(0)-P.Y(cnt[i]))}
+ (ov||[]).forEach(o=>P.line(o.f,o.col,o.lw||2.4,lo,hi,200,o.dash));return P}
+const fmt=x=>f3(x);
+
+/* ---------- shared for this page ---------- */
+const POPS=['norm','unif','expo','logn','bimo','par5'];
+D.norm.med=0;D.norm.q90=1.2815516;D.unif.med=.5;D.unif.q90=.9;D.expo.med=Math.LN2;D.expo.q90=Math.log(10);D.logn.med=1;D.logn.q90=Math.exp(1.2815516);
+D.bimo.med=0;D.bimo.q90=qc(x=>.5*normCdf((x+2)/.5)+.5*normCdf((x-2)/.5),-10,10,.9,80);D.par5.med=Math.pow(2,.2);D.par5.q90=Math.pow(10,.2);
+const SF={mean:a=>mean(a),median:a=>{const b=Float64Array.from(a).sort(),n=b.length;return n%2?b[(n-1)/2]:(b[n/2-1]+b[n/2])/2},sd:a=>{const n=a.length,m=mean(a);let s=0;for(const v of a)s+=(v-m)*(v-m);return Math.sqrt(s/(n-1))},q90:a=>{const b=Float64Array.from(a).sort();return b[Math.round(.9*(b.length-1))]}};
+function truth(key,st){const d=D[key];return st==='mean'?d.mu:st==='median'?d.med:st==='sd'?d.sd:d.q90}
+const SNAME={mean:'sample mean',median:'sample median',sd:'sample SD',q90:'90th percentile'};
+const N10=[2,3,5,10,20,50,100,200,500,1000];
+function pct(a,p){const b=Float64Array.from(a).sort();return b[Math.min(b.length-1,Math.max(0,Math.floor(p*b.length)))]}
+function histLines(cv,arrs,cols,lo,hi,bins,vl){const bw=(hi-lo)/bins,dens=arrs.map(a=>{const c=new Float64Array(bins);for(const v of a){if(v<lo||v>=hi)continue;c[Math.floor((v-lo)/bw)]++}for(let i=0;i<bins;i++)c[i]/=a.length*bw;return c});let ym=0;dens.forEach(c=>c.forEach(v=>ym=Math.max(ym,v)));const P=mk(cv,lo,hi,ym*1.15||1);
+ dens.forEach((c,k)=>{const pts=[];for(let i=0;i<bins;i++){pts.push([lo+i*bw,c[i]]);pts.push([lo+(i+1)*bw,c[i]])}clip(P,()=>poly(P,pts,cols[k],2.2))});(vl||[]).forEach(v=>P.vline(v[0],v[1],v[2],v[3]));return P}
+function sdOf(a){return mom(a).sd}
+
+/* ---------- Ch1 sampling distribution ---------- */
+(function(){fillSel('c1d',POPS,'expo');let cache=null;
+ function sim(){const key=$('c1d').value,st=$('c1s').value,n=N10[val('c1n')],d=D[key],f=SF[st],R=4000,v=new Float64Array(R),buf=new Float64Array(n);$('c1nv').textContent=n;
+  for(let r=0;r<R;r++){for(let i=0;i<n;i++)buf[i]=d.s();v[r]=f(buf)}cache={key,st,n,v};draw()}
+ function draw(){if(!cache)return;const{key,st,n,v}=cache,t=truth(key,st),m=mom(v);let lo=Math.min(pct(v,.005),t),hi=Math.max(pct(v,.995),t);const pad=(hi-lo)*.06;lo-=pad;hi+=pad;
+  const P=hist($('c1cv'),v,lo,hi,45);P.vline(t,C.y,'true '+fmt(t));P.vline(m.m,C.g,null,true);
+  const bias=m.m-t,rm=Math.sqrt(bias*bias+m.sd*m.sd);
+  $('c1st').innerHTML=stat('true '+(st==='mean'?'mean':st==='median'?'median':st==='sd'?'SD':'90th pct'),fmt(t),'in')+stat('average estimate',fmt(m.m),'')+stat('bias',fmt(bias),Math.abs(bias)>.1*m.sd?'hot':'ok')+stat('standard error',fmt(m.sd),'warn')+stat('RMSE',fmt(rm),'')+stat('skew of estimate',fmt(m.sk),'');
+  $('c1rd').innerHTML=`${SNAME[st]} of ${n} draws from ${D[key].n}: the estimate averages <b>${fmt(m.m)}</b> against a true value of ${fmt(t)} (bias ${fmt(bias)}, ${Math.abs(bias)>.1*m.sd?'a sizeable fraction of the SE':'small next to the SE'}), and a typical single estimate misses by about <b>${fmt(m.sd)}</b>, the standard error. ${Math.abs(m.sk)>.5?'The sampling distribution is visibly skewed here, so a symmetric ± interval will be lopsided.':''}`}
+ $('c1go').onclick=sim;on('c1d c1s c1n',sim);sim();resizers.push(draw);})();
+
+/* ---------- Ch2 SD vs SE ---------- */
+(function(){fillSel('c2d',POPS,'logn');let cache=null;
+ function sim(){const key=$('c2d').value,n=N10[val('c2n')],d=D[key],R=3000,means=new Float64Array(R),se=new Float64Array(R),raw=new Float64Array(6000);$('c2nv').textContent=n;
+  for(let r=0;r<R;r++){let s=0,ss=0;for(let i=0;i<n;i++){const x=d.s();s+=x;ss+=x*x}const m=s/n;means[r]=m;se[r]=Math.sqrt(Math.max(0,(ss-n*m*m)/(n-1))/n)}
+  for(let i=0;i<raw.length;i++)raw[i]=d.s();cache={key,n,means,se,raw};draw()}
+ function draw(){if(!cache)return;const{key,n,means,se,raw}=cache,d=D[key],lo=d.mu-4*d.sd,hi=d.mu+4*d.sd,tse=d.sd/Math.sqrt(n);
+  hist($('c2cv'),raw,lo,hi,45,null,'rgba(255,209,102,.5)').text('individual observations',52,24,C.mu);
+  const P=hist($('c2cv2'),means,lo,hi,45);P.text('sample means (n = '+n+')',52,24,C.mu);P.vline(d.mu,C.y,null,true);
+  const Q=hist($('c2cv3'),se,0,3*tse,50,null,'rgba(192,132,252,.5)');Q.vline(tse,C.y,'true SE '+fmt(tse));Q.text('estimated SE = s/√n, 3,000 samples',52,24,C.mu);
+  const ms=mom(se);let off=0;for(const v of se)if(Math.abs(v/tse-1)>.3)off++;
+  $('c2st').innerHTML=stat('SD of the data σ',fmt(d.sd),'warn')+stat('true SE σ/√n',fmt(tse),'ok')+stat('SD of the sample means (sim)',fmt(sdOf(means)),'in')+stat('average estimated SE',fmt(ms.m),'')+stat('relative spread of SE-hat',pc(ms.sd/tse),ms.sd/tse>.2?'hot':'ok')+stat('SE-hat off by more than 30%',pc(off/se.length),off/se.length>.1?'hot':'ok');
+  $('c2rd').innerHTML=`The data have SD ${fmt(d.sd)} no matter what n is. The sample mean's spread is ${fmt(sdOf(means))} = σ/√${n}. But the <em>estimate</em> of that SE is itself noisy: with n = ${n} it varies by about ${pc(ms.sd/tse)} of its target and is off by more than 30% in ${pc(off/se.length)} of samples${key==='logn'||key==='expo'||key==='par5'?' (worse for skewed data, where s is dragged by rare large values)':''}. Small samples give uncertain uncertainty.`}
+ $('c2go').onclick=sim;on('c2d c2n',sim);sim();resizers.push(draw);})();
+
+/* ---------- Ch3 finite population ---------- */
+(function(){const M=2000;let pop=null,mu=0,s2=0,dotsC=null;const GR=[10,50,100,250,500,1000,1500,1900];
+ function newPop(){pop=new Float64Array(M);for(let i=0;i<M;i++)pop[i]=100*Math.exp(.9*randn());mu=mean(pop);let a=0;for(const v of pop)a+=(v-mu)*(v-mu);s2=a/M;dotsC=null;draw()}
+ function simSE(n,R){const idx=new Int32Array(M);for(let i=0;i<M;i++)idx[i]=i;const ms=new Float64Array(R);for(let r=0;r<R;r++){let s=0;for(let i=0;i<n;i++){const j=i+Math.floor(Math.random()*(M-i)),t=idx[i];idx[i]=idx[j];idx[j]=t;s+=pop[idx[i]]}ms[r]=s/n}return sdOf(ms)}
+ const se0=n=>Math.sqrt(s2/n),se1=n=>Math.sqrt(s2/n*(M-n)/(M-1));
+ function draw(){if(!pop)return;const n=val('c3n');if(!dotsC)dotsC=GR.map(g=>[g,simSE(g,600)]);const sim=simSE(n,1500),sg=Math.sqrt(s2);
+  const P=mk($('c3cv'),0,M,se0(10)*1.08,{noGrid:true});customGrid(P,niceTicks(0,M,6),niceTicks(0,se0(10)*1.08,5));
+  const xs=[];for(let i=10;i<=M-1;i+=10)xs.push(i);poly(P,xs.map(x=>[x,se0(x)]),C.a,2.2,true);poly(P,xs.map(x=>[x,se1(x)]),C.r,2.6);
+  dots(P,dotsC.map(([g,v])=>[g,v]),C.g,4.5);P.vline(n,C.y,'n = '+n,true);
+  P.text('- - σ/√n (no correction)',P.L+8,P.T+14,C.a);P.text('— with finite-population correction',P.L+8,P.T+30,C.r);P.text('● simulated',P.L+8,P.T+46,C.g);P.text('sample size n  (population N = 2,000)',P.w/2,P.h-2,C.mu,'center');
+  $('c3st').innerHTML=stat('sampling fraction n/N',pc(n/M),'in')+stat('SE ignoring FPC',fmt(se0(n)),'warn')+stat('SE with FPC',fmt(se1(n)),'ok')+stat('simulated SE',fmt(sim),'in')+stat('FPC factor',fmt(Math.sqrt((M-n)/(M-1))),'')+stat('population σ',fmt(sg),'');
+  $('c3rd').innerHTML=`Sampling ${n} of ${M} accounts (${pc(n/M)}) without replacement: the simulated SE is ${fmt(sim)}, matching the corrected formula ${fmt(se1(n))} rather than the naive ${fmt(se0(n))}. ${n/M<.05?'At this small sampling fraction the correction is negligible.':n/M>.5?'You have seen most of the population: the correction is large, and at n = N the SE would be exactly 0.':'The correction is now material.'}`}
+ on('c3n',draw);$('c3go').onclick=newPop;newPop();resizers.push(draw);})();
+
+/* ---------- Ch4 formulas vs simulation ---------- */
+(function(){function draw(){const st=$('c4s').value,n=N10[val('c4n')],q=val('c4q'),R=4000,v=new Float64Array(R);$('c4nv').textContent=n;
+  let t=0,fse=0,ql='—',qv='';const qs=$('c4q');qs.disabled=!(st==='prop'||st==='diff'||st==='corr');
+  if(st==='mean'){t=0;fse=1/Math.sqrt(n);for(let r=0;r<R;r++){let s=0;for(let i=0;i<n;i++)s+=randn();v[r]=s/n}}
+  else if(st==='prop'){const p=q/100;ql='p';qv=p;t=p;fse=Math.sqrt(p*(1-p)/n);for(let r=0;r<R;r++)v[r]=binF(n,p)/n}
+  else if(st==='diff'){const s2=q/50;ql='σ₂';qv=s2;t=0;fse=Math.sqrt(1/n+s2*s2/n);for(let r=0;r<R;r++){let a=0,b=0;for(let i=0;i<n;i++){a+=randn();b+=s2*randn()}v[r]=a/n-b/n}}
+  else if(st==='median'){t=0;fse=1.2533/Math.sqrt(n);const buf=new Float64Array(n);for(let r=0;r<R;r++){for(let i=0;i<n;i++)buf[i]=randn();v[r]=SF.median(buf)}}
+  else if(st==='sd'){t=1;fse=1/Math.sqrt(2*(n-1));const buf=new Float64Array(n);for(let r=0;r<R;r++){for(let i=0;i<n;i++)buf[i]=randn();v[r]=SF.sd(buf)}}
+  else{const rho=q/100;ql='ρ';qv=rho;t=rho;fse=(1-rho*rho)/Math.sqrt(n);const c=Math.sqrt(1-rho*rho);for(let r=0;r<R;r++){let sx=0,sy=0,sxx=0,syy=0,sxy=0;for(let i=0;i<n;i++){const x=randn(),y=rho*x+c*randn();sx+=x;sy+=y;sxx+=x*x;syy+=y*y;sxy+=x*y}const cov=sxy/n-sx*sy/(n*n),vx=sxx/n-sx*sx/(n*n),vy=syy/n-sy*sy/(n*n);v[r]=cov/Math.sqrt(vx*vy)}}
+  $('c4ql').textContent=ql;$('c4qv').textContent=qv;
+  const m=mom(v),w=4*Math.max(m.sd,fse),sg=fse;
+  hist($('c4cv'),v,t-w,t+w,45,[{f:x=>Math.exp(-Math.pow(x-t,2)/(2*sg*sg))/(sg*2.5066282746),col:C.a}]);
+  const ratio=m.sd/fse;
+  $('c4st').innerHTML=stat('true value',fmt(t),'in')+stat('average estimate',fmt(m.m),'')+stat('formula SE',fmt(fse),'ok')+stat('simulated SE',fmt(m.sd),'warn')+stat('simulated ÷ formula',fmt(ratio),Math.abs(ratio-1)<.08?'ok':'hot');
+  $('c4rd').innerHTML=`Formula ${fmt(fse)} vs simulation ${fmt(m.sd)} (ratio ${fmt(ratio)}). ${Math.abs(ratio-1)<.08?'The large-n formula is accurate at this n.':'These are large-sample formulas; at this small n they are only approximate, and the sampling distribution may also be skewed (try the correlation near 0.9).'}`}
+ on('c4s c4q c4n',draw);reg(draw);})();
+
+/* ---------- Ch5 variance divisors ---------- */
+(function(){const NL=[2,3,5,10,20,50,100];fillSel('c5d',['norm','unif','expo','logn'],'norm');let cache=null;
+ function sim(){const key=$('c5d').value,n=NL[val('c5n')],d=D[key],R=6000,e=[[0,0],[0,0],[0,0]],dv=[n-1,n,n+1];$('c5nv').textContent=n;
+  for(let r=0;r<R;r++){let s=0,ss=0;for(let i=0;i<n;i++){const x=d.s();s+=x;ss+=x*x}const SS=ss-s*s/n;for(let k=0;k<3;k++){const est=SS/dv[k];e[k][0]+=est;e[k][1]+=est*est}}
+  const t=d.sd*d.sd,res=e.map((a,k)=>{const m=a[0]/R,v=a[1]/R-m*m,b=m-t;return{div:['n−1','n','n+1'][k],bias:b,v,mse:v+b*b}});cache={key,n,res,t};draw()}
+ function draw(){if(!cache)return;const{key,n,res,t}=cache,s4=t*t;let ym=0;res.forEach(r=>ym=Math.max(ym,r.v/s4,r.mse/s4,r.bias*r.bias/s4));
+  const P=mk($('c5cv'),0,3,ym*1.2,{noGrid:true});customGrid(P,res.map((r,i)=>[i+.5,'divide by '+r.div]),niceTicks(0,ym*1.2,5));
+  const cols=['rgba(255,107,129,.8)','rgba(110,168,255,.8)','rgba(255,209,102,.9)'];
+  res.forEach((r,i)=>{[r.bias*r.bias/s4,r.v/s4,r.mse/s4].forEach((v,j)=>{const x=i+.5+(j-1)*.27;P.g.fillStyle=cols[j];P.g.fillRect(P.X(x-.11),P.Y(v),P.X(x+.11)-P.X(x-.11),P.Y(0)-P.Y(v))})});
+  P.text('■ Bias²',P.L+8,P.T+14,'#ff6b81');P.text('■ Variance',P.L+8,P.T+30,'#6ea8ff');P.text('■ MSE',P.L+8,P.T+46,'#ffd166');
+  const th=key==='norm'?[2/(n-1),(2*n-1)/(n*n),2/(n+1)]:null,best=res.reduce((a,b)=>b.mse<a.mse?b:a);
+  $('c5tb').innerHTML='<table><tr><th>divisor</th><th>bias (÷σ²)</th><th>variance (÷σ⁴)</th><th>MSE (÷σ⁴)</th>'+(th?'<th>exact MSE (normal)</th>':'')+'</tr>'+res.map((r,i)=>`<tr><td>${r.div}</td><td class="n">${fmt(r.bias/t)}</td><td class="n">${fmt(r.v/s4)}</td><td class="n">${fmt(r.mse/s4)}</td>${th?`<td class="n">${fmt(th[i])}</td>`:''}</tr>`).join('')+'</table>';
+  $('c5rd').innerHTML=`With n = ${n} the lowest simulated MSE belongs to <b>divisor ${best.div}</b>. The n−1 estimator has bias ${fmt(res[0].bias/t)} σ² (essentially zero) but the largest variance; dividing by n+1 accepts bias ${fmt(res[2].bias/t)} σ² and wins on MSE for normal data. ${key!=='norm'?'For this non-normal population the ranking can differ: excess kurtosis makes the variance term larger, and the best divisor shifts.':'The gap closes quickly as n grows.'}`}
+ $('c5go').onclick=sim;on('c5d c5n',sim);sim();resizers.push(draw);})();
+
+/* ---------- Ch6 Jensen ---------- */
+(function(){const NL=[2,3,5,10,20,50,100,500,1000];let cache=null;
+ function sim(){const c=+$('c6c').value,n=NL[val('c6n')],R=6000,v=new Float64Array(R);$('c6nv').textContent=n;let t,tb,lab;
+  if(c===0){t=1;lab='s';const c4=Math.sqrt(2/(n-1))*Math.exp(lgamma(n/2)-lgamma((n-1)/2));tb=c4-1;for(let r=0;r<R;r++)v[r]=Math.sqrt(2*gammaS((n-1)/2)/(n-1))}
+  else if(c===1){t=1;lab='1/X̄';tb=n>1?1/(n-1):Infinity;for(let r=0;r<R;r++)v[r]=n/gammaS(n)}
+  else if(c===2){t=1;lab='exp(X̄)';tb=Math.exp(1/(2*n))-1;for(let r=0;r<R;r++)v[r]=Math.exp(randn()/Math.sqrt(n))}
+  else{t=0;lab='log X̄';tb=-1/(2*n)-1/(12*n*n);for(let r=0;r<R;r++)v[r]=Math.log(gammaS(n)/n)}
+  cache={c,n,v,t,tb,lab};draw()}
+ function draw(){if(!cache)return;const{c,n,v,t,tb,lab}=cache,m=mom(v);let lo=Math.min(pct(v,.005),t),hi=Math.max(pct(v,.995),t);const pad=(hi-lo)*.06;lo-=pad;hi+=pad;
+  const P=hist($('c6cv'),v,lo,hi,45);P.vline(t,C.y,'true '+fmt(t));P.vline(m.m,C.g,null,true);
+  const bias=m.m-t;
+  $('c6st').innerHTML=stat('true value',fmt(t),'in')+stat('average of '+lab,fmt(m.m),'')+stat('simulated bias',fmt(bias),'hot')+stat('theoretical bias',isFinite(tb)?fmt(tb):'∞','warn')+stat('SE',fmt(m.sd),'')+stat('bias ÷ SE',fmt(bias/m.sd),Math.abs(bias/m.sd)>.2?'hot':'ok');
+  $('c6rd').innerHTML=`${lab} averages <b>${fmt(m.m)}</b> against a true value of ${fmt(t)}: a bias of ${fmt(bias)} (theory: ${isFinite(tb)?fmt(tb):'∞'}). ${c===0?'The square root is concave, so E[s] &lt; σ even though E[s²] = σ².':c===1?'The reciprocal is convex, so E[1/X̄] &gt; 1/E[X̄]: the rate is overestimated by a factor n/(n−1).':c===2?'The exponential is convex: it overestimates e^μ by about the factor e^{σ²/(2n)}.':'The log is concave: log X̄ underestimates log μ by about 1/(2n).'} The bias shrinks like 1/n while the SE shrinks like 1/√n, so at large n bias is negligible, and at small n it is not.`}
+ $('c6go').onclick=sim;on('c6c c6n',sim);sim();resizers.push(draw);})();
+
+/* ---------- Ch7 German tank ---------- */
+(function(){let cache=null;
+ function sim(){const N=val('c7N'),n=Math.min(val('c7n'),Math.floor(N/2)),R=5000,A=new Float64Array(R),B=new Float64Array(R),Cc=new Float64Array(R);
+  for(let r=0;r<R;r++){const seen=new Set();let s=0,mx=0;while(seen.size<n){const x=1+Math.floor(Math.random()*N);if(!seen.has(x)){seen.add(x);s+=x;if(x>mx)mx=x}}A[r]=mx;B[r]=(1+1/n)*mx-1;Cc[r]=2*s/n-1}
+  cache={N,n,A,B,C:Cc};draw()}
+ function draw(){if(!cache)return;const{N,n,A,B,C:Cc}=cache,arrs=[A,B,Cc],cols=[C.r,C.g,C.a],nm=['sample maximum','(1 + 1/n)·max − 1','2·mean − 1'];
+  histLines($('c7cv'),arrs,cols,.3*N,1.8*N,60,[[N,C.y,'true N = '+N]]).text('— max   — corrected max   — 2·mean − 1',52,24,C.mu);
+  const ms=arrs.map(a=>mom(a)),thB=Math.sqrt((N-n)*(N+1)/(n*(n+2))),thC=Math.sqrt((N+1)*(N-n)/(3*n));
+  $('c7tb').innerHTML='<table><tr><th>estimator</th><th>average</th><th>bias</th><th>SD</th><th>RMSE</th><th>theoretical SD</th></tr>'+ms.map((m,i)=>{const b=m.m-N;return`<tr><td><span style="color:${cols[i]}">■</span> ${nm[i]}</td><td class="n">${fmt(m.m)}</td><td class="n">${fmt(b)}</td><td class="n">${fmt(m.sd)}</td><td class="n">${fmt(Math.sqrt(b*b+m.sd*m.sd))}</td><td class="n">${i===1?fmt(thB):i===2?fmt(thC):'—'}</td></tr>`}).join('')+'</table>';
+  $('c7rd').innerHTML=`With ${n} tanks out of N = ${N}: the raw maximum averages ${fmt(ms[0].m)}, always short of N. The corrected maximum is unbiased with SD ${fmt(ms[1].sd)}. The method-of-moments estimator is also unbiased but its SD is ${fmt(ms[2].sd/ms[1].sd)}× larger (theory: √((n+2)/3) = ${fmt(Math.sqrt((n+2)/3))}×). Both unbiased estimators are “correct on average”; only one of them is useful.`}
+ $('c7go').onclick=sim;on('c7N c7n',sim);sim();resizers.push(draw);})();
+
+/* ---------- Ch8 efficiency ---------- */
+(function(){const NL=[5,10,20,50,100],POP={norm:()=>randn(),lap:()=>{const u=Math.random()-.5;return -Math.sign(u)*Math.log(1-2*Math.abs(u))},t3:()=>randn()/Math.sqrt(2*gammaS(1.5)/3),unif:()=>2*Math.random()-1,cont:()=>Math.random()<.05?10*randn():randn()};
+ const EST=[['sample mean',a=>mean(a)],['sample median',SF.median],['20% trimmed mean',a=>{const b=Float64Array.from(a).sort(),n=b.length,k=Math.floor(.2*n);let s=0;for(let i=k;i<n-k;i++)s+=b[i];return s/(n-2*k)}],['midrange',a=>{let lo=Infinity,hi=-Infinity;for(const v of a){if(v<lo)lo=v;if(v>hi)hi=v}return(lo+hi)/2}]];let cache=null;
+ function sim(){const key=$('c8d').value,n=NL[val('c8n')],R=4000,f=POP[key],buf=new Float64Array(n),out=EST.map(()=>new Float64Array(R));$('c8nv').textContent=n;
+  for(let r=0;r<R;r++){for(let i=0;i<n;i++)buf[i]=f();EST.forEach((e,k)=>out[k][r]=e[1](buf))}cache={key,n,out};draw()}
+ function draw(){if(!cache)return;const{key,n,out}=cache,cols=[C.a,C.r,C.g,C.y],sds=out.map(sdOf),nv=sds.map(s=>n*s*s),best=Math.min(...nv),srt=sds.slice().sort((a,b)=>a-b),w=4*srt[2];
+  histLines($('c8cv'),out,cols,-w,w,60,[[0,C.fg,null,true]]);
+  $('c8tb').innerHTML='<table><tr><th>estimator</th><th>SE</th><th>n · Var</th><th>relative efficiency</th></tr>'+EST.map((e,k)=>`<tr><td><span style="color:${cols[k]}">■</span> ${e[0]}</td><td class="n">${fmt(sds[k])}</td><td class="n">${fmt(nv[k])}</td><td class="n">${pc(best/nv[k])}</td></tr>`).join('')+'</table>';
+  const bi=nv.indexOf(best);
+  $('c8rd').innerHTML=`For ${{norm:'normal',lap:'Laplace',t3:'t₃',unif:'uniform',cont:'contaminated normal'}[key]} data at n = ${n} the most efficient of the four is the <b>${EST[bi][0]}</b>. The sample mean has ${pc(best/nv[0])} of the best's efficiency. ${key==='norm'?'Normal data: the mean is efficient, the median only about 64% as efficient (the 2/π rule), and it needs ~57% more data.':key==='unif'?'Bounded data: the extremes carry the information about the centre, so the midrange wins by a wide margin.':'Heavy tails or outliers: the mean is inefficient, and the median or trimmed mean is much better. Efficiency depends on the distribution, so “best” is always relative to a model.'}`}
+ $('c8go').onclick=sim;on('c8d c8n',sim);sim();resizers.push(draw);})();
+
+/* ---------- Ch9 shrinkage ---------- */
+(function(){function draw(){const mu=val('c9m'),sg=val('c9s'),n=val('c9n'),v1=sg*sg/n,cs=mu*mu+v1>0?mu*mu/(mu*mu+v1):0,mse=c=>Math.pow(c-1,2)*mu*mu+c*c*v1;
+  const cs_=[];for(let i=0;i<=120;i++)cs_.push(i/100);let ym=0;cs_.forEach(c=>ym=Math.max(ym,mse(c)));ym=Math.max(ym,1e-9)*1.12;
+  const P=mk($('c9cv'),0,1.2,ym);poly(P,cs_.map(c=>[c,Math.pow(c-1,2)*mu*mu]),C.r,2,true);poly(P,cs_.map(c=>[c,c*c*v1]),C.a,2,true);poly(P,cs_.map(c=>[c,mse(c)]),C.y,2.8);
+  P.vline(1,C.r,'c = 1: unbiased',true);P.vline(cs,C.g,'c* = '+fmt(cs),true);P.text('shrinkage factor c  (estimate = c · X̄)',P.w/2,P.h-2,C.mu,'center');P.text('— MSE   - - Bias²   - - Variance',P.L+8,P.T+14,C.mu);
+  let a=0;const R=4000,sdx=Math.sqrt(v1);for(let r=0;r<R;r++){const e=cs*(mu+sdx*randn())-mu;a+=e*e}const sm=a/R;
+  $('c9st').innerHTML=stat('optimal c*',fmt(cs),'ok')+stat('MSE at c = 1',fmt(v1),'warn')+stat('MSE at c*',fmt(mse(cs)),'ok')+stat('reduction',pc(1-mse(cs)/v1),mse(cs)<.9*v1?'ok':'in')+stat('simulated MSE at c*',fmt(sm),'in')+stat('signal-to-noise μ²/(σ²/n)',fmt(mu*mu/v1),'');
+  $('c9rd').innerHTML=`Noise variance σ²/n = ${fmt(v1)} against μ² = ${fmt(mu*mu)}. The best shrinkage keeps ${pc(cs)} of the sample mean and cuts MSE from ${fmt(v1)} to ${fmt(mse(cs))} (${pc(1-mse(cs)/v1)} lower), even though the shrunken estimator is biased by ${fmt((cs-1)*mu)}. ${mu*mu<v1?'The signal is weaker than the noise, so shrinking a lot is right.':mu*mu>4*v1?'The signal dominates the noise, so there is little to gain.':'Signal and noise are comparable, so shrinking gives a moderate gain.'} Remember that c* uses the unknown μ: in practice you estimate it from many related estimates (empirical Bayes) or tune it by cross-validation.`}
+ on('c9m c9s c9n',draw);reg(draw);})();
+
+/* ---------- Ch10 exact distributions ---------- */
+(function(){const NL=[3,5,10,20,50];fillSel('c10d',POPS,'norm');let cache=null;
+ function sim(){const key=$('c10d').value,n=NL[val('c10n')],d=D[key],R=3000,m=new Float64Array(R),s=new Float64Array(R),q=new Float64Array(R);$('c10nv').textContent=n;
+  for(let r=0;r<R;r++){let a=0,b=0;for(let i=0;i<n;i++){const x=d.s();a+=x;b+=x*x}const mm=a/n,v=Math.max(0,(b-n*mm*mm)/(n-1));m[r]=mm;s[r]=Math.sqrt(v);q[r]=(n-1)*v/(d.sd*d.sd)}cache={key,n,m,s,q};draw()}
+ function corr(a,b){const ma=mean(a),mb=mean(b);let c=0,x=0,y=0;for(let i=0;i<a.length;i++){c+=(a[i]-ma)*(b[i]-mb);x+=(a[i]-ma)**2;y+=(b[i]-mb)**2}return c/Math.sqrt(x*y)}
+ function draw(){if(!cache)return;const{key,n,m,s,q}=cache,d=D[key],se=d.sd/Math.sqrt(n),x0=d.mu-4*se,x1=d.mu+4*se,y1=pct(s,.99)*1.1;
+  const P=mk($('c10cv'),x0,x1,y1,{});P.g.fillStyle='rgba(110,168,255,.35)';for(let i=0;i<1200;i++){if(m[i]<x0||m[i]>x1||s[i]>y1)continue;P.g.beginPath();P.g.arc(P.X(m[i]),P.Y(s[i]),1.8,0,7);P.g.fill()}
+  P.text('x-axis: sample mean   y-axis: sample SD',P.L+8,P.T+14,C.mu);
+  const qh=pct(q,.995),a=(n-1)/2,Q=hist($('c10cv2'),q,0,qh,45,[{f:x=>gampdf(x,a,.5),col:C.r}]);Q.text('(n−1)s²/σ² vs χ²('+(n-1)+')',52,24,C.mu);
+  const cr=corr(m,s),mq=mom(q);const srt=Float64Array.from(q).sort();let ks=0;for(let i=0;i<srt.length;i++){const F=gamcdf(srt[i],a,.5);ks=Math.max(ks,Math.abs((i+1)/srt.length-F),Math.abs(i/srt.length-F))}
+  $('c10st').innerHTML=stat('corr(X̄, s)',fmt(cr),Math.abs(cr)>.1?'hot':'ok')+stat('mean of (n−1)s²/σ²',fmt(mq.m),'')+stat('χ² mean n−1',n-1,'in')+stat('variance of it',fmt(mq.sd*mq.sd),'')+stat('χ² variance 2(n−1)',fmt(2*(n-1)),'in')+stat('KS distance to χ²',fmt(ks),ks<.03?'ok':'hot');
+  $('c10rd').innerHTML=key==='norm'?`Normal data: the cloud has no tilt (corr ${fmt(cr)}), and (n−1)s²/σ² follows the χ²<sub>${n-1}</sub> curve (KS ${fmt(ks)}). Both are exact for normal samples.`:`${d.n}: corr(X̄, s) = <b>${fmt(cr)}</b>, so the mean and the SD are no longer independent${d.sk>0?' (the right tail pushes both up together)':''}, and (n−1)s²/σ² is ${fmt(ks)} from a χ² in KS distance, with variance ${fmt(mq.sd*mq.sd)} rather than ${fmt(2*(n-1))}. The t and χ² results are normal-theory facts, not general ones.`}
+ $('c10go').onclick=sim;on('c10d c10n',sim);sim();resizers.push(draw);})();
+
+/* ---------- Ch11 bootstrap & jackknife ---------- */
+(function(){const NL=[10,20,50,100];fillSel('c11d',POPS,'logn');const tseC={};let cache=null;
+ function trueSE(key,st,n){const k=key+'|'+st+'|'+n;if(tseC[k])return tseC[k];const d=D[key],f=SF[st],R=2000,v=new Float64Array(R),buf=new Float64Array(n);for(let r=0;r<R;r++){for(let i=0;i<n;i++)buf[i]=d.s();v[r]=f(buf)}return tseC[k]=sdOf(v)}
+ function bootSE(x,f,B){const n=x.length,b=new Float64Array(n),v=new Float64Array(B);for(let r=0;r<B;r++){for(let i=0;i<n;i++)b[i]=x[Math.floor(Math.random()*n)];v[r]=f(b)}return v}
+ function jackSE(x,f){const n=x.length,t=new Float64Array(n),b=new Float64Array(n-1);for(let i=0;i<n;i++){let k=0;for(let j=0;j<n;j++)if(j!==i)b[k++]=x[j];t[i]=f(b)}const m=mean(t);let s=0;for(const v of t)s+=(v-m)*(v-m);return Math.sqrt((n-1)/n*s)}
+ function sim(){const key=$('c11d').value,st=$('c11s').value,n=NL[val('c11n')],d=D[key],f=SF[st];$('c11nv').textContent=n;const x=new Float64Array(n);for(let i=0;i<n;i++)x[i]=d.s();
+  const est=f(x),bv=bootSE(x,f,1000),bs=sdOf(bv),js=jackSE(x,f),ts=trueSE(key,st,n);cache={key,st,n,est,bv,bs,js,ts,x,rep:null};draw()}
+ function draw(){if(!cache)return;const{key,st,n,est,bv,bs,js,ts,x,rep}=cache,t=truth(key,st);let lo=Math.min(pct(bv,.003),est,t),hi=Math.max(pct(bv,.997),est,t);const pad=(hi-lo)*.06;lo-=pad;hi+=pad;
+  const P=hist($('c11cv'),bv,lo,hi,45);P.vline(est,C.y,'sample estimate');P.vline(t,C.g,'population value',true);
+  const sdx=SF.sd(x);
+  $('c11st').innerHTML=stat('estimate from this sample',fmt(est),'in')+stat('bootstrap SE',fmt(bs),'ok')+stat('jackknife SE',fmt(js),st==='median'||st==='q90'?'hot':'ok')+stat('true SE (brute force)',fmt(ts),'warn')+stat('bootstrap ÷ true',fmt(bs/ts),Math.abs(bs/ts-1)<.25?'ok':'hot')+(st==='mean'?stat('formula s/√n',fmt(sdx/Math.sqrt(n)),''):'');
+  $('c11rd').innerHTML=`From this one sample of ${n}, the bootstrap SE is <b>${fmt(bs)}</b> against a true SE of ${fmt(ts)}. ${st==='median'||st==='q90'?'The jackknife is unreliable for medians and quantiles (they are not smooth functions of the data), which is why the bootstrap is preferred here. ':''}${rep?`Across 100 fresh samples the bootstrap SE averaged ${fmt(rep.m)} with spread ${fmt(rep.sd)} (${pc(rep.sd/ts)} of the truth): the bootstrap estimates the SE, but with its own sampling noise.`:'Press “Repeat 100×” to see how much the bootstrap SE itself varies between samples.'}`}
+ $('c11rep').onclick=()=>{if(!cache)return;const{key,st,n,ts}=cache,d=D[key],f=SF[st],v=new Float64Array(100);for(let r=0;r<100;r++){const x=new Float64Array(n);for(let i=0;i<n;i++)x[i]=d.s();v[r]=sdOf(bootSE(x,f,200))}const m=mom(v);cache.rep={m:m.m,sd:m.sd};draw()};
+ $('c11go').onclick=sim;on('c11d c11s c11n',sim);sim();resizers.push(draw);})();
+
+/* ---------- Ch12 clustered data ---------- */
+(function(){function draw(){const K=val('c12k'),m=val('c12m'),rho=val('c12r'),Nt=K*m,R=Nt>3000?600:1500,sa=Math.sqrt(rho),se_=Math.sqrt(1-rho),tc=K>1?qc(x=>tcdf(x,K-1),0,300,.975,60):1.96,means=new Float64Array(R);
+  let nvSE=0,clSE=0,cn=0,cc=0;
+  for(let r=0;r<R;r++){let tot=0,ss=0;const cm=new Float64Array(K);for(let k=0;k<K;k++){const a=sa*randn();let c=0;for(let j=0;j<m;j++){const y=a+se_*randn();c+=y;ss+=y*y}cm[k]=c/m;tot+=c}
+   const g=tot/Nt,nse=Math.sqrt(Math.max(0,(ss-Nt*g*g)/(Nt-1))/Nt);let cs=0;for(let k=0;k<K;k++)cs+=(cm[k]-g)*(cm[k]-g);const cse=Math.sqrt(cs/(K-1)/K);means[r]=g;nvSE+=nse;clSE+=cse;if(Math.abs(g)<=1.96*nse)cn++;if(Math.abs(g)<=tc*cse)cc++}
+  nvSE/=R;clSE/=R;const deff=1+(m-1)*rho,sdSim=sdOf(means),sdI=1/Math.sqrt(Nt),sdT=Math.sqrt(deff/Nt),w=4*Math.max(sdSim,sdI);
+  hist($('c12cv'),means,-w,w,45,[{f:x=>Math.exp(-x*x/(2*sdI*sdI))/(sdI*2.5066282746),col:C.a},{f:x=>Math.exp(-x*x/(2*sdT*sdT))/(sdT*2.5066282746),col:C.r}]);
+  $('c12st').innerHTML=stat('design effect',fmt(deff),deff>2?'hot':'ok')+stat('effective n',fmt(Nt/deff),'warn')+stat('true SE (simulated)',fmt(sdSim),'in')+stat('naive iid SE',fmt(nvSE),'warn')+stat('cluster-robust SE',fmt(clSE),'ok')+stat('naive 95% coverage',pc(cn/R),cn/R<.9?'hot':'ok')+stat('cluster-robust coverage',pc(cc/R),Math.abs(cc/R-.95)<.025?'ok':'warn');
+  $('c12rd').innerHTML=`${Nt.toLocaleString()} rows in ${K} clusters with ICC ${fmt(rho)} carry the information of about <b>${fmt(Nt/deff)}</b> independent rows (DEFF ${fmt(deff)}). The naive SE (${fmt(nvSE)}) is too small by a factor ${fmt(sdSim/nvSE)}, so its “95%” interval covers only ${pc(cn/R)}. The cluster-robust SE (${fmt(clSE)}, from the spread of the ${K} cluster means) is close to the truth and covers ${pc(cc/R)}${K<20?'; with few clusters it is itself noisy, which is why a t distribution with K−1 degrees of freedom is used':''}.`}
+ on('c12k c12m c12r',draw);reg(draw);})();
+
+const QZ=[
+{l:'Beginner',q:'What is a sampling distribution?',o:['The distribution of the raw data in your sample','The distribution of a statistic over repeated samples of the same size from the population','The distribution of the population','The distribution of the model residuals'],a:1,e:'It describes how an estimate would vary from sample to sample. You observe only one draw from it.'},
+{l:'Beginner',q:'Data have standard deviation σ = 20 and n = 100. Which is correct?',o:['The SE of the mean is 20 and the SD of the data is 2','The SD of the data is 20 and the SE of the mean is 2','Both equal 2','Both equal 20'],a:1,e:'SD describes individual observations (20); the SE of the mean is σ/√n = 20/10 = 2.'},
+{l:'Intermediate',q:'Two independent group means: σ₁ = 3, n₁ = 36 and σ₂ = 4, n₂ = 64. The SE of the difference is…',o:['0.25','0.50','0.71','1.00'],a:2,e:'√(9/36 + 16/64) = √(0.25 + 0.25) = √0.5 ≈ 0.71. Variances add.'},
+{l:'Intermediate',q:'You audit 100 of 1,000 accounts without replacement. Compared with σ/√n, the SE of the mean is multiplied by about…',o:['0.95','0.50','1.00 (no change)','1.05'],a:0,e:'FPC = √((1000−100)/(1000−1)) ≈ 0.95.'},
+{l:'Intermediate',q:'A fraud rate is p̂ = 2% from n = 5,000 accounts. The standard error is about…',o:['0.02 percentage points','0.2 percentage points','2 percentage points','0.4 percentage points'],a:1,e:'√(0.02 × 0.98 / 5000) ≈ 0.00198, i.e. 0.2 percentage points.'},
+{l:'Intermediate',q:'For normal data, the SE of the sample median compared with the SE of the sample mean is about…',o:['the same','25% larger','2× larger','25% smaller'],a:1,e:'SE(median) ≈ 1.2533 σ/√n, so efficiency is 2/π ≈ 64% (equivalently, it needs about 57% more data).'},
+{l:'Advanced',q:'Which identity is correct?',o:['MSE = Bias + Variance','MSE = Bias² + Variance','MSE = Bias² × Variance','MSE = |Bias| + SD'],a:1,e:'E[(θ̂ − θ)²] = (E θ̂ − θ)² + Var(θ̂).'},
+{l:'Advanced',q:'For normal data, which divisor of the sum of squares minimises the MSE of the variance estimate?',o:['n − 1','n','n + 1','n + 2'],a:2,e:'MSE is 2σ⁴/(n+1) with divisor n+1, lower than for n (and n−1), despite the added bias.'},
+{l:'Advanced',q:'s² is unbiased for σ². What about s for σ?',o:['Unbiased','Biased low (Jensen: the square root is concave)','Biased high','Biased only for skewed data'],a:1,e:'E[s] < σ for every n. Unbiasedness is not preserved by nonlinear transformations.'},
+{l:'Advanced',q:'Exponential data with true rate λ = 1 and n = 10. E[1/X̄] is…',o:['1.00','1.11','0.90','2.00'],a:1,e:'E[1/X̄] = λ·n/(n−1) = 10/9 ≈ 1.11.'},
+{l:'Advanced',q:'You capture n = 5 tanks with largest serial 80. The unbiased estimate of the number of tanks is…',o:['80','85','95','160'],a:2,e:'(1 + 1/n)·max − 1 = 1.2 × 80 − 1 = 95.'},
+{l:'Advanced',q:'Which statement about efficiency is correct?',o:['The sample mean is the most efficient estimator of the centre for every distribution','The median or a trimmed mean can be far more efficient than the mean for heavy-tailed data','Efficiency does not depend on the data distribution','Unbiased estimators all have the same variance'],a:1,e:'Efficiency is relative to a model: mean for normal, median/trimmed for heavy tails, midrange for uniform.'},
+{l:'Expert',q:'X̄ ~ N(μ, σ²/n) with μ = 1, σ = 3, n = 9. The MSE-optimal shrinkage factor c in c·X̄ is…',o:['0.1','0.5','0.9','1.0'],a:1,e:'c* = μ²/(μ² + σ²/n) = 1/(1 + 1) = 0.5, and the MSE drops from 1 to 0.5.'},
+{l:'Expert',q:'For iid normal samples, X̄ and s are…',o:['Positively correlated','Negatively correlated','Independent','Related only through n'],a:2,e:'Independence of X̄ and s² is a special property of the normal; for skewed data they are correlated.'},
+{l:'Expert',q:'How does the nonparametric bootstrap estimate a standard error?',o:['By plugging the sample mean into σ/√n','By resampling the data with replacement many times and taking the SD of the statistic across resamples','By leaving out half the data','By adding noise to the data'],a:1,e:'Resample n observations with replacement B times, recompute T each time, and use SD(T*).'},
+{l:'Expert',q:'Clusters of m = 20 with ICC ρ = 0.1. By what factor is the SE of the overall mean inflated relative to the iid formula?',o:['1.1','1.7','2.9','19'],a:1,e:'DEFF = 1 + (m−1)ρ = 2.9, so the SE is multiplied by √2.9 ≈ 1.7.'},
+{l:'Expert',q:'10,000 loans from 100 branches (100 each), ICC = 0.05. The effective sample size is about…',o:['10,000','5,000','1,700','100'],a:2,e:'DEFF = 1 + 99 × 0.05 = 5.95, so n_eff = 10,000/5.95 ≈ 1,681.'},
+{l:'Expert',q:'Which statement is true?',o:['A consistent estimator must be unbiased','A biased estimator can be consistent (for example the variance with divisor n)','An unbiased estimator is always consistent','Consistency means zero variance at every n'],a:1,e:'Consistency is a large-n property (convergence in probability); bias can vanish as n → ∞.'}
+];
+(function(){const st=store.get('se_quiz',{});
+ function render(){const box=$('quiz');box.innerHTML='';
+  QZ.forEach((q,i)=>{const d=document.createElement('div');d.className='q'+(st[i]!=null?' done':'');d.innerHTML=`<div class="qh">Q${i+1} · ${q.l}</div><div style="margin:4px 0 6px"><b>${q.q}</b></div>`;
+   q.o.forEach((o,j)=>{const b=document.createElement('button');b.className='opt';b.textContent=o;if(st[i]!=null){if(j===q.a)b.classList.add('good');else if(j===st[i])b.classList.add('bad')}b.onclick=()=>{if(st[i]!=null)return;st[i]=j;store.set('se_quiz',st);render();meter()};d.appendChild(b)});
+   const e=document.createElement('div');e.className='ex';e.innerHTML=(st[i]===q.a?'✅ ':'❌ ')+q.e;d.appendChild(e);box.appendChild(d)});
+  const ans=Object.keys(st).length,ok=QZ.filter((q,i)=>st[i]===q.a).length;
+  $('qscore').innerHTML=stat('answered',ans+' / '+QZ.length,'in')+stat('correct',ok,'ok')+stat('score',ans?Math.round(100*ok/ans)+'%':'—',ok/Math.max(ans,1)>=.8?'ok':'warn')+stat('verdict',ans<QZ.length?'keep going':ok>=16?'estimation master':ok>=13?'strong':'review ch. 5–9','')}
+ $('qreset').onclick=()=>{Object.keys(st).forEach(k=>delete st[k]);store.set('se_quiz',st);render();meter()};
+ window.__qst=st;render();})();
+const CHK=['Define parameter, estimator, estimate and sampling distribution.','Distinguish SD of the data from SE of an estimate, and say how each scales with n.','Apply the finite population correction when sampling without replacement.','Write the SE of a mean, a proportion, a difference and a correlation from memory.','Decompose MSE into bias² + variance and explain why unbiased ≠ best.','Explain why s is biased for σ and 1/X̄ for λ (Jensen).','Give an example of two unbiased estimators with different variances (German tank).','Explain consistency vs unbiasedness vs efficiency, and the Cramér–Rao bound.','Choose between mean, median and trimmed mean given the data\'s tails.','Derive the optimal shrinkage factor μ²/(μ²+σ²/n) and say why it needs an estimate of μ.','State the exact normal-sampling results: X̄ ⟂ s, χ², t.','Compute a bootstrap SE and know why the jackknife fails for the median.','Compute the design effect and effective sample size for clustered data.','Name the unit of independence in a dataset before quoting an interval.'];
+(function(){const st=store.get('se_chk',{}),box=$('chk');CHK.forEach((t,i)=>{const l=document.createElement('label'),c=document.createElement('input');c.type='checkbox';c.checked=!!st[i];c.onchange=()=>{st[i]=c.checked;store.set('se_chk',st);meter()};l.appendChild(c);const s=document.createElement('span');s.textContent=t;l.appendChild(s);box.appendChild(l)});window.__cst=st;})();
+function meter(){const q=window.__qst||{},c=window.__cst||{};const ok=QZ.filter((x,i)=>q[i]===x.a).length,ck=Object.values(c).filter(Boolean).length;const p=Math.round(100*(.6*ok/QZ.length+.4*ck/CHK.length));$('mtxt').textContent='Mastery: '+p+'%  (exam + checklist)';$('mbar').style.width=p+'%';store.set('mastery_se',p)}
+meter();
+
+
+/* ---------- Navigation ---------- */
+(function(){const nav=$('nav');let html='';
+ document.querySelectorAll('main .part, main section.ch').forEach(el=>{if(el.classList.contains('part'))html+=`<div class="pt">${el.textContent}</div>`;else{const h=el.querySelector('h2'),num=h.querySelector('.num').textContent,t=Array.from(h.childNodes).filter(n=>n.nodeType===3).map(n=>n.textContent).join('').trim();html+=`<a href="#${el.id}" data-id="${el.id}">${num}. ${t}</a>`}});
+ nav.innerHTML=html;const links=nav.querySelectorAll('a'),io=new IntersectionObserver(es=>{es.forEach(e=>{if(e.isIntersecting)links.forEach(a=>a.classList.toggle('on',a.dataset.id===e.target.id))})},{rootMargin:'-20% 0px -70% 0px'});
+ document.querySelectorAll('section.ch').forEach(s=>io.observe(s));
+ $('menu').onclick=()=>$('side').classList.toggle('open');nav.addEventListener('click',e=>{if(e.target.tagName==='A')$('side').classList.remove('open')});
+ window.addEventListener('scroll',()=>{const h=document.documentElement;$('prog').style.width=(100*h.scrollTop/(h.scrollHeight-h.clientHeight))+'%'},{passive:true});})();
+</script>
+</body>
+</html>

@@ -1,0 +1,673 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>LLN &amp; Central Limit Theorem Mastery</title>
+<style>
+:root{--bg:#0b0e17;--panel:#121726;--panel2:#171d30;--line:#232a3d;--fg:#e8ebf5;--mu:#8a93ab;--a:#6ea8ff;--r:#ff6b81;--y:#ffd166;--g:#4ade80;--p:#c084fc;--t:#5eead4}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;background:var(--bg);color:var(--fg);font:16px/1.7 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+a{color:var(--a)}
+#prog{position:fixed;top:0;left:0;height:3px;background:linear-gradient(90deg,var(--a),var(--p),var(--r));width:0;z-index:50}
+.side{position:fixed;left:0;top:0;bottom:0;width:290px;background:#0e1220;border-right:1px solid var(--line);overflow:auto;padding:18px 14px 90px;z-index:40;transition:transform .25s}
+.side h1{font-size:15px;margin:0 0 2px}
+.side small{color:var(--mu)}
+.side .pt{margin:16px 0 4px;font-size:11px;text-transform:uppercase;letter-spacing:1.3px;color:var(--p)}
+.side a{display:block;color:var(--mu);text-decoration:none;padding:5px 9px;border-radius:7px;font-size:13.5px;line-height:1.35}
+.side a:hover{background:var(--panel);color:var(--fg)}
+.side a.on{background:var(--panel2);color:var(--fg);box-shadow:inset 3px 0 var(--a)}
+.side a.back{color:var(--t);padding-left:0;margin-bottom:6px}
+.meter{position:fixed;left:0;bottom:0;width:290px;background:#0e1220;border-top:1px solid var(--line);padding:10px 16px;z-index:41;font-size:12px;color:var(--mu)}
+.meter .bar{height:7px;background:var(--line);border-radius:6px;margin-top:5px;overflow:hidden}
+.meter .bar i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--g),var(--t));transition:width .4s}
+#menu{display:none;position:fixed;top:10px;left:10px;z-index:60;background:var(--panel2);color:var(--fg);border:1px solid var(--line);border-radius:9px;padding:7px 12px;font-size:14px;cursor:pointer}
+main{margin-left:290px;padding:0 34px 120px;max-width:1090px}
+.hero{padding:70px 0 30px}
+.hero h1{font-size:clamp(32px,5vw,56px);line-height:1.08;margin:0 0 14px;background:linear-gradient(100deg,#fff,var(--y) 40%,var(--r));-webkit-background-clip:text;background-clip:text;color:transparent}
+.hero p{font-size:19px;color:#c3c9dc;max-width:780px}
+.chips{display:flex;flex-wrap:wrap;gap:8px;margin:18px 0}
+.chip{border:1px solid var(--line);background:var(--panel);padding:5px 12px;border-radius:99px;font-size:13px;color:var(--mu)}
+.chip b{color:var(--fg)}
+.part{margin:90px 0 0;padding-top:22px;border-top:1px solid var(--line);font-size:12px;letter-spacing:2px;text-transform:uppercase;color:var(--p)}
+section.ch{padding-top:30px}
+h2{font-size:30px;line-height:1.2;margin:10px 0 8px;display:flex;gap:12px;align-items:center;flex-wrap:wrap}
+h2 .num{display:inline-grid;place-items:center;width:40px;height:40px;border-radius:12px;background:var(--panel2);border:1px solid var(--line);font-size:18px;color:var(--a)}
+.lvl{font-size:11px;font-weight:600;letter-spacing:.8px;text-transform:uppercase;padding:3px 9px;border-radius:99px;border:1px solid}
+.lvl.b{color:var(--g);border-color:#1f5c3a}.lvl.i{color:var(--a);border-color:#244a85}.lvl.a{color:var(--y);border-color:#6b5420}.lvl.e{color:var(--r);border-color:#7a2c3a}
+h3{font-size:19px;margin:30px 0 6px;color:#fff}
+p{margin:10px 0}li{margin:5px 0}
+code,.f{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace}
+code{background:var(--panel2);padding:1px 6px;border-radius:5px;font-size:.9em}
+.f{display:block;white-space:pre-wrap;background:#0e1322;border:1px solid var(--line);border-left:3px solid var(--a);padding:12px 16px;border-radius:9px;margin:14px 0;overflow-x:auto;font-size:15px;color:#dbe4ff;line-height:1.8}
+.co{border-radius:12px;padding:13px 17px;margin:16px 0;border:1px solid var(--line);background:var(--panel)}
+.co>b:first-child{display:block;margin-bottom:2px;font-size:12px;letter-spacing:1px;text-transform:uppercase}
+.co.def{border-left:4px solid var(--a)}.co.def>b:first-child{color:var(--a)}
+.co.warn{border-left:4px solid var(--r)}.co.warn>b:first-child{color:var(--r)}
+.co.tip{border-left:4px solid var(--g)}.co.tip>b:first-child{color:var(--g)}
+.co.key{border-left:4px solid var(--y);background:#171608}.co.key>b:first-child{color:var(--y)}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:18px 20px;margin:22px 0;box-shadow:0 8px 30px rgba(0,0,0,.25)}
+.card>h4{margin:0 0 3px;font-size:13px;letter-spacing:1.2px;text-transform:uppercase;color:var(--t)}
+.card>p.sub{margin:0 0 12px;color:var(--mu);font-size:14.5px}
+.ctl{display:flex;flex-wrap:wrap;gap:10px 22px;align-items:center;margin:8px 0 10px}
+.ctl label{display:flex;gap:8px;align-items:center;font-size:14px;color:#c3c9dc}
+.ctl output{min-width:38px;font-family:ui-monospace,monospace;color:var(--y);font-size:13px}
+input[type=range]{accent-color:var(--a);width:150px}
+input[type=checkbox]{accent-color:var(--a)}
+select,input[type=number],input[type=text]{background:#0e1322;color:var(--fg);border:1px solid var(--line);border-radius:8px;padding:6px 9px;font:inherit;font-size:14px}
+button{background:linear-gradient(180deg,#2c4a80,#233b68);color:#fff;border:1px solid #3a5a98;border-radius:9px;padding:7px 14px;font:inherit;font-size:14px;cursor:pointer}
+button:hover{filter:brightness(1.15)}
+button.alt{background:var(--panel2);border-color:var(--line);color:var(--fg)}
+canvas{width:100%;height:270px;display:block;background:#0e1322;border:1px solid var(--line);border-radius:10px;margin-top:6px}
+canvas.sm{height:210px}canvas.tl{height:330px}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(125px,1fr));gap:9px;margin:12px 0}
+.stat{background:#0e1322;border:1px solid var(--line);border-radius:10px;padding:8px 11px}
+.stat b{display:block;font-size:17px;font-family:ui-monospace,monospace}
+.stat span{font-size:11.5px;color:var(--mu);text-transform:uppercase;letter-spacing:.7px}
+.stat.hot b{color:var(--r)}.stat.ok b{color:var(--g)}.stat.warn b{color:var(--y)}.stat.in b{color:var(--a)}
+.read{margin:8px 0 0;padding:10px 14px;background:#0e1322;border:1px dashed #33406a;border-radius:10px;font-size:14.5px;color:#d3dbf3}
+table{border-collapse:collapse;width:100%;margin:12px 0;font-size:14px}
+th,td{border:1px solid var(--line);padding:7px 10px;text-align:left;vertical-align:top}
+th{background:var(--panel2);font-size:12px;text-transform:uppercase;letter-spacing:.6px;color:var(--mu)}
+td.n{font-family:ui-monospace,monospace;text-align:right}
+.tw{overflow-x:auto}
+.pill{display:inline-block;padding:1px 9px;border-radius:99px;font-size:12px;font-weight:600}
+.pill.r{background:#3a1520;color:var(--r)}.pill.g{background:#10321f;color:var(--g)}.pill.y{background:#3a2f0e;color:var(--y)}.pill.m{background:#202637;color:var(--mu)}
+details{background:var(--panel);border:1px solid var(--line);border-radius:11px;padding:9px 15px;margin:9px 0}
+details summary{cursor:pointer;font-weight:600}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.q{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:14px 18px;margin:14px 0}
+.q .qh{font-size:12px;letter-spacing:1px;text-transform:uppercase;color:var(--mu)}
+.q .opt{display:block;width:100%;text-align:left;margin:6px 0;background:#0e1322;border:1px solid var(--line);color:var(--fg);border-radius:9px;padding:9px 12px}
+.q .opt.good{border-color:var(--g);background:#0e2418}.q .opt.bad{border-color:var(--r);background:#2a1119}
+.q .ex{display:none;margin-top:8px;font-size:14.5px;color:#c3c9dc}
+.q.done .ex{display:block}
+.chk label{display:flex;gap:10px;align-items:flex-start;padding:6px 0;cursor:pointer}
+.chk input{margin-top:6px;accent-color:var(--g);width:17px;height:17px}
+.sigrow{display:grid;grid-template-columns:minmax(170px,2fr) 1fr 1fr auto;gap:8px 14px;align-items:center;padding:6px 0;border-top:1px dashed #1b2236}
+.sigrow:first-of-type{border-top:0}
+.sigrow label{display:flex;gap:6px;align-items:center;font-size:13.5px;color:#c3c9dc}
+@media(max-width:900px){
+ .side{transform:translateX(-100%)}.side.open{transform:none}.meter{display:none}
+ #menu{display:block}main{margin-left:0;padding:0 16px 100px}.two{grid-template-columns:1fr}.hero{padding-top:60px}
+ .sigrow{grid-template-columns:1fr 1fr}
+}
+</style>
+</head>
+<body>
+<div id="prog"></div>
+<button id="menu">☰ Contents</button>
+<nav class="side" id="side"><a class="back" href="index.html">← All courses</a><h1>LLN &amp; Central Limit Theorem</h1><small>14 chapters · 14 labs · exam</small><div id="nav"></div></nav>
+<div class="meter"><div id="mtxt">Mastery: 0%</div><div class="bar"><i id="mbar"></i></div></div>
+
+<main>
+<header class="hero">
+ <h1>The law of large numbers &amp; the central limit theorem.</h1>
+ <p>Two theorems hold up most of applied statistics. The <b>law of large numbers</b> says averages settle down. The <b>central limit theorem</b> says <em>how</em> they settle down: with a bell-shaped error whose size shrinks like 1/√n. Every confidence interval, A/B test, Monte Carlo estimate and risk number you will ever quote leans on one or both. This page builds them from the ground up, shows exactly how fast they work, and then breaks them on purpose, with heavy tails, dependent data and correlated loan portfolios, so you know when your intervals are lying.</p>
+ <div class="chips"><span class="chip"><b>Part I</b> Law of large numbers</span><span class="chip"><b>Part II</b> Central limit theorem</span><span class="chip"><b>Part III</b> When they break</span></div>
+ <div class="co tip"><b>How to use this</b>Every chapter has a lab. Before you touch a slider, predict what will happen, then check. The labs run real random simulations in your browser, so numbers change slightly each time you press a re-run button; that wobble is itself the lesson. Prerequisites: the Random Variables and Core Distributions pages (expectation, variance, the normal, the binomial).</div>
+</header>
+
+<!-- ============ PART I ============ -->
+<div class="part">Part I · The law of large numbers</div>
+
+<section class="ch" id="c1">
+<h2><span class="num">1</span>Averages settle down <span class="lvl b">Beginner</span></h2>
+<p>Take independent, identically distributed draws X₁, X₂, … with true mean μ. The <b>sample mean</b> after n draws is X̄ₙ = (X₁ + … + Xₙ)/n. The law of large numbers (LLN) says that as n grows, X̄ₙ gets arbitrarily close to μ.</p>
+<div class="f">X̄ₙ → μ  as n → ∞          (if E|X| &lt; ∞)</div>
+<p>This is why a casino is predictable while a single spin is not, and why an insurer can price a book of policies it could never price one by one. Randomness does not vanish; it <em>averages out</em>.</p>
+<div class="co key"><b>The condition that matters</b>The theorem needs a finite mean. It does <em>not</em> need a finite variance, and it does not need normality. It does need independence (or something close to it) and identical distributions (or at least comparable ones). Chapters 5 and 6 show what happens when these fail.</div>
+<div class="card"><h4>Lab 1 · Running mean paths</h4>
+ <p class="sub">Each coloured line is one experiment: the running average after 1, 2, 3, … n draws (horizontal axis is logarithmic, so you can see the early chaos). The dashed line is the true mean. Try Cauchy last.</p>
+ <div class="ctl"><label>distribution <select id="c1d"></select></label><label>draws N <input type="range" id="c1n" min="100" max="20000" step="100" value="5000"><output id="c1nv"></output></label><label>paths <input type="range" id="c1k" min="1" max="8" step="1" value="4"><output id="c1kv"></output></label><button id="c1go">Re-run</button></div>
+ <canvas class="tl" id="c1cv"></canvas><div class="stats" id="c1st"></div><div class="read" id="c1rd"></div></div>
+<p>Notice three things. Early on the paths disagree wildly. They then funnel toward μ. And the funnel narrows <em>slowly</em>: to cut the wobble in half you need four times the data (Chapter 4). For the Cauchy distribution, which has no mean, the lines never settle at all.</p>
+</section>
+
+<section class="ch" id="c2">
+<h2><span class="num">2</span>Dilution, not compensation <span class="lvl b">Beginner</span></h2>
+<p>The “law of averages” as people say it (“I've lost five times, so a win is due”) is the <b>gambler's fallacy</b>. The LLN says nothing of the kind. A fair coin has no memory. Early luck is never <em>repaid</em>; it is merely <em>swamped</em> by the much larger number of later flips.</p>
+<div class="f">proportion of heads = ½ + (heads − tails) / (2n)</div>
+<p>The surplus (heads − tails) does <em>not</em> drift back to zero; it performs a random walk whose typical size grows like √n. But the proportion is that surplus divided by 2n, and √n/n → 0. The proportion converges to ½ because the denominator grows faster than the surplus, not because the surplus is corrected.</p>
+<div class="card"><h4>Lab 2 · Start with a lucky streak</h4>
+ <p class="sub">Each of 200 independent coins starts with S heads in a row, then keeps flipping a fair coin. Left: the average proportion of heads. Right: the average surplus (heads − tails) and its ±1 standard deviation band.</p>
+ <div class="ctl"><label>initial streak S <input type="range" id="c2s" min="0" max="100" step="1" value="30"><output id="c2sv"></output></label><label>further flips <input type="range" id="c2n" min="200" max="20000" step="200" value="5000"><output id="c2nv"></output></label><button id="c2go">Re-run</button></div>
+ <div class="two"><canvas class="sm" id="c2cv"></canvas><canvas class="sm" id="c2cv2"></canvas></div><div class="stats" id="c2st"></div><div class="read" id="c2rd"></div></div>
+<div class="co warn"><b>Fraud-team version</b>“We've had no large fraud losses for six months, so we're due one” and “we've had too many, so it will calm down” are the same fallacy. Past counts matter only if they tell you about the <em>rate</em>; they do not owe you a correction.</div>
+</section>
+
+<section class="ch" id="c3">
+<h2><span class="num">3</span>Weak and strong laws, and Chebyshev <span class="lvl i">Intermediate</span></h2>
+<p>There are two standard versions of the LLN, and they differ in what kind of convergence they promise.</p>
+<div class="tw"><table>
+<tr><th>Version</th><th>Statement</th><th>Meaning in practice</th></tr>
+<tr><td><b>Weak LLN</b></td><td>For every ε &gt; 0, P(|X̄ₙ − μ| &gt; ε) → 0</td><td>At any fixed large n, a big miss is unlikely.</td></tr>
+<tr><td><b>Strong LLN</b></td><td>P(X̄ₙ → μ) = 1</td><td>Along the one path you actually observe, the running average eventually settles and stays settled.</td></tr>
+</table></div>
+<p>A clean proof of the weak law for finite variance comes from <b>Chebyshev's inequality</b>, which holds for <em>any</em> distribution with variance σ²:</p>
+<div class="f">P(|X̄ₙ − μ| ≥ ε) ≤ Var(X̄ₙ) / ε² = σ² / (n ε²)</div>
+<p>The right side → 0 as n → ∞, so the weak law follows. Chebyshev is a <em>guarantee</em>, but a crude one: it must hold for the worst-behaved distribution, so it is usually far too pessimistic. The central limit theorem (Part II) gives a much sharper approximation, 2(1 − Φ(ε√n/σ)), which is accurate when n is large enough. Lab 3 puts all three side by side.</p>
+<div class="card"><h4>Lab 3 · Chebyshev vs CLT vs reality</h4>
+ <p class="sub">Probability that the sample mean misses μ by more than ε standard deviations of a single observation, as n grows (log axis). Blue is simulated, red dashed is Chebyshev's guarantee, green is the CLT approximation.</p>
+ <div class="ctl"><label>distribution <select id="c3d"></select></label><label>ε (in σ units) <input type="range" id="c3e" min="0.1" max="1" step="0.05" value="0.5"><output id="c3ev"></output></label><button id="c3go">Re-simulate</button></div>
+ <canvas class="tl" id="c3cv"></canvas><div class="stats" id="c3st"></div><div class="read" id="c3rd"></div></div>
+</section>
+
+<section class="ch" id="c4">
+<h2><span class="num">4</span>The √n law and Monte Carlo <span class="lvl i">Intermediate</span></h2>
+<p>The LLN tells you <em>that</em> X̄ₙ → μ. The next question is <em>how fast</em>. Because the variance of an average is σ²/n, the typical error is the <b>standard error</b>:</p>
+<div class="f">SE(X̄ₙ) = σ / √n</div>
+<p>Error shrinks like n<sup>−1/2</sup>. This is slow: <b>4× the data halves the error; 100× the data buys one more correct decimal digit.</b> It is also <em>dimension-free</em>, which is why Monte Carlo simulation works for integrals no grid could handle.</p>
+<p>Classic example: throw random points in the unit square; the fraction that lands inside the quarter circle estimates π/4. Each point is a Bernoulli(π/4) trial, so the estimator 4·(fraction) has standard error 4√(p(1−p)/n) ≈ 1.642/√n.</p>
+<div class="card"><h4>Lab 4 · Estimating pi by random points</h4>
+ <p class="sub">Each grey dot is the absolute error of one run after n points (log-log axes). The blue line is the root-mean-square error across runs; the dashed green line is the theoretical 1.642/√n. On log-log axes, 1/√n is a straight line of slope −½.</p>
+ <div class="ctl"><label>independent runs <input type="range" id="c4p" min="5" max="40" step="1" value="20"><output id="c4pv"></output></label><button id="c4go">Re-run</button></div>
+ <canvas class="tl" id="c4cv"></canvas><div class="stats" id="c4st"></div><div class="read" id="c4rd"></div></div>
+<div class="co tip"><b>Rule of thumb for planning</b>If you want an average accurate to ±m with 95% confidence, you need n ≈ (1.96 σ / m)². Estimate σ from a pilot run. Halving m quadruples n; it is always worth asking whether the extra precision changes any decision.</div>
+</section>
+
+<section class="ch" id="c5">
+<h2><span class="num">5</span>When the LLN fails: heavy tails <span class="lvl a">Advanced</span></h2>
+<p>The LLN needs a finite mean. Two distinct things can go wrong in heavy-tailed data, and it is worth keeping them separate. Take a Pareto distribution with tail index α (P(X &gt; x) = x<sup>−α</sup> for x ≥ 1):</p>
+<div class="tw"><table>
+<tr><th>Tail index α</th><th>Mean</th><th>Variance</th><th>What you get</th></tr>
+<tr><td>α ≤ 1</td><td>infinite</td><td>infinite</td><td>No LLN. The running mean keeps climbing, driven by ever-larger single values.</td></tr>
+<tr><td>1 &lt; α ≤ 2</td><td>finite</td><td>infinite</td><td>LLN holds but converges slowly and erratically; the CLT in its usual √n form fails.</td></tr>
+<tr><td>α &gt; 2</td><td>finite</td><td>finite</td><td>LLN and CLT both hold, though the CLT can need huge n when α is near 2.</td></tr>
+</table></div>
+<p>A useful diagnostic is the <b>largest observation's share of the total</b>. In well-behaved data it shrinks like 1/n. In heavy-tailed data a single draw can be a large fraction of the whole sum even at n = 1,000, so the “average” is really the average of one or two events. Losses from operational risk, fraud amounts and exposure at default are often in this regime.</p>
+<div class="card"><h4>Lab 5 · Pareto running mean and the dominance of the maximum</h4>
+ <p class="sub">Three paths of the running mean of Pareto(α) draws (log horizontal axis, values above the plot are clipped). The table reports, over 300 repetitions with n = 1,000, how much of the total sum the single largest draw makes up.</p>
+ <div class="ctl"><label>tail index α <input type="range" id="c5a" min="0.5" max="4" step="0.1" value="1.5"><output id="c5av"></output></label><label>draws N <input type="range" id="c5n" min="500" max="50000" step="500" value="10000"><output id="c5nv"></output></label><button id="c5go">Re-run</button></div>
+ <canvas class="tl" id="c5cv"></canvas><div class="stats" id="c5st"></div><div class="tw" id="c5tb"></div><div class="read" id="c5rd"></div></div>
+<div class="co warn"><b>Practical consequence</b>If a sample mean of losses jumps every time one large claim arrives, do not trust its standard error, and do not trust a normal-based confidence interval. Look at the maximum's share, use medians or trimmed means for the typical case, and model the tail separately (Stage 7 of the roadmap: extreme value theory).</div>
+</section>
+
+<section class="ch" id="c6">
+<h2><span class="num">6</span>When the LLN bites slowly: dependence <span class="lvl a">Advanced</span></h2>
+<p>With independent data, Var(X̄) = σ²/n. With dependent data that formula is wrong, and it is wrong in the dangerous direction when observations are positively correlated (transactions of one customer, daily returns in a regime, repeated measurements). For a stationary series with autocorrelation ρₖ at lag k:</p>
+<div class="f">Var(X̄ₙ) ≈ (σ²/n) · [1 + 2 Σₖ ρₖ]      →      n_eff = n / [1 + 2 Σₖ ρₖ]</div>
+<p>For an AR(1) process, ρₖ = ρᵏ, so the bracket is (1+ρ)/(1−ρ). With ρ = 0.9 the bracket is 19: 1,000 observations are worth about <b>53 independent ones</b>. The LLN still holds (the mean still converges), but far slower than the n you counted, and an interval built with the iid standard error is far too narrow.</p>
+<div class="card"><h4>Lab 6 · A positively autocorrelated series</h4>
+ <p class="sub">1,500 simulated series of length n, each with mean 0 and variance 1. The histogram shows the 1,500 sample means. Blue curve: what the iid formula predicts. Red curve: the correct spread. The coverage figure is how often the naive 95% interval (using the iid standard error) actually contains the true mean 0.</p>
+ <div class="ctl"><label>autocorrelation ρ <input type="range" id="c6r" min="-0.9" max="0.95" step="0.05" value="0.7"><output id="c6rv"></output></label><label>series length n <input type="range" id="c6n" min="30" max="1000" step="10" value="200"><output id="c6nv"></output></label></div>
+ <canvas class="tl" id="c6cv"></canvas><div class="stats" id="c6st"></div><div class="read" id="c6rd"></div></div>
+<p>Negative autocorrelation (alternating signs) does the reverse: the mean is <em>more</em> precise than iid would suggest. In practice you handle dependence with block bootstraps, HAC (Newey–West) standard errors, or by modelling the dependence explicitly (Stage 4 of the roadmap).</p>
+</section>
+
+<!-- ============ PART II ============ -->
+<div class="part">Part II · The central limit theorem</div>
+
+<section class="ch" id="c7">
+<h2><span class="num">7</span>The theorem and the sampling distribution of the mean <span class="lvl b">Beginner</span></h2>
+<p>The LLN says X̄ₙ lands near μ. The <b>central limit theorem (CLT)</b> describes the error around μ. If the Xᵢ are iid with mean μ and <em>finite variance</em> σ², then</p>
+<div class="f">Zₙ = (X̄ₙ − μ) / (σ/√n)  →  N(0, 1)   in distribution, as n → ∞</div>
+<p>Equivalently, X̄ₙ is approximately N(μ, σ²/n) for large n. Read it carefully:</p>
+<ul>
+<li>It is about the <b>distribution of the average</b>, not of the data. Your raw data stay as skewed as they ever were.</li>
+<li>The parent distribution can be almost anything with finite variance: skewed, lumpy, bimodal, discrete.</li>
+<li>It says nothing about how large n must be. That depends on the parent's shape (Chapter 9).</li>
+</ul>
+<div class="card"><h4>Lab 7 · Watch the bell appear</h4>
+ <p class="sub">Left: histogram of 6,000 draws from the parent distribution. Right: histogram of 4,000 standardised sample means Zₙ, with the N(0,1) curve in blue. Move n up from 1 and watch the right-hand side turn into the bell.</p>
+ <div class="ctl"><label>parent <select id="c7d"></select></label><label>sample size n <input type="range" id="c7n" min="0" max="10" step="1" value="3"><output id="c7nv"></output></label><button id="c7go">Re-sample</button></div>
+ <div class="two"><canvas class="sm" id="c7cv"></canvas><canvas class="sm" id="c7cv2"></canvas></div><div class="stats" id="c7st"></div><div class="read" id="c7rd"></div></div>
+<p>Try the 5% Bernoulli at n = 10 and n = 100 (a rare event: most samples contain zero or one success), and then the Pareto(α = 5), which has a fat right tail. They need much larger n than the uniform, which is almost bell-shaped at n = 3.</p>
+</section>
+
+<section class="ch" id="c8">
+<h2><span class="num">8</span>Why the normal? Convolutions and the proof sketch <span class="lvl i">Intermediate</span></h2>
+<p>Adding independent variables <b>convolves</b> their densities: the density of X + Y is ∫f_X(t) f_Y(s − t) dt. Convolution is a smoothing operation. Each time you convolve, bumps and kinks are averaged out and the shape drifts toward a single smooth hill. The normal curve is the <em>fixed point</em>: convolve it with itself and, after rescaling, you get the same curve back.</p>
+<p>The standard proof uses the characteristic function φ(t) = E[eⁱᵗˣ], because convolution of densities becomes <em>multiplication</em> of characteristic functions. Standardise each term so it has mean 0 and variance 1; then φ(t) = 1 − t²/2 + o(t²), and for the standardised sum Zₙ:</p>
+<div class="f">φ_Zₙ(t) = [ φ(t/√n) ]ⁿ = [ 1 − t²/(2n) + o(1/n) ]ⁿ  →  e^(−t²/2)</div>
+<p>and e^(−t²/2) is the characteristic function of N(0,1). Only the first two moments survive the limit; everything about the parent's shape (skewness, kurtosis, bumps) is pushed into the o(1/n) remainder, which is why the CLT forgets the parent. The remainders are exactly what controls <em>how fast</em> (Chapter 9).</p>
+<div class="card"><h4>Lab 8 · Design your own parent and convolve it</h4>
+ <p class="sub">Drag the eight bars to draw any density on [0, 1]. The plot shows the exact density of the sum of k independent copies (computed by repeated convolution), standardised, against the normal curve. Presets include shapes that are hard for the CLT.</p>
+ <div class="ctl" id="c8ctl"></div>
+ <div class="ctl"><button class="alt" data-pre="1,1,1,1,1,1,1,1">uniform</button><button class="alt" data-pre="10,6,4,2.5,1.5,1,.6,.4">skewed (exp-like)</button><button class="alt" data-pre="10,0,0,0,0,0,0,10">two spikes</button><button class="alt" data-pre="0,0,0,10,10,0,0,0">middle block</button><button class="alt" data-pre="10,0,0,0,0,0,0,.3">one big spike, rare far tail</button><label>sum of k copies <input type="range" id="c8k" min="1" max="12" step="1" value="3"><output id="c8kv"></output></label></div>
+ <canvas class="tl" id="c8cv"></canvas><div class="stats" id="c8st"></div><div class="read" id="c8rd"></div></div>
+</section>
+
+<section class="ch" id="c9">
+<h2><span class="num">9</span>How fast? Skewness, Berry–Esseen and interval coverage <span class="lvl a">Advanced</span></h2>
+<p>“n ≥ 30” is folklore, not a theorem. Two results give the real picture.</p>
+<h3>1. The skewness of the mean decays like 1/√n</h3>
+<div class="f">skew(X̄ₙ) = skew(X) / √n          excess kurtosis(X̄ₙ) = excess kurt(X) / n</div>
+<p>The mean of a very skewed parent keeps a visible skew for a long time. Exponential data (skew 2) still give skew 0.2 at n = 100.</p>
+<h3>2. Berry–Esseen: a guaranteed rate</h3>
+<div class="f">sup ₓ |P(Zₙ ≤ x) − Φ(x)|  ≤  C · E|X − μ|³ / (σ³ √n)          (C ≤ 0.4748)</div>
+<p>The error is O(1/√n), and the constant depends on the third absolute moment relative to σ³: more skewed and heavier-tailed parents need more data. If the third moment is infinite the bound is useless, which is why Pareto data with α &lt; 3 misbehave. Lab 9a computes the <em>exact</em> distance for a Bernoulli(p) parent, so you can see how loose the bound is. The green line is the lattice floor: a discrete sum has jumps, and a smooth normal can never match a jump.</p>
+<div class="card"><h4>Lab 9a · Exact error of the normal approximation to a binomial</h4>
+ <p class="sub">The largest vertical gap between the standardised Binomial(n, p) CDF and the normal CDF, for n from 5 to 20,000, against the Berry–Esseen bound (red) and the lattice floor ≈ 1/(2√(2π n p q)) (green dashed). Log-log axes.</p>
+ <div class="ctl"><label>success probability p % <input type="range" id="c9p" min="0.5" max="50" step="0.5" value="5"><output id="c9pv"></output></label></div>
+ <canvas class="tl" id="c9cv"></canvas><div class="stats" id="c9st"></div><div class="read" id="c9rd"></div></div>
+<h3>3. What you actually care about: does my confidence interval cover?</h3>
+<p>The usual interval X̄ ± t·s/√n is justified by the CLT plus <b>Slutsky's theorem</b> (replacing the unknown σ by the estimate s does not spoil the limit, because s → σ by the LLN). Its <em>actual</em> coverage for finite n depends on the parent. For skewed data the errors are one-sided: a right-skewed parent usually produces samples that miss the tail, giving a mean that is too low and an interval whose upper end sits below μ.</p>
+<div class="card"><h4>Lab 9b · Real coverage of the 95% t-interval</h4>
+ <p class="sub">For each n, 2,000 samples are drawn and the 95% t-interval X̄ ± t₀.₉₇₅,ₙ₋₁·s/√n is formed. The table shows how often it covers the true mean, and on which side it fails.</p>
+ <div class="ctl"><label>parent <select id="c9bd"></select></label><button id="c9bgo">Re-simulate</button></div>
+ <canvas class="tl" id="c9bcv"></canvas><div class="tw" id="c9btb"></div><div class="read" id="c9brd"></div></div>
+</section>
+
+<section class="ch" id="c10">
+<h2><span class="num">10</span>Normal approximations: binomial, Poisson and rare events <span class="lvl i">Intermediate</span></h2>
+<p>A binomial count is a sum of n Bernoulli trials, so the CLT gives Bin(n, p) ≈ N(np, np(1−p)). Two refinements matter in practice.</p>
+<ul>
+<li><b>Continuity correction.</b> Counts are integers, the normal is continuous. To approximate P(X ≥ k), integrate from k − ½: P(X ≥ k) ≈ 1 − Φ((k − ½ − np)/√(np q)).</li>
+<li><b>Rare events.</b> When p is small the binomial is skewed and the normal is poor, especially in the <em>tails</em>, which is exactly where fraud, default and breach probabilities live. The Poisson(np) is usually better there (Core Distributions, Chapter 4).</li>
+</ul>
+<p>A common rule of thumb is np(1−p) ≥ 10. It is a rule of thumb for the centre; far tails need more.</p>
+<div class="card"><h4>Lab 10 · Exact, normal, continuity-corrected normal and Poisson</h4>
+ <p class="sub">The bars are the exact pmf. The shaded region is the tail P(X ≥ k₀), where k₀ is z standard deviations above the mean. Compare the four tail probabilities.</p>
+ <div class="ctl"><label>n <input type="range" id="c10n" min="5" max="2000" step="5" value="100"><output id="c10nv"></output></label><label>p % <input type="range" id="c10p" min="0.05" max="50" step="0.05" value="5"><output id="c10pv"></output></label><label>tail at z <input type="range" id="c10z" min="1" max="4" step="0.1" value="2.5"><output id="c10zv"></output></label></div>
+ <canvas class="tl" id="c10cv"></canvas><div class="stats" id="c10st"></div><div class="read" id="c10rd"></div></div>
+</section>
+
+<section class="ch" id="c11">
+<h2><span class="num">11</span>The delta method: CLT for functions of averages <span class="lvl a">Advanced</span></h2>
+<p>You rarely care about the mean itself. You care about a rate, a ratio, a log-odds, a variance. If X̄ₙ is asymptotically normal and g is smooth with g′(μ) ≠ 0, then g(X̄ₙ) is too:</p>
+<div class="f">√n (g(X̄ₙ) − g(μ))  →  N(0, g′(μ)² σ²)          so   SE[g(X̄)] ≈ |g′(μ)| σ / √n</div>
+<p>Derivation: first-order Taylor, g(X̄) ≈ g(μ) + g′(μ)(X̄ − μ), so the variance gets multiplied by g′(μ)². This is how standard errors for log-odds, log-ratios, rates (1/mean) and correlations are obtained. <b>When g′(μ) = 0</b> the first-order term vanishes and the limit is not normal at the √n scale (you need a second-order expansion, giving a scaled χ²).</p>
+<div class="card"><h4>Lab 11 · Predicted vs simulated standard error</h4>
+ <p class="sub">6,000 simulated sample means are pushed through g. The histogram is the distribution of g(X̄); the blue curve is the delta-method normal; compare the simulated and predicted standard errors.</p>
+ <div class="ctl"><label>quantity <select id="c11c"><option value="0">Exp(1): rate estimate 1/X̄</option><option value="1">Exp(1): log X̄</option><option value="2">Bernoulli(p): log-odds of proportion</option><option value="3">Bernoulli(p): variance estimate p̂(1−p̂)</option></select></label><label>n <input type="range" id="c11n" min="0" max="9" step="1" value="4"><output id="c11nv"></output></label><label>p % (Bernoulli) <input type="range" id="c11p" min="2" max="98" step="1" value="20"><output id="c11pv"></output></label></div>
+ <canvas class="tl" id="c11cv"></canvas><div class="stats" id="c11st"></div><div class="read" id="c11rd"></div></div>
+<p>Try the last case at p = 50%: g′(μ) = 0 and the delta method predicts zero spread, yet the estimate still varies, with a skewed one-sided shape. That is the second-order regime.</p>
+</section>
+
+<section class="ch" id="c12">
+<h2><span class="num">12</span>The CLT in practice: proportions, rare events and sample size <span class="lvl i">Intermediate</span></h2>
+<p>For a proportion p̂ = k/n, the CLT gives SE = √(p(1−p)/n) and the <b>Wald interval</b> p̂ ± 1.96·SE. The <b>Wilson interval</b> inverts the test instead and is far better behaved for small p or small n. The relative precision of a rate depends on how many <em>events</em> you see, not on n alone:</p>
+<div class="f">relative half-width of 95% CI ≈ 1.96 · √((1 − p) / (n p))  →  events needed for ±10% ≈ 384 (1 − p)</div>
+<p>A fraud rate of 0.2% estimated from 10,000 accounts rests on about 20 events, so its 95% interval is roughly ±45% of the estimate. Counting accounts does not help; counting <em>events</em> does.</p>
+<div class="card"><h4>Lab 12 · How often does the 95% interval cover a rare rate?</h4>
+ <p class="sub">Forty simulated samples; each bar is the Wald interval (green if it contains the true p, red if it misses; a zero-event sample gives a zero-width interval). Statistics below come from 4,000 samples.</p>
+ <div class="ctl"><label>true rate p % <input type="range" id="c12p" min="0.05" max="30" step="0.05" value="1"><output id="c12pv"></output></label><label>sample size n <input type="range" id="c12n" min="0" max="11" step="1" value="4"><output id="c12nv"></output></label><button id="c12go">Re-sample</button></div>
+ <canvas class="tl" id="c12cv"></canvas><div class="stats" id="c12st"></div><div class="read" id="c12rd"></div></div>
+</section>
+
+<!-- ============ PART III ============ -->
+<div class="part">Part III · When the theorems break</div>
+
+<section class="ch" id="c13">
+<h2><span class="num">13</span>Correlated portfolios: the CLT that does not arrive <span class="lvl e">Expert</span></h2>
+<p>A bank holds N loans, each defaulting with probability p. If defaults were independent, the loss rate L = (defaults)/N would be approximately N(p, p(1−p)/N): its spread shrinks to zero as N grows, and large portfolios become safe. That is the LLN and CLT working. Now add a common economic factor with asset correlation ρ (the one-factor Vasicek model used in Basel's formulas). Conditional on the factor Z, loans are independent with default probability</p>
+<div class="f">p(Z) = Φ( (Φ⁻¹(p) − √ρ · Z) / √(1 − ρ) )</div>
+<p>Averaging over many loans gives L → p(Z) as N → ∞: the idiosyncratic noise averages out (the LLN), <b>but the common factor does not</b>. The loss rate stays random however large the portfolio. The independent-normal approximation then <em>understates the tail badly</em>.</p>
+<div class="card"><h4>Lab 13 · Portfolio loss: independent normal vs one-factor reality</h4>
+ <p class="sub">6,000 simulated portfolios. The blue curve is the CLT answer if defaults were independent. The red-dashed line marks the simulated 99th percentile, the blue-dashed line marks what the independent-normal approximation would say, and the table adds the infinite-granularity Vasicek limit.</p>
+ <div class="ctl"><label>loans N <input type="range" id="c13n" min="10" max="2000" step="10" value="200"><output id="c13nv"></output></label><label>PD p % <input type="range" id="c13p" min="0.2" max="10" step="0.1" value="2"><output id="c13pv"></output></label><label>asset correlation ρ <input type="range" id="c13r" min="0" max="0.5" step="0.01" value="0.15"><output id="c13rv"></output></label></div>
+ <canvas class="tl" id="c13cv"></canvas><div class="stats" id="c13st"></div><div class="read" id="c13rd"></div></div>
+<div class="co key"><b>The general lesson</b>The LLN and CLT are theorems about <em>independent</em> (or weakly dependent) averaging. Whenever your data share a common driver (a market, an economy, a fraud ring, a device, a branch), the number that matters is the effective number of independent observations, and it can be tiny compared with the number of rows. Always ask: what is n_eff?</div>
+</section>
+
+<section class="ch" id="c14">
+<h2><span class="num">14</span>Final exam, mastery checklist, cheat sheet <span class="lvl e">Expert</span></h2>
+<h3>Exam (18 questions — click an answer)</h3>
+<div id="quiz"></div>
+<div class="card"><h4>Score</h4><div class="stats" id="qscore"></div><button class="alt" id="qreset">Reset exam</button></div>
+<h3>Mastery checklist — tick when you can do it without notes</h3>
+<div class="card chk" id="chk"></div>
+<h3>Cheat sheet</h3>
+<div class="tw"><table>
+<tr><th>Idea</th><th>One line</th></tr>
+<tr><td>LLN</td><td>X̄ₙ → μ if E|X| &lt; ∞ (weak: in probability; strong: almost surely)</td></tr>
+<tr><td>Gambler's fallacy</td><td>No compensation: surplus stays ~√n, proportion converges by dilution</td></tr>
+<tr><td>Chebyshev</td><td>P(|X̄ − μ| ≥ ε) ≤ σ²/(nε²): always true, usually loose</td></tr>
+<tr><td>Standard error</td><td>σ/√n: 4× data halves it; 100× data gains a digit</td></tr>
+<tr><td>Required n</td><td>n ≈ (1.96σ/m)² for margin m</td></tr>
+<tr><td>CLT</td><td>(X̄ − μ)/(σ/√n) → N(0,1); needs finite variance</td></tr>
+<tr><td>Speed</td><td>skew(X̄) = skew(X)/√n; Berry–Esseen error ≤ 0.4748·E|X−μ|³/(σ³√n)</td></tr>
+<tr><td>Heavy tails</td><td>α ≤ 1: no LLN; 1 &lt; α ≤ 2: LLN but no √n CLT; Cauchy mean is Cauchy</td></tr>
+<tr><td>Dependence</td><td>n_eff = n/[1 + 2Σρₖ]; AR(1): n(1−ρ)/(1+ρ)</td></tr>
+<tr><td>Binomial → normal</td><td>N(np, npq) with continuity correction k ± ½; use Poisson for rare events</td></tr>
+<tr><td>Delta method</td><td>SE[g(X̄)] ≈ |g′(μ)|σ/√n; breaks when g′(μ) = 0</td></tr>
+<tr><td>Slutsky</td><td>Replace σ by s and the CLT still holds (s → σ)</td></tr>
+<tr><td>Rare proportions</td><td>Precision is set by events: ±10% needs about 384(1−p) events; prefer Wilson</td></tr>
+<tr><td>Correlated portfolio</td><td>Loss-rate spread does not vanish as N grows; independent-normal understates tails</td></tr>
+</table></div>
+<div class="co tip"><b>Next on the roadmap</b>Stage 2 begins: sampling distributions and standard errors, then maximum likelihood estimation. The CLT you just learned is what makes the MLE asymptotically normal, and the delta method is how you get standard errors for anything you compute from it.</div>
+</section>
+</main>
+
+<script>
+/*MATH*/
+function lgamma(x){const c=[76.18009172947146,-86.50532032941677,24.01409824083091,-1.231739572450155,0.1208650973866179e-2,-0.5395239384953e-5];let y=x,t=x+5.5;t-=(x+.5)*Math.log(t);let s=1.000000000190015;for(let j=0;j<6;j++)s+=c[j]/++y;return -t+Math.log(2.5066282746310005*s/x);}
+function gser(a,x){let ap=a,sum=1/a,del=sum;for(let n=0;n<1000;n++){ap++;del*=x/ap;sum+=del;if(Math.abs(del)<Math.abs(sum)*1e-15)break;}return sum*Math.exp(-x+a*Math.log(x)-lgamma(a));}
+function gcf(a,x){let b=x+1-a,c=1/1e-300,d=1/b,h=d;for(let i=1;i<1000;i++){const an=-i*(i-a);b+=2;d=an*d+b;if(Math.abs(d)<1e-300)d=1e-300;c=b+an/c;if(Math.abs(c)<1e-300)c=1e-300;d=1/d;const del=d*c;h*=del;if(Math.abs(del-1)<1e-15)break;}return Math.exp(-x+a*Math.log(x)-lgamma(a))*h;}
+function gammaQ(a,x){if(x<=0)return 1;return x<a+1?1-gser(a,x):gcf(a,x);}
+function betacf(a,b,x){const qab=a+b,qap=a+1,qam=a-1;let c=1,d=1-qab*x/qap;if(Math.abs(d)<1e-300)d=1e-300;d=1/d;let h=d;for(let m=1;m<=1000;m++){const m2=2*m;let aa=m*(b-m)*x/((qam+m2)*(a+m2));d=1+aa*d;if(Math.abs(d)<1e-300)d=1e-300;c=1+aa/c;if(Math.abs(c)<1e-300)c=1e-300;d=1/d;h*=d*c;aa=-(a+m)*(qab+m)*x/((a+m2)*(qap+m2));d=1+aa*d;if(Math.abs(d)<1e-300)d=1e-300;c=1+aa/c;if(Math.abs(c)<1e-300)c=1e-300;d=1/d;const del=d*c;h*=del;if(Math.abs(del-1)<1e-15)break;}return h;}
+function betai(a,b,x){if(x<=0)return 0;if(x>=1)return 1;const bt=Math.exp(lgamma(a+b)-lgamma(a)-lgamma(b)+a*Math.log(x)+b*Math.log(1-x));return x<(a+1)/(a+b+2)?bt*betacf(a,b,x)/a:1-bt*betacf(b,a,1-x)/b;}
+function normSf(z){const q=0.5*gammaQ(.5,z*z/2);return z>=0?q:1-q;}
+function normCdf(z){return normSf(-z);}
+function npdf(x){return Math.exp(-x*x/2)/2.5066282746310002;}
+function lbin(n,k){return lgamma(n+1)-lgamma(k+1)-lgamma(n-k+1);}
+function binom(n,k,p){return Math.exp(lbin(n,k)+k*Math.log(p)+(n-k)*Math.log(1-p));}
+function betapdf(x,a,b){return x<=0||x>=1?0:Math.exp(lgamma(a+b)-lgamma(a)-lgamma(b)+(a-1)*Math.log(x)+(b-1)*Math.log(1-x));}
+function betacdf(x,a,b){return betai(a,b,x);}
+function gampdf(x,a,r){return x<=0?0:Math.exp(a*Math.log(r)+(a-1)*Math.log(x)-r*x-lgamma(a));}
+function gamcdf(x,a,r){return x<=0?0:1-gammaQ(a,r*x);}
+function randn(){let u=0;while(!u)u=Math.random();return Math.sqrt(-2*Math.log(u))*Math.cos(2*Math.PI*Math.random());}
+function gammaS(a){if(a<1)return gammaS(a+1)*Math.pow(Math.random(),1/a);const d=a-1/3,c=1/Math.sqrt(9*d);for(;;){let x,v;do{x=randn();v=1+c*x}while(v<=0);v=v*v*v;const u=Math.random();if(Math.log(u)<.5*x*x+d-d*v+d*Math.log(v))return d*v;}}
+function betaS(a,b){const x=gammaS(a),y=gammaS(b);return x/(x+y);}
+function binS(n,p){let k=0;for(let i=0;i<n;i++)if(Math.random()<p)k++;return k;}
+function mean(a){let s=0;for(const v of a)s+=v;return s/a.length;}
+function qc(cdf,lo,hi,p,it){for(let i=0;i<(it||100);i++){const m=(lo+hi)/2;if(cdf(m)<p)lo=m;else hi=m}return(lo+hi)/2;}
+function qb(a,b,p){return qc(x=>betai(a,b,x),0,1,p,50);}
+function tcdf(x,v){const t=.5*betai(v/2,.5,v/(v+x*x));return x>0?1-t:t}
+function qn(p){return qc(normCdf,-9,9,p,70)}
+function pois(k,l){return Math.exp(-l+k*Math.log(l)-lgamma(k+1))}
+function binF(n,p){let k=0;for(;;){if(n<=0||p<=0)return k;if(p>=1)return k+n;if(n<=40){for(let i=0;i<n;i++)if(Math.random()<p)k++;return k}const a=1+(n>>1),bb=1+n-a,x=betaS(a,bb);if(x>=p){n=a-1;p=p/x}else{k+=a;n=bb-1;p=(p-x)/(1-x)}}}
+/*ENDMATH*/
+
+const $=id=>document.getElementById(id), val=id=>+$(id).value;
+const C={fg:'#e8ebf5',mu:'#8a93ab',gr:'#232a3d',a:'#6ea8ff',r:'#ff6b81',y:'#ffd166',g:'#4ade80',p:'#c084fc',t:'#5eead4'};
+const store={get(k,d){try{const v=JSON.parse(localStorage.getItem(k));return v==null?d:v}catch(e){return d}},set(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}};
+function stat(l,v,c){return `<div class="stat ${c||''}"><b>${v}</b><span>${l}</span></div>`}
+function f3(x){if(!isFinite(x))return String(x);const a=Math.abs(x);if(a!==0&&(a<1e-3||a>=1e6))return x.toExponential(2);return String(+x.toFixed(a<1?4:a<100?3:a<1000?2:0))}
+function pc(x){return f3(100*x)+'%'}
+const resizers=[];
+function reg(fn){fn();resizers.push(fn)}
+function on(ids,fn){ids.split(' ').forEach(i=>{const e=$(i);e.addEventListener('input',fn);e.addEventListener('change',fn)})}
+let rt;window.addEventListener('resize',()=>{clearTimeout(rt);rt=setTimeout(()=>resizers.forEach(f=>f()),150)});
+document.querySelectorAll('input[type=range]').forEach(i=>{const o=$(i.id+'v');if(!o)return;const f=()=>{o.textContent=i.value};i.addEventListener('input',f);f()});
+
+function nice(x){const e=Math.pow(10,Math.floor(Math.log10(x))),f=x/e;return (f<1.5?1:f<3?2:f<7?5:10)*e}
+function mk(cv,x0,x1,ymax,o){o=o||{};const y0=o.y0||0,dpr=window.devicePixelRatio||1,r=cv.getBoundingClientRect(),w=r.width||600,h=r.height||270;
+ cv.width=w*dpr;cv.height=h*dpr;const g=cv.getContext('2d');g.setTransform(dpr,0,0,dpr,0,0);g.clearRect(0,0,w,h);
+ const L=o.L||42,R=12,T=14,B=28,X=x=>L+(x-x0)/(x1-x0)*(w-L-R),Y=y=>h-B-(y-y0)/(ymax-y0)*(h-T-B);
+ g.font='11px system-ui';g.lineWidth=1;g.strokeStyle=C.gr;g.fillStyle=C.mu;
+ if(!o.noGrid){const sx=nice((x1-x0)/7);for(let x=Math.ceil(x0/sx-1e-9)*sx;!o.noX&&x<=x1+1e-9;x+=sx){g.beginPath();g.moveTo(X(x),T);g.lineTo(X(x),h-B);g.stroke();g.textAlign='center';g.fillText(String(+x.toFixed(6)),X(x),h-B+15)}
+ const sy=nice((ymax-y0)/4);for(let y=Math.ceil(y0/sy-1e-9)*sy;y<=ymax+1e-9;y+=sy){g.beginPath();g.moveTo(L,Y(y));g.lineTo(w-R,Y(y));g.stroke();g.textAlign='right';g.fillText(String(+y.toFixed(4)),L-5,Y(y)+3)}}
+ return{g,w,h,X,Y,L,R,T,B,
+  line(f,col,lw,a,b,n,dash){a=a==null?x0:a;b=b==null?x1:b;n=n||260;g.save();if(dash)g.setLineDash([5,4]);g.beginPath();g.strokeStyle=col;g.lineWidth=lw||2;let st=false;for(let i=0;i<=n;i++){const x=a+(b-a)*i/n,y=f(x);if(!isFinite(y)){st=false;continue}st?g.lineTo(X(x),Y(y)):g.moveTo(X(x),Y(y));st=true}g.stroke();g.restore()},
+  area(f,a,b,col,n){a=Math.max(a,x0);b=Math.min(b,x1);if(b<=a)return;n=n||200;g.beginPath();g.moveTo(X(a),Y(0));for(let i=0;i<=n;i++){const x=a+(b-a)*i/n;g.lineTo(X(x),Y(f(x)))}g.lineTo(X(b),Y(0));g.closePath();g.fillStyle=col;g.fill()},
+  vline(x,col,lab,dash){g.save();g.strokeStyle=col;g.lineWidth=1.6;if(dash)g.setLineDash([5,4]);g.beginPath();g.moveTo(X(x),T);g.lineTo(X(x),h-B);g.stroke();g.restore();if(lab){g.fillStyle=col;g.textAlign='center';g.fillText(lab,Math.min(Math.max(X(x),34),w-34),T+10)}},
+  hline(y,col,lab){g.save();g.strokeStyle=col;g.lineWidth=1.4;g.setLineDash([5,4]);g.beginPath();g.moveTo(L,Y(y));g.lineTo(w-R,Y(y));g.stroke();g.restore();if(lab){g.fillStyle=col;g.textAlign='right';g.fillText(lab,w-R-3,Y(y)-4)}},
+  text(s,x,y,col,al){g.fillStyle=col||C.fg;g.textAlign=al||'left';g.fillText(s,x,y)}};}
+
+/* ---------- shared helpers for this page ---------- */
+const D={
+ norm:{n:'Normal(0,1)',s:()=>randn(),mu:0,sd:1,sk:0},
+ unif:{n:'Uniform(0,1)',s:()=>Math.random(),mu:.5,sd:Math.sqrt(1/12),sk:0},
+ expo:{n:'Exponential(1)',s:()=>-Math.log(1-Math.random()),mu:1,sd:1,sk:2},
+ logn:{n:'Lognormal(0,1)',s:()=>Math.exp(randn()),mu:Math.exp(.5),sd:Math.sqrt((Math.E-1)*Math.E),sk:(Math.E+2)*Math.sqrt(Math.E-1),disc:0},
+ b05:{n:'Bernoulli(0.5)',s:()=>Math.random()<.5?1:0,mu:.5,sd:.5,sk:0,disc:1},
+ b05s:{n:'Bernoulli(0.05)',s:()=>Math.random()<.05?1:0,mu:.05,sd:Math.sqrt(.0475),sk:.9/Math.sqrt(.0475),disc:1},
+ bimo:{n:'Two humps',s:()=>(Math.random()<.5?-2:2)+.5*randn(),mu:0,sd:Math.sqrt(4.25),sk:0},
+ par5:{n:'Pareto(α=5)',s:()=>Math.pow(1-Math.random(),-.2),mu:1.25,sd:Math.sqrt(5/48),sk:6*Math.sqrt(.6)},
+ cauchy:{n:'Cauchy (no mean)',s:()=>Math.tan(Math.PI*(Math.random()-.5)),mu:NaN,sd:Infinity,sk:NaN}
+};
+function fillSel(id,keys,def){const e=$(id);e.innerHTML=keys.map(k=>`<option value="${k}">${D[k].n}</option>`).join('');e.value=def}
+const PAL=[C.a,C.r,C.y,C.g,C.p,C.t,'#ff9f43','#9aa4bf'];
+function tgrid(N,M){const T=[];let prev=0;for(let i=0;i<M;i++){let n=Math.round(Math.pow(10,Math.log10(N)*i/(M-1)));if(i===M-1)n=N;n=Math.max(prev+1,n);if(n>N)break;T.push(n);prev=n}if(T[T.length-1]!==N)T[T.length-1]=N;return T}
+function nlab(n){return n>=1e6?(n/1e6)+'M':n>=1000?(n/1000)+'k':String(n)}
+function customGrid(P,xt,yt){const g=P.g;g.save();g.strokeStyle=C.gr;g.fillStyle=C.mu;g.font='11px system-ui';g.lineWidth=1;
+ xt.forEach(([v,l])=>{g.beginPath();g.moveTo(P.X(v),P.T);g.lineTo(P.X(v),P.h-P.B);g.stroke();g.textAlign='center';g.fillText(l,P.X(v),P.h-P.B+15)});
+ yt.forEach(([v,l])=>{g.beginPath();g.moveTo(P.L,P.Y(v));g.lineTo(P.w-P.R,P.Y(v));g.stroke();g.textAlign='right';g.fillText(l,P.L-5,P.Y(v)+3)});g.restore()}
+function clip(P,fn){const g=P.g;g.save();g.beginPath();g.rect(P.L,P.T,P.w-P.L-P.R,P.h-P.T-P.B);g.clip();fn();g.restore()}
+function poly(P,pts,col,lw,dash){const g=P.g;g.save();if(dash)g.setLineDash([5,4]);g.strokeStyle=col;g.lineWidth=lw||2;g.beginPath();pts.forEach(([x,y],i)=>i?g.lineTo(P.X(x),P.Y(y)):g.moveTo(P.X(x),P.Y(y)));g.stroke();g.restore()}
+function dots(P,pts,col,r){const g=P.g;g.fillStyle=col;pts.forEach(([x,y])=>{g.beginPath();g.arc(P.X(x),P.Y(y),r||3,0,7);g.fill()})}
+function niceTicks(lo,hi,k){const st=nice((hi-lo)/(k||5)),a=[];for(let v=Math.ceil(lo/st-1e-9)*st;v<=hi+1e-9;v+=st)a.push([v,String(+v.toFixed(6))]);return a}
+function logTicks(lo,hi){const a=[];for(let e=Math.ceil(lo-1e-9);e<=hi+1e-9;e++)a.push([e,nlab(Math.pow(10,e))]);return a}
+function mom(a){const n=a.length;let m=0;for(const v of a)m+=v;m/=n;let v2=0,v3=0,v4=0;for(const v of a){const d=v-m;v2+=d*d;v3+=d*d*d;v4+=d*d*d*d}v2/=n;v3/=n;v4/=n;const sd=Math.sqrt(v2);return{n,m,sd,sk:sd>0?v3/(sd*sd*sd):0,ku:v2>0?v4/(v2*v2)-3:0}}
+function ksN(z){const a=Array.from(z).sort((x,y)=>x-y),n=a.length;let d=0;for(let i=0;i<n;i++){const F=normCdf(a[i]);d=Math.max(d,Math.abs((i+1)/n-F),Math.abs(i/n-F))}return d}
+/* histogram of data as density with optional overlay curves [{f,col,lw,dash}] */
+function hist(cv,data,lo,hi,bins,ov,col){const cnt=new Float64Array(bins),bw=(hi-lo)/bins;let n=0;for(const v of data){if(v<lo||v>=hi)continue;cnt[Math.floor((v-lo)/bw)]++;n++}
+ const N=data.length;let ym=0;for(let i=0;i<bins;i++){cnt[i]/=N*bw;ym=Math.max(ym,cnt[i])}
+ (ov||[]).forEach(o=>{for(let i=0;i<=80;i++)ym=Math.max(ym,o.f(lo+(hi-lo)*i/80)||0)});
+ const P=mk(cv,lo,hi,ym*1.12);
+ P.g.fillStyle=col||'rgba(110,168,255,.5)';for(let i=0;i<bins;i++){if(cnt[i]<=0)continue;const a=P.X(lo+i*bw),b=P.X(lo+(i+1)*bw);P.g.fillRect(a,P.Y(cnt[i]),Math.max(1,b-a-1),P.Y(0)-P.Y(cnt[i]))}
+ (ov||[]).forEach(o=>P.line(o.f,o.col,o.lw||2.4,lo,hi,200,o.dash));return P}
+const fmt=x=>f3(x);
+
+/* ---------- Ch1 running means ---------- */
+(function(){fillSel('c1d',['norm','expo','logn','b05s','par5','cauchy'],'expo');let cache=null;
+ function sim(){const key=$('c1d').value,N=val('c1n'),K=val('c1k'),d=D[key],T=tgrid(N,Math.min(400,N)),paths=[];
+  for(let k=0;k<K;k++){let s=0,j=0;const pts=[];for(let i=1;i<=N&&j<T.length;i++){s+=d.s();if(i===T[j]){pts.push([Math.log10(i),s/i]);j++}}paths.push(pts)}
+  cache={key,N,paths};draw()}
+ function draw(){if(!cache)return;const{key,N,paths}=cache,d=D[key],fin=isFinite(d.mu),sdc=isFinite(d.sd)?d.sd:3,cap=isFinite(d.sd)?5*d.sd:15,cen=fin?d.mu:0;
+  let lo=Infinity,hi=-Infinity;paths.forEach(p=>p.forEach(([x,y])=>{if(x>=.5){lo=Math.min(lo,y);hi=Math.max(hi,y)}}));
+  lo=Math.max(lo,cen-cap);hi=Math.min(hi,cen+cap);if(fin){lo=Math.min(lo,d.mu-.1*sdc);hi=Math.max(hi,d.mu+.1*sdc)}const pad=(hi-lo)*.06+1e-9;lo-=pad;hi+=pad;
+  const P=mk($('c1cv'),0,Math.log10(N),hi,{y0:lo,noGrid:true});customGrid(P,logTicks(0,Math.log10(N)),niceTicks(lo,hi,5));
+  clip(P,()=>{paths.forEach((p,i)=>poly(P,p,PAL[i%PAL.length],1.8));});
+  if(fin)P.hline(d.mu,C.fg,'true mean μ = '+fmt(d.mu));P.text('number of draws n (log scale)',P.w/2,P.h-2,C.mu,'center');
+  const fin_=paths.map(p=>p[p.length-1][1]),mm=mom(fin_);
+  $('c1st').innerHTML=stat('true mean μ',fin?fmt(d.mu):'does not exist','in')+stat('path 1 after N',fmt(fin_[0]),'ok')+stat('spread of finals (sd)',paths.length>1?fmt(mm.sd):'—','warn')+stat('predicted σ/√N',isFinite(d.sd)?fmt(d.sd/Math.sqrt(N)):'∞ / n.a.','');
+  $('c1rd').innerHTML=key==='cauchy'?`The Cauchy has no mean, so there is nothing to converge to. The average of n Cauchy draws has <b>exactly the same distribution as a single draw</b>: the lines keep jumping to new places no matter how large n gets. The LLN's finite-mean condition is not a technicality.`:`After ${N.toLocaleString()} draws the paths sit within about ${fmt(2*d.sd/Math.sqrt(N))} of μ = ${fmt(d.mu)} (two standard errors). The shape of the parent only changes how bumpy the early part is: the funnel width is σ/√n.`}
+ $('c1go').onclick=sim;on('c1d c1n c1k',sim);sim();resizers.push(draw);})();
+
+/* ---------- Ch2 gambler's fallacy ---------- */
+(function(){let cache=null;
+ function sim(){const S=val('c2s'),N=val('c2n'),P=200,step=Math.max(1,Math.round(N/250)),heads=new Float64Array(P).fill(S),rec=[];
+  for(let t=1;t<=N;t++){for(let i=0;i<P;i++)if(Math.random()<.5)heads[i]++;if(t%step===0||t===N){const tot=S+t;let sm=0,sq=0;for(let i=0;i<P;i++){const sur=2*heads[i]-tot;sm+=sur;sq+=sur*sur}const m=sm/P;rec.push({x:Math.log10(tot),tot,m,sd:Math.sqrt(Math.max(0,sq/P-m*m))})}}
+  cache={S,N,rec};draw()}
+ function draw(){if(!cache)return;const{S,N,rec}=cache,x1=Math.log10(S+N),x0=Math.log10(rec[0].tot);
+  const xt=logTicks(Math.ceil(x0),x1);
+  let hi=.55;rec.forEach(r=>hi=Math.max(hi,.5+r.m/(2*r.tot)));
+  let P=mk($('c2cv'),x0,x1,hi,{y0:.45,noGrid:true});customGrid(P,xt,niceTicks(.45,hi,4));
+  poly(P,rec.map(r=>[r.x,.5+r.m/(2*r.tot)]),C.a,2.4);P.hline(.5,C.g,'½');P.text('average proportion of heads',P.L+4,P.T+12,C.mu);
+  let lo2=Infinity,hi2=-Infinity;rec.forEach(r=>{lo2=Math.min(lo2,r.m-r.sd);hi2=Math.max(hi2,r.m+r.sd)});lo2=Math.min(lo2,0);hi2=Math.max(hi2,S+1);
+  const Q=mk($('c2cv2'),x0,x1,hi2,{y0:lo2,noGrid:true});customGrid(Q,xt,niceTicks(lo2,hi2,4));
+  poly(Q,rec.map(r=>[r.x,r.m+r.sd]),C.mu,1.4,true);poly(Q,rec.map(r=>[r.x,r.m-r.sd]),C.mu,1.4,true);poly(Q,rec.map(r=>[r.x,r.m]),C.y,2.4);Q.hline(0,C.g,'0');Q.text('surplus (heads − tails): mean ± 1 sd',Q.L+4,Q.T+12,C.mu);
+  const e=rec[rec.length-1];
+  $('c2st').innerHTML=stat('initial surplus',S,'in')+stat('final proportion',fmt(.5+e.m/(2*e.tot)),'ok')+stat('final mean surplus',fmt(e.m),'warn')+stat('final surplus sd',fmt(e.sd),'')+stat('√(flips)',fmt(Math.sqrt(e.tot)),'');
+  $('c2rd').innerHTML=`The proportion has fallen from ${S>0?'1.0':'—'} to <b>${fmt(.5+e.m/(2*e.tot))}</b>, almost exactly ½. Yet the average surplus is still about <b>${fmt(e.m)}</b> (it started at ${S}): nothing pushed it back. Its spread is ${fmt(e.sd)}, close to √n = ${fmt(Math.sqrt(e.tot))}. Convergence of the proportion is dilution by new flips, not repayment of the early excess.`}
+ $('c2go').onclick=sim;on('c2s c2n',sim);sim();resizers.push(draw);})();
+
+/* ---------- Ch3 Chebyshev vs CLT ---------- */
+(function(){const FIN=['unif','expo','logn','b05s','par5','bimo'],NS=[1,2,5,10,20,50,100,200,500,1000];fillSel('c3d',FIN,'expo');let Z=null,key=null;
+ function sim(){key=$('c3d').value;const d=D[key],R=1500;Z=NS.map(n=>{const a=new Float64Array(R);for(let r=0;r<R;r++){let s=0;for(let i=0;i<n;i++)s+=d.s();a[r]=(s/n-d.mu)/d.sd}return a});draw()}
+ function draw(){if(!Z)return;const e=val('c3e'),emp=NS.map((n,i)=>{let c=0;for(const v of Z[i])if(Math.abs(v)>e)c++;return c/Z[i].length});
+  const P=mk($('c3cv'),0,3,1.02,{noGrid:true});customGrid(P,logTicks(0,3),niceTicks(0,1,5));
+  poly(P,NS.map(n=>[Math.log10(n),Math.min(1,1/(n*e*e))]),C.r,2,true);
+  poly(P,NS.map(n=>[Math.log10(n),2*normSf(e*Math.sqrt(n))]),C.g,2.4);
+  poly(P,NS.map((n,i)=>[Math.log10(n),emp[i]]),C.a,2.4);dots(P,NS.map((n,i)=>[Math.log10(n),emp[i]]),C.a,3.5);
+  P.text('— simulated',P.L+8,P.T+14,C.a);P.text('- - Chebyshev bound',P.L+8,P.T+30,C.r);P.text('— CLT approximation',P.L+8,P.T+46,C.g);P.text('sample size n (log scale)',P.w/2,P.h-2,C.mu,'center');
+  const i=NS.indexOf(100);
+  $('c3st').innerHTML=stat('ε',fmt(e)+' σ','in')+stat('simulated at n=100',pc(emp[i]),'in')+stat('CLT at n=100',pc(2*normSf(e*10)),'ok')+stat('Chebyshev at n=100',pc(Math.min(1,1/(100*e*e))),'hot');
+  $('c3rd').innerHTML=`At n = 100 the chance of missing μ by more than ${fmt(e)}σ is about <b>${pc(emp[i])}</b>. Chebyshev only promises “at most ${pc(Math.min(1,1/(100*e*e)))}”: true, but far from the truth. The CLT value (${pc(2*normSf(e*10))}) is much closer. For small n and skewed parents (try Bernoulli(0.05) at n = 5 to 20) the CLT value can be noticeably off, which is Part II's subject.`}
+ $('c3go').onclick=sim;on('c3d',sim);on('c3e',draw);sim();resizers.push(draw);})();
+
+/* ---------- Ch4 Monte Carlo pi ---------- */
+(function(){const grid=[];for(let e=1;e<=5.0001;e+=.25)grid.push(Math.round(Math.pow(10,e)));let cache=null;
+ function sim(){const K=val('c4p'),errs=[];for(let k=0;k<K;k++){let ins=0,gi=0;const row=[];for(let i=1;i<=100000;i++){const x=Math.random(),y=Math.random();if(x*x+y*y<1)ins++;if(i===grid[gi]){row.push(Math.abs(4*ins/i-Math.PI));gi++}}errs.push(row)}cache=errs;draw()}
+ function draw(){if(!cache)return;const K=cache.length,lg=grid.map(Math.log10);
+  const rms=grid.map((n,j)=>{let s=0;cache.forEach(r=>s+=r[j]*r[j]);return Math.sqrt(s/K)});
+  const P=mk($('c4cv'),1,5,.5,{y0:-4.5,noGrid:true});const yt=[];for(let e=-4;e<=0;e++)yt.push([e,'10^'+e]);customGrid(P,logTicks(1,5),yt);
+  cache.forEach(r=>dots(P,r.map((v,j)=>[lg[j],Math.log10(Math.max(v,1e-6))]),'rgba(160,170,200,.35)',2.2));
+  poly(P,lg.map(x=>[x,Math.log10(1.642)-.5*x]),C.g,2.2,true);poly(P,lg.map((x,j)=>[x,Math.log10(rms[j])]),C.a,2.8);
+  P.text('absolute error |π̂ − π|',P.L+6,P.T+14,C.mu);P.text('number of random points n (log scale)',P.w/2,P.h-2,C.mu,'center');
+  const xs=lg,ys=rms.map(Math.log10),mx=mean(xs),my=mean(ys);let sxy=0,sxx=0;for(let i=0;i<xs.length;i++){sxy+=(xs[i]-mx)*(ys[i]-my);sxx+=(xs[i]-mx)**2}const slope=sxy/sxx;
+  const nreq=Math.pow(1.96*1.642/.0005,2);
+  $('c4st').innerHTML=stat('fitted slope',fmt(slope),'in')+stat('theory slope','−0.5','ok')+stat('RMS error at n=100,000',fmt(rms[rms.length-1]),'warn')+stat('theory 1.642/√n',fmt(1.642/Math.sqrt(1e5)),'')+stat('n for ±0.0005 (95%)',nreq.toExponential(2),'hot');
+  $('c4rd').innerHTML=`The fitted slope is <b>${fmt(slope)}</b>, essentially −½: every factor of 100 in n buys one more correct digit. To pin π down to ±0.0005 with 95% confidence by this method you would need about ${nreq.toExponential(1)} points, which is why smarter sampling (variance reduction, quasi-Monte Carlo) is worth knowing.`}
+ $('c4go').onclick=sim;on('c4p',sim);sim();resizers.push(draw);})();
+
+/* ---------- Ch5 heavy tails ---------- */
+(function(){let cache=null,tab=null;const AL=[.8,1.2,1.5,2,3,5];
+ function pareto(a){return Math.pow(1-Math.random(),-1/a)}
+ function shareRow(a){const R=300,n=1000,sh=new Float64Array(R);for(let r=0;r<R;r++){let s=0,m=0;for(let i=0;i<n;i++){const v=pareto(a);s+=v;if(v>m)m=v}sh[r]=m/s}const arr=Array.from(sh).sort((x,y)=>x-y);return[mean(arr),arr[Math.floor(.9*R)]]}
+ function table(){const cur=val('c5a');tab=AL.map(a=>[a,...shareRow(a)]);drawTab()}
+ function drawTab(){const cur=val('c5a'),row=shareRow(cur);const rows=[['your α = '+cur,...row]].concat(tab.map(r=>[r[0],r[1],r[2]]));
+  $('c5tb').innerHTML='<table><tr><th>tail index α</th><th>mean exists?</th><th>variance exists?</th><th>avg share of total from largest draw (n = 1,000)</th><th>90th percentile of that share</th></tr>'+rows.map((r,i)=>{const a=i?r[0]:cur;return`<tr><td>${i?a:r[0]}</td><td>${a>1?'yes':'<span class="pill r">no</span>'}</td><td>${a>2?'yes':'<span class="pill r">no</span>'}</td><td class="n">${pc(r[1])}</td><td class="n">${pc(r[2])}</td></tr>`}).join('')+'</table>'}
+ function sim(){const a=val('c5a'),N=val('c5n'),T=tgrid(N,Math.min(400,N)),paths=[],shares=[];
+  for(let k=0;k<3;k++){let s=0,m=0,j=0;const pts=[];for(let i=1;i<=N&&j<T.length;i++){const v=pareto(a);s+=v;if(v>m)m=v;if(i===T[j]){pts.push([Math.log10(i),s/i]);j++}}paths.push(pts);shares.push(m/s)}
+  cache={a,N,paths,shares};draw()}
+ function draw(){if(!cache)return;const{a,N,paths,shares}=cache,mu=a>1?a/(a-1):Infinity;let ym;
+  if(a>1)ym=Math.min(60,Math.max(2.5*mu,4));else{ym=0;paths.forEach(p=>p.forEach(([x,y])=>ym=Math.max(ym,y)));ym*=1.05}
+  const P=mk($('c5cv'),0,Math.log10(N),ym,{noGrid:true});customGrid(P,logTicks(0,Math.log10(N)),niceTicks(0,ym,5));
+  clip(P,()=>paths.forEach((p,i)=>poly(P,p,PAL[i],1.8)));if(a>1)P.hline(mu,C.fg,'true mean '+fmt(mu));P.text('number of draws n (log scale)',P.w/2,P.h-2,C.mu,'center');
+  const fin=paths.map(p=>p[p.length-1][1]);
+  $('c5st').innerHTML=stat('tail index α',fmt(a),'in')+stat('true mean',a>1?fmt(mu):'infinite',a>1?'ok':'hot')+stat('variance',a>2?fmt(a/((a-1)**2*(a-2))):'infinite',a>2?'ok':'hot')+stat('path 1 mean at N',fmt(fin[0]),'warn')+stat('path 1: largest draw / sum',pc(shares[0]),'hot');
+  $('c5rd').innerHTML=a<=1?`With α = ${fmt(a)} ≤ 1 the mean is infinite: the running average has no limit and drifts upward in jumps. The largest single draw is ${pc(shares[0])} of the entire sum on path 1.`:a<=2?`With α = ${fmt(a)} the mean exists (${fmt(mu)}) so the LLN holds, but the variance is infinite: the paths converge slowly and jump upward each time a large value arrives. The usual standard error σ/√n does not exist.`:`With α = ${fmt(a)} both mean (${fmt(mu)}) and variance exist: the paths funnel in normally. Lower α toward 2 and below to watch the behaviour degrade.`;drawTab()}
+ $('c5go').onclick=()=>{table();sim()};on('c5a c5n',sim);table();sim();resizers.push(draw);})();
+
+/* ---------- Ch6 AR(1) dependence ---------- */
+(function(){function draw(){const rho=val('c6r'),n=val('c6n'),R=1500,sq=Math.sqrt(1-rho*rho),means=new Float64Array(R);let cover=0;
+  for(let r=0;r<R;r++){let x=randn(),s=0,ss=0;for(let t=0;t<n;t++){s+=x;ss+=x*x;x=rho*x+sq*randn()}const m=s/n,v=(ss-n*m*m)/(n-1);means[r]=m;if(Math.abs(m)<=1.96*Math.sqrt(v/n))cover++}
+  let b=0;for(let k=1;k<n;k++)b+=(1-k/n)*Math.pow(rho,k);const vex=(1+2*b)/n,sdex=Math.sqrt(vex),sdiid=1/Math.sqrt(n),neff=1/vex,sdemp=mom(means).sd,w=4*Math.max(sdex,sdiid,sdemp);
+  hist($('c6cv'),means,-w,w,41,[{f:x=>Math.exp(-x*x/(2*sdiid*sdiid))/(sdiid*2.5066282746),col:C.a},{f:x=>Math.exp(-x*x/(2*sdex*sdex))/(sdex*2.5066282746),col:C.r}]);
+  $('c6st').innerHTML=stat('simulated sd of X̄',fmt(sdemp),'in')+stat('iid formula 1/√n',fmt(sdiid),'warn')+stat('correct sd (AR(1))',fmt(sdex),'ok')+stat('effective n',fmt(neff),'hot')+stat('naive 95% interval coverage',pc(cover/R),cover/R<.9?'hot':'ok');
+  $('c6rd').innerHTML=`${n} observations with ρ = ${fmt(rho)} carry the information of only about <b>${fmt(neff)}</b> independent ones. The naive interval, which assumes the blue curve, covers the true mean just <b>${pc(cover/R)}</b> of the time instead of 95%. ${rho<0?'Negative ρ makes the mean <em>more</em> precise than iid would suggest.':rho>0.5?'The mean still converges (LLN), but the n you wrote down overstates the evidence.':''}`}
+ on('c6r c6n',draw);reg(draw);})();
+
+/* ---------- Ch7 CLT sampling distribution ---------- */
+(function(){const NS=[1,2,3,5,10,20,30,50,100,200,500],KEYS=['unif','expo','logn','b05','b05s','bimo','par5'];fillSel('c7d',KEYS,'expo');let cache=null;
+ function sim(){const key=$('c7d').value,d=D[key],n=NS[val('c7n')],R=4000,Z=new Float64Array(R),par=new Float64Array(6000);
+  for(let r=0;r<R;r++){let s=0;for(let i=0;i<n;i++)s+=d.s();Z[r]=(s/n-d.mu)/(d.sd/Math.sqrt(n))}
+  for(let i=0;i<par.length;i++)par[i]=d.s();cache={key,n,Z,par};draw()}
+ function draw(){if(!cache)return;const{key,n,Z,par}=cache,d=D[key];$('c7nv').textContent=n;
+  const s=Array.from(par).sort((a,b)=>a-b);let lo=s[Math.floor(.002*s.length)],hi=s[Math.floor(.998*s.length)];if(d.disc){lo=-.5;hi=1.5}if(hi<=lo)hi=lo+1;
+  hist($('c7cv'),par,lo,hi+(hi-lo)*1e-9,d.disc?4:40,null,'rgba(255,209,102,.5)').text('parent: '+d.n,12+42,24,C.mu);
+  const P=hist($('c7cv2'),Z,-4,4,41,[{f:x=>npdf(x),col:C.r}]);P.text('standardised mean, n = '+n,12+42,24,C.mu);
+  const m=mom(Z),ks=ksN(Z);let tail=0;for(const v of Z)if(Math.abs(v)>1.96)tail++;
+  $('c7st').innerHTML=stat('n',n,'in')+stat('skew of parent',fmt(d.sk),'')+stat('skew of mean (sim)',fmt(m.sk),'warn')+stat('theory skew/√n',fmt(d.sk/Math.sqrt(n)),'ok')+stat('KS distance to N(0,1)',fmt(ks),ks<.03?'ok':'hot')+stat('P(|Z| > 1.96)',pc(tail/Z.length),Math.abs(tail/Z.length-.05)<.012?'ok':'hot');
+  $('c7rd').innerHTML=`Parent: ${d.n}. At n = ${n} the standardised mean has skew ${fmt(m.sk)} (theory ${fmt(d.sk/Math.sqrt(n))}), sits ${fmt(ks)} from the normal in Kolmogorov distance, and falls outside ±1.96 ${pc(tail/Z.length)} of the time (the normal says 5%). ${ks<.03?'The bell has arrived.':'Not yet bell-shaped: increase n.'}${d.disc&&n<10?' The lumps are the discrete lattice of possible counts.':''}`}
+ $('c7go').onclick=sim;on('c7d c7n',sim);sim();resizers.push(draw);})();
+
+/* ---------- Ch8 convolution ---------- */
+(function(){const ctl=$('c8ctl');for(let i=0;i<8;i++){const l=document.createElement('label');l.innerHTML=`bar ${i+1} <input type="range" id="c8h${i}" min="0" max="10" step="0.1" value="1" style="width:90px">`;ctl.appendChild(l)}
+ function conv(a,b){const o=new Float64Array(a.length+b.length-1);for(let i=0;i<a.length;i++){const ai=a[i];if(!ai)continue;for(let j=0;j<b.length;j++)o[i+j]+=ai*b[j]}return o}
+ function m4(p){let m=0;for(let j=0;j<p.length;j++)m+=j*p[j];let v=0,s3=0,s4=0;for(let j=0;j<p.length;j++){const d=j-m;v+=d*d*p[j];s3+=d*d*d*p[j];s4+=d*d*d*d*p[j]}const sd=Math.sqrt(v);return{m,sd,sk:s3/(sd*sd*sd),ku:s4/(v*v)-3}}
+ function draw(){const h=[];for(let i=0;i<8;i++)h.push(+$('c8h'+i).value);let sm=h.reduce((a,b)=>a+b,0);if(sm<=0){for(let i=0;i<8;i++)h[i]=1;sm=8}
+  const p=new Float64Array(128);for(let i=0;i<8;i++)for(let j=0;j<16;j++)p[i*16+j]=h[i]/sm/16;
+  const k=val('c8k');let cur=p;for(let i=1;i<k;i++)cur=conv(cur,p);
+  const pm=m4(p),s=m4(cur);let ym=.42;const pts=[];for(let j=0;j<cur.length;j++){const z=(j-s.m)/s.sd,dn=cur[j]*s.sd;pts.push([z,dn]);if(Math.abs(z)<4.2)ym=Math.max(ym,dn)}
+  const P=mk($('c8cv'),-4,4,ym*1.1);
+  clip(P,()=>{const g=P.g;g.beginPath();g.moveTo(P.X(pts[0][0]),P.Y(0));pts.forEach(([x,y])=>g.lineTo(P.X(x),P.Y(y)));g.lineTo(P.X(pts[pts.length-1][0]),P.Y(0));g.closePath();g.fillStyle='rgba(255,209,102,.38)';g.fill();g.strokeStyle=C.y;g.lineWidth=1.6;g.stroke()});
+  P.line(npdf,C.r,2.4,-4,4,200);P.text('yellow: sum of '+k+' copies, standardised   red: N(0,1)',P.L+8,P.T+14,C.mu);
+  let cum=0,ks=0;for(let j=0;j<cur.length;j++){cum+=cur[j];ks=Math.max(ks,Math.abs(cum-normCdf((j+.5-s.m)/s.sd)))}
+  $('c8st').innerHTML=stat('k',k,'in')+stat('skew of parent',fmt(pm.sk),'')+stat('skew of sum',fmt(s.sk),'warn')+stat('theory skew/√k',fmt(pm.sk/Math.sqrt(k)),'ok')+stat('excess kurtosis of sum',fmt(s.ku),'warn')+stat('theory kurt/k',fmt(pm.ku/k),'ok')+stat('distance to normal',fmt(ks),ks<.03?'ok':'hot');
+  $('c8rd').innerHTML=`Sum of ${k} copy${k>1?'ies':''}: skew ${fmt(s.sk)} (the skew/√k rule predicts ${fmt(pm.sk/Math.sqrt(k))}), excess kurtosis ${fmt(s.ku)} (kurt/k predicts ${fmt(pm.ku/k)}), distance from the normal ${fmt(ks)}. The exact numbers match the two rules because skewness and kurtosis of a sum of independent copies are exact functions of k.`}
+ document.querySelectorAll('[data-pre]').forEach(b=>b.onclick=()=>{b.dataset.pre.split(',').forEach((v,i)=>{$('c8h'+i).value=v});draw()});
+ for(let i=0;i<8;i++)$('c8h'+i).addEventListener('input',draw);on('c8k',draw);reg(draw);})();
+
+/* ---------- Ch9a Berry-Esseen ---------- */
+(function(){function draw(){const p=val('c9p')/100,q=1-p,NSL=[];for(let e=.7;e<=4.3001;e+=.1)NSL.push(Math.round(Math.pow(10,e)));const ns=NSL.filter((v,i)=>i===0||v!==NSL[i-1]);
+  const ex=ns.map(n=>{const mu=n*p,sd=Math.sqrt(n*p*q),k0=Math.max(0,Math.floor(mu-8*sd)),k1=Math.min(n,Math.ceil(mu+8*sd));let F=0,d=0;for(let k=k0;k<=k1;k++){const pk=binom(n,k,p),Fk=F+pk,Ph=normCdf((k-mu)/sd);d=Math.max(d,Math.abs(Fk-Ph),Math.abs(F-Ph));F=Fk}return d});
+  const bound=ns.map(n=>.4748*(p*p+q*q)/Math.sqrt(p*q)/Math.sqrt(n)),floor_=ns.map(n=>1/(2*Math.sqrt(2*Math.PI*n*p*q)));
+  const P=mk($('c9cv'),Math.log10(ns[0]),Math.log10(ns[ns.length-1]),.5,{y0:-3.5,noGrid:true});const yt=[];for(let e=-3;e<=0;e++)yt.push([e,'10^'+e]);customGrid(P,logTicks(1,4),yt);
+  const lg=ns.map(Math.log10),L=v=>Math.log10(Math.max(v,1e-9));
+  clip(P,()=>{poly(P,lg.map((x,i)=>[x,L(bound[i])]),C.r,2,true);poly(P,lg.map((x,i)=>[x,L(floor_[i])]),C.g,2,true);poly(P,lg.map((x,i)=>[x,L(ex[i])]),C.a,2.6)});
+  P.text('— exact distance',P.L+8,P.T+14,C.a);P.text('- - Berry–Esseen bound',P.L+8,P.T+30,C.r);P.text('- - lattice floor',P.L+8,P.T+46,C.g);P.text('n (log scale)',P.w/2,P.h-2,C.mu,'center');
+  const i100=ns.findIndex(v=>v>=100),i1k=ns.findIndex(v=>v>=1000);
+  $('c9st').innerHTML=stat('skew of Bernoulli',fmt((q-p)/Math.sqrt(p*q)),'warn')+stat('exact distance, n≈100',fmt(ex[i100]),'in')+stat('B–E bound, n≈100',fmt(bound[i100]),'hot')+stat('exact distance, n≈1000',fmt(ex[i1k]),'in')+stat('bound ÷ exact (n≈1000)',fmt(bound[i1k]/ex[i1k])+'×','');
+  $('c9rd').innerHTML=`For p = ${pc(p)} the standardised binomial is within ${fmt(ex[i100])} of the normal CDF at n ≈ 100 and ${fmt(ex[i1k])} at n ≈ 1,000: a 1/√n decline. The guaranteed bound is ${fmt(bound[i1k]/ex[i1k])}× too pessimistic at n ≈ 1,000. Make p small (try 0.5%) and watch both curves shift up: rare events need far larger n.`}
+ on('c9p',draw);reg(draw);})();
+
+/* ---------- Ch9b coverage of t-interval ---------- */
+(function(){const KEYS=['unif','expo','logn','b05','b05s','bimo','par5'],NS=[5,10,20,30,50,100,200,500],tqs={};fillSel('c9bd',KEYS,'logn');let cache=null;
+ function sim(){const key=$('c9bd').value,d=D[key],R=2000,res=NS.map(n=>{if(!tqs[n])tqs[n]=qc(x=>tcdf(x,n-1),0,300,.975,80);const t=tqs[n];let cov=0,below=0,above=0;
+   for(let r=0;r<R;r++){let s=0,ss=0;for(let i=0;i<n;i++){const v=d.s();s+=v;ss+=v*v}const m=s/n,se=Math.sqrt(Math.max(0,(ss-n*m*m)/(n-1))/n),lo=m-t*se,hi=m+t*se;if(lo>d.mu)below++;else if(hi<d.mu)above++;else cov++}
+   return{n,cov:cov/R,below:below/R,above:above/R}});cache={key,res};draw()}
+ function draw(){if(!cache)return;const{key,res}=cache,d=D[key];let lo=Math.min(.9,Math.min(...res.map(r=>r.cov))-.03);lo=Math.max(0,lo);
+  const P=mk($('c9bcv'),Math.log10(5),Math.log10(500),1.0,{y0:lo,noGrid:true});customGrid(P,res.map(r=>[Math.log10(r.n),String(r.n)]),niceTicks(lo,1,5));P.hline(.95,C.g,'95% target');
+  poly(P,res.map(r=>[Math.log10(r.n),r.cov]),C.a,2.6);dots(P,res.map(r=>[Math.log10(r.n),r.cov]),C.a,4);P.text('actual coverage of the nominal 95% t-interval',P.L+8,P.T+14,C.mu);P.text('sample size n (log scale)',P.w/2,P.h-2,C.mu,'center');
+  $('c9btb').innerHTML='<table><tr><th>n</th><th>coverage</th><th>μ lies below the interval</th><th>μ lies above the interval</th></tr>'+res.map(r=>`<tr><td>${r.n}</td><td class="n">${pc(r.cov)}</td><td class="n">${pc(r.below)}</td><td class="n">${pc(r.above)}</td></tr>`).join('')+'</table>';
+  const ok=res.find(r=>r.cov>=.94);
+  $('c9brd').innerHTML=`${d.n}: coverage first reaches 94% at ${ok?'n = <b>'+ok.n+'</b>':'<b>no n in this range</b>'}. ${d.sk>1?'The failures are lopsided: for a right-skewed parent the sample mean usually lands <em>below</em> μ and the interval fails on one side much more often than the other, so even where total coverage looks acceptable the error rates are asymmetric.':'With a symmetric parent coverage is close to 95% already at small n.'} “n ≥ 30” is not a law of nature.`}
+ $('c9bgo').onclick=sim;on('c9bd',sim);sim();resizers.push(draw);})();
+
+/* ---------- Ch10 normal approximations ---------- */
+(function(){function draw(){const n=val('c10n'),p=val('c10p')/100,z=val('c10z'),q=1-p,mu=n*p,sd=Math.sqrt(n*p*q),k0=Math.min(n,Math.max(1,Math.ceil(mu+z*sd)));
+  let kl=Math.max(0,Math.floor(mu-4*sd-1)),kh=Math.min(n,Math.ceil(mu+Math.max(5.5*sd,k0-mu+2*sd)));if(kh-kl<4)kh=Math.min(n,kl+4);
+  const pm=[];let ym=0;for(let k=kl;k<=kh;k++){const v=binom(n,k,p);pm.push(v);ym=Math.max(ym,v)}ym=Math.max(ym,npdf(0)/sd)*1.12;
+  const P=mk($('c10cv'),kl-.5,kh+.5,ym);
+  pm.forEach((v,i)=>{const k=kl+i;P.g.fillStyle=k>=k0?'rgba(255,107,129,.65)':'rgba(110,168,255,.5)';const a=P.X(k-.5),b=P.X(k+.5);P.g.fillRect(a,P.Y(v),Math.max(1,b-a-1),P.Y(0)-P.Y(v))});
+  P.line(x=>npdf((x-mu)/sd)/sd,C.y,2.4,kl-.5,kh+.5,200);
+  const lam=mu;poly(P,pm.map((_,i)=>[kl+i,pois(kl+i,lam)]),C.g,1.8,true);
+  P.text('bars: exact binomial',P.L+8,P.T+14,C.mu);P.text('— normal',P.L+8,P.T+30,C.y);P.text('- - Poisson',P.L+8,P.T+46,C.g);
+  let ex=0;for(let k=k0;k<=n;k++)ex+=binom(n,k,p);const nm=normSf((k0-mu)/sd),nc=normSf((k0-.5-mu)/sd);let pl=0;for(let k=0;k<k0;k++)pl+=pois(k,lam);const po=Math.max(0,1-pl);
+  const r=v=>fmt(v/ex)+'×';
+  $('c10st').innerHTML=stat('threshold k₀',k0,'in')+stat('exact P(X ≥ k₀)',fmt(ex),'ok')+stat('normal',fmt(nm)+' ('+r(nm)+')',Math.abs(nm/ex-1)>.3?'hot':'warn')+stat('normal + continuity',fmt(nc)+' ('+r(nc)+')',Math.abs(nc/ex-1)>.3?'hot':'warn')+stat('Poisson(np)',fmt(po)+' ('+r(po)+')',Math.abs(po/ex-1)>.3?'hot':'ok')+stat('np(1−p)',fmt(n*p*q),n*p*q>=10?'ok':'hot');
+  $('c10rd').innerHTML=`P(X ≥ ${k0}) is exactly <b>${fmt(ex)}</b>. The plain normal says ${fmt(nm)}, the continuity-corrected normal ${fmt(nc)}, the Poisson ${fmt(po)}. ${n*p*q<10?'Here np(1−p) = '+fmt(n*p*q)+' &lt; 10, so the rule of thumb already warns you; notice how far the normal is off in the tail, especially without the continuity correction.':'With np(1−p) ≥ 10 the centre is fine, but push z up to 3.5–4 to see the far tail drift away from the normal.'}`}
+ on('c10n c10p c10z',draw);reg(draw);})();
+
+/* ---------- Ch11 delta method ---------- */
+(function(){const NL=[5,10,20,50,100,200,500,1000,2000,5000];
+ function draw(){const c=+$('c11c').value,n=NL[val('c11n')],p=val('c11p')/100,q=1-p,R=6000;$('c11nv').textContent=n;$('c11pv').textContent=Math.round(100*p);$('c11p').disabled=c<2;
+  let g,gm,gp,sg;const vals=[];let dropped=0;
+  if(c===0){g=x=>1/x;gm=1;gp=-1;sg=1}else if(c===1){g=Math.log;gm=0;gp=1;sg=1}else if(c===2){g=x=>Math.log(x/(1-x));gm=Math.log(p/q);gp=1/(p*q);sg=Math.sqrt(p*q)}else{g=x=>x*(1-x);gm=p*q;gp=1-2*p;sg=Math.sqrt(p*q)}
+  for(let r=0;r<R;r++){const xb=c<2?gammaS(n)/n:binF(n,p)/n;if((c===2)&&(xb<=0||xb>=1)){dropped++;continue}vals.push(g(xb))}
+  const m=mom(vals),dsd=Math.abs(gp)*sg/Math.sqrt(n),w=4*Math.max(m.sd,dsd,1e-9);
+  const ov=dsd>0?[{f:x=>Math.exp(-Math.pow(x-gm,2)/(2*dsd*dsd))/(dsd*2.5066282746),col:C.a}]:[];
+  hist($('c11cv'),vals,gm-w,gm+w,45,ov);
+  const ratio=m.sd/dsd;
+  $('c11st').innerHTML=stat('g(μ)',fmt(gm),'in')+stat('simulated mean of g(X̄)',fmt(m.m),'')+stat('bias',fmt(m.m-gm),'warn')+stat('simulated SE',fmt(m.sd),'ok')+stat('delta-method SE',dsd>0?fmt(dsd):'0','in')+stat('sim ÷ delta',dsd>0?fmt(ratio):'∞',dsd>0&&Math.abs(ratio-1)<.1?'ok':'hot')+(c===2?stat('samples with 0 or n successes',dropped,dropped?'hot':'ok'):'');
+  $('c11rd').innerHTML=dsd===0?`Here g′(μ) = 1 − 2p = 0, so the delta method predicts <b>zero</b> spread at the √n scale. The simulation shows a real, skewed spread (SE ${fmt(m.sd)}): the first-order expansion has nothing to say and a second-order term takes over.`:`The delta method predicts SE ${fmt(dsd)}; the simulation gives ${fmt(m.sd)} (ratio ${fmt(ratio)}). ${ratio>1.1||ratio<.9?'The approximation is rough at this n because g is strongly curved over the range X̄ visits (note the skew and the bias): increase n.':'The curve is the normal with that standard error and matches the histogram.'}`}
+ on('c11c c11n c11p',draw);reg(draw);})();
+
+/* ---------- Ch12 proportions ---------- */
+(function(){const NL=[50,100,200,500,1000,2000,5000,10000,20000,50000,100000,200000];let cache=null;
+ function wilson(k,n){const ph=k/n,z=1.96,d=1+z*z/n,c=(ph+z*z/(2*n))/d,h=z*Math.sqrt(ph*(1-ph)/n+z*z/(4*n*n))/d;return[c-h,c+h]}
+ function sim(){const p=val('c12p')/100,n=NL[val('c12n')],R=4000;$('c12nv').textContent=n.toLocaleString();let cw=0,cs=0,zero=0;const first=[];
+  for(let r=0;r<R;r++){const k=binF(n,p),ph=k/n,se=Math.sqrt(ph*(1-ph)/n),lo=ph-1.96*se,hi=ph+1.96*se;if(lo<=p&&p<=hi)cw++;const w=wilson(k,n);if(w[0]<=p&&p<=w[1])cs++;if(k===0)zero++;if(r<40)first.push([lo,hi,ph,lo<=p&&p<=hi])}
+  cache={p,n,cw:cw/R,cs:cs/R,zero:zero/R,first};draw()}
+ function draw(){if(!cache)return;const{p,n,cw,cs,zero,first}=cache,se0=Math.sqrt(p*(1-p)/n),x0=p-4.5*se0,x1=p+4.5*se0;
+  const P=mk($('c12cv'),x0,x1,41,{noGrid:true});customGrid(P,niceTicks(x0,x1,6).map(([v])=>[v,(100*v).toFixed(Math.abs(x1-x0)<.01?3:2)+'%']),[]);
+  clip(P,()=>{first.forEach((f,i)=>{const y=i+1;P.g.strokeStyle=f[3]?C.g:C.r;P.g.lineWidth=2;P.g.beginPath();P.g.moveTo(P.X(f[0]),P.Y(y));P.g.lineTo(P.X(f[1]),P.Y(y));P.g.stroke();dots(P,[[f[2],y]],f[3]?C.g:C.r,2.6)})});
+  P.vline(p,C.y,'true p = '+pc(p),true);
+  const ev=n*p,rel=1.96*Math.sqrt((1-p)/ev);
+  $('c12st').innerHTML=stat('expected events np',fmt(ev),ev<20?'hot':'ok')+stat('Wald 95% coverage',pc(cw),cw<.93?'hot':'ok')+stat('Wilson 95% coverage',pc(cs),cs<.93?'warn':'ok')+stat('samples with zero events',pc(zero),zero>.01?'hot':'ok')+stat('relative half-width',pc(rel),rel>.25?'hot':'ok')+stat('events for ±10%',fmt(384*(1-p)),'in');
+  $('c12rd').innerHTML=`With about <b>${fmt(ev)}</b> expected events the Wald interval covers p only ${pc(cw)} of the time (Wilson: ${pc(cs)}), and its half-width is ±${pc(rel)} of the rate itself. ${zero>.01?'In '+pc(zero)+' of samples there are no events at all, and the Wald interval collapses to a single point at zero. ':''}For ±10% precision you need roughly ${fmt(384*(1-p))} <em>events</em>, i.e. n ≈ ${fmt(384*(1-p)/p)} accounts at this rate.`}
+ $('c12go').onclick=sim;on('c12p c12n',sim);sim();resizers.push(draw);})();
+
+/* ---------- Ch13 correlated portfolio ---------- */
+(function(){function draw(){const N=val('c13n'),p=val('c13p')/100,rho=val('c13r'),R=6000,pz=qn(p),sr=Math.sqrt(rho),s1=Math.sqrt(1-rho),L=new Float64Array(R);
+  for(let r=0;r<R;r++){const z=randn(),pd=normCdf((pz-sr*z)/s1);L[r]=binF(N,pd)/N}
+  const sorted=Float64Array.from(L).sort(),q99=sorted[Math.floor(.99*R)],sdI=Math.sqrt(p*(1-p)/N),qI=p+2.3263*sdI,qV=normCdf((pz+sr*2.3263)/s1),m=mom(L);
+  const hi=Math.min(1,Math.max(q99*1.35,p+5*sdI,qV*1.1)),lo=0;
+  const P=hist($('c13cv'),L,lo,hi,Math.max(10,Math.min(50,Math.floor((hi-lo)*N))),[{f:x=>Math.exp(-Math.pow(x-p,2)/(2*sdI*sdI))/(sdI*2.5066282746),col:C.a}]);
+  P.vline(q99,C.r,'sim 99%: '+pc(q99),true);P.vline(Math.min(qI,hi),C.a,'normal 99%: '+pc(qI),true);
+  P.text('loss rate of the portfolio',P.w/2,P.h-2,C.mu,'center');
+  $('c13st').innerHTML=stat('simulated sd of loss rate',pc(m.sd),'in')+stat('independent-normal sd',pc(sdI),'warn')+stat('simulated 99% loss',pc(q99),'hot')+stat('independent-normal 99%',pc(qI),'warn')+stat('N → ∞ (Vasicek) 99%',pc(qV),'in')+stat('tail understated by',fmt(q99/qI)+'×',q99/qI>1.5?'hot':'ok');
+  $('c13rd').innerHTML=rho===0?`With ρ = 0 the defaults are independent and the CLT works: simulated and normal 99% losses agree (${pc(q99)} vs ${pc(qI)}). Now raise ρ.`:`The independent-normal approximation puts the 99th-percentile loss at ${pc(qI)}; the simulation says <b>${pc(q99)}</b>, ${fmt(q99/qI)}× larger. Raise N to 2,000: the independent sd (${pc(sdI)}) shrinks toward zero, but the simulated sd (${pc(m.sd)}) barely moves, because the common factor does not average out. More loans do not diversify systematic risk.`}
+ on('c13n c13p c13r',draw);reg(draw);})();
+
+const QZ=[
+{l:'Beginner',q:'Which statement is the law of large numbers?',o:['The data become normally distributed as n grows','The sample mean converges to the true mean as n grows (given a finite mean)','The sample standard deviation converges to zero','Every sample of size 30 is representative'],a:1,e:'LLN: X̄ₙ → μ (in probability for the weak law, almost surely for the strong law) when E|X| is finite. It says nothing about the shape of the data.'},
+{l:'Beginner',q:'A fair coin has landed heads 10 times in a row. Over the next 10,000 flips, which is true?',o:['Tails are due, so the surplus of heads will be repaid','The expected surplus of heads stays at about 10, while the proportion of heads still tends to ½','The proportion of heads will stay near 1','The coin is probably biased, so the proportion tends to 1'],a:1,e:'No compensation: the early surplus is not corrected, it is diluted. Proportion = ½ + surplus/(2n) → ½.'},
+{l:'Intermediate',q:'σ = 2, n = 100, ε = 0.5. Chebyshev bounds P(|X̄ − μ| ≥ ε) by…',o:['0.04','0.16','0.32','0.50'],a:1,e:'σ²/(nε²) = 4 / (100 × 0.25) = 0.16.'},
+{l:'Intermediate',q:'To halve the standard error of a sample mean you need…',o:['2× the data','4× the data','√2× the data','10× the data'],a:1,e:'SE = σ/√n, so n must grow by a factor of 4.'},
+{l:'Intermediate',q:'To gain one more correct decimal digit (10× smaller error) in a Monte Carlo estimate you need about…',o:['10× the samples','100× the samples','1,000× the samples','the same samples with a better seed'],a:1,e:'Error ∝ 1/√n, so a 10× smaller error needs 100× the samples.'},
+{l:'Advanced',q:'The average of n independent standard Cauchy draws is distributed as…',o:['Normal with variance 1/n','A Cauchy with scale 1/n','A standard Cauchy, exactly the same as a single draw','Degenerate at 0'],a:2,e:'The Cauchy has no mean, so there is no LLN: averaging never narrows the distribution.'},
+{l:'Advanced',q:'X is Pareto with tail index α = 1.5. Which statement is correct?',o:['LLN and the usual √n CLT both hold','The LLN holds (finite mean) but the usual √n CLT does not (infinite variance)','Neither holds','The CLT holds but the LLN does not'],a:1,e:'Mean = α/(α−1) = 3 is finite, so the LLN holds. Variance is infinite for α ≤ 2, so the standard CLT fails.'},
+{l:'Advanced',q:'An AR(1) series has ρ = 0.8 and n = 1,000. Its effective sample size for estimating the mean is about…',o:['1,000','556','111','20'],a:2,e:'n_eff ≈ n(1−ρ)/(1+ρ) = 1,000 × 0.2/1.8 ≈ 111.'},
+{l:'Beginner',q:'What does the central limit theorem say?',o:['Raw data from any distribution are approximately normal','For large n the standardised sample mean is approximately N(0,1), if the variance is finite','The sample mean equals the population mean','Any statistic is normal in large samples'],a:1,e:'The CLT concerns the sampling distribution of the (standardised) mean, not the data, and needs finite variance.'},
+{l:'Intermediate',q:'σ = 10 and n = 400. The standard deviation of the sample mean is…',o:['0.025','0.5','2.5','10'],a:1,e:'σ/√n = 10/20 = 0.5.'},
+{l:'Intermediate',q:'The parent is exponential (skewness 2). The approximate skewness of the mean of n = 100 draws is…',o:['2','0.2','0.02','0'],a:1,e:'skew(X̄) = skew(X)/√n = 2/10 = 0.2.'},
+{l:'Advanced',q:'Berry–Esseen says the maximum CDF error of the normal approximation is of order…',o:['1/n, independent of the parent','1/√n, scaled by the third absolute moment relative to σ³','1/log n','1/n², scaled by the variance'],a:1,e:'Error ≤ C·E|X−μ|³/(σ³√n). Skewed and heavy-tailed parents have a larger constant.'},
+{l:'Intermediate',q:'X ~ Binomial(100, 0.5). With the continuity correction, the normal approximation to P(X ≥ 60) is about…',o:['2.3%','2.9%','5.7%','0.3%'],a:1,e:'1 − Φ((59.5 − 50)/5) = 1 − Φ(1.9) ≈ 0.0287. Without the correction you get 1 − Φ(2) = 2.3%; the exact value is about 2.84%.'},
+{l:'Advanced',q:'σ = 2, μ = 5, n = 100. The delta-method standard error of log(X̄) is about…',o:['0.02','0.04','0.4','0.2'],a:1,e:'|g′(μ)|σ/√n = (1/5)(2)/10 = 0.04.'},
+{l:'Advanced',q:'When does the first-order delta method fail?',o:['When n is above 1,000','When g′(μ) = 0, so the first-order term vanishes and a second-order expansion is needed','When X̄ is symmetric','Whenever g is nonlinear'],a:1,e:'With g′(μ) = 0 the variance estimate is zero; for example p̂(1−p̂) at p = ½.'},
+{l:'Expert',q:'About how many events do you need to estimate a rare rate to ±10% relative precision with 95% confidence?',o:['About 38','About 100 (any n)','About 384','About 10,000'],a:2,e:'Relative half-width ≈ 1.96√((1−p)/(np)), so np ≈ 384(1−p). Precision is governed by events, not accounts.'},
+{l:'Expert',q:'A loan portfolio has asset correlation ρ > 0. As the number of loans N → ∞, the spread of the portfolio loss rate…',o:['Goes to zero by the LLN','Goes to zero like 1/√N by the CLT','Does not vanish: the common factor does not average out','Doubles'],a:2,e:'Idiosyncratic noise averages away but the systematic factor remains, so L → p(Z), which is still random.'},
+{l:'Expert',q:'You observe 0 events in 50 accounts. The Wald interval for the rate is…',o:['[0, 0.04]','[0, 0] (zero width), which is clearly misleading','[0.00, 0.07]','Undefined, so it is skipped'],a:1,e:'p̂ = 0 gives SE = 0 and a zero-width interval. Use Wilson (≈ [0, 0.07]) or an exact interval.'}
+];
+(function(){const st=store.get('lc_quiz',{});
+ function render(){const box=$('quiz');box.innerHTML='';
+  QZ.forEach((q,i)=>{const d=document.createElement('div');d.className='q'+(st[i]!=null?' done':'');d.innerHTML=`<div class="qh">Q${i+1} · ${q.l}</div><div style="margin:4px 0 6px"><b>${q.q}</b></div>`;
+   q.o.forEach((o,j)=>{const b=document.createElement('button');b.className='opt';b.textContent=o;if(st[i]!=null){if(j===q.a)b.classList.add('good');else if(j===st[i])b.classList.add('bad')}b.onclick=()=>{if(st[i]!=null)return;st[i]=j;store.set('lc_quiz',st);render();meter()};d.appendChild(b)});
+   const e=document.createElement('div');e.className='ex';e.innerHTML=(st[i]===q.a?'✅ ':'❌ ')+q.e;d.appendChild(e);box.appendChild(d)});
+  const ans=Object.keys(st).length,ok=QZ.filter((q,i)=>st[i]===q.a).length;
+  $('qscore').innerHTML=stat('answered',ans+' / '+QZ.length,'in')+stat('correct',ok,'ok')+stat('score',ans?Math.round(100*ok/ans)+'%':'—',ok/Math.max(ans,1)>=.8?'ok':'warn')+stat('verdict',ans<QZ.length?'keep going':ok>=16?'LLN/CLT master':ok>=13?'strong':'review ch. 5–9','')}
+ $('qreset').onclick=()=>{Object.keys(st).forEach(k=>delete st[k]);store.set('lc_quiz',st);render();meter()};
+ window.__qst=st;render();})();
+const CHK=['State the LLN and its one essential condition (finite mean).','Explain why a losing streak does not make a win “due” (dilution, not compensation).','Use Chebyshev to bound a deviation and say why it is loose.','Use SE = σ/√n to plan a sample size: n ≈ (1.96σ/m)².','Explain why Monte Carlo error falls like 1/√n and what that costs.','Explain why the LLN fails for the Cauchy and for Pareto with α ≤ 1.','Recognise the 1 < α ≤ 2 case: LLN holds, usual CLT does not.','Compute effective sample size for positively autocorrelated data.','State the CLT precisely and say what it does not claim.','Sketch the characteristic-function proof and say what gets forgotten.','Judge how large n must be from skewness and Berry–Esseen, not from “30”.','Use the continuity correction and know when to prefer the Poisson.','Apply the delta method and identify when g′(μ) = 0 breaks it.','Explain why correlated portfolios do not diversify away systematic risk.'];
+(function(){const st=store.get('lc_chk',{}),box=$('chk');CHK.forEach((t,i)=>{const l=document.createElement('label'),c=document.createElement('input');c.type='checkbox';c.checked=!!st[i];c.onchange=()=>{st[i]=c.checked;store.set('lc_chk',st);meter()};l.appendChild(c);const s=document.createElement('span');s.textContent=t;l.appendChild(s);box.appendChild(l)});window.__cst=st;})();
+function meter(){const q=window.__qst||{},c=window.__cst||{};const ok=QZ.filter((x,i)=>q[i]===x.a).length,ck=Object.values(c).filter(Boolean).length;const p=Math.round(100*(.6*ok/QZ.length+.4*ck/CHK.length));$('mtxt').textContent='Mastery: '+p+'%  (exam + checklist)';$('mbar').style.width=p+'%';store.set('mastery_lc',p)}
+meter();
+
+
+/* ---------- Navigation ---------- */
+(function(){const nav=$('nav');let html='';
+ document.querySelectorAll('main .part, main section.ch').forEach(el=>{if(el.classList.contains('part'))html+=`<div class="pt">${el.textContent}</div>`;else{const h=el.querySelector('h2'),num=h.querySelector('.num').textContent,t=Array.from(h.childNodes).filter(n=>n.nodeType===3).map(n=>n.textContent).join('').trim();html+=`<a href="#${el.id}" data-id="${el.id}">${num}. ${t}</a>`}});
+ nav.innerHTML=html;const links=nav.querySelectorAll('a'),io=new IntersectionObserver(es=>{es.forEach(e=>{if(e.isIntersecting)links.forEach(a=>a.classList.toggle('on',a.dataset.id===e.target.id))})},{rootMargin:'-20% 0px -70% 0px'});
+ document.querySelectorAll('section.ch').forEach(s=>io.observe(s));
+ $('menu').onclick=()=>$('side').classList.toggle('open');nav.addEventListener('click',e=>{if(e.target.tagName==='A')$('side').classList.remove('open')});
+ window.addEventListener('scroll',()=>{const h=document.documentElement;$('prog').style.width=(100*h.scrollTop/(h.scrollHeight-h.clientHeight))+'%'},{passive:true});})();
+</script>
+</body>
+</html>

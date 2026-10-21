@@ -1,0 +1,695 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Core Distributions Mastery — the family and how it relates</title>
+<style>
+:root{--bg:#0b0e17;--panel:#121726;--panel2:#171d30;--line:#232a3d;--fg:#e8ebf5;--mu:#8a93ab;--a:#6ea8ff;--r:#ff6b81;--y:#ffd166;--g:#4ade80;--p:#c084fc;--t:#5eead4}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;background:var(--bg);color:var(--fg);font:16px/1.7 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+a{color:var(--a)}
+#prog{position:fixed;top:0;left:0;height:3px;background:linear-gradient(90deg,var(--a),var(--p),var(--r));width:0;z-index:50}
+.side{position:fixed;left:0;top:0;bottom:0;width:290px;background:#0e1220;border-right:1px solid var(--line);overflow:auto;padding:18px 14px 90px;z-index:40;transition:transform .25s}
+.side h1{font-size:15px;margin:0 0 2px}
+.side small{color:var(--mu)}
+.side .pt{margin:16px 0 4px;font-size:11px;text-transform:uppercase;letter-spacing:1.3px;color:var(--p)}
+.side a{display:block;color:var(--mu);text-decoration:none;padding:5px 9px;border-radius:7px;font-size:13.5px;line-height:1.35}
+.side a:hover{background:var(--panel);color:var(--fg)}
+.side a.on{background:var(--panel2);color:var(--fg);box-shadow:inset 3px 0 var(--a)}
+.side a.back{color:var(--t);padding-left:0;margin-bottom:6px}
+.meter{position:fixed;left:0;bottom:0;width:290px;background:#0e1220;border-top:1px solid var(--line);padding:10px 16px;z-index:41;font-size:12px;color:var(--mu)}
+.meter .bar{height:7px;background:var(--line);border-radius:6px;margin-top:5px;overflow:hidden}
+.meter .bar i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--g),var(--t));transition:width .4s}
+#menu{display:none;position:fixed;top:10px;left:10px;z-index:60;background:var(--panel2);color:var(--fg);border:1px solid var(--line);border-radius:9px;padding:7px 12px;font-size:14px;cursor:pointer}
+main{margin-left:290px;padding:0 34px 120px;max-width:1090px}
+.hero{padding:70px 0 30px}
+.hero h1{font-size:clamp(32px,5vw,56px);line-height:1.08;margin:0 0 14px;background:linear-gradient(100deg,#fff,var(--p) 45%,var(--t));-webkit-background-clip:text;background-clip:text;color:transparent}
+.hero p{font-size:19px;color:#c3c9dc;max-width:780px}
+.chips{display:flex;flex-wrap:wrap;gap:8px;margin:18px 0}
+.chip{border:1px solid var(--line);background:var(--panel);padding:5px 12px;border-radius:99px;font-size:13px;color:var(--mu)}
+.chip b{color:var(--fg)}
+.part{margin:90px 0 0;padding-top:22px;border-top:1px solid var(--line);font-size:12px;letter-spacing:2px;text-transform:uppercase;color:var(--p)}
+section.ch{padding-top:30px}
+h2{font-size:30px;line-height:1.2;margin:10px 0 8px;display:flex;gap:12px;align-items:center;flex-wrap:wrap}
+h2 .num{display:inline-grid;place-items:center;width:40px;height:40px;border-radius:12px;background:var(--panel2);border:1px solid var(--line);font-size:18px;color:var(--a)}
+.lvl{font-size:11px;font-weight:600;letter-spacing:.8px;text-transform:uppercase;padding:3px 9px;border-radius:99px;border:1px solid}
+.lvl.b{color:var(--g);border-color:#1f5c3a}.lvl.i{color:var(--a);border-color:#244a85}.lvl.a{color:var(--y);border-color:#6b5420}.lvl.e{color:var(--r);border-color:#7a2c3a}
+h3{font-size:19px;margin:30px 0 6px;color:#fff}
+p{margin:10px 0}li{margin:5px 0}
+code,.f{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace}
+code{background:var(--panel2);padding:1px 6px;border-radius:5px;font-size:.9em}
+.f{display:block;background:#0e1322;border:1px solid var(--line);border-left:3px solid var(--a);padding:12px 16px;border-radius:9px;margin:14px 0;overflow-x:auto;font-size:15px;color:#dbe4ff;line-height:1.8}
+.co{border-radius:12px;padding:13px 17px;margin:16px 0;border:1px solid var(--line);background:var(--panel)}
+.co>b:first-child{display:block;margin-bottom:2px;font-size:12px;letter-spacing:1px;text-transform:uppercase}
+.co.def{border-left:4px solid var(--a)}.co.def>b:first-child{color:var(--a)}
+.co.warn{border-left:4px solid var(--r)}.co.warn>b:first-child{color:var(--r)}
+.co.tip{border-left:4px solid var(--g)}.co.tip>b:first-child{color:var(--g)}
+.co.key{border-left:4px solid var(--y);background:#171608}.co.key>b:first-child{color:var(--y)}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:18px 20px;margin:22px 0;box-shadow:0 8px 30px rgba(0,0,0,.25)}
+.card>h4{margin:0 0 3px;font-size:13px;letter-spacing:1.2px;text-transform:uppercase;color:var(--t)}
+.card>p.sub{margin:0 0 12px;color:var(--mu);font-size:14.5px}
+.ctl{display:flex;flex-wrap:wrap;gap:10px 22px;align-items:center;margin:8px 0 10px}
+.ctl label{display:flex;gap:8px;align-items:center;font-size:14px;color:#c3c9dc}
+.ctl output{min-width:38px;font-family:ui-monospace,monospace;color:var(--y);font-size:13px}
+input[type=range]{accent-color:var(--a);width:140px}
+input[type=checkbox]{accent-color:var(--a)}
+select,input[type=number],input[type=text]{background:#0e1322;color:var(--fg);border:1px solid var(--line);border-radius:8px;padding:6px 9px;font:inherit;font-size:14px}
+button{background:linear-gradient(180deg,#2c4a80,#233b68);color:#fff;border:1px solid #3a5a98;border-radius:9px;padding:7px 14px;font:inherit;font-size:14px;cursor:pointer}
+button:hover{filter:brightness(1.15)}
+button.alt{background:var(--panel2);border-color:var(--line);color:var(--fg)}
+canvas{width:100%;height:270px;display:block;background:#0e1322;border:1px solid var(--line);border-radius:10px;margin-top:6px}
+canvas.sm{height:210px}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(118px,1fr));gap:9px;margin:12px 0}
+.stat{background:#0e1322;border:1px solid var(--line);border-radius:10px;padding:8px 11px}
+.stat b{display:block;font-size:17px;font-family:ui-monospace,monospace}
+.stat span{font-size:11.5px;color:var(--mu);text-transform:uppercase;letter-spacing:.7px}
+.stat.hot b{color:var(--r)}.stat.ok b{color:var(--g)}.stat.warn b{color:var(--y)}.stat.in b{color:var(--a)}
+.read{margin:8px 0 0;padding:10px 14px;background:#0e1322;border:1px dashed #33406a;border-radius:10px;font-size:14.5px;color:#d3dbf3}
+table{border-collapse:collapse;width:100%;margin:12px 0;font-size:14px}
+th,td{border:1px solid var(--line);padding:7px 10px;text-align:left;vertical-align:top}
+th{background:var(--panel2);font-size:12px;text-transform:uppercase;letter-spacing:.6px;color:var(--mu)}
+td.n{font-family:ui-monospace,monospace;text-align:right}
+.tw{overflow-x:auto}
+.pill{display:inline-block;padding:1px 9px;border-radius:99px;font-size:12px;font-weight:600}
+.pill.r{background:#3a1520;color:var(--r)}.pill.g{background:#10321f;color:var(--g)}.pill.y{background:#3a2f0e;color:var(--y)}.pill.m{background:#202637;color:var(--mu)}
+details{background:var(--panel);border:1px solid var(--line);border-radius:11px;padding:9px 15px;margin:9px 0}
+details summary{cursor:pointer;font-weight:600}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.q{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:14px 18px;margin:14px 0}
+.q .qh{font-size:12px;letter-spacing:1px;text-transform:uppercase;color:var(--mu)}
+.q .opt{display:block;width:100%;text-align:left;margin:6px 0;background:#0e1322;border:1px solid var(--line);color:var(--fg);border-radius:9px;padding:9px 12px}
+.q .opt.good{border-color:var(--g);background:#0e2418}.q .opt.bad{border-color:var(--r);background:#2a1119}
+.q .ex{display:none;margin-top:8px;font-size:14.5px;color:#c3c9dc}
+.q.done .ex{display:block}
+.chk label{display:flex;gap:10px;align-items:flex-start;padding:6px 0;cursor:pointer}
+.chk input{margin-top:6px;accent-color:var(--g);width:17px;height:17px}
+svg text{font-family:system-ui,sans-serif}
+@media(max-width:900px){
+ .side{transform:translateX(-100%)}.side.open{transform:none}.meter{display:none}
+ #menu{display:block}main{margin-left:0;padding:0 16px 100px}.two{grid-template-columns:1fr}.hero{padding-top:60px}
+}
+</style>
+</head>
+<body>
+<div id="prog"></div>
+<button id="menu">☰ Contents</button>
+<nav class="side" id="side"><a class="back" href="index.html">← All courses</a><h1>Core Distributions</h1><small>14 chapters · 17 labs · exam</small><div id="nav"></div></nav>
+<div class="meter"><div id="mtxt">Mastery: 0%</div><div class="bar"><i id="mbar"></i></div></div>
+
+<main>
+<header class="hero">
+ <h1>Ten distributions, one family.</h1>
+ <p>Normal, binomial, Poisson, exponential, gamma, beta, lognormal, χ², t and F look like ten separate things to memorise. They aren't. Each one is a <em>story</em> about how data get generated, and the stories are wired to each other. Learn the wiring and you can derive most facts instead of remembering them.</p>
+ <div class="chips"><span class="chip"><b>Part I</b> The map</span><span class="chip"><b>Part II</b> Counts &amp; waiting</span><span class="chip"><b>Part III</b> The bell &amp; its offspring</span><span class="chip"><b>Part IV</b> Probabilities of probabilities</span><span class="chip"><b>Part V</b> Mastery</span></div>
+ <div class="co tip"><b>How to use this</b>Every chapter has a lab. The explorer labs share one design: sliders for the parameters, optional overlay of a normal curve with the same mean and SD, and a button to draw 5,000 real random samples on top of the exact curve. Prediction habit: guess what a slider will do to the mean, spread and skew <em>before</em> you move it. Prerequisite: the Random Variables page (expectation, variance, covariance).</div>
+</header>
+
+<!-- ============ PART I ============ -->
+<div class="part">Part I · The map</div>
+
+<section class="ch" id="c1">
+<h2><span class="num">1</span>The family map <span class="lvl b">Beginner</span></h2>
+<p>Start with the picture, then fill in the details. Every arrow is a theorem you will see verified by simulation in Chapter 12.</p>
+<div class="card"><h4>The family tree</h4><p class="sub">Blue = counting successes · green = waiting and positive amounts · purple = the bell curve family · teal = the sampling distributions used in tests · yellow = probabilities themselves.</p>
+ <div id="map"></div></div>
+<p>Five stories cover the whole map:</p>
+<ol>
+ <li><b>Counting successes</b> — a trial succeeds or fails (Bernoulli); count successes in n trials (Binomial); let trials be countless and each success rare (Poisson).</li>
+ <li><b>Waiting</b> — time between rare events is Exponential; the time to the k-th event is Gamma.</li>
+ <li><b>Adding up noise</b> — sums of many small independent effects are Normal. Square standard normal noise and add it up → χ². Divide a normal by an independent χ² → t. Divide two χ²s → F.</li>
+ <li><b>Multiplying effects</b> — products of many positive factors are Lognormal (log them and you're back at the Normal).</li>
+ <li><b>Uncertainty about a probability</b> — a quantity living in [0,1] with a flexible shape is Beta; it is the natural partner of the Binomial.</li>
+</ol>
+<h3>Quick reference</h3>
+<div class="tw"><table>
+<tr><th>Distribution</th><th>Support</th><th>Story</th><th>Mean</th><th>Variance</th></tr>
+<tr><td>Binomial(n, p)</td><td>0…n</td><td>successes in n independent trials</td><td class="n">np</td><td class="n">np(1−p)</td></tr>
+<tr><td>Poisson(λ)</td><td>0,1,2,…</td><td>events in a fixed window, rare &amp; independent</td><td class="n">λ</td><td class="n">λ</td></tr>
+<tr><td>Exponential(λ)</td><td>x ≥ 0</td><td>waiting time to next event</td><td class="n">1/λ</td><td class="n">1/λ²</td></tr>
+<tr><td>Gamma(a, rate β)</td><td>x ≥ 0</td><td>time to the a-th event; flexible positive skew</td><td class="n">a/β</td><td class="n">a/β²</td></tr>
+<tr><td>Normal(μ, σ²)</td><td>ℝ</td><td>sum of many small effects</td><td class="n">μ</td><td class="n">σ²</td></tr>
+<tr><td>Lognormal(μ, σ²)</td><td>x &gt; 0</td><td>product of many positive factors</td><td class="n">e^(μ+σ²/2)</td><td class="n">(e^σ²−1)e^(2μ+σ²)</td></tr>
+<tr><td>Beta(a, b)</td><td>0…1</td><td>an unknown probability / proportion</td><td class="n">a/(a+b)</td><td class="n">ab/((a+b)²(a+b+1))</td></tr>
+<tr><td>χ²(k)</td><td>x ≥ 0</td><td>sum of k squared standard normals</td><td class="n">k</td><td class="n">2k</td></tr>
+<tr><td>t(ν)</td><td>ℝ</td><td>Z / √(χ²ν/ν)</td><td class="n">0 (ν&gt;1)</td><td class="n">ν/(ν−2) (ν&gt;2)</td></tr>
+<tr><td>F(d₁, d₂)</td><td>x ≥ 0</td><td>(χ²d₁/d₁) / (χ²d₂/d₂)</td><td class="n">d₂/(d₂−2) (d₂&gt;2)</td><td class="n">see Ch. 10</td></tr>
+</table></div>
+</section>
+
+<!-- ============ PART II ============ -->
+<div class="part">Part II · Counts and waiting</div>
+
+<section class="ch" id="c2">
+<h2><span class="num">2</span>Bernoulli and Binomial <span class="lvl b">Beginner</span></h2>
+<p>A <b>Bernoulli(p)</b> variable is one yes/no trial: 1 with probability p, 0 otherwise. Mean p, variance p(1−p) — largest at p = ½, shrinking to 0 as the outcome becomes certain. A <b>Binomial(n, p)</b> counts the successes in n independent Bernoulli(p) trials:</p>
+<div class="f">P(X = k) = C(n, k) · pᵏ · (1−p)ⁿ⁻ᵏ        E[X] = np        Var(X) = np(1−p)</div>
+<p>Mean and variance follow instantly from the previous course: X is a sum of n indicators, so linearity gives np, and independence lets variances add.</p>
+<div class="co warn"><b>The three assumptions (and how banks violate them)</b>(1) fixed n, (2) the same p for every trial, (3) independence. Defaults cluster in time and sector, so Var(X) is usually <em>larger</em> than np(1−p): this is <b>overdispersion</b>. Allowing p itself to vary gives the beta-binomial (Chapter 11), and with pairwise correlation ρ the variance is np(1−p)[1+(n−1)ρ].</div>
+<div class="card" id="e_bin" data-explore="binomial"><h4>Lab 1 · Binomial explorer</h4><p class="sub">Slide p toward 0.5 and n up: the shape becomes symmetric and bell-like (the normal approximation). Slide p toward 0.02 with small n: strongly right-skewed. Turn on the normal overlay and watch where it fails.</p></div>
+<p><b>Normal approximation rule of thumb:</b> use it when both np and n(1−p) are at least 10 (many say 5). With PD = 1% on 500 loans, np = 5 — skewed, so use exact binomial or Poisson methods.</p>
+</section>
+
+<section class="ch" id="c3">
+<h2><span class="num">3</span>Poisson <span class="lvl b">Beginner</span></h2>
+<p>The <b>Poisson(λ)</b> counts events in a fixed window when events are rare, independent and arrive at a steady average rate λ per window.</p>
+<div class="f">P(X = k) = e^(−λ) · λᵏ / k!        E[X] = Var(X) = λ</div>
+<p>Three facts to own: (1) <b>mean = variance</b> — a quick diagnostic (variance/mean ≫ 1 signals overdispersion; use a negative binomial). (2) <b>Additivity:</b> independent Poisson(λ₁) + Poisson(λ₂) = Poisson(λ₁+λ₂). (3) <b>It is the limit of the binomial</b> when n → ∞, p → 0 with np = λ fixed. Fraud alerts per day, account takeovers per week, ATM withdrawals per minute are all natural Poisson candidates.</p>
+<div class="card" id="e_poi" data-explore="poisson"><h4>Lab 2a · Poisson explorer</h4><p class="sub">For small λ the distribution piles up at 0 and 1; around λ ≈ 20 it is nearly a normal bell. Check that the SD is always √λ.</p></div>
+<div class="card"><h4>Lab 2b · Binomial → Poisson</h4><p class="sub">Blue bars: Binomial(n, λ/n). Yellow dots: Poisson(λ). Increase n with λ fixed and watch the bars snap onto the dots. TV distance is the largest possible difference in the probability of any event.</p>
+ <div class="ctl"><label>n <input type="range" id="c3n" min="5" max="1000" step="5" value="30"><output id="c3nv"></output></label><label>λ = np <input type="range" id="c3l" min="0.5" max="15" step="0.5" value="3"><output id="c3lv"></output></label></div>
+ <canvas class="sm" id="c3cv"></canvas><div class="stats" id="c3st"></div><div class="read" id="c3rd"></div></div>
+</section>
+
+<section class="ch" id="c4">
+<h2><span class="num">4</span>Exponential <span class="lvl i">Intermediate</span></h2>
+<p>If events arrive as a Poisson process with rate λ, the <b>gaps</b> between consecutive events are <b>Exponential(λ)</b>. Counts per window are Poisson; waits between events are exponential — two views of the same process.</p>
+<div class="f">f(x) = λ e^(−λx)        F(x) = 1 − e^(−λx)        E[X] = 1/λ    Var(X) = 1/λ²    median = ln 2 / λ</div>
+<h3>Memorylessness</h3>
+<p><code>P(X &gt; s + t | X &gt; s) = P(X &gt; t)</code>. Having already waited s minutes tells you nothing about the remaining wait: the hazard rate is constant at λ. This is the exponential's defining property and its main weakness — real durations (time to default, customer lifetime) usually have <em>changing</em> hazards, for which the Gamma or Weibull is better. Another handy fact: the minimum of independent exponentials with rates λ₁…λₘ is exponential with rate Σλᵢ.</p>
+<div class="card" id="e_exp" data-explore="exponential"><h4>Lab 3a · Exponential explorer</h4><p class="sub">The mean is 1/λ but the median is only 0.69/λ: a long right tail drags the mean above the median. Skewness is always exactly 2.</p></div>
+<div class="card"><h4>Lab 3b · One event stream, two distributions</h4><p class="sub">We simulate a Poisson process, record the gaps (exponential) and the counts per unit time (Poisson), and test memorylessness: among gaps longer than s, how much <em>longer</em> do they last on average?</p>
+ <div class="ctl"><label>rate λ per unit time <input type="range" id="c4l" min="1" max="10" step="0.5" value="4"><output id="c4lv"></output></label><label>already waited s <input type="range" id="c4s" min="0" max="1.5" step="0.05" value="0.5"><output id="c4sv"></output></label><button class="alt" id="c4go">Re-simulate</button></div>
+ <canvas class="sm" id="c4cv"></canvas><canvas class="sm" id="c4cv2"></canvas><div class="stats" id="c4st"></div><div class="read" id="c4rd"></div></div>
+</section>
+
+<section class="ch" id="c5">
+<h2><span class="num">5</span>Gamma <span class="lvl i">Intermediate</span></h2>
+<p>The time until the <b>k-th</b> event of a Poisson process is the sum of k independent exponentials: a <b>Gamma</b> (called Erlang when k is an integer). Allowing k to be any positive number gives a flexible family for positive, right-skewed quantities such as claim sizes and balances.</p>
+<div class="f">X ~ Gamma(shape a, rate β):   f(x) ∝ x^(a−1) e^(−βx)      E[X] = a/β      Var(X) = a/β²      skewness = 2/√a</div>
+<div class="co warn"><b>Rate vs scale</b>Textbooks and software disagree: some parametrise with <em>rate</em> β, others with <em>scale</em> θ = 1/β (R's <code>rgamma</code> takes rate by default, scipy takes scale). Always check which one a library wants. Here we use rate throughout.</div>
+<p>Shape controls skew: a = 1 is the exponential; a &lt; 1 puts a spike at 0; as a grows the Gamma becomes symmetric and approaches the normal. The coefficient of variation is 1/√a regardless of the rate — a Gamma model says “spread is proportional to the mean”, the same property that makes it popular in severity modelling.</p>
+<div class="card" id="e_gam" data-explore="gamma"><h4>Lab 4a · Gamma explorer</h4><p class="sub">Set shape = 1 to recover the exponential. Raise the shape to 15 and watch skewness fall as 2/√a.</p></div>
+<div class="card"><h4>Lab 4b · Sum of k exponentials is a Gamma</h4><p class="sub">Each of 4,000 trials adds up k independent Exponential(rate) waits. The histogram is compared with the exact Gamma(k, rate) curve.</p>
+ <div class="ctl"><label>k waits <input type="range" id="c5k" min="1" max="30" value="4"><output id="c5kv"></output></label><label>rate <input type="range" id="c5r" min="0.5" max="3" step="0.1" value="1"><output id="c5rv"></output></label><button class="alt" id="c5go">Re-simulate</button></div>
+ <canvas class="sm" id="c5cv"></canvas><div class="stats" id="c5st"></div><div class="read" id="c5rd"></div></div>
+</section>
+
+<!-- ============ PART III ============ -->
+<div class="part">Part III · The bell curve and its offspring</div>
+
+<section class="ch" id="c6">
+<h2><span class="num">6</span>Normal <span class="lvl b">Beginner</span></h2>
+<p>The <b>Normal(μ, σ²)</b> is the limit law of sums (central limit theorem) and the most closed-under-operations family there is: any linear combination of normals is normal, so <code>aX + bY ~ Normal(aμₓ + bμ_y, a²σₓ² + b²σ_y² + 2ab·Cov)</code>. It is fully described by its mean and variance.</p>
+<div class="f">f(x) = (1/(σ√(2π))) · exp(−(x−μ)²/(2σ²))       z = (x − μ)/σ       68% within 1σ, 95% within 1.96σ, 99.7% within 3σ</div>
+<p>Standardising turns any normal into the standard Normal(0,1): a z-score counts how many standard deviations a value sits from the mean. And uniquely for the (jointly) normal family, <b>zero correlation does imply independence</b> — the one place the converse from the previous course holds.</p>
+<div class="card" id="e_nor" data-explore="normal"><h4>Lab 5a · Normal explorer</h4><p class="sub">μ slides the curve; σ stretches it. Skewness and excess kurtosis are always 0.</p></div>
+<div class="card"><h4>Lab 5b · z-score and tail calculator</h4>
+ <div class="ctl"><label>μ <input type="number" id="c6m" value="100" step="any" style="width:80px"></label><label>σ <input type="number" id="c6s" value="15" step="any" min="0.0001" style="width:80px"></label><label>x <input type="number" id="c6x" value="130" step="any" style="width:80px"></label></div>
+ <div class="stats" id="c6st"></div><div class="read" id="c6rd"></div></div>
+</section>
+
+<section class="ch" id="c7">
+<h2><span class="num">7</span>Lognormal <span class="lvl i">Intermediate</span></h2>
+<p>X is <b>Lognormal(μ, σ²)</b> when ln X is Normal(μ, σ²). Since ln of a product is a sum of logs, the CLT says a <em>product</em> of many independent positive factors is approximately lognormal — compounding returns, multiplicative growth, transaction amounts built from many small multipliers.</p>
+<div class="f">median = e^μ        E[X] = e^(μ + σ²/2)  (always above the median)        CV = √(e^σ² − 1)</div>
+<div class="co warn"><b>Back-transform trap</b>If you model ln X and then exponentiate the average of the logs, you get the <em>median</em> (geometric mean), not the mean. The arithmetic mean needs the +σ²/2 correction. In expected-loss and revenue models this error is systematic and always in the same direction.</div>
+<div class="card" id="e_log" data-explore="lognormal"><h4>Lab 6a · Lognormal explorer</h4><p class="sub">Increase σ: the mean and median drift apart and the right tail explodes (skewness rises very fast). With σ = 1.5 the SD of the mean is huge and sample averages become unreliable.</p></div>
+<div class="card"><h4>Lab 6b · Products become lognormal</h4><p class="sub">Each trial multiplies m independent random factors, each between e^(−s) and e^(+s) (log-uniform). Left: the product is skewed; right: its logarithm is symmetric and bell-shaped as m grows.</p>
+ <div class="ctl"><label>factors m <input type="range" id="c7m" min="1" max="80" value="3"><output id="c7mv"></output></label><label>spread s <input type="range" id="c7s" min="0.05" max="0.6" step="0.01" value="0.3"><output id="c7sv"></output></label><button class="alt" id="c7go">Re-simulate</button></div>
+ <canvas class="sm" id="c7cv"></canvas><canvas class="sm" id="c7cv2"></canvas><div class="stats" id="c7st"></div><div class="read" id="c7rd"></div></div>
+</section>
+
+<section class="ch" id="c8">
+<h2><span class="num">8</span>Chi-square <span class="lvl i">Intermediate</span></h2>
+<p>If Z₁…Z_k are independent standard normals, <code>Z₁² + … + Z_k² ~ χ²(k)</code>. It is also exactly a Gamma with shape k/2 and rate ½. Mean k, variance 2k, always right-skewed, approaching normal as k grows. It is additive: χ²(a) + χ²(b) = χ²(a+b) for independent pieces.</p>
+<p>Why it matters: whenever we measure “total squared distance from expectation” we get a χ². In particular, the sample variance of normal data satisfies</p>
+<div class="f">(n − 1)·s² / σ²  ~  χ²(n − 1)</div>
+<p>which is the basis of confidence intervals for a variance. χ² is also behind goodness-of-fit and independence tests on tables (the Pearson statistic, previous course Ch. 6) and likelihood-ratio tests (<code>2Δℓ ~ χ²</code>, Ch. 7).</p>
+<div class="card" id="e_chi" data-explore="chisq"><h4>Lab 7a · Chi-square explorer</h4><p class="sub">With 1 degree of freedom the density explodes at 0 (it's a squared normal). With 30 it is nearly bell-shaped. Compare the 95% quantile with the mean to see how critical values work.</p></div>
+<div class="card"><h4>Lab 7b · Where χ² comes from</h4>
+ <div class="ctl"><label>Build the statistic as <select id="c8m"><option value="sumz">sum of k squared standard normals</option><option value="svar">(n−1)·s²/σ² from a normal sample of size n</option></select></label><label><span id="c8lab">k</span> <input type="range" id="c8k" min="1" max="30" value="4"><output id="c8kv"></output></label><button class="alt" id="c8go">Re-simulate</button></div>
+ <canvas class="sm" id="c8cv"></canvas><div class="stats" id="c8st"></div><div class="read" id="c8rd"></div></div>
+</section>
+
+<section class="ch" id="c9">
+<h2><span class="num">9</span>Student's t <span class="lvl i">Intermediate</span></h2>
+<p>When you standardise a mean using the <em>estimated</em> standard deviation, the extra uncertainty fattens the tails. Formally: if Z ~ N(0,1) and V ~ χ²(ν) independently,</p>
+<div class="f">T = Z / √(V/ν)  ~  t(ν)        t(ν) → Normal as ν → ∞        t(1) = Cauchy</div>
+<p>The tails of t(ν) decay like a power law, so <b>only moments below ν exist</b>: t(2) has infinite variance, t(1) has no mean. Beyond testing, the t is a standard model for fat-tailed returns and residuals because it nests “normal” as a limit and “very heavy-tailed” at small ν.</p>
+<div class="card" id="e_t" data-explore="t"><h4>Lab 8a · t explorer</h4><p class="sub">Overlay the normal. At ν = 1–3 the t is visibly heavier-tailed; by ν ≈ 30 the two are almost indistinguishable. Watch the 95th percentile approach 1.645.</p></div>
+<div class="card"><h4>Lab 8b · The t-statistic in action</h4><p class="sub">Draw samples of size n from a normal population, compute T = x̄ / (s/√n), repeat 6,000 times. The yellow curve is the t(n−1) law; the purple one is the normal that people wrongly use for small n.</p>
+ <div class="ctl"><label>sample size n <input type="range" id="c9n" min="2" max="40" value="5"><output id="c9nv"></output></label><button class="alt" id="c9go">Re-simulate</button></div>
+ <canvas class="sm" id="c9cv"></canvas><div class="stats" id="c9st"></div><div class="read" id="c9rd"></div></div>
+</section>
+
+<section class="ch" id="c10">
+<h2><span class="num">10</span>F distribution <span class="lvl i">Intermediate</span></h2>
+<p>The ratio of two independent χ² variables, each divided by its degrees of freedom, is an <b>F(d₁, d₂)</b>. It compares <em>variances</em>: if two independent samples of sizes n₁, n₂ come from normal populations with equal variance, then s₁²/s₂² ~ F(n₁−1, n₂−1). It also drives ANOVA (between-group variance ÷ within-group variance) and the overall F-test in regression.</p>
+<div class="f">F = (χ²(d₁)/d₁) / (χ²(d₂)/d₂)        mean = d₂/(d₂−2) for d₂ &gt; 2        t(ν)² = F(1, ν)        F(d₁, ∞) = χ²(d₁)/d₁</div>
+<p>Note that F is always positive and right-skewed, and that its mean is slightly above 1 even when the variances are equal (it is a ratio — Jensen again).</p>
+<div class="card" id="e_f" data-explore="f"><h4>Lab 9a · F explorer</h4><p class="sub">Small d₂ gives enormously heavy right tails. As d₂ grows the distribution tightens around 1.</p></div>
+<div class="card"><h4>Lab 9b · Ratio of two sample variances</h4>
+ <div class="ctl"><label>n₁ <input type="range" id="c10a" min="2" max="40" value="8"><output id="c10av"></output></label><label>n₂ <input type="range" id="c10b" min="2" max="40" value="12"><output id="c10bv"></output></label><button class="alt" id="c10go">Re-simulate</button></div>
+ <canvas class="sm" id="c10cv"></canvas><div class="stats" id="c10st"></div><div class="read" id="c10rd"></div></div>
+</section>
+
+<!-- ============ PART IV ============ -->
+<div class="part">Part IV · Probabilities of probabilities</div>
+
+<section class="ch" id="c11">
+<h2><span class="num">11</span>Beta <span class="lvl a">Advanced</span></h2>
+<p>The <b>Beta(a, b)</b> lives on [0, 1], so it is the natural distribution for an unknown probability, rate or proportion (a PD, a response rate, a market share). It can be flat, U-shaped, bell-shaped, J-shaped or skewed depending on a and b.</p>
+<div class="f">f(p) ∝ p^(a−1) (1−p)^(b−1)      E[p] = a/(a+b)      Var(p) = ab / ((a+b)²(a+b+1))      Beta(1,1) = Uniform(0,1)</div>
+<p><b>Conjugacy with the binomial.</b> Start with a Beta(a, b) belief about p. Observe k successes in n trials. The posterior is exactly <b>Beta(a + k, b + n − k)</b>. Read a and b as pseudo-counts: prior “successes” and “failures”. The posterior mean (a+k)/(a+b+n) is a weighted average of the prior mean and the observed rate k/n, with weight (a+b)/(a+b+n) on the prior — the more data, the less the prior matters. This is the cleanest way to estimate a PD for a segment with very few defaults.</p>
+<p><b>Link to the Gamma:</b> if X ~ Gamma(a), Y ~ Gamma(b) independently (same rate), then X/(X+Y) ~ Beta(a, b). <b>Link to heterogeneity:</b> if each account's p is drawn from a Beta and defaults are then binomial, the counts are beta-binomial — overdispersed relative to a plain binomial, with correlation ρ = 1/(a+b+1).</p>
+<div class="card" id="e_beta" data-explore="beta"><h4>Lab 10a · Beta explorer</h4><p class="sub">Try a = b = 0.5 (U-shape), a = b = 1 (flat), a = 2, b = 8 (typical PD-like shape), a = b = 20 (tight bell).</p></div>
+<div class="card"><h4>Lab 10b · Updating a PD estimate</h4><p class="sub">A segment has a prior PD belief Beta(a, b). You observe k defaults in n loans. Compare prior (blue), posterior (red) and the raw observed rate (yellow line). With little data the posterior stays near the prior; with lots, it follows the data.</p>
+ <div class="ctl"><label>prior a <input type="range" id="c11a" min="0.5" max="20" step="0.5" value="2"><output id="c11av"></output></label><label>prior b <input type="range" id="c11b" min="0.5" max="200" step="0.5" value="48"><output id="c11bv"></output></label><label>loans n <input type="range" id="c11n" min="0" max="2000" step="10" value="100"><output id="c11nv"></output></label><label>defaults k <input type="range" id="c11k" min="0" max="100" step="1" value="1"><output id="c11kv"></output></label></div>
+ <canvas class="sm" id="c11cv"></canvas><div class="stats" id="c11st"></div><div class="read" id="c11rd"></div></div>
+</section>
+
+<!-- ============ PART V ============ -->
+<div class="part">Part V · Mastery</div>
+
+<section class="ch" id="c12">
+<h2><span class="num">12</span>Verify every arrow by simulation <span class="lvl a">Advanced</span></h2>
+<p>You don't have to take the family map on faith. This lab runs the generating process on the left side of each identity, thousands of times, and compares the result with the distribution on the right side. The KS distance (largest vertical gap between the sample CDF and the theoretical CDF) should sit below the 5% critical value 1.36/√N whenever the identity is exact; for the approximations (limits), total variation distance shows how close the match is.</p>
+<div class="card"><h4>Lab 11 · Identity verifier</h4>
+ <div class="ctl"><label>Identity <select id="c12id"></select></label><span id="c12ps" style="display:contents"></span><button class="alt" id="c12go">Re-simulate</button></div>
+ <canvas class="sm" id="c12cv"></canvas><div class="stats" id="c12st"></div><div class="read" id="c12rd"></div></div>
+<h3>The identities in one table</h3>
+<div class="tw"><table>
+<tr><th>Start</th><th>Operation</th><th>Result</th></tr>
+<tr><td>Bernoulli(p) × n</td><td>sum</td><td>Binomial(n, p)</td></tr>
+<tr><td>Binomial(n, p)</td><td>n → ∞, p → 0, np = λ</td><td>Poisson(λ)</td></tr>
+<tr><td>Poisson(λ), large λ; Binomial, large n</td><td>CLT</td><td>≈ Normal (match mean &amp; variance)</td></tr>
+<tr><td>Poisson process</td><td>gaps between events</td><td>Exponential(λ)</td></tr>
+<tr><td>Exponential(β) × k</td><td>sum</td><td>Gamma(k, β)</td></tr>
+<tr><td>Gamma(k/2, rate ½)</td><td>relabel</td><td>χ²(k)</td></tr>
+<tr><td>Normal</td><td>square (Z²)</td><td>χ²(1)</td></tr>
+<tr><td>χ²(a) + χ²(b)</td><td>sum</td><td>χ²(a+b)</td></tr>
+<tr><td>Normal</td><td>exp( · )</td><td>Lognormal</td></tr>
+<tr><td>Z, V ~ χ²(ν)</td><td>Z/√(V/ν)</td><td>t(ν)</td></tr>
+<tr><td>V₁ ~ χ²(d₁), V₂ ~ χ²(d₂)</td><td>(V₁/d₁)/(V₂/d₂)</td><td>F(d₁, d₂)</td></tr>
+<tr><td>t(ν)</td><td>square</td><td>F(1, ν)</td></tr>
+<tr><td>Gamma(a), Gamma(b)</td><td>X/(X+Y)</td><td>Beta(a, b)</td></tr>
+<tr><td>Beta prior × Binomial data</td><td>Bayes</td><td>Beta(a+k, b+n−k)</td></tr>
+</table></div>
+</section>
+
+<section class="ch" id="c13">
+<h2><span class="num">13</span>Choosing a distribution for real data <span class="lvl e">Expert</span></h2>
+<p>Pick a distribution the way a good analyst reads a crime scene: three clues narrow the field before any fitting.</p>
+<ol>
+ <li><b>Support.</b> Integers only → binomial/Poisson/negative binomial. Strictly positive → gamma/lognormal/exponential. In [0,1] → beta. Whole real line → normal/t.</li>
+ <li><b>The variance–mean relationship.</b> Variance ≈ mean → Poisson. Variance ∝ mean² (constant coefficient of variation) → gamma or lognormal. Variance far above mean for counts → overdispersion (negative binomial, beta-binomial).</li>
+ <li><b>Tail and skew.</b> Plot a histogram <em>and</em> a log-scale or QQ plot. Symmetric with outliers beyond 3σ → t. Right skew with a long tail → lognormal (heavier) or gamma (lighter). A spike at zero plus a continuous part → mixture (zero-inflated), not any single distribution here.</li>
+</ol>
+<div class="tw"><table>
+<tr><th>Typical quantity in banking</th><th>Candidate</th><th>Why</th></tr>
+<tr><td>Defaults in a pool of loans</td><td>Binomial → beta-binomial</td><td>Count of yes/no; correlation inflates variance</td></tr>
+<tr><td>Alerts / fraud cases per day</td><td>Poisson → negative binomial</td><td>Rare events per window; clustering gives overdispersion</td></tr>
+<tr><td>Time between transactions</td><td>Exponential → Gamma/Weibull</td><td>Waiting times; constant vs changing hazard</td></tr>
+<tr><td>Transaction amounts, balances, claim sizes</td><td>Lognormal / Gamma</td><td>Positive, right-skewed, spread ∝ mean</td></tr>
+<tr><td>Daily returns, model residuals</td><td>t (ν ≈ 3–6) rather than normal</td><td>Fat tails</td></tr>
+<tr><td>PD, response rate, recovery rate across segments</td><td>Beta</td><td>Proportions with segment-to-segment variation</td></tr>
+<tr><td>Test statistics for means, variances, models</td><td>t, χ², F</td><td>Sampling distributions under H₀</td></tr>
+</table></div>
+<div class="card"><h4>Lab 12 · The mystery sample</h4>
+ <p class="sub">A hidden distribution generated 600 values. Use the histogram and the clues (support, integer-ness, skew, tails) to choose. Several are deliberate look-alikes (gamma / lognormal / χ² / exponential) — that is the point of looking at the clues, not only the picture.</p>
+ <div class="ctl"><button id="c13new">New mystery sample</button><label>Your guess <select id="c13g"><option>Normal</option><option>Lognormal</option><option>Exponential</option><option>Gamma</option><option>Beta</option><option>Poisson</option><option>Binomial</option><option>Student t</option><option>Chi-square</option></select></label><button id="c13ok">Submit guess</button><span id="c13sc" style="color:var(--mu);font-size:13px"></span></div>
+ <canvas class="sm" id="c13cv"></canvas><div class="stats" id="c13st"></div><div class="read" id="c13rd"></div></div>
+</section>
+
+<section class="ch" id="c14">
+<h2><span class="num">14</span>Final exam, mastery checklist, cheat sheet <span class="lvl e">Expert</span></h2>
+<h3>Exam (16 questions — click an answer)</h3>
+<div id="quiz"></div>
+<div class="card"><h4>Score</h4><div class="stats" id="qscore"></div><button class="alt" id="qreset">Reset exam</button></div>
+<h3>Mastery checklist — tick when you can do it without notes</h3>
+<div class="card chk" id="chk"></div>
+<h3>Cheat sheet</h3>
+<div class="tw"><table>
+<tr><th>Distribution</th><th>One line to remember</th></tr>
+<tr><td>Binomial(n,p)</td><td>Successes in n independent trials; mean np, var np(1−p); normal-ish if np and n(1−p) ≥ 10</td></tr>
+<tr><td>Poisson(λ)</td><td>Rare events in a window; mean = var = λ; limit of Binomial; sums of Poissons are Poisson</td></tr>
+<tr><td>Exponential(λ)</td><td>Gap between Poisson events; memoryless; constant hazard; mean 1/λ</td></tr>
+<tr><td>Gamma(a, β)</td><td>Sum of a exponentials; mean a/β; CV = 1/√a; χ²(k) = Gamma(k/2, ½)</td></tr>
+<tr><td>Normal</td><td>Sum of many small effects; closed under linear combinations; 95% within 1.96σ</td></tr>
+<tr><td>Lognormal</td><td>exp of a normal; product of many factors; mean e^(μ+σ²/2) &gt; median e^μ</td></tr>
+<tr><td>χ²(k)</td><td>Σ Z²; mean k, var 2k; (n−1)s²/σ² ~ χ²(n−1)</td></tr>
+<tr><td>t(ν)</td><td>Z/√(χ²/ν); fat tails; moments exist only below ν; → Normal as ν → ∞</td></tr>
+<tr><td>F(d₁,d₂)</td><td>Ratio of scaled χ²s; compares variances; t² = F(1,ν)</td></tr>
+<tr><td>Beta(a,b)</td><td>Distribution on [0,1]; posterior Beta(a+k, b+n−k); pseudo-counts</td></tr>
+</table></div>
+<div class="co tip"><b>Next on the roadmap</b>Item 3 is conditional probability and Bayes' theorem (the Beta lab previews it), and item 4 is the CLT in depth. With this page behind you, most of stage 2 (estimation and inference) is just applying these distributions.</div>
+</section>
+</main>
+
+<script>
+/*MATH*/
+function lgamma(x){const c=[76.18009172947146,-86.50532032941677,24.01409824083091,-1.231739572450155,0.1208650973866179e-2,-0.5395239384953e-5];let y=x,t=x+5.5;t-=(x+.5)*Math.log(t);let s=1.000000000190015;for(let j=0;j<6;j++)s+=c[j]/++y;return -t+Math.log(2.5066282746310005*s/x);}
+function gser(a,x){let ap=a,sum=1/a,del=sum;for(let n=0;n<1000;n++){ap++;del*=x/ap;sum+=del;if(Math.abs(del)<Math.abs(sum)*1e-15)break;}return sum*Math.exp(-x+a*Math.log(x)-lgamma(a));}
+function gcf(a,x){let b=x+1-a,c=1/1e-300,d=1/b,h=d;for(let i=1;i<1000;i++){const an=-i*(i-a);b+=2;d=an*d+b;if(Math.abs(d)<1e-300)d=1e-300;c=b+an/c;if(Math.abs(c)<1e-300)c=1e-300;d=1/d;const del=d*c;h*=del;if(Math.abs(del-1)<1e-15)break;}return Math.exp(-x+a*Math.log(x)-lgamma(a))*h;}
+function gammaQ(a,x){if(x<=0)return 1;return x<a+1?1-gser(a,x):gcf(a,x);}
+function betacf(a,b,x){const qab=a+b,qap=a+1,qam=a-1;let c=1,d=1-qab*x/qap;if(Math.abs(d)<1e-300)d=1e-300;d=1/d;let h=d;for(let m=1;m<=1000;m++){const m2=2*m;let aa=m*(b-m)*x/((qam+m2)*(a+m2));d=1+aa*d;if(Math.abs(d)<1e-300)d=1e-300;c=1+aa/c;if(Math.abs(c)<1e-300)c=1e-300;d=1/d;h*=d*c;aa=-(a+m)*(qab+m)*x/((a+m2)*(qap+m2));d=1+aa*d;if(Math.abs(d)<1e-300)d=1e-300;c=1+aa/c;if(Math.abs(c)<1e-300)c=1e-300;d=1/d;const del=d*c;h*=del;if(Math.abs(del-1)<1e-15)break;}return h;}
+function betai(a,b,x){if(x<=0)return 0;if(x>=1)return 1;const bt=Math.exp(lgamma(a+b)-lgamma(a)-lgamma(b)+a*Math.log(x)+b*Math.log(1-x));return x<(a+1)/(a+b+2)?bt*betacf(a,b,x)/a:1-bt*betacf(b,a,1-x)/b;}
+function normSf(z){const q=0.5*gammaQ(.5,z*z/2);return z>=0?q:1-q;}
+function normCdf(z){return normSf(-z);}
+function npdf(x){return Math.exp(-x*x/2)/2.5066282746310002;}
+function tTwo(t,df){if(!isFinite(t))return 0;return betai(df/2,.5,df/(df+t*t));}
+function tCdf(x,v){return x>=0?1-tTwo(x,v)/2:tTwo(-x,v)/2;}
+function tpdf(x,v){return Math.exp(lgamma((v+1)/2)-lgamma(v/2))/Math.sqrt(v*Math.PI)*Math.pow(1+x*x/v,-(v+1)/2);}
+function lbin(n,k){return lgamma(n+1)-lgamma(k+1)-lgamma(n-k+1);}
+function binom(n,k,p){return Math.exp(lbin(n,k)+k*Math.log(p)+(n-k)*Math.log(1-p));}
+function gampdf(x,a,r){return x<=0?(a<1?Infinity:(a===1?r:0)):Math.exp(a*Math.log(r)+(a-1)*Math.log(x)-r*x-lgamma(a));}
+function gamcdf(x,a,r){return x<=0?0:1-gammaQ(a,r*x);}
+function betapdf(x,a,b){return x<=0||x>=1?0:Math.exp(lgamma(a+b)-lgamma(a)-lgamma(b)+(a-1)*Math.log(x)+(b-1)*Math.log(1-x));}
+function betacdf(x,a,b){return betai(a,b,x);}
+function fpdf(x,d1,d2){return x<=0?0:Math.exp(lgamma((d1+d2)/2)-lgamma(d1/2)-lgamma(d2/2)+(d1/2)*Math.log(d1/d2)+(d1/2-1)*Math.log(x)-((d1+d2)/2)*Math.log(1+d1*x/d2));}
+function fcdf(x,d1,d2){return x<=0?0:betai(d1/2,d2/2,d1*x/(d1*x+d2));}
+function randn(){let u=0;while(!u)u=Math.random();return Math.sqrt(-2*Math.log(u))*Math.cos(2*Math.PI*Math.random());}
+function gammaS(a){if(a<1)return gammaS(a+1)*Math.pow(Math.random(),1/a);const d=a-1/3,c=1/Math.sqrt(9*d);for(;;){let x,v;do{x=randn();v=1+c*x}while(v<=0);v=v*v*v;const u=Math.random();if(Math.log(u)<.5*x*x+d-d*v+d*Math.log(v))return d*v;}}
+function betaS(a,b){const x=gammaS(a),y=gammaS(b);return x/(x+y);}
+function binS(n,p){let k=0;for(let i=0;i<n;i++)if(Math.random()<p)k++;return k;}
+function poisS(l){const L=Math.exp(-l);let k=0,p=1;do{k++;p*=Math.random()}while(p>L);return k-1;}
+function expS(r){return -Math.log(1-Math.random())/r;}
+function chiS(k){return 2*gammaS(k/2);}
+function mean(a){let s=0;for(const v of a)s+=v;return s/a.length;}
+function vr(a){const m=mean(a);let s=0;for(const v of a)s+=(v-m)*(v-m);return s/(a.length-1);}
+function skewKurt(a){const m=mean(a),n=a.length;let s2=0,s3=0,s4=0;for(const v of a){const d=v-m,d2=d*d;s2+=d2;s3+=d2*d;s4+=d2*d2}s2/=n;s3/=n;s4/=n;return{sd:Math.sqrt(s2),sk:s3/Math.pow(s2,1.5),ku:s4/(s2*s2)-3};}
+function qc(cdf,lo,hi,p){for(let i=0;i<200;i++){const m=(lo+hi)/2;if(cdf(m)<p)lo=m;else hi=m}return(lo+hi)/2;}
+/*ENDMATH*/
+
+const $=id=>document.getElementById(id), val=id=>+$(id).value;
+const C={fg:'#e8ebf5',mu:'#8a93ab',gr:'#232a3d',a:'#6ea8ff',r:'#ff6b81',y:'#ffd166',g:'#4ade80',p:'#c084fc',t:'#5eead4'};
+const store={get(k,d){try{const v=JSON.parse(localStorage.getItem(k));return v==null?d:v}catch(e){return d}},set(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}};
+function stat(l,v,c){return `<div class="stat ${c||''}"><b>${v}</b><span>${l}</span></div>`}
+function f3(x){if(!isFinite(x))return String(x);const a=Math.abs(x);if(a!==0&&(a<1e-3||a>=1e5))return x.toExponential(2);return String(+x.toFixed(a<1?4:a<100?3:2))}
+function fv(x){if(x===null||x===undefined||Number.isNaN(x))return 'undefined';if(x===Infinity)return '∞';return f3(x)}
+const resizers=[];
+function reg(fn){fn();resizers.push(fn)}
+function on(ids,fn){ids.split(' ').forEach(i=>{const e=$(i);e.addEventListener('input',fn);e.addEventListener('change',fn)})}
+let rt;window.addEventListener('resize',()=>{clearTimeout(rt);rt=setTimeout(()=>resizers.forEach(f=>f()),150)});
+document.querySelectorAll('input[type=range]').forEach(i=>{const o=$(i.id+'v');if(!o)return;const f=()=>{o.textContent=i.value};i.addEventListener('input',f);f()});
+
+function nice(x){const e=Math.pow(10,Math.floor(Math.log10(x))),f=x/e;return (f<1.5?1:f<3?2:f<7?5:10)*e}
+function mk(cv,x0,x1,ymax,o){o=o||{};const y0=o.y0||0,dpr=window.devicePixelRatio||1,r=cv.getBoundingClientRect(),w=r.width||600,h=r.height||270;
+ cv.width=w*dpr;cv.height=h*dpr;const g=cv.getContext('2d');g.setTransform(dpr,0,0,dpr,0,0);g.clearRect(0,0,w,h);
+ const L=o.L||42,R=12,T=14,B=28,X=x=>L+(x-x0)/(x1-x0)*(w-L-R),Y=y=>h-B-(y-y0)/(ymax-y0)*(h-T-B);
+ g.font='11px system-ui';g.lineWidth=1;g.strokeStyle=C.gr;g.fillStyle=C.mu;
+ const sx=nice((x1-x0)/7);for(let x=Math.ceil(x0/sx-1e-9)*sx;x<=x1+1e-9;x+=sx){g.beginPath();g.moveTo(X(x),T);g.lineTo(X(x),h-B);g.stroke();g.textAlign='center';g.fillText(String(+x.toFixed(6)),X(x),h-B+15)}
+ const sy=nice((ymax-y0)/4);for(let y=Math.ceil(y0/sy-1e-9)*sy;y<=ymax+1e-9;y+=sy){g.beginPath();g.moveTo(L,Y(y));g.lineTo(w-R,Y(y));g.stroke();g.textAlign='right';g.fillText(String(+y.toFixed(4)),L-5,Y(y)+3)}
+ return{g,w,h,X,Y,L,R,T,B,
+  line(f,col,lw,a,b,n,dash){a=a==null?x0:a;b=b==null?x1:b;n=n||260;g.save();if(dash)g.setLineDash([5,4]);g.beginPath();g.strokeStyle=col;g.lineWidth=lw||2;for(let i=0;i<=n;i++){const x=a+(b-a)*i/n,y=f(x);i?g.lineTo(X(x),Y(y)):g.moveTo(X(x),Y(y))}g.stroke();g.restore()},
+  area(f,a,b,col,n){a=Math.max(a,x0);b=Math.min(b,x1);if(b<=a)return;n=n||200;g.beginPath();g.moveTo(X(a),Y(0));for(let i=0;i<=n;i++){const x=a+(b-a)*i/n;g.lineTo(X(x),Y(f(x)))}g.lineTo(X(b),Y(0));g.closePath();g.fillStyle=col;g.fill()},
+  vline(x,col,lab,dash){g.save();g.strokeStyle=col;g.lineWidth=1.6;if(dash)g.setLineDash([5,4]);g.beginPath();g.moveTo(X(x),T);g.lineTo(X(x),h-B);g.stroke();g.restore();if(lab){g.fillStyle=col;g.textAlign='center';g.fillText(lab,Math.min(Math.max(X(x),34),w-34),T+10)}},
+  text(s,x,y,col,al){g.fillStyle=col||C.fg;g.textAlign=al||'left';g.fillText(s,x,y)}};}
+function dens(data,x0,x1,nb){const c=new Array(nb).fill(0),bw=(x1-x0)/nb;data.forEach(v=>{if(v>=x0&&v<=x1)c[Math.min(nb-1,Math.floor((v-x0)/bw))]++});return c.map(k=>k/data.length/bw);}
+function bars(P,d,x0,x1,fill,stroke){const nb=d.length,bw=(x1-x0)/nb;d.forEach((v,i)=>{const xa=x0+i*bw,w=Math.max(1,P.X(xa+bw)-P.X(xa)-1);if(fill){P.g.fillStyle=fill;P.g.fillRect(P.X(xa)+.5,P.Y(v),w,P.Y(0)-P.Y(v))}if(stroke){P.g.strokeStyle=stroke;P.g.lineWidth=1.6;P.g.strokeRect(P.X(xa)+.5,P.Y(v),w,P.Y(0)-P.Y(v))}})}
+/* histogram of data with overlaid exact curves */
+function histPlot(cv,data,lo,hi,curves,nb){nb=nb||50;const d=dens(data,lo,hi,nb),dm=Math.max.apply(null,d);let cm=0;
+ (curves||[]).forEach(c=>{for(let i=0;i<=200;i++){const v=c.f(lo+(hi-lo)*(.02+.98*i/200));if(isFinite(v))cm=Math.max(cm,v)}});
+ const ymax=Math.max(dm,Math.min(cm,3*dm))*1.18||1,P=mk(cv,lo,hi,ymax);bars(P,d,lo,hi,'rgba(110,168,255,.55)');
+ (curves||[]).forEach(c=>P.line(x=>Math.min(c.f(x),ymax*1.4),c.color,2.2,lo+(hi-lo)*1e-4,hi,300,c.dash));return P;}
+/* discrete comparison: first series bars, others dots, 'line' = continuous function */
+function pmfPlot(cv,k0,k1,series){let ym=0;series.forEach(s=>{for(let k=k0;k<=k1;k++){const v=s.f(k);if(isFinite(v))ym=Math.max(ym,v)}});
+ const P=mk(cv,k0-.7,k1+.7,ym*1.18||1);
+ series.forEach(s=>{if(s.type==='bar'){for(let k=k0;k<=k1;k++){P.g.fillStyle=s.color;P.g.fillRect(P.X(k-.38),P.Y(s.f(k)),P.X(k+.38)-P.X(k-.38),P.Y(0)-P.Y(s.f(k)))}}
+  else if(s.type==='dot'){for(let k=k0;k<=k1;k++){P.g.fillStyle=s.color;P.g.beginPath();P.g.arc(P.X(k),P.Y(s.f(k)),4,0,7);P.g.fill()}}
+  else{P.line(s.f,s.color,2,k0-.5,k1+.5,300)}});return P;}
+function ksD(sorted,F){let D=0;const n=sorted.length;for(let i=0;i<n;i++){const f=F(sorted[i]);D=Math.max(D,Math.abs((i+1)/n-f),Math.abs(i/n-f))}return D}
+
+/* ---------- distribution table ---------- */
+const DS={
+ binomial:{name:'Binomial',kind:'d',P:[['n',1,200,20,1],['p',.01,.99,.3,.01]],sup:[0,1e6],
+  pdf:(k,n,p)=>(k<0||k>n||k!==Math.floor(k))?0:binom(n,k,p),cdf:(x,n,p)=>{if(x<0)return 0;let s=0;for(let k=0;k<=Math.min(Math.floor(x),n);k++)s+=binom(n,k,p);return Math.min(1,s)},
+  mean:(n,p)=>n*p,var:(n,p)=>n*p*(1-p),skew:(n,p)=>(1-2*p)/Math.sqrt(n*p*(1-p)),kurt:(n,p)=>(1-6*p*(1-p))/(n*p*(1-p)),
+  rng:(n,p)=>{const m=n*p,s=Math.sqrt(n*p*(1-p));return[Math.max(0,Math.floor(m-5*s-1)),Math.min(n,Math.ceil(m+5*s+1))]},samp:(n,p)=>binS(n,p),
+  note:(n,p)=>`E[X] = np = ${f3(n*p)}, Var = np(1−p) = ${f3(n*p*(1-p))}. ${n*p<10||n*(1-p)<10?'np or n(1−p) is below 10, so the normal approximation is shaky — compare the purple curve with the bars.':'Both np and n(1−p) are ≥ 10: the normal approximation is decent.'}`},
+ poisson:{name:'Poisson',kind:'d',P:[['λ',.5,40,4,.5]],sup:[0,1e6],
+  pdf:(k,l)=>k<0||k!==Math.floor(k)?0:Math.exp(-l+k*Math.log(l)-lgamma(k+1)),cdf:(x,l)=>x<0?0:gammaQ(Math.floor(x)+1,l),
+  mean:l=>l,var:l=>l,skew:l=>1/Math.sqrt(l),kurt:l=>1/l,rng:l=>[0,Math.ceil(l+5*Math.sqrt(l)+3)],samp:l=>poisS(l),
+  note:l=>`Mean and variance are both λ = ${f3(l)}, so SD = √λ = ${f3(Math.sqrt(l))}. Skewness 1/√λ = ${f3(1/Math.sqrt(l))}: the smaller the rate, the more lopsided.`},
+ exponential:{name:'Exponential',kind:'c',P:[['λ (rate)',.2,3,1,.05]],sup:[0,1e6],
+  pdf:(x,l)=>x<0?0:l*Math.exp(-l*x),cdf:(x,l)=>x<0?0:1-Math.exp(-l*x),mean:l=>1/l,var:l=>1/(l*l),skew:()=>2,kurt:()=>6,rng:l=>[0,7/l],samp:l=>expS(l),
+  note:l=>`Mean 1/λ = ${f3(1/l)} but median ln2/λ = ${f3(Math.LN2/l)}: the long right tail pulls the mean above the median. Skewness is exactly 2 whatever λ is.`},
+ gamma:{name:'Gamma',kind:'c',P:[['shape a',.5,15,3,.1],['rate β',.2,3,1,.05]],sup:[0,1e6],
+  pdf:gampdf,cdf:gamcdf,mean:(a,b)=>a/b,var:(a,b)=>a/(b*b),skew:a=>2/Math.sqrt(a),kurt:a=>6/a,rng:(a,b)=>[0,(a+5*Math.sqrt(a)+4)/b],samp:(a,b)=>gammaS(a)/b,
+  note:(a,b)=>`Mean a/β = ${f3(a/b)}, SD √a/β = ${f3(Math.sqrt(a)/b)}, CV = 1/√a = ${f3(1/Math.sqrt(a))}. ${a<1?'Shape < 1: the density is unbounded at 0.':a===1?'Shape = 1 is exactly the exponential.':'Shape > 1: a mode at (a−1)/β = '+f3((a-1)/b)+'.'}`},
+ normal:{name:'Normal',kind:'c',P:[['μ',-5,5,0,.1],['σ',.3,3,1,.1]],sup:[-1e6,1e6],
+  pdf:(x,m,s)=>npdf((x-m)/s)/s,cdf:(x,m,s)=>normCdf((x-m)/s),mean:m=>m,var:(m,s)=>s*s,skew:()=>0,kurt:()=>0,rng:(m,s)=>[m-4*s,m+4*s],samp:(m,s)=>m+s*randn(),
+  note:(m,s)=>`P(μ−σ < X < μ+σ) = 68.3%, within 2σ = 95.4%, within 3σ = 99.7%. Here that is [${f3(m-s)}, ${f3(m+s)}], [${f3(m-2*s)}, ${f3(m+2*s)}] and [${f3(m-3*s)}, ${f3(m+3*s)}].`},
+ lognormal:{name:'Lognormal',kind:'c',P:[['μ (of ln X)',-1,2,0,.05],['σ (of ln X)',.1,1.5,.6,.05]],sup:[0,1e9],
+  pdf:(x,m,s)=>x<=0?0:npdf((Math.log(x)-m)/s)/(x*s),cdf:(x,m,s)=>x<=0?0:normCdf((Math.log(x)-m)/s),mean:(m,s)=>Math.exp(m+s*s/2),var:(m,s)=>(Math.exp(s*s)-1)*Math.exp(2*m+s*s),
+  skew:(m,s)=>(Math.exp(s*s)+2)*Math.sqrt(Math.exp(s*s)-1),kurt:(m,s)=>Math.exp(4*s*s)+2*Math.exp(3*s*s)+3*Math.exp(2*s*s)-6,rng:(m,s)=>[0,Math.exp(m+3*s)],samp:(m,s)=>Math.exp(m+s*randn()),
+  note:(m,s)=>`Median e^μ = ${f3(Math.exp(m))} but mean e^(μ+σ²/2) = ${f3(Math.exp(m+s*s/2))}: the mean exceeds the median by ${f3(100*(Math.exp(s*s/2)-1))}%. Skewness ${f3((Math.exp(s*s)+2)*Math.sqrt(Math.exp(s*s)-1))}.`},
+ beta:{name:'Beta',kind:'c',P:[['a',.3,20,2,.1],['b',.3,20,5,.1]],sup:[0,1],
+  pdf:betapdf,cdf:betacdf,mean:(a,b)=>a/(a+b),var:(a,b)=>a*b/((a+b)*(a+b)*(a+b+1)),skew:(a,b)=>2*(b-a)*Math.sqrt(a+b+1)/((a+b+2)*Math.sqrt(a*b)),kurt:(a,b)=>6*((a-b)*(a-b)*(a+b+1)-a*b*(a+b+2))/(a*b*(a+b+2)*(a+b+3)),rng:()=>[0,1],samp:(a,b)=>betaS(a,b),
+  note:(a,b)=>`Mean a/(a+b) = ${f3(a/(a+b))}; “prior sample size” a+b = ${f3(a+b)} (bigger = tighter). ${a<1&&b<1?'Both parameters below 1 gives a U-shape: mass piles up at 0 and 1.':a===1&&b===1?'Beta(1,1) is the uniform distribution.':a>1&&b>1?'Both above 1: a single bump with mode '+f3((a-1)/(a+b-2))+'.':'One parameter below 1: J-shaped, with a spike at one end.'}`},
+ chisq:{name:'Chi-square',kind:'c',P:[['df k',1,30,4,1]],sup:[0,1e6],
+  pdf:(x,k)=>gampdf(x,k/2,.5),cdf:(x,k)=>gamcdf(x,k/2,.5),mean:k=>k,var:k=>2*k,skew:k=>Math.sqrt(8/k),kurt:k=>12/k,rng:k=>[0,k+5*Math.sqrt(2*k)+5],samp:k=>chiS(k),
+  note:k=>`Mean k = ${k}, variance 2k = ${2*k}. The 95% point is ${f3(qc(x=>gamcdf(x,k/2,.5),0,1e4,.95))} — the critical value for a χ² test with ${k} df.`},
+ t:{name:'Student t',kind:'c',P:[['df ν',1,60,5,1]],sup:[-1e8,1e8],
+  pdf:tpdf,cdf:tCdf,mean:v=>v>1?0:null,var:v=>v>2?v/(v-2):(v>1?Infinity:null),skew:v=>v>3?0:null,kurt:v=>v>4?6/(v-4):(v>2?Infinity:null),rng:()=>[-6,6],samp:v=>randn()/Math.sqrt(chiS(v)/v),
+  note:v=>`${v<=1?'ν = 1 is the Cauchy: no mean, no variance.':v<=2?'With ν ≤ 2 the variance is infinite.':v<=4?'Variance is finite, but kurtosis is infinite (ν ≤ 4).':'All of mean, variance and kurtosis exist.'} Two-sided 5% critical value: ±${f3(qc(x=>tCdf(x,v),0,1e8,.975))} (normal: ±1.960).`},
+ f:{name:'F',kind:'c',P:[['d₁',1,30,5,1],['d₂',1,60,10,1]],sup:[0,1e8],
+  pdf:fpdf,cdf:fcdf,mean:(d1,d2)=>d2>2?d2/(d2-2):null,var:(d1,d2)=>d2>4?2*d2*d2*(d1+d2-2)/(d1*Math.pow(d2-2,2)*(d2-4)):(d2>2?Infinity:null),
+  skew:(d1,d2)=>d2>6?(2*d1+d2-2)*Math.sqrt(8*(d2-4))/((d2-6)*Math.sqrt(d1*(d1+d2-2))):null,kurt:()=>null,rng:()=>[0,5],samp:(d1,d2)=>(chiS(d1)/d1)/(chiS(d2)/d2),
+  note:(d1,d2)=>`The 95% point is ${f3(qc(x=>fcdf(x,d1,d2),0,1e8,.95))}: reject “equal variances” when the ratio exceeds this. Curve shown for x up to 5 only; heavy tails extend beyond.`}
+};
+function dq(d,pv,p){if(d.kind==='d'){let k=0;while(d.cdf(k,...pv)<p&&k<100000)k++;return k}return qc(x=>d.cdf(x,...pv),d.sup[0],d.sup[1],p)}
+
+function explorer(el){
+ const key=el.dataset.explore,d=DS[key];
+ const sl=d.P.map((p,i)=>`<label>${p[0]} <input type="range" data-i="${i}" min="${p[1]}" max="${p[2]}" step="${p[4]}" value="${p[3]}"><output></output></label>`).join('');
+ el.insertAdjacentHTML('beforeend',`<div class="ctl">${sl}<label>x₀ <input type="number" class="x0" step="any" style="width:80px"></label><label><input type="checkbox" class="ov"> overlay normal (same mean &amp; SD)</label><button class="sim">Draw 5,000 samples</button><button class="alt clr">Clear</button></div><canvas></canvas><div class="stats"></div><div class="read"></div>`);
+ const sls=[...el.querySelectorAll('input[type=range]')],x0i=el.querySelector('.x0'),ov=el.querySelector('.ov'),cv=el.querySelector('canvas'),st=el.querySelector('.stats'),rd=el.querySelector('.read');
+ let sim=null;
+ const pvs=()=>sls.map(s=>+s.value);
+ const m0=d.mean(...pvs());x0i.value=m0!=null&&isFinite(m0)?+m0.toFixed(2):0;
+ function draw(){const pv=pvs();sls.forEach(s=>{s.nextElementSibling.textContent=s.value});const x0=+x0i.value,disc=d.kind==='d',[r0,r1]=d.rng(...pv);
+  const m=d.mean(...pv),v=d.var(...pv),sd=(v!==null&&isFinite(v))?Math.sqrt(v):null;let P;
+  if(!disc){let mx=0;for(let i=0;i<=300;i++){const y=d.pdf(r0+(r1-r0)*(.02+.98*i/300),...pv);if(isFinite(y))mx=Math.max(mx,y)}
+   let sd_=null;if(sim){sd_=dens(sim,r0,r1,50);mx=Math.max(mx,Math.min(Math.max.apply(null,sd_),mx*3))}
+   P=mk(cv,r0,r1,mx*1.2||1);
+   P.area(x=>d.pdf(x,...pv),r0,Math.min(x0,r1),'rgba(255,107,129,.35)');
+   if(sd_)bars(P,sd_,r0,r1,null,C.y);
+   P.line(x=>Math.min(d.pdf(x,...pv),mx*1.5),C.a,2.4,r0+(r1-r0)*1e-4,r1,400);
+   if(ov.checked&&sd!==null)P.line(x=>npdf((x-m)/sd)/sd,C.p,2,r0,r1,300,true);
+  }else{let mx=0;for(let k=r0;k<=r1;k++)mx=Math.max(mx,d.pdf(k,...pv));
+   let fr=null;if(sim){fr={};sim.forEach(x=>{fr[x]=(fr[x]||0)+1/sim.length});for(let k=r0;k<=r1;k++)mx=Math.max(mx,fr[k]||0)}
+   P=mk(cv,r0-.7,r1+.7,mx*1.2||1);
+   for(let k=r0;k<=r1;k++){const p=d.pdf(k,...pv);P.g.fillStyle=k<=x0?'rgba(255,107,129,.7)':'rgba(110,168,255,.6)';P.g.fillRect(P.X(k-.38),P.Y(p),P.X(k+.38)-P.X(k-.38),P.Y(0)-P.Y(p))}
+   if(fr)for(let k=r0;k<=r1;k++){P.g.fillStyle=C.y;P.g.beginPath();P.g.arc(P.X(k),P.Y(fr[k]||0),3.6,0,7);P.g.fill()}
+   if(ov.checked&&sd!==null)P.line(x=>npdf((x-m)/sd)/sd,C.p,2,r0-.5,r1+.5,300,true);}
+  if(m!==null&&isFinite(m)&&m>=r0&&m<=r1)P.vline(m,C.y,'mean',true);
+  const pl=d.cdf(x0,...pv),med=dq(d,pv,.5),q5=dq(d,pv,.05),q95=dq(d,pv,.95);
+  st.innerHTML=stat('mean',fv(m),'in')+stat('variance',fv(v),'warn')+stat('SD',sd===null?fv(v):f3(sd),'')+stat('skewness',fv(d.skew(...pv)),'')+stat('excess kurtosis',key==='f'?'—':fv(d.kurt(...pv)),'')+stat('median',f3(med),'')+stat('5% / 95%',f3(q5)+' / '+f3(q95),'')+stat('P(X ≤ x₀)',f3(pl),'hot')+stat('P(X > x₀)',f3(1-pl),'ok');
+  rd.innerHTML=d.note(...pv)+(sim?` Yellow = 5,000 simulated draws (sample mean ${f3(mean(sim))}, sample variance ${f3(vr(sim))}).`:'')+` Shaded/red region: everything at or below x₀ = ${x0}.`}
+ sls.forEach(s=>s.addEventListener('input',()=>{sim=null;draw()}));x0i.addEventListener('input',draw);ov.addEventListener('change',draw);
+ el.querySelector('.sim').onclick=()=>{const pv=pvs();sim=Array.from({length:5000},()=>d.samp(...pv));draw()};
+ el.querySelector('.clr').onclick=()=>{sim=null;draw()};
+ reg(draw);}
+document.querySelectorAll('[data-explore]').forEach(explorer);
+
+/* ---------- Ch1 family map (SVG built from data) ---------- */
+(function(){const N={Bernoulli:[80,40,'a'],Binomial:[250,40,'a'],Poisson:[420,40,'a'],Normal:[590,40,'p'],Beta:[80,140,'y'],Gamma:[250,140,'g'],Exponential:[420,140,'g'],Lognormal:[590,140,'p'],'χ²':[250,250,'t'],F:[250,350,'t'],t:[420,350,'t']};
+ const col={a:'#6ea8ff',p:'#c084fc',y:'#ffd166',g:'#4ade80',t:'#5eead4'};
+ const E=[[135,40,195,40,'sum of n',165,16],[305,40,365,40,'n→∞, np=λ',335,16],[475,40,535,40,'λ large',505,16],
+  [420,57,420,123,'gaps between events',428,94,'start'],[365,140,305,140,'sum of k',335,116],[195,140,135,140,'X/(X+Y)',165,116],
+  [590,57,590,123,'exp( · )',598,94,'start'],[250,157,250,233,'shape k/2, rate ½',258,200,'start'],
+  [300,265,400,333,'Z / √(χ²/ν)',352,296,'start'],[250,267,250,333,'(χ²₁/d₁)/(χ²₂/d₂)',240,305,'end'],[365,350,305,350,'t² = F(1,ν)',335,385]];
+ let s=`<svg viewBox="0 -30 790 430" style="width:100%;height:auto;background:#0e1322;border:1px solid #232a3d;border-radius:12px" role="img" aria-label="Family tree of distributions"><defs><marker id="ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0L10,5L0,10z" fill="#8a93ab"/></marker></defs>`;
+ E.forEach(e=>{s+=`<line x1="${e[0]}" y1="${e[1]}" x2="${e[2]}" y2="${e[3]}" stroke="#8a93ab" stroke-width="1.6" marker-end="url(#ar)"/><text x="${e[5]}" y="${e[6]}" fill="#c3c9dc" font-size="11" text-anchor="${e[7]||'middle'}">${e[4]}</text>`});
+ s+=`<path d="M250,23 C250,-25 590,-25 590,23" fill="none" stroke="#8a93ab" stroke-width="1.6" marker-end="url(#ar)"/><text x="420" y="-18" fill="#c3c9dc" font-size="11" text-anchor="middle">n large (CLT)</text>`;
+ s+=`<path d="M645,40 C770,40 770,250 305,250" fill="none" stroke="#8a93ab" stroke-width="1.6" marker-end="url(#ar)"/><text x="708" y="150" fill="#c3c9dc" font-size="11" text-anchor="start">sum of k Z²</text>`;
+ Object.keys(N).forEach(k=>{const[x,y,c]=N[k];s+=`<rect x="${x-55}" y="${y-17}" width="110" height="34" rx="9" fill="#171d30" stroke="${col[c]}" stroke-width="1.6"/><text x="${x}" y="${y+5}" fill="#e8ebf5" font-size="14" font-weight="600" text-anchor="middle">${k}</text>`});
+ $('map').innerHTML=s+'</svg>';})();
+
+/* ---------- Ch3 binomial -> poisson ---------- */
+(function(){function draw(){const n=val('c3n'),l=Math.min(val('c3l'),n*.99),p=l/n,k1=Math.ceil(l+5*Math.sqrt(l)+3);
+ const pb=k=>k>n?0:binom(n,k,p),pp=k=>Math.exp(-l+k*Math.log(l)-lgamma(k+1));
+ pmfPlot($('c3cv'),0,k1,[{f:pb,type:'bar',color:'rgba(110,168,255,.6)'},{f:pp,type:'dot',color:C.y}]);
+ let tv=0;for(let k=0;k<=Math.max(n,k1)&&k<=400;k++)tv+=Math.abs(pb(k)-pp(k));tv/=2;
+ $('c3st').innerHTML=stat('p = λ/n',f3(p),'in')+stat('binomial variance np(1−p)',f3(n*p*(1-p)),'warn')+stat('Poisson variance λ',f3(l),'ok')+stat('TV distance',f3(tv),tv<.01?'ok':'hot');
+ $('c3rd').innerHTML=`With n = ${n} and p = ${f3(p)} the binomial variance is ${f3(n*p*(1-p))} versus ${f3(l)} for the Poisson: they differ by the factor (1−p). As n grows with λ fixed, p → 0, the factor → 1 and the total-variation distance (${f3(tv)}) shrinks roughly like 1/n.`}
+ on('c3n c3l',draw);reg(draw);})();
+
+/* ---------- Ch4 poisson process ---------- */
+(function(){let res=null;
+ function run(){const l=val('c4l'),T=300,gaps=[];let t=0,cnt=new Array(T).fill(0);for(;;){const g=expS(l);t+=g;if(t>=T)break;gaps.push(g);cnt[Math.floor(t)]++}res={l,gaps,cnt};draw()}
+ function draw(){if(!res)return;const{l,gaps,cnt}=res,s=val('c4s'),hi=6/l;
+  histPlot($('c4cv'),gaps,0,hi,[{f:x=>l*Math.exp(-l*x),color:C.y}],45);
+  const mx=Math.max.apply(null,cnt),c=new Array(mx+1).fill(0);cnt.forEach(k=>c[k]++);
+  pmfPlot($('c4cv2'),0,mx,[{f:k=>c[k]/cnt.length,type:'bar',color:'rgba(110,168,255,.6)'},{f:k=>Math.exp(-l+k*Math.log(l)-lgamma(k+1)),type:'dot',color:C.y}]);
+  const longer=gaps.filter(g=>g>s),resid=longer.map(g=>g-s);
+  $('c4st').innerHTML=stat('events simulated',gaps.length,'in')+stat('mean gap (theory 1/λ)',f3(mean(gaps))+' ('+f3(1/l)+')','ok')+stat('mean count/unit (theory λ)',f3(mean(cnt))+' ('+f3(l)+')','')+stat('var count/unit (theory λ)',f3(vr(cnt)),'warn')+stat('gaps longer than s',longer.length,'')+stat('mean extra wait given > s',longer.length?f3(mean(resid)):'—','hot')+stat('unconditional mean wait',f3(mean(gaps)),'ok');
+  $('c4rd').innerHTML=`Top: gap lengths follow the exponential curve. Bottom: the number of events per unit of time follows the Poisson pmf (mean ≈ variance ≈ λ = ${l}). Memorylessness: among gaps that have already lasted more than s = ${s}, the <i>additional</i> wait averages ${longer.length?f3(mean(resid)):'—'} — essentially the same as the unconditional mean ${f3(mean(gaps))}. The past does not matter.`}
+ on('c4l',run);on('c4s',draw);$('c4go').onclick=run;resizers.push(draw);run();})();
+
+/* ---------- Ch5 gamma sum ---------- */
+(function(){let res=null;
+ function run(){const k=val('c5k'),r=val('c5r');const x=Array.from({length:4000},()=>{let s=0;for(let i=0;i<k;i++)s+=expS(r);return s});res={k,r,x};draw()}
+ function draw(){if(!res)return;const{k,r,x}=res,hi=Math.max(...[(k+5*Math.sqrt(k)+3)/r]);
+  histPlot($('c5cv'),x,0,hi,[{f:t=>gampdf(t,k,r),color:C.y},{f:t=>npdf((t-k/r)/(Math.sqrt(k)/r))/(Math.sqrt(k)/r),color:C.p,dash:true}],50);
+  const sk=skewKurt(x);
+  $('c5st').innerHTML=stat('sample mean',f3(mean(x)),'in')+stat('theory k/rate',f3(k/r),'ok')+stat('sample variance',f3(vr(x)),'in')+stat('theory k/rate²',f3(k/(r*r)),'ok')+stat('sample skewness',f3(sk.sk),'warn')+stat('theory 2/√k',f3(2/Math.sqrt(k)),'ok');
+  $('c5rd').innerHTML=`Yellow = exact Gamma(${k}, ${r}); purple dashed = a normal curve with the same mean and SD. For k = 1 the sum is a single exponential; by k ≈ 20–30 the skew (2/√k = ${f3(2/Math.sqrt(k))}) is small and the normal is a good approximation — the CLT at work.`}
+ on('c5k c5r',run);$('c5go').onclick=run;resizers.push(draw);run();})();
+
+/* ---------- Ch6 normal calculator ---------- */
+(function(){function draw(){const m=val('c6m'),s=Math.max(1e-9,val('c6s')),x=val('c6x'),z=(x-m)/s,p=normCdf(z),tw=2*normSf(Math.abs(z));
+ $('c6st').innerHTML=stat('z-score',f3(z),'in')+stat('P(X ≤ x) — percentile',f3(100*p)+'%','ok')+stat('P(X > x)',f3(1-p),'warn')+stat('P(|X−μ| ≥ |x−μ|)',f3(tw),'hot')+stat('about 1 in',tw>0?f3(1/tw):'∞','');
+ $('c6rd').innerHTML=`x = ${x} is ${f3(Math.abs(z))} standard deviations ${z>=0?'above':'below'} the mean, at the ${f3(100*p)}th percentile. A value this far from the mean (in either direction) occurs about 1 time in ${tw>0?f3(1/tw):'∞'} for a normal population. Try x = ${f3(m+3*s)} (3σ) and x = ${f3(m+5*s)} (5σ).`}
+ on('c6m c6s c6x',draw);draw();})();
+
+/* ---------- Ch7 lognormal products ---------- */
+(function(){let res=null;
+ function run(){const m=val('c7m'),s=val('c7s');const x=Array.from({length:4000},()=>{let l=0;for(let i=0;i<m;i++)l+=s*(2*Math.random()-1);return l});res={m,s,lg:x,pr:x.map(Math.exp)};draw()}
+ function draw(){if(!res)return;const{m,s,lg,pr}=res,mu=mean(lg),sg=Math.sqrt(vr(lg));
+  const hi=Math.exp(mu+3.2*sg);
+  histPlot($('c7cv'),pr,0,hi,[{f:x=>x<=0?0:npdf((Math.log(x)-mu)/sg)/(x*sg),color:C.y}],55);
+  histPlot($('c7cv2'),lg,mu-4*sg,mu+4*sg,[{f:x=>npdf((x-mu)/sg)/sg,color:C.y}],45);
+  const a=skewKurt(pr),b=skewKurt(lg);
+  $('c7st').innerHTML=stat('skewness of product',f3(a.sk),'hot')+stat('skewness of ln(product)',f3(b.sk),'ok')+stat('mean of product',f3(mean(pr)),'in')+stat('median of product',f3(pr.slice().sort((x,y)=>x-y)[2000]),'warn')+stat('mean ÷ median',f3(mean(pr)/pr.slice().sort((x,y)=>x-y)[2000]),'')+stat('fitted σ of ln',f3(sg),'');
+  $('c7rd').innerHTML=`Top: the product (skewed right; yellow = lognormal with the fitted parameters). Bottom: its logarithm — a <i>sum</i> of ${m} independent terms — is symmetric and bell-shaped (skewness ${f3(b.sk)}). More factors → the log gets more normal, and the product more convincingly lognormal. Mean ÷ median ${f3(mean(pr)/pr.slice().sort((x,y)=>x-y)[2000])} ≈ e^(σ²/2).`}
+ on('c7m c7s',run);$('c7go').onclick=run;resizers.push(draw);run();})();
+
+/* ---------- Ch8 chi-square construction ---------- */
+(function(){let res=null;
+ function run(){const mode=$('c8m').value,k=val('c8k');$('c8lab').textContent=mode==='sumz'?'k':'n';const df=mode==='sumz'?k:k-1;
+  if(mode==='svar'&&k<2){$('c8k').value=2}const kk=val('c8k'),dd=mode==='sumz'?kk:kk-1;let x;
+  if(mode==='sumz')x=Array.from({length:5000},()=>{let s=0;for(let i=0;i<kk;i++){const z=randn();s+=z*z}return s});
+  else x=Array.from({length:5000},()=>{const a=Array.from({length:kk},()=>5+3*randn());return(kk-1)*vr(a)/9});
+  res={mode,df:dd,x};draw()}
+ function draw(){if(!res)return;const{mode,df,x}=res,hi=df+5*Math.sqrt(2*df)+4;
+  histPlot($('c8cv'),x,0,hi,[{f:t=>gampdf(t,df/2,.5),color:C.y}],50);
+  const crit=qc(t=>gamcdf(t,df/2,.5),0,1e4,.95),ex=x.filter(v=>v>crit).length/x.length;
+  $('c8st').innerHTML=stat('df',df,'in')+stat('sample mean (theory = df)',f3(mean(x)),'ok')+stat('sample var (theory 2·df)',f3(vr(x)),'ok')+stat('95% critical value',f3(crit),'warn')+stat('share above it (ideal 5%)',f3(100*ex)+'%','hot');
+  $('c8rd').innerHTML=mode==='sumz'?`Adding ${df} squared standard normals produces exactly the χ²(${df}) curve (yellow).`:`Samples of size n = ${df+1} from Normal(5, 3²); the statistic (n−1)s²/σ² uses the <i>true</i> σ² = 9. Notice the degrees of freedom are n − 1, not n: one degree is “used up” estimating the mean — the same n − 1 as in the unbiased variance.`}
+ on('c8m c8k',run);$('c8go').onclick=run;resizers.push(draw);run();})();
+
+/* ---------- Ch9 t statistic ---------- */
+(function(){let res=null;
+ function run(){const n=val('c9n'),T=[];for(let r=0;r<6000;r++){let s=0,q=0;const a=new Array(n);for(let i=0;i<n;i++){a[i]=randn();s+=a[i]}const m=s/n;for(let i=0;i<n;i++)q+=(a[i]-m)*(a[i]-m);T.push(m/Math.sqrt(q/(n-1)/n))}res={n,T};draw()}
+ function draw(){if(!res)return;const{n,T}=res,df=n-1;
+  histPlot($('c9cv'),T,-6,6,[{f:x=>tpdf(x,df),color:C.y},{f:npdf,color:C.p,dash:true}],60);
+  const ex=T.filter(v=>Math.abs(v)>1.96).length/T.length,tc=qc(x=>tCdf(x,df),0,1e8,.975),th=2*(1-tCdf(1.96,df));
+  $('c9st').innerHTML=stat('df = n−1',df,'in')+stat('P(|T| > 1.96) simulated',f3(ex),'hot')+stat('theory under t',f3(th),'ok')+stat('theory under normal','0.0500','warn')+stat('correct 5% critical value',f3(tc),'ok');
+  $('c9rd').innerHTML=`With n = ${n} the real two-sided error rate of the “±1.96” rule is ${f3(100*ex)}%, not 5%. The correct cutoff is ±${f3(tc)}. The t (yellow) tracks the simulation; the normal (purple dashed) understates the tails. By n ≈ 30 the gap is small.`}
+ on('c9n',run);$('c9go').onclick=run;resizers.push(draw);run();})();
+
+/* ---------- Ch10 F ---------- */
+(function(){let res=null;
+ function run(){const n1=val('c10a'),n2=val('c10b');const x=Array.from({length:6000},()=>vr(Array.from({length:n1},randn))/vr(Array.from({length:n2},randn)));res={n1,n2,x};draw()}
+ function draw(){if(!res)return;const{n1,n2,x}=res,d1=n1-1,d2=n2-1;
+  histPlot($('c10cv'),x,0,5,[{f:t=>fpdf(t,d1,d2),color:C.y}],60);
+  const crit=qc(t=>fcdf(t,d1,d2),0,1e8,.95),ex=x.filter(v=>v>crit).length/x.length;
+  $('c10st').innerHTML=stat('F(d₁, d₂)',`F(${d1}, ${d2})`,'in')+stat('sample mean of ratio',f3(mean(x)),'')+stat('theory d₂/(d₂−2)',d2>2?f3(d2/(d2-2)):'undefined','ok')+stat('95% critical value',f3(crit),'warn')+stat('share above it (ideal 5%)',f3(100*ex)+'%','hot');
+  $('c10rd').innerHTML=`Even though both populations have the same variance, the ratio of two sample variances is far from exactly 1 — with n₁ = ${n1}, n₂ = ${n2} the ratio exceeds ${f3(crit)} about 5% of the time. So “variance A is 2× variance B” may mean nothing at small n. Larger samples tighten the ratio around 1.`}
+ on('c10a c10b',run);$('c10go').onclick=run;resizers.push(draw);run();})();
+
+/* ---------- Ch11 beta bayes ---------- */
+(function(){function draw(){const a=val('c11a'),b=val('c11b'),n=val('c11n'),kI=$('c11k');kI.max=n;if(+kI.value>n)kI.value=n;$('c11kv').textContent=kI.value;const k=+kI.value,a2=a+k,b2=b+n-k;
+ const q=(a_,b_,p)=>qc(x=>betacdf(x,a_,b_),0,1,p),hi=Math.min(1,Math.max(q(a,b,.995),q(a2,b2,.995))*1.15),mle=n?k/n:null;
+ let mx=0;for(let i=1;i<=300;i++){const x=hi*i/300;mx=Math.max(mx,Math.min(betapdf(x,a,b),1e9),Math.min(betapdf(x,a2,b2),1e9))}
+ const P=mk($('c11cv'),0,hi,mx*1.15);P.area(x=>betapdf(x,a2,b2),0,hi,'rgba(255,107,129,.25)',300);
+ P.line(x=>Math.min(betapdf(x,a,b),mx*1.4),C.a,2.2,hi*1e-4,hi,300);P.line(x=>Math.min(betapdf(x,a2,b2),mx*1.4),C.r,2.6,hi*1e-4,hi,300);
+ if(mle!==null)P.vline(mle,C.y,'k/n = '+f3(mle),true);P.text('blue: prior   red: posterior',P.w-P.R-6,P.T+12,C.mu,'right');
+ const pm=a2/(a2+b2),w=(a+b)/(a+b+n),lo=q(a2,b2,.025),up=q(a2,b2,.975);
+ $('c11st').innerHTML=stat('prior mean',f3(a/(a+b)),'in')+stat('observed rate k/n',mle===null?'—':f3(mle),'warn')+stat('posterior mean',f3(pm),'hot')+stat('weight on prior',f3(100*w)+'%','')+stat('95% credible interval',`[${f3(lo)}, ${f3(up)}]`,'ok')+stat('posterior Beta',`(${f3(a2)}, ${f3(b2)})`,'');
+ $('c11rd').innerHTML=`Posterior = Beta(a+k, b+n−k) = Beta(${f3(a2)}, ${f3(b2)}). The posterior mean ${f3(pm)} is a weighted average of the prior mean ${f3(a/(a+b))} (weight ${f3(100*w)}%) and the observed rate ${mle===null?'—':f3(mle)} (weight ${f3(100-100*w)}%). ${w>.5?'The prior carries more weight than the data here: with so few loans a raw k/n would be extremely noisy, so the posterior stays near the prior.':'The data now outweigh the prior, so the posterior concentrates near the observed rate.'}`}
+ on('c11a c11b c11n c11k',draw);reg(draw);})();
+
+/* ---------- Ch12 identity verifier ---------- */
+const REL=[
+ {t:'Z² ~ χ²(1)',P:[],samp:()=>{const z=randn();return z*z},pdf:x=>gampdf(x,.5,.5),cdf:x=>gamcdf(x,.5,.5),rng:()=>[0,6],txt:'Square one standard normal.'},
+ {t:'Σ of k squared standard normals ~ χ²(k)',P:[['k',1,25,5,1]],samp:k=>{let s=0;for(let i=0;i<k;i++){const z=randn();s+=z*z}return s},pdf:(x,k)=>gampdf(x,k/2,.5),cdf:(x,k)=>gamcdf(x,k/2,.5),rng:k=>[0,k+5*Math.sqrt(2*k)+4],txt:'Add k squared standard normals.'},
+ {t:'Sum of k Exponential(β) ~ Gamma(k, β)',P:[['k',1,25,4,1],['β',.5,3,1,.1]],samp:(k,b)=>{let s=0;for(let i=0;i<k;i++)s+=expS(b);return s},pdf:(x,k,b)=>gampdf(x,k,b),cdf:(x,k,b)=>gamcdf(x,k,b),rng:(k,b)=>[0,(k+5*Math.sqrt(k)+3)/b],txt:'Add k independent exponential waiting times.'},
+ {t:'Gamma(k/2, rate ½) = χ²(k)',P:[['k',1,25,4,1]],samp:k=>gammaS(k/2)*2,pdf:(x,k)=>gampdf(x,k/2,.5),cdf:(x,k)=>gamcdf(x,k/2,.5),rng:k=>[0,k+5*Math.sqrt(2*k)+4],txt:'Sample a Gamma with shape k/2 and rate ½ (scale 2); compare with the χ² formula.'},
+ {t:'X/(X+Y) ~ Beta(a, b), X~Gamma(a), Y~Gamma(b)',P:[['a',.5,10,2,.5],['b',.5,10,5,.5]],samp:(a,b)=>betaS(a,b),pdf:betapdf,cdf:betacdf,rng:()=>[0,1],txt:'Two independent gammas with the same rate; take the fraction X/(X+Y).'},
+ {t:'Z / √(χ²(ν)/ν) ~ t(ν)',P:[['ν',1,30,5,1]],samp:v=>randn()/Math.sqrt(chiS(v)/v),pdf:tpdf,cdf:tCdf,rng:()=>[-6,6],txt:'A standard normal divided by the root of an independent χ² over its df.'},
+ {t:'(χ²(d₁)/d₁) / (χ²(d₂)/d₂) ~ F(d₁, d₂)',P:[['d₁',1,30,5,1],['d₂',3,60,10,1]],samp:(a,b)=>(chiS(a)/a)/(chiS(b)/b),pdf:fpdf,cdf:fcdf,rng:()=>[0,5],txt:'Ratio of two independent scaled χ² variables.'},
+ {t:'t(ν)² ~ F(1, ν)',P:[['ν',2,40,6,1]],samp:v=>{const t=randn()/Math.sqrt(chiS(v)/v);return t*t},pdf:(x,v)=>fpdf(x,1,v),cdf:(x,v)=>fcdf(x,1,v),rng:()=>[0,5],txt:'Square a Student t variable.'},
+ {t:'exp(Normal(μ, σ²)) ~ Lognormal(μ, σ²)',P:[['μ',-1,2,0,.1],['σ',.2,1.2,.5,.1]],samp:(m,s)=>Math.exp(m+s*randn()),pdf:(x,m,s)=>x<=0?0:npdf((Math.log(x)-m)/s)/(x*s),cdf:(x,m,s)=>x<=0?0:normCdf((Math.log(x)-m)/s),rng:(m,s)=>[0,Math.exp(m+3*s)],txt:'Exponentiate a normal draw.'},
+ {t:'Binomial(n, λ/n) ≈ Poisson(λ)',disc:true,P:[['n',10,500,50,10],['λ',.5,12,3,.5]],samp:(n,l)=>binS(n,Math.min(.99,l/n)),pmf:(k,n,l)=>k<0?0:Math.exp(-l+k*Math.log(l)-lgamma(k+1)),rng:(n,l)=>[0,Math.ceil(l+5*Math.sqrt(l)+3)],txt:'Bars: simulated binomial counts. Dots: Poisson pmf.'},
+ {t:'Poisson(λ) ≈ Normal(λ, λ) for large λ',disc:true,P:[['λ',1,80,30,1]],samp:l=>poisS(l),pmf:(k,l)=>normCdf((k+.5-l)/Math.sqrt(l))-normCdf((k-.5-l)/Math.sqrt(l)),rng:l=>[Math.max(0,Math.floor(l-4.5*Math.sqrt(l))),Math.ceil(l+4.5*Math.sqrt(l))],txt:'Bars: simulated Poisson counts. Dots: normal probability of the interval (k−½, k+½).'},
+ {t:'Binomial(n, p) ≈ Normal(np, np(1−p)) (CLT)',disc:true,P:[['n',5,300,40,5],['p',.05,.95,.4,.05]],samp:(n,p)=>binS(n,p),pmf:(k,n,p)=>{const m=n*p,s=Math.sqrt(n*p*(1-p));return normCdf((k+.5-m)/s)-normCdf((k-.5-m)/s)},rng:(n,p)=>{const m=n*p,s=Math.sqrt(n*p*(1-p));return[Math.max(0,Math.floor(m-4.5*s)),Math.min(n,Math.ceil(m+4.5*s))]},txt:'Bars: simulated binomial counts. Dots: normal probability of the interval (k−½, k+½).'}
+];
+(function(){const sel=$('c12id');REL.forEach((r,i)=>{const o=document.createElement('option');o.value=i;o.textContent=r.t;sel.appendChild(o)});
+ let res=null,pvals=[];
+ function build(){const r=REL[+sel.value];$('c12ps').innerHTML=r.P.map((p,i)=>`<label>${p[0]} <input type="range" data-i="${i}" min="${p[1]}" max="${p[2]}" step="${p[4]}" value="${p[3]}"><output>${p[3]}</output></label>`).join('');
+  [...$('c12ps').querySelectorAll('input')].forEach(s=>s.addEventListener('input',()=>{s.nextElementSibling.textContent=s.value;run()}));run()}
+ function run(){const r=REL[+sel.value];pvals=[...$('c12ps').querySelectorAll('input')].map(s=>+s.value);const N=6000;const x=Array.from({length:N},()=>r.samp(...pvals));res={r,x,pv:pvals};draw()}
+ function draw(){if(!res)return;const{r,x,pv}=res,N=x.length,[lo,hi]=r.rng(...pv);let st;
+  if(r.disc){const fr={};x.forEach(v=>{fr[v]=(fr[v]||0)+1/N});pmfPlot($('c12cv'),lo,hi,[{f:k=>fr[k]||0,type:'bar',color:'rgba(110,168,255,.6)'},{f:k=>r.pmf(k,...pv),type:'dot',color:C.y}]);
+   let tv=0;for(let k=lo;k<=hi;k++)tv+=Math.abs((fr[k]||0)-r.pmf(k,...pv));tv/=2;
+   st=stat('total-variation distance',f3(tv),tv<.04?'ok':'hot')+stat('sample mean',f3(mean(x)),'in')+stat('sample variance',f3(vr(x)),'warn')+stat('sampling noise floor ≈',f3(.5*Math.sqrt((hi-lo+1)/N)),'');
+   $('c12rd').innerHTML=`${r.txt} This is an <b>approximation</b>, not an exact identity: the distance ${f3(tv)} is small but not zero. It shrinks as the limit condition (n or λ large) improves — move the sliders to see.`}
+  else{histPlot($('c12cv'),x,lo,hi,[{f:t=>r.pdf(t,...pv),color:C.y}],55);const s=x.slice().sort((a,b)=>a-b),D=ksD(s,t=>r.cdf(t,...pv)),crit=1.36/Math.sqrt(N);
+   st=stat('KS distance D',f3(D),D<crit?'ok':'hot')+stat('5% threshold 1.36/√N',f3(crit),'warn')+stat('sample mean',f3(mean(x)),'in')+stat('sample variance',f3(vr(x)),'in')+stat('verdict',D<crit?'consistent ✔':'rejected ✘','');
+   $('c12rd').innerHTML=`${r.txt} The yellow curve is the claimed exact distribution. KS D = ${f3(D)} ${D<crit?'is below':'exceeds'} the 5% threshold ${f3(crit)}, so the simulation is ${D<crit?'consistent with the identity (as it should be — it is a theorem)':'unexpectedly far (rare — about 1 run in 20 will exceed the threshold by chance; press Re-simulate)'}.`}
+  $('c12st').innerHTML=st}
+ sel.addEventListener('change',build);$('c12go').onclick=run;resizers.push(draw);build();})();
+
+/* ---------- Ch13 mystery ---------- */
+(function(){const U=(a,b)=>a+(b-a)*Math.random();
+ const MY=[
+  {n:'Normal',g:()=>{const m=U(-5,15),s=U(1,5);return{f:()=>m+s*randn(),d:`μ = ${f3(m)}, σ = ${f3(s)}`,tip:'Symmetric, skewness ≈ 0, excess kurtosis ≈ 0, spans negative and positive values.'}}},
+  {n:'Lognormal',g:()=>{const m=U(0,1.5),s=U(.4,1);return{f:()=>Math.exp(m+s*randn()),d:`μ = ${f3(m)}, σ = ${f3(s)} (of the log)`,tip:'Strictly positive, strong right skew, very long tail (large kurtosis).'}}},
+  {n:'Exponential',g:()=>{const r=U(.2,2);return{f:()=>expS(r),d:`rate = ${f3(r)}`,tip:'Positive, mode at 0, skewness ≈ 2, excess kurtosis ≈ 6, SD ≈ mean.'}}},
+  {n:'Gamma',g:()=>{const a=U(2.5,9),r=U(.3,2);return{f:()=>gammaS(a)/r,d:`shape = ${f3(a)}, rate = ${f3(r)}`,tip:'Positive, mild right skew (2/√shape), a mode away from 0, SD smaller than mean.'}}},
+  {n:'Beta',g:()=>{const a=U(.8,6),b=U(.8,6);return{f:()=>betaS(a,b),d:`a = ${f3(a)}, b = ${f3(b)}`,tip:'Every value lies strictly between 0 and 1.'}}},
+  {n:'Poisson',g:()=>{const l=U(1,12);return{f:()=>poisS(l),d:`λ = ${f3(l)}`,tip:'Integers only, variance ≈ mean.'}}},
+  {n:'Binomial',g:()=>{const n=Math.round(U(8,40)),p=U(.15,.85);return{f:()=>binS(n,p),d:`n = ${n}, p = ${f3(p)}`,tip:'Integers only, bounded above by n, variance below the mean (np(1−p) < np).'}}},
+  {n:'Student t',g:()=>{const v=U(2.5,5);return{f:()=>randn()/Math.sqrt(chiS(v)/v),d:`ν = ${f3(v)}`,tip:'Symmetric around 0 but with extreme outliers: large excess kurtosis.'}}},
+  {n:'Chi-square',g:()=>{const k=Math.round(U(2,10));return{f:()=>chiS(k),d:`k = ${k}`,tip:'Positive, right-skewed, variance ≈ 2 × mean.'}}}
+ ];
+ let cur=null,score=0,tries=0;
+ function neu(){const t=MY[Math.floor(Math.random()*MY.length)],g=t.g();const x=Array.from({length:600},g.f);cur={t,g,x,done:false};$('c13rd').innerHTML='Make your guess, then press Submit.';draw()}
+ function draw(){if(!cur)return;const x=cur.x,sk=skewKurt(x),isInt=x.every(v=>Math.abs(v-Math.round(v))<1e-9),mn=Math.min(...x),mx=Math.max(...x),m=mean(x),v=vr(x);
+  if(isInt){const lo=Math.min(...x),hi=Math.max(...x),fr={};x.forEach(a=>{fr[a]=(fr[a]||0)+1/x.length});pmfPlot($('c13cv'),lo,hi,[{f:k=>fr[k]||0,type:'bar',color:'rgba(110,168,255,.6)'}])}
+  else{const s=x.slice().sort((a,b)=>a-b),lo=s[Math.floor(.005*s.length)],hi=s[Math.floor(.995*s.length)];histPlot($('c13cv'),x,lo,hi,[],40)}
+  $('c13st').innerHTML=stat('all integers?',isInt?'yes':'no',isInt?'hot':'')+stat('min',f3(mn),'in')+stat('max',f3(mx),'in')+stat('mean',f3(m),'')+stat('variance ÷ mean',f3(v/m),'warn')+stat('SD ÷ mean (CV)',f3(Math.sqrt(v)/Math.abs(m)),'')+stat('skewness',f3(sk.sk),'')+stat('excess kurtosis',f3(sk.ku),'')+stat('values in (0,1)?',(mn>=0&&mx<=1)?'yes':'no','')}
+ $('c13new').onclick=neu;
+ $('c13ok').onclick=()=>{if(!cur||cur.done)return;cur.done=true;tries++;const guess=$('c13g').value,right=guess===cur.t.n;if(right)score++;
+  $('c13sc').textContent=`score ${score}/${tries}`;
+  $('c13rd').innerHTML=(right?'✅ <b>Correct</b> — ':`❌ It was <b>${cur.t.n}</b>, you guessed ${guess}. `)+`Generated with ${cur.g.d}. Giveaway: ${cur.g.tip} <i>(Press “New mystery sample” for another.)</i>`};
+ resizers.push(draw);neu();})();
+
+/* ---------- Quiz ---------- */
+const QZ=[
+{l:'Beginner',q:'Which distribution describes the number of defaults in 200 independent loans, each with the same default probability?',o:['Poisson','Binomial','Normal','Exponential'],a:1,e:'Fixed n, same p, independent trials: the definition of the binomial.'},
+{l:'Beginner',q:'Which pair has mean = variance?',o:['Binomial','Exponential','Poisson','Normal'],a:2,e:'Poisson(λ): mean λ and variance λ. A variance far above the mean is the sign of overdispersion.'},
+{l:'Beginner',q:'Events arrive as a Poisson process with rate 3 per hour. The waiting time to the next event is…',o:['Poisson(3)','Exponential with mean 1/3 hour','Normal(3,3)','Binomial'],a:1,e:'Gaps between events are exponential; mean 1/λ = 20 minutes.'},
+{l:'Beginner',q:'A customer has already waited 10 minutes in an exponential queue. The distribution of the remaining wait is…',o:['Shorter than the original','Longer than the original','The same exponential as at the start (memoryless)','Normal'],a:2,e:'Constant hazard: P(X > s+t | X > s) = P(X > t).'},
+{l:'Intermediate',q:'X ~ Lognormal(μ, σ²). Which is true?',o:['Mean = median','Mean < median','Mean > median','Mean and median are unrelated'],a:2,e:'Mean = e^(μ+σ²/2) exceeds median e^μ by the factor e^(σ²/2).'},
+{l:'Intermediate',q:'The sum of 5 independent Exponential(β) waiting times has which distribution?',o:['Exponential(5β)','Gamma(shape 5, rate β)','Poisson(5)','Normal(5,5)'],a:1,e:'Sums of independent exponentials with the same rate are Gamma (Erlang).'},
+{l:'Intermediate',q:'If Z₁, Z₂, Z₃ are independent standard normals, Z₁² + Z₂² + Z₃² has…',o:['mean 3, variance 6','mean 3, variance 3','mean 0, variance 3','mean 9, variance 18'],a:0,e:'χ²(3): mean k = 3, variance 2k = 6.'},
+{l:'Intermediate',q:'You compute a 95% interval for a mean from n = 6 observations using ±1.96 standard errors. The true coverage is…',o:['Exactly 95%','Above 95%','Below 95%, because t(5) has heavier tails than the normal','Unknown'],a:2,e:'The critical value for t(5) is 2.57. Using 1.96 undercovers.'},
+{l:'Intermediate',q:'t(ν)² follows…',o:['χ²(ν)','F(1, ν)','Normal','Beta'],a:1,e:'Z²/(χ²ν/ν) = (χ²₁/1)/(χ²ν/ν) = F(1, ν).'},
+{l:'Advanced',q:'Variance equals mean in Poisson; in a Gamma, which relation holds between variance and mean (at fixed rate)?',o:['Variance = mean','Variance = mean/rate','Variance = mean²/shape (CV constant at 1/√shape)','Variance is constant'],a:2,e:'Var = a/β² = mean²/a, so the CV = 1/√a. Spread proportional to mean.'},
+{l:'Advanced',q:'A Beta(2, 48) prior for a PD is updated with 3 defaults in 100 loans. The posterior is…',o:['Beta(5, 148)','Beta(5, 145)','Beta(3, 97)','Beta(2, 48)'],a:1,e:'Beta(a+k, b+n−k) = Beta(2+3, 48+97) = Beta(5, 145). Posterior mean 5/150 = 3.3%.'},
+{l:'Advanced',q:'Daily returns show occasional moves beyond 6 SD. Which model is more appropriate than the normal?',o:['Uniform','Student t with small ν (e.g. 4)','Beta','Poisson'],a:1,e:'The t has power-law tails and nests the normal as ν → ∞.'},
+{l:'Advanced',q:'F(d₁, d₂) is the distribution of…',o:['Z/√(χ²/ν)','Ratio of two independent scaled χ² variables','Difference of two normals','Sum of squares of Bernoullis'],a:1,e:'(χ²d₁/d₁)/(χ²d₂/d₂). It is used to compare variances, in ANOVA and regression F-tests.'},
+{l:'Expert',q:'Counts of fraud alerts per day have mean 5 and variance 20. The best model family is…',o:['Poisson(5)','Binomial','Overdispersed counts: negative binomial','Normal(5, 5)'],a:2,e:'Variance ≫ mean violates Poisson. Overdispersion calls for the negative binomial (a gamma-mixture of Poissons).'},
+{l:'Expert',q:'How are the Gamma and Beta related?',o:['They are unrelated','X/(X+Y) is Beta(a,b) when X~Gamma(a), Y~Gamma(b) share the same rate','Beta is the sum of two gammas','Beta is the square of a gamma'],a:1,e:'This is why Dirichlet and Beta models are built from gamma draws.'},
+{l:'Expert',q:'You model ln(claim size) as Normal(8, 1) and report exp(8) = 2,981 as the average claim. This is…',o:['The mean','The median; the mean is e^(8+0.5) ≈ 4,915','Too high','The mode'],a:1,e:'Exponentiating the mean of logs gives the geometric mean / median. Mean = e^(μ+σ²/2).'}
+];
+(function(){const st=store.get('cd_quiz',{});
+ function render(){const box=$('quiz');box.innerHTML='';
+  QZ.forEach((q,i)=>{const d=document.createElement('div');d.className='q'+(st[i]!=null?' done':'');d.innerHTML=`<div class="qh">Q${i+1} · ${q.l}</div><div style="margin:4px 0 6px"><b>${q.q}</b></div>`;
+   q.o.forEach((o,j)=>{const b=document.createElement('button');b.className='opt';b.textContent=o;if(st[i]!=null){if(j===q.a)b.classList.add('good');else if(j===st[i])b.classList.add('bad')}b.onclick=()=>{if(st[i]!=null)return;st[i]=j;store.set('cd_quiz',st);render();meter()};d.appendChild(b)});
+   const e=document.createElement('div');e.className='ex';e.innerHTML=(st[i]===q.a?'✅ ':'❌ ')+q.e;d.appendChild(e);box.appendChild(d)});
+  const ans=Object.keys(st).length,ok=QZ.filter((q,i)=>st[i]===q.a).length;
+  $('qscore').innerHTML=stat('answered',ans+' / '+QZ.length,'in')+stat('correct',ok,'ok')+stat('score',ans?Math.round(100*ok/ans)+'%':'—',ok/Math.max(ans,1)>=.8?'ok':'warn')+stat('verdict',ans<QZ.length?'keep going':ok>=14?'distribution master':ok>=11?'strong':'review ch. 7–11','')}
+ $('qreset').onclick=()=>{Object.keys(st).forEach(k=>delete st[k]);store.set('cd_quiz',st);render();meter()};
+ window.__qst=st;render();})();
+const CHK=['Draw the family map from memory and label each arrow with its operation.','Derive the mean and variance of the binomial from Bernoulli indicators.','State the three binomial assumptions and a banking example that violates each.','Explain why the Poisson is the limit of the binomial and when mean = variance fails.','Connect Poisson counts to exponential gaps and explain memorylessness.','Explain Gamma as a sum of exponentials and avoid the rate/scale mix-up.','Standardise a normal value and convert z-scores to tail probabilities.','Explain why the lognormal mean exceeds its median and avoid the back-transform trap.','Construct χ², t and F from standard normals and explain each use.','Explain why n − 1 degrees of freedom appear for the sample variance.','State the conjugate update Beta(a,b) + k of n → Beta(a+k, b+n−k).','Choose a candidate distribution from support, variance–mean relation and tails.','Recognise overdispersion and name the standard fixes.','Verify at least three identities by simulation in Lab 11.'];
+(function(){const st=store.get('cd_chk',{}),box=$('chk');CHK.forEach((t,i)=>{const l=document.createElement('label'),c=document.createElement('input');c.type='checkbox';c.checked=!!st[i];c.onchange=()=>{st[i]=c.checked;store.set('cd_chk',st);meter()};l.appendChild(c);const s=document.createElement('span');s.textContent=t;l.appendChild(s);box.appendChild(l)});window.__cst=st;})();
+function meter(){const q=window.__qst||{},c=window.__cst||{};const ok=QZ.filter((x,i)=>q[i]===x.a).length,ck=Object.values(c).filter(Boolean).length;const pc=Math.round(100*(.6*ok/QZ.length+.4*ck/CHK.length));$('mtxt').textContent='Mastery: '+pc+'%  (exam + checklist)';$('mbar').style.width=pc+'%';store.set('mastery_cd',pc)}
+meter();
+
+/* ---------- Navigation ---------- */
+(function(){const nav=$('nav');let html='';
+ document.querySelectorAll('main .part, main section.ch').forEach(el=>{if(el.classList.contains('part'))html+=`<div class="pt">${el.textContent}</div>`;else{const h=el.querySelector('h2'),num=h.querySelector('.num').textContent,t=Array.from(h.childNodes).filter(n=>n.nodeType===3).map(n=>n.textContent).join('').trim();html+=`<a href="#${el.id}" data-id="${el.id}">${num}. ${t}</a>`}});
+ nav.innerHTML=html;const links=nav.querySelectorAll('a'),io=new IntersectionObserver(es=>{es.forEach(e=>{if(e.isIntersecting)links.forEach(a=>a.classList.toggle('on',a.dataset.id===e.target.id))})},{rootMargin:'-20% 0px -70% 0px'});
+ document.querySelectorAll('section.ch').forEach(s=>io.observe(s));
+ $('menu').onclick=()=>$('side').classList.toggle('open');nav.addEventListener('click',e=>{if(e.target.tagName==='A')$('side').classList.remove('open')});
+ window.addEventListener('scroll',()=>{const h=document.documentElement;$('prog').style.width=(100*h.scrollTop/(h.scrollHeight-h.clientHeight))+'%'},{passive:true});})();
+</script>
+</body>
+</html>

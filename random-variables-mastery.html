@@ -1,0 +1,712 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Random Variables Mastery — expectation, variance, covariance</title>
+<style>
+:root{--bg:#0b0e17;--panel:#121726;--panel2:#171d30;--line:#232a3d;--fg:#e8ebf5;--mu:#8a93ab;--a:#6ea8ff;--r:#ff6b81;--y:#ffd166;--g:#4ade80;--p:#c084fc;--t:#5eead4}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;background:var(--bg);color:var(--fg);font:16px/1.7 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+a{color:var(--a)}
+#prog{position:fixed;top:0;left:0;height:3px;background:linear-gradient(90deg,var(--a),var(--p),var(--r));width:0;z-index:50}
+.side{position:fixed;left:0;top:0;bottom:0;width:290px;background:#0e1220;border-right:1px solid var(--line);overflow:auto;padding:18px 14px 90px;z-index:40;transition:transform .25s}
+.side h1{font-size:15px;margin:0 0 2px}
+.side small{color:var(--mu)}
+.side .pt{margin:16px 0 4px;font-size:11px;text-transform:uppercase;letter-spacing:1.3px;color:var(--p)}
+.side a{display:block;color:var(--mu);text-decoration:none;padding:5px 9px;border-radius:7px;font-size:13.5px;line-height:1.35}
+.side a:hover{background:var(--panel);color:var(--fg)}
+.side a.on{background:var(--panel2);color:var(--fg);box-shadow:inset 3px 0 var(--a)}
+.meter{position:fixed;left:0;bottom:0;width:290px;background:#0e1220;border-top:1px solid var(--line);padding:10px 16px;z-index:41;font-size:12px;color:var(--mu)}
+.meter .bar{height:7px;background:var(--line);border-radius:6px;margin-top:5px;overflow:hidden}
+.meter .bar i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--g),var(--t));transition:width .4s}
+#menu{display:none;position:fixed;top:10px;left:10px;z-index:60;background:var(--panel2);color:var(--fg);border:1px solid var(--line);border-radius:9px;padding:7px 12px;font-size:14px;cursor:pointer}
+main{margin-left:290px;padding:0 34px 120px;max-width:1090px}
+.hero{padding:70px 0 30px}
+.hero h1{font-size:clamp(32px,5vw,56px);line-height:1.08;margin:0 0 14px;background:linear-gradient(100deg,#fff,var(--t) 45%,var(--a));-webkit-background-clip:text;background-clip:text;color:transparent}
+.hero p{font-size:19px;color:#c3c9dc;max-width:780px}
+.chips{display:flex;flex-wrap:wrap;gap:8px;margin:18px 0}
+.chip{border:1px solid var(--line);background:var(--panel);padding:5px 12px;border-radius:99px;font-size:13px;color:var(--mu)}
+.chip b{color:var(--fg)}
+.part{margin:90px 0 0;padding-top:22px;border-top:1px solid var(--line);font-size:12px;letter-spacing:2px;text-transform:uppercase;color:var(--p)}
+section.ch{padding-top:30px}
+h2{font-size:30px;line-height:1.2;margin:10px 0 8px;display:flex;gap:12px;align-items:center;flex-wrap:wrap}
+h2 .num{display:inline-grid;place-items:center;width:40px;height:40px;border-radius:12px;background:var(--panel2);border:1px solid var(--line);font-size:18px;color:var(--a)}
+.lvl{font-size:11px;font-weight:600;letter-spacing:.8px;text-transform:uppercase;padding:3px 9px;border-radius:99px;border:1px solid}
+.lvl.b{color:var(--g);border-color:#1f5c3a}.lvl.i{color:var(--a);border-color:#244a85}.lvl.a{color:var(--y);border-color:#6b5420}.lvl.e{color:var(--r);border-color:#7a2c3a}
+h3{font-size:19px;margin:30px 0 6px;color:#fff}
+p{margin:10px 0}li{margin:5px 0}
+code,.f{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace}
+code{background:var(--panel2);padding:1px 6px;border-radius:5px;font-size:.9em}
+.f{display:block;background:#0e1322;border:1px solid var(--line);border-left:3px solid var(--a);padding:12px 16px;border-radius:9px;margin:14px 0;overflow-x:auto;font-size:15px;color:#dbe4ff;line-height:1.8}
+.co{border-radius:12px;padding:13px 17px;margin:16px 0;border:1px solid var(--line);background:var(--panel)}
+.co>b:first-child{display:block;margin-bottom:2px;font-size:12px;letter-spacing:1px;text-transform:uppercase}
+.co.def{border-left:4px solid var(--a)}.co.def>b:first-child{color:var(--a)}
+.co.warn{border-left:4px solid var(--r)}.co.warn>b:first-child{color:var(--r)}
+.co.tip{border-left:4px solid var(--g)}.co.tip>b:first-child{color:var(--g)}
+.co.key{border-left:4px solid var(--y);background:#171608}.co.key>b:first-child{color:var(--y)}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:18px 20px;margin:22px 0;box-shadow:0 8px 30px rgba(0,0,0,.25)}
+.card>h4{margin:0 0 3px;font-size:13px;letter-spacing:1.2px;text-transform:uppercase;color:var(--t)}
+.card>p.sub{margin:0 0 12px;color:var(--mu);font-size:14.5px}
+.ctl{display:flex;flex-wrap:wrap;gap:10px 22px;align-items:center;margin:8px 0 10px}
+.ctl label{display:flex;gap:8px;align-items:center;font-size:14px;color:#c3c9dc}
+.ctl output{min-width:38px;font-family:ui-monospace,monospace;color:var(--y);font-size:13px}
+input[type=range]{accent-color:var(--a);width:150px}
+select,input[type=number],input[type=text]{background:#0e1322;color:var(--fg);border:1px solid var(--line);border-radius:8px;padding:6px 9px;font:inherit;font-size:14px}
+button{background:linear-gradient(180deg,#2c4a80,#233b68);color:#fff;border:1px solid #3a5a98;border-radius:9px;padding:7px 14px;font:inherit;font-size:14px;cursor:pointer}
+button:hover{filter:brightness(1.15)}
+button.alt{background:var(--panel2);border-color:var(--line);color:var(--fg)}
+canvas{width:100%;height:270px;display:block;background:#0e1322;border:1px solid var(--line);border-radius:10px;margin-top:6px}
+canvas.sm{height:200px}canvas.tl{height:340px}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(125px,1fr));gap:9px;margin:12px 0}
+.stat{background:#0e1322;border:1px solid var(--line);border-radius:10px;padding:8px 11px}
+.stat b{display:block;font-size:18px;font-family:ui-monospace,monospace}
+.stat span{font-size:11.5px;color:var(--mu);text-transform:uppercase;letter-spacing:.7px}
+.stat.hot b{color:var(--r)}.stat.ok b{color:var(--g)}.stat.warn b{color:var(--y)}.stat.in b{color:var(--a)}
+.read{margin:8px 0 0;padding:10px 14px;background:#0e1322;border:1px dashed #33406a;border-radius:10px;font-size:14.5px;color:#d3dbf3}
+table{border-collapse:collapse;width:100%;margin:12px 0;font-size:14px}
+th,td{border:1px solid var(--line);padding:7px 10px;text-align:left;vertical-align:top}
+th{background:var(--panel2);font-size:12px;text-transform:uppercase;letter-spacing:.6px;color:var(--mu)}
+td.n{font-family:ui-monospace,monospace;text-align:right}
+.tw{overflow-x:auto}
+table.grid td{text-align:center;font-family:ui-monospace,monospace;padding:5px 8px;width:14%}
+.pill{display:inline-block;padding:1px 9px;border-radius:99px;font-size:12px;font-weight:600}
+.pill.r{background:#3a1520;color:var(--r)}.pill.g{background:#10321f;color:var(--g)}.pill.y{background:#3a2f0e;color:var(--y)}.pill.m{background:#202637;color:var(--mu)}
+details{background:var(--panel);border:1px solid var(--line);border-radius:11px;padding:9px 15px;margin:9px 0}
+details summary{cursor:pointer;font-weight:600}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.q{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:14px 18px;margin:14px 0}
+.q .qh{font-size:12px;letter-spacing:1px;text-transform:uppercase;color:var(--mu)}
+.q .opt{display:block;width:100%;text-align:left;margin:6px 0;background:#0e1322;border:1px solid var(--line);color:var(--fg);border-radius:9px;padding:9px 12px}
+.q .opt.good{border-color:var(--g);background:#0e2418}.q .opt.bad{border-color:var(--r);background:#2a1119}
+.q .ex{display:none;margin-top:8px;font-size:14.5px;color:#c3c9dc}
+.q.done .ex{display:block}
+.chk label{display:flex;gap:10px;align-items:flex-start;padding:6px 0;cursor:pointer}
+.chk input{margin-top:6px;accent-color:var(--g);width:17px;height:17px}
+.legend{display:flex;gap:14px;flex-wrap:wrap;font-size:13px;color:var(--mu);margin-top:6px}
+.legend i{display:inline-block;width:11px;height:11px;border-radius:50%;margin-right:5px;vertical-align:-1px}
+@media(max-width:900px){
+ .side{transform:translateX(-100%)}.side.open{transform:none}.meter{display:none}
+ #menu{display:block}main{margin-left:0;padding:0 16px 100px}.two{grid-template-columns:1fr}.hero{padding-top:60px}
+}
+</style>
+</head>
+<body>
+<div id="prog"></div>
+<button id="menu">☰ Contents</button>
+<nav class="side" id="side"><a href="index.html" style="color:#5eead4;padding-left:0;margin-bottom:6px">← All courses</a><h1>Random Variables Mastery</h1><small>15 chapters · 14 labs · exam</small><div id="nav"></div></nav>
+<div class="meter"><div id="mtxt">Mastery: 0%</div><div class="bar"><i id="mbar"></i></div></div>
+
+<main>
+<header class="hero">
+ <h1>Random variables, expectation, variance &amp; covariance.</h1>
+ <p>These four ideas are the grammar of all statistics and machine learning. Regression, risk models, p-values, PCA, portfolio theory and credit-loss distributions are all sentences written in them. Learn them until they feel obvious, and everything downstream gets easier.</p>
+ <div class="chips"><span class="chip"><b>Part I</b> One variable</span><span class="chip"><b>Part II</b> Several variables</span><span class="chip"><b>Part III</b> Estimation &amp; tails</span><span class="chip"><b>Part IV</b> Geometry, bounds, risk</span></div>
+ <div class="co tip"><b>How to use this</b>Every idea has a lab. Move the sliders until you can predict what the numbers will do <em>before</em> they change; that prediction habit is what “mastery” means. Chapter 15 has an exam and checklist; progress saves in your browser.</div>
+</header>
+
+<!-- ============ PART I ============ -->
+<div class="part">Part I · One variable</div>
+
+<section class="ch" id="c1">
+<h2><span class="num">1</span>What a random variable really is <span class="lvl b">Beginner</span></h2>
+<p>Despite the name, a random variable is neither random nor a variable. It is a <b>function</b>: a rule that takes the outcome of a random experiment and returns a <b>number</b>.</p>
+<div class="co def"><b>Definition</b>An experiment has a sample space Ω (all possible outcomes) and probabilities on it. A random variable is a function X : Ω → ℝ. The randomness lives in <em>which outcome occurs</em>; X just reads off a number from it.</div>
+<p>Roll two dice: the outcome is a pair like (3, 5). The <i>sum</i>, the <i>maximum</i>, the <i>product</i> and “was it a double?” are four different random variables defined on the same experiment. Same randomness, different numbers read off. In a bank: the experiment is “pick a customer”; PD flag, balance, number of transactions and days past due are all random variables on that one experiment.</p>
+<div class="card">
+ <h4>Lab 1 · One experiment, many random variables</h4>
+ <p class="sub">The grid is the sample space (36 equally likely outcomes). Choose the rule X; each cell shows the number X assigns. The bars are the distribution of X, computed exactly. “Roll” adds real simulated rolls on top.</p>
+ <div class="ctl"><label>Random variable X <select id="c1rv">
+  <option value="sum">sum of the dice</option><option value="max">maximum</option><option value="min">minimum</option><option value="diff">|difference|</option><option value="prod">product</option><option value="dbl">1 if double, else 0</option><option value="six">number of sixes</option></select></label>
+  <button id="c1roll">Roll 1,000 times</button><button class="alt" id="c1clr">Clear rolls</button></div>
+ <div class="tw"><div id="c1grid"></div></div>
+ <canvas class="sm" id="c1cv"></canvas><div class="stats" id="c1st"></div><div class="read" id="c1rd"></div>
+</div>
+<p><b>Discrete vs continuous.</b> If X takes countable values (dice, counts of defaults) it is <b>discrete</b> and described by probabilities of exact values. If X can take any value in an interval (a balance, a time) it is <b>continuous</b>, and any <em>single</em> exact value has probability 0 — only intervals get probability. Many real variables are mixed (a balance that is exactly 0 for many customers, continuous otherwise).</p>
+<div class="co warn"><b>Notation trap</b>Capital X is the random variable (the rule). Lower-case x is a particular number it might produce. P(X = x) reads “the probability that the rule returns x”. Mixing them up is the root of a lot of confusion later.</div>
+</section>
+
+<section class="ch" id="c2">
+<h2><span class="num">2</span>PMF, PDF and CDF <span class="lvl b">Beginner</span></h2>
+<p>The <b>distribution</b> of X says how probability is spread over its possible values. Three equivalent descriptions:</p>
+<ul>
+ <li><b>PMF</b> (discrete): <code>p(x) = P(X = x)</code>. Probabilities, so 0 ≤ p ≤ 1 and Σ p(x) = 1.</li>
+ <li><b>PDF</b> (continuous): <code>f(x)</code> with <code>P(a ≤ X ≤ b) = ∫ₐᵇ f(x) dx</code>. A <em>density</em>, not a probability: it can exceed 1 (a narrow spike), and it integrates to 1.</li>
+ <li><b>CDF</b> (both): <code>F(x) = P(X ≤ x)</code>. Always rising from 0 to 1. It is the universal description: <code>P(a &lt; X ≤ b) = F(b) − F(a)</code>, and its inverse is the <b>quantile function</b> (percentiles, VaR).</li>
+</ul>
+<div class="card">
+ <h4>Lab 2 · Distribution explorer</h4>
+ <p class="sub">Pick a distribution and its parameters, then choose an interval [lo, hi]. The shaded area (or highlighted bars) is the probability. The lower chart is the CDF: read the same probability as the vertical gap between two points.</p>
+ <div class="ctl">
+  <label>Distribution <select id="c2d"><option value="normal">Normal</option><option value="uniform">Uniform</option><option value="exponential">Exponential</option><option value="lognormal">Lognormal</option><option value="binomial">Binomial</option><option value="poisson">Poisson</option></select></label>
+  <label id="c2l1"><span id="c2n1">μ</span> <input type="range" id="c2p1" min="-5" max="5" step="0.1" value="0"><output id="c2p1v"></output></label>
+  <label id="c2l2"><span id="c2n2">σ</span> <input type="range" id="c2p2" min="0.2" max="4" step="0.1" value="1"><output id="c2p2v"></output></label>
+ </div>
+ <div class="ctl"><label>lo <input type="number" id="c2lo" step="0.1" style="width:90px"></label><label>hi <input type="number" id="c2hi" step="0.1" style="width:90px"></label></div>
+ <canvas id="c2cv"></canvas><canvas class="sm" id="c2fcv"></canvas>
+ <div class="stats" id="c2st"></div><div class="read" id="c2rd"></div>
+</div>
+<p><b>The distributions to know cold:</b> Bernoulli/Binomial (counts of successes: defaults, fraud flags), Poisson (event counts in a period), Exponential (waiting times), Uniform, Normal (sums and averages), Lognormal (positive, right-skewed: balances, claim sizes, transaction amounts). Try each one and notice how mean and variance depend on the parameters.</p>
+</section>
+
+<section class="ch" id="c3">
+<h2><span class="num">3</span>Expectation and the law of large numbers <span class="lvl b">Beginner</span></h2>
+<p>The <b>expectation</b> (mean) of X is its probability-weighted average: the long-run average you would see over infinitely many repetitions, and the balance point of the distribution.</p>
+<div class="f">discrete:    E[X] = Σ x · p(x)<br>continuous:  E[X] = ∫ x · f(x) dx</div>
+<h3>Four rules that do most of the work</h3>
+<ol>
+ <li><b>Linearity:</b> <code>E[aX + b] = a·E[X] + b</code> and <code>E[X + Y] = E[X] + E[Y]</code> — <u>always</u>, even if X and Y are dependent. This is the most useful fact in probability; it turns hard counting problems into easy sums of indicators.</li>
+ <li><b>Indicators:</b> for an event A, <code>E[1_A] = P(A)</code>. Expected number of defaults in a portfolio = Σ PDᵢ, no matter how correlated they are.</li>
+ <li><b>LOTUS</b> (law of the unconscious statistician): <code>E[g(X)] = Σ g(x) p(x)</code> — you don’t need the distribution of g(X), just that of X.</li>
+ <li><b>Jensen:</b> <code>E[g(X)] ≠ g(E[X])</code> in general. For convex g, <code>E[g(X)] ≥ g(E[X])</code>. So E[X²] ≥ (E[X])², E[1/X] ≥ 1/E[X], and the average of a lognormal is above exp of the average of its log.</li>
+</ol>
+<p>The <b>law of large numbers</b> says sample averages converge to E[X] as n grows. The next lab lets you watch it — and watch it <em>fail</em> when the mean does not exist.</p>
+<div class="card">
+ <h4>Lab 3 · Five running averages racing toward the mean</h4>
+ <p class="sub">Each coloured line is an independent sequence of draws; the y-value is the average of the first n. The x-axis is log₁₀ n. The dashed line is the true mean. Try Cauchy last.</p>
+ <div class="ctl">
+  <label>Distribution <select id="c3d"><option value="unif">Uniform(0,1)</option><option value="expo">Exponential(1)</option><option value="bern">Bernoulli(0.1)</option><option value="logn">Lognormal(0, 1.5) — heavy tail</option><option value="cauchy">Cauchy — has NO mean</option></select></label>
+  <label>Draws N <input type="range" id="c3n" min="1000" max="100000" step="1000" value="20000"><output id="c3nv"></output></label>
+  <button id="c3go">Resample</button></div>
+ <canvas id="c3cv"></canvas><div class="read" id="c3rd"></div>
+</div>
+<div class="co key"><b>Convergence has a speed, and sometimes no destination</b>For finite variance σ², the sample mean wobbles around E[X] with size σ/√n — to halve the error you need 4× the data. For the lognormal, rare giant values keep yanking the average (slow convergence). For the Cauchy, the average of n draws has <em>exactly the same distribution as a single draw</em>: averaging buys you nothing, because the mean doesn’t exist.</div>
+</section>
+
+<section class="ch" id="c4">
+<h2><span class="num">4</span>Variance, standard deviation and transformations <span class="lvl b">Beginner</span></h2>
+<p>The mean tells you where the distribution sits; the <b>variance</b> tells you how widely it is spread: the average squared distance from the mean.</p>
+<div class="f">Var(X) = E[(X − μ)²] = E[X²] − (E[X])²     SD(X) = √Var(X)</div>
+<p>Squaring makes distances positive and punishes big deviations; SD brings the unit back to X’s own units. The shortcut formula <code>E[X²] − μ²</code> is also the Jensen gap: variance <em>is</em> how much E[X²] exceeds (E[X])².</p>
+<div class="f">Var(aX + b) = a² · Var(X)          (shifting does nothing; scaling squares)<br>Var(X + Y) = Var X + Var Y + 2 Cov(X,Y)     (Chapter 7)<br>Independent X, Y:  Var(X + Y) = Var(X − Y) = Var X + Var Y   — <u>both add</u></div>
+<div class="card">
+ <h4>Lab 4 · Build new random variables from X ~ Normal(3, σ²)</h4>
+ <p class="sub">X is blue outline. The new variable T is filled. Compare simulated mean/variance with the formulas. Then pick “X + X” and see why it is <i>not</i> “X + independent copy”.</p>
+ <div class="ctl">
+  <label>Build T = <select id="c4o"><option value="aff">a·X + b</option><option value="sum">X + Y (Y independent, N(1, 1.5²))</option><option value="dif">X − Y (Y independent)</option><option value="xx">X + X (same variable twice)</option></select></label>
+  <label>a <input type="range" id="c4a" min="-3" max="3" step="0.1" value="2"><output id="c4av"></output></label>
+  <label>b <input type="range" id="c4b" min="-10" max="10" step="0.5" value="1"><output id="c4bv"></output></label>
+  <label>σ of X <input type="range" id="c4s" min="0.5" max="4" step="0.1" value="2"><output id="c4sv"></output></label>
+  <button class="alt" id="c4re">Resample</button></div>
+ <canvas id="c4cv"></canvas><div class="tw"><div id="c4tb"></div></div><div class="read" id="c4rd"></div>
+</div>
+</section>
+
+<!-- ============ PART II ============ -->
+<div class="part">Part II · Several variables</div>
+
+<section class="ch" id="c5">
+<h2><span class="num">5</span>Joint, marginal and conditional distributions <span class="lvl i">Intermediate</span></h2>
+<p>Real problems involve several variables at once. The <b>joint distribution</b> of (X, Y) assigns probability to pairs. From it you can get:</p>
+<ul>
+ <li><b>Marginals:</b> sum/integrate out the other variable: <code>p<sub>X</sub>(x) = Σ<sub>y</sub> p(x, y)</code>. Forget Y and look only at X.</li>
+ <li><b>Conditionals:</b> slice and renormalise: <code>p(y | x) = p(x, y) / p<sub>X</sub>(x)</code>. “What does Y look like <em>given</em> X = x?”</li>
+ <li><b>Independence:</b> p(x, y) = p<sub>X</sub>(x) · p<sub>Y</sub>(y) for all x, y — knowing X tells you nothing about Y. Equivalent: every conditional equals the marginal.</li>
+</ul>
+<p>For a bivariate normal with standard marginals and correlation ρ, the conditional law has a clean closed form:</p>
+<div class="f">Y | X = x  ~  Normal( ρ·x ,  1 − ρ² )      — mean moves with x; spread shrinks by the factor (1 − ρ²)</div>
+<div class="card">
+ <h4>Lab 5 · Slice the cloud</h4>
+ <p class="sub">1,500 points from a bivariate normal. Yellow points are those with X inside the narrow band around your chosen x. Their average height and spread are the <b>conditional</b> mean and SD of Y.</p>
+ <div class="ctl"><label>Correlation ρ <input type="range" id="c5r" min="-0.95" max="0.95" step="0.05" value="0.7"><output id="c5rv"></output></label>
+ <label>Condition on x ≈ <input type="range" id="c5c" min="-2.5" max="2.5" step="0.1" value="1.5"><output id="c5cv_"></output></label><button class="alt" id="c5re">Resample</button></div>
+ <canvas class="tl" id="c5cv"></canvas><div class="stats" id="c5st"></div><div class="read" id="c5rd"></div>
+</div>
+<p>Notice: conditioning <em>reduces uncertainty</em> (conditional SD &lt; marginal SD of 1) exactly when ρ ≠ 0. That reduction is what a predictive model exploits. Regression, in one sentence, is “estimate E[Y | X]”.</p>
+</section>
+
+<section class="ch" id="c6">
+<h2><span class="num">6</span>Covariance and correlation <span class="lvl i">Intermediate</span></h2>
+<p><b>Covariance</b> measures whether two variables move together: the average product of their deviations from their means.</p>
+<div class="f">Cov(X, Y) = E[(X − μₓ)(Y − μ_y)] = E[XY] − E[X]·E[Y]<br>Corr(X, Y) = ρ = Cov(X, Y) / (SD(X) · SD(Y))        always −1 ≤ ρ ≤ 1</div>
+<p>Covariance has units (dollars × days…) and no natural scale; correlation divides the units away. <b>Correlation measures only <em>linear</em> association</b> — and is wrecked by outliers. Two variables can be perfectly dependent and have correlation zero.</p>
+<div class="card">
+ <h4>Lab 6 · Five scatterplots, one correlation number</h4>
+ <p class="sub">Each pattern has a very different story. Compare Pearson r (linear), Spearman (monotone, rank-based), and covariance.</p>
+ <div class="ctl"><label>Pattern <select id="c6p"><option value="lin">Linear relationship</option><option value="par">Parabola: Y = X² + noise</option><option value="cir">Circle</option><option value="out">No relation + ONE outlier</option><option value="sim">Three groups (Simpson)</option></select></label>
+ <label>ρ (linear only) <input type="range" id="c6r" min="-0.95" max="0.95" step="0.05" value="0.6"><output id="c6rv"></output></label><button class="alt" id="c6re">Resample</button></div>
+ <canvas class="tl" id="c6cv"></canvas><div class="stats" id="c6st"></div><div class="read" id="c6rd"></div>
+</div>
+<div class="co key"><b>Independent ⇒ uncorrelated, but NOT the reverse</b>If X and Y are independent, Cov = 0. The parabola and the circle show the converse is false: strong, perfectly structured dependence with r ≈ 0. And in the “three groups” pattern, the pooled correlation is strongly positive although <em>within every group</em> it is negative: Simpson’s paradox — the cause of many wrong conclusions from aggregated data.</div>
+</section>
+
+<section class="ch" id="c7">
+<h2><span class="num">7</span>Variance of sums, and why diversification works <span class="lvl i">Intermediate</span></h2>
+<p>The single most reused formula in quantitative finance and risk:</p>
+<div class="f">Var(aX + bY) = a²·Var(X) + b²·Var(Y) + 2ab·Cov(X, Y)<br>general:  Var(Σ wᵢXᵢ) = Σᵢ Σⱼ wᵢ wⱼ Cov(Xᵢ, Xⱼ)  =  wᵀ Σ w</div>
+<p>With ρ = 1 the SDs just add; with ρ &lt; 1 they add <em>less</em> than that. Combining imperfectly correlated pieces shrinks risk, and the lower the correlation, the larger the saving. Conversely, positive correlation among many small risks leaves a stubborn floor of risk that no amount of adding more of them can remove — the core of Chapter 14.</p>
+<div class="card">
+ <h4>Lab 7 · Two-asset portfolio</h4>
+ <p class="sub">Weight w in asset A, 1 − w in asset B. Thick curve = portfolio SD at your ρ. Thin lines = ρ = +1 (no benefit), 0 and −1. The marker is your chosen weight.</p>
+ <div class="ctl">
+  <label>σ A % <input type="range" id="c7sa" min="5" max="40" value="20"><output id="c7sav"></output></label>
+  <label>σ B % <input type="range" id="c7sb" min="5" max="40" value="10"><output id="c7sbv"></output></label>
+  <label>E[R] A % <input type="range" id="c7ma" min="0" max="20" value="9"><output id="c7mav"></output></label>
+  <label>E[R] B % <input type="range" id="c7mb" min="0" max="20" value="5"><output id="c7mbv"></output></label>
+  <label>ρ <input type="range" id="c7r" min="-1" max="1" step="0.05" value="0.2"><output id="c7rv"></output></label>
+  <label>weight in A <input type="range" id="c7w" min="0" max="1" step="0.01" value="0.4"><output id="c7wv"></output></label>
+ </div>
+ <canvas id="c7cv"></canvas><div class="stats" id="c7st"></div><div class="read" id="c7rd"></div>
+</div>
+<p>Notice two things: expectation is linear (portfolio return is just the weighted average, correlation irrelevant), but variance is <em>not</em> — it depends on the covariance. And with low ρ the minimum-variance portfolio can have <b>lower SD than either asset alone</b>.</p>
+</section>
+
+<section class="ch" id="c8">
+<h2><span class="num">8</span>Conditional expectation and the law of total variance <span class="lvl a">Advanced</span></h2>
+<p>E[Y | X] is itself a random variable (a function of X). Two laws govern it:</p>
+<div class="f">Law of total expectation:  E[Y] = E[ E[Y | X] ]<br>Law of total variance:     Var(Y) = E[ Var(Y | X) ] + Var( E[Y | X] )<br>                           =  within-group variance  +  between-group variance</div>
+<p>Averaging group means gives the overall mean (weighted by group sizes). Overall variance is the average <b>within</b>-group variance <em>plus</em> the variance of the group means: a heterogeneous population is more spread out than any of its parts. This identity is ANOVA, the R² of a regression (explained = between, unexplained = within), and the reason mixing customer segments inflates variance.</p>
+<div class="card">
+ <h4>Lab 8 · A two-segment customer population</h4>
+ <p class="sub">Segment 1 has share π, mean m₁, SD s₁; segment 2 has the rest. Watch within + between add up to the total variance, and see how R² (the share explained by knowing the segment) behaves.</p>
+ <div class="ctl">
+  <label>share of seg 1 % <input type="range" id="c8p" min="5" max="95" value="30"><output id="c8pv"></output></label>
+  <label>mean 1 <input type="range" id="c8m1" min="0" max="100" value="70"><output id="c8m1v"></output></label>
+  <label>mean 2 <input type="range" id="c8m2" min="0" max="100" value="40"><output id="c8m2v"></output></label>
+  <label>SD 1 <input type="range" id="c8s1" min="1" max="30" value="8"><output id="c8s1v"></output></label>
+  <label>SD 2 <input type="range" id="c8s2" min="1" max="30" value="12"><output id="c8s2v"></output></label>
+  <button class="alt" id="c8re">Resample</button></div>
+ <canvas id="c8cv"></canvas><div class="stats" id="c8st"></div><div class="read" id="c8rd"></div>
+</div>
+<div class="co def"><b>Why this matters for modelling</b>R² = Var(E[Y | X]) / Var(Y): the fraction of variance a model with features X could ever explain. If within-group variance dominates, no feature set based on the grouping can predict individuals well, however many customers you have.</div>
+</section>
+
+<!-- ============ PART III ============ -->
+<div class="part">Part III · Shape, estimation and tails</div>
+
+<section class="ch" id="c9">
+<h2><span class="num">9</span>Moments, skewness, kurtosis and heavy tails <span class="lvl a">Advanced</span></h2>
+<p>The <b>k-th moment</b> is E[Xᵏ]; <b>central moments</b> are taken around the mean. Mean = 1st moment, variance = 2nd central moment. The next two describe shape:</p>
+<div class="f">skewness = E[(X−μ)³] / σ³      (asymmetry; &gt; 0 means a long right tail)<br>excess kurtosis = E[(X−μ)⁴] / σ⁴ − 3      (tail weight relative to the normal; 0 for a normal)</div>
+<p>Higher moments are dominated by extreme values. For <b>heavy-tailed</b> distributions some moments are infinite: Student-t with 3 degrees of freedom has finite variance but infinite kurtosis; Cauchy has no mean at all. Then the sample versions are unstable — and the textbook formulas built on them mislead.</p>
+<div class="card">
+ <h4>Lab 9 · Shape and tail stability</h4>
+ <p class="sub">8,000 draws from the chosen distribution. See skewness, excess kurtosis, how many values land beyond 3 SD (a normal gives 0.27%), and how unstable the sample variance is across 300 repeats at n = 100. Press Resample several times with Student t(3) and watch the numbers jump.</p>
+ <div class="ctl"><label>Distribution <select id="c9d"><option value="norm">Normal</option><option value="unif">Uniform</option><option value="expo">Exponential</option><option value="logn">Lognormal(0,1)</option><option value="t3">Student t, 3 df</option><option value="bern">Bernoulli(0.02) — rare event</option></select></label><button id="c9go">Resample</button></div>
+ <canvas id="c9cv"></canvas><div class="stats" id="c9st"></div><div class="read" id="c9rd"></div>
+</div>
+<div class="co warn"><b>Financial and behavioural data are rarely normal</b>Transaction amounts, claim sizes, balances and returns are skewed and fat-tailed. Using “mean ± 3 SD” as an outlier rule or as a tail-risk estimate understates extremes badly. Use quantiles and robust statistics, and model the tail explicitly (extreme value theory, Chapter “next steps”).</div>
+</section>
+
+<section class="ch" id="c10">
+<h2><span class="num">10</span>Estimating these quantities from data: bias and n − 1 <span class="lvl a">Advanced</span></h2>
+<p>Everything above describes the <em>population</em>. From a sample you compute <b>estimates</b>, which are themselves random variables, with their own mean and variance (the <b>sampling distribution</b>). The estimator’s expectation tells you about <b>bias</b>; its variance tells you about <b>precision</b>.</p>
+<div class="f">sample mean:   x̄ = (1/n) Σ xᵢ                E[x̄] = μ  (unbiased),  Var(x̄) = σ²/n<br>sample variance: s² = (1/(n−1)) Σ (xᵢ − x̄)²    E[s²] = σ²  (unbiased)<br>divisor n instead:  E = ((n−1)/n)·σ²   (biased low)</div>
+<p>Why n − 1? Deviations are measured from x̄, which was fitted to the same data and sits closer to the points than the true μ does, so the raw sum of squares is too small. Using n − 1 degrees of freedom exactly repairs it. Note that s itself (the standard deviation) is <em>still</em> biased low, by Jensen (√ is concave).</p>
+<div class="card">
+ <h4>Lab 10 · The bias you can see</h4>
+ <p class="sub">20,000 samples of size n from Normal(0, σ=2) (true variance 4). Average the estimates.</p>
+ <div class="ctl"><label>Sample size n <input type="range" id="c10n" min="2" max="30" value="5"><output id="c10nv"></output></label><button id="c10go">Re-run</button></div>
+ <canvas class="sm" id="c10cv"></canvas><div class="stats" id="c10st"></div><div class="read" id="c10rd"></div>
+</div>
+<p>Also remember the <b>standard error</b> of the mean, σ/√n, is the “SD of an average” — the quantity behind every confidence interval and z-score in the p-value course. And estimating covariance matrices from few samples is much noisier than estimating means, a central problem in high-dimensional risk modelling.</p>
+</section>
+
+<!-- ============ PART IV ============ -->
+<div class="part">Part IV · Geometry, bounds and risk</div>
+
+<section class="ch" id="c11">
+<h2><span class="num">11</span>Covariance matrices and the geometry of variance <span class="lvl e">Expert</span></h2>
+<p>With p variables, all variances and covariances sit in a symmetric <b>covariance matrix Σ</b> (diagonal = variances, off-diagonal = covariances). Two facts make it powerful:</p>
+<div class="f">Var(aᵀX) = aᵀ Σ a  ≥ 0      (so Σ is positive semi-definite)<br>Σ = V Λ Vᵀ     eigenvectors V = principal axes, eigenvalues Λ = variance along each axis</div>
+<p>Data with covariance Σ forms an ellipse (ellipsoid): axes point along the eigenvectors, with lengths ∝ √eigenvalue. <b>PCA</b> is just this eigen-decomposition. The <b>Mahalanobis distance</b> d² = (x − μ)ᵀ Σ⁻¹ (x − μ) measures how far a point is in units of <em>that</em> shape, accounting for scale and correlation; for a normal, d² follows a χ² law with p degrees of freedom (for p = 2: P(d² ≥ t) = e<sup>−t/2</sup>).</p>
+<div class="card">
+ <h4>Lab 11 · The covariance ellipse</h4>
+ <p class="sub">Set σₓ, σ_y, ρ. The ellipses are 1, 2 and 3 Mahalanobis-SD contours. Place a test point: its Euclidean distance (ordinary ruler) can mislead; the Mahalanobis distance respects the data’s shape.</p>
+ <div class="ctl">
+  <label>σₓ <input type="range" id="c11sx" min="0.5" max="3" step="0.1" value="2"><output id="c11sxv"></output></label>
+  <label>σ_y <input type="range" id="c11sy" min="0.5" max="3" step="0.1" value="1"><output id="c11syv"></output></label>
+  <label>ρ <input type="range" id="c11r" min="-0.95" max="0.95" step="0.05" value="0.8"><output id="c11rv"></output></label>
+  <label>test point x <input type="range" id="c11px" min="-5" max="5" step="0.1" value="2.5"><output id="c11pxv"></output></label>
+  <label>test point y <input type="range" id="c11py" min="-5" max="5" step="0.1" value="-1.5"><output id="c11pyv"></output></label></div>
+ <canvas class="tl" id="c11cv"></canvas><div class="stats" id="c11st"></div><div class="read" id="c11rd"></div>
+</div>
+<p>Try ρ = 0.8 and put the test point at (2.5, −1.5): it is only ~2.9 units from the origin by the ruler, but it lies <em>against</em> the correlation, so it is a genuine multivariate outlier (large Mahalanobis distance, tiny probability) even though each coordinate is unremarkable on its own. This is the basis of multivariate anomaly and fraud screening.</p>
+</section>
+
+<section class="ch" id="c12">
+<h2><span class="num">12</span>Inequalities: what you can say without knowing the distribution <span class="lvl e">Expert</span></h2>
+<ul>
+ <li><b>Markov</b> (X ≥ 0): <code>P(X ≥ t) ≤ E[X] / t</code>. Needs only the mean.</li>
+ <li><b>Chebyshev</b>: <code>P(|X − μ| ≥ kσ) ≤ 1/k²</code>. Needs only mean and variance. Guarantees ≥ 75% within 2 SD and ≥ 89% within 3 SD for <em>any</em> distribution.</li>
+ <li><b>Jensen</b>: <code>E[g(X)] ≥ g(E[X])</code> for convex g.</li>
+ <li><b>Cauchy–Schwarz</b>: <code>|Cov(X, Y)|² ≤ Var(X)·Var(Y)</code>, which is exactly why |ρ| ≤ 1.</li>
+</ul>
+<p>These bounds are valid for every distribution — so they are loose for any specific one. The table shows how loose.</p>
+<div class="card">
+ <h4>Lab 12 · How tight is Chebyshev?</h4>
+ <div class="ctl"><label>Distribution <select id="c12d"><option value="normal">Normal(0,1)</option><option value="uniform">Uniform(0,1)</option><option value="exponential">Exponential(1)</option><option value="lognormal">Lognormal(0,1)</option></select></label></div>
+ <div class="tw" id="c12tb"></div><div class="read" id="c12rd"></div>
+</div>
+</section>
+
+<section class="ch" id="c13">
+<h2><span class="num">13</span>Sums, averages and the central limit theorem <span class="lvl e">Expert</span></h2>
+<p>If X₁…Xₙ are independent with mean μ and SD σ, the average satisfies E[X̄] = μ and SD(X̄) = σ/√n, and the CLT says the standardised average becomes normal:</p>
+<div class="f">Z = (X̄ − μ) / (σ / √n)  →  Normal(0, 1)   as n → ∞,   with error roughly proportional to skewness/√n</div>
+<p>This is why normal-based inference works for means of almost anything. But it is an <em>asymptotic</em> statement: for skewed or heavy-tailed data and moderate n, the tails — exactly what p-values and risk limits depend on — are still visibly off.</p>
+<div class="card">
+ <h4>Lab 13 · Averages of skewed data</h4>
+ <p class="sub">4,000 simulated sample means (standardised), compared with the normal curve. Compare the empirical tail probabilities with the ideal 2.5%.</p>
+ <div class="ctl"><label>Underlying distribution <select id="c13d"><option value="unif">Uniform(0,1)</option><option value="expo">Exponential(1)</option><option value="bern">Bernoulli(0.05)</option><option value="logn">Lognormal(0, 1.5)</option></select></label>
+ <label>n per average <input type="range" id="c13n" min="1" max="200" value="5"><output id="c13nv"></output></label><button id="c13go">Resample</button></div>
+ <canvas id="c13cv"></canvas><div class="stats" id="c13st"></div><div class="read" id="c13rd"></div>
+</div>
+<h3>The delta method: variance of a function</h3>
+<p>If an estimate θ̂ has variance v, then for smooth g: <code>Var(g(θ̂)) ≈ g′(θ)² · v</code>. Example: the log of a ratio, the SE of an odds ratio, or the variance of a log-transformed average all come from this one-line approximation (a first-order Taylor expansion plus the variance-scaling rule from Chapter 4).</p>
+</section>
+
+<section class="ch" id="c14">
+<h2><span class="num">14</span>Risk application: expected loss, correlated defaults and tail capital <span class="lvl e">Expert</span></h2>
+<p>Bring it all together. A portfolio of n loans, each defaulting with probability PD; the number of defaults D = Σ Iᵢ (indicators). Linearity gives the mean <b>regardless of correlation</b>; variance does not:</p>
+<div class="f">E[D] = n · PD                                   (no assumption on dependence)<br>Var(D) = n·PD(1−PD) · [ 1 + (n−1)·ρ ]          (ρ = pairwise correlation of default indicators)<br>SD of the default <i>rate</i> D/n  →  √( PD(1−PD) · ρ )   as n → ∞   — a floor that diversification cannot remove</div>
+<p>With ρ = 0, the default rate’s SD shrinks like 1/√n and large portfolios become almost deterministic. With even a tiny ρ (say 0.02), the 1/√n term disappears and a <b>systematic</b> component remains. The simulation below draws each portfolio’s “true” default probability from a Beta distribution with mean PD (this encodes the correlation), then draws defaults.</p>
+<div class="card">
+ <h4>Lab 14 · Loss distribution of a loan book</h4>
+ <p class="sub">Blue outline: independent defaults (ρ = 0). Red: correlated defaults at your ρ. Same mean, wildly different tails. Loss given default is fixed at 45%.</p>
+ <div class="ctl">
+  <label>Loans n <input type="range" id="c14n" min="50" max="2000" step="50" value="1000"><output id="c14nv"></output></label>
+  <label>PD % <input type="range" id="c14pd" min="0.5" max="10" step="0.1" value="2"><output id="c14pdv"></output></label>
+  <label>default correlation ρ % <input type="range" id="c14r" min="0" max="10" step="0.1" value="2"><output id="c14rv"></output></label>
+  <button id="c14go">Re-simulate</button></div>
+ <canvas id="c14cv"></canvas><div class="stats" id="c14st"></div><div class="read" id="c14rd"></div>
+</div>
+<div class="co key"><b>Expected vs unexpected loss</b>Expected loss = PD × LGD × EAD is a pure <em>expectation</em>, covered by pricing and provisions. Capital is held for the <em>unexpected</em> part: a high quantile (e.g. 99.9%) minus the mean — a statement about the <b>variance and tail shape</b>, which depend almost entirely on correlation. Underestimating ρ is how books that looked diversified failed together in 2008.</div>
+</section>
+
+<section class="ch" id="c15">
+<h2><span class="num">15</span>Final exam, mastery checklist, cheat sheet <span class="lvl e">Expert</span></h2>
+<h3>Exam (16 questions — click an answer)</h3>
+<div id="quiz"></div>
+<div class="card"><h4>Score</h4><div class="stats" id="qscore"></div><button class="alt" id="qreset">Reset exam</button></div>
+<h3>Mastery checklist — tick when you can do it without notes</h3>
+<div class="card chk" id="chk"></div>
+<h3>Cheat sheet</h3>
+<div class="tw"><table>
+<tr><th>Concept</th><th>Formula / one-liner</th></tr>
+<tr><td>Random variable</td><td>A function X: outcomes → numbers</td></tr>
+<tr><td>CDF</td><td>F(x) = P(X ≤ x); P(a &lt; X ≤ b) = F(b) − F(a)</td></tr>
+<tr><td>Expectation</td><td>E[X] = Σ x p(x) = ∫ x f(x) dx; linear always: E[aX+bY+c] = aE[X] + bE[Y] + c</td></tr>
+<tr><td>Indicator trick</td><td>E[1_A] = P(A); expected count = sum of probabilities</td></tr>
+<tr><td>Variance</td><td>E[X²] − (E X)²; Var(aX+b) = a²Var(X)</td></tr>
+<tr><td>Covariance</td><td>E[XY] − E[X]E[Y]; Corr = Cov/(σₓσ_y) ∈ [−1,1] (linear only)</td></tr>
+<tr><td>Var of a sum</td><td>Var X + Var Y + 2Cov(X,Y); wᵀΣw in general</td></tr>
+<tr><td>Independent ⇒ ?</td><td>Cov = 0, Var(X±Y) = VarX + VarY; but Cov = 0 ⇏ independent</td></tr>
+<tr><td>Total expectation / variance</td><td>E[Y] = E[E[Y|X]]; Var Y = E[Var(Y|X)] + Var(E[Y|X])</td></tr>
+<tr><td>Standard error of the mean</td><td>σ/√n</td></tr>
+<tr><td>Unbiased variance</td><td>s² with divisor n − 1 (s itself still biased)</td></tr>
+<tr><td>Chebyshev / Markov</td><td>P(|X−μ| ≥ kσ) ≤ 1/k²; P(X ≥ t) ≤ E[X]/t</td></tr>
+<tr><td>Jensen</td><td>convex g: E[g(X)] ≥ g(E[X])</td></tr>
+<tr><td>Mahalanobis</td><td>d² = (x−μ)ᵀΣ⁻¹(x−μ) ~ χ²ₚ for normal data</td></tr>
+<tr><td>Correlated Bernoulli sum</td><td>Var(D) = nPD(1−PD)[1 + (n−1)ρ]</td></tr>
+<tr><td>CLT</td><td>(X̄−μ)/(σ/√n) → N(0,1); slow for skewed data and rare events</td></tr>
+</table></div>
+<div class="co tip"><b>Next on the roadmap</b>With these in hand, items 2–4 of your tracker (core distributions, Bayes, CLT in depth) become fast. In particular, Chapters 13–14 are the bridge to hypothesis testing, confidence intervals and the p-value course.</div>
+</section>
+</main>
+
+<script>
+/*MATH*/
+function lgamma(x){const c=[76.18009172947146,-86.50532032941677,24.01409824083091,-1.231739572450155,0.1208650973866179e-2,-0.5395239384953e-5];let y=x,t=x+5.5;t-=(x+.5)*Math.log(t);let s=1.000000000190015;for(let j=0;j<6;j++)s+=c[j]/++y;return -t+Math.log(2.5066282746310005*s/x);}
+function gser(a,x){let ap=a,sum=1/a,del=sum;for(let n=0;n<1000;n++){ap++;del*=x/ap;sum+=del;if(Math.abs(del)<Math.abs(sum)*1e-15)break;}return sum*Math.exp(-x+a*Math.log(x)-lgamma(a));}
+function gcf(a,x){let b=x+1-a,c=1/1e-300,d=1/b,h=d;for(let i=1;i<1000;i++){const an=-i*(i-a);b+=2;d=an*d+b;if(Math.abs(d)<1e-300)d=1e-300;c=b+an/c;if(Math.abs(c)<1e-300)c=1e-300;d=1/d;const del=d*c;h*=del;if(Math.abs(del-1)<1e-15)break;}return Math.exp(-x+a*Math.log(x)-lgamma(a))*h;}
+function gammaQ(a,x){if(x<=0)return 1;return x<a+1?1-gser(a,x):gcf(a,x);}
+function normSf(z){const q=0.5*gammaQ(.5,z*z/2);return z>=0?q:1-q;}
+function normCdf(z){return normSf(-z);}
+function npdf(x){return Math.exp(-x*x/2)/2.5066282746310002;}
+function lbin(n,k){return lgamma(n+1)-lgamma(k+1)-lgamma(n-k+1);}
+function binom(n,k,p){return Math.exp(lbin(n,k)+k*Math.log(p)+(n-k)*Math.log(1-p));}
+function randn(){let u=0;while(!u)u=Math.random();return Math.sqrt(-2*Math.log(u))*Math.cos(2*Math.PI*Math.random());}
+function gammaS(a){if(a<1)return gammaS(a+1)*Math.pow(Math.random(),1/a);const d=a-1/3,c=1/Math.sqrt(9*d);for(;;){let x,v;do{x=randn();v=1+c*x}while(v<=0);v=v*v*v;const u=Math.random();if(Math.log(u)<.5*x*x+d-d*v+d*Math.log(v))return d*v;}}
+function betaS(a,b){const x=gammaS(a),y=gammaS(b);return x/(x+y);}
+function binS(n,p){let k=0;for(let i=0;i<n;i++)if(Math.random()<p)k++;return k;}
+function mean(a){let s=0;for(const v of a)s+=v;return s/a.length;}
+function vr(a){const m=mean(a);let s=0;for(const v of a)s+=(v-m)*(v-m);return s/(a.length-1);}
+function skewKurt(a){const m=mean(a),n=a.length;let s2=0,s3=0,s4=0;for(const v of a){const d=v-m,d2=d*d;s2+=d2;s3+=d2*d;s4+=d2*d2}s2/=n;s3/=n;s4/=n;return{sd:Math.sqrt(s2),sk:s3/Math.pow(s2,1.5),ku:s4/(s2*s2)-3};}
+function corr(x,y){const mx=mean(x),my=mean(y);let sxy=0,sx=0,sy=0;for(let i=0;i<x.length;i++){const dx=x[i]-mx,dy=y[i]-my;sxy+=dx*dy;sx+=dx*dx;sy+=dy*dy}return sxy/Math.sqrt(sx*sy);}
+function cov(x,y){const mx=mean(x),my=mean(y);let s=0;for(let i=0;i<x.length;i++)s+=(x[i]-mx)*(y[i]-my);return s/(x.length-1);}
+function ranks(a){const idx=a.map((v,i)=>[v,i]).sort((p,q)=>p[0]-q[0]);const r=new Array(a.length);idx.forEach((p,k)=>{r[p[1]]=k+1});return r;}
+/*ENDMATH*/
+
+const $=id=>document.getElementById(id), val=id=>+$(id).value;
+const C={fg:'#e8ebf5',mu:'#8a93ab',gr:'#232a3d',a:'#6ea8ff',r:'#ff6b81',y:'#ffd166',g:'#4ade80',p:'#c084fc',t:'#5eead4'};
+const store={get(k,d){try{const v=JSON.parse(localStorage.getItem(k));return v==null?d:v}catch(e){return d}},set(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}};
+function stat(l,v,c){return `<div class="stat ${c||''}"><b>${v}</b><span>${l}</span></div>`}
+function f3(x){if(!isFinite(x))return String(x);const a=Math.abs(x);if(a!==0&&(a<1e-3||a>=1e5))return x.toExponential(2);return String(+x.toFixed(a<1?4:a<100?3:2))}
+const resizers=[];
+function reg(fn){fn();resizers.push(fn)}
+function on(ids,fn){ids.split(' ').forEach(i=>{const e=$(i);e.addEventListener('input',fn);e.addEventListener('change',fn)})}
+let rt;window.addEventListener('resize',()=>{clearTimeout(rt);rt=setTimeout(()=>resizers.forEach(f=>f()),150)});
+document.querySelectorAll('input[type=range]').forEach(i=>{const o=$(i.id+'v');const f=()=>{if(o)o.textContent=i.value};i.addEventListener('input',f);f()});
+
+function nice(x){const e=Math.pow(10,Math.floor(Math.log10(x))),f=x/e;return (f<1.5?1:f<3?2:f<7?5:10)*e}
+function mk(cv,x0,x1,ymax,o){o=o||{};const y0=o.y0||0,dpr=window.devicePixelRatio||1,r=cv.getBoundingClientRect(),w=r.width||600,h=r.height||270;
+ cv.width=w*dpr;cv.height=h*dpr;const g=cv.getContext('2d');g.setTransform(dpr,0,0,dpr,0,0);g.clearRect(0,0,w,h);
+ const L=o.L||42,R=12,T=14,B=28,X=x=>L+(x-x0)/(x1-x0)*(w-L-R),Y=y=>h-B-(y-y0)/(ymax-y0)*(h-T-B);
+ g.font='11px system-ui';g.lineWidth=1;g.strokeStyle=C.gr;g.fillStyle=C.mu;
+ const sx=nice((x1-x0)/7);for(let x=Math.ceil(x0/sx-1e-9)*sx;x<=x1+1e-9;x+=sx){g.beginPath();g.moveTo(X(x),T);g.lineTo(X(x),h-B);g.stroke();g.textAlign='center';g.fillText(String(+x.toFixed(6)),X(x),h-B+15)}
+ if(!o.noY){const sy=nice((ymax-y0)/4);for(let y=Math.ceil(y0/sy-1e-9)*sy;y<=ymax+1e-9;y+=sy){g.beginPath();g.moveTo(L,Y(y));g.lineTo(w-R,Y(y));g.stroke();g.textAlign='right';g.fillText(String(+y.toFixed(4)),L-5,Y(y)+3)}}
+ return{g,w,h,X,Y,L,R,T,B,
+  line(f,col,lw,a,b,n){a=a==null?x0:a;b=b==null?x1:b;n=n||260;g.beginPath();g.strokeStyle=col;g.lineWidth=lw||2;for(let i=0;i<=n;i++){const x=a+(b-a)*i/n,y=f(x);i?g.lineTo(X(x),Y(y)):g.moveTo(X(x),Y(y))}g.stroke()},
+  area(f,a,b,col,n){a=Math.max(a,x0);b=Math.min(b,x1);if(b<=a)return;n=n||200;g.beginPath();g.moveTo(X(a),Y(0));for(let i=0;i<=n;i++){const x=a+(b-a)*i/n;g.lineTo(X(x),Y(f(x)))}g.lineTo(X(b),Y(0));g.closePath();g.fillStyle=col;g.fill()},
+  vline(x,col,lab,dash){g.save();g.strokeStyle=col;g.lineWidth=1.6;if(dash)g.setLineDash([5,4]);g.beginPath();g.moveTo(X(x),T);g.lineTo(X(x),h-B);g.stroke();g.restore();if(lab){g.fillStyle=col;g.textAlign='center';g.fillText(lab,Math.min(Math.max(X(x),34),w-34),T+10)}},
+  hline(y,col,lab){g.save();g.strokeStyle=col;g.lineWidth=1.4;g.setLineDash([5,4]);g.beginPath();g.moveTo(L,Y(y));g.lineTo(w-R,Y(y));g.stroke();g.restore();if(lab){g.fillStyle=col;g.textAlign='right';g.fillText(lab,w-R-3,Y(y)-4)}},
+  text(s,x,y,col,al){g.fillStyle=col||C.fg;g.textAlign=al||'left';g.fillText(s,x,y)}};}
+function dens(data,x0,x1,nb){const c=new Array(nb).fill(0),bw=(x1-x0)/nb;data.forEach(v=>{if(v>=x0&&v<=x1)c[Math.min(nb-1,Math.floor((v-x0)/bw))]++});return c.map(k=>k/data.length/bw);}
+function bars(P,d,x0,x1,fill,stroke){const nb=d.length,bw=(x1-x0)/nb;d.forEach((v,i)=>{const xa=x0+i*bw,w=Math.max(1,P.X(xa+bw)-P.X(xa)-1);if(fill){P.g.fillStyle=fill;P.g.fillRect(P.X(xa)+.5,P.Y(v),w,P.Y(0)-P.Y(v))}if(stroke){P.g.strokeStyle=stroke;P.g.lineWidth=1.6;P.g.strokeRect(P.X(xa)+.5,P.Y(v),w,P.Y(0)-P.Y(v))}})}
+function pct(a,q){const b=a.slice().sort((x,y)=>x-y);return b[Math.min(b.length-1,Math.max(0,Math.floor(q*b.length)))]}
+
+/* ---------- Ch1 dice ---------- */
+(function(){const RV={sum:(i,j)=>i+j,max:(i,j)=>Math.max(i,j),min:(i,j)=>Math.min(i,j),diff:(i,j)=>Math.abs(i-j),prod:(i,j)=>i*j,dbl:(i,j)=>i===j?1:0,six:(i,j)=>(i===6)+(j===6)};
+ let rolls=null;
+ function draw(){const f=RV[$('c1rv').value],pm={};let mx=0;
+  for(let i=1;i<=6;i++)for(let j=1;j<=6;j++){const v=f(i,j);pm[v]=(pm[v]||0)+1/36;mx=Math.max(mx,v)}
+  let h='<table class="grid"><tr><th>die 1 ↓ / die 2 →</th>'+[1,2,3,4,5,6].map(j=>`<th>${j}</th>`).join('')+'</tr>';
+  for(let i=1;i<=6;i++){h+=`<tr><th>${i}</th>`;for(let j=1;j<=6;j++){const v=f(i,j);h+=`<td style="background:rgba(110,168,255,${.08+.5*v/Math.max(mx,1)})">${v}</td>`}h+='</tr>'}
+  $('c1grid').innerHTML=h+'</table>';
+  const vs=Object.keys(pm).map(Number).sort((a,b)=>a-b);let E=0,E2=0;vs.forEach(v=>{E+=v*pm[v];E2+=v*v*pm[v]});const V=E2-E*E;
+  let emp=null;if(rolls){emp={};rolls.forEach(v=>{emp[v]=(emp[v]||0)+1/rolls.length})}
+  const ymax=Math.max.apply(null,vs.map(v=>Math.max(pm[v],emp?emp[v]||0:0)))*1.25;
+  const P=mk($('c1cv'),vs[0]-.7,vs[vs.length-1]+.7,ymax);
+  vs.forEach(v=>{P.g.fillStyle='rgba(110,168,255,.6)';P.g.fillRect(P.X(v-.35),P.Y(pm[v]),P.X(v+.35)-P.X(v-.35),P.Y(0)-P.Y(pm[v]));if(emp){P.g.fillStyle=C.y;P.g.beginPath();P.g.arc(P.X(v),P.Y(emp[v]||0),4.5,0,7);P.g.fill()}});
+  P.vline(E,C.r,'E[X] = '+f3(E),true);
+  $('c1st').innerHTML=stat('E[X]',f3(E),'in')+stat('Var(X)',f3(V),'warn')+stat('SD(X)',f3(Math.sqrt(V)),'')+stat('values X can take',vs.length,'')+(rolls?stat('mean of rolls',f3(mean(rolls)),'ok'):'');
+  $('c1rd').innerHTML=`X is just the table above: each of the 36 equally likely outcomes is mapped to a number, and the bars collect equal numbers together. E[X] = Σ x·p(x) = <b>${f3(E)}</b>; Var(X) = E[X²] − E[X]² = ${f3(E2)} − ${f3(E*E)} = <b>${f3(V)}</b>.${rolls?' Yellow dots: relative frequencies from simulated rolls — they hug the exact bars, and the mean of the rolls approaches E[X].':''}`}
+ on('c1rv',draw);reg(draw);
+ $('c1roll').onclick=()=>{const f=RV[$('c1rv').value];rolls=Array.from({length:1000},()=>f(1+Math.floor(Math.random()*6),1+Math.floor(Math.random()*6)));draw()};
+ $('c1clr').onclick=()=>{rolls=null;draw()};
+ $('c1rv').addEventListener('change',()=>{rolls=null;draw()});})();
+
+/* ---------- Ch2 distributions ---------- */
+const D={
+ normal:{k:'c',P:[['μ',-5,5,0,.1],['σ',.2,4,1,.1]],pdf:(x,a,b)=>npdf((x-a)/b)/b,cdf:(x,a,b)=>normCdf((x-a)/b),m:(a,b)=>a,v:(a,b)=>b*b,r:(a,b)=>[a-4*b,a+4*b]},
+ uniform:{k:'c',P:[['a',-5,5,0,.1],['width',.5,10,4,.1]],pdf:(x,a,b)=>x>=a&&x<=a+b?1/b:0,cdf:(x,a,b)=>x<a?0:x>a+b?1:(x-a)/b,m:(a,b)=>a+b/2,v:(a,b)=>b*b/12,r:(a,b)=>[a-1,a+b+1]},
+ exponential:{k:'c',P:[['λ',.2,3,1,.05]],pdf:(x,a)=>x<0?0:a*Math.exp(-a*x),cdf:(x,a)=>x<0?0:1-Math.exp(-a*x),m:a=>1/a,v:a=>1/(a*a),r:a=>[0,7/a]},
+ lognormal:{k:'c',P:[['μ (of ln X)',-1,2,0,.05],['σ (of ln X)',.1,1.5,.6,.05]],pdf:(x,a,b)=>x<=0?0:npdf((Math.log(x)-a)/b)/(x*b),cdf:(x,a,b)=>x<=0?0:normCdf((Math.log(x)-a)/b),m:(a,b)=>Math.exp(a+b*b/2),v:(a,b)=>(Math.exp(b*b)-1)*Math.exp(2*a+b*b),r:(a,b)=>[0,Math.exp(a+2.7*b)]},
+ binomial:{k:'d',P:[['n',1,60,20,1],['p',.01,.99,.3,.01]],pdf:(k,n,p)=>k<0||k>n||k!==Math.floor(k)?0:binom(n,k,p),m:(n,p)=>n*p,v:(n,p)=>n*p*(1-p),r:(n,p)=>[0,n]},
+ poisson:{k:'d',P:[['λ',.5,25,4,.5]],pdf:(k,l)=>k<0||k!==Math.floor(k)?0:Math.exp(-l+k*Math.log(l)-lgamma(k+1)),m:l=>l,v:l=>l,r:l=>[0,Math.ceil(l+5*Math.sqrt(l)+3)]}
+};
+D.binomial.cdf=(x,n,p)=>{let s=0;for(let k=0;k<=Math.floor(x)&&k<=n;k++)s+=binom(n,k,p);return s};
+D.poisson.cdf=(x,l)=>{let s=0;for(let k=0;k<=Math.floor(x);k++)s+=D.poisson.pdf(k,l);return Math.min(1,s)};
+(function(){
+ function setDist(){const d=D[$('c2d').value];
+  [1,2].forEach((i,ix)=>{const s=$('c2p'+i),lab=$('c2l'+i),p=d.P[ix];if(!p){lab.style.display='none';return}lab.style.display='';s.min=p[1];s.max=p[2];s.step=p[4];s.value=p[3];$('c2n'+i).textContent=p[0];$('c2p'+i+'v').textContent=s.value});
+  const a=val('c2p1'),b=d.P[1]?val('c2p2'):0,m=d.m(a,b),sd=Math.sqrt(d.v(a,b));
+  $('c2lo').value=+(Math.max(d.k==='d'?0:-1e9,m-sd)).toFixed(2);$('c2hi').value=+(m+sd).toFixed(2);draw()}
+ function draw(){const d=D[$('c2d').value],a=val('c2p1'),b=d.P[1]?val('c2p2'):0,lo=val('c2lo'),hi=val('c2hi'),r=d.r(a,b),m=d.m(a,b),v=d.v(a,b);let prob;
+  const P=(()=>{if(d.k==='c'){let ym=0;for(let i=0;i<=300;i++){const x=r[0]+(r[1]-r[0])*i/300;ym=Math.max(ym,d.pdf(x,a,b))}return mk($('c2cv'),r[0],r[1],ym*1.2)}
+   let ym=0;for(let k=Math.ceil(r[0]);k<=r[1];k++)ym=Math.max(ym,d.pdf(k,a,b));return mk($('c2cv'),r[0]-.7,r[1]+.7,ym*1.2)})();
+  if(d.k==='c'){prob=Math.max(0,d.cdf(hi,a,b)-d.cdf(lo,a,b));P.area(x=>d.pdf(x,a,b),lo,hi,'rgba(255,107,129,.5)');P.line(x=>d.pdf(x,a,b),C.a,2.2,r[0],r[1],400)}
+  else{prob=0;for(let k=Math.ceil(r[0]);k<=r[1];k++){const p=d.pdf(k,a,b),inn=k>=lo&&k<=hi;if(inn)prob+=p;P.g.fillStyle=inn?'rgba(255,107,129,.8)':'rgba(110,168,255,.6)';P.g.fillRect(P.X(k-.38),P.Y(p),P.X(k+.38)-P.X(k-.38),P.Y(0)-P.Y(p))}}
+  P.vline(m,C.y,'mean',true);
+  const x0=d.k==='c'?r[0]:r[0]-.7,x1=d.k==='c'?r[1]:r[1]+.7,Q=mk($('c2fcv'),x0,x1,1);Q.line(x=>d.cdf(x,a,b),C.g,2.2,x0,x1,500);
+  [lo,hi].forEach((x,i)=>{const y=d.cdf(x,a,b);Q.g.fillStyle=C.r;Q.g.beginPath();Q.g.arc(Q.X(x),Q.Y(y),5,0,7);Q.g.fill();Q.hline(y,C.mu)});
+  Q.text('CDF F(x) = P(X ≤ x)',Q.L+6,Q.T+12,C.mu);
+  $('c2st').innerHTML=stat('P(lo ≤ X ≤ hi)',f3(prob),'hot')+stat('E[X]',f3(m),'in')+stat('Var(X)',f3(v),'warn')+stat('SD(X)',f3(Math.sqrt(v)),'')+stat('E[X²] = Var + E²',f3(v+m*m),'');
+  $('c2rd').innerHTML=d.k==='c'?`P(${lo} ≤ X ≤ ${hi}) = ∫ f = F(${hi}) − F(${lo}) = <b>${f3(prob)}</b>. For a continuous variable the endpoints don’t matter (single points have probability 0) and the density can exceed 1 — try Uniform with width 0.5.`:`Discrete: add the probability bars for integers between lo and hi: <b>${f3(prob)}</b>. Here endpoints <i>do</i> matter, unlike the continuous case.`}
+ on('c2p1 c2p2 c2lo c2hi',draw);$('c2d').addEventListener('change',setDist);reg(draw);setDist();})();
+
+/* ---------- Ch3 LLN ---------- */
+(function(){const LL={unif:{mu:.5,y:[0,1],s:()=>Math.random()},expo:{mu:1,y:[0,3],s:()=>-Math.log(1-Math.random())},bern:{mu:.1,y:[0,.4],s:()=>Math.random()<.1?1:0},logn:{mu:Math.exp(1.125),y:[0,10],s:()=>Math.exp(1.5*randn())},cauchy:{mu:null,y:[-8,8],s:()=>Math.tan(Math.PI*(Math.random()-.5))}};
+ let data=null,keyN=0;
+ function sim(){const L=LL[$('c3d').value],N=val('c3n'),pts=[];for(let k=0;k<=200;k++)pts.push(Math.max(1,Math.round(Math.pow(N,k/200))));
+  data=[];for(let p=0;p<5;p++){let s=0,idx=0;const ys=[];for(let i=1;i<=N;i++){s+=L.s();while(idx<pts.length&&pts[idx]===i){ys.push([Math.log10(i),s/i]);idx++}}data.push(ys)}keyN=N;draw()}
+ function draw(){if(!data)return;const L=LL[$('c3d').value],P=mk($('c3cv'),0,Math.log10(keyN),L.y[1],{y0:L.y[0]}),cols=[C.a,C.r,C.g,C.y,C.p];
+  data.forEach((ys,k)=>{P.g.strokeStyle=cols[k];P.g.lineWidth=1.6;P.g.beginPath();let first=true;ys.forEach(([x,y])=>{const yy=Math.max(L.y[0],Math.min(L.y[1],y));first?P.g.moveTo(P.X(x),P.Y(yy)):P.g.lineTo(P.X(x),P.Y(yy));first=false});P.g.stroke()});
+  if(L.mu!=null)P.hline(L.mu,C.fg,'true mean '+f3(L.mu));P.text('x: log₁₀(n)   y: running average',P.L+6,P.T+12,C.mu);
+  const fin=data.map(ys=>ys[ys.length-1][1]);
+  $('c3rd').innerHTML=L.mu!=null?`After ${keyN.toLocaleString()} draws the five averages are ${fin.map(f3).join(', ')}; true mean ${f3(L.mu)}. Early on they scatter widely; the spread shrinks like 1/√n (every 100× more data → 10× tighter).${$('c3d').value==='logn'?' Notice the occasional jumps: a single huge value shoves the average — slow convergence.':''}`:`The Cauchy distribution has no mean. After ${keyN.toLocaleString()} draws the five “averages” are ${fin.map(f3).join(', ')} — they keep jumping and never settle, however long you run it. The law of large numbers needs a finite mean.`}
+ on('c3d c3n',sim);$('c3go').onclick=sim;resizers.push(draw);sim();})();
+
+/* ---------- Ch4 transforms ---------- */
+(function(){let zx=Array.from({length:6000},randn),zy=Array.from({length:6000},randn);
+ function draw(){const op=$('c4o').value,a=val('c4a'),b=val('c4b'),s=val('c4s'),X=zx.map(z=>3+s*z),Y=zy.map(z=>1+1.5*z);let T,tm,tv,formula;
+  if(op==='aff'){T=X.map(x=>a*x+b);tm=a*3+b;tv=a*a*s*s;formula='Var = a²σ²'}
+  else if(op==='sum'){T=X.map((x,i)=>x+Y[i]);tm=4;tv=s*s+2.25;formula='Var = σ² + 1.5²'}
+  else if(op==='dif'){T=X.map((x,i)=>x-Y[i]);tm=2;tv=s*s+2.25;formula='Var = σ² + 1.5² (variances ADD even for a difference)'}
+  else{T=X.map(x=>x+x);tm=6;tv=4*s*s;formula='Var = 4σ², not 2σ²: X and X are perfectly correlated, Cov = Var(X)'}
+  const all=X.concat(T),x0=Math.min.apply(null,all.map((v,i)=>v)),x1=Math.max.apply(null,all);const lo=pct(all,.002),hi=pct(all,.998),nb=60;
+  const dX=dens(X,lo,hi,nb),dT=dens(T,lo,hi,nb),ym=Math.max(Math.max.apply(null,dX),Math.max.apply(null,dT))*1.15,P=mk($('c4cv'),lo,hi,ym);
+  bars(P,dT,lo,hi,'rgba(255,107,129,.5)');bars(P,dX,lo,hi,null,C.a);P.vline(mean(T),C.r,'mean T',true);P.vline(3,C.a,'mean X',true);
+  $('c4tb').innerHTML=`<table><tr><th></th><th>mean (simulated)</th><th>mean (formula)</th><th>variance (simulated)</th><th>variance (formula)</th></tr><tr><td>X</td><td class="n">${f3(mean(X))}</td><td class="n">3</td><td class="n">${f3(vr(X))}</td><td class="n">${f3(s*s)}</td></tr><tr><td>T</td><td class="n">${f3(mean(T))}</td><td class="n">${f3(tm)}</td><td class="n">${f3(vr(T))}</td><td class="n">${f3(tv)}</td></tr></table>`;
+  $('c4rd').innerHTML=`${formula}. The mean follows linearity (E[aX+b] = a·E[X]+b always); the spread follows the variance rules. Notice shifting by b moves the picture but never widens it.`}
+ on('c4o c4a c4b c4s',draw);reg(draw);$('c4re').onclick=()=>{zx=Array.from({length:6000},randn);zy=Array.from({length:6000},randn);draw()};})();
+
+/* ---------- Ch5 conditioning ---------- */
+(function(){const N=1500;let z1=Array.from({length:N},randn),z2=Array.from({length:N},randn);
+ function draw(){const r=val('c5r'),c=val('c5c');$('c5cv_').textContent=c;const xs=z1,ys=z1.map((z,i)=>r*z+Math.sqrt(1-r*r)*z2[i]),w=.25;
+  const P=mk($('c5cv'),-4,4,4,{y0:-4});const band=[];
+  xs.forEach((x,i)=>{const inb=Math.abs(x-c)<=w;if(inb)band.push(ys[i]);P.g.fillStyle=inb?C.y:'rgba(110,168,255,.45)';P.g.beginPath();P.g.arc(P.X(x),P.Y(ys[i]),inb?3.4:2.4,0,7);P.g.fill()});
+  P.line(x=>r*x,C.r,2,-4,4,2);P.g.fillStyle='rgba(255,209,102,.12)';P.g.fillRect(P.X(c-w),P.T,P.X(c+w)-P.X(c-w),P.h-P.B-P.T);
+  P.text('line: E[Y | X = x] = ρx',P.L+6,P.T+12,C.r);
+  const cm=band.length?mean(band):NaN,cs=band.length>2?Math.sqrt(vr(band)):NaN;
+  $('c5st').innerHTML=stat('points in band',band.length,'warn')+stat('E[Y | X≈x] simulated',f3(cm),'in')+stat('ρ·x (formula)',f3(r*c),'ok')+stat('SD(Y | X≈x) simulated',f3(cs),'in')+stat('√(1−ρ²) (formula)',f3(Math.sqrt(1-r*r)),'ok')+stat('marginal SD(Y)','1','');
+  $('c5rd').innerHTML=`Given X ≈ ${c}, Y’s average is ${f3(cm)} (theory ${f3(r*c)}) and its spread is ${f3(cs)} (theory ${f3(Math.sqrt(1-r*r))}) versus 1 unconditionally. At ρ = 0 slicing changes nothing (independence); at |ρ| near 1 the conditional spread collapses — X nearly determines Y.`}
+ on('c5r c5c',draw);reg(draw);$('c5re').onclick=()=>{z1=Array.from({length:N},randn);z2=Array.from({length:N},randn);draw()};})();
+
+/* ---------- Ch6 patterns ---------- */
+(function(){const N=400;let e1=Array.from({length:N},randn),e2=Array.from({length:N},randn),u=Array.from({length:N},Math.random);
+ function build(p,r){let x=[],y=[];
+  if(p==='lin'){x=e1.slice(0,200);y=x.map((v,i)=>r*v+Math.sqrt(1-r*r)*e2[i])}
+  else if(p==='par'){x=e1.slice(0,200).map(v=>Math.max(-2.2,Math.min(2.2,v)));y=x.map((v,i)=>v*v+.35*e2[i])}
+  else if(p==='cir'){x=[];y=[];for(let i=0;i<200;i++){const t=2*Math.PI*u[i];x.push(2*Math.cos(t)+.12*e1[i]);y.push(2*Math.sin(t)+.12*e2[i])}}
+  else if(p==='out'){x=e1.slice(0,60);y=e2.slice(0,60);x.push(6);y.push(6)}
+  else{x=[];y=[];for(let i=0;i<210;i++){const g=i%3,c=(g-1)*2.4,xx=c+.6*e1[i];x.push(xx);y.push(c-.8*(xx-c)+.25*e2[i])}}
+  return[x,y]}
+ const MSG={lin:'Linear: correlation captures it well.',par:'Y is a deterministic-ish function of X (strong dependence) yet r ≈ 0: symmetric U-shape cancels out in the average product. Spearman also ≈ 0. Correlation = 0 does <b>not</b> mean independent.',cir:'Perfect structure, zero correlation. Each X value has two possible Y values (±), so the covariance cancels.',out:'Sixty unrelated points (r ≈ 0) plus ONE outlier at (6, 6) creates a large correlation. Spearman (ranks) is much less affected — a robust alternative.',sim:'Pooled correlation is strongly positive, but within every group the slope is negative: Simpson’s paradox. Always check whether the data are mixtures of subgroups.'};
+ function draw(){const p=$('c6p').value,r=val('c6r'),[x,y]=build(p,r),rx=ranks(x),ry=ranks(y),pr=corr(x,y),sp=corr(rx,ry),cv=cov(x,y);
+  const xl=Math.min.apply(null,x),xh=Math.max.apply(null,x),yl=Math.min.apply(null,y),yh=Math.max.apply(null,y),mx=(xh-xl)*.08,my=(yh-yl)*.08;
+  const P=mk($('c6cv'),xl-mx,xh+mx,yh+my,{y0:yl-my});
+  const cols=['#6ea8ff','#ff6b81','#4ade80'];x.forEach((v,i)=>{P.g.fillStyle=p==='sim'?cols[i%3]:(p==='out'&&i===x.length-1?C.y:'rgba(110,168,255,.7)');P.g.beginPath();P.g.arc(P.X(v),P.Y(y[i]),p==='out'&&i===x.length-1?6:3.3,0,7);P.g.fill()});
+  $('c6st').innerHTML=stat('Pearson r',f3(pr),Math.abs(pr)>.5?'hot':'ok')+stat('Spearman ρ',f3(sp),'in')+stat('covariance',f3(cv),'warn')+stat('n',x.length,'');
+  $('c6rd').innerHTML=MSG[p]}
+ on('c6p c6r',draw);reg(draw);$('c6re').onclick=()=>{e1=Array.from({length:N},randn);e2=Array.from({length:N},randn);u=Array.from({length:N},Math.random);draw()};})();
+
+/* ---------- Ch7 portfolio ---------- */
+(function(){function sd(w,sa,sb,r){return Math.sqrt(Math.max(0,w*w*sa*sa+(1-w)*(1-w)*sb*sb+2*w*(1-w)*r*sa*sb))}
+ function draw(){const sa=val('c7sa'),sb=val('c7sb'),ma=val('c7ma'),mb=val('c7mb'),r=val('c7r'),w=val('c7w');
+  const P=mk($('c7cv'),0,1,Math.max(sa,sb)*1.15);
+  [[1,C.mu],[0,'#556'],[-1,C.mu]].forEach(([rr,col])=>{P.line(x=>sd(x,sa,sb,rr),col,1.2,0,1,100);P.text('ρ='+rr,P.X(.985),P.Y(sd(.985,sa,sb,rr))-4,col,'right')});
+  P.line(x=>sd(x,sa,sb,r),C.t,3,0,1,200);
+  const s=sd(w,sa,sb,r);P.g.fillStyle=C.y;P.g.beginPath();P.g.arc(P.X(w),P.Y(s),6,0,7);P.g.fill();
+  const den=sa*sa+sb*sb-2*r*sa*sb;let wm=den>0?(sb*sb-r*sa*sb)/den:1;wm=Math.max(0,Math.min(1,wm));const smin=sd(wm,sa,sb,r);
+  P.text('x: weight in A    y: portfolio SD (%)',P.L+6,P.T+12,C.mu);
+  const er=w*ma+(1-w)*mb,naive=w*sa+(1-w)*sb;
+  $('c7st').innerHTML=stat('E[R] (linear)',f3(er)+'%','in')+stat('portfolio SD',f3(s)+'%','hot')+stat('weighted-avg of SDs',f3(naive)+'%','warn')+stat('diversification gain',f3(naive-s)+' pts','ok')+stat('min-variance weight in A',f3(wm),'')+stat('min-variance SD',f3(smin)+'%','ok');
+  $('c7rd').innerHTML=`At w = ${w}: the expected return is simply ${f3(er)}% (expectation is linear). Risk is ${f3(s)}%, below the naive weighted average of the SDs (${f3(naive)}%) whenever ρ &lt; 1. The least risky mix puts ${f3(wm)} in A with SD ${f3(smin)}%${smin<Math.min(sa,sb)-1e-9?' — <b>lower than either asset alone</b>':''}.`}
+ on('c7sa c7sb c7ma c7mb c7r c7w',draw);reg(draw);})();
+
+/* ---------- Ch8 mixture ---------- */
+(function(){const N=6000;let z=Array.from({length:N},randn),u=Array.from({length:N},Math.random);
+ function draw(){const pi=val('c8p')/100,m1=val('c8m1'),m2=val('c8m2'),s1=val('c8s1'),s2=val('c8s2');
+  const seg=[],x=[];for(let i=0;i<N;i++){const a=u[i]<pi;seg.push(a);x.push(a?m1+s1*z[i]:m2+s2*z[i])}
+  const lo=Math.min(m1-3.5*s1,m2-3.5*s2),hi=Math.max(m1+3.5*s1,m2+3.5*s2),nb=70,bw=(hi-lo)/nb,c1=new Array(nb).fill(0),c2=new Array(nb).fill(0);
+  x.forEach((v,i)=>{if(v>=lo&&v<=hi){const k=Math.min(nb-1,Math.floor((v-lo)/bw));(seg[i]?c1:c2)[k]++}});
+  const d1=c1.map(k=>k/N/bw),d2=c2.map(k=>k/N/bw),tot=d1.map((v,i)=>v+d2[i]),P=mk($('c8cv'),lo,hi,Math.max.apply(null,tot)*1.2);
+  bars(P,d2,lo,hi,'rgba(255,107,129,.55)');
+  d1.forEach((v,i)=>{const xa=lo+i*bw;P.g.fillStyle='rgba(110,168,255,.6)';P.g.fillRect(P.X(xa)+.5,P.Y(tot[i]),Math.max(1,P.X(xa+bw)-P.X(xa)-1),P.Y(tot[i])-P.Y(d2[i]))});
+  const Em=pi*m1+(1-pi)*m2,within=pi*s1*s1+(1-pi)*s2*s2,between=pi*(m1-Em)*(m1-Em)+(1-pi)*(m2-Em)*(m2-Em),tvar=within+between;
+  P.vline(Em,C.y,'E[X]',true);
+  $('c8st').innerHTML=stat('E[X] = Σ π·mean',f3(Em),'in')+stat('E[Var(X|S)] within',f3(within),'warn')+stat('Var(E[X|S]) between',f3(between),'hot')+stat('total variance',f3(tvar),'ok')+stat('simulated variance',f3(vr(x)),'')+stat('R² = between / total',f3(between/tvar),'in');
+  $('c8rd').innerHTML=`Total variance ${f3(tvar)} = within ${f3(within)} + between ${f3(between)}. Knowing which segment a customer belongs to explains ${f3(100*between/tvar)}% of the variance (R²). Push the two means together and between → 0: the segmentation tells you nothing; pull them apart and the histogram turns bimodal while R² rises.`}
+ on('c8p c8m1 c8m2 c8s1 c8s2',draw);reg(draw);$('c8re').onclick=()=>{z=Array.from({length:N},randn);u=Array.from({length:N},Math.random);draw()};})();
+
+/* ---------- Ch9 moments ---------- */
+(function(){const M={norm:randn,unif:()=>Math.random(),expo:()=>-Math.log(1-Math.random()),logn:()=>Math.exp(randn()),t3:()=>randn()/Math.sqrt((randn()*randn()*0+0)+(Math.pow(randn(),2)+Math.pow(randn(),2)+Math.pow(randn(),2))/3),bern:()=>Math.random()<.02?1:0};
+ let data=null,info=null;
+ function run(){const s=M[$('c9d').value];data=Array.from({length:8000},s);const sk=skewKurt(data);
+  const m=mean(data);let beyond=0;data.forEach(v=>{if(Math.abs(v-m)>3*sk.sd)beyond++});
+  const vs=[];for(let r=0;r<300;r++){const a=Array.from({length:100},s);vs.push(vr(a))}
+  const mv=mean(vs),cvv=Math.sqrt(vr(vs))/mv;info={sk,beyond:beyond/8000,cvv,mv};draw()}
+ function draw(){if(!data)return;const lo=pct(data,.005),hi=pct(data,.995),h=hi===lo?lo+1:hi,l=hi===lo?lo-1:lo,nb=60,d=dens(data,l,h,nb);
+  const P=mk($('c9cv'),l,h,Math.max.apply(null,d)*1.15);bars(P,d,l,h,'rgba(110,168,255,.6)');
+  const m=mean(data),sd=info.sk.sd;if(sd>0)P.line(x=>npdf((x-m)/sd)/sd,C.y,2,l,h,200);P.text('yellow: normal curve with the same mean and SD',P.L+6,P.T+12,C.mu);
+  const heavy=info.sk.ku>6;
+  $('c9st').innerHTML=stat('skewness',f3(info.sk.sk),Math.abs(info.sk.sk)>1?'hot':'ok')+stat('excess kurtosis',f3(info.sk.ku),heavy?'hot':'ok')+stat('beyond ±3 SD',f3(100*info.beyond)+'%','warn')+stat('(normal: 0.27%)','','')+stat('instability of s² (CV, n=100)',f3(info.cvv),info.cvv>.5?'hot':'in');
+  $('c9rd').innerHTML=`Skewness ${f3(info.sk.sk)}, excess kurtosis ${f3(info.sk.ku)}. The CV of the sample variance is ${f3(info.cvv)} — a CV above ~0.5 means a variance computed from 100 points is <b>unreliable</b>. ${$('c9d').value==='t3'?'Resample a few times: kurtosis and CV jump around because the 4th moment is infinite — the “estimate” never converges.':$('c9d').value==='bern'?'Rare events: values are 0 or 1, so everything is in the tail; normal-based thinking makes no sense here.':'Compare with Normal: skewness 0, excess kurtosis 0, CV ≈ 0.14.'}`}
+ $('c9d').addEventListener('change',run);$('c9go').onclick=run;resizers.push(draw);run();})();
+
+/* ---------- Ch10 Bessel ---------- */
+(function(){let res=null;
+ function run(){const n=val('c10n'),R=20000;let sn=0,sn1=0,ss=0;for(let r=0;r<R;r++){let m=0,a=new Array(n);for(let i=0;i<n;i++){a[i]=2*randn();m+=a[i]}m/=n;let q=0;for(let i=0;i<n;i++)q+=(a[i]-m)*(a[i]-m);sn+=q/n;sn1+=q/(n-1);ss+=Math.sqrt(q/(n-1))}res={n,sn:sn/R,sn1:sn1/R,sd:ss/R};draw()}
+ function draw(){if(!res)return;const P=mk($('c10cv'),0,4,5,{noY:false});
+  [[res.sn,C.r,'divisor n'],[res.sn1,C.g,'divisor n−1'],[4,C.y,'true σ² = 4']].forEach(([v,col,lab],i)=>{const x0=.35+i*1.25;P.g.fillStyle=col;P.g.globalAlpha=.75;P.g.fillRect(P.X(x0),P.Y(v),P.X(x0+.9)-P.X(x0),P.Y(0)-P.Y(v));P.g.globalAlpha=1;P.text(lab,P.X(x0+.45),P.Y(v)-6,col,'center')});
+  $('c10st').innerHTML=stat('avg s² (divisor n)',f3(res.sn),'hot')+stat('theory (n−1)/n · 4',f3((res.n-1)/res.n*4),'')+stat('avg s² (divisor n−1)',f3(res.sn1),'ok')+stat('avg s = √s² (true σ = 2)',f3(res.sd),'warn');
+  $('c10rd').innerHTML=`With n = ${res.n}: dividing by n averages ${f3(res.sn)} (too low by the factor (n−1)/n = ${f3((res.n-1)/res.n)}); dividing by n−1 averages ${f3(res.sn1)} ≈ 4 (unbiased). The standard deviation s is still low on average (${f3(res.sd)} &lt; 2) — Jensen’s inequality: E[√s²] ≤ √E[s²]. The bias shrinks as n grows.`}
+ on('c10n',run);$('c10go').onclick=run;resizers.push(draw);run();})();
+
+/* ---------- Ch11 ellipse ---------- */
+(function(){let z1=Array.from({length:500},randn),z2=Array.from({length:500},randn);
+ function draw(){const sx=val('c11sx'),sy=val('c11sy'),r=val('c11r'),px=val('c11px'),py=val('c11py'),cv=$('c11cv'),bb=cv.getBoundingClientRect(),asp=Math.max(.5,(bb.width-54)/Math.max(1,(bb.height-42)||1)),yr=6;
+  const P=mk(cv,-yr*asp,yr*asp,yr,{y0:-yr});
+  const a=sx*sx,b=sy*sy,c=r*sx*sy,tr=(a+b)/2,dd=Math.sqrt(((a-b)/2)**2+c*c),l1=tr+dd,l2=Math.max(0,tr-dd),th=.5*Math.atan2(2*c,a-b);
+  for(let i=0;i<500;i++){const x=sx*z1[i],y=r*sy*z1[i]+Math.sqrt(1-r*r)*sy*z2[i];P.g.fillStyle='rgba(110,168,255,.4)';P.g.beginPath();P.g.arc(P.X(x),P.Y(y),2,0,7);P.g.fill()}
+  [1,2,3].forEach(k=>{P.g.strokeStyle=k===1?C.t:C.mu;P.g.lineWidth=k===1?2:1.2;P.g.beginPath();for(let i=0;i<=100;i++){const t=2*Math.PI*i/100,u=k*Math.sqrt(l1)*Math.cos(t),v=k*Math.sqrt(l2)*Math.sin(t),x=u*Math.cos(th)-v*Math.sin(th),y=u*Math.sin(th)+v*Math.cos(th);i?P.g.lineTo(P.X(x),P.Y(y)):P.g.moveTo(P.X(x),P.Y(y))}P.g.stroke()});
+  [[Math.sqrt(l1),0,C.y],[0,Math.sqrt(l2),C.p]].forEach(([u,v,col])=>{const x=u*Math.cos(th)-v*Math.sin(th),y=u*Math.sin(th)+v*Math.cos(th);P.g.strokeStyle=col;P.g.lineWidth=2.5;P.g.beginPath();P.g.moveTo(P.X(-2*x),P.Y(-2*y));P.g.lineTo(P.X(2*x),P.Y(2*y));P.g.stroke()});
+  const det=a*b-c*c,d2=(b*px*px-2*c*px*py+a*py*py)/det,eu=Math.hypot(px,py);
+  P.g.fillStyle=C.r;P.g.beginPath();P.g.arc(P.X(px),P.Y(py),7,0,7);P.g.fill();P.g.strokeStyle=C.r;P.g.setLineDash([4,4]);P.g.beginPath();P.g.moveTo(P.X(0),P.Y(0));P.g.lineTo(P.X(px),P.Y(py));P.g.stroke();P.g.setLineDash([]);
+  const pr=Math.exp(-d2/2);
+  $('c11st').innerHTML=stat('Σ',`[${f3(a)}, ${f3(c)}; ${f3(c)}, ${f3(b)}]`,'in')+stat('eigenvalues λ₁, λ₂',`${f3(l1)}, ${f3(l2)}`,'warn')+stat('share of variance on axis 1',f3(100*l1/(l1+l2))+'%','')+stat('Euclidean distance',f3(eu),'')+stat('Mahalanobis distance',f3(Math.sqrt(d2)),'hot')+stat('P(a normal point is this far or farther)',f3(pr),pr<.01?'hot':'ok');
+  $('c11rd').innerHTML=`The test point is ${f3(eu)} units from the center by the ruler but <b>${f3(Math.sqrt(d2))}</b> Mahalanobis units (${f3(pr*100)}% of normal data lie that far out). Yellow axis = first principal component (variance λ₁ = ${f3(l1)}); purple = second (λ₂ = ${f3(l2)}). As |ρ| → 1, λ₂ → 0: the cloud collapses onto a line, which is what PCA exploits.`}
+ on('c11sx c11sy c11r c11px c11py',draw);reg(draw);})();
+
+/* ---------- Ch12 Chebyshev ---------- */
+(function(){const CD={normal:{mu:0,sd:1,F:x=>normCdf(x),pos:false},uniform:{mu:.5,sd:Math.sqrt(1/12),F:x=>x<0?0:x>1?1:x,pos:true},exponential:{mu:1,sd:1,F:x=>x<0?0:1-Math.exp(-x),pos:true},lognormal:{mu:Math.exp(.5),sd:Math.sqrt((Math.E-1)*Math.E),F:x=>x<=0?0:normCdf(Math.log(x)),pos:true}};
+ function draw(){const d=CD[$('c12d').value];let rows='',mk_='';
+  for(let k=1;k<=6;k++){const act=1-(d.F(d.mu+k*d.sd)-d.F(d.mu-k*d.sd)),ch=Math.min(1,1/(k*k)),nm=2*normSf(k);rows+=`<tr><td class="n">${k}</td><td class="n">${f3(act)}</td><td class="n">${f3(ch)}</td><td class="n">${f3(nm)}</td></tr>`}
+  for(let k=1;k<=6;k++){if(!d.pos)break;const act=1-d.F(k*d.mu);mk_+=`<tr><td class="n">${k}</td><td class="n">${f3(act)}</td><td class="n">${f3(1/k)}</td></tr>`}
+  $('c12tb').innerHTML=`<table><tr><th>k (SDs)</th><th>actual P(|X−μ| ≥ kσ)</th><th>Chebyshev bound 1/k²</th><th>if it were normal</th></tr>${rows}</table>`+(d.pos?`<table><tr><th>k</th><th>actual P(X ≥ k·μ)</th><th>Markov bound 1/k</th></tr>${mk_}</table>`:'<p style="color:var(--mu)">Markov’s inequality needs X ≥ 0, so it is skipped for the normal.</p>');
+  $('c12rd').innerHTML=`Chebyshev is guaranteed but conservative: at k = 3 it allows up to 11.1% beyond 3 SD, while the actual figure here is ${f3(1-(d.F(d.mu+3*d.sd)-d.F(d.mu-3*d.sd)))}. The bound is only <i>tight</i> for contrived distributions — its value is that it needs no distributional assumption at all, so it is an honest worst-case when you know only a mean and SD.`}
+ on('c12d',draw);draw();})();
+
+/* ---------- Ch13 CLT ---------- */
+(function(){const CL={unif:{mu:.5,sd:Math.sqrt(1/12),s:()=>Math.random()},expo:{mu:1,sd:1,s:()=>-Math.log(1-Math.random())},bern:{mu:.05,sd:Math.sqrt(.0475),s:()=>Math.random()<.05?1:0},logn:{mu:Math.exp(1.125),sd:Math.sqrt((Math.exp(2.25)-1)*Math.exp(2.25)),s:()=>Math.exp(1.5*randn())}};
+ let zs=null;
+ function run(){const L=CL[$('c13d').value],n=val('c13n'),R=4000;zs=[];for(let r=0;r<R;r++){let s=0;for(let i=0;i<n;i++)s+=L.s();zs.push((s/n-L.mu)/(L.sd/Math.sqrt(n)))}draw()}
+ function draw(){if(!zs)return;const lo=-4,hi=4,d=dens(zs,lo,hi,50),P=mk($('c13cv'),lo,hi,Math.max(.45,Math.max.apply(null,d)*1.1));bars(P,d,lo,hi,'rgba(110,168,255,.6)');P.line(npdf,C.y,2.2);
+  const sk=skewKurt(zs),up=zs.filter(z=>z>1.96).length/zs.length,dn=zs.filter(z=>z<-1.96).length/zs.length;
+  $('c13st').innerHTML=stat('skewness of the averages',f3(sk.sk),Math.abs(sk.sk)>.3?'hot':'ok')+stat('P(Z > 1.96) (ideal 0.025)',f3(up),Math.abs(up-.025)>.01?'hot':'ok')+stat('P(Z < −1.96) (ideal 0.025)',f3(dn),Math.abs(dn-.025)>.01?'hot':'ok')+stat('n',val('c13n'),'in');
+  $('c13rd').innerHTML=`Yellow = the normal curve the CLT promises. Skewness falls like skew/√n, but the <b>tails</b> converge more slowly than the middle: with skewed data at small n the two 2.5% tails are visibly unequal (${f3(dn)} vs ${f3(up)}). For Bernoulli(0.05), average counts below ~10 successes make the normal approximation poor — the rare-event warning for confidence intervals.`}
+ on('c13d c13n',run);$('c13go').onclick=run;resizers.push(draw);run();})();
+
+/* ---------- Ch14 correlated defaults ---------- */
+(function(){let res=null;
+ function simulate(n,pd,rho,S){const out=[];if(rho<=0){for(let s=0;s<S;s++)out.push(binS(n,pd)/n);return out}
+  const k=(1-rho)/rho,a=pd*k,b=(1-pd)*k;for(let s=0;s<S;s++){const p=betaS(a,b);out.push(binS(n,p)/n)}return out}
+ function run(){const n=val('c14n'),pd=val('c14pd')/100,rho=val('c14r')/100,S=2500;res={n,pd,rho,ind:simulate(n,pd,0,S),cor:simulate(n,pd,rho,S)};draw()}
+ function draw(){if(!res)return;const{n,pd,rho,ind,cor}=res,LGD=.45;
+  const hi=Math.max(pct(cor,.9995),pct(ind,.9995))*1.05,lo=Math.max(0,Math.min(pct(cor,.0005),pct(ind,.0005))*.95),nb=60;
+  const di=dens(ind,lo,hi,nb),dc=dens(cor,lo,hi,nb),P=mk($('c14cv'),lo*100,hi*100,Math.max(Math.max.apply(null,di),Math.max.apply(null,dc))*1.1/100);
+  const sc=v=>v.map(x=>x/100),Xl=lo*100,Xh=hi*100;bars(P,sc(dc),Xl,Xh,'rgba(255,107,129,.5)');bars(P,sc(di),Xl,Xh,null,C.a);
+  P.text('x: default rate (%)   blue outline: independent   red: correlated',P.L+6,P.T+12,C.mu);
+  const q=v=>pct(v,.999),sdI=Math.sqrt(vr(ind)),sdC=Math.sqrt(vr(cor)),th=Math.sqrt(pd*(1-pd)*(1+(n-1)*rho)/n),elr=mean(cor)*LGD;
+  const ulC=(q(cor)-mean(cor))*LGD,ulI=(q(ind)-mean(ind))*LGD;
+  $('c14st').innerHTML=stat('expected loss rate PD×LGD',f3(pd*LGD*100)+'%','in')+stat('mean default rate (sim)',f3(100*mean(cor))+'%','')+stat('SD of default rate: independent',f3(100*sdI)+' pts','ok')+stat('SD: correlated (sim)',f3(100*sdC)+' pts','hot')+stat('SD: correlated (formula)',f3(100*th)+' pts','')+stat('99.9% unexpected loss: independent',f3(100*ulI)+'%','ok')+stat('99.9% unexpected loss: correlated',f3(100*ulC)+'%','hot')+stat('capital multiple',ulI>0?f3(ulC/ulI)+'×':'—','warn');
+  $('c14rd').innerHTML=`Both books have the same expected default rate (${f3(100*pd)}%), because expectation is linear regardless of correlation. But with ρ = ${f3(100*rho)}% the SD is ${f3(sdC/Math.max(sdI,1e-9))}× larger and the 99.9% unexpected loss is ${f3(ulC/Math.max(ulI,1e-9))}× larger. Try raising n to 2,000 with ρ = 0: the independent SD keeps shrinking. With ρ &gt; 0 it hits a floor of √(PD(1−PD)ρ) = ${f3(100*Math.sqrt(pd*(1-pd)*rho))} pts.`}
+ on('c14n c14pd c14r',run);$('c14go').onclick=run;resizers.push(draw);run();})();
+
+/* ---------- Quiz ---------- */
+const QZ=[
+{l:'Beginner',q:'What is a random variable?',o:['A number that changes unpredictably over time','A function that assigns a number to each outcome of a random experiment','A probability','Any variable that is hard to measure'],a:1,e:'It is a function X: Ω → ℝ. The randomness is in which outcome occurs; X reads a number from it.'},
+{l:'Beginner',q:'X is continuous. What is P(X = 3)?',o:['Equal to the density f(3)','Equal to F(3)','0 — only intervals have positive probability','It depends on σ'],a:2,e:'A density is not a probability; a single point has zero width. A density can even exceed 1.'},
+{l:'Beginner',q:'E[X] = 5 and Var(X) = 4. What are E[2X + 3] and Var(2X + 3)?',o:['13 and 8','13 and 16','13 and 19','10 and 16'],a:1,e:'Mean transforms linearly (2·5+3 = 13). Variance ignores the shift and squares the scale: 2²·4 = 16.'},
+{l:'Beginner',q:'X and Y are independent, each with variance 9. What is Var(X − Y)?',o:['0','9','18','−18'],a:2,e:'Variances add for sums and differences of independent variables: 9 + 9 = 18.'},
+{l:'Intermediate',q:'What is Var(X + X) in terms of Var(X)?',o:['2·Var(X)','4·Var(X)','Var(X)','0'],a:1,e:'X + X = 2X, so variance scales by 2² = 4. The “2Var(X)” answer needs two <i>independent</i> copies.'},
+{l:'Intermediate',q:'Cov(X, Y) = 0. Which is guaranteed?',o:['X and Y are independent','No linear association; but they may still be strongly (non-linearly) dependent','Y is constant','Corr(X, Y) = 1'],a:1,e:'Y = X² with X symmetric about 0 has Cov = 0 yet Y is a function of X.'},
+{l:'Intermediate',q:'The pooled correlation is +0.8, but inside every customer segment it is negative. This is…',o:['Impossible','Simpson’s paradox','A violation of Cauchy–Schwarz','Heteroscedasticity'],a:1,e:'Between-group differences can reverse the sign of the within-group relationship. Always check for mixtures.'},
+{l:'Intermediate',q:'Two assets each have SD 10%; ρ = 0.5; 50/50 portfolio. The portfolio SD is closest to…',o:['5%','7.1%','8.7%','10%'],a:2,e:'Var = 2·(.5²)(.01) + 2·(.25)(.5)(.01) = .005 + .0025 = .0075 → SD = 8.66%. Only ρ = 0 would give 7.1%; ρ = 1 gives 10%.'},
+{l:'Intermediate',q:'You observe E[Y | X = x] = 2 + 0.5x for all x, and E[X] = 4. What is E[Y]?',o:['2','4','Cannot be determined','2.5'],a:1,e:'Law of total expectation: E[Y] = E[E[Y|X]] = 2 + 0.5·4 = 4.'},
+{l:'Advanced',q:'Law of total variance: Var(Y) equals…',o:['E[Var(Y|X)]','Var(E[Y|X])','E[Var(Y|X)] + Var(E[Y|X])','E[Var(Y|X)] − Var(E[Y|X])'],a:2,e:'Within-group + between-group. R² is the between share.'},
+{l:'Advanced',q:'Why is s = √s² a slightly biased estimator of σ even though s² (divisor n−1) is unbiased?',o:['Rounding','Jensen: √ is concave, so E[√s²] ≤ √E[s²] = σ','Because of outliers','It is actually unbiased'],a:1,e:'Unbiasedness does not survive nonlinear transformations. The bias vanishes as n grows.'},
+{l:'Advanced',q:'g is convex. Which is always true?',o:['E[g(X)] ≤ g(E[X])','E[g(X)] = g(E[X])','E[g(X)] ≥ g(E[X])','Depends on the distribution of X'],a:2,e:'Jensen’s inequality. E[X²] ≥ (E[X])² is exactly “variance ≥ 0”.'},
+{l:'Advanced',q:'You average n draws from a Cauchy distribution. As n → ∞ the average…',o:['Converges to 0 (the center)','Converges to the median','Has the same distribution as a single draw — it does not converge','Converges to the sample SD'],a:2,e:'The Cauchy has no mean, so the law of large numbers does not apply.'},
+{l:'Expert',q:'Chebyshev’s inequality guarantees that for ANY distribution with finite variance, the share of probability within 3 SDs of the mean is at least…',o:['68%','95%','89%','99.7%'],a:2,e:'1 − 1/9 ≈ 88.9%. The 99.7% figure is specific to normal.'},
+{l:'Expert',q:'1,000 loans, PD = 2%, pairwise default correlation ρ = 0.02. Compared with independent defaults, the SD of the number of defaults is about…',o:['The same','1.4× larger','4.6× larger','20× larger'],a:2,e:'Var multiplies by 1 + (n−1)ρ = 1 + 999·0.02 ≈ 21 → SD multiplies by ≈ 4.6.'},
+{l:'Expert',q:'For weights w and covariance matrix Σ, the variance of the weighted sum wᵀX is…',o:['Σ wᵢ² only','wᵀΣw','Σ wᵢ Var(Xᵢ)','trace(Σ)'],a:1,e:'It includes all pairwise covariances. This also shows Σ must be positive semi-definite, because variances cannot be negative.'},
+{l:'Expert',q:'Why can the normal approximation for a sample proportion fail with 500 loans and PD = 0.1%?',o:['The CLT is wrong for proportions','Expected defaults ≈ 0.5: the distribution is highly skewed, far from the asymptotic regime','Because n is too large','Because the variance is infinite'],a:1,e:'The CLT’s speed depends on skewness and on the expected count; with ~0.5 expected events use exact (binomial/Poisson) methods.'}
+];
+(function(){const st=store.get('rv_quiz',{});
+ function render(){const box=$('quiz');box.innerHTML='';
+  QZ.forEach((q,i)=>{const d=document.createElement('div');d.className='q'+(st[i]!=null?' done':'');d.innerHTML=`<div class="qh">Q${i+1} · ${q.l}</div><div style="margin:4px 0 6px"><b>${q.q}</b></div>`;
+   q.o.forEach((o,j)=>{const b=document.createElement('button');b.className='opt';b.textContent=o;if(st[i]!=null){if(j===q.a)b.classList.add('good');else if(j===st[i])b.classList.add('bad')}b.onclick=()=>{if(st[i]!=null)return;st[i]=j;store.set('rv_quiz',st);render();meter()};d.appendChild(b)});
+   const e=document.createElement('div');e.className='ex';e.innerHTML=(st[i]===q.a?'✅ ':'❌ ')+q.e;d.appendChild(e);box.appendChild(d)});
+  const ans=Object.keys(st).length,ok=QZ.filter((q,i)=>st[i]===q.a).length;
+  $('qscore').innerHTML=stat('answered',ans+' / '+QZ.length,'in')+stat('correct',ok,'ok')+stat('score',ans?Math.round(100*ok/ans)+'%':'—',ok/Math.max(ans,1)>=.8?'ok':'warn')+stat('verdict',ans<QZ.length?'keep going':ok>=14?'building-block master':ok>=11?'strong':'review ch. 5–8','')}
+ $('qreset').onclick=()=>{Object.keys(st).forEach(k=>delete st[k]);store.set('rv_quiz',st);render();meter()};
+ window.__qst=st;render();})();
+const CHK=['State what a random variable is, and the difference between X and x.','Move between PMF/PDF/CDF and compute P(a < X ≤ b).','Use linearity of expectation and indicators, including with dependent variables.','Derive Var(X) = E[X²] − (E X)² and the scaling rule Var(aX+b) = a²Var(X).','Compute Var(X ± Y) with and without independence.','Explain why zero covariance does not imply independence (give an example).','Spot Simpson’s paradox in a pooled-vs-grouped comparison.','Apply the law of total expectation and total variance to a segmented population.','Compute the variance of a portfolio from weights and a covariance matrix.','Explain why divide-by-(n−1) gives an unbiased variance and why s is still biased.','Say when the LLN or CLT fails (no mean, heavy tails, rare events).','Interpret a covariance matrix via eigenvectors/eigenvalues and Mahalanobis distance.','Use Markov/Chebyshev to bound a tail with only partial information.','Explain why default correlation, not PD, drives tail loss in a diversified book.'];
+(function(){const st=store.get('rv_chk',{}),box=$('chk');CHK.forEach((t,i)=>{const l=document.createElement('label'),c=document.createElement('input');c.type='checkbox';c.checked=!!st[i];c.onchange=()=>{st[i]=c.checked;store.set('rv_chk',st);meter()};l.appendChild(c);const s=document.createElement('span');s.textContent=t;l.appendChild(s);box.appendChild(l)});window.__cst=st;})();
+function meter(){const q=window.__qst||{},c=window.__cst||{};const ok=QZ.filter((x,i)=>q[i]===x.a).length,ck=Object.values(c).filter(Boolean).length;const pc=Math.round(100*(.6*ok/QZ.length+.4*ck/CHK.length));$('mtxt').textContent='Mastery: '+pc+'%  (exam + checklist)';$('mbar').style.width=pc+'%';try{localStorage.setItem('mastery_rv',JSON.stringify(pc))}catch(e){}}
+meter();
+
+/* ---------- Navigation ---------- */
+(function(){const nav=$('nav');let html='';
+ document.querySelectorAll('main .part, main section.ch').forEach(el=>{if(el.classList.contains('part'))html+=`<div class="pt">${el.textContent}</div>`;else{const h=el.querySelector('h2'),num=h.querySelector('.num').textContent,t=Array.from(h.childNodes).filter(n=>n.nodeType===3).map(n=>n.textContent).join('').trim();html+=`<a href="#${el.id}" data-id="${el.id}">${num}. ${t}</a>`}});
+ nav.innerHTML=html;const links=nav.querySelectorAll('a'),io=new IntersectionObserver(es=>{es.forEach(e=>{if(e.isIntersecting)links.forEach(a=>a.classList.toggle('on',a.dataset.id===e.target.id))})},{rootMargin:'-20% 0px -70% 0px'});
+ document.querySelectorAll('section.ch').forEach(s=>io.observe(s));
+ $('menu').onclick=()=>$('side').classList.toggle('open');nav.addEventListener('click',e=>{if(e.target.tagName==='A')$('side').classList.remove('open')});
+ window.addEventListener('scroll',()=>{const h=document.documentElement;$('prog').style.width=(100*h.scrollTop/(h.scrollHeight-h.clientHeight))+'%'},{passive:true});})();
+</script>
+</body>
+</html>
