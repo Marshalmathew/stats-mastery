@@ -1,0 +1,657 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Bootstrap and Resampling Mastery</title>
+<style>
+:root{--bg:#0b0e17;--panel:#121726;--panel2:#171d30;--line:#232a3d;--fg:#e8ebf5;--mu:#8a93ab;--a:#6ea8ff;--r:#ff6b81;--y:#ffd166;--g:#4ade80;--p:#c084fc;--t:#5eead4}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;background:var(--bg);color:var(--fg);font:16px/1.7 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+a{color:var(--a)}
+#prog{position:fixed;top:0;left:0;height:3px;background:linear-gradient(90deg,var(--a),var(--p),var(--r));width:0;z-index:50}
+.side{position:fixed;left:0;top:0;bottom:0;width:290px;background:#0e1220;border-right:1px solid var(--line);overflow:auto;padding:18px 14px 90px;z-index:40;transition:transform .25s}
+.side h1{font-size:15px;margin:0 0 2px}
+.side small{color:var(--mu)}
+.side .pt{margin:16px 0 4px;font-size:11px;text-transform:uppercase;letter-spacing:1.3px;color:var(--p)}
+.side a{display:block;color:var(--mu);text-decoration:none;padding:5px 9px;border-radius:7px;font-size:13.5px;line-height:1.35}
+.side a:hover{background:var(--panel);color:var(--fg)}
+.side a.on{background:var(--panel2);color:var(--fg);box-shadow:inset 3px 0 var(--a)}
+.side a.back{color:var(--t);padding-left:0;margin-bottom:6px}
+.meter{position:fixed;left:0;bottom:0;width:290px;background:#0e1220;border-top:1px solid var(--line);padding:10px 16px;z-index:41;font-size:12px;color:var(--mu)}
+.meter .bar{height:7px;background:var(--line);border-radius:6px;margin-top:5px;overflow:hidden}
+.meter .bar i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--g),var(--t));transition:width .4s}
+#menu{display:none;position:fixed;top:10px;left:10px;z-index:60;background:var(--panel2);color:var(--fg);border:1px solid var(--line);border-radius:9px;padding:7px 12px;font-size:14px;cursor:pointer}
+main{margin-left:290px;padding:0 34px 120px;max-width:1090px}
+.hero{padding:70px 0 30px}
+.hero h1{font-size:clamp(32px,5vw,56px);line-height:1.08;margin:0 0 14px;background:linear-gradient(100deg,#fff,var(--y) 40%,var(--r));-webkit-background-clip:text;background-clip:text;color:transparent}
+.hero p{font-size:19px;color:#c3c9dc;max-width:780px}
+.chips{display:flex;flex-wrap:wrap;gap:8px;margin:18px 0}
+.chip{border:1px solid var(--line);background:var(--panel);padding:5px 12px;border-radius:99px;font-size:13px;color:var(--mu)}
+.chip b{color:var(--fg)}
+.part{margin:90px 0 0;padding-top:22px;border-top:1px solid var(--line);font-size:12px;letter-spacing:2px;text-transform:uppercase;color:var(--p)}
+section.ch{padding-top:30px}
+h2{font-size:30px;line-height:1.2;margin:10px 0 8px;display:flex;gap:12px;align-items:center;flex-wrap:wrap}
+h2 .num{display:inline-grid;place-items:center;width:40px;height:40px;border-radius:12px;background:var(--panel2);border:1px solid var(--line);font-size:18px;color:var(--a)}
+.lvl{font-size:11px;font-weight:600;letter-spacing:.8px;text-transform:uppercase;padding:3px 9px;border-radius:99px;border:1px solid}
+.lvl.b{color:var(--g);border-color:#1f5c3a}.lvl.i{color:var(--a);border-color:#244a85}.lvl.a{color:var(--y);border-color:#6b5420}.lvl.e{color:var(--r);border-color:#7a2c3a}
+h3{font-size:19px;margin:30px 0 6px;color:#fff}
+p{margin:10px 0}li{margin:5px 0}
+code,.f{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace}
+code{background:var(--panel2);padding:1px 6px;border-radius:5px;font-size:.9em}
+.f{display:block;white-space:pre-wrap;background:#0e1322;border:1px solid var(--line);border-left:3px solid var(--a);padding:12px 16px;border-radius:9px;margin:14px 0;overflow-x:auto;font-size:15px;color:#dbe4ff;line-height:1.8}
+.co{border-radius:12px;padding:13px 17px;margin:16px 0;border:1px solid var(--line);background:var(--panel)}
+.co>b:first-child{display:block;margin-bottom:2px;font-size:12px;letter-spacing:1px;text-transform:uppercase}
+.co.def{border-left:4px solid var(--a)}.co.def>b:first-child{color:var(--a)}
+.co.warn{border-left:4px solid var(--r)}.co.warn>b:first-child{color:var(--r)}
+.co.tip{border-left:4px solid var(--g)}.co.tip>b:first-child{color:var(--g)}
+.co.key{border-left:4px solid var(--y);background:#171608}.co.key>b:first-child{color:var(--y)}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:18px 20px;margin:22px 0;box-shadow:0 8px 30px rgba(0,0,0,.25)}
+.card>h4{margin:0 0 3px;font-size:13px;letter-spacing:1.2px;text-transform:uppercase;color:var(--t)}
+.card>p.sub{margin:0 0 12px;color:var(--mu);font-size:14.5px}
+.ctl{display:flex;flex-wrap:wrap;gap:10px 22px;align-items:center;margin:8px 0 10px}
+.ctl label{display:flex;gap:8px;align-items:center;font-size:14px;color:#c3c9dc}
+.ctl output{min-width:38px;font-family:ui-monospace,monospace;color:var(--y);font-size:13px}
+input[type=range]{accent-color:var(--a);width:150px}
+input[type=checkbox]{accent-color:var(--a)}
+select,input[type=number],input[type=text]{background:#0e1322;color:var(--fg);border:1px solid var(--line);border-radius:8px;padding:6px 9px;font:inherit;font-size:14px}
+button{background:linear-gradient(180deg,#2c4a80,#233b68);color:#fff;border:1px solid #3a5a98;border-radius:9px;padding:7px 14px;font:inherit;font-size:14px;cursor:pointer}
+button:hover{filter:brightness(1.15)}
+button.alt{background:var(--panel2);border-color:var(--line);color:var(--fg)}
+canvas{width:100%;height:270px;display:block;background:#0e1322;border:1px solid var(--line);border-radius:10px;margin-top:6px}
+canvas.sm{height:210px}canvas.tl{height:330px}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(125px,1fr));gap:9px;margin:12px 0}
+.stat{background:#0e1322;border:1px solid var(--line);border-radius:10px;padding:8px 11px}
+.stat b{display:block;font-size:17px;font-family:ui-monospace,monospace}
+.stat span{font-size:11.5px;color:var(--mu);text-transform:uppercase;letter-spacing:.7px}
+.stat.hot b{color:var(--r)}.stat.ok b{color:var(--g)}.stat.warn b{color:var(--y)}.stat.in b{color:var(--a)}
+.read{margin:8px 0 0;padding:10px 14px;background:#0e1322;border:1px dashed #33406a;border-radius:10px;font-size:14.5px;color:#d3dbf3}
+table{border-collapse:collapse;width:100%;margin:12px 0;font-size:14px}
+th,td{border:1px solid var(--line);padding:7px 10px;text-align:left;vertical-align:top}
+th{background:var(--panel2);font-size:12px;text-transform:uppercase;letter-spacing:.6px;color:var(--mu)}
+td.n{font-family:ui-monospace,monospace;text-align:right}
+.tw{overflow-x:auto}
+.pill{display:inline-block;padding:1px 9px;border-radius:99px;font-size:12px;font-weight:600}
+.pill.r{background:#3a1520;color:var(--r)}.pill.g{background:#10321f;color:var(--g)}.pill.y{background:#3a2f0e;color:var(--y)}.pill.m{background:#202637;color:var(--mu)}
+details{background:var(--panel);border:1px solid var(--line);border-radius:11px;padding:9px 15px;margin:9px 0}
+details summary{cursor:pointer;font-weight:600}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.q{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:14px 18px;margin:14px 0}
+.q .qh{font-size:12px;letter-spacing:1px;text-transform:uppercase;color:var(--mu)}
+.q .opt{display:block;width:100%;text-align:left;margin:6px 0;background:#0e1322;border:1px solid var(--line);color:var(--fg);border-radius:9px;padding:9px 12px}
+.q .opt.good{border-color:var(--g);background:#0e2418}.q .opt.bad{border-color:var(--r);background:#2a1119}
+.q .ex{display:none;margin-top:8px;font-size:14.5px;color:#c3c9dc}
+.q.done .ex{display:block}
+.chk label{display:flex;gap:10px;align-items:flex-start;padding:6px 0;cursor:pointer}
+.chk input{margin-top:6px;accent-color:var(--g);width:17px;height:17px}
+.sigrow{display:grid;grid-template-columns:minmax(170px,2fr) 1fr 1fr auto;gap:8px 14px;align-items:center;padding:6px 0;border-top:1px dashed #1b2236}
+.sigrow:first-of-type{border-top:0}
+.sigrow label{display:flex;gap:6px;align-items:center;font-size:13.5px;color:#c3c9dc}
+@media(max-width:900px){
+ .side{transform:translateX(-100%)}.side.open{transform:none}.meter{display:none}
+ #menu{display:block}main{margin-left:0;padding:0 16px 100px}.two{grid-template-columns:1fr}.hero{padding-top:60px}
+ .sigrow{grid-template-columns:1fr 1fr}
+}
+</style>
+</head>
+<body>
+<div id="prog"></div>
+<button id="menu">☰ Contents</button>
+<nav class="side" id="side"><a class="back" href="index.html">← All courses</a><h1>Bootstrap &amp; Resampling</h1><small>12 chapters · 11 labs · exam</small><div id="nav"></div></nav>
+<div class="meter"><div id="mtxt">Mastery: 0%</div><div class="bar"><i id="mbar"></i></div></div>
+
+<main>
+<header class="hero">
+ <h1>The bootstrap and resampling, in depth.</h1>
+ <p>When no formula exists for the standard error of your statistic, you let the computer repeat the experiment for you. Resampling is that idea: treat the data as a stand-in for the population, redraw from it thousands of times, and read uncertainty off the results. This page covers why the bootstrap works and when it fails, standard errors, bias and the jackknife, better intervals (BCa and bootstrap-t), regression bootstraps, permutation tests and their traps, Monte Carlo p-values, and the dependence structures that break naive resampling: time series, clustered accounts and paired model comparisons. It ends with the practical case most data scientists meet first: a confidence interval for a model's AUC.</p>
+ <div class="chips"><span class="chip"><b>Part I</b> The idea and its limits</span><span class="chip"><b>Part II</b> Better intervals and regression</span><span class="chip"><b>Part III</b> Permutation tests</span><span class="chip"><b>Part IV</b> Dependence and model metrics</span></div>
+ <div class="co tip"><b>How to use this</b>Labs that need many simulations run when you release a slider or press a button, and some take a second or two. Every number is Monte Carlo, so expect small run-to-run wobble; the wobble is itself part of the lesson in Chapter 8. Prerequisites: Sampling Distributions and Confidence Intervals pages.</div>
+</header>
+
+<div class="part">Part I · The idea and its limits</div>
+
+<section class="ch" id="c1">
+<h2><span class="num">1</span>The plug-in principle <span class="lvl b">Beginner</span></h2>
+<p>A statistic θ̂ computed from your sample varies from sample to sample; its sampling distribution is what tells you the standard error and the interval. You cannot redraw from the real population, but you do have its best available estimate, the <b>empirical distribution</b> F̂ that puts weight 1/n on each observed point. The bootstrap replaces the unknown F by F̂:</p>
+<div class="f">real world:       F  →  sample x₁…xₙ  →  θ̂                  (one draw of the sampling distribution)
+bootstrap world:  F̂  →  resample x₁*…xₙ* (with replacement)  →  θ̂*   (repeat B times)</div>
+<p>The hope is that the spread and shape of θ̂* − θ̂ around the bootstrap centre mimic those of θ̂ − θ around the truth. Notice what is <em>not</em> claimed: the bootstrap distribution is centred at θ̂, not at θ. It estimates <b>spread and shape</b>, not location. A resample of size n contains about 1 − (1 − 1/n)ⁿ → 63.2% of the distinct original points, the rest being duplicates.</p>
+<div class="card"><h4>Lab 1 · Bootstrap distribution vs the real sampling distribution</h4>
+ <p class="sub">Because the population is known here we can show both. Blue: the true sampling distribution of the statistic (3,000 fresh samples). Red: the bootstrap distribution from <em>one</em> sample (2,000 resamples). Yellow line: that sample's estimate; white line: the true value.</p>
+ <div class="ctl"><label>population <select id="c1d"></select></label><label>statistic <select id="c1s"><option value="mean">mean</option><option value="median">median</option><option value="sd">SD</option></select></label><label>n <input type="range" id="c1n" min="0" max="4" step="1" value="1"><output id="c1nv"></output></label><button id="c1go">Draw new sample</button></div>
+ <canvas class="tl" id="c1cv"></canvas><div class="stats" id="c1st"></div><div class="read" id="c1rd"></div></div>
+<div class="co key"><b>When it works</b>For smooth statistics (means, regression coefficients, quantiles away from ties, most estimators that are smooth functions of means) the bootstrap is consistent: its error shrinks as n grows. Chapter 3 shows where it is not.</div>
+</section>
+
+<section class="ch" id="c2">
+<h2><span class="num">2</span>Standard error, bias and the jackknife <span class="lvl i">Intermediate</span></h2>
+<p>From the B bootstrap replicates θ₁*,…,θ_B*:</p>
+<div class="tw"><table>
+<tr><th>Quantity</th><th>Bootstrap</th><th>Jackknife (leave one out)</th></tr>
+<tr><td>Standard error</td><td>SD of the θ*ᵦ</td><td>√( (n−1)/n · Σ(θ₍ᵢ₎ − θ̄₍.₎)² )</td></tr>
+<tr><td>Bias</td><td>mean(θ*) − θ̂</td><td>(n−1)(θ̄₍.₎ − θ̂)</td></tr>
+<tr><td>Bias-corrected estimate</td><td>2θ̂ − mean(θ*)</td><td>θ̂ − bias_jack</td></tr>
+</table></div>
+<p>The jackknife recomputes the statistic n times, deleting one observation each time. It is deterministic and cheap for small n, but it only uses n perturbed samples, so it fails for non-smooth statistics such as the median. The bootstrap is more general.</p>
+<div class="co warn"><b>Bias correction is not free</b>The corrected estimate 2θ̂ − mean(θ*) removes bias but adds noise, because it subtracts a noisy estimate of the bias. Unless the estimated bias is large compared with the standard error (a common rule is more than about 0.25 SE), the corrected estimator often has a <em>larger</em> mean squared error than the raw one.</div>
+<div class="card"><h4>Lab 2 · Does the bootstrap estimate bias and SE correctly?</h4>
+ <p class="sub">For 400 fresh samples from a normal population, bootstrap (200 resamples) and jackknife estimates of bias and SE are computed and averaged, then compared with the truth found by simulation. The last column asks whether bias correction helped.</p>
+ <div class="ctl"><label>statistic <select id="c2s"><option value="varn">variance, divisor n</option><option value="sd">SD, divisor n−1</option><option value="expm">exp(mean)</option><option value="logvar">log of sample variance</option></select></label><label>n <input type="range" id="c2n" min="0" max="3" step="1" value="1"><output id="c2nv"></output></label></div>
+ <canvas class="tl" id="c2cv"></canvas><div class="tw" id="c2tb"></div><div class="read" id="c2rd"></div></div>
+</section>
+
+<section class="ch" id="c3">
+<h2><span class="num">3</span>When the bootstrap fails <span class="lvl a">Advanced</span></h2>
+<p>Consistency needs the statistic to depend smoothly on the data distribution. Classic failures:</p>
+<ul>
+<li><b>Extremes</b> (maximum, minimum, high quantiles near the edge): a resample can never exceed the sample maximum, so the bootstrap distribution of the max has an atom at θ̂ with probability 1 − (1 − 1/n)ⁿ ≈ 63.2%, while the real sampling distribution is continuous.</li>
+<li><b>Heavy tails</b>: with infinite variance (Pareto tail index ≤ 2) the sample mean is not asymptotically normal and the bootstrap cannot reproduce its behaviour.</li>
+<li><b>Boundary parameters</b>, <b>non-smooth statistics</b> and <b>dependent data</b> (Chapters 9–10).</li>
+<li><b>Very small n</b>: with n = 10 distinct values the resampling world is a poor copy of the real one.</li>
+</ul>
+<p>Remedies include the <b>m-out-of-n bootstrap</b> or <b>subsampling</b> (resample fewer than n points), a <b>parametric bootstrap</b> from a fitted model (including extreme-value models for tails), or transforming the problem.</p>
+<div class="card"><h4>Lab 3 · Watch it fail</h4>
+ <p class="sub">Histograms of (θ̂ − θ) for the true sampling distribution (blue, 2,000 samples) and (θ̂* − θ̂) for the bootstrap of one sample (red). For the maximum the horizontal axis is scaled by n. A coverage study (150 samples, 200 resamples each) reports how often the 95% percentile interval contains the truth.</p>
+ <div class="ctl"><label>case <select id="c3s"><option value="ctrl">control: mean of Exponential(1)</option><option value="max">maximum of Uniform(0,1)</option><option value="par">mean of Pareto(tail index 1.5)</option></select></label><label>n <input type="range" id="c3n" min="0" max="3" step="1" value="1"><output id="c3nv"></output></label><button id="c3go">New sample</button></div>
+ <canvas class="tl" id="c3cv"></canvas><div class="stats" id="c3st"></div><div class="read" id="c3rd"></div></div>
+</section>
+
+<div class="part">Part II · Better intervals and regression</div>
+
+<section class="ch" id="c4">
+<h2><span class="num">4</span>BCa and the bootstrap-t <span class="lvl a">Advanced</span></h2>
+<p>The percentile, basic and normal intervals from the confidence-interval page have first-order accuracy: their coverage error shrinks like 1/√n. Two refinements reach second-order accuracy (error ~ 1/n):</p>
+<div class="tw"><table>
+<tr><th>Interval</th><th>Construction</th></tr>
+<tr><td><b>BCa</b> (bias-corrected and accelerated)</td><td>Percentile interval with adjusted levels α′ = Φ( ẑ₀ + (ẑ₀ + z_α) / (1 − â(ẑ₀ + z_α)) ), where ẑ₀ = Φ⁻¹(fraction of θ* below θ̂) corrects median bias and the acceleration â = Σ(θ̄₍.₎−θ₍ᵢ₎)³ / (6[Σ(θ̄₍.₎−θ₍ᵢ₎)²]^{3/2}) (from the jackknife) corrects skewness</td></tr>
+<tr><td><b>Bootstrap-t</b> (studentised)</td><td>Bootstrap the pivot t* = (θ* − θ̂)/SE*; interval [θ̂ − q₉₇.₅(t*)·SE, θ̂ − q₂.₅(t*)·SE]. Needs a standard error for every resample (a formula or a nested bootstrap)</td></tr>
+</table></div>
+<p>The gain is largest for skewed statistics and small samples. For skewed data a classic symptom is <b>unbalanced miss rates</b>: a 95% interval should miss 2.5% on each side, but the t-interval for a skewed mean typically misses mostly on one side.</p>
+<div class="card"><h4>Lab 4 · Six intervals for a mean, with miss rates</h4>
+ <p class="sub">The dumbbells show intervals from one sample (white line: true mean). “Run coverage study” repeats the whole thing for 200 samples (400 resamples each) and reports coverage and the split of misses between the two sides. Noise is about ±1.5 points.</p>
+ <div class="ctl"><label>population <select id="c4d"></select></label><label>n <input type="range" id="c4n" min="0" max="3" step="1" value="1"><output id="c4nv"></output></label><button id="c4go">Draw new sample</button><button class="alt" id="c4cs">Run coverage study</button></div>
+ <canvas class="tl" id="c4cv"></canvas><div class="tw" id="c4tb"></div><div class="read" id="c4rd"></div></div>
+</section>
+
+<section class="ch" id="c5">
+<h2><span class="num">5</span>Resampling a regression <span class="lvl a">Advanced</span></h2>
+<p>A regression offers several things to resample, and they make different assumptions:</p>
+<div class="tw"><table>
+<tr><th>Method</th><th>Resamples</th><th>Assumes</th></tr>
+<tr><td><b>Pairs (case) bootstrap</b></td><td>whole rows (xᵢ, yᵢ)</td><td>rows are iid; robust to heteroskedasticity and some misspecification</td></tr>
+<tr><td><b>Residual bootstrap</b></td><td>residuals eᵢ added back to the fit: y* = ŷ + e*</td><td>fixed X, <em>homoskedastic</em> errors and a correct mean model</td></tr>
+<tr><td><b>Wild bootstrap</b></td><td>y* = ŷ + eᵢ·wᵢ with random signs wᵢ = ±1</td><td>keeps each residual at its own x, so valid under heteroskedasticity</td></tr>
+</table></div>
+<p>Classical OLS standard errors assume constant variance. When the variance depends on x, they are wrong; heteroskedasticity-robust (HC0, “sandwich”) SEs, the pairs bootstrap and the wild bootstrap stay right, while the residual bootstrap inherits the same flaw as the classical formula.</p>
+<div class="card"><h4>Lab 5 · Slope standard errors under heteroskedasticity</h4>
+ <p class="sub">Model: y = 1 + 0.5x + σ(x)·ε with x ~ Uniform(0,10) and σ(x) = 0.5 + k·|x − 5|, so the noise is largest at the extremes of x, where the leverage on the slope is highest. The true SE of the slope comes from 3,000 simulated data sets; the five estimators are averaged over 250 data sets (200 resamples each), with their 95% interval coverage. The plot shows the current sample with 30 pairs-bootstrap fits.</p>
+ <div class="ctl"><label>heteroskedasticity k <input type="range" id="c5h" min="0" max="100" step="1" value="40"><output id="c5hv"></output></label><label>n <input type="range" id="c5n" min="0" max="2" step="1" value="1"><output id="c5nv"></output></label><button id="c5go">New data</button></div>
+ <canvas class="tl" id="c5cv"></canvas><div class="tw" id="c5tb"></div><div class="read" id="c5rd"></div></div>
+</section>
+
+<div class="part">Part III · Permutation tests</div>
+
+<section class="ch" id="c6">
+<h2><span class="num">6</span>Permutation tests <span class="lvl i">Intermediate</span></h2>
+<p>A permutation test uses resampling <em>without replacement</em> to build the null distribution. If the treatment has no effect on the outcome, the group labels are arbitrary: every reassignment of the n₁ + n₂ observations to the two groups was equally likely. So shuffle the labels, recompute the statistic T many times, and ask how extreme the observed T is among the shuffles:</p>
+<div class="f">p = ( 1 + #{ |T*| ≥ |T_obs| } ) / ( 1 + B )</div>
+<p>This is exact for any statistic (difference in means, medians, a t-statistic, a rank sum, an AUC), requires no distributional assumption, and is the natural analysis of a randomised experiment, where the labels really were assigned at random. The choice of statistic affects power, not validity.</p>
+<div class="card"><h4>Lab 6 · A permutation test, step by step</h4>
+ <p class="sub">Two groups; group 2 is shifted by the chosen effect (in SD units). The histogram is the distribution of the statistic over 5,000 random relabellings. The two-sided p-value is compared with Welch’s t-test.</p>
+ <div class="ctl"><label>distribution <select id="c6d"><option value="norm">Normal</option><option value="expo">Exponential</option><option value="logn">Lognormal</option></select></label><label>effect (SD units) <input type="range" id="c6e" min="0" max="20" step="1" value="8"><output id="c6ev"></output></label><label>n per group <input type="range" id="c6n" min="0" max="3" step="1" value="1"><output id="c6nv"></output></label><label>statistic <select id="c6t"><option value="0">difference in means</option><option value="1">difference in medians</option><option value="2">Welch t</option></select></label><button id="c6go">New data</button></div>
+ <canvas class="tl" id="c6cv"></canvas><div class="stats" id="c6st"></div><div class="read" id="c6rd"></div></div>
+</section>
+
+<section class="ch" id="c7">
+<h2><span class="num">7</span>Permutation vs bootstrap tests, and the Behrens–Fisher trap <span class="lvl e">Expert</span></h2>
+<p>The permutation null is “the two groups have the <em>same distribution</em>”, which is stronger than “the two groups have the same mean”. If you want to test equal <em>means</em> while allowing different variances, shuffling labels is not valid: under H₀ the observations are <b>not exchangeable</b>, because the group with the larger variance and smaller n makes extreme means more likely than the shuffles predict. The permutation test of the raw mean difference can then reject far more than 5% of the time.</p>
+<p>Fixes: use a <b>studentised</b> statistic (Welch t), which is asymptotically pivotal, so the permutation distribution is approximately right even when exchangeability fails; or use a <b>bootstrap test</b> that first imposes H₀ (shift each group to a common mean, then resample each group separately).</p>
+<div class="card"><h4>Lab 7 · Type I error with unequal variances and unequal n</h4>
+ <p class="sub">Both groups have true mean 0 (H₀ is true), so a valid test rejects 5% of the time. Group 1 has n₁ observations and an SD equal to the chosen multiple of group 2's SD. 1,000 data sets, 199 permutations each. Ratio 1 means equal variances.</p>
+ <div class="ctl"><label>n₁ <input type="range" id="c7a" min="5" max="60" step="1" value="10"><output id="c7av"></output></label><label>n₂ <input type="range" id="c7b" min="5" max="60" step="1" value="40"><output id="c7bv"></output></label><label>SD of group 1 ÷ SD of group 2 <input type="range" id="c7c" min="0" max="4" step="1" value="4"><output id="c7cv"></output></label><button id="c7go">Run simulation</button></div>
+ <canvas class="tl" id="c7cv2"></canvas><div class="tw" id="c7tb"></div><div class="read" id="c7rd"></div></div>
+</section>
+
+<section class="ch" id="c8">
+<h2><span class="num">8</span>Monte Carlo p-values and how many shuffles you need <span class="lvl a">Advanced</span></h2>
+<p>With B random shuffles, p̂ = (1 + #extreme)/(1 + B) is itself a random number with standard error ≈ √(p(1−p)/B). The “+1” counts the observed arrangement as one of the possible shuffles, which keeps the test valid and means p̂ can never be exactly 0. With samples as small as 10 and 10 there are only C(20,10) = 184,756 arrangements, so exact enumeration is possible; otherwise choose B by what your decision needs:</p>
+<ul>
+<li>B = 999 or 9,999 is typical for a single p near 0.05 (SE ≈ 0.007 and 0.002).</li>
+<li>To report p near 10⁻⁴ you need B well above 10⁴; to survive a Bonferroni correction over thousands of tests you may need 10⁶ or a sequential or analytic tail approximation.</li>
+<li>If p̂ sits near your threshold, add more shuffles: the decision is what is noisy.</li>
+</ul>
+<div class="card"><h4>Lab 8 · The p-value is a noisy number</h4>
+ <p class="sub">One fixed data set (two groups of 10). The permutation test is repeated 300 times with the chosen B. The histogram shows how p̂ varies; the white line is the “truth” (50,000 shuffles). If runs land on both sides of 0.05, the conclusion flips by chance.</p>
+ <div class="ctl"><label>shuffles B <input type="range" id="c8n" min="0" max="3" step="1" value="2"><output id="c8nv"></output></label><label>effect (SD units) <input type="range" id="c8e" min="0" max="20" step="1" value="7"><output id="c8ev"></output></label><label><input type="checkbox" id="c8near" checked> pick data whose p is near 0.05</label><button id="c8go">New data</button></div>
+ <canvas class="tl" id="c8cv"></canvas><div class="stats" id="c8st"></div><div class="read" id="c8rd"></div></div>
+</section>
+
+<div class="part">Part IV · Dependence and model metrics</div>
+
+<section class="ch" id="c9">
+<h2><span class="num">9</span>Time series: the block bootstrap <span class="lvl e">Expert</span></h2>
+<p>Resampling single observations destroys the dependence between neighbours, so the resamples look like independent data and the bootstrap standard error comes out as if the observations were iid. For a series with positive autocorrelation that is far too small. For an AR(1) process with coefficient φ the true variance of the mean is inflated by roughly (1 + φ)/(1 − φ), so the effective sample size is n(1 − φ)/(1 + φ): with φ = 0.6, 200 observations are worth only 50.</p>
+<p>The <b>moving block bootstrap</b> resamples overlapping <em>blocks</em> of ℓ consecutive observations and glues them together, preserving dependence within each block. Variants: circular blocks, the stationary bootstrap (random block lengths), and model-based (residual) bootstraps. Block length is a trade-off: too short and dependence is lost, too long and there are few distinct blocks. A common rule of thumb is ℓ ≈ n^{1/3}.</p>
+<div class="card"><h4>Lab 9 · SE of the mean of an AR(1) series by block length</h4>
+ <p class="sub">The blue curve is the block-bootstrap SE of the mean averaged over 30 simulated series (200 resamples each) for each block length; block length 1 is the ordinary iid bootstrap. Green: the true SE. Dashed yellow: the n^{1/3} rule.</p>
+ <div class="ctl"><label>autocorrelation φ <input type="range" id="c9p" min="-50" max="95" step="5" value="60"><output id="c9pv"></output></label><label>n <input type="range" id="c9n" min="0" max="2" step="1" value="1"><output id="c9nv"></output></label><button id="c9go">Re-simulate</button></div>
+ <canvas class="tl" id="c9cv"></canvas><div class="stats" id="c9st"></div><div class="read" id="c9rd"></div></div>
+</section>
+
+<section class="ch" id="c10">
+<h2><span class="num">10</span>Clustered data: resample the cluster <span class="lvl e">Expert</span></h2>
+<p>Customers with many transactions, branches with many accounts, patients with repeated visits: observations inside a cluster are correlated, so the number of independent units is the number of <em>clusters</em>, not the number of rows. With m clusters of size k and intra-cluster correlation ρ, the variance of the grand mean is multiplied by the <b>design effect</b> 1 + (k − 1)ρ. Resampling individual rows ignores this and understates uncertainty. The rule: <b>resample at the level of independence</b>, that is, draw whole clusters with replacement and keep their rows together.</p>
+<div class="card"><h4>Lab 10 · Row bootstrap vs cluster bootstrap</h4>
+ <p class="sub">Data: y = μ + cluster effect + noise, total variance 1, with intra-cluster correlation ρ. Left: the current data (dots) with cluster means (bars). Right: the true SE of the grand mean (from the formula √((1+(k−1)ρ)/(mk))), and the average SE from the row (iid) and cluster bootstraps over 400 simulated data sets, with the coverage of their 95% intervals.</p>
+ <div class="ctl"><label>correlation ρ % <input type="range" id="c10i" min="0" max="90" step="5" value="30"><output id="c10iv"></output></label><label>clusters m <input type="range" id="c10m" min="0" max="2" step="1" value="1"><output id="c10mv"></output></label><label>rows per cluster k <input type="range" id="c10k" min="2" max="50" step="1" value="10"><output id="c10kv"></output></label><button id="c10go">New data</button></div>
+ <div class="two"><canvas class="sm" id="c10cv"></canvas><canvas class="sm" id="c10cv2"></canvas></div><div class="tw" id="c10tb"></div><div class="read" id="c10rd"></div></div>
+</section>
+
+<section class="ch" id="c11">
+<h2><span class="num">11</span>Putting a confidence interval on a model's AUC <span class="lvl e">Expert</span></h2>
+<p>Validation reports should state a model's AUC (or Gini, KS) with an interval, and a claim that model B beats model A needs an interval on the <em>difference</em>. Resampling is the standard tool, with two details:</p>
+<ul>
+<li><b>Stratify by outcome</b> when positives are rare, so that every resample has the original number of positives and negatives. Plain row resampling lets the positive count wander, which adds spurious variability.</li>
+<li><b>Compare models on the same cases with a paired bootstrap</b>: draw case indices once and compute <em>both</em> AUCs on that resample. The two models' scores are correlated, so the SE of the difference is much smaller than √(SE_A² + SE_B²), and resampling the two models independently throws that correlation away and understates how much evidence you have.</li>
+</ul>
+<p>A bootstrap interval on a fixed test set measures sampling uncertainty of that test set; it does not replace out-of-sample validation, and it does not capture drift. (Analytic alternatives: Hanley–McNeil for a single AUC, DeLong for correlated AUCs.)</p>
+<div class="card"><h4>Lab 11 · AUC interval and paired model comparison</h4>
+ <p class="sub">Scores are normal: negatives N(0,1), positives N(d,1); model B has a slightly better separation (d + 0.15) and both share 60% of their noise. Click “Run” (300 resamples, plus 200 simulated test sets to find the truth) after changing a setting.</p>
+ <div class="ctl"><label>test-set size n <input type="range" id="c11n" min="0" max="3" step="1" value="2"><output id="c11nv"></output></label><label>positive rate % <input type="range" id="c11p" min="2" max="50" step="1" value="10"><output id="c11pv"></output></label><label>separation d of model A <input type="range" id="c11a" min="5" max="30" step="1" value="15"><output id="c11av"></output></label><button id="c11go">Run</button></div>
+ <canvas class="tl" id="c11cv"></canvas><div class="tw" id="c11tb"></div><div class="stats" id="c11st"></div><div class="read" id="c11rd"></div></div>
+</section>
+
+<section class="ch" id="c12">
+<h2><span class="num">12</span>Final exam, mastery checklist, cheat sheet <span class="lvl e">Expert</span></h2>
+<h3>Exam (18 questions — click an answer)</h3>
+<div id="quiz"></div>
+<div class="card"><h4>Score</h4><div class="stats" id="qscore"></div><button class="alt" id="qreset">Reset exam</button></div>
+<h3>Mastery checklist — tick when you can do it without notes</h3>
+<div class="card chk" id="chk"></div>
+<h3>Cheat sheet</h3>
+<div class="tw"><table>
+<tr><th>Idea</th><th>One line</th></tr>
+<tr><td>Bootstrap</td><td>Resample n points with replacement from the data; recompute the statistic B times; its spread estimates the sampling spread</td></tr>
+<tr><td>Centre</td><td>The bootstrap distribution is centred at θ̂, not θ: it estimates spread and shape, not location</td></tr>
+<tr><td>SE / bias</td><td>SE = SD(θ*); bias = mean(θ*) − θ̂; bias-correct only when bias ≳ 0.25 SE</td></tr>
+<tr><td>Jackknife</td><td>Leave-one-out; fine for smooth statistics, fails for the median</td></tr>
+<tr><td>Failures</td><td>Maxima, infinite-variance tails, boundaries, tiny n, dependent data; use m-out-of-n, subsampling or a parametric bootstrap</td></tr>
+<tr><td>Intervals</td><td>BCa or bootstrap-t for second-order accuracy; percentile/basic/normal are first-order</td></tr>
+<tr><td>Regression</td><td>Pairs or wild bootstrap under heteroskedasticity; residual bootstrap needs constant variance</td></tr>
+<tr><td>Permutation test</td><td>Shuffle labels under H₀; p = (1 + #extreme)/(1 + B); exact for any statistic if labels are exchangeable</td></tr>
+<tr><td>Unequal variances</td><td>Raw permutation of the mean difference is invalid for equal-means H₀; studentise or use a bootstrap test that imposes H₀</td></tr>
+<tr><td>Monte Carlo p</td><td>SE ≈ √(p(1−p)/B); use B ≥ 999–9,999; never report p = 0</td></tr>
+<tr><td>Time series</td><td>Moving block bootstrap, ℓ ≈ n^{1/3}; iid bootstrap understates SE by ≈ √((1+φ)/(1−φ))</td></tr>
+<tr><td>Clusters</td><td>Resample whole clusters; design effect 1 + (k − 1)ρ</td></tr>
+<tr><td>Model metrics</td><td>Stratified bootstrap for one AUC; paired (same cases) bootstrap for AUC differences</td></tr>
+</table></div>
+<div class="co tip"><b>Next on the roadmap</b>Item 9, hypothesis testing and power (which builds on the p-value course), and item 10, multiple testing and false-discovery control.</div>
+</section>
+</main>
+<script>
+/*MATH*/
+function lgamma(x){const c=[76.18009172947146,-86.50532032941677,24.01409824083091,-1.231739572450155,0.1208650973866179e-2,-0.5395239384953e-5];let y=x,t=x+5.5;t-=(x+.5)*Math.log(t);let s=1.000000000190015;for(let j=0;j<6;j++)s+=c[j]/++y;return -t+Math.log(2.5066282746310005*s/x);}
+function gser(a,x){let ap=a,sum=1/a,del=sum;for(let n=0;n<1000;n++){ap++;del*=x/ap;sum+=del;if(Math.abs(del)<Math.abs(sum)*1e-15)break;}return sum*Math.exp(-x+a*Math.log(x)-lgamma(a));}
+function gcf(a,x){let b=x+1-a,c=1/1e-300,d=1/b,h=d;for(let i=1;i<1000;i++){const an=-i*(i-a);b+=2;d=an*d+b;if(Math.abs(d)<1e-300)d=1e-300;c=b+an/c;if(Math.abs(c)<1e-300)c=1e-300;d=1/d;const del=d*c;h*=del;if(Math.abs(del-1)<1e-15)break;}return Math.exp(-x+a*Math.log(x)-lgamma(a))*h;}
+function gammaQ(a,x){if(x<=0)return 1;return x<a+1?1-gser(a,x):gcf(a,x);}
+function betacf(a,b,x){const qab=a+b,qap=a+1,qam=a-1;let c=1,d=1-qab*x/qap;if(Math.abs(d)<1e-300)d=1e-300;d=1/d;let h=d;for(let m=1;m<=1000;m++){const m2=2*m;let aa=m*(b-m)*x/((qam+m2)*(a+m2));d=1+aa*d;if(Math.abs(d)<1e-300)d=1e-300;c=1+aa/c;if(Math.abs(c)<1e-300)c=1e-300;d=1/d;h*=d*c;aa=-(a+m)*(qab+m)*x/((a+m2)*(qap+m2));d=1+aa*d;if(Math.abs(d)<1e-300)d=1e-300;c=1+aa/c;if(Math.abs(c)<1e-300)c=1e-300;d=1/d;const del=d*c;h*=del;if(Math.abs(del-1)<1e-15)break;}return h;}
+function betai(a,b,x){if(x<=0)return 0;if(x>=1)return 1;const bt=Math.exp(lgamma(a+b)-lgamma(a)-lgamma(b)+a*Math.log(x)+b*Math.log(1-x));return x<(a+1)/(a+b+2)?bt*betacf(a,b,x)/a:1-bt*betacf(b,a,1-x)/b;}
+function normSf(z){const q=0.5*gammaQ(.5,z*z/2);return z>=0?q:1-q;}
+function normCdf(z){return normSf(-z);}
+function npdf(x){return Math.exp(-x*x/2)/2.5066282746310002;}
+function lbin(n,k){return lgamma(n+1)-lgamma(k+1)-lgamma(n-k+1);}
+function binom(n,k,p){return Math.exp(lbin(n,k)+k*Math.log(p)+(n-k)*Math.log(1-p));}
+function betapdf(x,a,b){return x<=0||x>=1?0:Math.exp(lgamma(a+b)-lgamma(a)-lgamma(b)+(a-1)*Math.log(x)+(b-1)*Math.log(1-x));}
+function betacdf(x,a,b){return betai(a,b,x);}
+function gampdf(x,a,r){return x<=0?0:Math.exp(a*Math.log(r)+(a-1)*Math.log(x)-r*x-lgamma(a));}
+function gamcdf(x,a,r){return x<=0?0:1-gammaQ(a,r*x);}
+function randn(){let u=0;while(!u)u=Math.random();return Math.sqrt(-2*Math.log(u))*Math.cos(2*Math.PI*Math.random());}
+function gammaS(a){if(a<1)return gammaS(a+1)*Math.pow(Math.random(),1/a);const d=a-1/3,c=1/Math.sqrt(9*d);for(;;){let x,v;do{x=randn();v=1+c*x}while(v<=0);v=v*v*v;const u=Math.random();if(Math.log(u)<.5*x*x+d-d*v+d*Math.log(v))return d*v;}}
+function betaS(a,b){const x=gammaS(a),y=gammaS(b);return x/(x+y);}
+function binS(n,p){let k=0;for(let i=0;i<n;i++)if(Math.random()<p)k++;return k;}
+function mean(a){let s=0;for(const v of a)s+=v;return s/a.length;}
+function qc(cdf,lo,hi,p,it){for(let i=0;i<(it||100);i++){const m=(lo+hi)/2;if(cdf(m)<p)lo=m;else hi=m}return(lo+hi)/2;}
+function qb(a,b,p){return qc(x=>betai(a,b,x),0,1,p,50);}
+function tcdf(x,v){const t=.5*betai(v/2,.5,v/(v+x*x));return x>0?1-t:t}
+function qn(p){return qc(normCdf,-9,9,p,70)}
+function pois(k,l){return Math.exp(-l+k*Math.log(l)-lgamma(k+1))}
+function binF(n,p){let k=0;for(;;){if(n<=0||p<=0)return k;if(p>=1)return k+n;if(n<=40){for(let i=0;i<n;i++)if(Math.random()<p)k++;return k}const a=1+(n>>1),bb=1+n-a,x=betaS(a,bb);if(x>=p){n=a-1;p=p/x}else{k+=a;n=bb-1;p=(p-x)/(1-x)}}}
+/*ENDMATH*/
+
+const $=id=>document.getElementById(id), val=id=>+$(id).value;
+const C={fg:'#e8ebf5',mu:'#8a93ab',gr:'#232a3d',a:'#6ea8ff',r:'#ff6b81',y:'#ffd166',g:'#4ade80',p:'#c084fc',t:'#5eead4'};
+const store={get(k,d){try{const v=JSON.parse(localStorage.getItem(k));return v==null?d:v}catch(e){return d}},set(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}};
+function stat(l,v,c){return `<div class="stat ${c||''}"><b>${v}</b><span>${l}</span></div>`}
+function f3(x){if(!isFinite(x))return String(x);const a=Math.abs(x);if(a!==0&&(a<1e-3||a>=1e6))return x.toExponential(2);return String(+x.toFixed(a<1?4:a<100?3:a<1000?2:0))}
+function pc(x){return f3(100*x)+'%'}
+const resizers=[];
+function reg(fn){fn();resizers.push(fn)}
+function on(ids,fn){ids.split(' ').forEach(i=>{const e=$(i);e.addEventListener('input',fn);e.addEventListener('change',fn)})}
+let rt;window.addEventListener('resize',()=>{clearTimeout(rt);rt=setTimeout(()=>resizers.forEach(f=>f()),150)});
+document.querySelectorAll('input[type=range]').forEach(i=>{const o=$(i.id+'v');if(!o)return;const f=()=>{o.textContent=i.value};i.addEventListener('input',f);f()});
+
+function nice(x){const e=Math.pow(10,Math.floor(Math.log10(x))),f=x/e;return (f<1.5?1:f<3?2:f<7?5:10)*e}
+function mk(cv,x0,x1,ymax,o){o=o||{};const y0=o.y0||0,dpr=window.devicePixelRatio||1,r=cv.getBoundingClientRect(),w=r.width||600,h=r.height||270;
+ cv.width=w*dpr;cv.height=h*dpr;const g=cv.getContext('2d');g.setTransform(dpr,0,0,dpr,0,0);g.clearRect(0,0,w,h);
+ const L=o.L||42,R=12,T=14,B=28,X=x=>L+(x-x0)/(x1-x0)*(w-L-R),Y=y=>h-B-(y-y0)/(ymax-y0)*(h-T-B);
+ g.font='11px system-ui';g.lineWidth=1;g.strokeStyle=C.gr;g.fillStyle=C.mu;
+ if(!o.noGrid){const sx=nice((x1-x0)/7);for(let x=Math.ceil(x0/sx-1e-9)*sx;!o.noX&&x<=x1+1e-9;x+=sx){g.beginPath();g.moveTo(X(x),T);g.lineTo(X(x),h-B);g.stroke();g.textAlign='center';g.fillText(String(+x.toFixed(6)),X(x),h-B+15)}
+ const sy=nice((ymax-y0)/4);for(let y=Math.ceil(y0/sy-1e-9)*sy;y<=ymax+1e-9;y+=sy){g.beginPath();g.moveTo(L,Y(y));g.lineTo(w-R,Y(y));g.stroke();g.textAlign='right';g.fillText(String(+y.toFixed(4)),L-5,Y(y)+3)}}
+ return{g,w,h,X,Y,L,R,T,B,
+  line(f,col,lw,a,b,n,dash){a=a==null?x0:a;b=b==null?x1:b;n=n||260;g.save();if(dash)g.setLineDash([5,4]);g.beginPath();g.strokeStyle=col;g.lineWidth=lw||2;let st=false;for(let i=0;i<=n;i++){const x=a+(b-a)*i/n,y=f(x);if(!isFinite(y)){st=false;continue}st?g.lineTo(X(x),Y(y)):g.moveTo(X(x),Y(y));st=true}g.stroke();g.restore()},
+  area(f,a,b,col,n){a=Math.max(a,x0);b=Math.min(b,x1);if(b<=a)return;n=n||200;g.beginPath();g.moveTo(X(a),Y(0));for(let i=0;i<=n;i++){const x=a+(b-a)*i/n;g.lineTo(X(x),Y(f(x)))}g.lineTo(X(b),Y(0));g.closePath();g.fillStyle=col;g.fill()},
+  vline(x,col,lab,dash){g.save();g.strokeStyle=col;g.lineWidth=1.6;if(dash)g.setLineDash([5,4]);g.beginPath();g.moveTo(X(x),T);g.lineTo(X(x),h-B);g.stroke();g.restore();if(lab){g.fillStyle=col;g.textAlign='center';g.fillText(lab,Math.min(Math.max(X(x),34),w-34),T+10)}},
+  hline(y,col,lab){g.save();g.strokeStyle=col;g.lineWidth=1.4;g.setLineDash([5,4]);g.beginPath();g.moveTo(L,Y(y));g.lineTo(w-R,Y(y));g.stroke();g.restore();if(lab){g.fillStyle=col;g.textAlign='right';g.fillText(lab,w-R-3,Y(y)-4)}},
+  text(s,x,y,col,al){g.fillStyle=col||C.fg;g.textAlign=al||'left';g.fillText(s,x,y)}};}
+
+/* ---------- shared helpers for this page ---------- */
+const D={
+ norm:{n:'Normal(0,1)',s:()=>randn(),mu:0,sd:1,sk:0},
+ unif:{n:'Uniform(0,1)',s:()=>Math.random(),mu:.5,sd:Math.sqrt(1/12),sk:0},
+ expo:{n:'Exponential(1)',s:()=>-Math.log(1-Math.random()),mu:1,sd:1,sk:2},
+ logn:{n:'Lognormal(0,1)',s:()=>Math.exp(randn()),mu:Math.exp(.5),sd:Math.sqrt((Math.E-1)*Math.E),sk:(Math.E+2)*Math.sqrt(Math.E-1),disc:0},
+ b05:{n:'Bernoulli(0.5)',s:()=>Math.random()<.5?1:0,mu:.5,sd:.5,sk:0,disc:1},
+ b05s:{n:'Bernoulli(0.05)',s:()=>Math.random()<.05?1:0,mu:.05,sd:Math.sqrt(.0475),sk:.9/Math.sqrt(.0475),disc:1},
+ bimo:{n:'Two humps',s:()=>(Math.random()<.5?-2:2)+.5*randn(),mu:0,sd:Math.sqrt(4.25),sk:0},
+ par5:{n:'Pareto(α=5)',s:()=>Math.pow(1-Math.random(),-.2),mu:1.25,sd:Math.sqrt(5/48),sk:6*Math.sqrt(.6)},
+ cauchy:{n:'Cauchy (no mean)',s:()=>Math.tan(Math.PI*(Math.random()-.5)),mu:NaN,sd:Infinity,sk:NaN}
+};
+function fillSel(id,keys,def){const e=$(id);e.innerHTML=keys.map(k=>`<option value="${k}">${D[k].n}</option>`).join('');e.value=def}
+const PAL=[C.a,C.r,C.y,C.g,C.p,C.t,'#ff9f43','#9aa4bf'];
+function tgrid(N,M){const T=[];let prev=0;for(let i=0;i<M;i++){let n=Math.round(Math.pow(10,Math.log10(N)*i/(M-1)));if(i===M-1)n=N;n=Math.max(prev+1,n);if(n>N)break;T.push(n);prev=n}if(T[T.length-1]!==N)T[T.length-1]=N;return T}
+function nlab(n){return n>=1e6?(n/1e6)+'M':n>=1000?(n/1000)+'k':String(n)}
+function customGrid(P,xt,yt){const g=P.g;g.save();g.strokeStyle=C.gr;g.fillStyle=C.mu;g.font='11px system-ui';g.lineWidth=1;
+ xt.forEach(([v,l])=>{g.beginPath();g.moveTo(P.X(v),P.T);g.lineTo(P.X(v),P.h-P.B);g.stroke();g.textAlign='center';g.fillText(l,P.X(v),P.h-P.B+15)});
+ yt.forEach(([v,l])=>{g.beginPath();g.moveTo(P.L,P.Y(v));g.lineTo(P.w-P.R,P.Y(v));g.stroke();g.textAlign='right';g.fillText(l,P.L-5,P.Y(v)+3)});g.restore()}
+function clip(P,fn){const g=P.g;g.save();g.beginPath();g.rect(P.L,P.T,P.w-P.L-P.R,P.h-P.T-P.B);g.clip();fn();g.restore()}
+function poly(P,pts,col,lw,dash){const g=P.g;g.save();if(dash)g.setLineDash([5,4]);g.strokeStyle=col;g.lineWidth=lw||2;g.beginPath();pts.forEach(([x,y],i)=>i?g.lineTo(P.X(x),P.Y(y)):g.moveTo(P.X(x),P.Y(y)));g.stroke();g.restore()}
+function dots(P,pts,col,r){const g=P.g;g.fillStyle=col;pts.forEach(([x,y])=>{g.beginPath();g.arc(P.X(x),P.Y(y),r||3,0,7);g.fill()})}
+function niceTicks(lo,hi,k){const st=nice((hi-lo)/(k||5)),a=[];for(let v=Math.ceil(lo/st-1e-9)*st;v<=hi+1e-9;v+=st)a.push([v,String(+v.toFixed(6))]);return a}
+function logTicks(lo,hi){const a=[];for(let e=Math.ceil(lo-1e-9);e<=hi+1e-9;e++)a.push([e,nlab(Math.pow(10,e))]);return a}
+function mom(a){const n=a.length;let m=0;for(const v of a)m+=v;m/=n;let v2=0,v3=0,v4=0;for(const v of a){const d=v-m;v2+=d*d;v3+=d*d*d;v4+=d*d*d*d}v2/=n;v3/=n;v4/=n;const sd=Math.sqrt(v2);return{n,m,sd,sk:sd>0?v3/(sd*sd*sd):0,ku:v2>0?v4/(v2*v2)-3:0}}
+function ksN(z){const a=Array.from(z).sort((x,y)=>x-y),n=a.length;let d=0;for(let i=0;i<n;i++){const F=normCdf(a[i]);d=Math.max(d,Math.abs((i+1)/n-F),Math.abs(i/n-F))}return d}
+/* histogram of data as density with optional overlay curves [{f,col,lw,dash}] */
+function hist(cv,data,lo,hi,bins,ov,col){const cnt=new Float64Array(bins),bw=(hi-lo)/bins;let n=0;for(const v of data){if(v<lo||v>=hi)continue;cnt[Math.floor((v-lo)/bw)]++;n++}
+ const N=data.length;let ym=0;for(let i=0;i<bins;i++){cnt[i]/=N*bw;ym=Math.max(ym,cnt[i])}
+ (ov||[]).forEach(o=>{for(let i=0;i<=80;i++)ym=Math.max(ym,o.f(lo+(hi-lo)*i/80)||0)});
+ const P=mk(cv,lo,hi,ym*1.12);
+ P.g.fillStyle=col||'rgba(110,168,255,.5)';for(let i=0;i<bins;i++){if(cnt[i]<=0)continue;const a=P.X(lo+i*bw),b=P.X(lo+(i+1)*bw);P.g.fillRect(a,P.Y(cnt[i]),Math.max(1,b-a-1),P.Y(0)-P.Y(cnt[i]))}
+ (ov||[]).forEach(o=>P.line(o.f,o.col,o.lw||2.4,lo,hi,200,o.dash));return P}
+const fmt=x=>f3(x);
+
+/* ---------- shared for this page ---------- */
+const POPS=['norm','unif','expo','logn','bimo','par5'];
+D.norm.med=0;D.norm.q90=1.2815516;D.unif.med=.5;D.unif.q90=.9;D.expo.med=Math.LN2;D.expo.q90=Math.log(10);D.logn.med=1;D.logn.q90=Math.exp(1.2815516);
+D.bimo.med=0;D.bimo.q90=qc(x=>.5*normCdf((x+2)/.5)+.5*normCdf((x-2)/.5),-10,10,.9,80);D.par5.med=Math.pow(2,.2);D.par5.q90=Math.pow(10,.2);
+const SF={mean:a=>mean(a),median:a=>{const b=Float64Array.from(a).sort(),n=b.length;return n%2?b[(n-1)/2]:(b[n/2-1]+b[n/2])/2},sd:a=>{const n=a.length,m=mean(a);let s=0;for(const v of a)s+=(v-m)*(v-m);return Math.sqrt(s/(n-1))},q90:a=>{const b=Float64Array.from(a).sort();return b[Math.round(.9*(b.length-1))]}};
+function truth(key,st){const d=D[key];return st==='mean'?d.mu:st==='median'?d.med:st==='sd'?d.sd:d.q90}
+const SNAME={mean:'sample mean',median:'sample median',sd:'sample SD',q90:'90th percentile'};
+const N10=[2,3,5,10,20,50,100,200,500,1000];
+function pct(a,p){const b=Float64Array.from(a).sort();return b[Math.min(b.length-1,Math.max(0,Math.floor(p*b.length)))]}
+function histLines(cv,arrs,cols,lo,hi,bins,vl){const bw=(hi-lo)/bins,dens=arrs.map(a=>{const c=new Float64Array(bins);for(const v of a){if(v<lo||v>=hi)continue;c[Math.floor((v-lo)/bw)]++}for(let i=0;i<bins;i++)c[i]/=a.length*bw;return c});let ym=0;dens.forEach(c=>c.forEach(v=>ym=Math.max(ym,v)));const P=mk(cv,lo,hi,ym*1.15||1);
+ dens.forEach((c,k)=>{const pts=[];for(let i=0;i<bins;i++){pts.push([lo+i*bw,c[i]]);pts.push([lo+(i+1)*bw,c[i]])}clip(P,()=>poly(P,pts,cols[k],2.2))});(vl||[]).forEach(v=>P.vline(v[0],v[1],v[2],v[3]));return P}
+function sdOf(a){return mom(a).sd}
+
+/* ---------- ML helpers ---------- */
+function digamma(x){let r=0;while(x<6){r-=1/x;x++}const f=1/(x*x);return r+Math.log(x)-.5/x-f*(1/12-f*(1/120-f/252))}
+function trigamma(x){let r=0;while(x<6){r+=1/(x*x);x++}const f=1/(x*x);return r+1/x+.5*f+f/x*(1/6-f*(1/30-f/42))}
+function poisS(l){if(l<=0)return 0;if(l<30){const L=Math.exp(-l);let k=0,p=1;do{k++;p*=Math.random()}while(p>L);return k-1}const m=Math.floor(.875*l),g=gammaS(m);return g<l?m+poisS(l-g):binF(m-1,l/g)}
+function llb(k,n,p){return(k?k*Math.log(p):0)+(n-k?(n-k)*Math.log(1-p):0)}
+function lrInt(k,n,cut){const ph=k/n,l0=llb(k,n,ph),g=p=>2*(l0-llb(k,n,p))-cut;let lo=0,hi=1;
+ if(k>0){let a=1e-12,b=ph;for(let i=0;i<70;i++){const m=(a+b)/2;if(g(m)>0)a=m;else b=m}lo=(a+b)/2}
+ if(k<n){let a=ph,b=1-1e-12;for(let i=0;i<70;i++){const m=(a+b)/2;if(g(m)>0)b=m;else a=m}hi=(a+b)/2}return[lo,hi]}
+function solveAlpha(s){if(!(s>1e-9))return 1e6;let a=(3-s+Math.sqrt((3-s)*(3-s)+24*s))/(12*s);for(let i=0;i<8;i++){const f=Math.log(a)-digamma(a)-s,fp=1/a-trigamma(a);let n=a-f/fp;if(!(n>0))n=a/2;a=n}return a}
+function normPdfAt(x,m,s){return Math.exp(-(x-m)*(x-m)/(2*s*s))/(s*2.5066282746)}
+/* ---------- Bootstrap helpers ---------- */
+function tq(v,p){return qc(x=>tcdf(x,v),0,500,p,80)}
+const Z95=1.959964;
+function srt(a){return Float64Array.from(a).sort()}
+function qs(b,p){return b[Math.min(b.length-1,Math.max(0,Math.floor(p*b.length)))]}
+function bootArr(x,B,f){const n=x.length,out=new Float64Array(B),y=new Float64Array(n);for(let b=0;b<B;b++){for(let i=0;i<n;i++)y[i]=x[Math.floor(Math.random()*n)];out[b]=f(y)}return out}
+function sampleOf(key,n){const x=new Float64Array(n);for(let i=0;i<n;i++)x[i]=D[key].s();return x}
+function idx(id,arr,ff){const e=$(id),o=$(id+'v'),f=()=>{o.textContent=ff?ff(arr[+e.value]):arr[+e.value]};e.addEventListener('input',f);f()}
+function scl(id,ff){const e=$(id),o=$(id+'v'),f=()=>{o.textContent=ff(+e.value)};e.addEventListener('input',f);f()}
+function pctTicks(a,b,st){const r=[];for(let v=a;v<=b+1e-9;v+=st)r.push([v,Math.round(v*100)+'%']);return r}
+function sdS(a){return SF.sd(a)}
+
+/* ---------- Ch1 bootstrap vs true sampling distribution ---------- */
+(function(){const NL=[10,20,50,100,300],cache={};fillSel('c1d',POPS,'expo');idx('c1n',NL);let S=null;
+ function trueDist(key,st,n){const k=key+st+n;if(cache[k])return cache[k];const R=3000,a=new Float64Array(R);for(let r=0;r<R;r++)a[r]=SF[st](sampleOf(key,n));return cache[k]=a}
+ function newS(){const key=$('c1d').value,st=$('c1s').value,n=NL[val('c1n')],x=sampleOf(key,n);S={key,st,n,th:SF[st](x),b:bootArr(x,2000,SF[st])};draw()}
+ function draw(){if(!S)return;const{key,st,n,th,b}=S,tru=trueDist(key,st,n),theta=truth(key,st);
+  const lo=Math.min(pct(tru,.002),pct(b,.002),theta),hi=Math.max(pct(tru,.998),pct(b,.998),theta),w=hi-lo||1e-3;
+  const P=histLines($('c1cv'),[tru,b],[C.a,C.r],lo-.03*w,hi+.03*w,48,[[th,C.y,'θ̂',true],[theta,C.fg,'truth',true]]);
+  P.text('— true sampling distribution',P.L+8,P.T+26,C.a);P.text('— bootstrap distribution (one sample)',P.L+190,P.T+26,C.r);
+  const se1=sdOf(tru),se2=sdOf(b),m1=mean(tru),m2=mean(b);
+  $('c1st').innerHTML=stat('true SE',fmt(se1),'ok')+stat('bootstrap SE',fmt(se2),Math.abs(se2/se1-1)>.25?'hot':'warn')+stat('ratio',fmt(se2/se1),'')+stat('centre of true distribution',fmt(m1),'in')+stat('centre of bootstrap = θ̂ ',fmt(m2),'in')+stat('truth θ',fmt(theta),'');
+  $('c1rd').innerHTML=`The blue curve is what repeated real studies would produce; it is centred near the truth (${fmt(theta)}). The red curve is built from a single sample and is centred on that sample's estimate (${fmt(th)}); it does not know where the truth is. What it does capture is the <b>spread</b> (bootstrap SE ${fmt(se2)} vs true ${fmt(se1)}) and, roughly, the <b>shape</b>. Draw new samples: the red curve slides around with θ̂ while its width stays similar. At small n the bootstrap SE is noisy and slightly low; at n = 300 it is accurate. The median and SD under a skewed population show the biggest discrepancies.`}
+ $('c1go').onclick=newS;on('c1d c1s c1n',newS);newS();resizers.push(draw);})();
+
+/* ---------- Ch2 bias, SE, jackknife ---------- */
+(function(){const NL=[8,15,30,60];idx('c2n',NL);const cache={};
+ const ST={varn:{f:a=>{const n=a.length,m=mean(a);let s=0;for(const v of a)s+=(v-m)*(v-m);return s/n},th:1,n:'variance (÷n)'},
+  sd:{f:a=>sdS(a),th:1,n:'SD (÷(n−1))'},expm:{f:a=>Math.exp(mean(a)),th:1,n:'exp(mean)'},logvar:{f:a=>Math.log(Math.pow(sdS(a),2)),th:0,n:'log sample variance'}};
+ function truthOf(k,n){const key=k+n;if(cache[key])return cache[key];const R=4000,a=new Float64Array(R),f=ST[k].f;for(let r=0;r<R;r++){const x=new Float64Array(n);for(let i=0;i<n;i++)x[i]=randn();a[r]=f(x)}const m=mean(a);return cache[key]={bias:m-ST[k].th,se:sdOf(a)}}
+ function draw(){const k=$('c2s').value,n=NL[val('c2n')],S=ST[k],f=S.f,T=truthOf(k,n),R=400,B=200;
+  let bb=0,jb=0,bse=0,jse=0,e0=0,e1=0,e2=0;
+  for(let r=0;r<R;r++){const x=new Float64Array(n);for(let i=0;i<n;i++)x[i]=randn();const th=f(x),bs=bootArr(x,B,f),mb=mean(bs);bb+=mb-th;bse+=sdOf(bs);
+   const jk=new Float64Array(n),y=new Float64Array(n-1);for(let i=0;i<n;i++){let c=0;for(let j=0;j<n;j++)if(j!==i)y[c++]=x[j];jk[i]=f(y)}const jm=mean(jk);let ss=0;for(const v of jk)ss+=(v-jm)*(v-jm);
+   const jbias=(n-1)*(jm-th);jb+=jbias;jse+=Math.sqrt((n-1)/n*ss);e0+=(th-S.th)*(th-S.th);e1+=(2*th-mb-S.th)*(2*th-mb-S.th);e2+=(th-jbias-S.th)*(th-jbias-S.th)}
+  bb/=R;jb/=R;bse/=R;jse/=R;const vals=[T.bias,bb,jb],nm=['true bias','bootstrap','jackknife'],cl=[C.fg,C.r,C.a];
+  const ext=Math.max(Math.abs(T.bias),Math.abs(bb),Math.abs(jb),1e-6),ym=ext*1.5,P=mk($('c2cv'),0,3,ym,{y0:-ym,noGrid:true,L:60});customGrid(P,[],niceTicks(-ym,ym,6));P.hline(0,C.mu);
+  vals.forEach((v,j)=>{const g=P.g;g.fillStyle=cl[j];g.globalAlpha=.7;g.fillRect(P.X(j+.2),Math.min(P.Y(0),P.Y(v)),P.X(j+.8)-P.X(j+.2),Math.abs(P.Y(v)-P.Y(0)));g.globalAlpha=1;P.text(fmt(v),P.X(j+.5),v>=0?P.Y(v)-6:P.Y(v)+14,C.fg,'center');P.text(nm[j],P.X(j+.5),P.h-10,cl[j],'center')});P.text('average estimate of the bias of '+S.n,P.L+8,P.T+12,C.mu);
+  $('c2tb').innerHTML=`<table><tr><th>Quantity</th><th>Truth (or raw θ̂)</th><th>Bootstrap</th><th>Jackknife</th></tr><tr><td><b>bias</b></td><td>${fmt(T.bias)}</td><td>${fmt(bb)}</td><td>${fmt(jb)}</td></tr><tr><td><b>standard error</b></td><td>${fmt(T.se)}</td><td>${fmt(bse)}</td><td>${fmt(jse)}</td></tr><tr><td><b>RMSE: raw θ̂ | bias-corrected by bootstrap | by jackknife</b></td><td>${fmt(Math.sqrt(e0/R))}</td><td style="color:${e1<e0?C.g:C.r}">${fmt(Math.sqrt(e1/R))}</td><td style="color:${e2<e0?C.g:C.r}">${fmt(Math.sqrt(e2/R))}</td></tr></table>`;
+  const ratio=Math.abs(T.bias)/T.se;
+  $('c2rd').innerHTML=`For ${S.n} at n = ${n}, the true bias is ${fmt(T.bias)}, only ${fmt(ratio)} standard errors. The bootstrap averages ${fmt(bb)} and the jackknife ${fmt(jb)}: both find the bias because these statistics are smooth. But look at the RMSE row: bias correction ${e1<e0?'helped':'did not help'} here (${fmt(Math.sqrt(e1/R))} vs ${fmt(Math.sqrt(e0/R))} raw). ${ratio<.25?'The bias is small compared with the SE, so the extra noise in the correction costs more than the bias it removes.':'The bias is large relative to the SE, which is the situation where correcting pays off.'}`}
+ on('c2s',draw);$('c2n').addEventListener('change',draw);draw();resizers.push(draw);})();
+
+/* ---------- Ch3 failures ---------- */
+(function(){const NL=[20,50,200,1000];idx('c3n',NL);const cache={};let S=null,cov={};
+ const CS={ctrl:{s:()=>-Math.log(1-Math.random()),f:a=>mean(a),th:1,sc:()=>1,n:'mean of Exponential(1)'},
+  max:{s:()=>Math.random(),f:a=>{let m=-1;for(const v of a)if(v>m)m=v;return m},th:1,sc:n=>n,n:'maximum of Uniform(0,1)'},
+  par:{s:()=>Math.pow(1-Math.random(),-1/1.5),f:a=>mean(a),th:3,sc:()=>1,n:'mean of Pareto(1.5)'}};
+ function mkS(c,n){const x=new Float64Array(n);for(let i=0;i<n;i++)x[i]=CS[c].s();return x}
+ function trueD(c,n){const k=c+n;if(cache[k])return cache[k];const R=2000,a=new Float64Array(R),C0=CS[c];for(let r=0;r<R;r++)a[r]=(C0.f(mkS(c,n))-C0.th)*C0.sc(n);return cache[k]=a}
+ function study(c,n){const C0=CS[c],R=150,B=200;let ok=0;for(let r=0;r<R;r++){const x=mkS(c,n),th=C0.f(x),b=srt(bootArr(x,B,C0.f));if(qs(b,.025)<=C0.th&&C0.th<=qs(b,.975))ok++}return ok/R}
+ function newS(){const c=$('c3s').value,n=NL[val('c3n')],x=mkS(c,n),th=CS[c].f(x),b=bootArr(x,2000,CS[c].f);S={c,n,th,b,cov:study(c,n)};draw()}
+ function draw(){if(!S)return;const{c,n,th,b}=S,C0=CS[c],sc=C0.sc(n),tru=trueD(c,n),bd=Float64Array.from(b,v=>(v-th)*sc);
+  let lo=Math.min(pct(tru,.01),pct(bd,.01)),hi=Math.max(pct(tru,.99),pct(bd,.99));if(c==='max')hi=.45;const w=hi-lo||1e-3;
+  const P=histLines($('c3cv'),[tru,bd],[C.a,C.r],lo-.02*w,hi+(c==='max'?0:.02*w),48,[[0,C.fg,'0',true]]);
+  P.text('— true distribution of θ̂ − θ'+(c==='max'?' (× n)':''),P.L+8,P.T+26,C.a);P.text('— bootstrap distribution of θ̂* − θ̂'+(c==='max'?' (× n)':''),P.L+8,P.T+42,C.r);
+  const atom=b.filter(v=>v===th).length/b.length,se1=sdOf(tru)/sc,se2=sdOf(bd)/sc;
+  $('c3st').innerHTML=stat('true SE',fmt(se1),'ok')+stat('bootstrap SE',fmt(se2),Math.abs(se2/se1-1)>.3?'hot':'warn')+stat('95% percentile interval coverage',pc(S.cov),S.cov<.9?'hot':'ok')+(c==='max'?stat('P(θ̂* = θ̂)',pc(atom),'hot')+stat('theory 1−(1−1/n)ⁿ',pc(1-Math.pow(1-1/n,n)),'in'):'');
+  $('c3rd').innerHTML=c==='ctrl'?`The control case: for the mean of a well-behaved population the two histograms agree and the percentile interval covers ${pc(S.cov)} (a little under 95% at small n, as expected).`:c==='max'?`The bootstrap distribution has a giant spike at 0: in ${pc(atom)} of resamples the maximum is the original maximum (theory ${pc(1-Math.pow(1-1/n,n))}), whereas the real distribution is smooth. The percentile interval is always below the sample maximum, so it <b>never</b> contains the true upper bound 1 unless the sample maximum happens to equal it: coverage ${pc(S.cov)}.`:`With infinite variance the sample mean does not settle into a normal shape; the bootstrap histogram is the wrong shape and the 95% percentile interval covers only ${pc(S.cov)} (it improves very slowly with n). The remedies are subsampling, a tail model, or avoiding the mean.`}
+ $('c3go').onclick=newS;$('c3s').addEventListener('change',newS);$('c3n').addEventListener('change',newS);newS();resizers.push(draw);})();
+
+/* ---------- Ch4 BCa and bootstrap-t ---------- */
+(function(){const NL=[10,20,40,80],KEYS=['norm','unif','expo','logn','bimo','par5'],tc={},NAMES=['Normal','Percentile','Basic','BCa','Bootstrap-t','t-interval'],COL=[C.p,C.a,C.t,C.g,C.y,C.r];fillSel('c4d',KEYS,'logn');idx('c4n',NL);
+ let S=null,cs=null,busy=false;function tqc(n){return tc[n]||(tc[n]=tq(n-1,.975))}
+ function intsAll(x,B){const n=x.length,th=mean(x),s=sdS(x),se=s/Math.sqrt(n),b=new Float64Array(B),tt=new Float64Array(B),y=new Float64Array(n);
+  for(let k=0;k<B;k++){let sm=0,sq=0;for(let i=0;i<n;i++){const v=x[Math.floor(Math.random()*n)];sm+=v;sq+=v*v}const m=sm/n,vr=Math.max(0,(sq-n*m*m)/(n-1));b[k]=m;tt[k]=vr>0?(m-th)/Math.sqrt(vr/n):0}
+  const bs=srt(b),st=srt(tt),sd=sdOf(b);let below=0;for(const v of b)if(v<th)below++;const z0=qn(Math.min(B/(B+1),Math.max(1/(B+1),below/B)));
+  let S1=0;for(const v of x)S1+=v;const jm=[];let jb=0;for(let i=0;i<n;i++){const m=(S1-x[i])/(n-1);jm.push(m);jb+=m}jb/=n;let num=0,den=0;for(const m of jm){const d=jb-m;num+=d*d*d;den+=d*d}const a=den>0?num/(6*Math.pow(den,1.5)):0;
+  const adj=z=>{const u=z0+z,p=normCdf(z0+u/(1-a*u));return Math.min(.9995,Math.max(.0005,p))},tcr=tqc(n);
+  return[{lo:th-Z95*sd,hi:th+Z95*sd},{lo:qs(bs,.025),hi:qs(bs,.975)},{lo:2*th-qs(bs,.975),hi:2*th-qs(bs,.025)},{lo:qs(bs,adj(-Z95)),hi:qs(bs,adj(Z95))},{lo:th-qs(st,.975)*se,hi:th-qs(st,.025)*se},{lo:th-tcr*se,hi:th+tcr*se}]}
+ function newS(){const key=$('c4d').value,n=NL[val('c4n')],x=sampleOf(key,n);S={key,n,th:mean(x),iv:intsAll(x,1000)};draw()}
+ function draw(){if(!S)return;const{key,n,th,iv}=S,tr=D[key].mu,c=cs&&cs.key===key&&cs.n===n;
+  let lo=Math.min(tr,th),hi=Math.max(tr,th);iv.forEach(a=>{lo=Math.min(lo,a.lo);hi=Math.max(hi,a.hi)});const w=hi-lo||1;lo-=.05*w;hi+=.05*w;
+  const nr=6,P=mk($('c4cv'),lo,hi,nr+.8,{noGrid:true,L:120,y0:.2});customGrid(P,niceTicks(lo,hi,6),[]);const g=P.g;
+  iv.forEach((a,j)=>{const y=nr-j;g.strokeStyle=COL[j];g.lineWidth=7;g.lineCap='round';g.beginPath();g.moveTo(P.X(a.lo),P.Y(y));g.lineTo(P.X(a.hi),P.Y(y));g.stroke();g.lineCap='butt';P.text(NAMES[j],P.L-8,P.Y(y)+4,COL[j],'right')});
+  P.vline(tr,C.fg,'true mean',true);P.vline(th,C.y,null,true);
+  $('c4tb').innerHTML='<table><tr><th>Interval</th><th>Limits</th><th>Width</th><th>Contains μ?</th>'+(c?'<th>Coverage</th><th>Misses below</th><th>Misses above</th><th>Mean width</th>':'')+'</tr>'+iv.map((a,j)=>{const hit=a.lo<=tr&&tr<=a.hi;return`<tr><td style="color:${COL[j]}"><b>${NAMES[j]}</b></td><td>[${f3(a.lo)}, ${f3(a.hi)}]</td><td>${f3(a.hi-a.lo)}</td><td style="color:${hit?C.g:C.r}">${hit?'yes':'no'}</td>`+(c?`<td style="color:${cs.ok[j]/cs.R<.92?C.r:C.g}">${pc(cs.ok[j]/cs.R)}</td><td>${pc(cs.lo[j]/cs.R)}</td><td>${pc(cs.hi[j]/cs.R)}</td><td>${f3(cs.wd[j]/cs.R)}</td>`:'')+'</tr>'}).join('')+'</table>';
+  $('c4rd').innerHTML=c?`Over ${cs.R} samples from ${D[key].n} with n = ${n}: coverage ${NAMES.map((nm,j)=>nm+' '+pc(cs.ok[j]/cs.R)).join(', ')}. Targets are 95% overall and 2.5% missing on each side; with skewed data the misses pile up on one side (look at the two miss columns). BCa and bootstrap-t usually pull coverage and balance closest to the target at small n, at the cost of occasionally wider intervals.`:'Press “Run coverage study” (takes a few seconds) to compare coverage and the split of misses. Try the lognormal population at n = 10 and 20.'}
+ $('c4go').onclick=newS;on('c4d c4n',newS);
+ $('c4cs').onclick=()=>{if(busy)return;const key=$('c4d').value,n=NL[val('c4n')],R=200,tr=D[key].mu,ok=Array(6).fill(0),lo=Array(6).fill(0),hi=Array(6).fill(0),wd=Array(6).fill(0);let r=0;busy=true;$('c4cs').disabled=true;
+  (function step(){const t0=performance.now();while(r<R&&performance.now()-t0<40){const a=intsAll(sampleOf(key,n),400);a.forEach((q,j)=>{if(q.lo<=tr&&tr<=q.hi)ok[j]++;else if(q.hi<tr)lo[j]++;else hi[j]++;wd[j]+=q.hi-q.lo});r++}
+   if(r<R){$('c4rd').textContent='Running coverage study… '+r+' / '+R;setTimeout(step,0)}else{cs={key,n,ok,lo,hi,wd,R};busy=false;$('c4cs').disabled=false;draw()}})()};
+ newS();resizers.push(draw);})();
+
+/* ---------- Ch5 regression ---------- */
+(function(){const NL=[20,50,100],cache={};idx('c5n',NL);scl('c5h',v=>'k = '+fmt(v/50));
+ function gen(n,k){const x=new Float64Array(n),y=new Float64Array(n);for(let i=0;i<n;i++){x[i]=10*Math.random();y[i]=1+.5*x[i]+(.5+k*Math.abs(x[i]-5))*randn()}return[x,y]}
+ function fit(x,y){const n=x.length;let xm=0,ym=0;for(let i=0;i<n;i++){xm+=x[i];ym+=y[i]}xm/=n;ym/=n;let sxx=0,sxy=0;for(let i=0;i<n;i++){sxx+=(x[i]-xm)*(x[i]-xm);sxy+=(x[i]-xm)*(y[i]-ym)}const b=sxy/sxx,a=ym-b*xm,e=new Float64Array(n);for(let i=0;i<n;i++)e[i]=y[i]-a-b*x[i];return{a,b,e,xm,sxx}}
+ function ses(x,y,B){const n=x.length,F=fit(x,y),{b,e,xm,sxx}=F;let s2=0,h0=0;for(let i=0;i<n;i++){s2+=e[i]*e[i];h0+=(x[i]-xm)*(x[i]-xm)*e[i]*e[i]}
+  const cl=Math.sqrt(s2/(n-2)/sxx),hc=Math.sqrt(h0)/sxx,pb=new Float64Array(B),rb=new Float64Array(B),wb=new Float64Array(B);
+  for(let k=0;k<B;k++){let sx=0,sy=0,sxx2=0,sxy=0,xs=new Float64Array(n),ys=new Float64Array(n);for(let i=0;i<n;i++){const j=Math.floor(Math.random()*n);xs[i]=x[j];ys[i]=y[j];sx+=x[j];sy+=y[j]}const mx=sx/n,my=sy/n;for(let i=0;i<n;i++){sxx2+=(xs[i]-mx)*(xs[i]-mx);sxy+=(xs[i]-mx)*(ys[i]-my)}pb[k]=sxx2>0?sxy/sxx2:b;
+   let t1=0,t2=0;for(let i=0;i<n;i++){t1+=(x[i]-xm)*e[Math.floor(Math.random()*n)];t2+=(x[i]-xm)*e[i]*(Math.random()<.5?-1:1)}rb[k]=b+t1/sxx;wb[k]=b+t2/sxx}
+  return{b,se:[cl,hc,sdOf(pb),sdOf(rb),sdOf(wb)]}}
+ function trueSE(n,k){const key=n+'_'+k;if(cache[key])return cache[key];const R=3000,a=new Float64Array(R);for(let r=0;r<R;r++){const[x,y]=gen(n,k);a[r]=fit(x,y).b}return cache[key]=sdOf(a)}
+ const NM=['Classical OLS','HC0 (sandwich)','Pairs bootstrap','Residual bootstrap','Wild bootstrap'],CL=[C.r,C.y,C.g,C.p,C.t];let S=null;
+ function run(){const n=NL[val('c5n')],k=val('c5h')/50,R=250,T=trueSE(n,k),sum=Array(5).fill(0),cv=Array(5).fill(0);
+  for(let r=0;r<R;r++){const[x,y]=gen(n,k),o=ses(x,y,200);o.se.forEach((s,j)=>{sum[j]+=s;if(Math.abs(o.b-.5)<=Z95*s)cv[j]++})}
+  const[x,y]=gen(n,k),F=fit(x,y),lines=[];for(let l=0;l<30;l++){const xs=new Float64Array(n),ys=new Float64Array(n);for(let i=0;i<n;i++){const j=Math.floor(Math.random()*n);xs[i]=x[j];ys[i]=y[j]}lines.push(fit(xs,ys))}
+  S={n,k,T,sum:sum.map(v=>v/R),cv:cv.map(v=>v/R),x,y,F,lines,R};draw()}
+ function draw(){if(!S)return;const{n,k,T,sum,cv,x,y,F,lines}=S;let ylo=1e9,yhi=-1e9;for(const v of y){ylo=Math.min(ylo,v);yhi=Math.max(yhi,v)}const pd=.05*(yhi-ylo);
+  const P=mk($('c5cv'),0,10,yhi+pd,{y0:ylo-pd});clip(P,()=>{lines.forEach(l=>{P.g.globalAlpha=.25;P.line(t=>l.a+l.b*t,C.r,1,0,10,2);P.g.globalAlpha=1});dots(P,Array.from(x,(v,i)=>[v,y[i]]),'rgba(110,168,255,.75)',2.6);P.line(t=>F.a+F.b*t,C.y,2.6,0,10,2);P.line(t=>1+.5*t,C.fg,1.6,0,10,2,true)});
+  P.text('yellow: OLS fit · red: 30 pairs-bootstrap fits · white dashed: truth',P.L+8,P.T+14,C.mu);
+  $('c5tb').innerHTML='<table><tr><th>Slope SE estimator</th><th>Average SE</th><th>÷ true SE ('+f3(T)+')</th><th>95% interval coverage</th></tr>'+NM.map((nm,j)=>`<tr><td style="color:${CL[j]}"><b>${nm}</b></td><td>${f3(sum[j])}</td><td>${fmt(sum[j]/T)}</td><td style="color:${cv[j]<.92?C.r:C.g}">${pc(cv[j])}</td></tr>`).join('')+'</table>';
+  $('c5rd').innerHTML=k<.1?`With constant variance (k ≈ 0) all five estimators agree with the truth (${f3(T)}) and cover about 95%.`:`With k = ${fmt(k)} the error variance depends on x. The classical formula and the residual bootstrap average ${f3(sum[0])} and ${f3(sum[3])} against a true SE of ${f3(T)} (coverage ${pc(cv[0])} and ${pc(cv[3])}); HC0, the pairs bootstrap and the wild bootstrap track the truth (coverage ${pc(cv[1])}, ${pc(cv[2])}, ${pc(cv[4])}). Residual resampling shuffles residuals across x, destroying the pattern that the variance depends on x.`}
+ $('c5go').onclick=run;$('c5h').addEventListener('change',run);$('c5n').addEventListener('change',run);run();resizers.push(draw);})();
+
+/* ---------- Ch6 permutation test ---------- */
+(function(){const NL=[8,15,30,60];idx('c6n',NL);scl('c6e',v=>fmt(v/10));let S=null;
+ function T(a,b,t){const n1=a.length,n2=b.length;if(t===1)return SF.median(b)-SF.median(a);const m1=mean(a),m2=mean(b);if(t===0)return m2-m1;const v1=SF.sd(a)**2,v2=SF.sd(b)**2;return(m2-m1)/Math.sqrt(v1/n1+v2/n2+1e-300)}
+ function gen(){const key=$('c6d').value,n=NL[val('c6n')],e=val('c6e')/10,a=sampleOf(key,n),b=sampleOf(key,n),sd=D[key].sd;for(let i=0;i<n;i++)b[i]+=e*sd;S={a,b,key,n};calc()}
+ function calc(){if(!S)return;const{a,b,n}=S,t=+$('c6t').value,T0=T(a,b,t),B=5000,z=new Float64Array(2*n);z.set(a);z.set(b,n);const out=new Float64Array(B);let ext=0;
+  for(let k=0;k<B;k++){for(let i=2*n-1;i>0;i--){const j=Math.floor(Math.random()*(i+1)),tmp=z[i];z[i]=z[j];z[j]=tmp}out[k]=T(z.subarray(0,n),z.subarray(n),t);if(Math.abs(out[k])>=Math.abs(T0)-1e-12)ext++}
+  const p=(1+ext)/(1+B),m1=mean(a),m2=mean(b),v1=SF.sd(a)**2,v2=SF.sd(b)**2,se=Math.sqrt(v1/n+v2/n),tw=(m2-m1)/se,df=Math.pow(v1/n+v2/n,2)/(Math.pow(v1/n,2)/(n-1)+Math.pow(v2/n,2)/(n-1)),pw=2*(1-tcdf(Math.abs(tw),df));
+  S.res={T0,p,pw,ext,B,out,t};draw()}
+ function draw(){if(!S||!S.res)return;const{T0,p,pw,ext,B,out,t}=S.res,n=S.n,w=Math.max(pct(out.map(Math.abs),.999),Math.abs(T0))*1.1||1;
+  const P=hist($('c6cv'),out,-w,w,50,[],'rgba(110,168,255,.5)');P.vline(T0,C.y,'observed',true);P.vline(-T0,C.y,null,true);P.text('distribution of the statistic over 5,000 random relabellings',P.L+8,P.T+26,C.mu);
+  const NP=Math.exp(lbin(2*n,n));
+  $('c6st').innerHTML=stat('observed statistic',fmt(T0),'in')+stat('relabellings as extreme',ext+' of '+B,'')+stat('permutation p',f3(p),p<.05?'ok':'warn')+stat('Welch t-test p',f3(pw),pw<.05?'ok':'warn')+stat('possible relabellings',NP.toExponential(2),'in');
+  $('c6rd').innerHTML=`Pool all ${2*n} values, shuffle which ${n} belong to group 1, recompute the statistic, and repeat. ${ext} of ${B} shuffles gave a statistic at least as extreme as the observed ${fmt(T0)}, so p = (1 + ${ext}) / (1 + ${B}) = ${f3(p)}. Welch's t-test, which relies on a normal approximation, gives ${f3(pw)}. With skewed data and small n they can differ visibly; with the effect set to 0 both should reject only about 5% of the time. Switch the statistic to medians: the permutation test handles it with no extra theory.`}
+ $('c6go').onclick=gen;on('c6d c6e c6n',gen);$('c6t').addEventListener('change',calc);gen();resizers.push(draw);})();
+
+/* ---------- Ch7 Behrens-Fisher ---------- */
+(function(){const RAT=[.25,.5,1,2,4],NAMES=['Permutation, mean difference','Permutation, Welch t','Welch t-test','Pooled t-test','Bootstrap-t (null imposed)'],COL=[C.r,C.y,C.g,C.a,C.p],SHORT=['perm: mean diff','perm: Welch t','Welch t','pooled t','bootstrap-t'];let busy=false,res=null;scl('c7a',v=>v);scl('c7b',v=>v);idx('c7c',RAT);
+ function welch(m1,v1,n1,m2,v2,n2){const se2=v1/n1+v2/n2,t=(m1-m2)/Math.sqrt(se2),df=se2*se2/(v1*v1/(n1*n1*(n1-1))+v2*v2/(n2*n2*(n2-1)));return{t,df}}
+ function oneSet(n1,n2,sd1,B){const N=n1+n2,z=new Float64Array(N),x1=new Float64Array(n1),x2=new Float64Array(n2);let S=0,SS=0,s1=0,q1=0,s2=0,q2=0;
+  for(let i=0;i<n1;i++){const v=sd1*randn();x1[i]=v;z[i]=v;s1+=v;q1+=v*v}for(let i=0;i<n2;i++){const v=randn();x2[i]=v;z[n1+i]=v;s2+=v;q2+=v*v}S=s1+s2;SS=q1+q2;
+  const m1=s1/n1,m2=s2/n2,v1=(q1-n1*m1*m1)/(n1-1),v2=(q2-n2*m2*m2)/(n2-1),W=welch(m1,v1,n1,m2,v2,n2),pw=2*(1-tcdf(Math.abs(W.t),W.df));
+  const sp=((n1-1)*v1+(n2-1)*v2)/(N-2),tp=(m1-m2)/Math.sqrt(sp*(1/n1+1/n2)),pp=2*(1-tcdf(Math.abs(tp),N-2));
+  const T0=m1-m2,Tt=W.t;let c1=0,c2=0;
+  for(let b=0;b<B;b++){let a=0,aa=0;for(let i=0;i<n1;i++){const j=i+Math.floor(Math.random()*(N-i)),t=z[i];z[i]=z[j];z[j]=t;const v=z[i];a+=v;aa+=v*v}
+   const b1=a/n1,b2=(S-a)/n2,w1=(aa-n1*b1*b1)/(n1-1),w2=(SS-aa-n2*b2*b2)/(n2-1);if(Math.abs(b1-b2)>=Math.abs(T0)-1e-12)c1++;if(Math.abs((b1-b2)/Math.sqrt(w1/n1+w2/n2))>=Math.abs(Tt)-1e-12)c2++}
+  let c3=0;for(let b=0;b<B;b++){let a=0,aa=0,c=0,cc=0;for(let i=0;i<n1;i++){const v=x1[Math.floor(Math.random()*n1)]-m1;a+=v;aa+=v*v}for(let i=0;i<n2;i++){const v=x2[Math.floor(Math.random()*n2)]-m2;c+=v;cc+=v*v}
+   const b1=a/n1,b2=c/n2,w1=(aa-n1*b1*b1)/(n1-1),w2=(cc-n2*b2*b2)/(n2-1);if(Math.abs((b1-b2)/Math.sqrt(w1/n1+w2/n2))>=Math.abs(Tt)-1e-12)c3++}
+  return[(1+c1)/(1+B)<=.05,(1+c2)/(1+B)<=.05,pw<.05,pp<.05,(1+c3)/(1+B)<=.05]}
+ function run(){if(busy)return;busy=true;$('c7go').disabled=true;const n1=val('c7a'),n2=val('c7b'),sd1=RAT[val('c7c')],R=1000,B=199,rej=[0,0,0,0,0];let r=0;
+  (function step(){const t0=performance.now();while(r<R&&performance.now()-t0<40){oneSet(n1,n2,sd1,B).forEach((h,j)=>{if(h)rej[j]++});r++}
+   if(r<R){$('c7rd').textContent='Running… '+r+' / '+R;setTimeout(step,0)}else{res={n1,n2,sd1,rej:rej.map(v=>v/R),R};busy=false;$('c7go').disabled=false;draw()}})()}
+ function draw(){if(!res)return;const{n1,n2,sd1,rej}=res,ym=Math.max(.12,Math.max(...rej)*1.2),P=mk($('c7cv2'),0,5,ym,{noGrid:true,L:50,y0:0});customGrid(P,[],niceTicks(0,ym,5).map(([v])=>[v,Math.round(v*100)+'%']));const g=P.g;
+  rej.forEach((v,j)=>{g.fillStyle=COL[j];g.globalAlpha=.7;g.fillRect(P.X(j+.15),P.Y(v),P.X(j+.85)-P.X(j+.15),P.Y(0)-P.Y(v));g.globalAlpha=1;P.text(pc(v),P.X(j+.5),P.Y(v)-6,C.fg,'center');P.text(SHORT[j],P.X(j+.5),P.h-10,COL[j],'center')});P.hline(.05,C.fg,'5% (valid test)');
+  $('c7tb').innerHTML='<table><tr><th>Test</th><th>Rejection rate when H₀ (equal means) is true</th></tr>'+NAMES.map((nm,j)=>`<tr><td style="color:${COL[j]}"><b>${nm}</b></td><td style="color:${Math.abs(rej[j]-.05)>.015?C.r:C.g}">${pc(rej[j])}</td></tr>`).join('')+'</table>';
+  const worst=rej[0];$('c7rd').innerHTML=`n₁ = ${n1}, n₂ = ${n2}, SD₁/SD₂ = ${sd1}. With H₀ true, a valid test rejects 5% (±0.7% simulation noise). The raw permutation test rejects ${pc(rej[0])}; the studentised permutation test ${pc(rej[1])}; Welch ${pc(rej[2])}; the pooled t-test ${pc(rej[3])}; the bootstrap-t ${pc(rej[4])}. ${Math.abs(rej[0]-.05)>.015?`The raw permutation test is ${rej[0]>.05?'anti-conservative':'conservative'} because the groups are not exchangeable when their variances differ and the sizes are unequal. The pooled t-test fails for the same reason; the studentised permutation test and Welch fix it.`:'With equal variances or balanced sizes, exchangeability is nearly true and every test is close to 5%. Set n₁ = 10, n₂ = 40 and the SD ratio to 4, or to 0.25, to see the failure in both directions.'}`}
+ $('c7go').onclick=run;run();resizers.push(draw);})();
+
+/* ---------- Ch8 Monte Carlo p-values ---------- */
+(function(){const BL=[99,499,999,9999];idx('c8n',BL);scl('c8e',v=>fmt(v/10));let S=null;
+ function perm(z,n,T0,B){let c=0;const N=z.length,S0=z.reduce((a,b)=>a+b,0);for(let b=0;b<B;b++){let a=0;for(let i=0;i<n;i++){const j=i+Math.floor(Math.random()*(N-i)),t=z[i];z[i]=z[j];z[j]=t;a+=z[i]}if(Math.abs(a/n-(S0-a)/(N-n))>=T0-1e-12)c++}return(1+c)/(1+B)}
+ function mkData(e){const n=10,z=new Float64Array(2*n);for(let i=0;i<n;i++){z[i]=randn();z[n+i]=randn()+e}let s1=0,s2=0;for(let i=0;i<n;i++){s1+=z[i];s2+=z[n+i]}return{z,n,T0:Math.abs(s2-s1)/n}}
+ function gen(){const near=$('c8near').checked,e=near?1:val('c8e')/10;let d=mkData(e);if(near){for(let t=0;t<80;t++){const p=perm(Float64Array.from(d.z),d.n,d.T0,1500);if(p>.035&&p<.075)break;d=mkData(e)}}S={z:d.z,n:d.n,T0:d.T0,pstar:perm(Float64Array.from(d.z),d.n,d.T0,50000)};calc()}
+ function calc(){if(!S)return;const B=BL[val('c8n')],R=300,a=new Float64Array(R);for(let r=0;r<R;r++)a[r]=perm(Float64Array.from(S.z),S.n,S.T0,B);S.B=B;S.a=a;draw()}
+ function draw(){if(!S||!S.a)return;const{a,B,pstar}=S,hi=Math.min(1,Math.max(.14,Math.max(...a)*1.15,pstar*1.5)),P=hist($('c8cv'),a,0,hi,40,[],'rgba(110,168,255,.55)');P.vline(pstar,C.fg,'p (50,000 shuffles)',true);P.vline(.05,C.r,'0.05',true);P.text('300 repeated runs of the same test with B = '+B,P.L+8,P.T+26,C.mu);
+  const m=mean(a),sd=sdOf(a),th=Math.sqrt(pstar*(1-pstar)/B),below=a.filter(v=>v<=.05).length/a.length;
+  $('c8st').innerHTML=stat('“true” p',f3(pstar),'ok')+stat('average p̂',f3(m),'')+stat('SD of p̂ (observed)',f3(sd),'warn')+stat('√(p(1−p)/B)',f3(th),'in')+stat('runs with p̂ ≤ 0.05',pc(below),below>.05&&below<.95?'hot':'ok')+stat('exact arrangements',Math.round(Math.exp(lbin(20,10))).toLocaleString(),'in');
+  $('c8rd').innerHTML=`The same data and the same test produced p̂ anywhere between ${f3(Math.min(...a))} and ${f3(Math.max(...a))} with B = ${B}. The spread (${f3(sd)}) matches √(p(1−p)/B) = ${f3(th)}. ${below>.05&&below<.95?`<b>The verdict flips:</b> ${pc(below)} of runs declare significance at 5% and the rest do not, purely from Monte Carlo noise.`:`The verdict is stable here because p is far from 0.05 relative to the noise.`} Raise B to 9,999 and watch the histogram tighten, or set the effect so that p is close to 0.05 to see the problem at its worst. These data have only ${Math.round(Math.exp(lbin(20,10))).toLocaleString()} distinct arrangements, small enough to enumerate exactly.`}
+ $('c8go').onclick=gen;$('c8e').addEventListener('change',gen);$('c8near').addEventListener('change',gen);$('c8n').addEventListener('change',calc);gen();resizers.push(draw);})();
+
+/* ---------- Ch9 block bootstrap ---------- */
+(function(){const NL=[100,200,500],LS=[1,2,3,5,8,12,18,25,35,50];idx('c9n',NL);scl('c9p',v=>fmt(v/100));
+ function ar(n,phi){const x=new Float64Array(n);x[0]=randn()/Math.sqrt(1-phi*phi);for(let t=1;t<n;t++)x[t]=phi*x[t-1]+randn();return x}
+ function bse(x,l,B){const n=x.length,P=new Float64Array(n+1);for(let i=0;i<n;i++)P[i+1]=P[i]+x[i];const nb=Math.ceil(n/l),m=new Float64Array(B);for(let b=0;b<B;b++){let s=0;for(let j=0;j<nb;j++){const st=Math.floor(Math.random()*(n-l+1));s+=P[st+l]-P[st]}m[b]=s/(nb*l)}return sdOf(m)}
+ let S=null;
+ function run(){const phi=val('c9p')/100,n=NL[val('c9n')],L=LS.filter(l=>l<=n/4),R=30,B=200,avg=new Float64Array(L.length);let first=null,naive=0;
+  for(let r=0;r<R;r++){const x=ar(n,phi),cur=L.map(l=>bse(x,l,B));if(!first)first=cur;cur.forEach((v,i)=>avg[i]+=v/R);naive+=sdS(x)/Math.sqrt(n)/R}
+  const g0=1/(1-phi*phi);let sum=0;for(let k=1;k<n;k++)sum+=(1-k/n)*Math.pow(phi,k);const tse=Math.sqrt(g0/n*(1+2*sum));S={phi,n,L,avg,first,naive,tse};draw()}
+ function draw(){if(!S)return;const{phi,n,L,avg,first,naive,tse}=S,rule=Math.round(Math.pow(n,1/3)),ym=Math.max(tse,naive,...avg,...first)*1.2,xm=L[L.length-1]*1.05;
+  const P=mk($('c9cv'),0,xm,ym,{y0:0,L:52});poly(P,L.map((l,i)=>[l,first[i]]),'rgba(110,168,255,.4)',1.6);poly(P,L.map((l,i)=>[l,avg[i]]),C.a,2.8);dots(P,L.map((l,i)=>[l,avg[i]]),C.a,3.5);P.hline(tse,C.g,'true SE '+f3(tse));P.hline(naive,C.r,'naive iid SE '+f3(naive));P.vline(rule,C.y,'n^(1/3) = '+rule,true);P.text('block length ℓ',P.w/2,P.h-2,C.mu,'center');P.text('thick: average over 30 series · thin: one series',P.L+8,P.T+30,C.mu);
+  let best=0,bd=1e9;L.forEach((l,i)=>{const d=Math.abs(avg[i]-tse);if(d<bd){bd=d;best=l}});const de=(1+phi)/(1-phi),ri=L.reduce((b,l,i)=>Math.abs(l-rule)<Math.abs(L[b]-rule)?i:b,0);
+  $('c9st').innerHTML=stat('true SE of the mean',f3(tse),'ok')+stat('iid bootstrap (ℓ = 1)',f3(avg[0]),Math.abs(avg[0]/tse-1)>.15?'hot':'ok')+stat('block bootstrap at ℓ ≈ n^⅓ ('+L[ri]+')',f3(avg[ri]),'warn')+stat('closest ℓ',best,'in')+stat('design effect (1+φ)/(1−φ)',fmt(de),'')+stat('effective sample size',fmt(n/de),'in');
+  $('c9rd').innerHTML=`With φ = ${fmt(phi)} and n = ${n}, the true SE of the mean is ${f3(tse)}. The ordinary iid bootstrap (ℓ = 1) gives ${f3(avg[0])}, which is ${phi>.05?'too small':phi<-.05?'too large':'about right'} by a factor of about ${fmt(tse/avg[0])}, close to √((1+φ)/(1−φ)) = ${fmt(Math.sqrt(de))}. Longer blocks recover most of the truth. The block bootstrap still runs somewhat low (typically 80–95% of the true SE at this n), because blocks are centred on the sample mean and each block only sees dependence within itself; very long blocks leave few distinct blocks and the estimate gets noisy. The n^{1/3} rule lands in the right region but is a starting point, not a guarantee. ${phi>.05?`Your ${n} observations carry the information of about ${fmt(n/de)} independent ones.`:''}`}
+ $('c9go').onclick=run;$('c9p').addEventListener('change',run);$('c9n').addEventListener('change',run);run();resizers.push(draw);})();
+
+/* ---------- Ch10 clusters ---------- */
+(function(){const ML=[10,20,50];idx('c10m',ML);scl('c10i',v=>v+'%');scl('c10k',v=>v);let S=null;
+ function gen(m,k,rho){const y=[];for(let i=0;i<m;i++){const a=Math.sqrt(rho)*randn(),r=new Float64Array(k);for(let j=0;j<k;j++)r[j]=a+Math.sqrt(1-rho)*randn();y.push(r)}return y}
+ function cm(y){return y.map(r=>mean(r))}
+ function clusterSE(cmv,B){const m=cmv.length,o=new Float64Array(B);for(let b=0;b<B;b++){let s=0;for(let i=0;i<m;i++)s+=cmv[Math.floor(Math.random()*m)];o[b]=s/m}return sdOf(o)}
+ function run(){const m=ML[val('c10m')],k=val('c10k'),rho=val('c10i')/100,R=400,N=m*k,means=new Float64Array(R);let sn=0,sc=0,cn=0,cc=0;
+  for(let r=0;r<R;r++){const y=gen(m,k,rho),c=cm(y),g=mean(c);means[r]=g;let ss=0;for(const row of y)for(const v of row)ss+=(v-g)*(v-g);const naive=Math.sqrt(ss/(N-1)/N),cl=clusterSE(c,300);sn+=naive;sc+=cl;if(Math.abs(g)<=Z95*naive)cn++;if(Math.abs(g)<=Z95*cl)cc++}
+  const y=gen(m,k,rho),c=cm(y),g=mean(c),flat=[];y.forEach(r=>r.forEach(v=>flat.push(v)));const fb=new Float64Array(500);for(let b=0;b<500;b++){let s=0;for(let i=0;i<N;i++)s+=flat[Math.floor(Math.random()*N)];fb[b]=s/N}
+  S={m,k,rho,N,y,c,g,tse:Math.sqrt((1+(k-1)*rho)/N),an:sn/R,ac:sc/R,cn:cn/R,cc:cc/R,rowB:sdOf(fb),clB:clusterSE(c,500),de:1+(k-1)*rho};draw()}
+ function draw(){if(!S)return;const{m,k,y,c,tse,an,ac,cn,cc,rowB,clB,de,rho,N}=S,show=Math.min(m,20);let ylo=1e9,yhi=-1e9;for(let i=0;i<show;i++)for(const v of y[i]){ylo=Math.min(ylo,v);yhi=Math.max(yhi,v)}
+  const P=mk($('c10cv'),0,show+1,yhi+.1,{y0:ylo-.1,noGrid:true,L:40});customGrid(P,niceTicks(1,show,6),niceTicks(ylo,yhi,4));for(let i=0;i<show;i++){dots(P,Array.from(y[i],v=>[i+1,v]),'rgba(110,168,255,.7)',2.3);P.g.strokeStyle=C.y;P.g.lineWidth=3;P.g.beginPath();P.g.moveTo(P.X(i+.65),P.Y(c[i]));P.g.lineTo(P.X(i+1.35),P.Y(c[i]));P.g.stroke()}P.text('cluster (first '+show+')  ·  yellow: cluster mean',P.L+8,P.T+12,C.mu);
+  const vs=[tse,an,ac],nm=['true SE','row bootstrap','cluster bootstrap'],cl=[C.fg,C.r,C.g],ym=Math.max(...vs)*1.25,Q=mk($('c10cv2'),0,3,ym,{y0:0,noGrid:true,L:50});customGrid(Q,[],niceTicks(0,ym,4));vs.forEach((v,j)=>{const g=Q.g;g.fillStyle=cl[j];g.globalAlpha=.7;g.fillRect(Q.X(j+.2),Q.Y(v),Q.X(j+.8)-Q.X(j+.2),Q.Y(0)-Q.Y(v));g.globalAlpha=1;Q.text(f3(v),Q.X(j+.5),Q.Y(v)-6,C.fg,'center');Q.text(nm[j],Q.X(j+.5),Q.h-10,cl[j],'center')});Q.text('SE of the grand mean (averages over 400 data sets)',Q.L+8,Q.T+12,C.mu);
+  $('c10tb').innerHTML=`<table><tr><th>Method</th><th>SE on this data set</th><th>Average SE (400 data sets)</th><th>95% interval coverage</th></tr><tr><td style="color:${C.r}"><b>Row (iid) bootstrap</b></td><td>${f3(rowB)}</td><td>${f3(an)}</td><td style="color:${cn<.92?C.r:C.g}">${pc(cn)}</td></tr><tr><td style="color:${C.g}"><b>Cluster bootstrap</b></td><td>${f3(clB)}</td><td>${f3(ac)}</td><td style="color:${cc<.92?C.r:C.g}">${pc(cc)}</td></tr><tr><td><b>Truth</b></td><td>—</td><td>${f3(tse)}</td><td>95%</td></tr></table>`;
+  $('c10rd').innerHTML=`With ${m} clusters of ${k} rows (${N} rows in all) and ρ = ${fmt(rho)}, the design effect is 1 + (k − 1)ρ = ${fmt(de)}, so the true SE is about √${fmt(de)} = ${fmt(Math.sqrt(de))} times the iid value. The row bootstrap (${f3(an)}) misses this and its intervals cover only ${pc(cn)}; the cluster bootstrap (${f3(ac)}) recovers the truth (${f3(tse)}) and covers ${pc(cc)} (a little low when the number of clusters is small, because ${m} clusters are all the information there is). Set ρ to 0 and the two agree. Adding more rows per cluster barely helps: <b>the cluster count controls precision</b>.`}
+ $('c10go').onclick=run;['c10i','c10m','c10k'].forEach(i=>$(i).addEventListener('change',run));run();resizers.push(draw);})();
+
+/* ---------- Ch11 AUC ---------- */
+(function(){const NL=[100,300,1000,3000];idx('c11n',NL);scl('c11p',v=>v+'%');scl('c11a',v=>fmt(v/10));let busy=false,S=null;
+ function auc(P,N){let j=0,s=0;const n0=N.length;for(let i=0;i<P.length;i++){while(j<n0&&N[j]<P[i])j++;s+=j}return s/(P.length*n0)}
+ function gen(n,n1,dA,dB){const y=new Uint8Array(n),a=new Float64Array(n),b=new Float64Array(n);for(let i=0;i<n;i++){const pos=i<n1;y[i]=pos?1:0;const u=Math.sqrt(.6)*randn();a[i]=(pos?dA:0)+u+Math.sqrt(.4)*randn();b[i]=(pos?dB:0)+u+Math.sqrt(.4)*randn()}return{y,a,b}}
+ function aucIdx(s,y,ix){const P=[],N=[];for(let t=0;t<ix.length;t++){const i=ix[t];(y[i]?P:N).push(s[i])}return auc(Float64Array.from(P).sort(),Float64Array.from(N).sort())}
+ function hm(A,n1,n0){const Q1=A/(2-A),Q2=2*A*A/(1+A);return Math.sqrt((A*(1-A)+(n1-1)*(Q1-A*A)+(n0-1)*(Q2-A*A))/(n1*n0))}
+ function run(){if(busy)return;busy=true;$('c11go').disabled=true;$('c11rd').textContent='Running…';setTimeout(go,20)}
+ function go(){const n=NL[val('c11n')],n1=Math.max(5,Math.round(n*val('c11p')/100)),n0=n-n1,dA=val('c11a')/10,dB=dA+.15,B=300;
+  const d=gen(n,n1,dA,dB),all=Array.from({length:n},(_,i)=>i),pos=all.filter(i=>d.y[i]),neg=all.filter(i=>!d.y[i]),aA=aucIdx(d.a,d.y,all),aB=aucIdx(d.b,d.y,all),dl=aB-aA;
+  const rowA=[],stA=[],pd=[],ud=[];const ix=new Int32Array(n),ix2=new Int32Array(n),ix3=new Int32Array(n);
+  for(let b=0;b<B;b++){for(let i=0;i<n;i++){ix[i]=Math.floor(Math.random()*n);ix2[i]=Math.floor(Math.random()*n)}
+   const ra=aucIdx(d.a,d.y,ix),rb=aucIdx(d.b,d.y,ix),rb2=aucIdx(d.b,d.y,ix2);rowA.push(ra);ud.push(rb2-ra);
+   for(let i=0;i<n1;i++)ix3[i]=pos[Math.floor(Math.random()*n1)];for(let i=0;i<n0;i++)ix3[n1+i]=neg[Math.floor(Math.random()*n0)];const sa=aucIdx(d.a,d.y,ix3),sb=aucIdx(d.b,d.y,ix3);stA.push(sa);pd.push(sb-sa)}
+  const R=200,ta=new Float64Array(R),td=new Float64Array(R);for(let r=0;r<R;r++){const e=gen(n,n1,dA,dB),al=all,x=aucIdx(e.a,e.y,al),yy=aucIdx(e.b,e.y,al);ta[r]=x;td[r]=yy-x}
+  S={n,n1,n0,dA,dB,aA,aB,dl,rowA:srt(rowA),stA:srt(stA),pd:srt(pd),ud:srt(ud),hse:hm(aA,n1,n0),tA:sdOf(ta),tD:sdOf(td),trA:normCdf(dA/Math.SQRT2),trB:normCdf(dB/Math.SQRT2)};busy=false;$('c11go').disabled=false;draw()}
+ function draw(){if(!S)return;const s=S,lo=Math.min(qs(s.pd,.005),qs(s.ud,.005),0)-.005,hi=Math.max(qs(s.pd,.995),qs(s.ud,.995),0)+.005;
+  const P=histLines($('c11cv'),[s.pd,s.ud],[C.a,C.r],lo,hi,40,[[0,C.fg,'0',true],[s.dl,C.y,'observed Δ',true],[s.trB-s.trA,C.g,'true Δ',true]]);P.text('— paired bootstrap of ΔAUC',P.L+8,P.T+26,C.a);P.text('— unpaired (independent) bootstrap',P.L+8,P.T+42,C.r);
+  const ci=a=>`[${f3(qs(a,.025))}, ${f3(qs(a,.975))}]`,hz=s.hse*Z95,sdp=sdOf(s.pd),sdu=sdOf(s.ud),ex=a=>qs(a,.025)>0||qs(a,.975)<0;
+  $('c11tb').innerHTML=`<table><tr><th>Quantity</th><th>Estimate</th><th>95% interval</th></tr><tr><td><b>AUC of model A</b> (true ${f3(s.trA)}): row bootstrap</td><td>${f3(s.aA)}</td><td>${ci(s.rowA)}</td></tr><tr><td>stratified bootstrap</td><td>${f3(s.aA)}</td><td>${ci(s.stA)}</td></tr><tr><td>Hanley–McNeil (analytic)</td><td>${f3(s.aA)}</td><td>[${f3(s.aA-hz)}, ${f3(s.aA+hz)}]</td></tr><tr><td><b>ΔAUC = B − A</b> (true ${f3(s.trB-s.trA)}): paired bootstrap</td><td>${f3(s.dl)}</td><td style="color:${ex(s.pd)?C.g:C.y}">${ci(s.pd)}</td></tr><tr><td>unpaired bootstrap</td><td>${f3(s.dl)}</td><td style="color:${ex(s.ud)?C.g:C.y}">${ci(s.ud)}</td></tr></table>`;
+  $('c11st').innerHTML=stat('true SD of AUC A (200 sets)',f3(s.tA),'in')+stat('bootstrap SD of AUC A',f3(sdOf(s.stA)),'ok')+stat('true SD of ΔAUC',f3(s.tD),'ok')+stat('paired SD of ΔAUC',f3(sdp),'ok')+stat('unpaired SD of ΔAUC',f3(sdu),Math.abs(sdu/s.tD-1)>.25?'hot':'warn')+stat('positives / negatives',s.n1+' / '+s.n0,'');
+  $('c11rd').innerHTML=`Model A's AUC is ${f3(s.aA)} (truth ${f3(s.trA)}) with a bootstrap standard deviation ${f3(sdOf(s.stA))}, in line with the true spread ${f3(s.tA)}. Model B is truly better by ${f3(s.trB-s.trA)}. The paired bootstrap SE of the difference is ${f3(sdp)}, close to the true ${f3(s.tD)}; the unpaired bootstrap says ${f3(sdu)}, ${sdu>sdp?'too large because it ignores the correlation between the two models’ scores':'a different value'}, so it ${ex(s.pd)&&!ex(s.ud)?'<b>misses</b> a real improvement that the paired interval detects':ex(s.ud)?'also flags the improvement here':'does not detect the difference either'}. With ${s.n1} positives, an interval of ±${f3(1.96*sdOf(s.stA))} on a single AUC is typical: report it. Try n = 100 and a 5% positive rate.`}
+ $('c11go').onclick=run;run();resizers.push(draw);})();
+const QZ=[
+{l:'Beginner',q:'How is one bootstrap resample of a data set of size n formed?',o:['Draw n observations from the data with replacement','Draw n observations from the data without replacement','Draw n/2 observations without replacement','Draw n new observations from a fitted normal distribution (always)'],a:0,e:'The standard (non-parametric) bootstrap resamples n points with replacement, so some points repeat and others are left out. Drawing from a fitted model is the parametric bootstrap.'},
+{l:'Beginner',q:'The bootstrap distribution of the sample mean x̄* is centred at…',o:['The true mean μ','The sample mean x̄ of the data in hand','Zero','The median of the data'],a:1,e:'Resampling is from F̂, whose mean is x̄. The bootstrap estimates spread and shape, not where the truth lies.'},
+{l:'Intermediate',q:'About what fraction of the distinct original observations appear in a typical bootstrap resample (large n)?',o:['50%','63%','80%','95%'],a:1,e:'P(a given point is included) = 1 − (1 − 1/n)ⁿ → 1 − e⁻¹ ≈ 63.2%.'},
+{l:'Intermediate',q:'The bootstrap estimate of the standard error of θ̂ is…',o:['The mean of the θ* values','The standard deviation of the θ* values','The difference between θ̂ and the mean of θ*','The 95th percentile of θ*'],a:1,e:'SE_boot = sd(θ₁*,…,θ_B*). The difference mean(θ*) − θ̂ is the bootstrap estimate of bias.'},
+{l:'Intermediate',q:'Which intervals reach second-order accuracy (coverage error of order 1/n)?',o:['Normal and percentile','Basic and normal','BCa and bootstrap-t','None; all bootstrap intervals are first-order'],a:2,e:'BCa corrects bias and skewness; the studentised bootstrap-t uses a pivot. The normal, percentile and basic intervals are first-order accurate.'},
+{l:'Intermediate',q:'Why does the bootstrap fail for the maximum of a Uniform(0, θ) sample?',o:['The maximum is not a function of the data','The bootstrap distribution has a point mass at the sample maximum (≈63% of resamples), unlike the true continuous distribution','The bootstrap needs normal data','B is always too small for extremes'],a:1,e:'A resample cannot exceed the sample maximum, and contains it with probability 1 − (1 − 1/n)ⁿ ≈ 63.2%. The percentile interval therefore never reaches the true θ.'},
+{l:'Intermediate',q:'A permutation test used B = 999 random shuffles and found 24 shuffles at least as extreme as the observed statistic. The p-value is…',o:['0.024','0.025','0.024 and never below 0.001','0.0240 but only for one-sided tests'],a:1,e:'p = (1 + 24)/(1 + 999) = 0.025. The “+1” counts the observed arrangement; it also keeps p̂ from being exactly 0.'},
+{l:'Advanced',q:'What does a two-sample permutation test assume under H₀?',o:['Normal data in both groups','Equal variances only','The observations are exchangeable across the group labels (the groups have the same distribution)','Large samples'],a:2,e:'Shuffling labels is valid when every relabelling is equally likely under H₀, i.e. the groups have identical distributions. It needs no normality but it does need exchangeability.'},
+{l:'Advanced',q:'You test equal means with a permutation test on the raw difference in means, but the groups have very different variances and sizes. The test is…',o:['Still exact, because permutation tests are exact','Not valid for the equal-means hypothesis: exchangeability fails and the type I error can be far from 5%; studentising the statistic fixes it approximately','Valid but with low power','Valid only if B is large'],a:1,e:'The Behrens–Fisher problem. A studentised statistic (Welch t) is approximately pivotal even when the groups differ in spread, so permuting it is asymptotically valid.'},
+{l:'Advanced',q:'In a regression with error variance that depends on x, which resampling scheme gives a valid SE for the slope?',o:['Residual bootstrap','Classical OLS formula','Pairs (case) bootstrap or wild bootstrap','Permuting y relative to x'],a:2,e:'Pairs resampling keeps each row’s own scatter; the wild bootstrap multiplies each residual by a random sign. The residual bootstrap shuffles residuals across x, which wrongly assumes constant variance.'},
+{l:'Advanced',q:'A series has AR(1) autocorrelation φ = 0.6. The iid bootstrap SE of its mean is too small by a factor of about…',o:['1','1.25','2','4'],a:2,e:'The variance inflation is (1 + φ)/(1 − φ) = 1.6/0.4 = 4, so the SE is understated by √4 = 2.'},
+{l:'Advanced',q:'A common rule-of-thumb block length for a moving block bootstrap of n = 1,000 observations is…',o:['1','About 10 (n^{1/3})','About 100','About 500'],a:1,e:'ℓ ≈ n^{1/3} = 10. It balances preserving dependence against having enough distinct blocks; data-driven choices refine it.'},
+{l:'Advanced',q:'You have 100 customers with 20 transactions each and intra-customer correlation 0.2. The design effect for the mean is…',o:['1','About 2','About 4.8','20'],a:2,e:'1 + (k − 1)ρ = 1 + 19 × 0.2 = 4.8, so SEs from treating the 2,000 rows as independent are too small by √4.8 ≈ 2.2. Resample customers, not rows.'},
+{l:'Expert',q:'A Monte Carlo permutation p-value with B = 999 comes out at 0.05. Its Monte Carlo standard error is about…',o:['0.0007','0.007','0.05','0.5'],a:1,e:'√(0.05 × 0.95 / 999) ≈ 0.007. A decision at the 5% threshold is not stable; add shuffles (or enumerate) before concluding.'},
+{l:'Expert',q:'When is bootstrap bias correction (2θ̂ − mean(θ*)) usually a bad idea?',o:['When the estimated bias is small compared with the standard error: the correction adds more noise than it removes bias','When n is large','When the statistic is a mean','Never; it always lowers MSE'],a:0,e:'The corrected estimator subtracts a noisy bias estimate. If bias ≪ SE, MSE typically gets worse. A common guideline is to correct only when |bias| exceeds about 0.25 SE.'},
+{l:'Expert',q:'You compare the AUCs of two models scored on the same test cases. Which bootstrap gives a correct SE for the difference?',o:['Resample each model’s scores independently','Resample cases once per replicate and compute both AUCs on that resample (paired)','Compute each AUC’s CI and check if they overlap','Use the larger of the two SEs'],a:1,e:'The two models’ scores are correlated, so the SE of the difference is smaller than √(SE_A² + SE_B²). Resampling cases jointly preserves that correlation; independent resampling and overlap checks overstate the uncertainty.'},
+{l:'Expert',q:'For which statistic does the jackknife fail?',o:['The mean','The variance','The median (a non-smooth statistic)','A regression coefficient'],a:2,e:'The leave-one-out values of the median take only a couple of distinct values, giving an inconsistent SE. The bootstrap handles the median.'},
+{l:'Expert',q:'You want a bootstrap test of H₀: two groups have equal means, allowing different variances. What must the resampling do?',o:['Resample the pooled data','Resample each group separately after shifting it to satisfy H₀ (e.g. subtract each group’s mean), using a studentised statistic','Nothing; resampling automatically imposes H₀','Resample only the smaller group'],a:1,e:'Bootstrap tests must generate data under the null. Centre each group at the common mean and resample within groups; studentising makes the test robust to unequal variances.'}
+];
+(function(){const st=store.get('bs_quiz',{});
+ function render(){const box=$('quiz');box.innerHTML='';
+  QZ.forEach((q,i)=>{const d=document.createElement('div');d.className='q'+(st[i]!=null?' done':'');d.innerHTML=`<div class="qh">Q${i+1} · ${q.l}</div><div style="margin:4px 0 6px"><b>${q.q}</b></div>`;
+   q.o.forEach((o,j)=>{const b=document.createElement('button');b.className='opt';b.textContent=o;if(st[i]!=null){if(j===q.a)b.classList.add('good');else if(j===st[i])b.classList.add('bad')}b.onclick=()=>{if(st[i]!=null)return;st[i]=j;store.set('bs_quiz',st);render();meter()};d.appendChild(b)});
+   const e=document.createElement('div');e.className='ex';e.innerHTML=(st[i]===q.a?'✅ ':'❌ ')+q.e;d.appendChild(e);box.appendChild(d)});
+  const ans=Object.keys(st).length,ok=QZ.filter((q,i)=>st[i]===q.a).length;
+  $('qscore').innerHTML=stat('answered',ans+' / '+QZ.length,'in')+stat('correct',ok,'ok')+stat('score',ans?Math.round(100*ok/ans)+'%':'—',ok/Math.max(ans,1)>=.8?'ok':'warn')+stat('verdict',ans<QZ.length?'keep going':ok>=16?'resampling master':ok>=13?'strong':'review ch. 1–8','')}
+ $('qreset').onclick=()=>{Object.keys(st).forEach(k=>delete st[k]);store.set('bs_quiz',st);render();meter()};
+ window.__qst=st;render();})();
+const CHK=['Explain the plug-in principle and why the bootstrap distribution is centred at θ̂, not θ.','Compute a bootstrap SE and bias, and the jackknife versions, and say when to bias-correct.','Name four situations where the bootstrap fails and a remedy for each.','Construct percentile, basic, normal, BCa and bootstrap-t intervals and say which are second-order accurate.','Choose between pairs, residual and wild bootstraps for a regression.','Run a permutation test by hand and compute its p-value with the +1 correction.','State the exchangeability assumption and explain the Behrens–Fisher failure.','Design a bootstrap hypothesis test that imposes the null.','Choose B for a Monte Carlo p-value and quote its Monte Carlo error.','Explain why the iid bootstrap fails for time series and set up a moving block bootstrap.','Compute the design effect for clustered data and resample at the right level.','Put a confidence interval on an AUC (stratified) and on an AUC difference (paired).','Explain what a bootstrap interval on a test set does and does not tell a regulator.','Decide between bootstrap, permutation, analytic and Bayesian approaches for a given problem.'];
+(function(){const st=store.get('bs_chk',{}),box=$('chk');CHK.forEach((t,i)=>{const l=document.createElement('label'),c=document.createElement('input');c.type='checkbox';c.checked=!!st[i];c.onchange=()=>{st[i]=c.checked;store.set('bs_chk',st);meter()};l.appendChild(c);const s=document.createElement('span');s.textContent=t;l.appendChild(s);box.appendChild(l)});window.__cst=st;})();
+function meter(){const q=window.__qst||{},c=window.__cst||{};const ok=QZ.filter((x,i)=>q[i]===x.a).length,ck=Object.values(c).filter(Boolean).length;const p=Math.round(100*(.6*ok/QZ.length+.4*ck/CHK.length));$('mtxt').textContent='Mastery: '+p+'%  (exam + checklist)';$('mbar').style.width=p+'%';store.set('mastery_bs',p)}
+meter();
+
+/* ---------- Navigation ---------- */
+(function(){const nav=$('nav');let html='';
+ document.querySelectorAll('main .part, main section.ch').forEach(el=>{if(el.classList.contains('part'))html+=`<div class="pt">${el.textContent}</div>`;else{const h=el.querySelector('h2'),num=h.querySelector('.num').textContent,t=Array.from(h.childNodes).filter(n=>n.nodeType===3).map(n=>n.textContent).join('').trim();html+=`<a href="#${el.id}" data-id="${el.id}">${num}. ${t}</a>`}});
+ nav.innerHTML=html;const links=nav.querySelectorAll('a'),io=new IntersectionObserver(es=>{es.forEach(e=>{if(e.isIntersecting)links.forEach(a=>a.classList.toggle('on',a.dataset.id===e.target.id))})},{rootMargin:'-20% 0px -70% 0px'});
+ document.querySelectorAll('section.ch').forEach(s=>io.observe(s));
+ $('menu').onclick=()=>$('side').classList.toggle('open');nav.addEventListener('click',e=>{if(e.target.tagName==='A')$('side').classList.remove('open')});
+ window.addEventListener('scroll',()=>{const h=document.documentElement;$('prog').style.width=(100*h.scrollTop/(h.scrollHeight-h.clientHeight))+'%'},{passive:true});})();
+</script>
+</body>
+</html>

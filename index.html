@@ -62,6 +62,8 @@ const COURSES=[
  {f:'random-variables-mastery.html',key:'mastery_rv',tag:'Stage 1 · item 1',t:'Random variables, expectation, variance & covariance',d:'The grammar of everything else: distributions, linearity, variance of sums, conditional expectation, Simpson’s paradox, covariance matrices and correlated-default loss.',m:['15 chapters','14 labs','16-question exam']},
  {f:'core-distributions.html',key:'mastery_cd',tag:'Stage 1 · item 2',t:'Core distributions and how they relate',d:'Binomial, Poisson, exponential, gamma, normal, lognormal, χ², t, F and beta as one connected family, with simulations that verify every identity.',m:['14 chapters','17 labs','16-question exam']},
  {f:'mle-mastery.html',key:'mastery_ml',tag:'Stage 2 · item 6',t:'Maximum likelihood estimation',d:'Likelihood, score and Fisher information, Wald vs likelihood-ratio vs Wilson intervals, Newton’s method, logistic regression, small-sample bias, Wilks’ test, sandwich standard errors, censoring and separation.',m:['12 chapters','11 labs','18-question exam']},
+ {f:'confidence-intervals-mastery.html',key:'mastery_ci',tag:'Stage 2 · item 7',t:'Confidence intervals',d:'What 95% really means, z vs t, sample-size planning, six proportion intervals with exact coverage, rare and zero events, Garwood, Fisher z and chi-square intervals, profile likelihood, bootstrap intervals, overlap traps, many intervals and prediction intervals.',m:['12 chapters','11 labs','18-question exam']},
+ {f:'bootstrap-resampling-mastery.html',key:'mastery_bs',tag:'Stage 2 · item 8',t:'Bootstrap and resampling',d:'Plug-in principle, bootstrap SE and bias, jackknife, where the bootstrap fails, BCa and bootstrap-t, regression bootstraps, permutation tests, Monte Carlo p-values, block and cluster bootstraps, and confidence intervals for AUC and model comparisons.',m:['12 chapters','11 labs','18-question exam']},
  {f:'sampling-estimators-mastery.html',key:'mastery_se',tag:'Stage 2 · item 5',t:'Sampling distributions, standard errors and estimators',d:'Estimates as random variables, SD vs SE, finite-population correction, MSE and bias–variance, Jensen bias, German tank, efficiency, shrinkage, exact normal results, bootstrap and jackknife, and clustered-data design effects.',m:['13 chapters','12 labs','18-question exam']},
  {f:'lln-clt-mastery.html',key:'mastery_lc',tag:'Stage 1 · item 4',t:'Law of large numbers and the central limit theorem',d:'Why averages settle, how fast, and when they do not: gambler’s fallacy, Chebyshev, Monte Carlo, heavy tails, dependence, convolution proof sketch, Berry–Esseen, delta method, rare-event proportions and correlated loan portfolios.',m:['14 chapters','14 labs','18-question exam']},
  {f:'bayes-conditional-probability.html',key:'mastery_by',tag:'Stage 1 · item 3',t:'Conditional probability and Bayes’ theorem',d:'Zooming in, the base-rate fallacy with 10,000 dots, odds and likelihood ratios, alert thresholds and cost, Beta–Binomial updating, shrinkage, Monty Hall, the prosecutor’s fallacy and Bayes vs p-values.',m:['11 chapters','12 labs','16-question exam']},
@@ -76,8 +78,8 @@ const ST=[
  ['Stage 2 · Estimation and inference',[
   ['Sampling distributions, standard errors, bias vs variance of estimators',{f:'sampling-estimators-mastery.html'}],
   ['Maximum likelihood estimation',{f:'mle-mastery.html'}],
-  ['Confidence intervals (exact, Wilson, bootstrap)',{p:'mle-mastery.html#c4',note:'Wald, LR, Wilson'}],
-  ['Bootstrap and resampling',{p:'p-value-mastery.html#c15',note:'permutation + bootstrap'}],
+  ['Confidence intervals (exact, Wilson, bootstrap)',{f:'confidence-intervals-mastery.html'}],
+  ['Bootstrap and resampling',{f:'bootstrap-resampling-mastery.html'}],
   ['Hypothesis testing and p-values',{f:'p-value-mastery.html'}],
   ['Power, effect sizes and experimental design',{p:'p-value-mastery.html#c8',note:'power lab'}]]],
  ['Stage 3 · Regression, the workhorse',[

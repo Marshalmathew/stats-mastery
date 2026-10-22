@@ -1,0 +1,629 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Confidence Intervals Mastery</title>
+<style>
+:root{--bg:#0b0e17;--panel:#121726;--panel2:#171d30;--line:#232a3d;--fg:#e8ebf5;--mu:#8a93ab;--a:#6ea8ff;--r:#ff6b81;--y:#ffd166;--g:#4ade80;--p:#c084fc;--t:#5eead4}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;background:var(--bg);color:var(--fg);font:16px/1.7 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+a{color:var(--a)}
+#prog{position:fixed;top:0;left:0;height:3px;background:linear-gradient(90deg,var(--a),var(--p),var(--r));width:0;z-index:50}
+.side{position:fixed;left:0;top:0;bottom:0;width:290px;background:#0e1220;border-right:1px solid var(--line);overflow:auto;padding:18px 14px 90px;z-index:40;transition:transform .25s}
+.side h1{font-size:15px;margin:0 0 2px}
+.side small{color:var(--mu)}
+.side .pt{margin:16px 0 4px;font-size:11px;text-transform:uppercase;letter-spacing:1.3px;color:var(--p)}
+.side a{display:block;color:var(--mu);text-decoration:none;padding:5px 9px;border-radius:7px;font-size:13.5px;line-height:1.35}
+.side a:hover{background:var(--panel);color:var(--fg)}
+.side a.on{background:var(--panel2);color:var(--fg);box-shadow:inset 3px 0 var(--a)}
+.side a.back{color:var(--t);padding-left:0;margin-bottom:6px}
+.meter{position:fixed;left:0;bottom:0;width:290px;background:#0e1220;border-top:1px solid var(--line);padding:10px 16px;z-index:41;font-size:12px;color:var(--mu)}
+.meter .bar{height:7px;background:var(--line);border-radius:6px;margin-top:5px;overflow:hidden}
+.meter .bar i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--g),var(--t));transition:width .4s}
+#menu{display:none;position:fixed;top:10px;left:10px;z-index:60;background:var(--panel2);color:var(--fg);border:1px solid var(--line);border-radius:9px;padding:7px 12px;font-size:14px;cursor:pointer}
+main{margin-left:290px;padding:0 34px 120px;max-width:1090px}
+.hero{padding:70px 0 30px}
+.hero h1{font-size:clamp(32px,5vw,56px);line-height:1.08;margin:0 0 14px;background:linear-gradient(100deg,#fff,var(--y) 40%,var(--r));-webkit-background-clip:text;background-clip:text;color:transparent}
+.hero p{font-size:19px;color:#c3c9dc;max-width:780px}
+.chips{display:flex;flex-wrap:wrap;gap:8px;margin:18px 0}
+.chip{border:1px solid var(--line);background:var(--panel);padding:5px 12px;border-radius:99px;font-size:13px;color:var(--mu)}
+.chip b{color:var(--fg)}
+.part{margin:90px 0 0;padding-top:22px;border-top:1px solid var(--line);font-size:12px;letter-spacing:2px;text-transform:uppercase;color:var(--p)}
+section.ch{padding-top:30px}
+h2{font-size:30px;line-height:1.2;margin:10px 0 8px;display:flex;gap:12px;align-items:center;flex-wrap:wrap}
+h2 .num{display:inline-grid;place-items:center;width:40px;height:40px;border-radius:12px;background:var(--panel2);border:1px solid var(--line);font-size:18px;color:var(--a)}
+.lvl{font-size:11px;font-weight:600;letter-spacing:.8px;text-transform:uppercase;padding:3px 9px;border-radius:99px;border:1px solid}
+.lvl.b{color:var(--g);border-color:#1f5c3a}.lvl.i{color:var(--a);border-color:#244a85}.lvl.a{color:var(--y);border-color:#6b5420}.lvl.e{color:var(--r);border-color:#7a2c3a}
+h3{font-size:19px;margin:30px 0 6px;color:#fff}
+p{margin:10px 0}li{margin:5px 0}
+code,.f{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace}
+code{background:var(--panel2);padding:1px 6px;border-radius:5px;font-size:.9em}
+.f{display:block;white-space:pre-wrap;background:#0e1322;border:1px solid var(--line);border-left:3px solid var(--a);padding:12px 16px;border-radius:9px;margin:14px 0;overflow-x:auto;font-size:15px;color:#dbe4ff;line-height:1.8}
+.co{border-radius:12px;padding:13px 17px;margin:16px 0;border:1px solid var(--line);background:var(--panel)}
+.co>b:first-child{display:block;margin-bottom:2px;font-size:12px;letter-spacing:1px;text-transform:uppercase}
+.co.def{border-left:4px solid var(--a)}.co.def>b:first-child{color:var(--a)}
+.co.warn{border-left:4px solid var(--r)}.co.warn>b:first-child{color:var(--r)}
+.co.tip{border-left:4px solid var(--g)}.co.tip>b:first-child{color:var(--g)}
+.co.key{border-left:4px solid var(--y);background:#171608}.co.key>b:first-child{color:var(--y)}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:18px 20px;margin:22px 0;box-shadow:0 8px 30px rgba(0,0,0,.25)}
+.card>h4{margin:0 0 3px;font-size:13px;letter-spacing:1.2px;text-transform:uppercase;color:var(--t)}
+.card>p.sub{margin:0 0 12px;color:var(--mu);font-size:14.5px}
+.ctl{display:flex;flex-wrap:wrap;gap:10px 22px;align-items:center;margin:8px 0 10px}
+.ctl label{display:flex;gap:8px;align-items:center;font-size:14px;color:#c3c9dc}
+.ctl output{min-width:38px;font-family:ui-monospace,monospace;color:var(--y);font-size:13px}
+input[type=range]{accent-color:var(--a);width:150px}
+input[type=checkbox]{accent-color:var(--a)}
+select,input[type=number],input[type=text]{background:#0e1322;color:var(--fg);border:1px solid var(--line);border-radius:8px;padding:6px 9px;font:inherit;font-size:14px}
+button{background:linear-gradient(180deg,#2c4a80,#233b68);color:#fff;border:1px solid #3a5a98;border-radius:9px;padding:7px 14px;font:inherit;font-size:14px;cursor:pointer}
+button:hover{filter:brightness(1.15)}
+button.alt{background:var(--panel2);border-color:var(--line);color:var(--fg)}
+canvas{width:100%;height:270px;display:block;background:#0e1322;border:1px solid var(--line);border-radius:10px;margin-top:6px}
+canvas.sm{height:210px}canvas.tl{height:330px}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(125px,1fr));gap:9px;margin:12px 0}
+.stat{background:#0e1322;border:1px solid var(--line);border-radius:10px;padding:8px 11px}
+.stat b{display:block;font-size:17px;font-family:ui-monospace,monospace}
+.stat span{font-size:11.5px;color:var(--mu);text-transform:uppercase;letter-spacing:.7px}
+.stat.hot b{color:var(--r)}.stat.ok b{color:var(--g)}.stat.warn b{color:var(--y)}.stat.in b{color:var(--a)}
+.read{margin:8px 0 0;padding:10px 14px;background:#0e1322;border:1px dashed #33406a;border-radius:10px;font-size:14.5px;color:#d3dbf3}
+table{border-collapse:collapse;width:100%;margin:12px 0;font-size:14px}
+th,td{border:1px solid var(--line);padding:7px 10px;text-align:left;vertical-align:top}
+th{background:var(--panel2);font-size:12px;text-transform:uppercase;letter-spacing:.6px;color:var(--mu)}
+td.n{font-family:ui-monospace,monospace;text-align:right}
+.tw{overflow-x:auto}
+.pill{display:inline-block;padding:1px 9px;border-radius:99px;font-size:12px;font-weight:600}
+.pill.r{background:#3a1520;color:var(--r)}.pill.g{background:#10321f;color:var(--g)}.pill.y{background:#3a2f0e;color:var(--y)}.pill.m{background:#202637;color:var(--mu)}
+details{background:var(--panel);border:1px solid var(--line);border-radius:11px;padding:9px 15px;margin:9px 0}
+details summary{cursor:pointer;font-weight:600}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.q{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:14px 18px;margin:14px 0}
+.q .qh{font-size:12px;letter-spacing:1px;text-transform:uppercase;color:var(--mu)}
+.q .opt{display:block;width:100%;text-align:left;margin:6px 0;background:#0e1322;border:1px solid var(--line);color:var(--fg);border-radius:9px;padding:9px 12px}
+.q .opt.good{border-color:var(--g);background:#0e2418}.q .opt.bad{border-color:var(--r);background:#2a1119}
+.q .ex{display:none;margin-top:8px;font-size:14.5px;color:#c3c9dc}
+.q.done .ex{display:block}
+.chk label{display:flex;gap:10px;align-items:flex-start;padding:6px 0;cursor:pointer}
+.chk input{margin-top:6px;accent-color:var(--g);width:17px;height:17px}
+.sigrow{display:grid;grid-template-columns:minmax(170px,2fr) 1fr 1fr auto;gap:8px 14px;align-items:center;padding:6px 0;border-top:1px dashed #1b2236}
+.sigrow:first-of-type{border-top:0}
+.sigrow label{display:flex;gap:6px;align-items:center;font-size:13.5px;color:#c3c9dc}
+@media(max-width:900px){
+ .side{transform:translateX(-100%)}.side.open{transform:none}.meter{display:none}
+ #menu{display:block}main{margin-left:0;padding:0 16px 100px}.two{grid-template-columns:1fr}.hero{padding-top:60px}
+ .sigrow{grid-template-columns:1fr 1fr}
+}
+</style>
+</head>
+<body>
+<div id="prog"></div>
+<button id="menu">☰ Contents</button>
+<nav class="side" id="side"><a class="back" href="index.html">← All courses</a><h1>Confidence Intervals</h1><small>12 chapters · 11 labs · exam</small><div id="nav"></div></nav>
+<div class="meter"><div id="mtxt">Mastery: 0%</div><div class="bar"><i id="mbar"></i></div></div>
+
+<main>
+<header class="hero">
+ <h1>Confidence intervals, from meaning to practice.</h1>
+ <p>A point estimate without an interval is a number without a unit. A confidence interval says how much that number could move if you drew another sample, and it is the form in which most statistics reaches a regulator, a CEO or an A/B-test dashboard. This page covers what “95%” actually promises, how intervals are built from a pivot, how to plan sample sizes, which interval to use for proportions (and why the textbook one fails for rare events), exact and transformed intervals, profile-likelihood and bootstrap intervals, and the traps: overlapping intervals, many intervals at once, and confusing a confidence interval with a prediction interval.</p>
+ <div class="chips"><span class="chip"><b>Part I</b> Meaning and construction</span><span class="chip"><b>Part II</b> Proportions and exact intervals</span><span class="chip"><b>Part III</b> Likelihood and bootstrap</span><span class="chip"><b>Part IV</b> Traps</span></div>
+ <div class="co tip"><b>How to use this</b>Almost every lab simulates thousands of repeated studies, because a confidence interval's defining property is about <em>repetition</em>: how often the procedure succeeds. Coverage numbers carry a little simulation noise (about ±0.5%); the exact-coverage labs have none. Prerequisites: Sampling Distributions and Maximum Likelihood pages.</div>
+</header>
+
+<div class="part">Part I · Meaning and construction</div>
+
+<section class="ch" id="c1">
+<h2><span class="num">1</span>What “95% confident” really means <span class="lvl b">Beginner</span></h2>
+<p>A <b>95% confidence interval</b> is produced by a <em>procedure</em> that, over repeated samples from the same population, captures the true parameter in 95% of the samples. The parameter is a fixed number; the interval is the random thing. Once you have computed [2.1, 3.4] from your data, that particular interval either contains the truth or it does not; the 95% describes the method's long-run success rate, not the probability for this interval.</p>
+<div class="co warn"><b>The classic misreading</b>“There is a 95% probability that μ lies in [2.1, 3.4]” is a <em>credible interval</em> statement and needs a prior (Bayes page). For a confidence interval, the right sentence is: “this method gives intervals that contain the truth 95% of the time.”</div>
+<div class="card"><h4>Lab 1 · One hundred repeated studies</h4>
+ <p class="sub">Each vertical line is the t-interval from a fresh sample of n observations from a population with true mean 0 (the horizontal line). Green lines contain it; red lines miss. Change the level and watch both the width and the miss rate.</p>
+ <div class="ctl"><label>sample size n <input type="range" id="c1n" min="5" max="100" step="1" value="20"><output id="c1nv"></output></label><label>confidence level % <input type="range" id="c1l" min="50" max="99" step="1" value="95"><output id="c1lv"></output></label><button id="c1go">Run 100 new studies</button></div>
+ <canvas class="tl" id="c1cv"></canvas><div class="stats" id="c1st"></div><div class="read" id="c1rd"></div></div>
+</section>
+
+<section class="ch" id="c2">
+<h2><span class="num">2</span>Building an interval from a pivot: z and t <span class="lvl i">Intermediate</span></h2>
+<p>The standard construction starts from a <b>pivot</b>: a function of the data and the parameter whose distribution does not depend on the parameter. For a normal mean with unknown σ the pivot is</p>
+<div class="f">T = (X̄ − μ) / (s/√n) ~ t with n − 1 degrees of freedom       ⇒       X̄ ± t_{1−α/2, n−1} · s/√n</div>
+<p>Invert the statement P(−t ≤ T ≤ t) = 1 − α for μ and the interval falls out. If you used the <em>z</em> value 1.96 instead of t, you would be pretending s = σ. That is harmless for large n and costly for small n, because s is itself noisy and sometimes small, giving an interval that is too narrow.</p>
+<div class="card"><h4>Lab 2 · What using z instead of t really costs</h4>
+ <p class="sub">Exact coverage (no simulation) of the “z-interval” X̄ ± z·s/√n with normal data, against the sample size. The correct t-interval has coverage exactly equal to the nominal level at every n.</p>
+ <div class="ctl"><label>sample size n <input type="range" id="c2n" min="2" max="60" step="1" value="8"><output id="c2nv"></output></label><label>nominal level <select id="c2l"><option value="0.9">90%</option><option value="0.95" selected>95%</option><option value="0.99">99%</option></select></label></div>
+ <canvas class="tl" id="c2cv"></canvas><div class="stats" id="c2st"></div><div class="read" id="c2rd"></div></div>
+<div class="co key"><b>Duality with tests</b>A 95% interval for θ is the set of θ₀ that a 5% two-sided test would <em>not</em> reject. Intervals therefore contain everything a p-value tells you, plus the size of the effect and its uncertainty. Prefer reporting the interval.</div>
+</section>
+
+<section class="ch" id="c3">
+<h2><span class="num">3</span>Width and sample-size planning <span class="lvl i">Intermediate</span></h2>
+<p>The half-width of an interval (the <b>margin of error</b>) is z·SE. Setting it equal to a target margin m and solving for n gives the planning formulas:</p>
+<div class="tw"><table>
+<tr><th>Target</th><th>Required n</th></tr>
+<tr><td>Mean (σ known or from a pilot)</td><td>n = (zσ/m)²</td></tr>
+<tr><td>Proportion</td><td>n = z² p(1−p) / m²   (p = ½ is the worst case)</td></tr>
+<tr><td>Difference of two proportions (A/B test), n per group</td><td>n = 2 z² p(1−p) / m²   (equal groups, similar p)</td></tr>
+</table></div>
+<p>Two consequences are worth internalising. Margin falls like 1/√n, so <b>halving it costs 4× the data</b>. And the level matters: moving from 95% to 99% raises n by (2.576/1.96)² ≈ 1.73×.</p>
+<div class="card"><h4>Lab 3 · How many observations do I need?</h4>
+ <p class="sub">Pick what you are estimating, the desired margin and the confidence level. The curve shows the margin you would get at each n; the marker is the planned n.</p>
+ <div class="ctl"><label>estimating <select id="c3t"><option value="0">a mean</option><option value="1">a proportion</option><option value="2">a difference of two proportions (per group)</option></select></label><label><span id="c3sl">σ</span> <input type="range" id="c3s" min="1" max="99" step="1" value="40"><output id="c3sv"></output></label><label><span id="c3ml">margin</span> <input type="range" id="c3m" min="1" max="100" step="1" value="20"><output id="c3mv"></output></label><label>level % <input type="range" id="c3L" min="80" max="99" step="1" value="95"><output id="c3Lv"></output></label></div>
+ <canvas class="tl" id="c3cv"></canvas><div class="stats" id="c3st"></div><div class="read" id="c3rd"></div></div>
+</section>
+
+<div class="part">Part II · Proportions and exact intervals</div>
+
+<section class="ch" id="c4">
+<h2><span class="num">4</span>Intervals for a proportion: six methods <span class="lvl a">Advanced</span></h2>
+<p>For a binomial proportion there are at least six standard 95% intervals, and they are not equivalent.</p>
+<div class="tw"><table>
+<tr><th>Method</th><th>Idea</th><th>Behaviour</th></tr>
+<tr><td><b>Wald</b></td><td>p̂ ± z√(p̂(1−p̂)/n)</td><td>Textbook default; poor for small n or p near 0/1; collapses at p̂ = 0</td></tr>
+<tr><td><b>Wilson</b></td><td>invert the score test</td><td>Good coverage; excellent default</td></tr>
+<tr><td><b>Agresti–Coull</b></td><td>Wald after adding z²/2 successes and failures</td><td>Simple, slightly conservative</td></tr>
+<tr><td><b>Clopper–Pearson</b></td><td>invert two exact binomial tails (Beta quantiles)</td><td>“Exact”: coverage is <em>at least</em> nominal, typically too conservative</td></tr>
+<tr><td><b>Jeffreys</b></td><td>Beta(½,½)-prior credible interval</td><td>Near-nominal on average; recommended</td></tr>
+<tr><td><b>Likelihood ratio</b></td><td>{p : 2[ℓ(p̂) − ℓ(p)] ≤ 3.84}</td><td>Good, invariant, asymmetric</td></tr>
+</table></div>
+<p>“Exact” does not mean “has exactly 95% coverage”. A discrete distribution cannot deliver that; the Clopper–Pearson interval guarantees coverage <em>no less than</em> 95%, and pays for the guarantee with wider intervals.</p>
+<div class="card"><h4>Lab 4 · Exact coverage and width of six methods</h4>
+ <p class="sub">Coverage as a function of the true p, computed exactly by summing binomial probabilities. Tick the methods to compare; the table gives mean coverage, worst coverage for p ∈ [0.05, 0.95] and mean width, all at the chosen n.</p>
+ <div class="ctl"><label>sample size n <input type="range" id="c4n" min="10" max="300" step="5" value="40"><output id="c4nv"></output></label></div>
+ <div class="ctl" id="c4m"></div>
+ <canvas class="tl" id="c4cv"></canvas><div class="tw" id="c4tb"></div><div class="read" id="c4rd"></div></div>
+</section>
+
+<section class="ch" id="c5">
+<h2><span class="num">5</span>Rare events and zero events <span class="lvl a">Advanced</span></h2>
+<p>Fraud rates, default rates, breach rates: the interesting cases have very few events, sometimes none. If you see <b>k = 0</b> events in n trials, the Wald interval is [0, 0] (certainty), which is absurd. The honest statement is an upper bound. The <b>rule of three</b>: with zero events in n independent trials the 95% one-sided upper bound on the rate is about 3/n, because (1 − p)ⁿ ≈ e^(−np) = 0.05 at np ≈ 3.</p>
+<p>More generally, whenever the count is small, the intervals above disagree sharply, and the choice matters for a conclusion such as “the default rate is below 1%”.</p>
+<div class="card"><h4>Lab 5 · Zero and few events</h4>
+ <p class="sub">Six two-sided 95% intervals for k events in n trials. The yellow marker is the observed proportion k/n. Try 0 events with n = 30, 300 and 3,000.</p>
+ <div class="ctl"><label>trials n <input type="range" id="c5n" min="0" max="6" step="1" value="2"><output id="c5nv"></output></label><label>events k <input type="range" id="c5k" min="0" max="20" step="1" value="0"><output id="c5kv"></output></label></div>
+ <canvas class="tl" id="c5cv"></canvas><div class="tw" id="c5tb"></div><div class="read" id="c5rd"></div></div>
+</section>
+
+<section class="ch" id="c6">
+<h2><span class="num">6</span>Transformed and exact intervals for other quantities <span class="lvl a">Advanced</span></h2>
+<p>When an estimator's distribution is skewed or bounded, build the interval on a scale where it is closer to normal, then transform back. Three standard cases:</p>
+<ul>
+<li><b>Poisson count k:</b> the Wald interval k ± z√k is poor for small k. The exact (<b>Garwood</b>) interval uses χ² quantiles: [½χ²_{α/2, 2k}, ½χ²_{1−α/2, 2k+2}]. A cheap alternative is the square-root transform (√k ± z/2)².</li>
+<li><b>Correlation r:</b> r is bounded by ±1 and skewed. Use <b>Fisher's z</b>: atanh(r) is approximately normal with SE 1/√(n−3); form the interval there and apply tanh.</li>
+<li><b>Standard deviation (normal data):</b> (n−1)s²/σ² ~ χ²_{n−1} gives [s√((n−1)/χ²_{1−α/2}), s√((n−1)/χ²_{α/2})], which is asymmetric and never negative.</li>
+</ul>
+<div class="card"><h4>Lab 6 · Naive vs transformed or exact</h4>
+ <p class="sub">4,000 simulated data sets. For each, a naive Wald-style interval and the better interval are built; the bars show their coverage, and the table the average width. Target: 95%.</p>
+ <div class="ctl"><label>quantity <select id="c6t"><option value="0">Poisson mean (one count)</option><option value="1">correlation (bivariate normal)</option><option value="2">standard deviation (normal)</option></select></label><label><span id="c6pl">mean count λ</span> <input type="range" id="c6p" min="1" max="95" step="1" value="10"><output id="c6pv"></output></label><label>n <input type="range" id="c6n" min="0" max="5" step="1" value="1"><output id="c6nv"></output></label></div>
+ <canvas class="tl" id="c6cv"></canvas><div class="tw" id="c6tb"></div><div class="read" id="c6rd"></div></div>
+</section>
+
+<div class="part">Part III · Likelihood-based and resampling intervals</div>
+
+<section class="ch" id="c7">
+<h2><span class="num">7</span>Profile-likelihood intervals <span class="lvl a">Advanced</span></h2>
+<p>When a model has several parameters and you want an interval for one of them (the <em>parameter of interest</em>), maximise the likelihood over the others for each value of the parameter of interest. This gives the <b>profile log-likelihood</b>, and the interval is {θ : ℓ_p(θ̂) − ℓ_p(θ) ≤ 1.92}. It respects the shape of the likelihood (asymmetric, bounded) and is invariant to reparameterisation. The Wald interval θ̂ ± 1.96·SE assumes the log-likelihood is a parabola.</p>
+<p>The shape α of a gamma distribution is a good test case: its sampling distribution is skewed for small n, so a symmetric Wald interval is mis-centred and can even dip below zero.</p>
+<div class="card"><h4>Lab 7 · Profile-likelihood vs Wald interval for a gamma shape</h4>
+ <p class="sub">Left of the table: one sample's profile log-likelihood with the Wald parabola. Coverage of both 95% intervals is estimated from 1,500 fresh samples at the chosen n and α (the sliders re-run the study when released).</p>
+ <div class="ctl"><label>true shape α <input type="range" id="c7a" min="0.5" max="5" step="0.1" value="2"><output id="c7av"></output></label><label>n <input type="range" id="c7n" min="0" max="4" step="1" value="1"><output id="c7nv"></output></label><button id="c7go">New sample</button></div>
+ <canvas class="tl" id="c7cv"></canvas><div class="stats" id="c7st"></div><div class="read" id="c7rd"></div></div>
+</section>
+
+<section class="ch" id="c8">
+<h2><span class="num">8</span>Bootstrap intervals <span class="lvl a">Advanced</span></h2>
+<p>When no formula exists, resample. Draw B bootstrap resamples (with replacement), compute the statistic for each, and build an interval from the bootstrap distribution θ̂*:</p>
+<div class="tw"><table>
+<tr><th>Interval</th><th>Formula</th><th>Note</th></tr>
+<tr><td><b>Normal</b></td><td>θ̂ ± z · SE_boot</td><td>Assumes a symmetric bootstrap distribution</td></tr>
+<tr><td><b>Percentile</b></td><td>[θ̂*_{α/2}, θ̂*_{1−α/2}]</td><td>Simple and transformation-invariant; biased if the distribution is skewed or θ̂ is biased</td></tr>
+<tr><td><b>Basic (reverse percentile)</b></td><td>[2θ̂ − θ̂*_{1−α/2}, 2θ̂ − θ̂*_{α/2}]</td><td>Reflects the bootstrap distribution about the estimate</td></tr>
+<tr><td><b>BCa, studentised</b></td><td>bias- and acceleration-corrected, or bootstrap-t</td><td>Second-order accurate; preferred in practice (library implementations)</td></tr>
+</table></div>
+<p>Bootstrap intervals are still approximations: with small n and skewed data their coverage falls short of nominal, often by more than the t-interval's. Lab 8 measures it.</p>
+<div class="card"><h4>Lab 8 · Percentile, basic, normal and t intervals</h4>
+ <p class="sub">The histogram is the bootstrap distribution (1,000 resamples) of one sample; the table lists each method's interval and whether it contains the truth. “Run coverage study” repeats everything for 200 fresh samples (300 resamples each) and reports coverage; expect ±1.5% noise.</p>
+ <div class="ctl"><label>population <select id="c8d"></select></label><label>statistic <select id="c8s"><option value="mean">mean</option><option value="median">median</option><option value="sd">SD</option><option value="q90">90th percentile</option></select></label><label>n <input type="range" id="c8n" min="0" max="3" step="1" value="1"><output id="c8nv"></output></label><button id="c8go">Draw new sample</button><button class="alt" id="c8cs">Run coverage study</button></div>
+ <canvas class="tl" id="c8cv"></canvas><div class="tw" id="c8tb"></div><div class="read" id="c8rd"></div></div>
+</section>
+
+<div class="part">Part IV · Traps</div>
+
+<section class="ch" id="c9">
+<h2><span class="num">9</span>Overlapping intervals do not mean “no difference” <span class="lvl e">Expert</span></h2>
+<p>A very common error is to compare two groups by checking whether their separate 95% intervals overlap. That is the wrong test. The intervals overlap whenever the difference d is below 1.96·(SE₁ + SE₂), but the difference is significant whenever d exceeds 1.96·√(SE₁² + SE₂²), which is a smaller number. Between the two thresholds the intervals overlap yet the difference <em>is</em> significant. With equal SEs the zone runs from 2.77 SE to 3.92 SE.</p>
+<div class="card"><h4>Lab 9 · Overlap vs significance</h4>
+ <p class="sub">Two group means and the interval for their difference. Thick bars: 95% intervals; thin bars: 83.4% intervals (for equal SEs, non-overlap of these approximates a 5% test).</p>
+ <div class="ctl"><label>SE of group 1 <input type="range" id="c9a" min="0.5" max="3" step="0.1" value="1"><output id="c9av"></output></label><label>SE of group 2 <input type="range" id="c9b" min="0.5" max="3" step="0.1" value="1"><output id="c9bv"></output></label><label>true difference d <input type="range" id="c9d" min="0" max="10" step="0.1" value="3.3"><output id="c9dv"></output></label></div>
+ <canvas class="tl" id="c9cv"></canvas><div class="stats" id="c9st"></div><div class="read" id="c9rd"></div></div>
+<div class="co tip"><b>Rule</b>Always form the interval for the <em>difference</em> (or ratio) directly. Do not compare two intervals by eye.</div>
+</section>
+
+<section class="ch" id="c10">
+<h2><span class="num">10</span>Many intervals at once <span class="lvl e">Expert</span></h2>
+<p>Each 95% interval fails 5% of the time. If you report m independent intervals (one per segment, branch, feature or coefficient), the chance that <em>all</em> contain their truths is 0.95ᵐ: for m = 20 only 36%, and you expect one miss. To get 95% simultaneous coverage the <b>Bonferroni</b> correction uses level 1 − α/m for each interval (Šidák: 1 − (1−α)^{1/m}), at the cost of wider intervals. This is the interval counterpart of the multiple-testing problem in the p-value course.</p>
+<div class="card"><h4>Lab 10 · Reporting m intervals</h4>
+ <p class="sub">Each of 3,000 data sets produces m independent intervals (z-intervals, known σ). Left: number of intervals that miss, unadjusted vs Bonferroni. Right: probability that at least one interval misses, against m.</p>
+ <div class="ctl"><label>number of intervals m <input type="range" id="c10m" min="1" max="200" step="1" value="20"><output id="c10mv"></output></label><label>nominal level <select id="c10l"><option value="0.9">90%</option><option value="0.95" selected>95%</option><option value="0.99">99%</option></select></label></div>
+ <div class="two"><canvas class="sm" id="c10cv"></canvas><canvas class="sm" id="c10cv2"></canvas></div><div class="stats" id="c10st"></div><div class="read" id="c10rd"></div></div>
+</section>
+
+<section class="ch" id="c11">
+<h2><span class="num">11</span>Confidence vs prediction intervals <span class="lvl e">Expert</span></h2>
+<p>A confidence interval is about a <em>parameter</em>, such as the mean. A <b>prediction interval</b> is about a <em>future observation</em>. The latter must cover both the uncertainty in the estimated mean and the individual's own scatter:</p>
+<div class="f">CI for μ:   x̄ ± t · s/√n                    PI for the next observation:   x̄ ± t · s · √(1 + 1/n)</div>
+<p>As n grows the CI shrinks to nothing, while the PI converges to ±1.96σ and never goes below it. “The model's average error is known to ±0.1” does not mean any single prediction is within ±0.1. For regulators and customers the PI is often the relevant statement. (A <em>tolerance interval</em> goes one step further: it covers a stated proportion of the whole population with stated confidence.)</p>
+<div class="card"><h4>Lab 11 · The CI vanishes, the PI does not</h4>
+ <p class="sub">Normal data with σ = 1. Curves: expected widths of the 95% CI for the mean and the 95% PI for the next observation (log n axis). Coverage is checked by simulating 4,000 samples, each followed by one new observation.</p>
+ <div class="ctl"><label>sample size n <input type="range" id="c11n" min="0" max="7" step="1" value="3"><output id="c11nv"></output></label></div>
+ <canvas class="tl" id="c11cv"></canvas><div class="stats" id="c11st"></div><div class="read" id="c11rd"></div></div>
+</section>
+
+<section class="ch" id="c12">
+<h2><span class="num">12</span>Final exam, mastery checklist, cheat sheet <span class="lvl e">Expert</span></h2>
+<h3>Exam (18 questions — click an answer)</h3>
+<div id="quiz"></div>
+<div class="card"><h4>Score</h4><div class="stats" id="qscore"></div><button class="alt" id="qreset">Reset exam</button></div>
+<h3>Mastery checklist — tick when you can do it without notes</h3>
+<div class="card chk" id="chk"></div>
+<h3>Cheat sheet</h3>
+<div class="tw"><table>
+<tr><th>Idea</th><th>One line</th></tr>
+<tr><td>Meaning</td><td>The procedure covers the truth in 95% of repeated samples; this one interval either does or does not</td></tr>
+<tr><td>Mean</td><td>x̄ ± t_{n−1}·s/√n; using z with estimated σ undercovers at small n</td></tr>
+<tr><td>Duality</td><td>The 95% interval = all θ₀ not rejected by the 5% test</td></tr>
+<tr><td>Planning</td><td>n = (zσ/m)²; proportion z²p(1−p)/m²; halve margin ⇒ 4× n</td></tr>
+<tr><td>Proportion</td><td>Prefer Wilson, Jeffreys or likelihood-ratio; Clopper–Pearson if a guarantee is needed; avoid Wald</td></tr>
+<tr><td>Zero events</td><td>Rule of three: upper 95% bound ≈ 3/n</td></tr>
+<tr><td>Poisson / correlation / SD</td><td>Garwood (χ²); Fisher z (atanh, SE 1/√(n−3)); χ² interval for σ</td></tr>
+<tr><td>Profile likelihood</td><td>Drop in the profile log-likelihood ≤ 1.92; asymmetric, invariant</td></tr>
+<tr><td>Bootstrap</td><td>Percentile, basic, normal; BCa or studentised for accuracy; still approximate at small n</td></tr>
+<tr><td>Comparing groups</td><td>Interval for the difference, not overlap of intervals (equal SE: significant beyond 2.77 SE, overlap until 3.92 SE)</td></tr>
+<tr><td>Many intervals</td><td>P(all cover) = 0.95ᵐ; Bonferroni uses level 1 − α/m</td></tr>
+<tr><td>CI vs PI</td><td>CI width → 0 as n → ∞; PI width → ±1.96σ</td></tr>
+</table></div>
+<div class="co tip"><b>Next on the roadmap</b>Item 8, the bootstrap and resampling in depth (including permutation tests and the block bootstrap for dependent data), and then item 9 (hypothesis testing), which you have already studied in the P-value course.</div>
+</section>
+</main>
+<script>
+/*MATH*/
+function lgamma(x){const c=[76.18009172947146,-86.50532032941677,24.01409824083091,-1.231739572450155,0.1208650973866179e-2,-0.5395239384953e-5];let y=x,t=x+5.5;t-=(x+.5)*Math.log(t);let s=1.000000000190015;for(let j=0;j<6;j++)s+=c[j]/++y;return -t+Math.log(2.5066282746310005*s/x);}
+function gser(a,x){let ap=a,sum=1/a,del=sum;for(let n=0;n<1000;n++){ap++;del*=x/ap;sum+=del;if(Math.abs(del)<Math.abs(sum)*1e-15)break;}return sum*Math.exp(-x+a*Math.log(x)-lgamma(a));}
+function gcf(a,x){let b=x+1-a,c=1/1e-300,d=1/b,h=d;for(let i=1;i<1000;i++){const an=-i*(i-a);b+=2;d=an*d+b;if(Math.abs(d)<1e-300)d=1e-300;c=b+an/c;if(Math.abs(c)<1e-300)c=1e-300;d=1/d;const del=d*c;h*=del;if(Math.abs(del-1)<1e-15)break;}return Math.exp(-x+a*Math.log(x)-lgamma(a))*h;}
+function gammaQ(a,x){if(x<=0)return 1;return x<a+1?1-gser(a,x):gcf(a,x);}
+function betacf(a,b,x){const qab=a+b,qap=a+1,qam=a-1;let c=1,d=1-qab*x/qap;if(Math.abs(d)<1e-300)d=1e-300;d=1/d;let h=d;for(let m=1;m<=1000;m++){const m2=2*m;let aa=m*(b-m)*x/((qam+m2)*(a+m2));d=1+aa*d;if(Math.abs(d)<1e-300)d=1e-300;c=1+aa/c;if(Math.abs(c)<1e-300)c=1e-300;d=1/d;h*=d*c;aa=-(a+m)*(qab+m)*x/((a+m2)*(qap+m2));d=1+aa*d;if(Math.abs(d)<1e-300)d=1e-300;c=1+aa/c;if(Math.abs(c)<1e-300)c=1e-300;d=1/d;const del=d*c;h*=del;if(Math.abs(del-1)<1e-15)break;}return h;}
+function betai(a,b,x){if(x<=0)return 0;if(x>=1)return 1;const bt=Math.exp(lgamma(a+b)-lgamma(a)-lgamma(b)+a*Math.log(x)+b*Math.log(1-x));return x<(a+1)/(a+b+2)?bt*betacf(a,b,x)/a:1-bt*betacf(b,a,1-x)/b;}
+function normSf(z){const q=0.5*gammaQ(.5,z*z/2);return z>=0?q:1-q;}
+function normCdf(z){return normSf(-z);}
+function npdf(x){return Math.exp(-x*x/2)/2.5066282746310002;}
+function lbin(n,k){return lgamma(n+1)-lgamma(k+1)-lgamma(n-k+1);}
+function binom(n,k,p){return Math.exp(lbin(n,k)+k*Math.log(p)+(n-k)*Math.log(1-p));}
+function betapdf(x,a,b){return x<=0||x>=1?0:Math.exp(lgamma(a+b)-lgamma(a)-lgamma(b)+(a-1)*Math.log(x)+(b-1)*Math.log(1-x));}
+function betacdf(x,a,b){return betai(a,b,x);}
+function gampdf(x,a,r){return x<=0?0:Math.exp(a*Math.log(r)+(a-1)*Math.log(x)-r*x-lgamma(a));}
+function gamcdf(x,a,r){return x<=0?0:1-gammaQ(a,r*x);}
+function randn(){let u=0;while(!u)u=Math.random();return Math.sqrt(-2*Math.log(u))*Math.cos(2*Math.PI*Math.random());}
+function gammaS(a){if(a<1)return gammaS(a+1)*Math.pow(Math.random(),1/a);const d=a-1/3,c=1/Math.sqrt(9*d);for(;;){let x,v;do{x=randn();v=1+c*x}while(v<=0);v=v*v*v;const u=Math.random();if(Math.log(u)<.5*x*x+d-d*v+d*Math.log(v))return d*v;}}
+function betaS(a,b){const x=gammaS(a),y=gammaS(b);return x/(x+y);}
+function binS(n,p){let k=0;for(let i=0;i<n;i++)if(Math.random()<p)k++;return k;}
+function mean(a){let s=0;for(const v of a)s+=v;return s/a.length;}
+function qc(cdf,lo,hi,p,it){for(let i=0;i<(it||100);i++){const m=(lo+hi)/2;if(cdf(m)<p)lo=m;else hi=m}return(lo+hi)/2;}
+function qb(a,b,p){return qc(x=>betai(a,b,x),0,1,p,50);}
+function tcdf(x,v){const t=.5*betai(v/2,.5,v/(v+x*x));return x>0?1-t:t}
+function qn(p){return qc(normCdf,-9,9,p,70)}
+function pois(k,l){return Math.exp(-l+k*Math.log(l)-lgamma(k+1))}
+function binF(n,p){let k=0;for(;;){if(n<=0||p<=0)return k;if(p>=1)return k+n;if(n<=40){for(let i=0;i<n;i++)if(Math.random()<p)k++;return k}const a=1+(n>>1),bb=1+n-a,x=betaS(a,bb);if(x>=p){n=a-1;p=p/x}else{k+=a;n=bb-1;p=(p-x)/(1-x)}}}
+/*ENDMATH*/
+
+const $=id=>document.getElementById(id), val=id=>+$(id).value;
+const C={fg:'#e8ebf5',mu:'#8a93ab',gr:'#232a3d',a:'#6ea8ff',r:'#ff6b81',y:'#ffd166',g:'#4ade80',p:'#c084fc',t:'#5eead4'};
+const store={get(k,d){try{const v=JSON.parse(localStorage.getItem(k));return v==null?d:v}catch(e){return d}},set(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}};
+function stat(l,v,c){return `<div class="stat ${c||''}"><b>${v}</b><span>${l}</span></div>`}
+function f3(x){if(!isFinite(x))return String(x);const a=Math.abs(x);if(a!==0&&(a<1e-3||a>=1e6))return x.toExponential(2);return String(+x.toFixed(a<1?4:a<100?3:a<1000?2:0))}
+function pc(x){return f3(100*x)+'%'}
+const resizers=[];
+function reg(fn){fn();resizers.push(fn)}
+function on(ids,fn){ids.split(' ').forEach(i=>{const e=$(i);e.addEventListener('input',fn);e.addEventListener('change',fn)})}
+let rt;window.addEventListener('resize',()=>{clearTimeout(rt);rt=setTimeout(()=>resizers.forEach(f=>f()),150)});
+document.querySelectorAll('input[type=range]').forEach(i=>{const o=$(i.id+'v');if(!o)return;const f=()=>{o.textContent=i.value};i.addEventListener('input',f);f()});
+
+function nice(x){const e=Math.pow(10,Math.floor(Math.log10(x))),f=x/e;return (f<1.5?1:f<3?2:f<7?5:10)*e}
+function mk(cv,x0,x1,ymax,o){o=o||{};const y0=o.y0||0,dpr=window.devicePixelRatio||1,r=cv.getBoundingClientRect(),w=r.width||600,h=r.height||270;
+ cv.width=w*dpr;cv.height=h*dpr;const g=cv.getContext('2d');g.setTransform(dpr,0,0,dpr,0,0);g.clearRect(0,0,w,h);
+ const L=o.L||42,R=12,T=14,B=28,X=x=>L+(x-x0)/(x1-x0)*(w-L-R),Y=y=>h-B-(y-y0)/(ymax-y0)*(h-T-B);
+ g.font='11px system-ui';g.lineWidth=1;g.strokeStyle=C.gr;g.fillStyle=C.mu;
+ if(!o.noGrid){const sx=nice((x1-x0)/7);for(let x=Math.ceil(x0/sx-1e-9)*sx;!o.noX&&x<=x1+1e-9;x+=sx){g.beginPath();g.moveTo(X(x),T);g.lineTo(X(x),h-B);g.stroke();g.textAlign='center';g.fillText(String(+x.toFixed(6)),X(x),h-B+15)}
+ const sy=nice((ymax-y0)/4);for(let y=Math.ceil(y0/sy-1e-9)*sy;y<=ymax+1e-9;y+=sy){g.beginPath();g.moveTo(L,Y(y));g.lineTo(w-R,Y(y));g.stroke();g.textAlign='right';g.fillText(String(+y.toFixed(4)),L-5,Y(y)+3)}}
+ return{g,w,h,X,Y,L,R,T,B,
+  line(f,col,lw,a,b,n,dash){a=a==null?x0:a;b=b==null?x1:b;n=n||260;g.save();if(dash)g.setLineDash([5,4]);g.beginPath();g.strokeStyle=col;g.lineWidth=lw||2;let st=false;for(let i=0;i<=n;i++){const x=a+(b-a)*i/n,y=f(x);if(!isFinite(y)){st=false;continue}st?g.lineTo(X(x),Y(y)):g.moveTo(X(x),Y(y));st=true}g.stroke();g.restore()},
+  area(f,a,b,col,n){a=Math.max(a,x0);b=Math.min(b,x1);if(b<=a)return;n=n||200;g.beginPath();g.moveTo(X(a),Y(0));for(let i=0;i<=n;i++){const x=a+(b-a)*i/n;g.lineTo(X(x),Y(f(x)))}g.lineTo(X(b),Y(0));g.closePath();g.fillStyle=col;g.fill()},
+  vline(x,col,lab,dash){g.save();g.strokeStyle=col;g.lineWidth=1.6;if(dash)g.setLineDash([5,4]);g.beginPath();g.moveTo(X(x),T);g.lineTo(X(x),h-B);g.stroke();g.restore();if(lab){g.fillStyle=col;g.textAlign='center';g.fillText(lab,Math.min(Math.max(X(x),34),w-34),T+10)}},
+  hline(y,col,lab){g.save();g.strokeStyle=col;g.lineWidth=1.4;g.setLineDash([5,4]);g.beginPath();g.moveTo(L,Y(y));g.lineTo(w-R,Y(y));g.stroke();g.restore();if(lab){g.fillStyle=col;g.textAlign='right';g.fillText(lab,w-R-3,Y(y)-4)}},
+  text(s,x,y,col,al){g.fillStyle=col||C.fg;g.textAlign=al||'left';g.fillText(s,x,y)}};}
+
+/* ---------- shared helpers for this page ---------- */
+const D={
+ norm:{n:'Normal(0,1)',s:()=>randn(),mu:0,sd:1,sk:0},
+ unif:{n:'Uniform(0,1)',s:()=>Math.random(),mu:.5,sd:Math.sqrt(1/12),sk:0},
+ expo:{n:'Exponential(1)',s:()=>-Math.log(1-Math.random()),mu:1,sd:1,sk:2},
+ logn:{n:'Lognormal(0,1)',s:()=>Math.exp(randn()),mu:Math.exp(.5),sd:Math.sqrt((Math.E-1)*Math.E),sk:(Math.E+2)*Math.sqrt(Math.E-1),disc:0},
+ b05:{n:'Bernoulli(0.5)',s:()=>Math.random()<.5?1:0,mu:.5,sd:.5,sk:0,disc:1},
+ b05s:{n:'Bernoulli(0.05)',s:()=>Math.random()<.05?1:0,mu:.05,sd:Math.sqrt(.0475),sk:.9/Math.sqrt(.0475),disc:1},
+ bimo:{n:'Two humps',s:()=>(Math.random()<.5?-2:2)+.5*randn(),mu:0,sd:Math.sqrt(4.25),sk:0},
+ par5:{n:'Pareto(α=5)',s:()=>Math.pow(1-Math.random(),-.2),mu:1.25,sd:Math.sqrt(5/48),sk:6*Math.sqrt(.6)},
+ cauchy:{n:'Cauchy (no mean)',s:()=>Math.tan(Math.PI*(Math.random()-.5)),mu:NaN,sd:Infinity,sk:NaN}
+};
+function fillSel(id,keys,def){const e=$(id);e.innerHTML=keys.map(k=>`<option value="${k}">${D[k].n}</option>`).join('');e.value=def}
+const PAL=[C.a,C.r,C.y,C.g,C.p,C.t,'#ff9f43','#9aa4bf'];
+function tgrid(N,M){const T=[];let prev=0;for(let i=0;i<M;i++){let n=Math.round(Math.pow(10,Math.log10(N)*i/(M-1)));if(i===M-1)n=N;n=Math.max(prev+1,n);if(n>N)break;T.push(n);prev=n}if(T[T.length-1]!==N)T[T.length-1]=N;return T}
+function nlab(n){return n>=1e6?(n/1e6)+'M':n>=1000?(n/1000)+'k':String(n)}
+function customGrid(P,xt,yt){const g=P.g;g.save();g.strokeStyle=C.gr;g.fillStyle=C.mu;g.font='11px system-ui';g.lineWidth=1;
+ xt.forEach(([v,l])=>{g.beginPath();g.moveTo(P.X(v),P.T);g.lineTo(P.X(v),P.h-P.B);g.stroke();g.textAlign='center';g.fillText(l,P.X(v),P.h-P.B+15)});
+ yt.forEach(([v,l])=>{g.beginPath();g.moveTo(P.L,P.Y(v));g.lineTo(P.w-P.R,P.Y(v));g.stroke();g.textAlign='right';g.fillText(l,P.L-5,P.Y(v)+3)});g.restore()}
+function clip(P,fn){const g=P.g;g.save();g.beginPath();g.rect(P.L,P.T,P.w-P.L-P.R,P.h-P.T-P.B);g.clip();fn();g.restore()}
+function poly(P,pts,col,lw,dash){const g=P.g;g.save();if(dash)g.setLineDash([5,4]);g.strokeStyle=col;g.lineWidth=lw||2;g.beginPath();pts.forEach(([x,y],i)=>i?g.lineTo(P.X(x),P.Y(y)):g.moveTo(P.X(x),P.Y(y)));g.stroke();g.restore()}
+function dots(P,pts,col,r){const g=P.g;g.fillStyle=col;pts.forEach(([x,y])=>{g.beginPath();g.arc(P.X(x),P.Y(y),r||3,0,7);g.fill()})}
+function niceTicks(lo,hi,k){const st=nice((hi-lo)/(k||5)),a=[];for(let v=Math.ceil(lo/st-1e-9)*st;v<=hi+1e-9;v+=st)a.push([v,String(+v.toFixed(6))]);return a}
+function logTicks(lo,hi){const a=[];for(let e=Math.ceil(lo-1e-9);e<=hi+1e-9;e++)a.push([e,nlab(Math.pow(10,e))]);return a}
+function mom(a){const n=a.length;let m=0;for(const v of a)m+=v;m/=n;let v2=0,v3=0,v4=0;for(const v of a){const d=v-m;v2+=d*d;v3+=d*d*d;v4+=d*d*d*d}v2/=n;v3/=n;v4/=n;const sd=Math.sqrt(v2);return{n,m,sd,sk:sd>0?v3/(sd*sd*sd):0,ku:v2>0?v4/(v2*v2)-3:0}}
+function ksN(z){const a=Array.from(z).sort((x,y)=>x-y),n=a.length;let d=0;for(let i=0;i<n;i++){const F=normCdf(a[i]);d=Math.max(d,Math.abs((i+1)/n-F),Math.abs(i/n-F))}return d}
+/* histogram of data as density with optional overlay curves [{f,col,lw,dash}] */
+function hist(cv,data,lo,hi,bins,ov,col){const cnt=new Float64Array(bins),bw=(hi-lo)/bins;let n=0;for(const v of data){if(v<lo||v>=hi)continue;cnt[Math.floor((v-lo)/bw)]++;n++}
+ const N=data.length;let ym=0;for(let i=0;i<bins;i++){cnt[i]/=N*bw;ym=Math.max(ym,cnt[i])}
+ (ov||[]).forEach(o=>{for(let i=0;i<=80;i++)ym=Math.max(ym,o.f(lo+(hi-lo)*i/80)||0)});
+ const P=mk(cv,lo,hi,ym*1.12);
+ P.g.fillStyle=col||'rgba(110,168,255,.5)';for(let i=0;i<bins;i++){if(cnt[i]<=0)continue;const a=P.X(lo+i*bw),b=P.X(lo+(i+1)*bw);P.g.fillRect(a,P.Y(cnt[i]),Math.max(1,b-a-1),P.Y(0)-P.Y(cnt[i]))}
+ (ov||[]).forEach(o=>P.line(o.f,o.col,o.lw||2.4,lo,hi,200,o.dash));return P}
+const fmt=x=>f3(x);
+
+/* ---------- shared for this page ---------- */
+const POPS=['norm','unif','expo','logn','bimo','par5'];
+D.norm.med=0;D.norm.q90=1.2815516;D.unif.med=.5;D.unif.q90=.9;D.expo.med=Math.LN2;D.expo.q90=Math.log(10);D.logn.med=1;D.logn.q90=Math.exp(1.2815516);
+D.bimo.med=0;D.bimo.q90=qc(x=>.5*normCdf((x+2)/.5)+.5*normCdf((x-2)/.5),-10,10,.9,80);D.par5.med=Math.pow(2,.2);D.par5.q90=Math.pow(10,.2);
+const SF={mean:a=>mean(a),median:a=>{const b=Float64Array.from(a).sort(),n=b.length;return n%2?b[(n-1)/2]:(b[n/2-1]+b[n/2])/2},sd:a=>{const n=a.length,m=mean(a);let s=0;for(const v of a)s+=(v-m)*(v-m);return Math.sqrt(s/(n-1))},q90:a=>{const b=Float64Array.from(a).sort();return b[Math.round(.9*(b.length-1))]}};
+function truth(key,st){const d=D[key];return st==='mean'?d.mu:st==='median'?d.med:st==='sd'?d.sd:d.q90}
+const SNAME={mean:'sample mean',median:'sample median',sd:'sample SD',q90:'90th percentile'};
+const N10=[2,3,5,10,20,50,100,200,500,1000];
+function pct(a,p){const b=Float64Array.from(a).sort();return b[Math.min(b.length-1,Math.max(0,Math.floor(p*b.length)))]}
+function histLines(cv,arrs,cols,lo,hi,bins,vl){const bw=(hi-lo)/bins,dens=arrs.map(a=>{const c=new Float64Array(bins);for(const v of a){if(v<lo||v>=hi)continue;c[Math.floor((v-lo)/bw)]++}for(let i=0;i<bins;i++)c[i]/=a.length*bw;return c});let ym=0;dens.forEach(c=>c.forEach(v=>ym=Math.max(ym,v)));const P=mk(cv,lo,hi,ym*1.15||1);
+ dens.forEach((c,k)=>{const pts=[];for(let i=0;i<bins;i++){pts.push([lo+i*bw,c[i]]);pts.push([lo+(i+1)*bw,c[i]])}clip(P,()=>poly(P,pts,cols[k],2.2))});(vl||[]).forEach(v=>P.vline(v[0],v[1],v[2],v[3]));return P}
+function sdOf(a){return mom(a).sd}
+
+/* ---------- ML helpers ---------- */
+function digamma(x){let r=0;while(x<6){r-=1/x;x++}const f=1/(x*x);return r+Math.log(x)-.5/x-f*(1/12-f*(1/120-f/252))}
+function trigamma(x){let r=0;while(x<6){r+=1/(x*x);x++}const f=1/(x*x);return r+1/x+.5*f+f/x*(1/6-f*(1/30-f/42))}
+function poisS(l){if(l<=0)return 0;if(l<30){const L=Math.exp(-l);let k=0,p=1;do{k++;p*=Math.random()}while(p>L);return k-1}const m=Math.floor(.875*l),g=gammaS(m);return g<l?m+poisS(l-g):binF(m-1,l/g)}
+function llb(k,n,p){return(k?k*Math.log(p):0)+(n-k?(n-k)*Math.log(1-p):0)}
+function lrInt(k,n,cut){const ph=k/n,l0=llb(k,n,ph),g=p=>2*(l0-llb(k,n,p))-cut;let lo=0,hi=1;
+ if(k>0){let a=1e-12,b=ph;for(let i=0;i<70;i++){const m=(a+b)/2;if(g(m)>0)a=m;else b=m}lo=(a+b)/2}
+ if(k<n){let a=ph,b=1-1e-12;for(let i=0;i<70;i++){const m=(a+b)/2;if(g(m)>0)b=m;else a=m}hi=(a+b)/2}return[lo,hi]}
+function solveAlpha(s){if(!(s>1e-9))return 1e6;let a=(3-s+Math.sqrt((3-s)*(3-s)+24*s))/(12*s);for(let i=0;i<8;i++){const f=Math.log(a)-digamma(a)-s,fp=1/a-trigamma(a);let n=a-f/fp;if(!(n>0))n=a/2;a=n}return a}
+function normPdfAt(x,m,s){return Math.exp(-(x-m)*(x-m)/(2*s*s))/(s*2.5066282746)}
+/* ---------- CI helpers ---------- */
+function tq(v,p){return qc(x=>tcdf(x,v),0,500,p,80)}
+function chiq(df,p){return qc(x=>gamcdf(x,df/2,.5),0,df+40*Math.sqrt(2*df)+100,p,90)}
+const ZQ=l=>qn(1-(1-l)/2);
+function sS(n){return Math.sqrt(2*gammaS((n-1)/2)/(n-1))}
+function c4f(n){return Math.sqrt(2/(n-1))*Math.exp(lgamma(n/2)-lgamma((n-1)/2))}
+function pctTicks(a,b,st){const r=[];for(let v=a;v<=b+1e-9;v+=st)r.push([v,Math.round(v*100)+'%']);return r}
+const Z95=1.959964;
+const PM=[
+ {n:'Wald',c:C.r,f:(k,n)=>{const p=k/n,s=Z95*Math.sqrt(p*(1-p)/n);return[p-s,p+s]}},
+ {n:'Wilson',c:C.a,f:(k,n)=>{const z=Z95,p=k/n,d=1+z*z/n,c=(p+z*z/(2*n))/d,h=z*Math.sqrt(p*(1-p)/n+z*z/(4*n*n))/d;return[c-h,c+h]}},
+ {n:'Agresti–Coull',c:C.t,f:(k,n)=>{const z=Z95,nt=n+z*z,p=(k+z*z/2)/nt,s=z*Math.sqrt(p*(1-p)/nt);return[p-s,p+s]}},
+ {n:'Clopper–Pearson',c:C.y,f:(k,n)=>[k===0?0:qb(k,n-k+1,.025),k===n?1:qb(k+1,n-k,.975)]},
+ {n:'Jeffreys',c:C.p,f:(k,n)=>[k===0?0:qb(k+.5,n-k+.5,.025),k===n?1:qb(k+.5,n-k+.5,.975)]},
+ {n:'Likelihood ratio',c:C.g,f:(k,n)=>lrInt(k,n,3.8415)}];
+
+/* ---------- Ch1 one hundred studies ---------- */
+(function(){let S=null,sn=0;
+ function gen(){const n=val('c1n');sn=n;S=[];for(let i=0;i<100;i++)S.push([randn()/Math.sqrt(n),sS(n)]);draw()}
+ function draw(){if(!S)return;const n=val('c1n'),L=val('c1l')/100;if(n!==sn)return gen();$('c1nv').textContent=n;$('c1lv').textContent=Math.round(L*100)+'%';
+  const t=tq(n-1,(1+L)/2),iv=S.map(([m,s])=>[m-t*s/Math.sqrt(n),m+t*s/Math.sqrt(n)]);let ym=0;iv.forEach(a=>{ym=Math.max(ym,Math.abs(a[0]),Math.abs(a[1]))});ym=Math.max(ym*1.08,.1);
+  const P=mk($('c1cv'),0,101,ym,{y0:-ym});let miss=0,ws=0;const g=P.g;
+  iv.forEach((a,i)=>{const hit=a[0]<=0&&0<=a[1];if(!hit)miss++;ws+=a[1]-a[0];g.strokeStyle=hit?C.g:C.r;g.lineWidth=hit?1.6:2.6;g.globalAlpha=hit?.7:1;g.beginPath();g.moveTo(P.X(i+1),P.Y(a[0]));g.lineTo(P.X(i+1),P.Y(a[1]));g.stroke()});g.globalAlpha=1;
+  P.hline(0,C.fg,'true μ = 0');P.text('study number',P.w/2,P.h-2,C.mu,'center');
+  const ew=2*t*c4f(n)/Math.sqrt(n);
+  $('c1st').innerHTML=stat('intervals that miss μ',miss+' of 100',miss>(1-L)*100+8?'hot':'warn')+stat('expected misses',fmt((1-L)*100),'in')+stat('covered',(100-miss)+'%','ok')+stat('mean width',fmt(ws/100),'')+stat('expected width',fmt(ew),'in')+stat('multiplier t',fmt(t),'');
+  $('c1rd').innerHTML=`${miss} of these 100 intervals miss the true mean; the long-run rate is ${fmt((1-L)*100)}. Press the button a few times: the count wanders around ${fmt((1-L)*100)} (it is Binomial(100, ${fmt(1-L)}), so ±${fmt(2*Math.sqrt(100*L*(1-L)))} is ordinary). Notice that the <em>widths</em> also vary from study to study, because each study estimates its own spread. Raising the level widens every interval; raising n narrows them like 1/√n. The 95% describes the procedure; no single green line is “95% likely” to be right, since each is either right or wrong.`}
+ $('c1go').onclick=gen;on('c1n',gen);on('c1l',draw);gen();resizers.push(draw);})();
+
+/* ---------- Ch2 z vs t ---------- */
+(function(){const LV=[.9,.95,.99],COL=[C.t,C.a,C.r];
+ function cov(n,L){return 2*tcdf(ZQ(L),n-1)-1}
+ function draw(){const n=val('c2n'),L=+$('c2l').value,li=LV.indexOf(L);$('c2nv').textContent=n;
+  const P=mk($('c2cv'),2,60,1.03,{y0:.7,noGrid:true,L:46});customGrid(P,niceTicks(2,60,6),pctTicks(.7,1,.05));
+  LV.forEach((l,i)=>{const pts=[];for(let m=2;m<=60;m++)pts.push([m,cov(m,l)]);poly(P,pts,COL[i],i===li?3.2:1.4);P.hline(l,COL[i]);dots(P,[[n,cov(n,l)]],COL[i],i===li?5.5:3)});
+  P.vline(n,C.y,null,true);let x=P.L+8;LV.forEach((l,i)=>{const s='— nominal '+Math.round(l*100)+'%';P.text(s,x,P.T+12,COL[i]);x+=P.g.measureText(s).width+16});P.text('sample size n',P.w/2,P.h-2,C.mu,'center');
+  const c=cov(n,L),z=ZQ(L),t=tq(n-1,(1+L)/2);let n1=null;for(let m=2;m<=400;m++){if(cov(m,L)>=L-.01){n1=m;break}}
+  $('c2st').innerHTML=stat('z-interval true coverage',pc(c),Math.abs(c-L)>.02?'hot':'ok')+stat('nominal',pc(L),'in')+stat('z multiplier',fmt(z),'warn')+stat('t multiplier',fmt(t),'ok')+stat('t is wider by',fmt(100*(t/z-1))+'%','')+stat('n where z gets within 1 pt',n1==null?'>400':n1,'in');
+  $('c2rd').innerHTML=`With n = ${n} and normal data, the “z-interval” (X̄ ± ${fmt(z)}·s/√n) contains the truth ${pc(c)} of the time, not ${pc(L)}. The correct multiplier is ${fmt(t)}, ${fmt(100*(t/z-1))}% larger. The damage is worst for tiny n and for high levels: at 99% you need roughly n = ${n1==null?'400+':n1} before the shortcut is within a point of its promise.`}
+ on('c2n c2l',draw);reg(draw);})();
+
+/* ---------- Ch3 sample size planning ---------- */
+(function(){function draw(){const ty=+$('c3t').value,L=val('c3L')/100,z=ZQ(L),sv=val('c3s'),mv=val('c3m');let mar,margf,k,nreq,nhalf;
+  if(ty===0){const sig=sv/5;mar=mv/20;margf=n=>z*sig/Math.sqrt(n);k=1;nreq=Math.pow(z*sig/mar,2);nhalf=Math.pow(z*sig/(mar/2),2);$('c3sl').textContent='σ (standard deviation)';$('c3ml').textContent='margin of error ±';$('c3sv').textContent=fmt(sig);$('c3mv').textContent=fmt(mar)}
+  else{const p=sv/100,v=ty===1?p*(1-p):2*p*(1-p);mar=mv/1000;margf=n=>z*Math.sqrt(v/n);k=100;nreq=z*z*v/(mar*mar);nhalf=z*z*v/((mar/2)*(mar/2));$('c3sl').textContent=ty===1?'expected rate p (%)':'baseline rate p (%)';$('c3ml').textContent='margin of error ± (percentage points)';$('c3sv').textContent=sv+'%';$('c3mv').textContent=fmt(mv/10)+' pp'}
+  $('c3Lv').textContent=Math.round(L*100)+'%';nreq=Math.ceil(nreq);nhalf=Math.ceil(nhalf);
+  const lo=nreq<30?0:1,hi=Math.max(3,Math.ceil(Math.log10(nreq)+.5)),ym=margf(Math.pow(10,lo))*k*1.08,P=mk($('c3cv'),lo,hi,ym,{noGrid:true,L:50});customGrid(P,logTicks(lo,hi),niceTicks(0,ym,4));
+  P.line(x=>margf(Math.pow(10,x))*k,C.a,2.8,lo,hi,300);P.hline(mar*k,C.y,'target ± '+fmt(mar*k)+(ty?' pp':''));P.vline(Math.log10(nreq),C.g,'n = '+nreq,true);dots(P,[[Math.log10(nreq),mar*k]],C.g,5);P.text('sample size n (log scale)',P.w/2,P.h-2,C.mu,'center');P.text('margin of error',P.L+8,P.T+14,C.mu);
+  const z99=ZQ(.99),n99=Math.ceil(nreq*Math.pow(z99/z,2));
+  $('c3st').innerHTML=stat(ty===2?'required n per group':'required n',nreq.toLocaleString(),'ok')+(ty===2?stat('total both groups',(2*nreq).toLocaleString(),'in'):'')+stat('for half the margin',nhalf.toLocaleString(),'warn')+stat('ratio',fmt(nhalf/nreq),'')+stat('same target at 99%',n99.toLocaleString(),'in')+stat('z multiplier',fmt(z),'');
+  $('c3rd').innerHTML=`To estimate ${ty===0?'a mean':ty===1?'a proportion':'a difference between two proportions'} to within ±${fmt(mar*k)}${ty?' percentage points':''} at ${Math.round(L*100)}% confidence you need <b>${nreq.toLocaleString()}</b>${ty===2?' per group':' observations'}. Halving the margin needs ${nhalf.toLocaleString()} (about 4×); moving to 99% confidence needs ${n99.toLocaleString()}. ${ty?'The rate p enters through p(1−p), which is largest at p = 50%, so p = 50% is the safe worst case when you have no pilot data.':'σ comes from a pilot study or prior data; an underestimate of σ means an interval wider than planned.'}`}
+ on('c3t c3s c3m c3L',draw);reg(draw);})();
+
+/* ---------- Ch4 six proportion methods ---------- */
+(function(){const dflt=[1,1,0,1,1,0];let cache={};const box=$('c4m');
+ box.innerHTML=PM.map((m,i)=>`<label style="color:${m.c}"><input type="checkbox" data-i="${i}" ${dflt[i]?'checked':''}> ${m.n}</label>`).join('');
+ function ivs(n){if(cache.n===n)return cache.iv;const iv=PM.map(m=>{const a=[];for(let k=0;k<=n;k++)a.push(m.f(k,n));return a});cache={n,iv};return iv}
+ function draw(){const n=val('c4n');$('c4nv').textContent=n;const iv=ivs(n),sel=PM.map((m,i)=>box.querySelector(`[data-i="${i}"]`).checked);
+  const grid=[];for(let p=.005;p<.9951;p+=.005)grid.push(p);const nm=PM.length,wd=new Float64Array(nm);
+  const cc=grid.map(p=>{const w=[];for(let k=0;k<=n;k++)w.push(binom(n,k,p));return PM.map((m,j)=>{let s=0,ww=0;for(let k=0;k<=n;k++){const a=iv[j][k];if(a[0]<=p&&p<=a[1])s+=w[k];ww+=w[k]*(Math.min(1,a[1])-Math.max(0,a[0]))}wd[j]+=ww;return s})});
+  let mn=1;cc.forEach(c=>PM.forEach((m,j)=>{if(sel[j])mn=Math.min(mn,c[j])}));const y0=Math.min(.9,Math.max(.5,Math.floor((mn-.02)*20)/20)),ym=1+.12*(1-y0),st=(1-y0)>.3?.1:.05;
+  const P=mk($('c4cv'),0,1,ym,{noGrid:true,y0,L:46});customGrid(P,niceTicks(0,1,5),pctTicks(y0,1,st));
+  clip(P,()=>PM.forEach((m,j)=>{if(sel[j])poly(P,grid.map((p,i)=>[p,cc[i][j]]),m.c,1.8)}));P.hline(.95,C.fg,'95%');
+  let x=P.L+8;PM.forEach((m,j)=>{if(!sel[j])return;const s='— '+m.n;P.text(s,x,P.T+12,m.c);x+=P.g.measureText(s).width+16});P.text('true p',P.w/2,P.h-2,C.mu,'center');
+  const rows=PM.map((m,j)=>{const col=cc.map(c=>c[j]);const mid=Math.min(...col.filter((c,i)=>grid[i]>=.05&&grid[i]<=.95));return{n:m.n,c:m.c,mean:mean(col),worst:mid,w:wd[j]/grid.length}});
+  $('c4tb').innerHTML='<table><tr><th>Method</th><th>Mean coverage</th><th>Worst coverage, p ∈ [.05,.95]</th><th>Mean width</th></tr>'+rows.map(r=>`<tr><td style="color:${r.c}"><b>${r.n}</b></td><td>${pc(r.mean)}</td><td style="color:${r.worst<.9?C.r:r.worst<.94?C.y:C.g}">${pc(r.worst)}</td><td>${fmt(r.w)}</td></tr>`).join('')+'</table>';
+  const R=Object.fromEntries(rows.map(r=>[r.n,r]));
+  $('c4rd').innerHTML=`At n = ${n}: Wald averages ${pc(R['Wald'].mean)} and dips as low as ${pc(R['Wald'].worst)} inside [.05,.95]. Wilson averages ${pc(R['Wilson'].mean)} (worst ${pc(R['Wilson'].worst)}). Clopper–Pearson averages ${pc(R['Clopper–Pearson'].mean)}, above 95% everywhere, and pays with the widest intervals (${fmt(R['Clopper–Pearson'].w)} vs Wilson's ${fmt(R['Wilson'].w)}). The jagged curves are real: with a discrete count, coverage jumps as p crosses an interval endpoint, so no method sits exactly at 95%. Try n = 10 and watch Wald collapse near 0 and 1.`}
+ box.addEventListener('change',draw);on('c4n',draw);reg(draw);})();
+
+/* ---------- Ch5 rare and zero events ---------- */
+(function(){const NL=[10,30,100,300,1000,3000,10000];
+ function draw(){const n=NL[val('c5n')],ke=$('c5k');ke.max=Math.min(20,n);if(+ke.value>n)ke.value=n;const k=val('c5k');$('c5nv').textContent=n;$('c5kv').textContent=k;
+  const rows=PM.map(m=>{const a=m.f(k,n);return{n:m.n,c:m.c,lo:Math.max(0,a[0]),hi:Math.min(1,a[1])}});if(k===0)rows.push({n:'rule of three (1-sided)',c:C.fg,lo:0,hi:3/n});
+  let xm=k/n;rows.forEach(r=>xm=Math.max(xm,r.hi));xm=xm*1.12||.01;const nr=rows.length,P=mk($('c5cv'),0,xm,nr+.8,{noGrid:true,L:150,y0:.2});customGrid(P,niceTicks(0,xm,6),[]);
+  const g=P.g;rows.forEach((r,j)=>{const y=nr-j;g.strokeStyle=r.c;g.fillStyle=r.c;g.lineWidth=7;g.lineCap='round';g.beginPath();g.moveTo(P.X(r.lo),P.Y(y));g.lineTo(P.X(Math.max(r.hi,r.lo+xm*.002)),P.Y(y));g.stroke();g.lineCap='butt';P.text(r.n,P.L-8,P.Y(y)+4,r.c,'right');if(r.hi-r.lo<1e-12)P.text('degenerate',P.X(r.hi)+10,P.Y(y)+4,C.r)});
+  P.vline(k/n,C.y,'k/n = '+f3(k/n),true);P.text('proportion p',P.w/2,P.h-2,C.mu,'center');
+  const one=k<n?qb(k+1,n-k,.95):1;
+  $('c5tb').innerHTML='<table><tr><th>Method</th><th>Lower</th><th>Upper</th><th>Width</th></tr>'+rows.map(r=>`<tr><td style="color:${r.c}"><b>${r.n}</b></td><td>${f3(r.lo)}</td><td>${f3(r.hi)}</td><td>${f3(r.hi-r.lo)}</td></tr>`).join('')+'</table>';
+  $('c5rd').innerHTML=k===0?`With 0 events in ${n.toLocaleString()} trials the Wald interval is exactly [0, 0], claiming certainty. The honest summary is an upper bound: the exact one-sided 95% bound is ${f3(1-Math.pow(.05,1/n))}, essentially the rule of three (3/n = ${f3(3/n)}); the two-sided Clopper–Pearson upper end is ${f3(1-Math.pow(.025,1/n))}. Wilson, Jeffreys and the likelihood-ratio interval also give sensible, non-degenerate answers, but they differ by a factor of two or more among themselves: for rare events <b>the choice of method changes the conclusion</b>.`:`With k = ${k} events in ${n.toLocaleString()} trials, p̂ = ${f3(k/n)}. The one-sided exact 95% upper bound is ${f3(one)}. Notice how far the methods disagree when k is small and how they converge as k grows (try k = 20 with n = 10,000). The rule of three applies only to k = 0.`}
+ on('c5n c5k',draw);reg(draw);})();
+
+/* ---------- Ch6 Poisson / correlation / SD ---------- */
+(function(){const NS=[5,10,20,40,80,160],DEF=[12,70,50];let gw={};
+ function garw(k){if(!gw[k])gw[k]=[k===0?0:.5*chiq(2*k,.025),.5*chiq(2*k+2,.975)];return gw[k]}
+ function rcor(n,rho){let sx=0,sy=0,sxx=0,syy=0,sxy=0;const c=Math.sqrt(1-rho*rho);for(let i=0;i<n;i++){const x=randn(),y=rho*x+c*randn();sx+=x;sy+=y;sxx+=x*x;syy+=y*y;sxy+=x*y}return(sxy-sx*sy/n)/Math.sqrt((sxx-sx*sx/n)*(syy-sy*sy/n))}
+ function setType(){const t=+$('c6t').value,p=$('c6p'),n=$('c6n');p.disabled=t===2;n.disabled=t===0;p.value=DEF[t];$('c6pl').textContent=t===0?'mean count λ':t===1?'true correlation ρ':'(not used)';draw()}
+ function draw(){const t=+$('c6t').value,R=4000,z=Z95,n=NS[val('c6n')],pv=val('c6p');let truth,gen,mf,names,desc;
+  $('c6nv').textContent=t===0?'—':n;
+  if(t===0){const lam=pv/4;truth=lam;$('c6pv').textContent=fmt(lam);desc=`one Poisson count with mean λ = ${fmt(lam)}`;names=['Wald  k ± z√k','Garwood (exact, χ²)'];gen=()=>poisS(lam);mf=[k=>[k-z*Math.sqrt(k),k+z*Math.sqrt(k)],k=>garw(k)]}
+  else if(t===1){const rho=pv/100;truth=rho;$('c6pv').textContent=fmt(rho);desc=`n = ${n} bivariate-normal pairs with ρ = ${fmt(rho)}`;names=['naive  r ± z(1−r²)/√n','Fisher z'];gen=()=>rcor(n,rho);
+   mf=[r=>[r-z*(1-r*r)/Math.sqrt(n),r+z*(1-r*r)/Math.sqrt(n)],r=>{const a=Math.atanh(Math.max(-.999999,Math.min(.999999,r))),d=z/Math.sqrt(n-3);return[Math.tanh(a-d),Math.tanh(a+d)]}]}
+  else{truth=1;$('c6pv').textContent='—';desc=`n = ${n} normal observations, true σ = 1`;names=['naive  s ± z·s/√(2(n−1))','χ² interval'];const lo=chiq(n-1,.025),hi=chiq(n-1,.975);gen=()=>sS(n);mf=[s=>[s-z*s/Math.sqrt(2*(n-1)),s+z*s/Math.sqrt(2*(n-1))],s=>[s*Math.sqrt((n-1)/hi),s*Math.sqrt((n-1)/lo)]]}
+  const cnt=[0,0],wd=[0,0];for(let r=0;r<R;r++){const s=gen();for(let j=0;j<2;j++){const a=mf[j](s);if(a[0]<=truth&&truth<=a[1])cnt[j]++;wd[j]+=a[1]-a[0]}}
+  const cv=cnt.map(c=>c/R),y0=Math.max(0,Math.floor((Math.min(...cv)-.08)*10)/10),P=mk($('c6cv'),0,2,1.04,{noGrid:true,y0,L:46});customGrid(P,[],pctTicks(y0,1,y0>.5?.05:.1));
+  cv.forEach((c,j)=>{const g=P.g;g.fillStyle=Math.abs(c-.95)<.012||c>.95?'rgba(74,222,128,.55)':'rgba(255,107,129,.55)';g.fillRect(P.X(j+.2),P.Y(c),P.X(j+.8)-P.X(j+.2),P.Y(y0)-P.Y(c));P.text(pc(c),P.X(j+.5),P.Y(c)-6,C.fg,'center');P.text(names[j],P.X(j+.5),P.h-P.B-8,C.fg,'center')});P.hline(.95,C.y,'95% target');
+  $('c6tb').innerHTML='<table><tr><th>Interval</th><th>Coverage</th><th>Mean width</th></tr>'+names.map((nm,j)=>`<tr><td><b>${nm}</b></td><td style="color:${cv[j]<.93?C.r:C.g}">${pc(cv[j])}</td><td>${fmt(wd[j]/R)}</td></tr>`).join('')+'</table>';
+  $('c6rd').innerHTML=`${R.toLocaleString()} simulations of ${desc}. The naive interval covers ${pc(cv[0])}; the ${t===0?'exact Garwood':t===1?'Fisher-z':'χ²'} interval covers ${pc(cv[1])}. ${t===0?'Garwood is conservative by construction (the count is discrete) but never collapses at k = 0.':t===1?'The naive correlation interval can run beyond ±1 and is badly centred when ρ is large; the transform keeps the interval inside (−1, 1).':'The naive SD interval pretends s is symmetric; the sampling distribution of s is skewed for small n, so it under-covers.'} Simulation noise is about ±0.4%.`}
+ $('c6t').addEventListener('change',setType);on('c6p c6n',draw);setType();reg(draw);})();
+
+/* ---------- Ch7 profile likelihood, gamma shape ---------- */
+(function(){const NL=[10,20,50,100,200];let sm=null,study=null;
+ function pl(a,xb,ml,n){return n*(a*Math.log(a/xb)-lgamma(a)+(a-1)*ml-a)}
+ function fit(xb,ml,n){const ah=solveAlpha(Math.log(xb)-ml),p0=pl(ah,xb,ml,n),g=a=>p0-pl(a,xb,ml,n)-1.92073;
+  let a1=ah/2,it=0;while(g(a1)<0&&it<60){a1/=2;it++}let l=a1,u=ah;for(let i=0;i<60;i++){const m=(l+u)/2;if(g(m)>0)l=m;else u=m}const lo=(l+u)/2;
+  let b1=ah*2;it=0;while(g(b1)<0&&it<60){b1*=2;it++}l=ah;u=b1;for(let i=0;i<60;i++){const m=(l+u)/2;if(g(m)>0)u=m;else l=m}const hi=(l+u)/2;
+  const se=Math.sqrt(ah/(n*(ah*trigamma(ah)-1)));return{ah,lo,hi,se,wl:ah-Z95*se,wh:ah+Z95*se,p0}}
+ function draw1(){const a=+$('c7a').value,n=NL[val('c7n')];$('c7av').textContent=a.toFixed(1);$('c7nv').textContent=n}
+ function newSample(){const a=+$('c7a').value,n=NL[val('c7n')];let s=0,sl=0;for(let i=0;i<n;i++){const v=gammaS(a);s+=v;sl+=Math.log(v)}sm={a,n,xb:s/n,ml:sl/n};draw()}
+ function runStudy(){const a=+$('c7a').value,n=NL[val('c7n')],R=1500;let cp=0,cw=0,neg=0,lp=0,hp=0,lw=0,hw=0,wp=0,ww=0;
+  for(let r=0;r<R;r++){let s=0,sl=0;for(let i=0;i<n;i++){const v=gammaS(a);s+=v;sl+=Math.log(v)}const f=fit(s/n,sl/n,n);
+   if(f.lo<=a&&a<=f.hi)cp++;else if(a<f.lo)lp++;else hp++;if(f.wl<=a&&a<=f.wh)cw++;else if(a<f.wl)lw++;else hw++;if(f.wl<0)neg++;wp+=f.hi-f.lo;ww+=f.wh-f.wl}
+  study={a,n,R,cp:cp/R,cw:cw/R,neg:neg/R,lp:lp/R,hp:hp/R,lw:lw/R,hw:hw/R,wp:wp/R,ww:ww/R};draw()}
+ function draw(){draw1();if(!sm)return;const f=fit(sm.xb,sm.ml,sm.n),{a,n,xb,ml}=sm;
+  const xlo=Math.max(.02,f.lo*.6),xhi=Math.max(f.hi,f.wh)*1.25,P=mk($('c7cv'),xlo,xhi,.4,{y0:-6,L:46});
+  P.line(x=>pl(x,xb,ml,n)-f.p0,C.a,2.8,xlo,xhi,400);P.line(x=>-(x-f.ah)*(x-f.ah)/(2*f.se*f.se),C.r,2,xlo,xhi,300,true);P.hline(-1.92,C.g,'−1.92');
+  P.vline(f.lo,C.g);P.vline(f.hi,C.g);P.vline(f.wl,C.r,null,true);P.vline(f.wh,C.r,null,true);P.vline(a,C.fg,'true α',true);P.vline(f.ah,C.y,'α̂');
+  P.text('blue: profile log-lik · red dashed: Wald parabola · green/red lines: the two intervals',P.L+8,P.T+26,C.mu);P.text('shape α',P.w/2,P.h-2,C.mu,'center');
+  const s=study,ok=s&&s.a===a&&s.n===n;
+  $('c7st').innerHTML=stat('α̂ (MLE)',fmt(f.ah),'ok')+stat('profile 95%',`[${fmt(f.lo)}, ${fmt(f.hi)}]`,'ok')+stat('Wald 95%',`[${fmt(f.wl)}, ${fmt(f.wh)}]`,f.wl<0?'hot':'warn')+(s?stat(`profile coverage (α=${s.a}, n=${s.n})`,pc(s.cp),s.cp<.93?'hot':'ok')+stat('Wald coverage',pc(s.cw),s.cw<.93?'hot':'ok')+stat('Wald lower < 0',pc(s.neg),s.neg>.01?'hot':'ok'):stat('study','running…',''));
+  $('c7rd').innerHTML=s?`Over ${s.R.toLocaleString()} samples with α = ${s.a} and n = ${s.n}, the profile-likelihood interval covers ${pc(s.cp)} (misses: ${pc(s.lp)} below, ${pc(s.hp)} above) and the Wald interval ${pc(s.cw)} (misses: ${pc(s.lw)} below, ${pc(s.hw)} above). The profile interval is ${fmt(s.wp)} wide on average against ${fmt(s.ww)}. Look at the picture: the blue curve is lopsided, falling slowly to the right and steeply to the left, while the red parabola is symmetric, so Wald is shifted toward the wrong side. ${s.neg>.001?`In ${pc(s.neg)} of samples the Wald lower limit is negative, impossible for a shape parameter. `:''}${ok?'':'(Release the slider to re-run the coverage study.)'}`:''}
+ $('c7go').onclick=newSample;
+ ['c7a','c7n'].forEach(i=>{$(i).addEventListener('input',draw1);$(i).addEventListener('change',()=>{runStudy();newSample()})});
+ runStudy();newSample();resizers.push(draw);})();
+
+/* ---------- Ch8 bootstrap intervals ---------- */
+(function(){const NL=[10,30,100,300],KEYS=['norm','unif','expo','logn','bimo','par5'],tc={};let S=null,cs=null,busy=false;fillSel('c8d',KEYS,'expo');
+ function tqc(n){return tc[n]||(tc[n]=tq(n-1,.975))}
+ function boot(x,B,f){const n=x.length,out=new Float64Array(B),y=new Float64Array(n);for(let b=0;b<B;b++){for(let i=0;i<n;i++)y[i]=x[Math.floor(Math.random()*n)];out[b]=f(y)}return out}
+ function ints(x,st,b){const th=SF[st](x),n=x.length,sd=sdOf(b),q1=pct(b,.025),q2=pct(b,.975),r=[{n:'Normal',lo:th-Z95*sd,hi:th+Z95*sd},{n:'Percentile',lo:q1,hi:q2},{n:'Basic',lo:2*th-q2,hi:2*th-q1}];
+  if(st==='mean'){const s=SF.sd(x),h=tqc(n)*s/Math.sqrt(n);r.push({n:'t-interval',lo:th-h,hi:th+h})}return r}
+ function newS(){const key=$('c8d').value,st=$('c8s').value,n=NL[val('c8n')],x=new Float64Array(n);for(let i=0;i<n;i++)x[i]=D[key].s();S={key,st,n,x,b:boot(x,1000,SF[st]),th:SF[st](x)};draw()}
+ function draw(){$('c8nv').textContent=NL[val('c8n')];if(!S)return;const{key,st,n,x,b,th}=S,tr=truth(key,st),r=ints(x,st,b),q1=pct(b,.025),q2=pct(b,.975);
+  let lo0=pct(b,.003),hi0=pct(b,.997);const w=(hi0-lo0)||1e-3,lo=Math.min(lo0,tr,th)-.08*w,hi=Math.max(hi0,tr,th)+.08*w;
+  const P=hist($('c8cv'),b,lo,hi,40,[],'rgba(110,168,255,.5)');P.vline(th,C.y,'θ̂',true);P.vline(tr,C.fg,'truth',true);P.vline(q1,C.g,null,true);P.vline(q2,C.g,null,true);P.text('bootstrap distribution of the '+SNAME[st]+' (B = 1000);  green: percentile limits',P.L+8,P.T+26,C.mu);
+  const cov=cs&&cs.key===key&&cs.st===st&&cs.n===n;
+  let h='<table><tr><th>Interval</th><th>Limits</th><th>Width</th><th>Contains truth '+f3(tr)+'?</th>'+(cov?'<th>Coverage (200 samples)</th><th>Mean width</th>':'')+'</tr>';
+  r.forEach((a,j)=>{const hit=a.lo<=tr&&tr<=a.hi;h+=`<tr><td><b>${a.n}</b></td><td>[${f3(a.lo)}, ${f3(a.hi)}]</td><td>${f3(a.hi-a.lo)}</td><td style="color:${hit?C.g:C.r}">${hit?'yes':'no'}</td>`+(cov?`<td style="color:${cs.cnt[j]/cs.R<.92?C.r:C.g}">${pc(cs.cnt[j]/cs.R)}</td><td>${f3(cs.wd[j]/cs.R)}</td>`:'')+'</tr>'});
+  if(st!=='mean')h+=`<tr><td><b>t-interval</b></td><td colspan="${cov?5:3}" style="color:${C.mu}">only defined for the mean</td></tr>`;
+  $('c8tb').innerHTML=h+'</table>';
+  $('c8rd').innerHTML=(cov?`Coverage over ${cs.R} fresh samples (300 resamples each; noise about ±1.5%): `+r.map((a,j)=>`${a.n} ${pc(cs.cnt[j]/cs.R)}`).join(', ')+`. A good interval would be near 95%. Bootstrap intervals are approximations: at n = ${n} with ${D[key].n} data and the ${SNAME[st]}, they ${Math.min(...cs.cnt.map(c=>c/cs.R))<.92?'under-cover noticeably':'do reasonably well'}. `:'Press “Run coverage study” for coverage numbers (it takes a few seconds). ')+`This sample: ${SNAME[st]} = ${f3(th)}, bootstrap SE = ${f3(sdOf(b))}.`}
+ $('c8cs').onclick=()=>{if(busy)return;const key=$('c8d').value,st=$('c8s').value,n=NL[val('c8n')],R=200,B=300,tr=truth(key,st),cnt=[0,0,0,0],wd=[0,0,0,0];let r=0;busy=true;$('c8cs').disabled=true;
+  (function step(){const t0=performance.now();while(r<R&&performance.now()-t0<40){const x=new Float64Array(n);for(let i=0;i<n;i++)x[i]=D[key].s();const a=ints(x,st,boot(x,B,SF[st]));a.forEach((q,j)=>{if(q.lo<=tr&&tr<=q.hi)cnt[j]++;wd[j]+=q.hi-q.lo});r++}
+   if(r<R){$('c8rd').textContent='Running coverage study… '+r+' / '+R;setTimeout(step,0)}else{cs={key,st,n,cnt,wd,R};busy=false;$('c8cs').disabled=false;draw()}})()};
+ $('c8go').onclick=newS;on('c8d c8s c8n',newS);newS();$('c8cs').click();resizers.push(draw);})();
+
+/* ---------- Ch9 overlap vs significance ---------- */
+(function(){const zb=qn(1-(1-.834)/2);
+ function draw(){const s1=val('c9a'),s2=val('c9b'),d=val('c9d');$('c9av').textContent=fmt(s1);$('c9bv').textContent=fmt(s2);$('c9dv').textContent=fmt(d);
+  const sd=Math.sqrt(s1*s1+s2*s2),z=d/sd,p=2*normSf(Math.abs(z)),over=d<Z95*(s1+s2),sig=p<.05,lo1=Z95*sd,hi1=Z95*(s1+s2);
+  const P=mk($('c9cv'),-7,17,4.2,{noGrid:true,L:150,y0:0});customGrid(P,niceTicks(-7,17,8),[]);const g=P.g;
+  function bar(y,c,se,col,z,lw){g.strokeStyle=col;g.lineWidth=lw;g.lineCap='round';g.beginPath();g.moveTo(P.X(c-z*se),P.Y(y));g.lineTo(P.X(c+z*se),P.Y(y));g.stroke();g.lineCap='butt'}
+  P.vline(0,C.mu,null,true);
+  bar(3.2,0,s1,'rgba(110,168,255,.6)',Z95,11);bar(3.2,0,s1,C.y,zb,3);dots(P,[[0,3.2]],C.fg,4);
+  bar(2.2,d,s2,'rgba(192,132,252,.6)',Z95,11);bar(2.2,d,s2,C.y,zb,3);dots(P,[[d,2.2]],C.fg,4);
+  bar(.9,d,sd,sig?'rgba(74,222,128,.7)':'rgba(255,107,129,.7)',Z95,11);dots(P,[[d,.9]],C.fg,4);
+  P.text('group 1 mean',P.L-8,P.Y(3.2)+4,C.a,'right');P.text('group 2 mean',P.L-8,P.Y(2.2)+4,C.p,'right');P.text('difference',P.L-8,P.Y(.9)+4,sig?C.g:C.r,'right');
+  P.text('thick: 95% interval;  thin yellow: 83.4% interval;  dashed line at 0 = group 1 mean = no difference',P.L+8,P.T+14,C.mu);
+  $('c9st').innerHTML=stat('p-value of the difference',f3(p),sig?'ok':'warn')+stat('significant at 5%?',sig?'yes':'no',sig?'ok':'warn')+stat('95% intervals overlap?',over?'yes':'no',over?'hot':'ok')+stat('overlap until d <',fmt(hi1),'')+stat('significant once d >',fmt(lo1),'')+stat('95% CI for difference',`[${fmt(d-lo1)}, ${fmt(d+lo1)}]`,'in');
+  $('c9rd').innerHTML=!over?`The two 95% intervals do not overlap, so the difference is significant (p = ${f3(p)}). Non-overlap is a <em>sufficient</em> condition, but a stricter one than needed.`:sig?`<b>The trap.</b> The two 95% intervals overlap, yet the difference is significant (p = ${f3(p)}), because the standard error of a difference is ${fmt(sd)}, smaller than the sum ${fmt(s1+s2)}. A reader who checked “do they overlap?” would wrongly say “no evidence of a difference”. The interval for the difference, [${fmt(d-lo1)}, ${fmt(d+lo1)}], excludes 0.`:`The intervals overlap and the difference is not significant (p = ${f3(p)}); the interval for the difference, [${fmt(d-lo1)}, ${fmt(d+lo1)}], contains 0. Drag d up to ${fmt(lo1)} to cross into significance while the bars still overlap until d = ${fmt(hi1)}.`}
+ on('c9a c9b c9d',draw);reg(draw);})();
+
+/* ---------- Ch10 many intervals ---------- */
+(function(){function draw(){const m=val('c10m'),L=+$('c10l').value,al=1-L,R=3000;$('c10mv').textContent=m;
+  const c0=qn(1-al/2),c1=qn(1-al/(2*m)),q0=2*normSf(c0),q1=2*normSf(c1),n0=new Float64Array(m+1),n1=new Float64Array(m+1);let a0=0,a1=0;
+  for(let r=0;r<R;r++){const x=binF(m,q0),y=binF(m,q1);n0[x]++;n1[y]++;if(x>0)a0++;if(y>0)a1++}
+  let K=0;for(let k=0;k<=m;k++)if(n0[k]+n1[k]>0)K=k;K=Math.min(m,K+1);let ym=0;for(let k=0;k<=K;k++)ym=Math.max(ym,n0[k]/R,n1[k]/R);ym=Math.max(.05,ym*1.2);
+  const P=mk($('c10cv'),-.7,K+.7,ym,{noGrid:true,L:46}),step=Math.max(1,Math.ceil((K+1)/16)),xt=[];for(let k=0;k<=K;k+=step)xt.push([k,String(k)]);customGrid(P,xt,niceTicks(0,ym,4).map(([v])=>[v,Math.round(v*100)+'%']));
+  const g=P.g;for(let k=0;k<=K;k++){g.fillStyle='rgba(255,107,129,.75)';g.fillRect(P.X(k-.4),P.Y(n0[k]/R),P.X(k)-P.X(k-.4)-1,P.Y(0)-P.Y(n0[k]/R));g.fillStyle='rgba(74,222,128,.75)';g.fillRect(P.X(k),P.Y(n1[k]/R),P.X(k+.4)-P.X(k)-1,P.Y(0)-P.Y(n1[k]/R))}
+  P.text('— unadjusted',P.L+8,P.T+12,C.r);P.text('— Bonferroni',P.L+100,P.T+12,C.g);P.text('number of intervals that miss',P.w/2,P.h-2,C.mu,'center');
+  const Q=mk($('c10cv2'),0,200,1.02,{noGrid:true,L:46});customGrid(Q,niceTicks(0,200,5),pctTicks(0,1,.25));
+  const u=[],b=[];for(let k=1;k<=200;k++){u.push([k,1-Math.pow(1-al,k)]);b.push([k,1-Math.pow(1-al/k,k)])}poly(Q,u,C.r,2.4);poly(Q,b,C.g,2.4);Q.vline(m,C.y,null,true);dots(Q,[[m,1-Math.pow(1-al,m)],[m,1-Math.pow(1-al/m,m)]],C.y,4);
+  Q.text('P(at least one interval misses)',Q.L+8,Q.T+12,C.mu);Q.text('number of intervals m',Q.w/2,Q.h-2,C.mu,'center');
+  $('c10st').innerHTML=stat('P(all cover), unadjusted',pc(Math.pow(L,m)),Math.pow(L,m)<.9?'hot':'ok')+stat('expected misses',fmt(m*al),'warn')+stat('sim. P(≥1 miss) unadj.',pc(a0/R),'hot')+stat('sim. P(≥1 miss) Bonferroni',pc(a1/R),'ok')+stat('per-interval level, Bonferroni',pc(1-al/m),'in')+stat('Bonferroni intervals are wider by',fmt(100*(c1/c0-1))+'%','');
+  $('c10rd').innerHTML=`With m = ${m} intervals at ${Math.round(L*100)}%, the chance that every one covers is ${Math.pow(L,m).toFixed(3)} (simulated: ${pc(1-a0/R)}), and you should expect ${fmt(m*al)} misses. Bonferroni sets each interval at ${pc(1-al/m)}, which holds the chance of <em>any</em> miss near ${Math.round(al*100)}% (simulated ${pc(a1/R)}) at the price of intervals ${fmt(100*(c1/c0-1))}% wider. Whether you need this depends on the claim: “every segment is within its interval” needs it; “this particular segment is within its interval” does not.`}
+ on('c10m c10l',draw);reg(draw);})();
+
+/* ---------- Ch11 CI vs PI ---------- */
+(function(){const NL=[3,5,10,20,50,100,500,2000];
+ function draw(){const n=NL[val('c11n')],R=4000;$('c11nv').textContent=n;const tt=tq(n-1,.975),cw=m=>2*tq(m-1,.975)*c4f(m)/Math.sqrt(m),pw=m=>2*tq(m-1,.975)*c4f(m)*Math.sqrt(1+1/m);
+  let cci=0,cpi=0,cmis=0;for(let r=0;r<R;r++){const xb=randn()/Math.sqrt(n),s=sS(n),y=randn(),h=tt*s/Math.sqrt(n);if(Math.abs(xb)<=h)cci++;if(Math.abs(y-xb)<=tt*s*Math.sqrt(1+1/n))cpi++;if(Math.abs(y-xb)<=h)cmis++}
+  const lo=Math.log10(3),hi=Math.log10(2000),P=mk($('c11cv'),lo,hi,5,{noGrid:true,L:46});customGrid(P,logTicks(1,3).concat([[lo,'3']]),niceTicks(0,5,5));
+  const xs=[];for(let i=0;i<=60;i++)xs.push(lo+(hi-lo)*i/60);const ci=xs.map(x=>[x,cw(Math.pow(10,x))]),pi=xs.map(x=>[x,pw(Math.pow(10,x))]);poly(P,ci,C.a,2.8);poly(P,pi,C.r,2.8);P.hline(2*Z95,C.y,'PI limit  2 × 1.96σ = 3.92');
+  dots(P,[[Math.log10(n),cw(n)]],C.a,5);dots(P,[[Math.log10(n),pw(n)]],C.r,5);P.vline(Math.log10(n),C.fg,'n = '+n,true);P.text('— CI for the mean',P.L+8,P.T+26,C.a);P.text('— PI for a new observation',P.L+130,P.T+26,C.r);P.text('sample size n (log scale)',P.w/2,P.h-2,C.mu,'center');
+  $('c11st').innerHTML=stat('CI width',fmt(cw(n)),'ok')+stat('PI width',fmt(pw(n)),'warn')+stat('PI ÷ CI',fmt(pw(n)/cw(n)),'in')+stat('CI covers μ',pc(cci/R),'ok')+stat('PI covers new obs.',pc(cpi/R),'ok')+stat('CI mistaken for a PI',pc(cmis/R),cmis/R<.5?'hot':'warn');
+  $('c11rd').innerHTML=`At n = ${n} the 95% CI for the mean is ${fmt(cw(n))} wide and the 95% PI for the next observation is ${fmt(pw(n))} wide, ${fmt(pw(n)/cw(n))} times larger. Both have correct coverage for their own target (${pc(cci/R)} and ${pc(cpi/R)}). But if you mistake the CI for a range of likely individual values, it contains only ${pc(cmis/R)} of new observations. As n grows the CI shrinks toward zero while the PI levels off at 2 × 1.96σ = 3.92.`}
+ on('c11n',draw);reg(draw);})();
+const QZ=[
+{l:'Beginner',q:'What does a “95% confidence interval” promise?',o:['This particular interval has a 95% chance of containing the true value','95% of the data lie inside the interval','The procedure produces intervals that contain the true value in 95% of repeated samples','The estimate is 95% accurate'],a:2,e:'The 95% is a long-run success rate of the method. Once computed, a given interval either contains the parameter or not.'},
+{l:'Beginner',q:'Everything else equal, a 99% interval compared with a 95% interval is…',o:['Narrower','Wider','The same width','Wider only for small n'],a:1,e:'More confidence needs a larger multiplier (2.576 instead of 1.96 for the normal), so the interval is wider by about 31%.'},
+{l:'Intermediate',q:'Normal data, n = 5. You use X̄ ± 1.96·s/√n instead of the t multiplier. The actual coverage is about…',o:['88%','95%','99%','80%'],a:0,e:'P(|T₄| ≤ 1.96) ≈ 0.878. Using z with an estimated σ under-covers, badly at small n.'},
+{l:'Intermediate',q:'You want a 95% margin of error of ±2 percentage points for a proportion and have no pilot data (worst case p = ½). Required n is about…',o:['600','1,200','2,401','9,604'],a:2,e:'n = z²p(1−p)/m² = 1.96² × 0.25 / 0.02² ≈ 2,401.'},
+{l:'Intermediate',q:'To cut the margin of error in half you need about…',o:['Twice the data','Four times the data','Eight times the data','Only a lower confidence level, not more data'],a:1,e:'Margin ∝ 1/√n, so halving it requires n × 4.'},
+{l:'Intermediate',q:'A 95% CI for a mean is [10, 14]. Which statement is correct?',o:['A two-sided 5% test of H₀: μ = 15 would reject','95% of the observations lie in [10, 14]','There is a 95% probability that μ is in [10, 14]','A 99% interval from the same data would be narrower'],a:0,e:'15 is outside the interval, so by test–interval duality H₀: μ = 15 is rejected at 5%. The other statements confuse CI with PI, with credible intervals, or get the direction wrong.'},
+{l:'Intermediate',q:'You observe 0 events in 50 trials. The Wald interval for the rate is…',o:['[0, 0] (zero width, claiming certainty)','[0, 0.08]','[−0.04, 0.04]','Undefined, so the software must refuse'],a:0,e:'p̂(1−p̂) = 0 gives zero standard error. Use Wilson, Jeffreys, likelihood-ratio or exact intervals at boundaries.'},
+{l:'Advanced',q:'Which is true of the Clopper–Pearson (“exact”) interval for a binomial proportion?',o:['Coverage is at least 95% for every p, so it is typically conservative','Coverage is exactly 95% for every p','It is always narrower than Wilson','It is only valid asymptotically'],a:0,e:'It inverts exact tail probabilities, which guarantees coverage ≥ nominal. Because the binomial is discrete, the price is wider intervals and coverage usually above 95%.'},
+{l:'Advanced',q:'Zero failures in 300 independent trials. The rule of three gives an approximate 95% upper bound on the failure rate of…',o:['0.3%','1%','3%','0.01%'],a:1,e:'3/n = 3/300 = 1%. It comes from (1−p)ⁿ ≈ e^(−np) = 0.05 at np ≈ 3.'},
+{l:'Advanced',q:'For a correlation coefficient r from n pairs, Fisher’s z transform says atanh(r) is approximately normal with standard error…',o:['1/√(n − 3)','1/√n','(1 − r²)/√n','√((1 − r²)/(n − 2))'],a:0,e:'Build the interval for atanh(ρ) with SE 1/√(n−3), then back-transform with tanh. The result stays inside (−1, 1).'},
+{l:'Advanced',q:'A 95% likelihood-ratio interval for p is [0.10, 0.30]. The 95% LR interval for the odds p/(1−p) is…',o:['[0.111, 0.429]','[0.10, 0.30]','[0.09, 0.21]','Cannot be obtained without refitting the model'],a:0,e:'Likelihood intervals are invariant under monotone reparameterisation: transform the endpoints. 0.1/0.9 = 0.111 and 0.3/0.7 = 0.429.'},
+{l:'Advanced',q:'For a mean of skewed data with n = 15, the 95% percentile bootstrap interval typically has actual coverage…',o:['Exactly 95% by construction','Below 95%, because it only approximates the sampling distribution and tiny samples under-represent tails','Above 95%, because the bootstrap is conservative','Identical to the t-interval'],a:1,e:'The bootstrap is an asymptotic device. At small n it tends to be too narrow, sometimes by more than the t-interval is.'},
+{l:'Advanced',q:'You observe 0 events in one unit of exposure under a Poisson model. The exact one-sided 95% upper bound for the rate is about…',o:['3.0','1.96','0','1.0'],a:0,e:'Solve e^(−λ) = 0.05, so λ = −ln 0.05 ≈ 2.996. This is the Poisson version of the rule of three.'},
+{l:'Expert',q:'Two groups each have a standard error of 1. Their 95% intervals just barely overlap when the difference is about 3.9. The difference is significant at 5% from about…',o:['3.9 (the same point)','2.8','1.96','5.9'],a:1,e:'Significance requires d > 1.96·√(SE₁² + SE₂²) = 1.96·√2 ≈ 2.77, while overlap persists until 1.96·(SE₁ + SE₂) = 3.92. Between 2.77 and 3.92 the intervals overlap but the difference is significant.'},
+{l:'Expert',q:'You report 20 independent 95% intervals. The probability that all of them contain their true values is about…',o:['95%','64%','36%','5%'],a:2,e:'0.95²⁰ ≈ 0.358. You should expect one miss on average.'},
+{l:'Expert',q:'With m = 20 intervals, the Bonferroni-adjusted level per interval for 95% simultaneous coverage is…',o:['95%','97.5%','99.75%','99.99%'],a:2,e:'1 − α/m = 1 − 0.05/20 = 0.9975.'},
+{l:'Expert',q:'As n → ∞, the 95% confidence interval for a mean and the 95% prediction interval for a new observation behave as follows…',o:['Both shrink to a point','The CI shrinks to a point; the PI converges to about ±1.96σ','The PI shrinks and the CI stays fixed','They become identical'],a:1,e:'The CI measures uncertainty in the mean, which vanishes with data; the PI also contains the irreducible scatter σ of an individual observation.'},
+{l:'Expert',q:'Compared with the percentile interval [q₂.₅, q₉₇.₅], the basic bootstrap interval [2θ̂ − q₉₇.₅, 2θ̂ − q₂.₅] is…',o:['The same interval written differently','The percentile interval reflected about θ̂; for a right-skewed bootstrap distribution it stretches further to the left','Always narrower','Only valid for the mean'],a:1,e:'Basic reflects the bootstrap distribution around the estimate, treating θ̂* − θ̂ as the analogue of θ̂ − θ. The two agree only when the bootstrap distribution is symmetric about θ̂.'}
+];
+(function(){const st=store.get('ci_quiz',{});
+ function render(){const box=$('quiz');box.innerHTML='';
+  QZ.forEach((q,i)=>{const d=document.createElement('div');d.className='q'+(st[i]!=null?' done':'');d.innerHTML=`<div class="qh">Q${i+1} · ${q.l}</div><div style="margin:4px 0 6px"><b>${q.q}</b></div>`;
+   q.o.forEach((o,j)=>{const b=document.createElement('button');b.className='opt';b.textContent=o;if(st[i]!=null){if(j===q.a)b.classList.add('good');else if(j===st[i])b.classList.add('bad')}b.onclick=()=>{if(st[i]!=null)return;st[i]=j;store.set('ci_quiz',st);render();meter()};d.appendChild(b)});
+   const e=document.createElement('div');e.className='ex';e.innerHTML=(st[i]===q.a?'✅ ':'❌ ')+q.e;d.appendChild(e);box.appendChild(d)});
+  const ans=Object.keys(st).length,ok=QZ.filter((q,i)=>st[i]===q.a).length;
+  $('qscore').innerHTML=stat('answered',ans+' / '+QZ.length,'in')+stat('correct',ok,'ok')+stat('score',ans?Math.round(100*ok/ans)+'%':'—',ok/Math.max(ans,1)>=.8?'ok':'warn')+stat('verdict',ans<QZ.length?'keep going':ok>=16?'interval master':ok>=13?'strong':'review ch. 2–8','')}
+ $('qreset').onclick=()=>{Object.keys(st).forEach(k=>delete st[k]);store.set('ci_quiz',st);render();meter()};
+ window.__qst=st;render();})();
+const CHK=['State precisely what “95% confidence” means and why “95% probability the parameter is in this interval” is a different claim.','Derive the t-interval from a pivot and say what goes wrong when z is used with an estimated σ.','State test–interval duality and use it to read a hypothesis test off an interval.','Compute the sample size for a mean, a proportion and an A/B difference, and explain the 4× rule.','Write down Wald, Wilson, Agresti–Coull, Clopper–Pearson, Jeffreys and likelihood-ratio intervals for a proportion.','Explain why exact coverage of a discrete interval oscillates and why “exact” means “at least nominal”.','Report a result with zero events (rule of three, exact one-sided bound).','Build intervals for a Poisson rate (Garwood), a correlation (Fisher z) and a standard deviation (χ²).','Define a profile likelihood and read an interval from the 1.92 drop; explain its invariance.','Compute percentile, basic and normal bootstrap intervals and say when each fails.','Explain why overlapping intervals do not imply “no difference” and what to do instead.','Compute the chance that m intervals all cover and apply Bonferroni.','Distinguish confidence, prediction and tolerance intervals and say which one a given question needs.','Choose a default interval for a proportion, a mean of skewed data and a ratio, and defend the choice.'];
+(function(){const st=store.get('ci_chk',{}),box=$('chk');CHK.forEach((t,i)=>{const l=document.createElement('label'),c=document.createElement('input');c.type='checkbox';c.checked=!!st[i];c.onchange=()=>{st[i]=c.checked;store.set('ci_chk',st);meter()};l.appendChild(c);const s=document.createElement('span');s.textContent=t;l.appendChild(s);box.appendChild(l)});window.__cst=st;})();
+function meter(){const q=window.__qst||{},c=window.__cst||{};const ok=QZ.filter((x,i)=>q[i]===x.a).length,ck=Object.values(c).filter(Boolean).length;const p=Math.round(100*(.6*ok/QZ.length+.4*ck/CHK.length));$('mtxt').textContent='Mastery: '+p+'%  (exam + checklist)';$('mbar').style.width=p+'%';store.set('mastery_ci',p)}
+meter();
+
+/* ---------- Navigation ---------- */
+(function(){const nav=$('nav');let html='';
+ document.querySelectorAll('main .part, main section.ch').forEach(el=>{if(el.classList.contains('part'))html+=`<div class="pt">${el.textContent}</div>`;else{const h=el.querySelector('h2'),num=h.querySelector('.num').textContent,t=Array.from(h.childNodes).filter(n=>n.nodeType===3).map(n=>n.textContent).join('').trim();html+=`<a href="#${el.id}" data-id="${el.id}">${num}. ${t}</a>`}});
+ nav.innerHTML=html;const links=nav.querySelectorAll('a'),io=new IntersectionObserver(es=>{es.forEach(e=>{if(e.isIntersecting)links.forEach(a=>a.classList.toggle('on',a.dataset.id===e.target.id))})},{rootMargin:'-20% 0px -70% 0px'});
+ document.querySelectorAll('section.ch').forEach(s=>io.observe(s));
+ $('menu').onclick=()=>$('side').classList.toggle('open');nav.addEventListener('click',e=>{if(e.target.tagName==='A')$('side').classList.remove('open')});
+ window.addEventListener('scroll',()=>{const h=document.documentElement;$('prog').style.width=(100*h.scrollTop/(h.scrollHeight-h.clientHeight))+'%'},{passive:true});})();
+</script>
+</body>
+</html>
