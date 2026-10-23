@@ -1,0 +1,584 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Generalised Linear Models Mastery</title>
+<style>
+:root{--bg:#0b0e17;--panel:#121726;--panel2:#171d30;--line:#232a3d;--fg:#e8ebf5;--mu:#8a93ab;--a:#6ea8ff;--r:#ff6b81;--y:#ffd166;--g:#4ade80;--p:#c084fc;--t:#5eead4}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;background:var(--bg);color:var(--fg);font:16px/1.7 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+a{color:var(--a)}
+#prog{position:fixed;top:0;left:0;height:3px;background:linear-gradient(90deg,var(--a),var(--p),var(--r));width:0;z-index:50}
+.side{position:fixed;left:0;top:0;bottom:0;width:290px;background:#0e1220;border-right:1px solid var(--line);overflow:auto;padding:18px 14px 90px;z-index:40;transition:transform .25s}
+.side h1{font-size:15px;margin:0 0 2px}
+.side small{color:var(--mu)}
+.side .pt{margin:16px 0 4px;font-size:11px;text-transform:uppercase;letter-spacing:1.3px;color:var(--p)}
+.side a{display:block;color:var(--mu);text-decoration:none;padding:5px 9px;border-radius:7px;font-size:13.5px;line-height:1.35}
+.side a:hover{background:var(--panel);color:var(--fg)}
+.side a.on{background:var(--panel2);color:var(--fg);box-shadow:inset 3px 0 var(--a)}
+.side a.back{color:var(--t);padding-left:0;margin-bottom:6px}
+.meter{position:fixed;left:0;bottom:0;width:290px;background:#0e1220;border-top:1px solid var(--line);padding:10px 16px;z-index:41;font-size:12px;color:var(--mu)}
+.meter .bar{height:7px;background:var(--line);border-radius:6px;margin-top:5px;overflow:hidden}
+.meter .bar i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--g),var(--t));transition:width .4s}
+#menu{display:none;position:fixed;top:10px;left:10px;z-index:60;background:var(--panel2);color:var(--fg);border:1px solid var(--line);border-radius:9px;padding:7px 12px;font-size:14px;cursor:pointer}
+main{margin-left:290px;padding:0 34px 120px;max-width:1090px}
+.hero{padding:70px 0 30px}
+.hero h1{font-size:clamp(32px,5vw,56px);line-height:1.08;margin:0 0 14px;background:linear-gradient(100deg,#fff,var(--y) 40%,var(--r));-webkit-background-clip:text;background-clip:text;color:transparent}
+.hero p{font-size:19px;color:#c3c9dc;max-width:780px}
+.chips{display:flex;flex-wrap:wrap;gap:8px;margin:18px 0}
+.chip{border:1px solid var(--line);background:var(--panel);padding:5px 12px;border-radius:99px;font-size:13px;color:var(--mu)}
+.chip b{color:var(--fg)}
+.part{margin:90px 0 0;padding-top:22px;border-top:1px solid var(--line);font-size:12px;letter-spacing:2px;text-transform:uppercase;color:var(--p)}
+section.ch{padding-top:30px}
+h2{font-size:30px;line-height:1.2;margin:10px 0 8px;display:flex;gap:12px;align-items:center;flex-wrap:wrap}
+h2 .num{display:inline-grid;place-items:center;width:40px;height:40px;border-radius:12px;background:var(--panel2);border:1px solid var(--line);font-size:18px;color:var(--a)}
+.lvl{font-size:11px;font-weight:600;letter-spacing:.8px;text-transform:uppercase;padding:3px 9px;border-radius:99px;border:1px solid}
+.lvl.b{color:var(--g);border-color:#1f5c3a}.lvl.i{color:var(--a);border-color:#244a85}.lvl.a{color:var(--y);border-color:#6b5420}.lvl.e{color:var(--r);border-color:#7a2c3a}
+h3{font-size:19px;margin:30px 0 6px;color:#fff}
+p{margin:10px 0}li{margin:5px 0}
+code,.f{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace}
+code{background:var(--panel2);padding:1px 6px;border-radius:5px;font-size:.9em}
+.f{display:block;white-space:pre-wrap;background:#0e1322;border:1px solid var(--line);border-left:3px solid var(--a);padding:12px 16px;border-radius:9px;margin:14px 0;overflow-x:auto;font-size:15px;color:#dbe4ff;line-height:1.8}
+.co{border-radius:12px;padding:13px 17px;margin:16px 0;border:1px solid var(--line);background:var(--panel)}
+.co>b:first-child{display:block;margin-bottom:2px;font-size:12px;letter-spacing:1px;text-transform:uppercase}
+.co.def{border-left:4px solid var(--a)}.co.def>b:first-child{color:var(--a)}
+.co.warn{border-left:4px solid var(--r)}.co.warn>b:first-child{color:var(--r)}
+.co.tip{border-left:4px solid var(--g)}.co.tip>b:first-child{color:var(--g)}
+.co.key{border-left:4px solid var(--y);background:#171608}.co.key>b:first-child{color:var(--y)}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:18px 20px;margin:22px 0;box-shadow:0 8px 30px rgba(0,0,0,.25)}
+.card>h4{margin:0 0 3px;font-size:13px;letter-spacing:1.2px;text-transform:uppercase;color:var(--t)}
+.card>p.sub{margin:0 0 12px;color:var(--mu);font-size:14.5px}
+.ctl{display:flex;flex-wrap:wrap;gap:10px 22px;align-items:center;margin:8px 0 10px}
+.ctl label{display:flex;gap:8px;align-items:center;font-size:14px;color:#c3c9dc}
+.ctl output{min-width:38px;font-family:ui-monospace,monospace;color:var(--y);font-size:13px}
+input[type=range]{accent-color:var(--a);width:150px}
+input[type=checkbox]{accent-color:var(--a)}
+select,input[type=number],input[type=text]{background:#0e1322;color:var(--fg);border:1px solid var(--line);border-radius:8px;padding:6px 9px;font:inherit;font-size:14px}
+button{background:linear-gradient(180deg,#2c4a80,#233b68);color:#fff;border:1px solid #3a5a98;border-radius:9px;padding:7px 14px;font:inherit;font-size:14px;cursor:pointer}
+button:hover{filter:brightness(1.15)}
+button.alt{background:var(--panel2);border-color:var(--line);color:var(--fg)}
+canvas{width:100%;height:270px;display:block;background:#0e1322;border:1px solid var(--line);border-radius:10px;margin-top:6px}
+canvas.sm{height:210px}canvas.tl{height:330px}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(125px,1fr));gap:9px;margin:12px 0}
+.stat{background:#0e1322;border:1px solid var(--line);border-radius:10px;padding:8px 11px}
+.stat b{display:block;font-size:17px;font-family:ui-monospace,monospace}
+.stat span{font-size:11.5px;color:var(--mu);text-transform:uppercase;letter-spacing:.7px}
+.stat.hot b{color:var(--r)}.stat.ok b{color:var(--g)}.stat.warn b{color:var(--y)}.stat.in b{color:var(--a)}
+.read{margin:8px 0 0;padding:10px 14px;background:#0e1322;border:1px dashed #33406a;border-radius:10px;font-size:14.5px;color:#d3dbf3}
+table{border-collapse:collapse;width:100%;margin:12px 0;font-size:14px}
+th,td{border:1px solid var(--line);padding:7px 10px;text-align:left;vertical-align:top}
+th{background:var(--panel2);font-size:12px;text-transform:uppercase;letter-spacing:.6px;color:var(--mu)}
+td.n{font-family:ui-monospace,monospace;text-align:right}
+.tw{overflow-x:auto}
+.pill{display:inline-block;padding:1px 9px;border-radius:99px;font-size:12px;font-weight:600}
+.pill.r{background:#3a1520;color:var(--r)}.pill.g{background:#10321f;color:var(--g)}.pill.y{background:#3a2f0e;color:var(--y)}.pill.m{background:#202637;color:var(--mu)}
+details{background:var(--panel);border:1px solid var(--line);border-radius:11px;padding:9px 15px;margin:9px 0}
+details summary{cursor:pointer;font-weight:600}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.q{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:14px 18px;margin:14px 0}
+.q .qh{font-size:12px;letter-spacing:1px;text-transform:uppercase;color:var(--mu)}
+.q .opt{display:block;width:100%;text-align:left;margin:6px 0;background:#0e1322;border:1px solid var(--line);color:var(--fg);border-radius:9px;padding:9px 12px}
+.q .opt.good{border-color:var(--g);background:#0e2418}.q .opt.bad{border-color:var(--r);background:#2a1119}
+.q .ex{display:none;margin-top:8px;font-size:14.5px;color:#c3c9dc}
+.q.done .ex{display:block}
+.chk label{display:flex;gap:10px;align-items:flex-start;padding:6px 0;cursor:pointer}
+.chk input{margin-top:6px;accent-color:var(--g);width:17px;height:17px}
+.sigrow{display:grid;grid-template-columns:minmax(170px,2fr) 1fr 1fr auto;gap:8px 14px;align-items:center;padding:6px 0;border-top:1px dashed #1b2236}
+.sigrow:first-of-type{border-top:0}
+.sigrow label{display:flex;gap:6px;align-items:center;font-size:13.5px;color:#c3c9dc}
+@media(max-width:900px){
+ .side{transform:translateX(-100%)}.side.open{transform:none}.meter{display:none}
+ #menu{display:block}main{margin-left:0;padding:0 16px 100px}.two{grid-template-columns:1fr}.hero{padding-top:60px}
+ .sigrow{grid-template-columns:1fr 1fr}
+}
+</style>
+</head>
+<body>
+<div id="prog"></div>
+<button id="menu">☰ Contents</button>
+<nav class="side" id="side"><a class="back" href="index.html">← All courses</a><h1>Generalised Linear Models</h1><small>12 chapters · 11 labs · exam</small><div id="nav"></div></nav>
+<div class="meter"><div id="mtxt">Mastery: 0%</div><div class="bar"><i id="mbar"></i></div></div>
+
+<main>
+<header class="hero">
+ <h1>Generalised linear models.</h1>
+ <p>Linear regression assumes a continuous outcome with constant variance. Defaults, churn, fraud, claims and event counts are none of those. A generalised linear model keeps the linear predictor but changes two things: the distribution of the outcome (binomial, Poisson, gamma) and the <b>link</b> that connects the mean to the predictor. This page covers logistic regression end to end (fitting, interpretation, testing, separation, classification metrics), count models with exposures and overdispersion, deviance and likelihood-ratio tests, the choice of link, and what rare-event sampling does to a fitted model.</p>
+ <div class="chips"><span class="chip"><b>Part I</b> Logistic regression</span><span class="chip"><b>Part II</b> Counts and other families</span><span class="chip"><b>Part III</b> Practice</span></div>
+ <div class="co tip"><b>How to use this</b>Every lab simulates data with known truth and fits real GLMs by iteratively reweighted least squares, written from scratch in this page. Heavy sliders update when you release them. Prerequisites: Maximum Likelihood and Linear Regression pages.</div>
+</header>
+
+<div class="part">Part I · Logistic regression</div>
+
+<section class="ch" id="c1">
+<h2><span class="num">1</span>Why a straight line fails for a 0/1 outcome <span class="lvl b">Beginner</span></h2>
+<p>For a binary outcome the mean of y is a probability, p(x) = P(y = 1 | x), and it must lie in [0, 1]. A straight line does not respect that: fitted to binary data (the <b>linear probability model</b>) it produces probabilities below 0 and above 1 and its errors cannot have constant variance, since Var(y | x) = p(1 − p). The GLM fix is to model a transformation of the mean. In <b>logistic regression</b> the transformation is the log-odds:</p>
+<div class="f">logit(p) = log( p / (1 − p) ) = β₀ + β₁x₁ + … + β_k x_k          p = 1 / (1 + e^−(β₀ + β₁x₁ + …))</div>
+<p>The S-shaped curve is steep in the middle and flat in the tails, which is how real probabilities behave: a unit of the predictor matters a lot near p = 0.5 and little near p = 0.01. (The linear probability model is still used for quick estimates of average effects, where its slope is close to the average marginal effect, but never for prediction.)</p>
+<div class="card"><h4>Lab 1 · Line versus S-curve</h4>
+ <p class="sub">Binary data from a logistic model with intercept −0.5. Red: ordinary least squares on 0/1 values. Green: logistic fit. Dashed: truth. Raise the slope and watch the red line leave the 0–1 band.</p>
+ <div class="ctl"><label>true slope β₁ <input type="range" id="c1b" min="3" max="40" step="1" value="15"><output id="c1bv"></output></label><label>n <input type="range" id="c1n" min="50" max="1000" step="10" value="300"><output id="c1nv"></output></label><button id="c1go">New data</button></div>
+ <canvas class="tl" id="c1cv"></canvas><div class="stats" id="c1st"></div><div class="read" id="c1rd"></div></div>
+</section>
+
+<section class="ch" id="c2">
+<h2><span class="num">2</span>The GLM recipe and how it is fitted <span class="lvl i">Intermediate</span></h2>
+<p>A GLM has three parts: a <b>distribution</b> from the exponential family for y (binomial, Poisson, Gaussian, gamma…), a <b>linear predictor</b> η = Xβ, and a <b>link</b> g with g(E[y]) = η. Maximum likelihood has no closed form (except for the Gaussian case), but a Newton–Raphson step has a neat form: <b>iteratively reweighted least squares</b> (IRLS). At each iteration compute the working weights wᵢ = (dμᵢ/dηᵢ)² / Var(μᵢ) and the working response zᵢ = ηᵢ + (yᵢ − μᵢ)/(dμᵢ/dηᵢ), then solve the weighted least squares problem β ← (XᵀWX)⁻¹XᵀWz. For the canonical link (logit for binomial, log for Poisson) this is exactly Newton’s method on the log-likelihood, which is concave, so it converges to the unique maximum, usually in 4 to 7 steps. The inverse (XᵀWX)⁻¹ at the end is the covariance matrix of β̂ (Fisher information), giving Wald standard errors.</p>
+<div class="card"><h4>Lab 2 · Watch IRLS climb the likelihood</h4>
+ <p class="sub">The heat map is the log-likelihood over the intercept and slope (bright = high); the white path is IRLS starting from (0, 0). The table gives each iteration’s estimates and log-likelihood.</p>
+ <div class="ctl"><label>true slope <input type="range" id="c2b" min="3" max="40" step="1" value="15"><output id="c2bv"></output></label><label>n <input type="range" id="c2n" min="20" max="500" step="10" value="100"><output id="c2nv"></output></label><button id="c2go">New data</button></div>
+ <canvas class="tl" id="c2cv"></canvas><div class="tw" id="c2tb"></div><div class="read" id="c2rd"></div></div>
+</section>
+
+<section class="ch" id="c3">
+<h2><span class="num">3</span>Interpreting coefficients: log-odds, odds ratios, probabilities <span class="lvl i">Intermediate</span></h2>
+<p>A logistic coefficient β is the change in the <em>log-odds</em> per unit of x, so e^β is a constant <b>odds ratio</b> (OR). The odds ratio is the same everywhere, but the effect on the <em>probability</em> is not: the change in p is β·p(1 − p), largest at p = 0.5 and tiny in the tails. Reporting an OR of 1.8 says nothing about how many percentage points of risk it moves unless the baseline is stated. The odds ratio also approximates the risk ratio only when the event is rare (p below roughly 10%); for common outcomes it exaggerates. For summaries on the probability scale use <b>average marginal effects</b>: the mean over the observed data of the change in predicted probability.</p>
+<div class="card"><h4>Lab 3 · Same odds ratio, different risk change</h4>
+ <p class="sub">The curve is p(x) = logistic(a + b·x) with x standard normal. At x = −2, 0 and +2 the table gives the change in probability per unit of x, even though the odds ratio is identical everywhere.</p>
+ <div class="ctl"><label>intercept a <input type="range" id="c3a" min="-60" max="20" step="1" value="-20"><output id="c3av"></output></label><label>slope b <input type="range" id="c3b" min="0" max="40" step="1" value="12"><output id="c3bv"></output></label></div>
+ <canvas class="tl" id="c3cv"></canvas><div class="stats" id="c3st"></div><div class="read" id="c3rd"></div></div>
+</section>
+
+<section class="ch" id="c4">
+<h2><span class="num">4</span>Wald, likelihood-ratio and score tests <span class="lvl a">Advanced</span></h2>
+<p>There are three large-sample tests of H₀: β = β₀, all asymptotically χ²₁. The <b>Wald</b> test uses the estimate and its standard error, z = (β̂ − β₀)/SE, and needs only the full fit. The <b>likelihood-ratio</b> (LR) test compares the maximised log-likelihoods, 2(ℓ̂ − ℓ̂₀), and needs both fits. The <b>score</b> test needs only the null fit: it looks at the slope of the log-likelihood at β₀. They agree for large samples but differ when the sample is small, the event rare or the effect large. The Wald test is the least reliable (its standard error comes from the curvature at the estimate, which can be misleading); the LR test is usually the best, and is what you should use for important decisions and for CIs (profile likelihood).</p>
+<div class="card"><h4>Lab 4 · Size of the three tests in small samples</h4>
+ <p class="sub">Data are generated with the slope equal to the null value, so a rejection is a false alarm; each bar should be 5%. 800 simulated data sets per sample size. Rare events and a bigger slope make the differences larger.</p>
+ <div class="ctl"><label>event rate % <input type="range" id="c4p" min="2" max="50" step="1" value="10"><output id="c4pv"></output></label><label>true slope <input type="range" id="c4b" min="0" max="30" step="1" value="12"><output id="c4bv"></output></label><button id="c4go">Re-simulate</button></div>
+ <canvas class="tl" id="c4cv"></canvas><div class="stats" id="c4st"></div><div class="read" id="c4rd"></div></div>
+</section>
+
+<section class="ch" id="c5">
+<h2><span class="num">5</span>Separation, small-sample bias and Firth’s fix <span class="lvl e">Expert</span></h2>
+<p>When a predictor perfectly (or almost perfectly) splits the outcomes, the likelihood has no maximum: the coefficient runs off to ±∞ and the Wald standard error explodes, so the software reports a huge coefficient with p ≈ 1. This <b>separation</b> is common with few events, rare categories and many dummies. Even without separation the MLE is biased <em>away from zero</em> in small samples (by about a 1/n term, important at fewer than 10 events per variable). <b>Firth’s penalised likelihood</b> adds a Jeffreys-prior term that removes the leading bias and always gives finite estimates; ridge-type penalties or Bayesian priors serve the same purpose.</p>
+<div class="card"><h4>Lab 5 · Separation rates and bias</h4>
+ <p class="sub">Logistic model with intercept −1 and the slope you choose. For each sample size, 600 data sets: how often the data are perfectly separated, the median MLE (among the non-separated sets), and the median Firth estimate (all data sets).</p>
+ <div class="ctl"><label>true slope <input type="range" id="c5b" min="5" max="30" step="1" value="15"><output id="c5bv"></output></label><button id="c5go">Re-simulate</button></div>
+ <canvas class="tl" id="c5cv"></canvas><div class="tw" id="c5tb"></div><div class="read" id="c5rd"></div></div>
+</section>
+
+<section class="ch" id="c6">
+<h2><span class="num">6</span>Classification: ROC, calibration and base rates <span class="lvl a">Advanced</span></h2>
+<p>A logistic model outputs probabilities; a decision needs a threshold. At a threshold t, <b>sensitivity</b> (recall) is the share of true events flagged and <b>specificity</b> the share of non-events passed; the <b>ROC curve</b> traces both over all thresholds, and the <b>AUC</b> is the probability that a random event scores higher than a random non-event (0.5 = coin flip). AUC is blind to the base rate; <b>precision</b> (the share of flagged cases that are real) is not. With a 1% event rate even a strong model flags mostly false positives, which is why fraud and AML teams talk about alert precision. Separately, a model can rank well (high AUC) and still be <b>miscalibrated</b>, with predicted probabilities that do not match observed frequencies; calibration matters whenever the probability itself is used (pricing, capital, expected loss).</p>
+<div class="card"><h4>Lab 6 · Threshold, precision and calibration</h4>
+ <p class="sub">A logistic model fitted on 2,000 cases and evaluated on 4,000 new ones. Left: ROC curve with your threshold marked. Right: calibration (mean predicted against observed rate in 8 risk groups).</p>
+ <div class="ctl"><label>signal strength β <input type="range" id="c6s" min="5" max="40" step="1" value="15"><output id="c6sv"></output></label><label>event rate % <input type="range" id="c6p" min="1" max="50" step="1" value="5"><output id="c6pv"></output></label><label>threshold % <input type="range" id="c6t" min="1" max="99" step="1" value="10"><output id="c6tv"></output></label><button id="c6go">New data</button></div>
+ <div class="two"><canvas class="sm" id="c6cv"></canvas><canvas class="sm" id="c6cv2"></canvas></div><div class="stats" id="c6st"></div><div class="read" id="c6rd"></div></div>
+</section>
+
+<div class="part">Part II · Counts and other families</div>
+
+<section class="ch" id="c7">
+<h2><span class="num">7</span>Poisson regression, rates and exposure <span class="lvl i">Intermediate</span></h2>
+<p>For counts (claims, defaults, alerts, visits) the Poisson model uses the log link: log E[y] = β₀ + β₁x, so e^β is a <b>rate ratio</b>. When units are observed for different lengths of time or amounts of exposure E, the mean count is E times the rate, and the model needs log E as an <b>offset</b>, a term with its coefficient fixed at 1: log E[y] = log E + β₀ + β₁x. Leaving it out misreads exposure as rate; if exposure is related to a predictor, the coefficient is biased as well. Fitting least squares to raw counts ignores the skew and the variance that grows with the mean.</p>
+<div class="card"><h4>Lab 7 · The offset matters</h4>
+ <p class="sub">Counts are Poisson with mean E·exp(0.5 + β x); exposure E varies across units and is correlated with x. Compare the Poisson fit with the offset, without it, and least squares on log of the observed rate. 400 repeated data sets give the average estimate and the coverage of the 95% interval.</p>
+ <div class="ctl"><label>true β <input type="range" id="c7b" min="0" max="80" step="1" value="30"><output id="c7bv"></output></label><label>spread of exposure <input type="range" id="c7e" min="0" max="150" step="1" value="80"><output id="c7ev"></output></label><label>n <input type="range" id="c7n" min="50" max="1000" step="10" value="300"><output id="c7nv"></output></label><button id="c7go">New data</button></div>
+ <canvas class="tl" id="c7cv"></canvas><div class="stats" id="c7st"></div><div class="read" id="c7rd"></div></div>
+</section>
+
+<section class="ch" id="c8">
+<h2><span class="num">8</span>Overdispersion: quasi-Poisson, robust and negative binomial <span class="lvl a">Advanced</span></h2>
+<p>A Poisson variable has variance equal to its mean. Real counts nearly always vary more (unobserved heterogeneity, clustering), which is <b>overdispersion</b>. The Poisson coefficients stay consistent, but the standard errors are too small, p-values too optimistic, and CIs undercover. Diagnose it with the Pearson statistic divided by its degrees of freedom (φ̂ ≈ 1 if the model is right). Remedies: <b>quasi-Poisson</b> (multiply the SEs by √φ̂), <b>sandwich (robust) standard errors</b>, or a <b>negative binomial</b> model, which adds a variance term Var = μ + αμ² and gives a proper likelihood (so AIC and LR tests still work). Zero-inflated and hurdle models are for an excess of zeros specifically.</p>
+<div class="card"><h4>Lab 8 · How wrong are Poisson standard errors?</h4>
+ <p class="sub">Counts are generated from a gamma–Poisson mixture with variance μ + αμ², α = extra variation. 1,500 data sets; the table compares each standard error with the true spread of the slope and the coverage of the nominal 95% interval.</p>
+ <div class="ctl"><label>extra variation α <input type="range" id="c8k" min="0" max="200" step="5" value="80"><output id="c8kv"></output></label><label>n <input type="range" id="c8n" min="0" max="3" step="1" value="1"><output id="c8nv"></output></label><button id="c8go">Re-simulate</button></div>
+ <canvas class="tl" id="c8cv"></canvas><div class="tw" id="c8tb"></div><div class="read" id="c8rd"></div></div>
+</section>
+
+<section class="ch" id="c9">
+<h2><span class="num">9</span>Deviance, likelihood-ratio tests and goodness of fit <span class="lvl a">Advanced</span></h2>
+<p>The <b>deviance</b> is twice the log-likelihood gap between the fitted model and a saturated model that fits each observation perfectly: D = 2(ℓ_sat − ℓ̂). For nested models the drop in deviance, D₀ − D₁, is the LR statistic and is χ² with degrees of freedom equal to the number of added parameters. It is the GLM analogue of the F-test, and the tool for deciding whether a term (a square, an interaction, a whole group of dummies) is needed. <b>AIC</b> = −2ℓ̂ + 2p trades fit for complexity, and <b>McFadden’s pseudo-R²</b> = 1 − ℓ̂/ℓ̂₀ is the likelihood-based analogue of R² (values of 0.2 to 0.4 are considered excellent; it is not comparable to OLS R²). For binary data the deviance does not follow a χ² distribution by itself, so goodness-of-fit is judged by calibration and by comparing with richer models, not by the residual deviance.</p>
+<div class="card"><h4>Lab 9 · Deviance table and the LR statistic</h4>
+ <p class="sub">True model: logit p = −0.5 + 0.8x + b₂(x² − 1). One data set gives the deviance table; 1,000 further data sets give the sampling distribution of the LR statistic for adding x², with the χ²₁ curve overlaid (exact when b₂ = 0).</p>
+ <div class="ctl"><label>true curvature b₂ <input type="range" id="c9b" min="0" max="15" step="1" value="0"><output id="c9bv"></output></label><label>n <input type="range" id="c9n" min="50" max="1000" step="10" value="300"><output id="c9nv"></output></label><button id="c9go">New data</button></div>
+ <canvas class="tl" id="c9cv"></canvas><div class="tw" id="c9tb"></div><div class="stats" id="c9st"></div><div class="read" id="c9rd"></div></div>
+</section>
+
+<section class="ch" id="c10">
+<h2><span class="num">10</span>Choosing the link: logit, probit, complementary log-log <span class="lvl e">Expert</span></h2>
+<p>The link is a modelling choice. <b>Logit</b> (log-odds) is the default because of its odds-ratio interpretation, and because it is the canonical link (simplest likelihood, sufficient statistics, works with case-control sampling). <b>Probit</b> assumes a normal latent variable; its curve is almost indistinguishable from the logit’s after rescaling (probit coefficients are roughly the logit ones divided by 1.7). The <b>complementary log-log</b> link is asymmetric, suited to events such as survival to a time point in discrete-time hazard models. A <b>log</b> link on binomial data gives risk ratios directly but can predict probabilities above 1 and fail to converge. Links disagree mainly in the tails, which is exactly where rare-event risk models live, so check calibration there.</p>
+<div class="card"><h4>Lab 10 · Three links, one data set</h4>
+ <p class="sub">Choose the true link. The same data are fitted with all three; the curves are almost identical in the middle and separate in the tails. AIC is a weak guide: the data rarely distinguish the links.</p>
+ <div class="ctl"><label>true link <select id="c10t"><option value="logit">logit</option><option value="probit">probit</option><option value="cll">complementary log-log</option></select></label><label>n <input type="range" id="c10n" min="100" max="3000" step="50" value="600"><output id="c10nv"></output></label><button id="c10go">New data</button></div>
+ <canvas class="tl" id="c10cv"></canvas><div class="tw" id="c10tb"></div><div class="read" id="c10rd"></div></div>
+</section>
+
+<div class="part">Part III · Practice</div>
+
+<section class="ch" id="c11">
+<h2><span class="num">11</span>Rare events and undersampling <span class="lvl e">Expert</span></h2>
+<p>With 1% events (fraud, default, churn in some books), analysts often keep every event and only a fraction r of the non-events, to speed up training. For logistic regression this is a well-understood case-control sample: the <b>slope coefficients are unchanged</b> (they are estimated consistently) but the <b>intercept is pushed up by −log r</b>, so predicted probabilities are inflated by a factor of about 1/r. Rankings and AUC are unaffected, but anything that uses the probability (expected loss, thresholds defined by cost, reporting to a regulator) is wrong until the intercept is corrected: α̂_corrected = α̂ + log r (log r is negative). Undersampling also throws away information about the non-events, so with enough computing power it is better to keep all the data and use weights or simply fit the full model.</p>
+<div class="card"><h4>Lab 11 · The shifted intercept</h4>
+ <p class="sub">A population of 30,000 with true slope 1 is undersampled (all events, a fraction of non-events) and a logistic model is fitted. The calibration plot is on the full population: predicted against observed rate in 10 risk groups, before and after the prior correction.</p>
+ <div class="ctl"><label>event rate % <input type="range" id="c11p" min="5" max="100" step="1" value="20"><output id="c11pv"></output></label><label>non-events kept % <input type="range" id="c11r" min="2" max="100" step="1" value="10"><output id="c11rv"></output></label><button id="c11go">New data</button></div>
+ <canvas class="tl" id="c11cv"></canvas><div class="stats" id="c11st"></div><div class="read" id="c11rd"></div></div>
+</section>
+
+<section class="ch" id="c12">
+<h2><span class="num">12</span>Final exam, mastery checklist, cheat sheet <span class="lvl e">Expert</span></h2>
+<h3>Exam (18 questions — click an answer)</h3>
+<div id="quiz"></div>
+<div class="card"><h4>Score</h4><div class="stats" id="qscore"></div><button class="alt" id="qreset">Reset exam</button></div>
+<h3>Mastery checklist — tick when you can do it without notes</h3>
+<div class="card chk" id="chk"></div>
+<h3>Cheat sheet</h3>
+<div class="tw"><table>
+<tr><th>Idea</th><th>One line</th></tr>
+<tr><td>GLM</td><td>y ~ exponential family, g(E[y]) = Xβ; fit by IRLS (Newton for canonical links)</td></tr>
+<tr><td>Logit</td><td>log(p/(1−p)) = Xβ; e^β = odds ratio (constant); Δp ≈ β p(1−p) (varies)</td></tr>
+<tr><td>OR vs RR</td><td>OR ≈ RR only when the event is rare (&lt; ~10%)</td></tr>
+<tr><td>Tests</td><td>Wald (SE), LR (two fits, best), score (null fit only); all χ²₁</td></tr>
+<tr><td>Separation</td><td>Perfect split ⇒ β → ∞; use Firth or a penalty; MLE is biased outward in small samples</td></tr>
+<tr><td>Metrics</td><td>AUC (rank), precision depends on base rate, calibration is separate from discrimination</td></tr>
+<tr><td>Poisson</td><td>log link, e^β = rate ratio, offset log(exposure) with coefficient 1</td></tr>
+<tr><td>Overdispersion</td><td>φ̂ = Pearson/df &gt; 1: quasi-Poisson, sandwich or negative binomial (Var = μ + αμ²)</td></tr>
+<tr><td>Deviance</td><td>D = 2(ℓ_sat − ℓ̂); drop in D between nested models ~ χ²(df); AIC = −2ℓ + 2p</td></tr>
+<tr><td>Pseudo-R²</td><td>McFadden 1 − ℓ̂/ℓ̂₀; 0.2–0.4 is already very good</td></tr>
+<tr><td>Links</td><td>Logit ≈ probit (÷1.7); cloglog is asymmetric; they differ in the tails</td></tr>
+<tr><td>Undersampling</td><td>Slopes unchanged, intercept pushed up by −log r; add log r back before using probabilities</td></tr>
+</table></div>
+<div class="co tip"><b>Next on the roadmap</b>Item 14, regularisation (ridge, lasso, elastic net): penalised versions of exactly these likelihoods, and the natural cure for separation and collinearity.</div>
+</section>
+</main>
+<script>
+/*MATH*/
+function lgamma(x){const c=[76.18009172947146,-86.50532032941677,24.01409824083091,-1.231739572450155,0.1208650973866179e-2,-0.5395239384953e-5];let y=x,t=x+5.5;t-=(x+.5)*Math.log(t);let s=1.000000000190015;for(let j=0;j<6;j++)s+=c[j]/++y;return -t+Math.log(2.5066282746310005*s/x);}
+function gser(a,x){let ap=a,sum=1/a,del=sum;for(let n=0;n<1000;n++){ap++;del*=x/ap;sum+=del;if(Math.abs(del)<Math.abs(sum)*1e-15)break;}return sum*Math.exp(-x+a*Math.log(x)-lgamma(a));}
+function gcf(a,x){let b=x+1-a,c=1/1e-300,d=1/b,h=d;for(let i=1;i<1000;i++){const an=-i*(i-a);b+=2;d=an*d+b;if(Math.abs(d)<1e-300)d=1e-300;c=b+an/c;if(Math.abs(c)<1e-300)c=1e-300;d=1/d;const del=d*c;h*=del;if(Math.abs(del-1)<1e-15)break;}return Math.exp(-x+a*Math.log(x)-lgamma(a))*h;}
+function gammaQ(a,x){if(x<=0)return 1;return x<a+1?1-gser(a,x):gcf(a,x);}
+function betacf(a,b,x){const qab=a+b,qap=a+1,qam=a-1;let c=1,d=1-qab*x/qap;if(Math.abs(d)<1e-300)d=1e-300;d=1/d;let h=d;for(let m=1;m<=1000;m++){const m2=2*m;let aa=m*(b-m)*x/((qam+m2)*(a+m2));d=1+aa*d;if(Math.abs(d)<1e-300)d=1e-300;c=1+aa/c;if(Math.abs(c)<1e-300)c=1e-300;d=1/d;h*=d*c;aa=-(a+m)*(qab+m)*x/((a+m2)*(qap+m2));d=1+aa*d;if(Math.abs(d)<1e-300)d=1e-300;c=1+aa/c;if(Math.abs(c)<1e-300)c=1e-300;d=1/d;const del=d*c;h*=del;if(Math.abs(del-1)<1e-15)break;}return h;}
+function betai(a,b,x){if(x<=0)return 0;if(x>=1)return 1;const bt=Math.exp(lgamma(a+b)-lgamma(a)-lgamma(b)+a*Math.log(x)+b*Math.log(1-x));return x<(a+1)/(a+b+2)?bt*betacf(a,b,x)/a:1-bt*betacf(b,a,1-x)/b;}
+function normSf(z){const q=0.5*gammaQ(.5,z*z/2);return z>=0?q:1-q;}
+function normCdf(z){return normSf(-z);}
+function npdf(x){return Math.exp(-x*x/2)/2.5066282746310002;}
+function lbin(n,k){return lgamma(n+1)-lgamma(k+1)-lgamma(n-k+1);}
+function binom(n,k,p){return Math.exp(lbin(n,k)+k*Math.log(p)+(n-k)*Math.log(1-p));}
+function betapdf(x,a,b){return x<=0||x>=1?0:Math.exp(lgamma(a+b)-lgamma(a)-lgamma(b)+(a-1)*Math.log(x)+(b-1)*Math.log(1-x));}
+function betacdf(x,a,b){return betai(a,b,x);}
+function gampdf(x,a,r){return x<=0?0:Math.exp(a*Math.log(r)+(a-1)*Math.log(x)-r*x-lgamma(a));}
+function gamcdf(x,a,r){return x<=0?0:1-gammaQ(a,r*x);}
+function randn(){let u=0;while(!u)u=Math.random();return Math.sqrt(-2*Math.log(u))*Math.cos(2*Math.PI*Math.random());}
+function gammaS(a){if(a<1)return gammaS(a+1)*Math.pow(Math.random(),1/a);const d=a-1/3,c=1/Math.sqrt(9*d);for(;;){let x,v;do{x=randn();v=1+c*x}while(v<=0);v=v*v*v;const u=Math.random();if(Math.log(u)<.5*x*x+d-d*v+d*Math.log(v))return d*v;}}
+function betaS(a,b){const x=gammaS(a),y=gammaS(b);return x/(x+y);}
+function binS(n,p){let k=0;for(let i=0;i<n;i++)if(Math.random()<p)k++;return k;}
+function mean(a){let s=0;for(const v of a)s+=v;return s/a.length;}
+function qc(cdf,lo,hi,p,it){for(let i=0;i<(it||100);i++){const m=(lo+hi)/2;if(cdf(m)<p)lo=m;else hi=m}return(lo+hi)/2;}
+function qb(a,b,p){return qc(x=>betai(a,b,x),0,1,p,50);}
+function tcdf(x,v){const t=.5*betai(v/2,.5,v/(v+x*x));return x>0?1-t:t}
+function qn(p){return qc(normCdf,-9,9,p,70)}
+function pois(k,l){return Math.exp(-l+k*Math.log(l)-lgamma(k+1))}
+function binF(n,p){let k=0;for(;;){if(n<=0||p<=0)return k;if(p>=1)return k+n;if(n<=40){for(let i=0;i<n;i++)if(Math.random()<p)k++;return k}const a=1+(n>>1),bb=1+n-a,x=betaS(a,bb);if(x>=p){n=a-1;p=p/x}else{k+=a;n=bb-1;p=(p-x)/(1-x)}}}
+/*ENDMATH*/
+
+const $=id=>document.getElementById(id), val=id=>+$(id).value;
+const C={fg:'#e8ebf5',mu:'#8a93ab',gr:'#232a3d',a:'#6ea8ff',r:'#ff6b81',y:'#ffd166',g:'#4ade80',p:'#c084fc',t:'#5eead4'};
+const store={get(k,d){try{const v=JSON.parse(localStorage.getItem(k));return v==null?d:v}catch(e){return d}},set(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}};
+function stat(l,v,c){return `<div class="stat ${c||''}"><b>${v}</b><span>${l}</span></div>`}
+function f3(x){if(!isFinite(x))return String(x);const a=Math.abs(x);if(a!==0&&(a<1e-3||a>=1e6))return x.toExponential(2);return String(+x.toFixed(a<1?4:a<100?3:a<1000?2:0))}
+function pc(x){return f3(100*x)+'%'}
+const resizers=[];
+function reg(fn){fn();resizers.push(fn)}
+function on(ids,fn){ids.split(' ').forEach(i=>{const e=$(i);e.addEventListener('input',fn);e.addEventListener('change',fn)})}
+let rt;window.addEventListener('resize',()=>{clearTimeout(rt);rt=setTimeout(()=>resizers.forEach(f=>f()),150)});
+document.querySelectorAll('input[type=range]').forEach(i=>{const o=$(i.id+'v');if(!o)return;const f=()=>{o.textContent=i.value};i.addEventListener('input',f);f()});
+
+function nice(x){const e=Math.pow(10,Math.floor(Math.log10(x))),f=x/e;return (f<1.5?1:f<3?2:f<7?5:10)*e}
+function mk(cv,x0,x1,ymax,o){o=o||{};const y0=o.y0||0,dpr=window.devicePixelRatio||1,r=cv.getBoundingClientRect(),w=r.width||600,h=r.height||270;
+ cv.width=w*dpr;cv.height=h*dpr;const g=cv.getContext('2d');g.setTransform(dpr,0,0,dpr,0,0);g.clearRect(0,0,w,h);
+ const L=o.L||42,R=12,T=14,B=28,X=x=>L+(x-x0)/(x1-x0)*(w-L-R),Y=y=>h-B-(y-y0)/(ymax-y0)*(h-T-B);
+ g.font='11px system-ui';g.lineWidth=1;g.strokeStyle=C.gr;g.fillStyle=C.mu;
+ if(!o.noGrid){const sx=nice((x1-x0)/7);for(let x=Math.ceil(x0/sx-1e-9)*sx;!o.noX&&x<=x1+1e-9;x+=sx){g.beginPath();g.moveTo(X(x),T);g.lineTo(X(x),h-B);g.stroke();g.textAlign='center';g.fillText(String(+x.toFixed(6)),X(x),h-B+15)}
+ const sy=nice((ymax-y0)/4);for(let y=Math.ceil(y0/sy-1e-9)*sy;y<=ymax+1e-9;y+=sy){g.beginPath();g.moveTo(L,Y(y));g.lineTo(w-R,Y(y));g.stroke();g.textAlign='right';g.fillText(String(+y.toFixed(4)),L-5,Y(y)+3)}}
+ return{g,w,h,X,Y,L,R,T,B,
+  line(f,col,lw,a,b,n,dash){a=a==null?x0:a;b=b==null?x1:b;n=n||260;g.save();if(dash)g.setLineDash([5,4]);g.beginPath();g.strokeStyle=col;g.lineWidth=lw||2;let st=false;for(let i=0;i<=n;i++){const x=a+(b-a)*i/n,y=f(x);if(!isFinite(y)){st=false;continue}st?g.lineTo(X(x),Y(y)):g.moveTo(X(x),Y(y));st=true}g.stroke();g.restore()},
+  area(f,a,b,col,n){a=Math.max(a,x0);b=Math.min(b,x1);if(b<=a)return;n=n||200;g.beginPath();g.moveTo(X(a),Y(0));for(let i=0;i<=n;i++){const x=a+(b-a)*i/n;g.lineTo(X(x),Y(f(x)))}g.lineTo(X(b),Y(0));g.closePath();g.fillStyle=col;g.fill()},
+  vline(x,col,lab,dash){g.save();g.strokeStyle=col;g.lineWidth=1.6;if(dash)g.setLineDash([5,4]);g.beginPath();g.moveTo(X(x),T);g.lineTo(X(x),h-B);g.stroke();g.restore();if(lab){g.fillStyle=col;g.textAlign='center';g.fillText(lab,Math.min(Math.max(X(x),34),w-34),T+10)}},
+  hline(y,col,lab){g.save();g.strokeStyle=col;g.lineWidth=1.4;g.setLineDash([5,4]);g.beginPath();g.moveTo(L,Y(y));g.lineTo(w-R,Y(y));g.stroke();g.restore();if(lab){g.fillStyle=col;g.textAlign='right';g.fillText(lab,w-R-3,Y(y)-4)}},
+  text(s,x,y,col,al){g.fillStyle=col||C.fg;g.textAlign=al||'left';g.fillText(s,x,y)}};}
+
+/* ---------- shared helpers for this page ---------- */
+const D={
+ norm:{n:'Normal(0,1)',s:()=>randn(),mu:0,sd:1,sk:0},
+ unif:{n:'Uniform(0,1)',s:()=>Math.random(),mu:.5,sd:Math.sqrt(1/12),sk:0},
+ expo:{n:'Exponential(1)',s:()=>-Math.log(1-Math.random()),mu:1,sd:1,sk:2},
+ logn:{n:'Lognormal(0,1)',s:()=>Math.exp(randn()),mu:Math.exp(.5),sd:Math.sqrt((Math.E-1)*Math.E),sk:(Math.E+2)*Math.sqrt(Math.E-1),disc:0},
+ b05:{n:'Bernoulli(0.5)',s:()=>Math.random()<.5?1:0,mu:.5,sd:.5,sk:0,disc:1},
+ b05s:{n:'Bernoulli(0.05)',s:()=>Math.random()<.05?1:0,mu:.05,sd:Math.sqrt(.0475),sk:.9/Math.sqrt(.0475),disc:1},
+ bimo:{n:'Two humps',s:()=>(Math.random()<.5?-2:2)+.5*randn(),mu:0,sd:Math.sqrt(4.25),sk:0},
+ par5:{n:'Pareto(α=5)',s:()=>Math.pow(1-Math.random(),-.2),mu:1.25,sd:Math.sqrt(5/48),sk:6*Math.sqrt(.6)},
+ cauchy:{n:'Cauchy (no mean)',s:()=>Math.tan(Math.PI*(Math.random()-.5)),mu:NaN,sd:Infinity,sk:NaN}
+};
+function fillSel(id,keys,def){const e=$(id);e.innerHTML=keys.map(k=>`<option value="${k}">${D[k].n}</option>`).join('');e.value=def}
+const PAL=[C.a,C.r,C.y,C.g,C.p,C.t,'#ff9f43','#9aa4bf'];
+function tgrid(N,M){const T=[];let prev=0;for(let i=0;i<M;i++){let n=Math.round(Math.pow(10,Math.log10(N)*i/(M-1)));if(i===M-1)n=N;n=Math.max(prev+1,n);if(n>N)break;T.push(n);prev=n}if(T[T.length-1]!==N)T[T.length-1]=N;return T}
+function nlab(n){return n>=1e6?(n/1e6)+'M':n>=1000?(n/1000)+'k':String(n)}
+function customGrid(P,xt,yt){const g=P.g;g.save();g.strokeStyle=C.gr;g.fillStyle=C.mu;g.font='11px system-ui';g.lineWidth=1;
+ xt.forEach(([v,l])=>{g.beginPath();g.moveTo(P.X(v),P.T);g.lineTo(P.X(v),P.h-P.B);g.stroke();g.textAlign='center';g.fillText(l,P.X(v),P.h-P.B+15)});
+ yt.forEach(([v,l])=>{g.beginPath();g.moveTo(P.L,P.Y(v));g.lineTo(P.w-P.R,P.Y(v));g.stroke();g.textAlign='right';g.fillText(l,P.L-5,P.Y(v)+3)});g.restore()}
+function clip(P,fn){const g=P.g;g.save();g.beginPath();g.rect(P.L,P.T,P.w-P.L-P.R,P.h-P.T-P.B);g.clip();fn();g.restore()}
+function poly(P,pts,col,lw,dash){const g=P.g;g.save();if(dash)g.setLineDash([5,4]);g.strokeStyle=col;g.lineWidth=lw||2;g.beginPath();pts.forEach(([x,y],i)=>i?g.lineTo(P.X(x),P.Y(y)):g.moveTo(P.X(x),P.Y(y)));g.stroke();g.restore()}
+function dots(P,pts,col,r){const g=P.g;g.fillStyle=col;pts.forEach(([x,y])=>{g.beginPath();g.arc(P.X(x),P.Y(y),r||3,0,7);g.fill()})}
+function niceTicks(lo,hi,k){const st=nice((hi-lo)/(k||5)),a=[];for(let v=Math.ceil(lo/st-1e-9)*st;v<=hi+1e-9;v+=st)a.push([v,String(+v.toFixed(6))]);return a}
+function logTicks(lo,hi){const a=[];for(let e=Math.ceil(lo-1e-9);e<=hi+1e-9;e++)a.push([e,nlab(Math.pow(10,e))]);return a}
+function mom(a){const n=a.length;let m=0;for(const v of a)m+=v;m/=n;let v2=0,v3=0,v4=0;for(const v of a){const d=v-m;v2+=d*d;v3+=d*d*d;v4+=d*d*d*d}v2/=n;v3/=n;v4/=n;const sd=Math.sqrt(v2);return{n,m,sd,sk:sd>0?v3/(sd*sd*sd):0,ku:v2>0?v4/(v2*v2)-3:0}}
+function ksN(z){const a=Array.from(z).sort((x,y)=>x-y),n=a.length;let d=0;for(let i=0;i<n;i++){const F=normCdf(a[i]);d=Math.max(d,Math.abs((i+1)/n-F),Math.abs(i/n-F))}return d}
+/* histogram of data as density with optional overlay curves [{f,col,lw,dash}] */
+function hist(cv,data,lo,hi,bins,ov,col){const cnt=new Float64Array(bins),bw=(hi-lo)/bins;let n=0;for(const v of data){if(v<lo||v>=hi)continue;cnt[Math.floor((v-lo)/bw)]++;n++}
+ const N=data.length;let ym=0;for(let i=0;i<bins;i++){cnt[i]/=N*bw;ym=Math.max(ym,cnt[i])}
+ (ov||[]).forEach(o=>{for(let i=0;i<=80;i++)ym=Math.max(ym,o.f(lo+(hi-lo)*i/80)||0)});
+ const P=mk(cv,lo,hi,ym*1.12);
+ P.g.fillStyle=col||'rgba(110,168,255,.5)';for(let i=0;i<bins;i++){if(cnt[i]<=0)continue;const a=P.X(lo+i*bw),b=P.X(lo+(i+1)*bw);P.g.fillRect(a,P.Y(cnt[i]),Math.max(1,b-a-1),P.Y(0)-P.Y(cnt[i]))}
+ (ov||[]).forEach(o=>P.line(o.f,o.col,o.lw||2.4,lo,hi,200,o.dash));return P}
+const fmt=x=>f3(x);
+
+/* ---------- shared for this page ---------- */
+const POPS=['norm','unif','expo','logn','bimo','par5'];
+D.norm.med=0;D.norm.q90=1.2815516;D.unif.med=.5;D.unif.q90=.9;D.expo.med=Math.LN2;D.expo.q90=Math.log(10);D.logn.med=1;D.logn.q90=Math.exp(1.2815516);
+D.bimo.med=0;D.bimo.q90=qc(x=>.5*normCdf((x+2)/.5)+.5*normCdf((x-2)/.5),-10,10,.9,80);D.par5.med=Math.pow(2,.2);D.par5.q90=Math.pow(10,.2);
+const SF={mean:a=>mean(a),median:a=>{const b=Float64Array.from(a).sort(),n=b.length;return n%2?b[(n-1)/2]:(b[n/2-1]+b[n/2])/2},sd:a=>{const n=a.length,m=mean(a);let s=0;for(const v of a)s+=(v-m)*(v-m);return Math.sqrt(s/(n-1))},q90:a=>{const b=Float64Array.from(a).sort();return b[Math.round(.9*(b.length-1))]}};
+function truth(key,st){const d=D[key];return st==='mean'?d.mu:st==='median'?d.med:st==='sd'?d.sd:d.q90}
+const SNAME={mean:'sample mean',median:'sample median',sd:'sample SD',q90:'90th percentile'};
+const N10=[2,3,5,10,20,50,100,200,500,1000];
+function pct(a,p){const b=Float64Array.from(a).sort();return b[Math.min(b.length-1,Math.max(0,Math.floor(p*b.length)))]}
+function histLines(cv,arrs,cols,lo,hi,bins,vl){const bw=(hi-lo)/bins,dens=arrs.map(a=>{const c=new Float64Array(bins);for(const v of a){if(v<lo||v>=hi)continue;c[Math.floor((v-lo)/bw)]++}for(let i=0;i<bins;i++)c[i]/=a.length*bw;return c});let ym=0;dens.forEach(c=>c.forEach(v=>ym=Math.max(ym,v)));const P=mk(cv,lo,hi,ym*1.15||1);
+ dens.forEach((c,k)=>{const pts=[];for(let i=0;i<bins;i++){pts.push([lo+i*bw,c[i]]);pts.push([lo+(i+1)*bw,c[i]])}clip(P,()=>poly(P,pts,cols[k],2.2))});(vl||[]).forEach(v=>P.vline(v[0],v[1],v[2],v[3]));return P}
+function sdOf(a){return mom(a).sd}
+
+/* ---------- ML helpers ---------- */
+function digamma(x){let r=0;while(x<6){r-=1/x;x++}const f=1/(x*x);return r+Math.log(x)-.5/x-f*(1/12-f*(1/120-f/252))}
+function trigamma(x){let r=0;while(x<6){r+=1/(x*x);x++}const f=1/(x*x);return r+1/x+.5*f+f/x*(1/6-f*(1/30-f/42))}
+function poisS(l){if(l<=0)return 0;if(l<30){const L=Math.exp(-l);let k=0,p=1;do{k++;p*=Math.random()}while(p>L);return k-1}const m=Math.floor(.875*l),g=gammaS(m);return g<l?m+poisS(l-g):binF(m-1,l/g)}
+function llb(k,n,p){return(k?k*Math.log(p):0)+(n-k?(n-k)*Math.log(1-p):0)}
+function lrInt(k,n,cut){const ph=k/n,l0=llb(k,n,ph),g=p=>2*(l0-llb(k,n,p))-cut;let lo=0,hi=1;
+ if(k>0){let a=1e-12,b=ph;for(let i=0;i<70;i++){const m=(a+b)/2;if(g(m)>0)a=m;else b=m}lo=(a+b)/2}
+ if(k<n){let a=ph,b=1-1e-12;for(let i=0;i<70;i++){const m=(a+b)/2;if(g(m)>0)b=m;else a=m}hi=(a+b)/2}return[lo,hi]}
+function solveAlpha(s){if(!(s>1e-9))return 1e6;let a=(3-s+Math.sqrt((3-s)*(3-s)+24*s))/(12*s);for(let i=0;i<8;i++){const f=Math.log(a)-digamma(a)-s,fp=1/a-trigamma(a);let n=a-f/fp;if(!(n>0))n=a/2;a=n}return a}
+function normPdfAt(x,m,s){return Math.exp(-(x-m)*(x-m)/(2*s*s))/(s*2.5066282746)}
+/* ---------- Regression helpers ---------- */
+function idx(id,arr,ff){const e=$(id),o=$(id+'v'),f=()=>{o.textContent=ff?ff(arr[+e.value]):arr[+e.value]};e.addEventListener('input',f);f()}
+function scl(id,ff){const e=$(id),o=$(id+'v'),f=()=>{o.textContent=ff(+e.value)};e.addEventListener('input',f);f()}
+function pctTicks(a,b,st){const r=[];for(let v=a;v<=b+1e-9;v+=st)r.push([v,Math.round(v*100)+'%']);return r}
+const _tq={};function tq(v,p){const k=v+'_'+p;return _tq[k]||(_tq[k]=qc(x=>tcdf(x,v),0,500,p,80))}
+function simple(x,y){const n=x.length;let xm=0,ym=0;for(let i=0;i<n;i++){xm+=x[i];ym+=y[i]}xm/=n;ym/=n;let sxx=0,sxy=0,syy=0;for(let i=0;i<n;i++){const dx=x[i]-xm,dy=y[i]-ym;sxx+=dx*dx;sxy+=dx*dy;syy+=dy*dy}const b=sxy/sxx,a=ym-b*xm,res=new Float64Array(n);let sse=0;for(let i=0;i<n;i++){res[i]=y[i]-a-b*x[i];sse+=res[i]*res[i]}return{n,xm,ym,sxx,sxy,syy,b,a,res,sse,sst:syy,r2:1-sse/syy}}
+function gj(A,B){const p=A.length;const M=A.map((r,i)=>Array.from(r).concat(B?[B[i]]:[]));for(let c=0;c<p;c++){let m=c;for(let r=c+1;r<p;r++)if(Math.abs(M[r][c])>Math.abs(M[m][c]))m=r;[M[c],M[m]]=[M[m],M[c]];const d=M[c][c]||1e-12;for(let k=c;k<M[c].length;k++)M[c][k]/=d;for(let r=0;r<p;r++)if(r!==c){const f=M[r][c];if(f!==0)for(let k=c;k<M[c].length;k++)M[r][k]-=f*M[c][k]}}return M}
+function olsMulti(cols,y,needInv){const n=y.length,k=cols.length,p=k+1,A=[],B=new Float64Array(p);for(let i=0;i<p;i++)A.push(new Float64Array(p));
+ for(let r=0;r<n;r++){const row=[1];for(let j=0;j<k;j++)row.push(cols[j][r]);for(let i=0;i<p;i++){B[i]+=row[i]*y[r];for(let j=i;j<p;j++)A[i][j]+=row[i]*row[j]}}
+ for(let i=0;i<p;i++){for(let j=0;j<i;j++)A[i][j]=A[j][i];if(i>0)A[i][i]+=1e-9}
+ let beta,inv=null;if(needInv){const I=[];for(let i=0;i<p;i++){const e=new Float64Array(p);e[i]=1;I.push(e)}const M=gj(A,null);const aug=A.map((r,i)=>Array.from(r).concat(Array.from(I[i])));
+  const m=aug;for(let c=0;c<p;c++){let q=c;for(let r=c+1;r<p;r++)if(Math.abs(m[r][c])>Math.abs(m[q][c]))q=r;[m[c],m[q]]=[m[q],m[c]];const d=m[c][c]||1e-12;for(let kk=0;kk<2*p;kk++)m[c][kk]/=d;for(let r=0;r<p;r++)if(r!==c){const f=m[r][c];if(f!==0)for(let kk=0;kk<2*p;kk++)m[r][kk]-=f*m[c][kk]}}
+  inv=m.map(r=>r.slice(p));beta=inv.map(r=>{let s=0;for(let j=0;j<p;j++)s+=r[j]*B[j];return s})}
+ else{const M=gj(A,B);beta=M.map(r=>r[p])}
+ const res=new Float64Array(n);let sse=0;for(let r=0;r<n;r++){let f=beta[0];for(let j=0;j<k;j++)f+=beta[j+1]*cols[j][r];res[r]=y[r]-f;sse+=res[r]*res[r]}
+ const out={beta,res,sse,n,p,inv};if(inv){const s2=sse/(n-p);out.s2=s2;out.se=inv.map((r,i)=>Math.sqrt(s2*r[i]))}return out}
+function scatterAxes(cv,xs,ys,xlo,xhi,ylo,yhi,L){return mk(cv,xlo,xhi,yhi,{y0:ylo,L:L||44})}
+function range(a,pad){let lo=1e99,hi=-1e99;for(const v of a){if(v<lo)lo=v;if(v>hi)hi=v}const w=(hi-lo)||1;return[lo-(pad||.05)*w,hi+(pad||.05)*w]}
+
+
+function bars(P,groups,cols,yt){/* groups: array of arrays of values (0..1) */const g=P.g,G=groups.length,B=groups[0].length,W=(P.w-P.L-P.R)/G;groups.forEach((vals,gi)=>vals.forEach((v,bi)=>{const bw=W*.78/B,x=P.L+W*gi+W*.11+bw*bi;g.fillStyle=cols[bi];g.fillRect(x,P.Y(v),bw-2,P.Y(0)-P.Y(v));g.fillStyle=C.fg;g.textAlign='center';g.font='10px system-ui';g.fillText(Math.round(v*100)+'%',x+bw/2-1,P.Y(v)-3)}));g.font='11px system-ui'}
+function gridG(P,yt,labels){customGrid(P,[],yt);const G=labels.length,W=(P.w-P.L-P.R)/G;P.g.fillStyle=C.mu;P.g.textAlign='center';labels.forEach((l,i)=>P.g.fillText(l,P.L+W*(i+.5),P.h-P.B+15))}
+function legend(P,items,y){let x=P.L+8;items.forEach(([s,c])=>{P.text('■ '+s,x,y,c);x+=P.g.measureText('■ '+s).width+16})}
+
+/* ---------- GLM machinery ---------- */
+const LK={logit:{mu:e=>1/(1+Math.exp(-e)),d:e=>{const m=1/(1+Math.exp(-e));return m*(1-m)}},
+ probit:{mu:e=>normCdf(e),d:e=>npdf(e)},
+ cll:{mu:e=>1-Math.exp(-Math.exp(e)),d:e=>Math.exp(e-Math.exp(e))},
+ log:{mu:e=>Math.exp(e),d:e=>Math.exp(e)}};
+function minv(A){const p=A.length,m=A.map((r,i)=>{const row=Array.from(r);for(let j=0;j<p;j++)row.push(i===j?1:0);return row});
+ for(let c=0;c<p;c++){let q=c;for(let r=c+1;r<p;r++)if(Math.abs(m[r][c])>Math.abs(m[q][c]))q=r;[m[c],m[q]]=[m[q],m[c]];const d=m[c][c]||1e-12;for(let k=0;k<2*p;k++)m[c][k]/=d;for(let r=0;r<p;r++)if(r!==c){const f=m[r][c];if(f!==0)for(let k=0;k<2*p;k++)m[r][k]-=f*m[c][k]}}
+ return m.map(r=>r.slice(p))}
+function glm(cols,y,o){o=o||{};const n=y.length,k=cols.length,p=k+1,fam=o.fam||'binom',L=LK[o.link||(fam==='pois'?'log':'logit')],off=o.off,X=[new Float64Array(n).fill(1)].concat(cols),V=m=>fam==='pois'?m:m*(1-m);
+ let b=new Float64Array(p);if(o.init)b=Float64Array.from(o.init);else if(fam==='pois'){let m=0;for(const v of y)m+=v;b[0]=Math.log(Math.max(m/n,1e-3))-(off?mean(off):0)}
+ function ev(b){const eta=new Float64Array(n),mu=new Float64Array(n);let ll=0;for(let i=0;i<n;i++){let e=off?off[i]:0;for(let j=0;j<p;j++)e+=b[j]*X[j][i];e=Math.max(-30,Math.min(30,e));eta[i]=e;let m=L.mu(e);m=fam==='binom'?Math.min(1-1e-12,Math.max(1e-12,m)):Math.max(m,1e-12);mu[i]=m;ll+=fam==='pois'?y[i]*Math.log(m)-m-lgamma(y[i]+1):y[i]*Math.log(m)+(1-y[i])*Math.log(1-m)}return{eta,mu,ll}}
+ function info(c){const A=[];for(let i=0;i<p;i++)A.push(new Float64Array(p));const w=new Float64Array(n);for(let r=0;r<n;r++){const d=L.d(c.eta[r]),wi=d*d/V(c.mu[r]);w[r]=wi;for(let i=0;i<p;i++){const xi=X[i][r]*wi;for(let j=i;j<p;j++)A[i][j]+=xi*X[j][r]}}for(let i=0;i<p;i++)for(let j=0;j<i;j++)A[i][j]=A[j][i];return{A,w}}
+ let cur=ev(b),it=0,conv=false,maxit=o.maxit==null?40:o.maxit;
+ for(;it<maxit;it++){const{A,w}=info(cur),Ai=minv(A),g=new Float64Array(p);
+  for(let r=0;r<n;r++){const d=L.d(cur.eta[r]),v=V(cur.mu[r]);let s=(y[r]-cur.mu[r])*d/v;if(o.firth){let h=0;for(let i=0;i<p;i++)for(let j=0;j<p;j++)h+=X[i][r]*Ai[i][j]*X[j][r];h*=w[r];s+=h*(.5-cur.mu[r])}for(let i=0;i<p;i++)g[i]+=X[i][r]*s}
+  const st=new Float64Array(p);let mx=0;for(let i=0;i<p;i++){let s=0;for(let j=0;j<p;j++)s+=Ai[i][j]*g[j];st[i]=s}
+  if(o.firth){for(let i=0;i<p;i++){st[i]=Math.max(-1,Math.min(1,st[i]));mx=Math.max(mx,Math.abs(st[i]))}b=b.map((v,i)=>v+st[i]);cur=ev(b);if(mx<1e-8){conv=true;it++;break}}
+  else{let a=1,nb,nc;for(let h=0;h<25;h++){nb=b.map((v,i)=>v+a*st[i]);nc=ev(nb);if(nc.ll>=cur.ll-1e-10)break;a/=2}for(let i=0;i<p;i++)mx=Math.max(mx,Math.abs(a*st[i]));const dl=Math.abs(nc.ll-cur.ll);b=nb;cur=nc;if(mx<1e-8||dl<1e-11){conv=true;it++;break}}}
+ const{A,w}=info(cur),Ai=minv(A),se=Ai.map((r,i)=>Math.sqrt(Math.max(r[i],0)));let dev;
+ if(fam==='binom')dev=-2*cur.ll;else{dev=0;for(let i=0;i<n;i++){const yy=y[i],m=cur.mu[i];dev+=2*((yy>0?yy*Math.log(yy/m):0)-(yy-m))}}
+ return{beta:b,mu:cur.mu,eta:cur.eta,ll:cur.ll,dev,inv:Ai,se,iter:it,conv,X,w,p,n,A}}
+function auc(sc,y){const n=y.length,idx=Array.from({length:n},(_,i)=>i).sort((a,b)=>sc[a]-sc[b]);let rk=0,np=0,i=0;while(i<n){let j=i;while(j+1<n&&sc[idx[j+1]]===sc[idx[i]])j++;const r=(i+j)/2+1;for(let t=i;t<=j;t++)if(y[idx[t]]===1){rk+=r;np++}i=j+1}const nn=n-np;return np&&nn?(rk-np*(np+1)/2)/(np*nn):.5}
+function sepTest(x,y){let a1=1e99,b1=-1e99,a0=1e99,b0=-1e99,n1=0,n0=0;for(let i=0;i<x.length;i++){if(y[i]===1){n1++;a1=Math.min(a1,x[i]);b1=Math.max(b1,x[i])}else{n0++;a0=Math.min(a0,x[i]);b0=Math.max(b0,x[i])}}return n1>0&&n0>0&&(a1>b0||a0>b1)}
+const sig=e=>1/(1+Math.exp(-e));
+function lgt(p){return Math.log(p/(1-p))}
+function binaryData(n,a,b,sd){const x=new Float64Array(n),y=new Float64Array(n);for(let i=0;i<n;i++){x[i]=(sd||1)*randn();y[i]=Math.random()<sig(a+b*x[i])?1:0}return{x,y}}
+function heat(P,gx,gy,vals,x0,x1,y0,y1){const g=P.g,nx=gx,ny=gy;let mn=1e99,mx=-1e99;vals.forEach(v=>{if(isFinite(v)){mn=Math.min(mn,v);mx=Math.max(mx,v)}});mn=Math.max(mn,mx-30);for(let i=0;i<nx;i++)for(let j=0;j<ny;j++){const v=vals[i*ny+j],t=isFinite(v)?Math.max(0,Math.min(1,(v-mn)/(mx-mn))):0,tt=Math.pow(t,1.6),c=Math.round(40+190*tt);g.fillStyle=`rgb(${Math.round(20+60*tt)},${Math.round(30+100*tt)},${c})`;const xa=P.X(x0+(x1-x0)*i/nx),xb=P.X(x0+(x1-x0)*(i+1)/nx),ya=P.Y(y0+(y1-y0)*j/ny),yb=P.Y(y0+(y1-y0)*(j+1)/ny);g.fillRect(xa,Math.min(ya,yb),xb-xa+1,Math.abs(ya-yb)+1)}}
+
+/* ---------- Ch1 LPM vs logistic ---------- */
+(function(){scl('c1b',v=>fmt(v/10));scl('c1n',v=>v);let S=null;
+ function gen(){const n=val('c1n'),b=val('c1b')/10,d=binaryData(n,-.5,b,1.2);S={...d,b,lp:simple(d.x,d.y),lg:glm([d.x],d.y)};draw()}
+ function draw(){if(!S)return;const{x,y,b,lp,lg}=S,n=x.length,P=mk($('c1cv'),-4,4,1.4,{y0:-.4});P.hline(0,C.mu);P.hline(1,C.mu);const js=Float64Array.from(y,v=>v+.05*(Math.random()-.5));
+  clip(P,()=>{P.line(t=>sig(-.5+b*t),C.fg,1.8,-4,4,200,true);P.line(t=>lp.a+lp.b*t,C.r,2.6,-4,4,2);P.line(t=>sig(lg.beta[0]+lg.beta[1]*t),C.g,2.8,-4,4,200)});dots(P,Array.from({length:Math.min(n,400)},(_,i)=>[x[i],js[i]]),'rgba(110,168,255,.5)',2.4);P.text('red: OLS on 0/1 · green: logistic · dashed: truth',P.L+8,P.T+14,C.mu);
+  let out=0,mn=1e9,mxp=-1e9;for(let i=0;i<n;i++){const f=lp.a+lp.b*x[i];if(f<0||f>1)out++;mn=Math.min(mn,f);mxp=Math.max(mxp,f)}let ame=0;for(let i=0;i<n;i++)ame+=lg.beta[1]*lg.mu[i]*(1-lg.mu[i]);ame/=n;
+  $('c1st').innerHTML=stat('OLS predictions outside [0, 1]',pc(out/n),out?'hot':'ok')+stat('range of OLS predictions',fmt(mn)+' to '+fmt(mxp),out?'warn':'')+stat('logistic slope (true '+fmt(b)+')',fmt(lg.beta[1]),'ok')+stat('OLS slope',fmt(lp.b),'in')+stat('logistic average marginal effect',fmt(ame),'in')+stat('IRLS iterations',lg.iter,'');
+  $('c1rd').innerHTML=`${out?`The straight line gives ${pc(out/n)} of the cases a “probability” below 0 or above 1 (from ${fmt(mn)} to ${fmt(mxp)}).`:'With this weak slope the line happens to stay inside [0, 1].'} The logistic curve bends to stay between 0 and 1 and follows the truth. Note that the OLS slope ${fmt(lp.b)} is close to the logistic <em>average marginal effect</em> ${fmt(ame)}: the linear model is a fair summary of the average effect, and a poor model of the individual probabilities.`}
+ on('c1b c1n',gen);$('c1go').onclick=gen;gen();resizers.push(draw);})();
+
+/* ---------- Ch2 IRLS path ---------- */
+(function(){scl('c2b',v=>fmt(v/10));scl('c2n',v=>v);let S=null;
+ function gen(){const n=val('c2n'),b=val('c2b')/10,d=binaryData(n,-.5,b,1),tr=[];for(let k=0;k<=9;k++){const f=glm([d.x],d.y,{maxit:k,init:[0,0]});tr.push({k,b0:f.beta[0],b1:f.beta[1],ll:f.ll})}S={d,tr,fin:glm([d.x],d.y)};draw()}
+ function draw(){if(!S)return;const{d,tr,fin}=S,w0=Math.max(.6,4*fin.se[0]),w1=Math.max(.8,4*fin.se[1]),ax=Math.min(-.2,-.5-0,fin.beta[0]-w0,-0.1),x0=Math.min(-.15,fin.beta[0]-w0),x1=Math.max(.15,fin.beta[0]+w0),y0=Math.min(-.15,fin.beta[1]-w1),y1=Math.max(.15,fin.beta[1]+w1),NX=36,NY=36,vals=[],P=mk($('c2cv'),x0,x1,y1,{y0});
+  const n=d.x.length;for(let i=0;i<NX;i++)for(let j=0;j<NY;j++){const a=x0+(x1-x0)*(i+.5)/NX,b=y0+(y1-y0)*(j+.5)/NY;let ll=0;for(let t=0;t<n;t++){const e=a+b*d.x[t];ll+=d.y[t]*e-Math.log(1+Math.exp(e))}vals.push(ll)}
+  heat(P,NX,NY,vals,x0,x1,y0,y1);const pts=tr.map(q=>[q.b0,q.b1]);poly(P,pts,'#ffffff',1.8);dots(P,pts,'#ffffff',3);dots(P,[pts[0]],C.y,5);dots(P,[[fin.beta[0],fin.beta[1]]],C.g,5);P.text('x: intercept · y: slope · yellow: start (0,0) · green: MLE',P.L+8,P.T+14,C.fg);
+  $('c2tb').innerHTML='<table><tr><th>iteration</th><th>intercept</th><th>slope</th><th>log-likelihood</th><th>gain</th></tr>'+tr.map((q,i)=>`<tr><td>${q.k}</td><td>${fmt(q.b0)}</td><td>${fmt(q.b1)}</td><td>${fmt(q.ll)}</td><td>${i?f3(q.ll-tr[i-1].ll):'—'}</td></tr>`).join('')+'</table>';
+  const conv=tr.findIndex((q,i)=>i&&Math.abs(q.ll-tr[i-1].ll)<1e-6);
+  $('c2rd').innerHTML=`Starting from (0, 0) the log-likelihood jumps most in the first step and is converged to six decimals after ${conv<0?'more than 9':conv} iterations; the final estimates (${fmt(fin.beta[0])}, ${fmt(fin.beta[1])}) have standard errors ${fmt(fin.se[0])} and ${fmt(fin.se[1])}, read from the inverse of the information matrix at the end. The speed is Newton’s method at work on a concave surface: the number of correct digits roughly doubles every iteration.`}
+ on('c2b c2n',gen);$('c2go').onclick=gen;gen();resizers.push(draw);})();
+
+/* ---------- Ch3 interpretation ---------- */
+(function(){scl('c3a',v=>fmt(v/10));scl('c3b',v=>fmt(v/10));
+ function draw(){const a=val('c3a')/10,b=val('c3b')/10,P=mk($('c3cv'),-3,3,1.05,{y0:0});P.hline(.5,C.mu);P.line(x=>sig(a+b*x),C.a,2.8,-3,3,200);
+  const xs=[-2,0,2],cols=[C.r,C.y,C.g];xs.forEach((x,i)=>{const p=sig(a+b*x);dots(P,[[x,p]],cols[i],5);const sl=b*p*(1-p);P.line(t=>p+sl*(t-x),cols[i],1.6,x-.8,x+.8,2,true)});P.text('probability of the event against x (standard normal)',P.L+8,P.T+14,C.mu);
+  const rd=x=>sig(a+b*(x+.5))-sig(a+b*(x-.5));let ame=0,wsum=0;for(let z=-5;z<=5;z+=.05){const w=npdf(z)*.05,p=sig(a+b*z);ame+=w*b*p*(1-p);wsum+=w}ame/=wsum;
+  const prev=(()=>{let s=0,w2=0;for(let z=-5;z<=5;z+=.05){const w=npdf(z)*.05;s+=w*sig(a+b*z);w2+=w}return s/w2})();
+  $('c3st').innerHTML=stat('odds ratio per unit (e^b)',fmt(Math.exp(b)),'in')+stat('risk change per unit at x = −2',f3(rd(-2)),'')+stat('at x = 0',f3(rd(0)),'')+stat('at x = +2',f3(rd(2)),'')+stat('average marginal effect',f3(ame),'ok')+stat('overall event rate',pc(prev),prev<.1?'ok':'warn');
+  $('c3rd').innerHTML=`The odds ratio is ${fmt(Math.exp(b))} at every x, but one more unit of x moves the probability by ${f3(rd(-2))} at x = −2, ${f3(rd(0))} at x = 0 and ${f3(rd(2))} at x = +2: the effect on risk depends on where you start. The average over the population is ${f3(ame)}. ${prev<.1?'The event is rare, so the odds ratio is close to the risk ratio.':'The event is common ('+pc(prev)+' overall): an odds ratio of '+fmt(Math.exp(b))+' overstates the risk ratio, so do not read it as “'+fmt(Math.exp(b))+' times as likely”.'}`}
+ on('c3a c3b',draw);draw();resizers.push(draw);})();
+
+/* ---------- Ch4 Wald, LR, score ---------- */
+(function(){scl('c4p',v=>v+'%');scl('c4b',v=>fmt(v/10));const NS=[20,40,80,160];
+ function run(){const prev=val('c4p')/100,b=val('c4b')/10,a=lgt(prev),R=800,rej=NS.map(()=>[0,0,0]),used=NS.map(()=>0);
+  NS.forEach((n,k)=>{for(let r=0;r<R;r++){const d=binaryData(n,a,b,1);let s=0;for(const v of d.y)s+=v;if(s===0||s===n)continue;const off=Float64Array.from(d.x,v=>b*v),f=glm([d.x],d.y),f0=glm([],d.y,{off});used[k]++;
+   if(Math.abs((f.beta[1]-b)/f.se[1])>1.96)rej[k][0]++;if(2*(f.ll-f0.ll)>3.841)rej[k][1]++;
+   let U=0,sw=0,swx=0,swxx=0;for(let i=0;i<n;i++){const m=f0.mu[i],w=m*(1-m);U+=d.x[i]*(d.y[i]-m);sw+=w;swx+=w*d.x[i];swxx+=w*d.x[i]*d.x[i]}const I=swxx-swx*swx/sw;if(U*U/I>3.841)rej[k][2]++}});
+  const P=mk($('c4cv'),0,1,1,{y0:0});const mxv=1.15*Math.max(.1,...rej.map((q,k)=>Math.max(...q)/Math.max(used[k],1))),P2=mk($('c4cv'),0,1,mxv,{y0:0,noGrid:true,L:46});customGrid(P2,[],[0,.025,.05,.075,.1,.15,.2,.3].filter(v=>v<=mxv).map(v=>[v,Math.round(v*1000)/10+'%']));P2.hline(.05,C.y,'nominal 5%');
+  const G=NS.length,W=(P2.w-P2.L-P2.R)/G,cols=[C.r,C.g,C.a];rej.forEach((q,k)=>q.forEach((c,j)=>{const v=c/Math.max(used[k],1),bw=W*.78/3,x=P2.L+W*k+W*.11+bw*j;P2.g.fillStyle=cols[j];P2.g.fillRect(x,P2.Y(v),bw-2,P2.Y(0)-P2.Y(v));P2.g.fillStyle=C.fg;P2.g.textAlign='center';P2.g.font='10px system-ui';P2.g.fillText((100*v).toFixed(1)+'%',x+bw/2-1,P2.Y(v)-3)}));P2.g.font='11px system-ui';P2.g.fillStyle=C.mu;P2.g.textAlign='center';NS.forEach((n,k)=>P2.g.fillText('n = '+n+' (≈'+Math.round(n*prev)+' events)',P2.L+W*(k+.5),P2.h-P2.B+15));legend(P2,[['Wald',C.r],['likelihood ratio',C.g],['score',C.a]],P2.T+12);
+  const f=(k,j)=>rej[k][j]/Math.max(used[k],1);
+  $('c4st').innerHTML=stat('Wald size at n = 20',pc(f(0,0)),Math.abs(f(0,0)-.05)>.03?'hot':'ok')+stat('LR size at n = 20',pc(f(0,1)),Math.abs(f(0,1)-.05)>.03?'hot':'ok')+stat('score size at n = 20',pc(f(0,2)),Math.abs(f(0,2)-.05)>.03?'hot':'ok')+stat('Wald size at n = 160',pc(f(3,0)),'')+stat('data sets used at n = 20',used[0]+' / '+R,'');
+  $('c4rd').innerHTML=`With about ${Math.round(20*prev)} events (n = 20) the Wald test rejects a true null ${pc(f(0,0))} of the time, the LR test ${pc(f(0,1))} and the score test ${pc(f(0,2))}; by n = 160 they are ${pc(f(3,0))}, ${pc(f(3,1))} and ${pc(f(3,2))}. The tests are equivalent in large samples and differ when events are few. Make the event rarer or the slope larger and the gaps widen. Prefer the LR test or profile-likelihood intervals for small or sparse data.`}
+ $('c4p').addEventListener('change',run);$('c4b').addEventListener('change',run);$('c4go').onclick=run;run();})();
+
+/* ---------- Ch5 separation and Firth ---------- */
+(function(){scl('c5b',v=>fmt(v/10));const NS=[15,25,40,80,160];
+ function run(){const b=val('c5b')/10,R=600,res=NS.map(n=>{let sep=0;const ml=[],fi=[],se=[];for(let r=0;r<R;r++){const d=binaryData(n,-1,b,1);let s=0;for(const v of d.y)s+=v;const fr=s>0&&s<n?glm([d.x],d.y,{firth:true,maxit:60}):null;if(fr)fi.push(fr.beta[1]);if(s===0||s===n||sepTest(d.x,d.y)){sep++;continue}const f=glm([d.x],d.y);ml.push(f.beta[1]);se.push(f.se[1])}return{n,sep:sep/R,ml:ml.length?pct(ml,.5):NaN,fi:fi.length?pct(fi,.5):NaN,se:se.length?pct(se,.5):NaN,mean:ml.length?mean(ml):NaN}});
+  const all=res.flatMap(q=>[q.ml,q.fi,b]).filter(isFinite),y1=Math.max(...all)*1.15+.2,P=mk($('c5cv'),0,NS.length-1+.5,y1,{y0:0,noGrid:true,L:46});customGrid(P,NS.map((n,i)=>[i,'n = '+n]),niceTicks(0,y1,5));P.hline(b,C.fg,'truth '+fmt(b));
+  poly(P,res.map((q,i)=>[i,q.ml]),C.r,2.6);dots(P,res.map((q,i)=>[i,q.ml]),C.r,3.5);poly(P,res.map((q,i)=>[i,q.fi]),C.g,2.6);dots(P,res.map((q,i)=>[i,q.fi]),C.g,3.5);legend(P,[['median MLE (non-separated sets)',C.r],['median Firth (all sets)',C.g]],P.T+26);
+  $('c5tb').innerHTML='<table><tr><th>n</th><th>data sets with separation</th><th>median MLE slope</th><th>median Firth slope</th><th>median Wald SE of the MLE</th></tr>'+res.map(q=>`<tr><td>${q.n}</td><td>${pc(q.sep)}</td><td>${fmt(q.ml)}</td><td>${fmt(q.fi)}</td><td>${fmt(q.se)}</td></tr>`).join('')+'</table>';
+  const r0=res[0],r3=res[3];
+  $('c5rd').innerHTML=`At n = ${r0.n} ${pc(r0.sep)} of the data sets are perfectly separated (the MLE does not exist), and among the others the median MLE slope is ${fmt(r0.ml)} against a truth of ${fmt(b)}: biased outward, with a very wide Wald SE of ${fmt(r0.se)}. Firth’s estimate is ${fmt(r0.fi)} and always finite. By n = ${r3.n} separation is ${pc(r3.sep)} and the MLE (${fmt(r3.ml)}) is close to the truth. The remedy is a penalty or a prior, or more events, not dropping the variable.`}
+ $('c5b').addEventListener('change',run);$('c5go').onclick=run;run();})();
+
+/* ---------- Ch6 classification ---------- */
+(function(){scl('c6s',v=>fmt(v/10));scl('c6p',v=>v+'%');scl('c6t',v=>v+'%');let S=null;
+ function alphaFor(pi,b){let lo=-15,hi=5;for(let i=0;i<50;i++){const m=(lo+hi)/2;let s=0,w=0;for(let z=-6;z<=6;z+=.1){const wt=npdf(z);s+=wt*sig(m+b*z);w+=wt}s/=w;if(s<pi)lo=m;else hi=m}return(lo+hi)/2}
+ function gen(){const b=val('c6s')/10,pi=val('c6p')/100,a=alphaFor(pi,b),tr=binaryData(2000,a,b,1),te=binaryData(4000,a,b,1);let pos=0;for(const v of tr.y)pos+=v;const f=pos>0&&pos<2000?glm([tr.x],tr.y):{beta:[a,b]};const sc=Float64Array.from(te.x,v=>sig(f.beta[0]+f.beta[1]*v));S={y:te.y,sc,a,b,auc:auc(sc,te.y)};draw()}
+ function draw(){if(!S)return;const{y,sc}=S,n=y.length,t=val('c6t')/100;let P1=0,N1=0;for(const v of y)v?P1++:N1++;const idx=Array.from({length:n},(_,i)=>i).sort((i,j)=>sc[j]-sc[i]);let tp=0,fp=0;const roc=[[0,0]];idx.forEach((i,k)=>{y[i]?tp++:fp++;if(k%Math.max(1,Math.floor(n/150))===0)roc.push([fp/N1,tp/P1])});roc.push([1,1]);
+  let TP=0,FP=0,FN=0,TN=0;for(let i=0;i<n;i++){const pr=sc[i]>=t;if(y[i])pr?TP++:FN++;else pr?FP++:TN++}const sens=TP/Math.max(P1,1),spec=TN/Math.max(N1,1),prec=TP+FP?TP/(TP+FP):NaN;
+  const P=mk($('c6cv'),0,1,1,{y0:0});P.line(t=>t,C.mu,1.2,0,1,2,true);poly(P,roc,C.a,2.6);dots(P,[[1-spec,sens]],C.r,6);P.text('ROC (AUC '+fmt(S.auc)+')',P.L+8,P.T+14,C.mu);P.text('false-positive rate →',P.w/2,P.h-2,C.mu,'center');
+  const B=8,bins=[];for(let b=0;b<B;b++){const s=idx.slice().reverse().slice(Math.floor(b*n/B),Math.floor((b+1)*n/B));bins.push([mean(s.map(i=>sc[i])),mean(s.map(i=>y[i]))])}const mxv=Math.max(.05,...bins.flat())*1.1,Q=mk($('c6cv2'),0,mxv,mxv,{y0:0});Q.line(t=>t,C.mu,1.2,0,mxv,2,true);poly(Q,bins,C.g,2.4);dots(Q,bins,C.g,4);Q.text('calibration: predicted → vs observed ↑',Q.L+8,Q.T+14,C.mu);
+  const base=Math.max(P1,1)/n;
+  $('c6st').innerHTML=stat('AUC',fmt(S.auc),'in')+stat('sensitivity (recall)',pc(sens),'')+stat('specificity',pc(spec),'')+stat('precision of the flags',isFinite(prec)?pc(prec):'—',prec<.3?'hot':'ok')+stat('flagged',TP+FP+' of '+n,'')+stat('event rate',pc(base),'')+stat('accuracy / always-negative',pc((TP+TN)/n)+' / '+pc(N1/n),'warn');
+  $('c6rd').innerHTML=`At a ${Math.round(100*t)}% threshold the model catches ${pc(sens)} of the events and clears ${pc(spec)} of the non-events, yet only ${isFinite(prec)?pc(prec):'—'} of the flagged cases are real: precision is dragged down by the ${pc(base)} base rate even though the AUC is ${fmt(S.auc)}. Accuracy (${pc((TP+TN)/n)}) is almost meaningless here: always predicting “no event” scores ${pc(N1/n)}. The calibration plot should hug the diagonal because the model is correctly specified; with a mis-specified or undersampled model it would not (Lab 11).`}
+ on('c6s c6p',gen);$('c6t').addEventListener('input',draw);$('c6go').onclick=gen;gen();resizers.push(draw);})();
+
+/* ---------- Ch7 Poisson with exposure ---------- */
+(function(){scl('c7b',v=>fmt(v/100));scl('c7e',v=>fmt(v/100));scl('c7n',v=>v);
+ function sim(n,b,s){const x=new Float64Array(n),y=new Float64Array(n),le=new Float64Array(n);for(let i=0;i<n;i++){x[i]=3*Math.random();const zx=(x[i]-1.5)/.866;le[i]=s*(.6*zx+.8*randn());y[i]=poisS(Math.exp(le[i]+.5+b*x[i]))}return{x,y,le}}
+ function fits(d){const f1=glm([d.x],d.y,{fam:'pois',off:d.le}),f2=glm([d.x],d.y,{fam:'pois'}),lr=Float64Array.from(d.y,(v,i)=>Math.log((v+.5))-d.le[i]),f3_=olsMulti([d.x],lr,true);return[f1,f2,f3_]}
+ function run(){const n=val('c7n'),b=val('c7b')/100,s=val('c7e')/100,d=sim(n,b,s),[f1,f2,f3_]=fits(d),R=400,est=[0,0,0],cov=[0,0,0];
+  for(let r=0;r<R;r++){const e=sim(n,b,s),[g1,g2,g3]=fits(e),bb=[g1.beta[1],g2.beta[1],g3.beta[1]],ss=[g1.se[1],g2.se[1],g3.se[1]];for(let j=0;j<3;j++){est[j]+=bb[j]/R;if(Math.abs(bb[j]-b)<=1.96*ss[j])cov[j]++}}
+  const E=Float64Array.from(d.le,Math.exp),me=mean(E),rate=Array.from(d.x,(v,i)=>[v,d.y[i]/E[i]]),rs=rate.map(q=>q[1]).sort((p,q)=>p-q),ym=Math.max(rs[Math.floor(.97*rs.length)]*1.1,Math.exp(.5+b*3)*1.5),P=mk($('c7cv'),0,3,ym,{y0:0});
+  clip(P,()=>{P.line(t=>Math.exp(.5+b*t),C.fg,1.8,0,3,100,true);P.line(t=>Math.exp(f1.beta[0]+f1.beta[1]*t),C.g,2.8,0,3,100);P.line(t=>Math.exp(f2.beta[0]+f2.beta[1]*t)/me,C.r,2.4,0,3,100)});dots(P,rate.slice(0,350),'rgba(110,168,255,.45)',2.2);P.text('observed rate (count ÷ exposure) · green: with offset · red: no offset · dashed: truth',P.L+8,P.T+14,C.mu);
+  const lab=['Poisson with offset','Poisson, no offset','OLS on log observed rate'];
+  $('c7st').innerHTML=lab.map((l,j)=>stat(l+': average β̂ (true '+fmt(b)+')',fmt(est[j]),Math.abs(est[j]-b)>.04?'hot':'ok')+stat('coverage of 95% CI',pc(cov[j]/R),Math.abs(cov[j]/R-.95)>.05?'hot':'ok')).join('')+stat('this data set: e^β̂ (rate ratio, offset)',fmt(Math.exp(f1.beta[1])),'in');
+  $('c7rd').innerHTML=`With the offset the estimate is unbiased (average ${fmt(est[0])}) and the interval covers ${pc(cov[0]/R)}. Without it the exposure that rides along with x is misread as rate: the slope averages ${fmt(est[1])} and the interval covers only ${pc(cov[1]/R)}. ${s===0?'With no variation in exposure the two agree (apart from the intercept).':'Make exposure vary more and the damage grows.'} Least squares on the log rate ${Math.abs(est[2]-b)>.03?'is also biased':'is fine here'} (average ${fmt(est[2])}), and fails when counts are zero. A rate ratio of e^β = ${fmt(Math.exp(f1.beta[1]))} per unit x is the usual report.`}
+ $('c7b').addEventListener('change',run);$('c7e').addEventListener('change',run);$('c7n').addEventListener('change',run);$('c7go').onclick=run;run();})();
+
+/* ---------- Ch8 overdispersion ---------- */
+(function(){const NL=[50,100,200,500];idx('c8n',NL);scl('c8k',v=>fmt(v/100));
+ function run(){const n=NL[val('c8n')],al=val('c8k')/100,R=1500,NM=['naive Poisson','quasi-Poisson','robust (sandwich)'],cov=[0,0,0],se=[0,0,0],bs=new Float64Array(R),x=new Float64Array(n),y=new Float64Array(n);let phi=0;
+  for(let r=0;r<R;r++){for(let i=0;i<n;i++){x[i]=randn();const mu=Math.exp(1+.3*x[i]);y[i]=poisS(al>0?gammaS(1/al)*al*mu:mu)}
+   const f=glm([x],y,{fam:'pois'});let pe=0;for(let i=0;i<n;i++)pe+=(y[i]-f.mu[i])*(y[i]-f.mu[i])/f.mu[i];const ph=pe/(n-2);phi+=ph/R;
+   const B=[[0,0],[0,0]];for(let i=0;i<n;i++){const e=(y[i]-f.mu[i])*(y[i]-f.mu[i]),v=[1,x[i]];for(let a=0;a<2;a++)for(let c=0;c<2;c++)B[a][c]+=e*v[a]*v[c]}
+   const Ai=f.inv;let sv=0;for(let a=0;a<2;a++)for(let c=0;c<2;c++)for(let d=0;d<2;d++)for(let e=0;e<2;e++)if(a===1&&e===1)sv+=Ai[1][c]*B[c][d]*Ai[d][1];
+   const ss=[f.se[1],f.se[1]*Math.sqrt(ph),Math.sqrt(sv)];bs[r]=f.beta[1];ss.forEach((s,j)=>{se[j]+=s/R;if(Math.abs(f.beta[1]-.3)<=1.96*s)cov[j]++})}
+  const sd=sdOf(bs),P=mk($('c8cv'),0,1,1.05,{y0:0,noGrid:true,L:46});gridG(P,[0,.25,.5,.75,.95,1].map(v=>[v,Math.round(v*100)+'%']),NM);P.hline(.95,C.y,'nominal 95%');const W=(P.w-P.L-P.R)/3;
+  cov.forEach((c,j)=>{const v=c/R,w=W*.5,xx=P.L+W*j+W*.25;P.g.fillStyle=Math.abs(v-.95)<.02?C.g:Math.abs(v-.95)<.05?C.y:C.r;P.g.fillRect(xx,P.Y(v),w,P.Y(0)-P.Y(v));P.g.fillStyle=C.fg;P.g.textAlign='center';P.g.fillText(pc(v),xx+w/2,P.Y(v)-4)});
+  $('c8tb').innerHTML='<table><tr><th>standard error</th><th>average SE ÷ true SD of the slope</th><th>95% interval coverage</th></tr>'+NM.map((m,j)=>`<tr><td>${m}</td><td>${fmt(se[j]/sd)}</td><td>${pc(cov[j]/R)}</td></tr>`).join('')+`</table><div class="sub" style="margin-top:6px">average Pearson dispersion φ̂ = ${fmt(phi)} (1 for a true Poisson) · variance = μ + ${fmt(al)}μ²</div>`;
+  $('c8rd').innerHTML=al===0?`With α = 0 the data really are Poisson: φ̂ ≈ ${fmt(phi)}, and the three standard errors agree.`:`The dispersion estimate is ${fmt(phi)}, well above 1. The naive Poisson standard error is only ${fmt(se[0]/sd)} of the true spread, so its “95%” interval covers ${pc(cov[0]/R)}. Quasi-Poisson (${pc(cov[1]/R)}) and the sandwich (${pc(cov[2]/R)}) restore coverage; a negative-binomial model would do the same and additionally gives a likelihood. The coefficient estimates themselves were fine all along: the damage is to the inference.`;}
+ $('c8k').addEventListener('change',run);$('c8n').addEventListener('change',run);$('c8go').onclick=run;run();})();
+
+/* ---------- Ch9 deviance ---------- */
+(function(){scl('c9b',v=>fmt(v/10));scl('c9n',v=>v);let busy=false;
+ function dat(n,b2){const x=new Float64Array(n),x2=new Float64Array(n),y=new Float64Array(n);for(let i=0;i<n;i++){x[i]=randn();x2[i]=x[i]*x[i]-1;y[i]=Math.random()<sig(-.5+.8*x[i]+b2*x2[i])?1:0}return{x,x2,y}}
+ function run(){const n=val('c9n'),b2=val('c9b')/10,d=dat(n,b2),f0=glm([],d.y),f1=glm([d.x],d.y),f2=glm([d.x,d.x2],d.y),ms=[['intercept only',f0,1],['linear in x',f1,2],['linear + x²',f2,3]];
+  $('c9tb').innerHTML='<table><tr><th>model</th><th>parameters</th><th>deviance</th><th>AIC</th><th>McFadden R²</th><th>LR vs previous (χ²₁)</th><th>p-value</th></tr>'+ms.map((m,i)=>{const lr=i?2*(m[1].ll-ms[i-1][1].ll):null;return `<tr><td>${m[0]}</td><td>${m[2]}</td><td>${fmt(m[1].dev)}</td><td>${fmt(-2*m[1].ll+2*m[2])}</td><td>${fmt(1-m[1].ll/f0.ll)}</td><td>${lr==null?'—':fmt(lr)}</td><td>${lr==null?'—':f3(gammaQ(.5,lr/2))}</td></tr>`}).join('')+'</table>';
+  const R=1000,lrs=new Float64Array(R);for(let r=0;r<R;r++){const e=dat(n,b2);lrs[r]=Math.max(0,2*(glm([e.x,e.x2],e.y).ll-glm([e.x],e.y).ll))}let rej=0,s=0;for(const v of lrs){if(v>3.841)rej++;s+=v}
+  const hi=Math.max(10,pct(lrs,.98)*1.1);hist($('c9cv'),lrs,0,hi,40,[{f:t=>gampdf(t,.5,.5),col:C.a}]).text('histogram: LR statistic for adding x² over 1,000 data sets · blue: χ²₁ density',70,28,C.mu);
+  const lr1=2*(f2.ll-f1.ll),lr0=2*(f1.ll-f0.ll);
+  $('c9st').innerHTML=stat('LR for x² (this data set)',fmt(lr1),lr1>3.841?'ok':'')+stat('p-value for x²',f3(gammaQ(.5,lr1/2)),lr1>3.841?'ok':'warn')+stat(b2===0?'false-alarm rate over 1,000 sets':'power over 1,000 sets',pc(rej/R),b2===0&&Math.abs(rej/R-.05)>.03?'hot':'ok')+stat('mean LR (χ²₁ has mean 1)',fmt(s/R),'');
+  $('c9rd').innerHTML=`Adding the linear term cuts the deviance by ${fmt(lr0)}, ${lr0>3.841?'clearly worth keeping':'not clearly'}; adding x² cuts it by ${fmt(lr1)} (p = ${f3(gammaQ(.5,lr1/2))}). ${b2===0?`There is no true curvature, so the simulated LR statistics follow the χ²₁ curve, with ${pc(rej/R)} above the 5% cutoff 3.84.`:`With true curvature ${fmt(b2)} the LR statistics shift to the right of the χ²₁ curve; ${pc(rej/R)} of the data sets detect it at n = ${n}.`} AIC ${fmt(-2*f1.ll+4)} versus ${fmt(-2*f2.ll+6)} reaches the same verdict, and McFadden’s R² of ${fmt(1-f2.ll/f0.ll)} shows how modest a “good” logistic model looks.`}
+ $('c9b').addEventListener('change',run);$('c9n').addEventListener('change',run);$('c9go').onclick=run;run();})();
+
+/* ---------- Ch10 links ---------- */
+(function(){scl('c10n',v=>v);let S=null;const TR={logit:[-.5,1.2],probit:[-.3,.7],cll:[-1,.9]};
+ function gen(){const tl=$('c10t').value,[a,b]=TR[tl],n=val('c10n'),x=new Float64Array(n),y=new Float64Array(n);for(let i=0;i<n;i++){x[i]=1.5*randn();y[i]=Math.random()<LK[tl].mu(a+b*x[i])?1:0}
+  S={tl,a,b,x,y,f:['logit','probit','cll'].map(l=>glm([x],y,{link:l}))};draw()}
+ function draw(){if(!S)return;const{tl,a,b,f}=S,names=['logit','probit','complementary log-log'],keys=['logit','probit','cll'],cols=[C.a,C.g,C.r],tr=x=>LK[tl].mu(a+b*x),P=mk($('c10cv'),-4,4,1.02,{y0:0});
+  clip(P,()=>{P.line(tr,C.fg,1.8,-4,4,200,true);f.forEach((q,j)=>P.line(x=>LK[keys[j]].mu(q.beta[0]+q.beta[1]*x),cols[j],2.4,-4,4,200))});P.text('dashed: truth · '+names.map((s,j)=>s).join(' / ')+' = blue / green / red',P.L+8,P.T+14,C.mu);
+  const pr=(q,j,x)=>LK[keys[j]].mu(q.beta[0]+q.beta[1]*x);let md=f.map((q,j)=>{let m=0;for(let x=-3;x<=3;x+=.1)m=Math.max(m,Math.abs(pr(q,j,x)-tr(x)));return m});
+  $('c10tb').innerHTML='<table><tr><th>link</th><th>slope</th><th>deviance</th><th>AIC</th><th>p̂ at x = −3</th><th>p̂ at x = +3</th><th>largest error in p for |x| ≤ 3</th></tr>'+f.map((q,j)=>`<tr><td style="color:${cols[j]}">${names[j]}</td><td>${fmt(q.beta[1])}</td><td>${fmt(q.dev)}</td><td>${fmt(q.dev+4)}</td><td>${f3(pr(q,j,-3))}</td><td>${f3(pr(q,j,3))}</td><td>${f3(md[j])}</td></tr>`).join('')+`<tr><td>truth (${tl==='cll'?'cloglog':tl})</td><td>${fmt(b)}</td><td>—</td><td>—</td><td>${f3(tr(-3))}</td><td>${f3(tr(3))}</td><td>—</td></tr></table>`;
+  const aic=f.map(q=>q.dev+4),best=aic.indexOf(Math.min(...aic));
+  $('c10rd').innerHTML=`Whatever the true link, the three fits are within ${f3(Math.max(...md))} of each other in probability across the bulk of the data; they separate in the tails (at x = −3 the estimates run from ${f3(Math.min(...f.map((q,j)=>pr(q,j,-3))))} to ${f3(Math.max(...f.map((q,j)=>pr(q,j,-3))))}, truth ${f3(tr(-3))}). The best AIC goes to <b>${names[best]}</b> (truth ${tl==='cll'?'complementary log-log':tl}), but differences are only a few units, so the link is rarely identified by the data alone. Probit slopes are about 1/1.7 of logit slopes (here ${fmt(f[1].beta[1])} vs ${fmt(f[0].beta[1])}). Choose the link for interpretability (odds ratios) and check calibration in the region that matters.`}
+ $('c10t').addEventListener('change',gen);on('c10n',gen);$('c10go').onclick=gen;gen();resizers.push(draw);})();
+
+/* ---------- Ch11 undersampling ---------- */
+(function(){scl('c11p',v=>fmt(v/10)+'%');scl('c11r',v=>v+'%');
+ function alphaFor(pi,b){let lo=-15,hi=5;for(let i=0;i<50;i++){const m=(lo+hi)/2;let s=0,w=0;for(let z=-6;z<=6;z+=.1){const wt=npdf(z);s+=wt*sig(m+b*z);w+=wt}s/=w;if(s<pi)lo=m;else hi=m}return(lo+hi)/2}
+ function run(){const pi=val('c11p')/1000,r=val('c11r')/100,N=30000,b0=1,a0=alphaFor(pi,b0),x=new Float64Array(N),y=new Float64Array(N);let tot=0;for(let i=0;i<N;i++){x[i]=randn();y[i]=Math.random()<sig(a0+b0*x[i])?1:0;tot+=y[i]}
+  const kx=[],ky=[];for(let i=0;i<N;i++)if(y[i]===1||Math.random()<r){kx.push(x[i]);ky.push(y[i])}const f=glm([Float64Array.from(kx)],Float64Array.from(ky)),al=f.beta[0],bl=f.beta[1],cor=al+Math.log(r);
+  const pu=Float64Array.from(x,v=>sig(al+bl*v)),pcor=Float64Array.from(x,v=>sig(cor+bl*v)),idx=Array.from({length:N},(_,i)=>i).sort((i,j)=>x[i]-x[j]),B=10,pts=[[],[]];
+  for(let g=0;g<B;g++){const s=idx.slice(Math.floor(g*N/B),Math.floor((g+1)*N/B)),ob=mean(s.map(i=>y[i]));if(ob>0){pts[0].push([Math.log10(ob),Math.log10(mean(s.map(i=>pu[i])))]);pts[1].push([Math.log10(ob),Math.log10(mean(s.map(i=>pcor[i])))])}}
+  const lo=Math.floor(Math.min(...pts.flat().flat())-.2),hi=0,P=mk($('c11cv'),lo,hi,hi,{y0:lo,noGrid:true,L:56}),tk=[];for(let e=lo;e<=0;e++)tk.push([e,Math.pow(10,e)>=.01?(100*Math.pow(10,e))+'%':(100*Math.pow(10,e)).toFixed(-e-2)+'%']);customGrid(P,tk,tk);P.line(t=>t,C.mu,1.2,lo,hi,2,true);poly(P,pts[0],C.r,2.4);dots(P,pts[0],C.r,4);poly(P,pts[1],C.g,2.4);dots(P,pts[1],C.g,4);legend(P,[['uncorrected',C.r],['intercept corrected',C.g]],P.T+12);P.text('observed rate (x) vs mean predicted (y), full population, log scales',P.L+8,P.T+28,C.mu);
+  const mu_=mean(pu),mc=mean(pcor),prev=tot/N;
+  $('c11st').innerHTML=stat('slope estimate (true 1)',fmt(bl),Math.abs(bl-1)>.2?'warn':'ok')+stat('intercept: true / fitted',fmt(a0)+' / '+fmt(al),'in')+stat('expected upward shift −log r',fmt(-Math.log(r)),'')+stat('corrected intercept',fmt(cor),'ok')+stat('mean predicted, uncorrected',pc(mu_),Math.abs(mu_/prev-1)>.3?'hot':'ok')+stat('mean predicted, corrected',pc(mc),'ok')+stat('actual event rate',pc(prev),'')+stat('rows used / population',kx.length+' / '+N,'');
+  $('c11rd').innerHTML=r===1?'With every non-event kept there is nothing to correct: both calibration lines lie on the diagonal.':`Keeping ${Math.round(r*100)}% of non-events leaves the slope essentially intact (${fmt(bl)} against 1) but pushes the intercept up from ${fmt(a0)} to ${fmt(al)}, by about −log r = ${fmt(-Math.log(r))}, because events are over-represented in the sample. The uncorrected model predicts an average risk of ${pc(mu_)} where the true rate is ${pc(prev)}, off by a factor of ${fmt(mu_/prev)}. Adding log r to the intercept restores ${pc(mc)}. The ranking (AUC) was never affected, which is why undersampled models look fine on ROC curves and fail on expected-loss reports.`}
+ $('c11p').addEventListener('change',run);$('c11r').addEventListener('change',run);$('c11go').onclick=run;run();})();
+const QZ=[
+{l:'Beginner',q:'Why is ordinary least squares a poor model for predicting a 0/1 outcome?',o:['It cannot be computed for binary data','It can produce fitted “probabilities” below 0 or above 1, and the error variance p(1 − p) is not constant','It always gives biased slopes','It requires a normal predictor'],a:1,e:'The linear probability model is serviceable for average effects but not for probabilities. A GLM keeps predictions in range and models the variance correctly.'},
+{l:'Beginner',q:'A logistic regression gives a coefficient of 0.69 for a predictor. The odds ratio per unit is about…',o:['0.69','1.5','2.0','0.5'],a:2,e:'e^0.69 ≈ 2.0: each unit doubles the odds (not the probability).'},
+{l:'Intermediate',q:'Which part of a GLM connects the mean of the outcome to the linear predictor?',o:['The variance function','The link function','The deviance','The offset'],a:1,e:'g(E[y]) = Xβ. The distribution supplies the variance function; the link is g.'},
+{l:'Intermediate',q:'The odds ratio for smoking is 2.0 in a logistic model. The change in disease probability per unit…',o:['Is the same for everyone','Depends on the baseline risk: roughly β·p(1 − p), largest near p = 0.5','Equals 2 times the baseline risk','Is zero when the odds ratio is constant'],a:1,e:'The odds ratio is constant; the risk difference is not. Report average marginal effects or predicted probabilities for the groups of interest.'},
+{l:'Intermediate',q:'An outcome occurs in 40% of the unexposed. A logistic model gives OR = 2. The risk ratio is…',o:['2','Less than 2 (about 1.4)','More than 2','Exactly 1'],a:1,e:'Odds 0.4/0.6 = 0.667 → 1.333 gives p = 0.571, a risk ratio of 1.43. The OR overstates the RR when the outcome is common.'},
+{l:'Intermediate',q:'Counts are observed for units with very different exposure times. The correct Poisson model includes…',o:['Exposure as an ordinary predictor','log(exposure) as an offset with its coefficient fixed at 1','Nothing; exposure averages out','A zero-inflation term'],a:1,e:'E[y] = exposure × rate, so log E[y] = log(exposure) + Xβ; the offset makes e^β a rate ratio.'},
+{l:'Intermediate',q:'IRLS for a GLM at each step solves…',o:['An unweighted regression of y on X','A weighted least-squares problem with working weights and a working response','A ridge problem','A linear program'],a:1,e:'β ← (XᵀWX)⁻¹XᵀWz with W = (dμ/dη)²/Var(μ). For canonical links this is exactly Newton–Raphson.'},
+{l:'Advanced',q:'In a small sample with few events, which of the three classical tests tends to be the least reliable?',o:['The likelihood-ratio test','The Wald test','The score test','They are identical in every sample'],a:1,e:'Wald uses the curvature at the estimate, which is misleading with sparse data or large effects. The LR test is usually the best behaved.'},
+{l:'Advanced',q:'A binary predictor perfectly separates the outcomes in a logistic regression. What happens to the maximum-likelihood estimate?',o:['It is zero','It does not exist: the coefficient diverges with a huge standard error','It is exactly the log of the odds','It is biased toward zero'],a:1,e:'The likelihood increases without limit. Use Firth’s penalised likelihood, a ridge penalty or a prior, or collect more events.'},
+{l:'Advanced',q:'A fraud model has AUC 0.95 on a 0.5% fraud rate. A threshold that catches 80% of fraud flags 5% of the legitimate cases. Roughly what is the precision of the alerts?',o:['About 80%','About 50%','About 7%','About 95%'],a:2,e:'Per 100,000: 500 fraud × 0.8 = 400 caught; 99,500 × 0.05 = 4,975 false alarms; precision = 400/5,375 ≈ 7%. Base rate dominates precision.'},
+{l:'Advanced',q:'A model has excellent AUC but the predicted probabilities average twice the observed event rate. This is a problem of…',o:['Discrimination','Calibration','Separation','Overdispersion'],a:1,e:'AUC measures ranking only. Probabilities used for pricing or expected loss need to be calibrated too.'},
+{l:'Advanced',q:'Poisson regression is fitted to counts whose variance is three times the mean. Compared with the nominal results…',o:['Coefficients are biased and standard errors correct','Coefficients are consistent but standard errors are too small and p-values too optimistic','Everything is correct','Coefficients are inconsistent'],a:1,e:'The mean model is right, so the estimates are consistent; the variance is wrong. Use quasi-Poisson, sandwich or negative-binomial standard errors.'},
+{l:'Advanced',q:'The Pearson χ² statistic divided by its degrees of freedom in a Poisson fit is 4.2. This suggests…',o:['Underdispersion','Overdispersion (variance above the mean)','A perfect fit','Separation'],a:1,e:'φ̂ near 1 supports the Poisson variance; φ̂ well above 1 signals overdispersion.'},
+{l:'Advanced',q:'Model B adds two parameters to model A and reduces the deviance by 9.4. Under H₀ (the two extra terms are useless) the statistic is compared with…',o:['χ² with 2 degrees of freedom (cutoff ≈ 5.99), so B is supported at 5%','A normal distribution with mean 9.4','χ² with 1 degree of freedom','An F distribution with 2 and n degrees of freedom'],a:0,e:'The drop in deviance is the LR statistic, χ² with df equal to the number of added parameters. 9.4 > 5.99.'},
+{l:'Expert',q:'McFadden’s pseudo-R² for a logistic credit model is 0.25. The sensible reading is…',o:['The model explains 25% of the variance, which is poor','Comparable to an OLS R² of 0.25','A good fit in likelihood terms; values of 0.2 to 0.4 are already considered excellent','It must be above 0.5 to be useful'],a:2,e:'McFadden’s measure is 1 − ℓ̂/ℓ̂₀ and runs much lower than OLS R² on the same quality of fit.'},
+{l:'Expert',q:'You fit logistic regression on all frauds and a 10% random sample of non-frauds. Compared with the full-data fit…',o:['The slopes are shifted by log 0.1','The slopes are consistent and the intercept is about −log 0.1 (≈ 2.3) too high','Everything is unbiased','Only the AUC changes'],a:1,e:'Case-control logic: slopes unchanged, intercept shifted by −log r. Add log r to the intercept before using the probabilities.'},
+{l:'Expert',q:'Which statement about link functions for binary data is correct?',o:['Logit and probit give very different probabilities in the centre of the data','Logit and probit curves are nearly identical after rescaling; the complementary log-log link is asymmetric; they differ mainly in the tails','Only the logit link has a likelihood','The link has no effect on the interpretation of the coefficients'],a:1,e:'Probit coefficients ≈ logit coefficients ÷ 1.7. Different links matter in the tails and change the meaning of the coefficients (odds ratio, normal score, hazard ratio).'},
+{l:'Expert',q:'You want risk ratios directly from a binary outcome. A log-binomial model (log link) is attractive, but its main practical problem is…',o:['It cannot be written as a GLM','It can predict probabilities above 1 and fails to converge','It has no standard errors','It needs an offset'],a:1,e:'exp(η) is not bounded by 1. Poisson regression with robust errors (“modified Poisson”) is a common alternative.'}
+];
+(function(){const st=store.get('gl_quiz',{});
+ function render(){const box=$('quiz');box.innerHTML='';
+  QZ.forEach((q,i)=>{const d=document.createElement('div');d.className='q'+(st[i]!=null?' done':'');d.innerHTML=`<div class="qh">Q${i+1} · ${q.l}</div><div style="margin:4px 0 6px"><b>${q.q}</b></div>`;
+   q.o.forEach((o,j)=>{const b=document.createElement('button');b.className='opt';b.textContent=o;if(st[i]!=null){if(j===q.a)b.classList.add('good');else if(j===st[i])b.classList.add('bad')}b.onclick=()=>{if(st[i]!=null)return;st[i]=j;store.set('gl_quiz',st);render();meter()};d.appendChild(b)});
+   const e=document.createElement('div');e.className='ex';e.innerHTML=(st[i]===q.a?'✅ ':'❌ ')+q.e;d.appendChild(e);box.appendChild(d)});
+  const ans=Object.keys(st).length,ok=QZ.filter((q,i)=>st[i]===q.a).length;
+  $('qscore').innerHTML=stat('answered',ans+' / '+QZ.length,'in')+stat('correct',ok,'ok')+stat('score',ans?Math.round(100*ok/ans)+'%':'—',ok/Math.max(ans,1)>=.8?'ok':'warn')+stat('verdict',ans<QZ.length?'keep going':ok>=16?'GLM master':ok>=13?'strong':'review ch. 1–9','')}
+ $('qreset').onclick=()=>{Object.keys(st).forEach(k=>delete st[k]);store.set('gl_quiz',st);render();meter()};
+ window.__qst=st;render();})();
+const CHK=['Explain why a linear probability model fails and what the logistic curve fixes.','Name the three parts of a GLM and the canonical link for binomial, Poisson and Gaussian.','Describe IRLS and why it equals Newton’s method for canonical links.','Interpret log-odds, odds ratios and average marginal effects and say when OR ≈ RR.','Choose between Wald, likelihood-ratio and score tests and explain why Wald fails with sparse data.','Recognise separation and apply Firth or a penalty.','Compute sensitivity, specificity, precision, AUC and explain why precision depends on the base rate.','Distinguish discrimination from calibration and check calibration.','Fit a Poisson rate model with an offset and report rate ratios.','Diagnose overdispersion and choose quasi-Poisson, sandwich or negative binomial.','Read a deviance table: LR tests, AIC, McFadden R².','Explain how logit, probit and cloglog differ and where it matters.','Explain what undersampling does to slopes and intercept and correct it.','Pick the right GLM for a new outcome (binary, count, rate, positive continuous, proportion).'];
+(function(){const st=store.get('gl_chk',{}),box=$('chk');CHK.forEach((t,i)=>{const l=document.createElement('label'),c=document.createElement('input');c.type='checkbox';c.checked=!!st[i];c.onchange=()=>{st[i]=c.checked;store.set('gl_chk',st);meter()};l.appendChild(c);const s=document.createElement('span');s.textContent=t;l.appendChild(s);box.appendChild(l)});window.__cst=st;})();
+function meter(){const q=window.__qst||{},c=window.__cst||{};const ok=QZ.filter((x,i)=>q[i]===x.a).length,ck=Object.values(c).filter(Boolean).length;const p=Math.round(100*(.6*ok/QZ.length+.4*ck/CHK.length));$('mtxt').textContent='Mastery: '+p+'%  (exam + checklist)';$('mbar').style.width=p+'%';store.set('mastery_gl',p)}
+meter();
+
+/* ---------- Navigation ---------- */
+(function(){const nav=$('nav');let html='';
+ document.querySelectorAll('main .part, main section.ch').forEach(el=>{if(el.classList.contains('part'))html+=`<div class="pt">${el.textContent}</div>`;else{const h=el.querySelector('h2'),num=h.querySelector('.num').textContent,t=Array.from(h.childNodes).filter(n=>n.nodeType===3).map(n=>n.textContent).join('').trim();html+=`<a href="#${el.id}" data-id="${el.id}">${num}. ${t}</a>`}});
+ nav.innerHTML=html;const links=nav.querySelectorAll('a'),io=new IntersectionObserver(es=>{es.forEach(e=>{if(e.isIntersecting)links.forEach(a=>a.classList.toggle('on',a.dataset.id===e.target.id))})},{rootMargin:'-20% 0px -70% 0px'});
+ document.querySelectorAll('section.ch').forEach(s=>io.observe(s));
+ $('menu').onclick=()=>$('side').classList.toggle('open');nav.addEventListener('click',e=>{if(e.target.tagName==='A')$('side').classList.remove('open')});
+ window.addEventListener('scroll',()=>{const h=document.documentElement;$('prog').style.width=(100*h.scrollTop/(h.scrollHeight-h.clientHeight))+'%'},{passive:true});})();
+</script>
+</body>
+</html>
