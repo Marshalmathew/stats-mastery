@@ -1,0 +1,558 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Collinearity, Interactions and Nonlinearity Mastery</title>
+<style>
+:root{--bg:#0b0e17;--panel:#121726;--panel2:#171d30;--line:#232a3d;--fg:#e8ebf5;--mu:#8a93ab;--a:#6ea8ff;--r:#ff6b81;--y:#ffd166;--g:#4ade80;--p:#c084fc;--t:#5eead4}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;background:var(--bg);color:var(--fg);font:16px/1.7 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+a{color:var(--a)}
+#prog{position:fixed;top:0;left:0;height:3px;background:linear-gradient(90deg,var(--a),var(--p),var(--r));width:0;z-index:50}
+.side{position:fixed;left:0;top:0;bottom:0;width:290px;background:#0e1220;border-right:1px solid var(--line);overflow:auto;padding:18px 14px 90px;z-index:40;transition:transform .25s}
+.side h1{font-size:15px;margin:0 0 2px}
+.side small{color:var(--mu)}
+.side .pt{margin:16px 0 4px;font-size:11px;text-transform:uppercase;letter-spacing:1.3px;color:var(--p)}
+.side a{display:block;color:var(--mu);text-decoration:none;padding:5px 9px;border-radius:7px;font-size:13.5px;line-height:1.35}
+.side a:hover{background:var(--panel);color:var(--fg)}
+.side a.on{background:var(--panel2);color:var(--fg);box-shadow:inset 3px 0 var(--a)}
+.side a.back{color:var(--t);padding-left:0;margin-bottom:6px}
+.meter{position:fixed;left:0;bottom:0;width:290px;background:#0e1220;border-top:1px solid var(--line);padding:10px 16px;z-index:41;font-size:12px;color:var(--mu)}
+.meter .bar{height:7px;background:var(--line);border-radius:6px;margin-top:5px;overflow:hidden}
+.meter .bar i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--g),var(--t));transition:width .4s}
+#menu{display:none;position:fixed;top:10px;left:10px;z-index:60;background:var(--panel2);color:var(--fg);border:1px solid var(--line);border-radius:9px;padding:7px 12px;font-size:14px;cursor:pointer}
+main{margin-left:290px;padding:0 34px 120px;max-width:1090px}
+.hero{padding:70px 0 30px}
+.hero h1{font-size:clamp(32px,5vw,56px);line-height:1.08;margin:0 0 14px;background:linear-gradient(100deg,#fff,var(--y) 40%,var(--r));-webkit-background-clip:text;background-clip:text;color:transparent}
+.hero p{font-size:19px;color:#c3c9dc;max-width:780px}
+.chips{display:flex;flex-wrap:wrap;gap:8px;margin:18px 0}
+.chip{border:1px solid var(--line);background:var(--panel);padding:5px 12px;border-radius:99px;font-size:13px;color:var(--mu)}
+.chip b{color:var(--fg)}
+.part{margin:90px 0 0;padding-top:22px;border-top:1px solid var(--line);font-size:12px;letter-spacing:2px;text-transform:uppercase;color:var(--p)}
+section.ch{padding-top:30px}
+h2{font-size:30px;line-height:1.2;margin:10px 0 8px;display:flex;gap:12px;align-items:center;flex-wrap:wrap}
+h2 .num{display:inline-grid;place-items:center;width:40px;height:40px;border-radius:12px;background:var(--panel2);border:1px solid var(--line);font-size:18px;color:var(--a)}
+.lvl{font-size:11px;font-weight:600;letter-spacing:.8px;text-transform:uppercase;padding:3px 9px;border-radius:99px;border:1px solid}
+.lvl.b{color:var(--g);border-color:#1f5c3a}.lvl.i{color:var(--a);border-color:#244a85}.lvl.a{color:var(--y);border-color:#6b5420}.lvl.e{color:var(--r);border-color:#7a2c3a}
+h3{font-size:19px;margin:30px 0 6px;color:#fff}
+p{margin:10px 0}li{margin:5px 0}
+code,.f{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace}
+code{background:var(--panel2);padding:1px 6px;border-radius:5px;font-size:.9em}
+.f{display:block;white-space:pre-wrap;background:#0e1322;border:1px solid var(--line);border-left:3px solid var(--a);padding:12px 16px;border-radius:9px;margin:14px 0;overflow-x:auto;font-size:15px;color:#dbe4ff;line-height:1.8}
+.co{border-radius:12px;padding:13px 17px;margin:16px 0;border:1px solid var(--line);background:var(--panel)}
+.co>b:first-child{display:block;margin-bottom:2px;font-size:12px;letter-spacing:1px;text-transform:uppercase}
+.co.def{border-left:4px solid var(--a)}.co.def>b:first-child{color:var(--a)}
+.co.warn{border-left:4px solid var(--r)}.co.warn>b:first-child{color:var(--r)}
+.co.tip{border-left:4px solid var(--g)}.co.tip>b:first-child{color:var(--g)}
+.co.key{border-left:4px solid var(--y);background:#171608}.co.key>b:first-child{color:var(--y)}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:18px 20px;margin:22px 0;box-shadow:0 8px 30px rgba(0,0,0,.25)}
+.card>h4{margin:0 0 3px;font-size:13px;letter-spacing:1.2px;text-transform:uppercase;color:var(--t)}
+.card>p.sub{margin:0 0 12px;color:var(--mu);font-size:14.5px}
+.ctl{display:flex;flex-wrap:wrap;gap:10px 22px;align-items:center;margin:8px 0 10px}
+.ctl label{display:flex;gap:8px;align-items:center;font-size:14px;color:#c3c9dc}
+.ctl output{min-width:38px;font-family:ui-monospace,monospace;color:var(--y);font-size:13px}
+input[type=range]{accent-color:var(--a);width:150px}
+input[type=checkbox]{accent-color:var(--a)}
+select,input[type=number],input[type=text]{background:#0e1322;color:var(--fg);border:1px solid var(--line);border-radius:8px;padding:6px 9px;font:inherit;font-size:14px}
+button{background:linear-gradient(180deg,#2c4a80,#233b68);color:#fff;border:1px solid #3a5a98;border-radius:9px;padding:7px 14px;font:inherit;font-size:14px;cursor:pointer}
+button:hover{filter:brightness(1.15)}
+button.alt{background:var(--panel2);border-color:var(--line);color:var(--fg)}
+canvas{width:100%;height:270px;display:block;background:#0e1322;border:1px solid var(--line);border-radius:10px;margin-top:6px}
+canvas.sm{height:210px}canvas.tl{height:330px}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(125px,1fr));gap:9px;margin:12px 0}
+.stat{background:#0e1322;border:1px solid var(--line);border-radius:10px;padding:8px 11px}
+.stat b{display:block;font-size:17px;font-family:ui-monospace,monospace}
+.stat span{font-size:11.5px;color:var(--mu);text-transform:uppercase;letter-spacing:.7px}
+.stat.hot b{color:var(--r)}.stat.ok b{color:var(--g)}.stat.warn b{color:var(--y)}.stat.in b{color:var(--a)}
+.read{margin:8px 0 0;padding:10px 14px;background:#0e1322;border:1px dashed #33406a;border-radius:10px;font-size:14.5px;color:#d3dbf3}
+table{border-collapse:collapse;width:100%;margin:12px 0;font-size:14px}
+th,td{border:1px solid var(--line);padding:7px 10px;text-align:left;vertical-align:top}
+th{background:var(--panel2);font-size:12px;text-transform:uppercase;letter-spacing:.6px;color:var(--mu)}
+td.n{font-family:ui-monospace,monospace;text-align:right}
+.tw{overflow-x:auto}
+.pill{display:inline-block;padding:1px 9px;border-radius:99px;font-size:12px;font-weight:600}
+.pill.r{background:#3a1520;color:var(--r)}.pill.g{background:#10321f;color:var(--g)}.pill.y{background:#3a2f0e;color:var(--y)}.pill.m{background:#202637;color:var(--mu)}
+details{background:var(--panel);border:1px solid var(--line);border-radius:11px;padding:9px 15px;margin:9px 0}
+details summary{cursor:pointer;font-weight:600}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.q{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:14px 18px;margin:14px 0}
+.q .qh{font-size:12px;letter-spacing:1px;text-transform:uppercase;color:var(--mu)}
+.q .opt{display:block;width:100%;text-align:left;margin:6px 0;background:#0e1322;border:1px solid var(--line);color:var(--fg);border-radius:9px;padding:9px 12px}
+.q .opt.good{border-color:var(--g);background:#0e2418}.q .opt.bad{border-color:var(--r);background:#2a1119}
+.q .ex{display:none;margin-top:8px;font-size:14.5px;color:#c3c9dc}
+.q.done .ex{display:block}
+.chk label{display:flex;gap:10px;align-items:flex-start;padding:6px 0;cursor:pointer}
+.chk input{margin-top:6px;accent-color:var(--g);width:17px;height:17px}
+.sigrow{display:grid;grid-template-columns:minmax(170px,2fr) 1fr 1fr auto;gap:8px 14px;align-items:center;padding:6px 0;border-top:1px dashed #1b2236}
+.sigrow:first-of-type{border-top:0}
+.sigrow label{display:flex;gap:6px;align-items:center;font-size:13.5px;color:#c3c9dc}
+@media(max-width:900px){
+ .side{transform:translateX(-100%)}.side.open{transform:none}.meter{display:none}
+ #menu{display:block}main{margin-left:0;padding:0 16px 100px}.two{grid-template-columns:1fr}.hero{padding-top:60px}
+ .sigrow{grid-template-columns:1fr 1fr}
+}
+</style>
+</head>
+<body>
+<div id="prog"></div>
+<button id="menu">☰ Contents</button>
+<nav class="side" id="side"><a class="back" href="index.html">← All courses</a><h1>Collinearity, Interactions, Nonlinearity</h1><small>12 chapters · 11 labs · exam</small><div id="nav"></div></nav>
+<div class="meter"><div id="mtxt">Mastery: 0%</div><div class="bar"><i id="mbar"></i></div></div>
+
+<main>
+<header class="hero">
+ <h1>Collinearity, interactions and nonlinearity.</h1>
+ <p>Real relationships are rarely a clean straight line with independent predictors. This page covers what happens when predictors overlap (multicollinearity), when the effect of one variable depends on another (interactions), and when the shape of the relationship is not a line (polynomials, splines, binning). You will see exactly what each does to coefficients, standard errors, predictions and power, and how to choose flexibility by cross-validation instead of by eye.</p>
+ <div class="chips"><span class="chip"><b>Part I</b> Collinearity</span><span class="chip"><b>Part II</b> Interactions</span><span class="chip"><b>Part III</b> Functional form</span></div>
+ <div class="co tip"><b>How to use this</b>Every lab simulates data with known truth. Sliders that run thousands of simulations update when released or when you press the button. Prerequisite: the Linear Regression page (OLS, Frisch–Waugh–Lovell, standard errors).</div>
+</header>
+
+<div class="part">Part I · Collinearity</div>
+
+<section class="ch" id="c1">
+<h2><span class="num">1</span>What collinearity does, and what it does not <span class="lvl b">Beginner</span></h2>
+<p>Two predictors are <b>collinear</b> when they carry much of the same information. By Frisch–Waugh–Lovell, the coefficient on x₁ comes from the part of x₁ that the other predictors cannot explain; the more x₂ explains x₁, the less variation is left, and the coefficient is determined by less information. For two predictors with correlation ρ:</p>
+<div class="f">Var(β̂₁) = σ² / [ Sxx₁ · (1 − ρ²) ]          standard error inflation = 1 / √(1 − ρ²)</div>
+<p>At ρ = 0.9 the standard error is 2.3 times larger; at ρ = 0.99 it is 7 times larger. Crucially, collinearity inflates <em>variance</em>, not bias: the estimates stay centred on the truth, they are just unstable. It also does <b>not</b> hurt predictions made inside the cloud of observed data, nor the joint effect of the correlated predictors, nor the coefficients of unrelated predictors. It hurts the question “which one of them is responsible?”.</p>
+<div class="card"><h4>Lab 1 · The price of correlated predictors</h4>
+ <p class="sub">y = 1·x₁ + 1·x₂ + noise. Histograms show the sampling distribution of the x₁ coefficient (both predictors in the model) over 3,000 data sets. Red: x₁ and x₂ uncorrelated. Blue: at the correlation you choose. Watch the spread widen as the correlation rises while the centre stays at 1.</p>
+ <div class="ctl"><label>correlation of x₁, x₂ % <input type="range" id="c1r" min="0" max="99" step="1" value="90"><output id="c1rv"></output></label><label>n <input type="range" id="c1n" min="30" max="300" step="5" value="100"><output id="c1nv"></output></label><button id="c1go">Re-simulate</button></div>
+ <canvas class="tl" id="c1cv"></canvas><div class="stats" id="c1st"></div><div class="read" id="c1rd"></div></div>
+</section>
+
+<section class="ch" id="c2">
+<h2><span class="num">2</span>VIF, tolerance and perfect collinearity <span class="lvl i">Intermediate</span></h2>
+<p>With many predictors, pairwise correlations miss overlaps that involve three or more variables. The <b>variance inflation factor</b> of predictor j is VIFⱼ = 1/(1 − Rⱼ²), where Rⱼ² is the R² from regressing xⱼ on all the other predictors. Tolerance is 1/VIF. A VIF of 10 (R² = 0.9) is the traditional alarm level, and the standard error of that coefficient is √VIF times what it would be with uncorrelated predictors. The <b>condition number</b> of the scaled design matrix summarises the same problem for the whole model.</p>
+<p><b>Perfect</b> collinearity (an exact linear relation, such as including all dummies of a category along with the intercept, or a percentage and its complement) makes XᵀX singular: the coefficients are not identified and software drops a column. Near-perfect collinearity gives enormous standard errors and wildly changing signs between samples.</p>
+<div class="card"><h4>Lab 2 · VIF of a predictor built from others</h4>
+ <p class="sub">x₁ and x₂ are independent; x₃ = a·x₁ + b·x₂ + noise. Raise the weights or shrink the noise and watch all three VIFs rise: a variable that is nearly a combination of two others drags them all in, even though no pair is highly correlated.</p>
+ <div class="ctl"><label>weight a of x₁ <input type="range" id="c2a" min="0" max="100" step="1" value="60"><output id="c2av"></output></label><label>weight b of x₂ <input type="range" id="c2b" min="0" max="100" step="1" value="60"><output id="c2bv"></output></label><label>noise SD of x₃ <input type="range" id="c2e" min="5" max="100" step="1" value="30"><output id="c2ev"></output></label><button id="c2go">New data</button></div>
+ <canvas class="tl" id="c2cv"></canvas><div class="tw" id="c2tb"></div><div class="read" id="c2rd"></div></div>
+</section>
+
+<section class="ch" id="c3">
+<h2><span class="num">3</span>Individually insignificant, jointly significant <span class="lvl a">Advanced</span></h2>
+<p>When two collinear predictors both matter, each t-test can be insignificant while the joint F-test is overwhelming: the data know that <em>something</em> in the pair drives y but cannot say which. Dropping one because its p-value is large then removes a real effect and biases the other (omitted-variable bias with δ near 1). What to do depends on the question:</p>
+<p><b>Prediction</b>: ignore the collinearity, or use ridge or principal-components regression. <b>Inference on the group</b>: test the predictors jointly. <b>Inference on each one</b>: you need more data, a design that breaks the correlation, or a subject-matter reason to combine them into one index or to constrain their coefficients. Do not use stepwise deletion, which hides the instability and makes the p-values invalid.</p>
+<div class="card"><h4>Lab 3 · The joint test sees what the t-tests miss</h4>
+ <p class="sub">y = 0.5·x₁ + 0.5·x₂ + noise. For each correlation, 1,500 data sets are analysed: bars show how often x₁ alone is significant, how often <em>both</em> are, and how often the joint F-test rejects, all at 5%.</p>
+ <div class="ctl"><label>sample size n <input type="range" id="c3n" min="30" max="300" step="5" value="80"><output id="c3nv"></output></label><button id="c3go">Re-simulate</button></div>
+ <canvas class="tl" id="c3cv"></canvas><div class="stats" id="c3st"></div><div class="read" id="c3rd"></div></div>
+</section>
+
+<div class="part">Part II · Interactions</div>
+
+<section class="ch" id="c4">
+<h2><span class="num">4</span>Interactions, main effects and centring <span class="lvl i">Intermediate</span></h2>
+<p>An <b>interaction</b> lets the effect of one variable depend on another: y = β₀ + β₁x + β₂d + β₃(x·d) + ε. Now β₁ is the slope of x <em>when d = 0</em>, β₂ is the effect of d <em>when x = 0</em>, and β₃ is the difference in slopes between the groups. The “main effect” coefficients lose their usual meaning: they describe a particular point (the reference group, x = 0). If x = 0 is outside the data (age 0, income 0), β₂ is an extrapolation with a huge standard error even when the effect of d across the actual data is clear.</p>
+<p>Centring x at its mean, x* = x − x̄, makes β₂ the effect of d at the average x and usually makes the main effects both interpretable and better determined. The fitted model is identical; only the parametrisation changes. Never interpret a main effect in a model with an interaction without saying at which value of the other variable.</p>
+<div class="card"><h4>Lab 4 · Two groups, two slopes</h4>
+ <p class="sub">x ranges from 2 to 8. True model: y = 1 + 0.5x + b_d·d + b_x·x·d + noise. Choose whether x is centred. The fitted lines never change, but the coefficient on d changes from “the gap at x = 0” (outside the data) to “the gap at the mean of x”.</p>
+ <div class="ctl"><label>interaction b_x <input type="range" id="c4b" min="-10" max="10" step="1" value="4"><output id="c4bv"></output></label><label>gap b_d at x = 0 <input type="range" id="c4d" min="-20" max="20" step="1" value="0"><output id="c4dv"></output></label><label>n <input type="range" id="c4n" min="40" max="400" step="10" value="120"><output id="c4nv"></output></label><label>x <select id="c4c"><option value="0">uncentred</option><option value="1">centred at its mean</option></select></label><button id="c4go">New data</button></div>
+ <canvas class="tl" id="c4cv"></canvas><div class="stats" id="c4st"></div><div class="read" id="c4rd"></div></div>
+</section>
+
+<section class="ch" id="c5">
+<h2><span class="num">5</span>Continuous interactions and marginal effects <span class="lvl a">Advanced</span></h2>
+<p>With two continuous variables, y = β₀ + β₁x + β₂z + β₃xz + ε, the effect of x is a <em>function</em> of z: ∂y/∂x = β₁ + β₃z. The right way to report it is the marginal effect across the range of z with a confidence band, not a table of coefficients. The variance uses the covariance matrix of the estimates:</p>
+<div class="f">Var(β̂₁ + β̂₃z) = Var(β̂₁) + z² Var(β̂₃) + 2z Cov(β̂₁, β̂₃)</div>
+<p>The band is narrowest near the middle of z’s data (where it should be, after centring) and widens at the edges. “Significant” differs between regions: x may matter for high z but not for low z, and the point where the band crosses zero is a finding in itself, but also an estimate with uncertainty. Interaction terms are strongly collinear with their parts unless centred; centring changes the coefficients and SEs of the lower-order terms, never the fit or the marginal-effect curve.</p>
+<div class="card"><h4>Lab 5 · The marginal effect curve with its band</h4>
+ <p class="sub">y = 1 + 0.5x + 0.5z + b·xz + noise, x and z standard normal. The line is the estimated effect of x at each value of z; the band is a 95% CI; the dashed line is the truth. Shrink n to see how wide the band gets away from z = 0.</p>
+ <div class="ctl"><label>interaction b <input type="range" id="c5b" min="-10" max="10" step="1" value="3"><output id="c5bv"></output></label><label>n <input type="range" id="c5n" min="40" max="800" step="10" value="200"><output id="c5nv"></output></label><button id="c5go">New data</button></div>
+ <canvas class="tl" id="c5cv"></canvas><div class="stats" id="c5st"></div><div class="read" id="c5rd"></div></div>
+</section>
+
+<section class="ch" id="c6">
+<h2><span class="num">6</span>Interactions are expensive to detect <span class="lvl e">Expert</span></h2>
+<p>In a randomised experiment with a binary treatment T and a binary subgroup G, the main effect of T is estimated from all n units, but the <em>difference in treatment effects between subgroups</em> compares two half-sized estimates: its standard error is <b>twice</b> as large as that of the main effect, so detecting an interaction of the same size needs about <b>four times</b> the sample, and with unequal groups even more. Underpowered subgroup analyses therefore produce exaggerated or sign-flipped interaction estimates (Type M and S errors from the power page) that are widely reported and rarely replicate.</p>
+<p>Practical rules: pre-specify a small number of subgroup hypotheses on subject-matter grounds; plan the sample size for the interaction, not the main effect; show the interaction estimate with its interval rather than separate significant and non-significant subgroup p-values (“the difference between significant and not significant is not itself significant”).</p>
+<div class="card"><h4>Lab 6 · Power of the main effect versus the interaction</h4>
+ <p class="sub">y = 0.3·T + δ·(T×G) + noise (SD 1), with T and G coded ±½ and balanced, so 0.3 is the average treatment effect and δ is the difference in treatment effect between the two subgroups. Curves show simulated power (600 data sets per point) of the tests for 0.3 and for δ, against total n.</p>
+ <div class="ctl"><label>interaction δ <input type="range" id="c6d" min="0" max="100" step="5" value="30"><output id="c6dv"></output></label><button id="c6go">Re-simulate</button></div>
+ <canvas class="tl" id="c6cv"></canvas><div class="stats" id="c6st"></div><div class="read" id="c6rd"></div></div>
+</section>
+
+<div class="part">Part III · Functional form</div>
+
+<section class="ch" id="c7">
+<h2><span class="num">7</span>Polynomials: flexible, global and dangerous <span class="lvl i">Intermediate</span></h2>
+<p>A quadratic or cubic term is the easiest way to add curvature, and the model is still linear in the coefficients, so OLS applies. But a polynomial is <em>global</em>: every coefficient affects the fit everywhere, so a high degree that bends to match the data at one end swings wildly at the other, and beyond the observed range it explodes. Degrees above 3 or 4 are rarely justified; the raw powers x, x², x³ are also highly collinear (centre or use orthogonal polynomials), and the individual coefficients have no useful interpretation: report fitted curves and marginal effects instead.</p>
+<div class="card"><h4>Lab 7 · Raising the degree</h4>
+ <p class="sub">The truth (dashed) is a smooth curve on x ∈ [−1, 1]. Increase the polynomial degree: training error always falls, test error is U-shaped, and the fit outside the data (the grey shaded zones) diverges.</p>
+ <div class="ctl"><label>degree <input type="range" id="c7d" min="1" max="12" step="1" value="3"><output id="c7dv"></output></label><label>n <input type="range" id="c7n" min="20" max="200" step="5" value="50"><output id="c7nv"></output></label><label>noise SD <input type="range" id="c7s" min="1" max="10" step="1" value="4"><output id="c7sv"></output></label><button id="c7go">New data</button></div>
+ <canvas class="tl" id="c7cv"></canvas><div class="stats" id="c7st"></div><div class="read" id="c7rd"></div></div>
+</section>
+
+<section class="ch" id="c8">
+<h2><span class="num">8</span>Piecewise models and splines <span class="lvl a">Advanced</span></h2>
+<p>A <b>spline</b> fits low-degree pieces joined at <b>knots</b>, so the flexibility is local: a bump in one region does not move the fit elsewhere. The <em>piecewise-linear</em> (hinge) basis adds a term (x − κ)₊ per knot, giving a continuous line that changes slope at each knot. A <em>cubic regression spline</em> uses (x − κ)₊³ terms, giving a smooth curve. A <em>step function</em> (binning) is the crudest: a constant per interval, discontinuous at the edges. All are ordinary regressions on constructed columns, so standard errors, tests and prediction intervals carry over; the number of knots is the tuning parameter.</p>
+<div class="card"><h4>Lab 8 · Three bases, one wiggly truth</h4>
+ <p class="sub">Truth: f(x) = 2 sin(0.9x) + 0.3x on [0, 10] (dashed). Pick a basis and a number of knots. Compare the fitted curve and the error on 1,000 new points.</p>
+ <div class="ctl"><label>basis <select id="c8t"><option value="cub">cubic spline</option><option value="lin">piecewise linear</option><option value="step">step function</option></select></label><label>knots <input type="range" id="c8k" min="0" max="12" step="1" value="4"><output id="c8kv"></output></label><label>n <input type="range" id="c8n" min="30" max="400" step="10" value="120"><output id="c8nv"></output></label><label>noise SD <input type="range" id="c8s" min="2" max="20" step="1" value="8"><output id="c8sv"></output></label><button id="c8go">New data</button></div>
+ <canvas class="tl" id="c8cv"></canvas><div class="stats" id="c8st"></div><div class="read" id="c8rd"></div></div>
+</section>
+
+<section class="ch" id="c9">
+<h2><span class="num">9</span>Choosing flexibility by cross-validation <span class="lvl a">Advanced</span></h2>
+<p>Training error always prefers more flexibility, so it cannot choose the number of knots or the degree. <b>K-fold cross-validation</b> splits the data into K parts, fits on K−1 of them, predicts the held-out part, and averages the squared errors: an honest estimate of out-of-sample error for each candidate. Choose the model minimising it, or the simplest one within one standard error of the minimum (the “one-standard-error rule”, which favours smoother fits). Remember that the CV curve is itself noisy, and that a selection made by CV and then tested on the same data needs an outer holdout.</p>
+<div class="card"><h4>Lab 9 · The cross-validation curve</h4>
+ <p class="sub">Same truth as Lab 8, cubic splines with 0 to 12 knots. Red: training MSE (always falls). Blue: 10-fold CV error (U-shaped). The marker shows the minimum and the one-SE choice.</p>
+ <div class="ctl"><label>n <input type="range" id="c9n" min="50" max="400" step="10" value="150"><output id="c9nv"></output></label><label>noise SD <input type="range" id="c9s" min="2" max="20" step="1" value="8"><output id="c9sv"></output></label><button id="c9go">New data</button></div>
+ <canvas class="tl" id="c9cv"></canvas><div class="stats" id="c9st"></div><div class="read" id="c9rd"></div></div>
+</section>
+
+<section class="ch" id="c10">
+<h2><span class="num">10</span>Seeing curvature: partial-residual plots <span class="lvl a">Advanced</span></h2>
+<p>With several predictors, a plot of y against one of them is muddied by the others. The <b>component-plus-residual (partial-residual) plot</b> adds each point’s residual back to the fitted part for the predictor of interest, e + β̂ⱼxⱼ, and plots it against xⱼ: if the relationship is truly linear the cloud follows the line; a curve or a kink shows exactly which transformation is needed. A smooth through the points (here, binned averages) makes the shape visible. The residual-versus-fitted plot says that <em>something</em> is wrong, the partial-residual plot says <em>where</em>.</p>
+<div class="card"><h4>Lab 10 · Where is the curve?</h4>
+ <p class="sub">y = x₁ + g(x₂) + noise, where g is linear, quadratic or a threshold. A linear model is fitted anyway. Left: residuals vs fitted. Right: the partial-residual plot for x₂ with the linear fit (red) and binned means (green).</p>
+ <div class="ctl"><label>shape of g <select id="c10s"><option value="lin">linear</option><option value="quad">quadratic</option><option value="thr">threshold (no effect below 0, rises above)</option></select></label><label>n <input type="range" id="c10n" min="50" max="500" step="10" value="200"><output id="c10nv"></output></label><button id="c10go">New data</button></div>
+ <div class="two"><canvas class="sm" id="c10cv"></canvas><canvas class="sm" id="c10cv2"></canvas></div><div class="stats" id="c10st"></div><div class="read" id="c10rd"></div></div>
+</section>
+
+<section class="ch" id="c11">
+<h2><span class="num">11</span>The cost of chopping a continuous variable <span class="lvl e">Expert</span></h2>
+<p>Splitting a continuous predictor into groups (above or below the median, quartiles, “high / low”) is convenient and costly. It discards within-group information: a median split of a linear effect keeps only about 64% of the information (a loss equal to dropping 36% of the sample), tertiles about 81% and quartiles about 88%. It makes results depend on arbitrary cut points, assumes a step where the truth is smooth, and when the binned variable is a <em>confounder</em> it leaves residual confounding within bins. If a shape is unknown, a spline is better than bins on every count.</p>
+<div class="card"><h4>Lab 11 · Power lost by binning</h4>
+ <p class="sub">y = β·x + noise, x standard normal. Bars give the simulated power (1,000 data sets, 5% level) of the slope test on the continuous x and of the ANOVA F-test after cutting x into 2, 3, 4, 5 or 10 equal-count groups.</p>
+ <div class="ctl"><label>effect β <input type="range" id="c11b" min="5" max="60" step="1" value="25"><output id="c11bv"></output></label><label>n <input type="range" id="c11n" min="40" max="800" step="10" value="150"><output id="c11nv"></output></label><button id="c11go">Re-simulate</button></div>
+ <canvas class="tl" id="c11cv"></canvas><div class="stats" id="c11st"></div><div class="read" id="c11rd"></div></div>
+</section>
+
+<section class="ch" id="c12">
+<h2><span class="num">12</span>Final exam, mastery checklist, cheat sheet <span class="lvl e">Expert</span></h2>
+<h3>Exam (18 questions — click an answer)</h3>
+<div id="quiz"></div>
+<div class="card"><h4>Score</h4><div class="stats" id="qscore"></div><button class="alt" id="qreset">Reset exam</button></div>
+<h3>Mastery checklist — tick when you can do it without notes</h3>
+<div class="card chk" id="chk"></div>
+<h3>Cheat sheet</h3>
+<div class="tw"><table>
+<tr><th>Idea</th><th>One line</th></tr>
+<tr><td>Collinearity</td><td>Inflates variance by 1/(1 − R²ⱼ) (VIF), not bias; leaves predictions in-sample and joint effects intact</td></tr>
+<tr><td>VIF</td><td>Regress xⱼ on the others; VIF = 1/(1 − R²); √VIF scales the SE; 10 is the old alarm level</td></tr>
+<tr><td>Perfect collinearity</td><td>XᵀX singular; coefficients unidentified (dummy trap)</td></tr>
+<tr><td>Remedies</td><td>Joint F-test, combine variables, more data or design, ridge/PCA for prediction; no stepwise deletion</td></tr>
+<tr><td>Interaction</td><td>Effect of x depends on d: β₁ is the slope at d = 0, β₃ the slope difference</td></tr>
+<tr><td>Centring</td><td>Makes main effects mean “at the average”; same fit, better-behaved coefficients</td></tr>
+<tr><td>Marginal effect</td><td>β₁ + β₃z with Var = V₁₁ + z²V₃₃ + 2zV₁₃; plot it with a band</td></tr>
+<tr><td>Interaction power</td><td>SE ≈ 2× that of a main effect; need ≈ 4× the sample for the same effect size</td></tr>
+<tr><td>Polynomials</td><td>Global, wild at the edges and outside the data; rarely above degree 3</td></tr>
+<tr><td>Splines</td><td>Local pieces joined at knots; hinge (linear) or truncated cubic basis; knots are the tuning parameter</td></tr>
+<tr><td>Cross-validation</td><td>Choose flexibility by held-out error; one-SE rule favours the smoother model</td></tr>
+<tr><td>Partial residuals</td><td>e + β̂ⱼxⱼ against xⱼ shows the shape of the effect of xⱼ</td></tr>
+<tr><td>Binning</td><td>Median split loses ≈ 36% of the information; prefer splines or the raw variable</td></tr>
+</table></div>
+<div class="co tip"><b>Next on the roadmap</b>Item 13, generalised linear models: logistic and Poisson regression, link functions and deviance, where everything on the last two pages carries over.</div>
+</section>
+</main>
+<script>
+/*MATH*/
+function lgamma(x){const c=[76.18009172947146,-86.50532032941677,24.01409824083091,-1.231739572450155,0.1208650973866179e-2,-0.5395239384953e-5];let y=x,t=x+5.5;t-=(x+.5)*Math.log(t);let s=1.000000000190015;for(let j=0;j<6;j++)s+=c[j]/++y;return -t+Math.log(2.5066282746310005*s/x);}
+function gser(a,x){let ap=a,sum=1/a,del=sum;for(let n=0;n<1000;n++){ap++;del*=x/ap;sum+=del;if(Math.abs(del)<Math.abs(sum)*1e-15)break;}return sum*Math.exp(-x+a*Math.log(x)-lgamma(a));}
+function gcf(a,x){let b=x+1-a,c=1/1e-300,d=1/b,h=d;for(let i=1;i<1000;i++){const an=-i*(i-a);b+=2;d=an*d+b;if(Math.abs(d)<1e-300)d=1e-300;c=b+an/c;if(Math.abs(c)<1e-300)c=1e-300;d=1/d;const del=d*c;h*=del;if(Math.abs(del-1)<1e-15)break;}return Math.exp(-x+a*Math.log(x)-lgamma(a))*h;}
+function gammaQ(a,x){if(x<=0)return 1;return x<a+1?1-gser(a,x):gcf(a,x);}
+function betacf(a,b,x){const qab=a+b,qap=a+1,qam=a-1;let c=1,d=1-qab*x/qap;if(Math.abs(d)<1e-300)d=1e-300;d=1/d;let h=d;for(let m=1;m<=1000;m++){const m2=2*m;let aa=m*(b-m)*x/((qam+m2)*(a+m2));d=1+aa*d;if(Math.abs(d)<1e-300)d=1e-300;c=1+aa/c;if(Math.abs(c)<1e-300)c=1e-300;d=1/d;h*=d*c;aa=-(a+m)*(qab+m)*x/((a+m2)*(qap+m2));d=1+aa*d;if(Math.abs(d)<1e-300)d=1e-300;c=1+aa/c;if(Math.abs(c)<1e-300)c=1e-300;d=1/d;const del=d*c;h*=del;if(Math.abs(del-1)<1e-15)break;}return h;}
+function betai(a,b,x){if(x<=0)return 0;if(x>=1)return 1;const bt=Math.exp(lgamma(a+b)-lgamma(a)-lgamma(b)+a*Math.log(x)+b*Math.log(1-x));return x<(a+1)/(a+b+2)?bt*betacf(a,b,x)/a:1-bt*betacf(b,a,1-x)/b;}
+function normSf(z){const q=0.5*gammaQ(.5,z*z/2);return z>=0?q:1-q;}
+function normCdf(z){return normSf(-z);}
+function npdf(x){return Math.exp(-x*x/2)/2.5066282746310002;}
+function lbin(n,k){return lgamma(n+1)-lgamma(k+1)-lgamma(n-k+1);}
+function binom(n,k,p){return Math.exp(lbin(n,k)+k*Math.log(p)+(n-k)*Math.log(1-p));}
+function betapdf(x,a,b){return x<=0||x>=1?0:Math.exp(lgamma(a+b)-lgamma(a)-lgamma(b)+(a-1)*Math.log(x)+(b-1)*Math.log(1-x));}
+function betacdf(x,a,b){return betai(a,b,x);}
+function gampdf(x,a,r){return x<=0?0:Math.exp(a*Math.log(r)+(a-1)*Math.log(x)-r*x-lgamma(a));}
+function gamcdf(x,a,r){return x<=0?0:1-gammaQ(a,r*x);}
+function randn(){let u=0;while(!u)u=Math.random();return Math.sqrt(-2*Math.log(u))*Math.cos(2*Math.PI*Math.random());}
+function gammaS(a){if(a<1)return gammaS(a+1)*Math.pow(Math.random(),1/a);const d=a-1/3,c=1/Math.sqrt(9*d);for(;;){let x,v;do{x=randn();v=1+c*x}while(v<=0);v=v*v*v;const u=Math.random();if(Math.log(u)<.5*x*x+d-d*v+d*Math.log(v))return d*v;}}
+function betaS(a,b){const x=gammaS(a),y=gammaS(b);return x/(x+y);}
+function binS(n,p){let k=0;for(let i=0;i<n;i++)if(Math.random()<p)k++;return k;}
+function mean(a){let s=0;for(const v of a)s+=v;return s/a.length;}
+function qc(cdf,lo,hi,p,it){for(let i=0;i<(it||100);i++){const m=(lo+hi)/2;if(cdf(m)<p)lo=m;else hi=m}return(lo+hi)/2;}
+function qb(a,b,p){return qc(x=>betai(a,b,x),0,1,p,50);}
+function tcdf(x,v){const t=.5*betai(v/2,.5,v/(v+x*x));return x>0?1-t:t}
+function qn(p){return qc(normCdf,-9,9,p,70)}
+function pois(k,l){return Math.exp(-l+k*Math.log(l)-lgamma(k+1))}
+function binF(n,p){let k=0;for(;;){if(n<=0||p<=0)return k;if(p>=1)return k+n;if(n<=40){for(let i=0;i<n;i++)if(Math.random()<p)k++;return k}const a=1+(n>>1),bb=1+n-a,x=betaS(a,bb);if(x>=p){n=a-1;p=p/x}else{k+=a;n=bb-1;p=(p-x)/(1-x)}}}
+/*ENDMATH*/
+
+const $=id=>document.getElementById(id), val=id=>+$(id).value;
+const C={fg:'#e8ebf5',mu:'#8a93ab',gr:'#232a3d',a:'#6ea8ff',r:'#ff6b81',y:'#ffd166',g:'#4ade80',p:'#c084fc',t:'#5eead4'};
+const store={get(k,d){try{const v=JSON.parse(localStorage.getItem(k));return v==null?d:v}catch(e){return d}},set(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}};
+function stat(l,v,c){return `<div class="stat ${c||''}"><b>${v}</b><span>${l}</span></div>`}
+function f3(x){if(!isFinite(x))return String(x);const a=Math.abs(x);if(a!==0&&(a<1e-3||a>=1e6))return x.toExponential(2);return String(+x.toFixed(a<1?4:a<100?3:a<1000?2:0))}
+function pc(x){return f3(100*x)+'%'}
+const resizers=[];
+function reg(fn){fn();resizers.push(fn)}
+function on(ids,fn){ids.split(' ').forEach(i=>{const e=$(i);e.addEventListener('input',fn);e.addEventListener('change',fn)})}
+let rt;window.addEventListener('resize',()=>{clearTimeout(rt);rt=setTimeout(()=>resizers.forEach(f=>f()),150)});
+document.querySelectorAll('input[type=range]').forEach(i=>{const o=$(i.id+'v');if(!o)return;const f=()=>{o.textContent=i.value};i.addEventListener('input',f);f()});
+
+function nice(x){const e=Math.pow(10,Math.floor(Math.log10(x))),f=x/e;return (f<1.5?1:f<3?2:f<7?5:10)*e}
+function mk(cv,x0,x1,ymax,o){o=o||{};const y0=o.y0||0,dpr=window.devicePixelRatio||1,r=cv.getBoundingClientRect(),w=r.width||600,h=r.height||270;
+ cv.width=w*dpr;cv.height=h*dpr;const g=cv.getContext('2d');g.setTransform(dpr,0,0,dpr,0,0);g.clearRect(0,0,w,h);
+ const L=o.L||42,R=12,T=14,B=28,X=x=>L+(x-x0)/(x1-x0)*(w-L-R),Y=y=>h-B-(y-y0)/(ymax-y0)*(h-T-B);
+ g.font='11px system-ui';g.lineWidth=1;g.strokeStyle=C.gr;g.fillStyle=C.mu;
+ if(!o.noGrid){const sx=nice((x1-x0)/7);for(let x=Math.ceil(x0/sx-1e-9)*sx;!o.noX&&x<=x1+1e-9;x+=sx){g.beginPath();g.moveTo(X(x),T);g.lineTo(X(x),h-B);g.stroke();g.textAlign='center';g.fillText(String(+x.toFixed(6)),X(x),h-B+15)}
+ const sy=nice((ymax-y0)/4);for(let y=Math.ceil(y0/sy-1e-9)*sy;y<=ymax+1e-9;y+=sy){g.beginPath();g.moveTo(L,Y(y));g.lineTo(w-R,Y(y));g.stroke();g.textAlign='right';g.fillText(String(+y.toFixed(4)),L-5,Y(y)+3)}}
+ return{g,w,h,X,Y,L,R,T,B,
+  line(f,col,lw,a,b,n,dash){a=a==null?x0:a;b=b==null?x1:b;n=n||260;g.save();if(dash)g.setLineDash([5,4]);g.beginPath();g.strokeStyle=col;g.lineWidth=lw||2;let st=false;for(let i=0;i<=n;i++){const x=a+(b-a)*i/n,y=f(x);if(!isFinite(y)){st=false;continue}st?g.lineTo(X(x),Y(y)):g.moveTo(X(x),Y(y));st=true}g.stroke();g.restore()},
+  area(f,a,b,col,n){a=Math.max(a,x0);b=Math.min(b,x1);if(b<=a)return;n=n||200;g.beginPath();g.moveTo(X(a),Y(0));for(let i=0;i<=n;i++){const x=a+(b-a)*i/n;g.lineTo(X(x),Y(f(x)))}g.lineTo(X(b),Y(0));g.closePath();g.fillStyle=col;g.fill()},
+  vline(x,col,lab,dash){g.save();g.strokeStyle=col;g.lineWidth=1.6;if(dash)g.setLineDash([5,4]);g.beginPath();g.moveTo(X(x),T);g.lineTo(X(x),h-B);g.stroke();g.restore();if(lab){g.fillStyle=col;g.textAlign='center';g.fillText(lab,Math.min(Math.max(X(x),34),w-34),T+10)}},
+  hline(y,col,lab){g.save();g.strokeStyle=col;g.lineWidth=1.4;g.setLineDash([5,4]);g.beginPath();g.moveTo(L,Y(y));g.lineTo(w-R,Y(y));g.stroke();g.restore();if(lab){g.fillStyle=col;g.textAlign='right';g.fillText(lab,w-R-3,Y(y)-4)}},
+  text(s,x,y,col,al){g.fillStyle=col||C.fg;g.textAlign=al||'left';g.fillText(s,x,y)}};}
+
+/* ---------- shared helpers for this page ---------- */
+const D={
+ norm:{n:'Normal(0,1)',s:()=>randn(),mu:0,sd:1,sk:0},
+ unif:{n:'Uniform(0,1)',s:()=>Math.random(),mu:.5,sd:Math.sqrt(1/12),sk:0},
+ expo:{n:'Exponential(1)',s:()=>-Math.log(1-Math.random()),mu:1,sd:1,sk:2},
+ logn:{n:'Lognormal(0,1)',s:()=>Math.exp(randn()),mu:Math.exp(.5),sd:Math.sqrt((Math.E-1)*Math.E),sk:(Math.E+2)*Math.sqrt(Math.E-1),disc:0},
+ b05:{n:'Bernoulli(0.5)',s:()=>Math.random()<.5?1:0,mu:.5,sd:.5,sk:0,disc:1},
+ b05s:{n:'Bernoulli(0.05)',s:()=>Math.random()<.05?1:0,mu:.05,sd:Math.sqrt(.0475),sk:.9/Math.sqrt(.0475),disc:1},
+ bimo:{n:'Two humps',s:()=>(Math.random()<.5?-2:2)+.5*randn(),mu:0,sd:Math.sqrt(4.25),sk:0},
+ par5:{n:'Pareto(α=5)',s:()=>Math.pow(1-Math.random(),-.2),mu:1.25,sd:Math.sqrt(5/48),sk:6*Math.sqrt(.6)},
+ cauchy:{n:'Cauchy (no mean)',s:()=>Math.tan(Math.PI*(Math.random()-.5)),mu:NaN,sd:Infinity,sk:NaN}
+};
+function fillSel(id,keys,def){const e=$(id);e.innerHTML=keys.map(k=>`<option value="${k}">${D[k].n}</option>`).join('');e.value=def}
+const PAL=[C.a,C.r,C.y,C.g,C.p,C.t,'#ff9f43','#9aa4bf'];
+function tgrid(N,M){const T=[];let prev=0;for(let i=0;i<M;i++){let n=Math.round(Math.pow(10,Math.log10(N)*i/(M-1)));if(i===M-1)n=N;n=Math.max(prev+1,n);if(n>N)break;T.push(n);prev=n}if(T[T.length-1]!==N)T[T.length-1]=N;return T}
+function nlab(n){return n>=1e6?(n/1e6)+'M':n>=1000?(n/1000)+'k':String(n)}
+function customGrid(P,xt,yt){const g=P.g;g.save();g.strokeStyle=C.gr;g.fillStyle=C.mu;g.font='11px system-ui';g.lineWidth=1;
+ xt.forEach(([v,l])=>{g.beginPath();g.moveTo(P.X(v),P.T);g.lineTo(P.X(v),P.h-P.B);g.stroke();g.textAlign='center';g.fillText(l,P.X(v),P.h-P.B+15)});
+ yt.forEach(([v,l])=>{g.beginPath();g.moveTo(P.L,P.Y(v));g.lineTo(P.w-P.R,P.Y(v));g.stroke();g.textAlign='right';g.fillText(l,P.L-5,P.Y(v)+3)});g.restore()}
+function clip(P,fn){const g=P.g;g.save();g.beginPath();g.rect(P.L,P.T,P.w-P.L-P.R,P.h-P.T-P.B);g.clip();fn();g.restore()}
+function poly(P,pts,col,lw,dash){const g=P.g;g.save();if(dash)g.setLineDash([5,4]);g.strokeStyle=col;g.lineWidth=lw||2;g.beginPath();pts.forEach(([x,y],i)=>i?g.lineTo(P.X(x),P.Y(y)):g.moveTo(P.X(x),P.Y(y)));g.stroke();g.restore()}
+function dots(P,pts,col,r){const g=P.g;g.fillStyle=col;pts.forEach(([x,y])=>{g.beginPath();g.arc(P.X(x),P.Y(y),r||3,0,7);g.fill()})}
+function niceTicks(lo,hi,k){const st=nice((hi-lo)/(k||5)),a=[];for(let v=Math.ceil(lo/st-1e-9)*st;v<=hi+1e-9;v+=st)a.push([v,String(+v.toFixed(6))]);return a}
+function logTicks(lo,hi){const a=[];for(let e=Math.ceil(lo-1e-9);e<=hi+1e-9;e++)a.push([e,nlab(Math.pow(10,e))]);return a}
+function mom(a){const n=a.length;let m=0;for(const v of a)m+=v;m/=n;let v2=0,v3=0,v4=0;for(const v of a){const d=v-m;v2+=d*d;v3+=d*d*d;v4+=d*d*d*d}v2/=n;v3/=n;v4/=n;const sd=Math.sqrt(v2);return{n,m,sd,sk:sd>0?v3/(sd*sd*sd):0,ku:v2>0?v4/(v2*v2)-3:0}}
+function ksN(z){const a=Array.from(z).sort((x,y)=>x-y),n=a.length;let d=0;for(let i=0;i<n;i++){const F=normCdf(a[i]);d=Math.max(d,Math.abs((i+1)/n-F),Math.abs(i/n-F))}return d}
+/* histogram of data as density with optional overlay curves [{f,col,lw,dash}] */
+function hist(cv,data,lo,hi,bins,ov,col){const cnt=new Float64Array(bins),bw=(hi-lo)/bins;let n=0;for(const v of data){if(v<lo||v>=hi)continue;cnt[Math.floor((v-lo)/bw)]++;n++}
+ const N=data.length;let ym=0;for(let i=0;i<bins;i++){cnt[i]/=N*bw;ym=Math.max(ym,cnt[i])}
+ (ov||[]).forEach(o=>{for(let i=0;i<=80;i++)ym=Math.max(ym,o.f(lo+(hi-lo)*i/80)||0)});
+ const P=mk(cv,lo,hi,ym*1.12);
+ P.g.fillStyle=col||'rgba(110,168,255,.5)';for(let i=0;i<bins;i++){if(cnt[i]<=0)continue;const a=P.X(lo+i*bw),b=P.X(lo+(i+1)*bw);P.g.fillRect(a,P.Y(cnt[i]),Math.max(1,b-a-1),P.Y(0)-P.Y(cnt[i]))}
+ (ov||[]).forEach(o=>P.line(o.f,o.col,o.lw||2.4,lo,hi,200,o.dash));return P}
+const fmt=x=>f3(x);
+
+/* ---------- shared for this page ---------- */
+const POPS=['norm','unif','expo','logn','bimo','par5'];
+D.norm.med=0;D.norm.q90=1.2815516;D.unif.med=.5;D.unif.q90=.9;D.expo.med=Math.LN2;D.expo.q90=Math.log(10);D.logn.med=1;D.logn.q90=Math.exp(1.2815516);
+D.bimo.med=0;D.bimo.q90=qc(x=>.5*normCdf((x+2)/.5)+.5*normCdf((x-2)/.5),-10,10,.9,80);D.par5.med=Math.pow(2,.2);D.par5.q90=Math.pow(10,.2);
+const SF={mean:a=>mean(a),median:a=>{const b=Float64Array.from(a).sort(),n=b.length;return n%2?b[(n-1)/2]:(b[n/2-1]+b[n/2])/2},sd:a=>{const n=a.length,m=mean(a);let s=0;for(const v of a)s+=(v-m)*(v-m);return Math.sqrt(s/(n-1))},q90:a=>{const b=Float64Array.from(a).sort();return b[Math.round(.9*(b.length-1))]}};
+function truth(key,st){const d=D[key];return st==='mean'?d.mu:st==='median'?d.med:st==='sd'?d.sd:d.q90}
+const SNAME={mean:'sample mean',median:'sample median',sd:'sample SD',q90:'90th percentile'};
+const N10=[2,3,5,10,20,50,100,200,500,1000];
+function pct(a,p){const b=Float64Array.from(a).sort();return b[Math.min(b.length-1,Math.max(0,Math.floor(p*b.length)))]}
+function histLines(cv,arrs,cols,lo,hi,bins,vl){const bw=(hi-lo)/bins,dens=arrs.map(a=>{const c=new Float64Array(bins);for(const v of a){if(v<lo||v>=hi)continue;c[Math.floor((v-lo)/bw)]++}for(let i=0;i<bins;i++)c[i]/=a.length*bw;return c});let ym=0;dens.forEach(c=>c.forEach(v=>ym=Math.max(ym,v)));const P=mk(cv,lo,hi,ym*1.15||1);
+ dens.forEach((c,k)=>{const pts=[];for(let i=0;i<bins;i++){pts.push([lo+i*bw,c[i]]);pts.push([lo+(i+1)*bw,c[i]])}clip(P,()=>poly(P,pts,cols[k],2.2))});(vl||[]).forEach(v=>P.vline(v[0],v[1],v[2],v[3]));return P}
+function sdOf(a){return mom(a).sd}
+
+/* ---------- ML helpers ---------- */
+function digamma(x){let r=0;while(x<6){r-=1/x;x++}const f=1/(x*x);return r+Math.log(x)-.5/x-f*(1/12-f*(1/120-f/252))}
+function trigamma(x){let r=0;while(x<6){r+=1/(x*x);x++}const f=1/(x*x);return r+1/x+.5*f+f/x*(1/6-f*(1/30-f/42))}
+function poisS(l){if(l<=0)return 0;if(l<30){const L=Math.exp(-l);let k=0,p=1;do{k++;p*=Math.random()}while(p>L);return k-1}const m=Math.floor(.875*l),g=gammaS(m);return g<l?m+poisS(l-g):binF(m-1,l/g)}
+function llb(k,n,p){return(k?k*Math.log(p):0)+(n-k?(n-k)*Math.log(1-p):0)}
+function lrInt(k,n,cut){const ph=k/n,l0=llb(k,n,ph),g=p=>2*(l0-llb(k,n,p))-cut;let lo=0,hi=1;
+ if(k>0){let a=1e-12,b=ph;for(let i=0;i<70;i++){const m=(a+b)/2;if(g(m)>0)a=m;else b=m}lo=(a+b)/2}
+ if(k<n){let a=ph,b=1-1e-12;for(let i=0;i<70;i++){const m=(a+b)/2;if(g(m)>0)b=m;else a=m}hi=(a+b)/2}return[lo,hi]}
+function solveAlpha(s){if(!(s>1e-9))return 1e6;let a=(3-s+Math.sqrt((3-s)*(3-s)+24*s))/(12*s);for(let i=0;i<8;i++){const f=Math.log(a)-digamma(a)-s,fp=1/a-trigamma(a);let n=a-f/fp;if(!(n>0))n=a/2;a=n}return a}
+function normPdfAt(x,m,s){return Math.exp(-(x-m)*(x-m)/(2*s*s))/(s*2.5066282746)}
+/* ---------- Regression helpers ---------- */
+function idx(id,arr,ff){const e=$(id),o=$(id+'v'),f=()=>{o.textContent=ff?ff(arr[+e.value]):arr[+e.value]};e.addEventListener('input',f);f()}
+function scl(id,ff){const e=$(id),o=$(id+'v'),f=()=>{o.textContent=ff(+e.value)};e.addEventListener('input',f);f()}
+function pctTicks(a,b,st){const r=[];for(let v=a;v<=b+1e-9;v+=st)r.push([v,Math.round(v*100)+'%']);return r}
+const _tq={};function tq(v,p){const k=v+'_'+p;return _tq[k]||(_tq[k]=qc(x=>tcdf(x,v),0,500,p,80))}
+function simple(x,y){const n=x.length;let xm=0,ym=0;for(let i=0;i<n;i++){xm+=x[i];ym+=y[i]}xm/=n;ym/=n;let sxx=0,sxy=0,syy=0;for(let i=0;i<n;i++){const dx=x[i]-xm,dy=y[i]-ym;sxx+=dx*dx;sxy+=dx*dy;syy+=dy*dy}const b=sxy/sxx,a=ym-b*xm,res=new Float64Array(n);let sse=0;for(let i=0;i<n;i++){res[i]=y[i]-a-b*x[i];sse+=res[i]*res[i]}return{n,xm,ym,sxx,sxy,syy,b,a,res,sse,sst:syy,r2:1-sse/syy}}
+function gj(A,B){const p=A.length;const M=A.map((r,i)=>Array.from(r).concat(B?[B[i]]:[]));for(let c=0;c<p;c++){let m=c;for(let r=c+1;r<p;r++)if(Math.abs(M[r][c])>Math.abs(M[m][c]))m=r;[M[c],M[m]]=[M[m],M[c]];const d=M[c][c]||1e-12;for(let k=c;k<M[c].length;k++)M[c][k]/=d;for(let r=0;r<p;r++)if(r!==c){const f=M[r][c];if(f!==0)for(let k=c;k<M[c].length;k++)M[r][k]-=f*M[c][k]}}return M}
+function olsMulti(cols,y,needInv){const n=y.length,k=cols.length,p=k+1,A=[],B=new Float64Array(p);for(let i=0;i<p;i++)A.push(new Float64Array(p));
+ for(let r=0;r<n;r++){const row=[1];for(let j=0;j<k;j++)row.push(cols[j][r]);for(let i=0;i<p;i++){B[i]+=row[i]*y[r];for(let j=i;j<p;j++)A[i][j]+=row[i]*row[j]}}
+ for(let i=0;i<p;i++){for(let j=0;j<i;j++)A[i][j]=A[j][i];if(i>0)A[i][i]+=1e-9}
+ let beta,inv=null;if(needInv){const I=[];for(let i=0;i<p;i++){const e=new Float64Array(p);e[i]=1;I.push(e)}const M=gj(A,null);const aug=A.map((r,i)=>Array.from(r).concat(Array.from(I[i])));
+  const m=aug;for(let c=0;c<p;c++){let q=c;for(let r=c+1;r<p;r++)if(Math.abs(m[r][c])>Math.abs(m[q][c]))q=r;[m[c],m[q]]=[m[q],m[c]];const d=m[c][c]||1e-12;for(let kk=0;kk<2*p;kk++)m[c][kk]/=d;for(let r=0;r<p;r++)if(r!==c){const f=m[r][c];if(f!==0)for(let kk=0;kk<2*p;kk++)m[r][kk]-=f*m[c][kk]}}
+  inv=m.map(r=>r.slice(p));beta=inv.map(r=>{let s=0;for(let j=0;j<p;j++)s+=r[j]*B[j];return s})}
+ else{const M=gj(A,B);beta=M.map(r=>r[p])}
+ const res=new Float64Array(n);let sse=0;for(let r=0;r<n;r++){let f=beta[0];for(let j=0;j<k;j++)f+=beta[j+1]*cols[j][r];res[r]=y[r]-f;sse+=res[r]*res[r]}
+ const out={beta,res,sse,n,p,inv};if(inv){const s2=sse/(n-p);out.s2=s2;out.se=inv.map((r,i)=>Math.sqrt(s2*r[i]))}return out}
+function scatterAxes(cv,xs,ys,xlo,xhi,ylo,yhi,L){return mk(cv,xlo,xhi,yhi,{y0:ylo,L:L||44})}
+function range(a,pad){let lo=1e99,hi=-1e99;for(const v of a){if(v<lo)lo=v;if(v>hi)hi=v}const w=(hi-lo)||1;return[lo-(pad||.05)*w,hi+(pad||.05)*w]}
+
+
+function bars(P,groups,cols,yt){/* groups: array of arrays of values (0..1) */const g=P.g,G=groups.length,B=groups[0].length,W=(P.w-P.L-P.R)/G;groups.forEach((vals,gi)=>vals.forEach((v,bi)=>{const bw=W*.78/B,x=P.L+W*gi+W*.11+bw*bi;g.fillStyle=cols[bi];g.fillRect(x,P.Y(v),bw-2,P.Y(0)-P.Y(v));g.fillStyle=C.fg;g.textAlign='center';g.font='10px system-ui';g.fillText(Math.round(v*100)+'%',x+bw/2-1,P.Y(v)-3)}));g.font='11px system-ui'}
+function gridG(P,yt,labels){customGrid(P,[],yt);const G=labels.length,W=(P.w-P.L-P.R)/G;P.g.fillStyle=C.mu;P.g.textAlign='center';labels.forEach((l,i)=>P.g.fillText(l,P.L+W*(i+.5),P.h-P.B+15))}
+function legend(P,items,y){let x=P.L+8;items.forEach(([s,c])=>{P.text('■ '+s,x,y,c);x+=P.g.measureText('■ '+s).width+16})}
+
+/* ---------- Ch1 variance inflation ---------- */
+(function(){scl('c1r',v=>fmt(v/100));scl('c1n',v=>v);
+ function coefs(n,rho,R){const out=new Float64Array(R),x1=new Float64Array(n),x2=new Float64Array(n),y=new Float64Array(n),c=Math.sqrt(1-rho*rho);for(let r=0;r<R;r++){for(let i=0;i<n;i++){x1[i]=randn();x2[i]=rho*x1[i]+c*randn();y[i]=x1[i]+x2[i]+randn()}out[r]=olsMulti([x1,x2],y).beta[1]}return out}
+ function run(){const n=val('c1n'),rho=val('c1r')/100,R=3000,a=coefs(n,0,R),b=coefs(n,rho,R),sa=sdOf(a),sb=sdOf(b),th=1/Math.sqrt(1-rho*rho),w=4*Math.max(sa,sb);
+  const P=histLines($('c1cv'),[a,b],[C.r,C.a],1-w,1+w,60,[[1,C.fg,'true value 1',true]]);P.text('— uncorrelated predictors',P.L+8,P.T+26,C.r);P.text('— correlated at your setting',P.L+8,P.T+42,C.a);
+  $('c1st').innerHTML=stat('mean of estimates',fmt(mean(b)),Math.abs(mean(b)-1)<.05?'ok':'warn')+stat('SD, uncorrelated',fmt(sa),'')+stat('SD, correlated',fmt(sb),'hot')+stat('SD ratio (simulated)',fmt(sb/sa),'in')+stat('1/√(1−ρ²)',fmt(th),'ok')+stat('VIF',fmt(th*th),th*th>10?'hot':th*th>5?'warn':'ok');
+  $('c1rd').innerHTML=`At correlation ${fmt(rho)} the coefficient is still unbiased (mean ${fmt(mean(b))}) but its spread is ${fmt(sb/sa)} times larger than with uncorrelated predictors, matching the theory 1/√(1−ρ²) = ${fmt(th)}. In a single data set that means a coefficient anywhere from about ${fmt(1-2*sb)} to ${fmt(1+2*sb)} is compatible with the data. The sum of the two coefficients, by contrast, stays well determined: the data know the combined effect, not its split.`}
+ $('c1r').addEventListener('change',run);$('c1n').addEventListener('change',run);$('c1go').onclick=run;run();})();
+
+/* ---------- Ch2 VIF of a built predictor ---------- */
+(function(){scl('c2a',v=>fmt(v/100));scl('c2b',v=>fmt(v/100));scl('c2e',v=>fmt(v/100));
+ function run(){const a=val('c2a')/100,b=val('c2b')/100,e=val('c2e')/100,n=200,X=[0,1,2].map(()=>new Float64Array(n)),y=new Float64Array(n);for(let i=0;i<n;i++){X[0][i]=randn();X[1][i]=randn();X[2][i]=a*X[0][i]+b*X[1][i]+e*randn();y[i]=X[0][i]+X[1][i]+X[2][i]+randn()}
+  const full=olsMulti(X,y,true),vif=[0,1,2].map(j=>{const o=[0,1,2].filter(k=>k!==j),aux=olsMulti(X.map((c,k)=>k).filter(k=>k!==j).map(k=>X[k]),X[j]),m=mean(X[j]);let sst=0;for(const v of X[j])sst+=(v-m)*(v-m);const r2=1-aux.sse/sst;return{r2,v:1/(1-r2)}});
+  const mx=Math.max(12,...vif.map(q=>q.v))*1.1,P=mk($('c2cv'),0,3,mx,{y0:0,noGrid:true,L:46}),yt=[];for(let v=0;v<=mx;v+=nice(mx/5))yt.push([v,String(+v.toFixed(1))]);customGrid(P,[],yt);P.hline(10,C.y,'VIF 10');const W=(P.w-P.L-P.R)/3;
+  vif.forEach((q,j)=>{const x=P.L+W*(j+.2),w=W*.6;P.g.fillStyle=q.v>10?C.r:q.v>5?C.y:C.g;P.g.fillRect(x,P.Y(q.v),w,P.Y(0)-P.Y(q.v));P.g.fillStyle=C.fg;P.g.textAlign='center';P.g.fillText(fmt(q.v),x+w/2,P.Y(q.v)-4);P.g.fillStyle=C.mu;P.g.fillText('x'+(j+1),x+w/2,P.h-P.B+15)});
+  $('c2tb').innerHTML='<table><tr><th>predictor</th><th>R² on the others</th><th>VIF</th><th>√VIF</th><th>coefficient (true 1)</th><th>standard error</th></tr>'+vif.map((q,j)=>`<tr><td>x${j+1}</td><td>${fmt(q.r2)}</td><td>${fmt(q.v)}</td><td>${fmt(Math.sqrt(q.v))}</td><td>${fmt(full.beta[j+1])}</td><td>${fmt(full.se[j+1])}</td></tr>`).join('')+'</table>';
+  const mxv=Math.max(...vif.map(q=>q.v));
+  $('c2rd').innerHTML=`x₁ and x₂ are independent of each other, yet their VIFs are ${fmt(vif[0].v)} and ${fmt(vif[1].v)}, because x₃ is built from them: ${fmt(100*vif[2].r2)}% of x₃ is explained by the other two. ${mxv>10?'All three exceed or approach the usual alarm level and the standard errors are inflated by up to '+fmt(Math.sqrt(mxv))+' times.':'The VIFs are modest here; push the weights up or the noise down to see them climb.'} No pairwise correlation matrix would flag the problem as clearly as the VIF does.`}
+ on('c2a c2b c2e',run);$('c2go').onclick=run;run();})();
+
+/* ---------- Ch3 joint test ---------- */
+(function(){scl('c3n',v=>v);const RH=[0,.5,.8,.9,.95,.99];
+ function run(){const n=val('c3n'),R=1000,tc=tq(n-3,.975),df2=n-3,fc=df2/2*(Math.pow(.05,-2/df2)-1),res=RH.map(()=>[0,0,0]),x1=new Float64Array(n),x2=new Float64Array(n),y=new Float64Array(n);
+  RH.forEach((rho,k)=>{const c=Math.sqrt(1-rho*rho);for(let r=0;r<R;r++){let ym=0;for(let i=0;i<n;i++){x1[i]=randn();x2[i]=rho*x1[i]+c*randn();y[i]=.5*x1[i]+.5*x2[i]+randn();ym+=y[i]}ym/=n;let sst=0;for(let i=0;i<n;i++)sst+=(y[i]-ym)*(y[i]-ym);const o=olsMulti([x1,x2],y,true),t1=Math.abs(o.beta[1]/o.se[1])>tc,t2=Math.abs(o.beta[2]/o.se[2])>tc,F=((sst-o.sse)/2)/(o.sse/df2);if(t1)res[k][0]++;if(t1&&t2)res[k][1]++;if(F>fc)res[k][2]++}});
+  const P=mk($('c3cv'),0,1,1.22,{y0:0,noGrid:true,L:46});gridG(P,[0,.25,.5,.75,1].map(v=>[v,Math.round(v*100)+'%']),RH.map(r=>'ρ = '+r));bars(P,res.map(q=>q.map(v=>v/R)),[C.r,C.y,C.g]);legend(P,[['x₁ alone significant',C.r],['both significant',C.y],['joint F-test rejects',C.g]],P.T+12);
+  const q=res[4];$('c3st').innerHTML=stat('n',n,'')+stat('ρ = 0.95: x₁ significant',pc(q[0]/R),'warn')+stat('ρ = 0.95: both significant',pc(q[1]/R),'hot')+stat('ρ = 0.95: joint F rejects',pc(q[2]/R),'ok');
+  $('c3rd').innerHTML=`Both predictors have a real effect of 0.5. With uncorrelated predictors both are usually significant at n = ${n} (${pc(res[0][1]/R)}). At ρ = 0.95 only ${pc(q[1]/R)} of the data sets flag both individually, yet the joint F-test still rejects in ${pc(q[2]/R)}: the pair is clearly informative, the split between them is not. Deleting the “insignificant” one would leave a biased coefficient on the other.`}
+ $('c3n').addEventListener('change',run);$('c3go').onclick=run;run();})();
+
+/* ---------- Ch4 interaction and centring ---------- */
+(function(){scl('c4b',v=>fmt(v/10));scl('c4d',v=>fmt(v/10));scl('c4n',v=>v);let S=null;
+ function gen(){const n=val('c4n'),bx=val('c4b')/10,bd=val('c4d')/10,x=new Float64Array(n),d=new Float64Array(n),y=new Float64Array(n);for(let i=0;i<n;i++){x[i]=2+6*Math.random();d[i]=Math.random()<.5?1:0;y[i]=1+.5*x[i]+bd*d[i]+bx*x[i]*d[i]+.8*randn()}S={x,d,y,bx,bd};draw()}
+ function fit(x,d,y,c){const xs=Float64Array.from(x,v=>v-c),xd=Float64Array.from(xs,(v,i)=>v*d[i]);return olsMulti([xs,d,xd],y,true)}
+ function draw(){if(!S)return;const{x,d,y,bx,bd}=S,cen=val('c4c')===1||$('c4c').value==='1',xm=mean(x),f0=fit(x,d,y,0),f1=fit(x,d,y,xm),f=cen?f1:f0,c=cen?xm:0;
+  const[ylo,yhi]=range(y,.08),P=mk($('c4cv'),0,10,yhi,{y0:Math.min(ylo,0)});const g0=[],g1=[];x.forEach((v,i)=>(d[i]?g1:g0).push([v,y[i]]));
+  clip(P,()=>{P.line(t=>f.beta[0]+f.beta[1]*(t-c),C.a,2.6,0,10,2);P.line(t=>f.beta[0]+f.beta[2]+(f.beta[1]+f.beta[3])*(t-c)+0*t,C.r,2.6,0,10,2)});dots(P,g0,'rgba(110,168,255,.75)',3);dots(P,g1,'rgba(255,107,129,.75)',3);P.vline(c,C.mu,cen?'x̄':'x = 0',true);
+  P.text('blue: group d = 0 · red: group d = 1',P.L+8,P.T+14,C.mu);
+  const tgt=cen?bd+bx*xm:bd;
+  $('c4st').innerHTML=stat(cen?'effect of d at x̄ (estimate)':'effect of d at x = 0 (estimate)',fmt(f.beta[2]),'in')+stat('its true value',fmt(tgt),'')+stat('SE of this coefficient',fmt(f.se[2]),f.se[2]>.5?'hot':'ok')+stat('SE if x uncentred',fmt(f0.se[2]),'warn')+stat('SE if x centred',fmt(f1.se[2]),'ok')+stat('interaction estimate ± SE',fmt(f.beta[3])+' ± '+fmt(f.se[3]),'in')+stat('slope of x when d = 0',fmt(f.beta[1]),'');
+  $('c4rd').innerHTML=`The two lines are identical whether or not x is centred; what changes is the meaning of the d coefficient. Uncentred it is the gap at x = 0, ${fmt(f0.beta[2])} ± ${fmt(f0.se[2])}, an extrapolation far from the data (x runs from 2 to 8). Centred it is the gap at the average x = ${fmt(xm)}: ${fmt(f1.beta[2])} ± ${fmt(f1.se[2])}, much better determined (true ${fmt(bd+bx*xm)}). The interaction ${fmt(f.beta[3])} (true ${fmt(bx)}) is the same in both parametrisations.`}
+ on('c4b c4d c4n',gen);$('c4c').addEventListener('change',draw);$('c4go').onclick=gen;gen();resizers.push(draw);})();
+
+/* ---------- Ch5 marginal effects ---------- */
+(function(){scl('c5b',v=>fmt(v/10));scl('c5n',v=>v);let S=null;
+ function gen(){const n=val('c5n'),b=val('c5b')/10,x=new Float64Array(n),z=new Float64Array(n),xz=new Float64Array(n),y=new Float64Array(n);for(let i=0;i<n;i++){x[i]=randn();z[i]=randn();xz[i]=x[i]*z[i];y[i]=1+.5*x[i]+.5*z[i]+b*xz[i]+randn()}S={b,o:olsMulti([x,z,xz],y,true),n};draw()}
+ function draw(){if(!S)return;const{b,o,n}=S,V=(i,j)=>o.s2*o.inv[i][j],tc=tq(n-4,.975),me=z=>o.beta[1]+o.beta[3]*z,se=z=>Math.sqrt(V(1,1)+z*z*V(3,3)+2*z*V(1,3)),zz=[];for(let z=-2.5;z<=2.5001;z+=.05)zz.push(z);
+  let lo=1e9,hi=-1e9;zz.forEach(z=>{lo=Math.min(lo,me(z)-tc*se(z),.5+b*z);hi=Math.max(hi,me(z)+tc*se(z),.5+b*z)});lo=Math.min(lo,0)-.1;hi=Math.max(hi,0)+.1;const P=mk($('c5cv'),-2.5,2.5,hi,{y0:lo}),g=P.g;
+  g.beginPath();zz.forEach((z,i)=>i?g.lineTo(P.X(z),P.Y(me(z)+tc*se(z))):g.moveTo(P.X(z),P.Y(me(z)+tc*se(z))));for(let i=zz.length-1;i>=0;i--)g.lineTo(P.X(zz[i]),P.Y(me(zz[i])-tc*se(zz[i])));g.closePath();g.fillStyle='rgba(110,168,255,.25)';g.fill();P.hline(0,C.mu);P.line(z=>.5+b*z,C.fg,1.6,-2.5,2.5,2,true);P.line(me,C.a,2.8,-2.5,2.5,2);P.text('effect of x on y, at each value of z',P.L+8,P.T+14,C.mu);P.text('z →',P.w-P.R-18,P.h-2,C.mu);
+  const lw=z=>me(z)-tc*se(z),up=z=>me(z)+tc*se(z),sig=z=>lw(z)>0||up(z)<0,tint=2*(1-tcdf(Math.abs(o.beta[3]/o.se[3]),n-4));
+  $('c5st').innerHTML=stat('interaction β̂₃ ± SE',fmt(o.beta[3])+' ± '+fmt(o.se[3]),'in')+stat('true β₃',fmt(b),'')+stat('p-value of β₃',f3(tint),tint<.05?'ok':'warn')+stat('effect at z = −2',fmt(me(-2))+' ± '+fmt(tc*se(-2)),sig(-2)?'ok':'warn')+stat('effect at z = 0',fmt(me(0))+' ± '+fmt(tc*se(0)),sig(0)?'ok':'warn')+stat('effect at z = +2',fmt(me(2))+' ± '+fmt(tc*se(2)),sig(2)?'ok':'warn');
+  $('c5rd').innerHTML=`The effect of x is ${fmt(me(0))} at z = 0 but ${fmt(me(-2))} at z = −2 and ${fmt(me(2))} at z = +2, with a band that is narrowest near z = 0 and flares at the edges where there is little data. The effect is “significant” where the band excludes zero (${sig(-2)?'yes':'no'} at −2, ${sig(0)?'yes':'no'} at 0, ${sig(2)?'yes':'no'} at +2), and where the verdict switches is itself uncertain. ${Math.abs(b)<.05?'With β₃ = 0 the band is just a flat strip.':'The dashed truth stays inside the band most of the time.'}`}
+ on('c5b c5n',gen);$('c5go').onclick=gen;gen();resizers.push(draw);})();
+
+/* ---------- Ch6 power of interactions ---------- */
+(function(){scl('c6d',v=>fmt(v/100));const NS=[100,200,400,800,1600];
+ function run(){const dl=val('c6d')/100,R=600,pw=NS.map(()=>[0,0]);NS.forEach((n,k)=>{const tc=tq(n-4,.975),T=new Float64Array(n),G=new Float64Array(n),TG=new Float64Array(n),y=new Float64Array(n);for(let r=0;r<R;r++){for(let i=0;i<n;i++){T[i]=Math.random()<.5?.5:-.5;G[i]=Math.random()<.5?.5:-.5;TG[i]=T[i]*G[i];y[i]=.3*T[i]+dl*TG[i]+randn()}const o=olsMulti([T,G,TG],y,true);if(Math.abs(o.beta[1]/o.se[1])>tc)pw[k][0]++;if(Math.abs(o.beta[3]/o.se[3])>tc)pw[k][1]++}});
+  const P=mk($('c6cv'),0,1600,1,{y0:0,noGrid:true,L:46});customGrid(P,niceTicks(0,1600,8),[0,.2,.4,.6,.8,1].map(v=>[v,Math.round(v*100)+'%']));P.hline(.8,C.y,'80%');P.hline(.05,C.mu);
+  poly(P,NS.map((n,k)=>[n,pw[k][0]/R]),C.g,2.6);dots(P,NS.map((n,k)=>[n,pw[k][0]/R]),C.g,3.5);poly(P,NS.map((n,k)=>[n,pw[k][1]/R]),C.r,2.6);dots(P,NS.map((n,k)=>[n,pw[k][1]/R]),C.r,3.5);legend(P,[['average effect 0.3',C.g],['interaction δ = '+fmt(dl),C.r]],P.T+26);P.text('total sample size n',P.w/2,P.h-2,C.mu,'center');
+  const nm=Math.pow(2.8*2/.3,2),ni=dl>0?Math.pow(2.8*4/dl,2):Infinity;
+  $('c6st').innerHTML=stat('n for 80% power, main effect',Math.round(nm),'ok')+stat('n for 80% power, interaction',isFinite(ni)?Math.round(ni):'—',ni>nm*3?'hot':'warn')+stat('SE ratio interaction ÷ main','2','in')+stat('power at n = 400: main',Math.round(100*pw[2][0]/R)+'%','')+stat('power at n = 400: interaction',Math.round(100*pw[2][1]/R)+'%','');
+  $('c6rd').innerHTML=`The average treatment effect of 0.3 reaches 80% power near n ≈ ${Math.round(nm)}. A subgroup difference of the <em>same size</em> (δ = 0.3) needs four times as much: n ≈ ${Math.round(Math.pow(2.8*4/.3,2))}. At your δ = ${fmt(dl)} the interaction needs n ≈ ${isFinite(ni)?Math.round(ni):'∞'}. With n = 400 the interaction is detected in only ${Math.round(100*pw[2][1]/R)+'%'} of studies, so those that “find” one are exaggerating it. Plan the sample size for the interaction you care about, not the main effect.`}
+ $('c6d').addEventListener('change',run);$('c6go').onclick=run;run();})();
+
+/* ---------- Ch7 polynomials ---------- */
+(function(){scl('c7d',v=>v);scl('c7n',v=>v);scl('c7s',v=>fmt(v/10));let S=null;const f0=x=>Math.sin(2.5*x)+.6*x;
+ const pw=(x,d)=>{const r=[];let p=1;for(let j=0;j<d;j++){p*=x;r.push(p)}return r};
+ function cols(xs,d){const c=[];for(let j=0;j<d;j++)c.push(new Float64Array(xs.length));xs.forEach((x,i)=>pw(x,d).forEach((v,j)=>c[j][i]=v));return c}
+ function gen(){const n=val('c7n'),sg=val('c7s')/10,x=Float64Array.from({length:n},()=>2*Math.random()-1),y=Float64Array.from(x,v=>f0(v)+sg*randn()),tx=Float64Array.from({length:1000},()=>2*Math.random()-1),ex=Float64Array.from({length:400},(_,i)=>(i%2?1:-1)*(1+.4*Math.random()));S={x,y,tx,ex,sg};draw()}
+ function draw(){if(!S)return;const{x,y,tx,ex,sg}=S,d=Math.min(val('c7d'),x.length-3),o=olsMulti(cols(x,d),y),pred=t=>{let s=o.beta[0],p=1;for(let j=0;j<d;j++){p*=t;s+=o.beta[j+1]*p}return s},tr=o.sse/x.length;
+  const mse=(a)=>{let s=0;for(const t of a){const e=pred(t)-f0(t);s+=e*e}return s/a.length},te=mse(tx),xe=mse(ex);
+  const P=mk($('c7cv'),-1.4,1.4,3.2,{y0:-3.2}),g=P.g;g.fillStyle='rgba(138,147,171,.12)';g.fillRect(P.L,P.T,P.X(-1)-P.L,P.h-P.T-P.B);g.fillRect(P.X(1),P.T,P.w-P.R-P.X(1),P.h-P.T-P.B);clip(P,()=>{P.line(f0,C.fg,1.8,-1.4,1.4,200,true);P.line(pred,C.r,2.8,-1.4,1.4,300)});dots(P,Array.from(x,(v,i)=>[v,y[i]]),'rgba(110,168,255,.8)',3);P.text('dashed: truth · red: polynomial fit · grey zones: outside the data',P.L+8,P.T+14,C.mu);
+  $('c7st').innerHTML=stat('degree · parameters',d+' · '+(d+1),'')+stat('training MSE',fmt(tr),'in')+stat('test MSE vs noise-free truth',fmt(te),te>sg*sg*.5?'warn':'ok')+stat('error outside the data (|x| in 1–1.4)',fmt(xe),xe>1?'hot':xe>.2?'warn':'ok')+stat('noise variance σ²',fmt(sg*sg),'');
+  $('c7rd').innerHTML=`Degree ${d}: the training error is ${fmt(tr)}, the error against the true curve inside the data is ${fmt(te)}, and just outside the data it is ${fmt(xe)}. ${d<3?'A low degree cannot follow the curvature (bias).':d>8?'The curve now chases noise and swings at the ends (variance); beyond the data it is meaningless.':'Around degree 4 to 6 the fit follows the truth closely inside the data.'} Training error keeps falling as the degree rises; the error that counts does not.`}
+ on('c7d',draw);on('c7n c7s',gen);$('c7go').onclick=gen;gen();resizers.push(draw);})();
+
+/* ---------- shared spline basis for Ch8 and Ch9 ---------- */
+const f8=x=>2*Math.sin(.9*x)+.3*x;
+function sbasis(type,k,x){const u=x/10,r=[];if(type==='cub'){r.push(u,u*u,u*u*u);for(let j=1;j<=k;j++){const t=Math.max(0,u-j/(k+1));r.push(t*t*t)}}else if(type==='lin'){r.push(u);for(let j=1;j<=k;j++)r.push(Math.max(0,u-j/(k+1)))}else{for(let j=1;j<=k;j++)r.push(u>=j/(k+1)?1:0)}return r}
+function scols(type,k,xs){const m=sbasis(type,k,0).length,c=[];for(let j=0;j<m;j++)c.push(new Float64Array(xs.length));for(let i=0;i<xs.length;i++){const r=sbasis(type,k,xs[i]);for(let j=0;j<m;j++)c[j][i]=r[j]}return c}
+function spred(o,type,k,x){const r=sbasis(type,k,x);let s=o.beta[0];for(let j=0;j<r.length;j++)s+=o.beta[j+1]*r[j];return s}
+
+/* ---------- Ch8 splines ---------- */
+(function(){scl('c8k',v=>v);scl('c8n',v=>v);scl('c8s',v=>fmt(v/10));let S=null;
+ function gen(){const n=val('c8n'),sg=val('c8s')/10,x=Float64Array.from({length:n},()=>10*Math.random());S={x,y:Float64Array.from(x,v=>f8(v)+sg*randn()),sg};draw()}
+ function draw(){if(!S)return;const{x,y,sg}=S,type=$('c8t').value,k=Math.min(val('c8k'),x.length-8),o=olsMulti(scols(type,k,x),y),pr=t=>spred(o,type,k,t),p=sbasis(type,k,0).length+1;let ee=0;for(let i=0;i<1000;i++){const t=10*i/1000,e=pr(t)-f8(t);ee+=e*e}ee/=1000;
+  const P=mk($('c8cv'),0,10,5,{y0:-4});clip(P,()=>{P.line(f8,C.fg,1.8,0,10,200,true);P.line(pr,C.g,2.8,0,10,400)});dots(P,Array.from(x,(v,i)=>[v,y[i]]),'rgba(110,168,255,.65)',2.6);for(let j=1;j<=k;j++)P.g.fillStyle=C.y,P.g.fillRect(P.X(10*j/(k+1))-1,P.h-P.B-8,2,8);
+  P.text('dashed: truth · green: fit · yellow ticks: knots',P.L+8,P.T+14,C.mu);
+  $('c8st').innerHTML=stat('parameters',p,'')+stat('training MSE',fmt(o.sse/x.length),'in')+stat('error vs truth (new points)',fmt(ee),ee<sg*sg*.15?'ok':ee<sg*sg*.5?'warn':'hot')+stat('noise variance σ²',fmt(sg*sg),'');
+  $('c8rd').innerHTML=`A ${{cub:'cubic spline',lin:'piecewise-linear fit',step:'step function'}[type]} with ${k} knot${k===1?'':'s'} (${p} parameters) is within ${fmt(ee)} (mean squared) of the true curve. ${k<3?'Too few knots: the curve cannot follow the oscillation (bias).':k>9?'Many knots on little data: the fit starts chasing noise.':'Enough knots to follow the wave without chasing noise.'} ${type==='step'?'The step function needs far more pieces than the cubic for the same accuracy, and its jumps are artefacts.':type==='lin'?'The piecewise-linear fit has visible corners at the knots.':'The cubic spline is smooth and accurate with few parameters.'}`}
+ on('c8k c8n c8s',gen);$('c8t').addEventListener('change',draw);$('c8go').onclick=gen;gen();resizers.push(draw);})();
+
+/* ---------- Ch9 cross-validation ---------- */
+(function(){scl('c9n',v=>v);scl('c9s',v=>fmt(v/10));let busy=false;
+ function run(){const n=val('c9n'),sg=val('c9s')/10,x=Float64Array.from({length:n},()=>10*Math.random()),y=Float64Array.from(x,v=>f8(v)+sg*randn()),K=10,fold=Int32Array.from({length:n},(_,i)=>i%K).sort(()=>Math.random()-.5),KN=13,tr=[],cv=[],cs=[];
+  for(let k=0;k<KN;k++){const kk=k,full=olsMulti(scols('cub',kk,x),y);tr.push(full.sse/n);const err=new Float64Array(n);for(let f=0;f<K;f++){const tri=[],tei=[];for(let i=0;i<n;i++)(fold[i]===f?tei:tri).push(i);const o=olsMulti(scols('cub',kk,tri.map(i=>x[i])),tri.map(i=>y[i]));for(const i of tei){const e=y[i]-spred(o,'cub',kk,x[i]);err[i]=e*e}}cv.push(mean(err));cs.push(sdOf(err)/Math.sqrt(n))}
+  let b=0;cv.forEach((v,i)=>{if(v<cv[b])b=i});let o1=0;for(let i=0;i<KN;i++)if(cv[i]<=cv[b]+cs[b]){o1=i;break}
+  const hi=Math.max(...cv,sg*sg*1.5),lo=Math.min(...tr,...cv,sg*sg)*.8,P=mk($('c9cv'),-.5,KN-.5,Math.min(hi,sg*sg*6+.5),{y0:Math.max(0,lo-.05),noGrid:true,L:48});customGrid(P,Array.from({length:KN},(_,i)=>[i,String(i)]),niceTicks(Math.max(0,lo-.05),Math.min(hi,sg*sg*6+.5),5));P.hline(sg*sg,C.mu,'σ²');
+  clip(P,()=>{poly(P,tr.map((v,i)=>[i,v]),C.r,2.6);poly(P,cv.map((v,i)=>[i,v]),C.a,2.6)});dots(P,tr.map((v,i)=>[i,v]),C.r,3);dots(P,cv.map((v,i)=>[i,v]),C.a,3);P.vline(b,C.g,'min CV',true);if(o1!==b)P.vline(o1,C.y,'1-SE',true);legend(P,[['training MSE',C.r],['10-fold CV error',C.a]],P.T+26);P.text('number of knots (cubic spline)',P.w/2,P.h-2,C.mu,'center');
+  $('c9st').innerHTML=stat('knots at minimum CV',b,'ok')+stat('knots by one-SE rule',o1,'in')+stat('CV error at minimum',fmt(cv[b]),'')+stat('noise variance σ²',fmt(sg*sg),'')+stat('training MSE at 12 knots',fmt(tr[12]),'warn');
+  $('c9rd').innerHTML=`Training error falls with every knot (${fmt(tr[0])} with none, ${fmt(tr[12])} with 12), as it always must. The cross-validation error falls, bottoms out at ${b} knot${b===1?'':'s'} (${fmt(cv[b])}, close to the noise floor ${fmt(sg*sg)}) and then creeps back up. The one-standard-error rule picks the simpler ${o1} knot${o1===1?'':'s'}, whose CV error is within noise of the best. Run it again: the minimiser wobbles by a knot or two between samples, which is why a flat CV curve means “anywhere in this range is fine”.`}
+ $('c9n').addEventListener('change',run);$('c9s').addEventListener('change',run);$('c9go').onclick=run;run();})();
+
+/* ---------- Ch10 partial residual plots ---------- */
+(function(){scl('c10n',v=>v);let S=null;
+ function gen(){const n=val('c10n'),sh=$('c10s').value,x1=new Float64Array(n),x2=new Float64Array(n),y=new Float64Array(n),g=v=>sh==='lin'?.8*v:sh==='quad'?.8*v*v:1.5*Math.max(v,0);for(let i=0;i<n;i++){x1[i]=randn();x2[i]=randn();y[i]=x1[i]+g(x2[i])+.7*randn()}
+  const o=olsMulti([x1,x2],y),fit=Float64Array.from(y,(v,i)=>v-o.res[i]),pr=Float64Array.from(o.res,(e,i)=>e+o.beta[2]*x2[i]),q=olsMulti([x1,x2,Float64Array.from(x2,v=>v*v)],y,true),idx=Array.from(x2,(_,i)=>i).sort((a,b)=>x2[a]-x2[b]),B=12,bn=[];for(let b=0;b<B;b++){const s=idx.slice(Math.floor(b*n/B),Math.floor((b+1)*n/B));bn.push([mean(s.map(i=>x2[i])),mean(s.map(i=>pr[i]))])}
+  const ym=mean(y);let sst=0;for(const v of y)sst+=(v-ym)*(v-ym);S={sh,n,x2,o,fit,pr,bn,t2:q.beta[3]/q.se[3],r2:1-o.sse/sst};draw()}
+ function draw(){if(!S)return;const{sh,n,x2,o,fit,pr,bn,t2,r2}=S,m=Math.min(n,350),[f0,f1]=range(fit,.05),[e0,e1]=range(o.res,.1),P=mk($('c10cv'),f0,f1,e1,{y0:e0});P.hline(0,C.mu);dots(P,Array.from({length:m},(_,i)=>[fit[i],o.res[i]]),'rgba(110,168,255,.7)',2.4);P.text('residuals vs fitted',P.L+8,P.T+14,C.mu);
+  const[a0,a1]=range(x2,.05),[p0,p1]=range(pr,.08),Q=mk($('c10cv2'),a0,a1,p1,{y0:p0});clip(Q,()=>Q.line(t=>o.beta[2]*t,C.r,2.4,a0,a1,2));dots(Q,Array.from({length:m},(_,i)=>[x2[i],pr[i]]),'rgba(138,147,171,.55)',2.2);clip(Q,()=>poly(Q,bn,C.g,2.8));dots(Q,bn,C.g,4);Q.text('partial residuals for x₂ · red: linear · green: binned means',Q.L+8,Q.T+14,C.mu);
+  const p=2*(1-tcdf(Math.abs(t2),n-4));
+  $('c10st').innerHTML=stat('R² of the linear fit',fmt(r2),'')+stat('t of an added x₂² term',fmt(t2),p<.05?'hot':'ok')+stat('p-value',f3(p),p<.05?'hot':'ok')+stat('slope on x₂ (linear fit)',fmt(o.beta[2]),'');
+  $('c10rd').innerHTML=sh==='lin'?`The true effect of x₂ is linear: the green binned means follow the red line and nothing stands out (p = ${f3(p)} for a curvature term).`:`The residuals-versus-fitted plot on the left is only mildly off, but the partial-residual plot on the right shows the shape of the problem: the green curve ${sh==='quad'?'bends like a U':'is flat below zero and then rises'} while the straight line cuts across it (p = ${f3(p)} for a squared term). The remedy follows from the picture: add x₂² (or a spline), or ${sh==='thr'?'a hinge term max(x₂, 0)':'a quadratic'}.`}
+ $('c10s').addEventListener('change',gen);on('c10n',gen);$('c10go').onclick=gen;gen();resizers.push(draw);})();
+
+/* ---------- Ch11 binning ---------- */
+(function(){scl('c11b',v=>fmt(v/100));scl('c11n',v=>v);const KS=[2,3,4,5,10],EFF=[.637,.81,.884,.92,.971];
+ function run(){const n=val('c11n'),b=val('c11b')/100,R=1000,pw=new Float64Array(KS.length+1),tcv=tq(n-2,.975),x=new Float64Array(n),y=new Float64Array(n);
+  for(let r=0;r<R;r++){for(let i=0;i<n;i++){x[i]=randn();y[i]=b*x[i]+randn()}const f=simple(x,y);if(Math.abs(f.b)/Math.sqrt(f.sse/(n-2)/f.sxx)>tcv)pw[0]++;
+   const idx=Array.from({length:n},(_,i)=>i).sort((p,q)=>x[p]-x[q]);let ym=0;for(const v of y)ym+=v;ym/=n;KS.forEach((k,j)=>{let sb=0,sw=0;for(let g=0;g<k;g++){const lo=Math.floor(g*n/k),hi=Math.floor((g+1)*n/k);let m=0;for(let t=lo;t<hi;t++)m+=y[idx[t]];m/=(hi-lo);sb+=(hi-lo)*(m-ym)*(m-ym);for(let t=lo;t<hi;t++)sw+=(y[idx[t]]-m)*(y[idx[t]]-m)}const F=(sb/(k-1))/(sw/(n-k)),p=betai((n-k)/2,(k-1)/2,(n-k)/((n-k)+(k-1)*F));if(p<.05)pw[j+1]++})}
+  const P=mk($('c11cv'),0,1,1.05,{y0:0,noGrid:true,L:46}),labs=['continuous x'].concat(KS.map(k=>k+' groups'));gridG(P,[0,.25,.5,.75,1].map(v=>[v,Math.round(v*100)+'%']),labs);const W=(P.w-P.L-P.R)/6;
+  P.hline(.8,C.y,'80%');Array.from(pw).forEach((c,i)=>{const v=c/R,w=W*.62,xx=P.L+W*i+W*.19;P.g.fillStyle=i?C.r:C.g;P.g.fillRect(xx,P.Y(v),w,P.Y(0)-P.Y(v));P.g.fillStyle=C.fg;P.g.textAlign='center';P.g.fillText(Math.round(v*100)+'%',xx+w/2,P.Y(v)-4)});
+  const pc0=pw[0]/R,p2=pw[1]/R;
+  $('c11st').innerHTML=stat('power, continuous slope',pc(pc0),'ok')+stat('power, median split',pc(p2),'hot')+stat('power, 4 groups',pc(pw[3]/R),'warn')+stat('information kept, median split','64%','')+stat('information kept, 4 groups','88%','');
+  $('c11rd').innerHTML=`With the linear effect left continuous the test has ${pc(pc0)} power. Cutting x at the median drops it to ${pc(p2)}; four groups give ${pc(pw[3]/R)}, ten ${pc(pw[5]/R)} (theoretical information kept: ${KS.map((k,i)=>k+' groups '+Math.round(EFF[i]*100)+'%').join(', ')}). To match the continuous test after a median split you would need roughly ${Math.round(100/.637)}% of the sample. Keep predictors continuous and let a spline show any curvature.`}
+ $('c11b').addEventListener('change',run);$('c11n').addEventListener('change',run);$('c11go').onclick=run;run();})();
+const QZ=[
+{l:'Beginner',q:'What does multicollinearity do to a regression coefficient?',o:['Biases it toward zero','Inflates its variance (standard error) without biasing it','Makes it always insignificant','Changes the R² of the model'],a:1,e:'Collinearity leaves the OLS estimates unbiased but makes them unstable: Var(β̂ⱼ) is multiplied by the VIF = 1/(1 − Rⱼ²).'},
+{l:'Beginner',q:'Which of these is NOT harmed by multicollinearity among predictors?',o:['The coefficient of one of the collinear predictors','Predictions at new points that resemble the observed data','The ability to tell the collinear predictors apart','The standard error of each collinear coefficient'],a:1,e:'Predictions within the observed cloud and the joint effect of the correlated predictors remain well determined. Only the split between them is uncertain.'},
+{l:'Intermediate',q:'Two predictors have correlation 0.9. By roughly what factor is the standard error of a coefficient inflated, relative to uncorrelated predictors?',o:['1.1','2.3','5','9'],a:1,e:'1/√(1 − 0.81) = 1/√0.19 ≈ 2.3 (VIF ≈ 5.3).'},
+{l:'Intermediate',q:'A predictor has VIF = 16. The standard error of its coefficient is about how many times what it would be with no correlation among predictors?',o:['4','8','16','1/16'],a:0,e:'SE inflation is √VIF = 4.'},
+{l:'Intermediate',q:'Both x₁ and x₂ truly affect y and are correlated at 0.95; neither t-test is significant but the joint F-test is. The best conclusion is…',o:['Neither matters','At least one of them matters but the data cannot separate them; do not drop one on the basis of the t-tests','Drop the one with the larger p-value and keep the other','The model is misspecified'],a:1,e:'Joint significance with individual insignificance is the signature of collinearity. Dropping one creates omitted-variable bias in the other.'},
+{l:'Intermediate',q:'In y = β₀ + β₁x + β₂d + β₃xd + ε, with d a 0/1 group indicator, β₂ is…',o:['The average effect of d across all x','The effect of d when x = 0','The difference in slopes between the groups','The correlation of d and y'],a:1,e:'With an interaction, β₂ is the group difference at x = 0 and β₃ is the slope difference. Centring x makes β₂ the difference at the mean of x.'},
+{l:'Intermediate',q:'Centring a predictor before creating an interaction term changes…',o:['The fitted values and the interaction coefficient','The meaning, estimates and standard errors of the lower-order (main-effect) terms but not the fit or the interaction coefficient','Nothing at all','The residuals'],a:1,e:'It is a reparametrisation: predictions, residuals and the interaction coefficient are unchanged; the main effects now refer to the mean of the other variable and are better determined.'},
+{l:'Advanced',q:'In y = β₀ + β₁x + β₂z + β₃xz + ε the marginal effect of x at z is β₁ + β₃z. Its variance is…',o:['Var(β̂₁) + Var(β̂₃)','Var(β̂₁) + z²Var(β̂₃) + 2z Cov(β̂₁, β̂₃)','z² Var(β̂₃)','Var(β̂₁) · Var(β̂₃)'],a:1,e:'It is the variance of a linear combination, so the covariance term is needed; the band is narrowest near the centre of the data in z.'},
+{l:'Advanced',q:'For a balanced randomised experiment, how does the sample size needed to detect a subgroup interaction of size δ compare with that needed to detect a main effect of the same size δ?',o:['About the same','About twice','About four times','About sixteen times'],a:2,e:'The interaction contrast has twice the standard error, so the same power needs 2² = 4 times the sample (more with unbalanced subgroups).'},
+{l:'Advanced',q:'Why is a high-degree polynomial a poor way to model a curved relationship?',o:['It is not a linear model','It is global: each coefficient affects the fit everywhere, so it oscillates and extrapolates wildly, and the powers are highly collinear','OLS cannot fit it','It always has a lower R² than a line'],a:1,e:'Polynomials are fitted by OLS and have high training R², but they behave badly at the edges and beyond the data; splines are local and better behaved.'},
+{l:'Advanced',q:'A cubic regression spline with K interior knots has how many coefficients (including the intercept)?',o:['K + 1','K + 3','K + 4','3K'],a:2,e:'Intercept + x, x², x³ + K truncated cubic terms = K + 4.'},
+{l:'Advanced',q:'You choose the number of spline knots by minimising 10-fold cross-validation error. The “one-standard-error rule” instead picks…',o:['The model with the lowest training error','The simplest model whose CV error is within one standard error of the minimum','The model with the most knots','The model with the lowest R²'],a:1,e:'The CV curve is noisy and often flat near its minimum; the one-SE rule prefers the smoother model among those statistically indistinguishable from the best.'},
+{l:'Advanced',q:'What does a component-plus-residual (partial-residual) plot for xⱼ show?',o:['The residuals against fitted values','eᵢ + β̂ⱼxᵢⱼ against xᵢⱼ, revealing the shape of the effect of xⱼ after adjusting for the other predictors','The leverage of each point','The correlation between xⱼ and the other predictors'],a:1,e:'If the effect is linear the points follow the fitted line; a curve or kink indicates the needed transformation.'},
+{l:'Expert',q:'A median split of a normally distributed predictor in a linear relationship retains approximately what share of the information in the continuous variable?',o:['36%','64%','90%','100%'],a:1,e:'The loss corresponds to discarding about 36% of the sample (information 2/π ≈ 0.64). More groups retain more, but a spline or the continuous variable is better.'},
+{l:'Expert',q:'You adjust for a confounder only after cutting it into three categories. A risk is…',o:['None; it always removes all confounding','Residual confounding within each category when the confounder varies inside the categories','Higher variance of the treatment estimate','The confounder becomes a collider'],a:1,e:'Within each bin the confounder still varies and still relates to both exposure and outcome, so some of the bias remains.'},
+{l:'Expert',q:'Dummy variables for all four categories of a factor are included together with an intercept. The result is…',o:['A model with more power','Perfect collinearity: the dummies sum to the intercept column, so the coefficients are not identified','An interaction','A saturated spline'],a:1,e:'The dummy-variable trap: XᵀX is singular. Drop one category as the reference or drop the intercept.'},
+{l:'Expert',q:'Which statement about collinearity remedies is correct?',o:['Stepwise deletion of insignificant variables solves it and keeps valid p-values','Ridge regression or principal components can stabilise predictions; inference on individual coefficients requires more data, a better design or a combined measure','Collinearity can be fixed by dividing by the standard deviation','Collinearity only occurs between exactly two predictors'],a:1,e:'Penalised and component methods trade a little bias for a lot of variance and serve prediction. They do not make unidentifiable effects identifiable, and stepwise selection invalidates the usual p-values.'},
+{l:'Expert',q:'A spline model with 12 knots fits the training data very well but has a CV error far above the noise level. The correct inference is…',o:['The model is good because the training error is small','The model overfits: reduce knots (or add a penalty) and choose by CV','The noise level was mis-estimated','Add more knots'],a:1,e:'A large gap between training and CV error is the signature of overfitting. The aim is the number of knots minimising held-out error.'}
+];
+(function(){const st=store.get('mi_quiz',{});
+ function render(){const box=$('quiz');box.innerHTML='';
+  QZ.forEach((q,i)=>{const d=document.createElement('div');d.className='q'+(st[i]!=null?' done':'');d.innerHTML=`<div class="qh">Q${i+1} · ${q.l}</div><div style="margin:4px 0 6px"><b>${q.q}</b></div>`;
+   q.o.forEach((o,j)=>{const b=document.createElement('button');b.className='opt';b.textContent=o;if(st[i]!=null){if(j===q.a)b.classList.add('good');else if(j===st[i])b.classList.add('bad')}b.onclick=()=>{if(st[i]!=null)return;st[i]=j;store.set('mi_quiz',st);render();meter()};d.appendChild(b)});
+   const e=document.createElement('div');e.className='ex';e.innerHTML=(st[i]===q.a?'✅ ':'❌ ')+q.e;d.appendChild(e);box.appendChild(d)});
+  const ans=Object.keys(st).length,ok=QZ.filter((q,i)=>st[i]===q.a).length;
+  $('qscore').innerHTML=stat('answered',ans+' / '+QZ.length,'in')+stat('correct',ok,'ok')+stat('score',ans?Math.round(100*ok/ans)+'%':'—',ok/Math.max(ans,1)>=.8?'ok':'warn')+stat('verdict',ans<QZ.length?'keep going':ok>=16?'functional-form master':ok>=13?'strong':'review ch. 1–9','')}
+ $('qreset').onclick=()=>{Object.keys(st).forEach(k=>delete st[k]);store.set('mi_quiz',st);render();meter()};
+ window.__qst=st;render();})();
+const CHK=['Explain what collinearity does to variance, bias and predictions, and derive the 1/(1 − ρ²) factor.','Compute and interpret VIF and tolerance, and spot collinearity involving three or more variables.','Recognise the dummy-variable trap and other perfect collinearity.','Read “jointly significant but individually insignificant” and choose a sensible remedy.','Interpret every coefficient in a model with a binary-by-continuous interaction.','Centre variables and explain what changes and what does not.','Compute and plot a marginal effect with its confidence band.','Explain why interactions need about four times the sample of main effects.','Say why high-degree polynomials fail and what happens outside the data.','Build linear and cubic spline bases and choose knots.','Choose flexibility with K-fold cross-validation and the one-SE rule.','Use partial-residual plots to find the shape of an effect.','Explain what is lost by binning a continuous predictor, including residual confounding.','Match a symptom (funnel, curve, kink, instability) to the right model change.'];
+(function(){const st=store.get('mi_chk',{}),box=$('chk');CHK.forEach((t,i)=>{const l=document.createElement('label'),c=document.createElement('input');c.type='checkbox';c.checked=!!st[i];c.onchange=()=>{st[i]=c.checked;store.set('mi_chk',st);meter()};l.appendChild(c);const s=document.createElement('span');s.textContent=t;l.appendChild(s);box.appendChild(l)});window.__cst=st;})();
+function meter(){const q=window.__qst||{},c=window.__cst||{};const ok=QZ.filter((x,i)=>q[i]===x.a).length,ck=Object.values(c).filter(Boolean).length;const p=Math.round(100*(.6*ok/QZ.length+.4*ck/CHK.length));$('mtxt').textContent='Mastery: '+p+'%  (exam + checklist)';$('mbar').style.width=p+'%';store.set('mastery_mi',p)}
+meter();
+
+/* ---------- Navigation ---------- */
+(function(){const nav=$('nav');let html='';
+ document.querySelectorAll('main .part, main section.ch').forEach(el=>{if(el.classList.contains('part'))html+=`<div class="pt">${el.textContent}</div>`;else{const h=el.querySelector('h2'),num=h.querySelector('.num').textContent,t=Array.from(h.childNodes).filter(n=>n.nodeType===3).map(n=>n.textContent).join('').trim();html+=`<a href="#${el.id}" data-id="${el.id}">${num}. ${t}</a>`}});
+ nav.innerHTML=html;const links=nav.querySelectorAll('a'),io=new IntersectionObserver(es=>{es.forEach(e=>{if(e.isIntersecting)links.forEach(a=>a.classList.toggle('on',a.dataset.id===e.target.id))})},{rootMargin:'-20% 0px -70% 0px'});
+ document.querySelectorAll('section.ch').forEach(s=>io.observe(s));
+ $('menu').onclick=()=>$('side').classList.toggle('open');nav.addEventListener('click',e=>{if(e.target.tagName==='A')$('side').classList.remove('open')});
+ window.addEventListener('scroll',()=>{const h=document.documentElement;$('prog').style.width=(100*h.scrollTop/(h.scrollHeight-h.clientHeight))+'%'},{passive:true});})();
+</script>
+</body>
+</html>
