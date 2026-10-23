@@ -1,0 +1,582 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Hypothesis Testing, Power and Design Mastery</title>
+<style>
+:root{--bg:#0b0e17;--panel:#121726;--panel2:#171d30;--line:#232a3d;--fg:#e8ebf5;--mu:#8a93ab;--a:#6ea8ff;--r:#ff6b81;--y:#ffd166;--g:#4ade80;--p:#c084fc;--t:#5eead4}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;background:var(--bg);color:var(--fg);font:16px/1.7 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+a{color:var(--a)}
+#prog{position:fixed;top:0;left:0;height:3px;background:linear-gradient(90deg,var(--a),var(--p),var(--r));width:0;z-index:50}
+.side{position:fixed;left:0;top:0;bottom:0;width:290px;background:#0e1220;border-right:1px solid var(--line);overflow:auto;padding:18px 14px 90px;z-index:40;transition:transform .25s}
+.side h1{font-size:15px;margin:0 0 2px}
+.side small{color:var(--mu)}
+.side .pt{margin:16px 0 4px;font-size:11px;text-transform:uppercase;letter-spacing:1.3px;color:var(--p)}
+.side a{display:block;color:var(--mu);text-decoration:none;padding:5px 9px;border-radius:7px;font-size:13.5px;line-height:1.35}
+.side a:hover{background:var(--panel);color:var(--fg)}
+.side a.on{background:var(--panel2);color:var(--fg);box-shadow:inset 3px 0 var(--a)}
+.side a.back{color:var(--t);padding-left:0;margin-bottom:6px}
+.meter{position:fixed;left:0;bottom:0;width:290px;background:#0e1220;border-top:1px solid var(--line);padding:10px 16px;z-index:41;font-size:12px;color:var(--mu)}
+.meter .bar{height:7px;background:var(--line);border-radius:6px;margin-top:5px;overflow:hidden}
+.meter .bar i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--g),var(--t));transition:width .4s}
+#menu{display:none;position:fixed;top:10px;left:10px;z-index:60;background:var(--panel2);color:var(--fg);border:1px solid var(--line);border-radius:9px;padding:7px 12px;font-size:14px;cursor:pointer}
+main{margin-left:290px;padding:0 34px 120px;max-width:1090px}
+.hero{padding:70px 0 30px}
+.hero h1{font-size:clamp(32px,5vw,56px);line-height:1.08;margin:0 0 14px;background:linear-gradient(100deg,#fff,var(--y) 40%,var(--r));-webkit-background-clip:text;background-clip:text;color:transparent}
+.hero p{font-size:19px;color:#c3c9dc;max-width:780px}
+.chips{display:flex;flex-wrap:wrap;gap:8px;margin:18px 0}
+.chip{border:1px solid var(--line);background:var(--panel);padding:5px 12px;border-radius:99px;font-size:13px;color:var(--mu)}
+.chip b{color:var(--fg)}
+.part{margin:90px 0 0;padding-top:22px;border-top:1px solid var(--line);font-size:12px;letter-spacing:2px;text-transform:uppercase;color:var(--p)}
+section.ch{padding-top:30px}
+h2{font-size:30px;line-height:1.2;margin:10px 0 8px;display:flex;gap:12px;align-items:center;flex-wrap:wrap}
+h2 .num{display:inline-grid;place-items:center;width:40px;height:40px;border-radius:12px;background:var(--panel2);border:1px solid var(--line);font-size:18px;color:var(--a)}
+.lvl{font-size:11px;font-weight:600;letter-spacing:.8px;text-transform:uppercase;padding:3px 9px;border-radius:99px;border:1px solid}
+.lvl.b{color:var(--g);border-color:#1f5c3a}.lvl.i{color:var(--a);border-color:#244a85}.lvl.a{color:var(--y);border-color:#6b5420}.lvl.e{color:var(--r);border-color:#7a2c3a}
+h3{font-size:19px;margin:30px 0 6px;color:#fff}
+p{margin:10px 0}li{margin:5px 0}
+code,.f{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace}
+code{background:var(--panel2);padding:1px 6px;border-radius:5px;font-size:.9em}
+.f{display:block;white-space:pre-wrap;background:#0e1322;border:1px solid var(--line);border-left:3px solid var(--a);padding:12px 16px;border-radius:9px;margin:14px 0;overflow-x:auto;font-size:15px;color:#dbe4ff;line-height:1.8}
+.co{border-radius:12px;padding:13px 17px;margin:16px 0;border:1px solid var(--line);background:var(--panel)}
+.co>b:first-child{display:block;margin-bottom:2px;font-size:12px;letter-spacing:1px;text-transform:uppercase}
+.co.def{border-left:4px solid var(--a)}.co.def>b:first-child{color:var(--a)}
+.co.warn{border-left:4px solid var(--r)}.co.warn>b:first-child{color:var(--r)}
+.co.tip{border-left:4px solid var(--g)}.co.tip>b:first-child{color:var(--g)}
+.co.key{border-left:4px solid var(--y);background:#171608}.co.key>b:first-child{color:var(--y)}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:18px 20px;margin:22px 0;box-shadow:0 8px 30px rgba(0,0,0,.25)}
+.card>h4{margin:0 0 3px;font-size:13px;letter-spacing:1.2px;text-transform:uppercase;color:var(--t)}
+.card>p.sub{margin:0 0 12px;color:var(--mu);font-size:14.5px}
+.ctl{display:flex;flex-wrap:wrap;gap:10px 22px;align-items:center;margin:8px 0 10px}
+.ctl label{display:flex;gap:8px;align-items:center;font-size:14px;color:#c3c9dc}
+.ctl output{min-width:38px;font-family:ui-monospace,monospace;color:var(--y);font-size:13px}
+input[type=range]{accent-color:var(--a);width:150px}
+input[type=checkbox]{accent-color:var(--a)}
+select,input[type=number],input[type=text]{background:#0e1322;color:var(--fg);border:1px solid var(--line);border-radius:8px;padding:6px 9px;font:inherit;font-size:14px}
+button{background:linear-gradient(180deg,#2c4a80,#233b68);color:#fff;border:1px solid #3a5a98;border-radius:9px;padding:7px 14px;font:inherit;font-size:14px;cursor:pointer}
+button:hover{filter:brightness(1.15)}
+button.alt{background:var(--panel2);border-color:var(--line);color:var(--fg)}
+canvas{width:100%;height:270px;display:block;background:#0e1322;border:1px solid var(--line);border-radius:10px;margin-top:6px}
+canvas.sm{height:210px}canvas.tl{height:330px}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(125px,1fr));gap:9px;margin:12px 0}
+.stat{background:#0e1322;border:1px solid var(--line);border-radius:10px;padding:8px 11px}
+.stat b{display:block;font-size:17px;font-family:ui-monospace,monospace}
+.stat span{font-size:11.5px;color:var(--mu);text-transform:uppercase;letter-spacing:.7px}
+.stat.hot b{color:var(--r)}.stat.ok b{color:var(--g)}.stat.warn b{color:var(--y)}.stat.in b{color:var(--a)}
+.read{margin:8px 0 0;padding:10px 14px;background:#0e1322;border:1px dashed #33406a;border-radius:10px;font-size:14.5px;color:#d3dbf3}
+table{border-collapse:collapse;width:100%;margin:12px 0;font-size:14px}
+th,td{border:1px solid var(--line);padding:7px 10px;text-align:left;vertical-align:top}
+th{background:var(--panel2);font-size:12px;text-transform:uppercase;letter-spacing:.6px;color:var(--mu)}
+td.n{font-family:ui-monospace,monospace;text-align:right}
+.tw{overflow-x:auto}
+.pill{display:inline-block;padding:1px 9px;border-radius:99px;font-size:12px;font-weight:600}
+.pill.r{background:#3a1520;color:var(--r)}.pill.g{background:#10321f;color:var(--g)}.pill.y{background:#3a2f0e;color:var(--y)}.pill.m{background:#202637;color:var(--mu)}
+details{background:var(--panel);border:1px solid var(--line);border-radius:11px;padding:9px 15px;margin:9px 0}
+details summary{cursor:pointer;font-weight:600}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.q{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:14px 18px;margin:14px 0}
+.q .qh{font-size:12px;letter-spacing:1px;text-transform:uppercase;color:var(--mu)}
+.q .opt{display:block;width:100%;text-align:left;margin:6px 0;background:#0e1322;border:1px solid var(--line);color:var(--fg);border-radius:9px;padding:9px 12px}
+.q .opt.good{border-color:var(--g);background:#0e2418}.q .opt.bad{border-color:var(--r);background:#2a1119}
+.q .ex{display:none;margin-top:8px;font-size:14.5px;color:#c3c9dc}
+.q.done .ex{display:block}
+.chk label{display:flex;gap:10px;align-items:flex-start;padding:6px 0;cursor:pointer}
+.chk input{margin-top:6px;accent-color:var(--g);width:17px;height:17px}
+.sigrow{display:grid;grid-template-columns:minmax(170px,2fr) 1fr 1fr auto;gap:8px 14px;align-items:center;padding:6px 0;border-top:1px dashed #1b2236}
+.sigrow:first-of-type{border-top:0}
+.sigrow label{display:flex;gap:6px;align-items:center;font-size:13.5px;color:#c3c9dc}
+@media(max-width:900px){
+ .side{transform:translateX(-100%)}.side.open{transform:none}.meter{display:none}
+ #menu{display:block}main{margin-left:0;padding:0 16px 100px}.two{grid-template-columns:1fr}.hero{padding-top:60px}
+ .sigrow{grid-template-columns:1fr 1fr}
+}
+</style>
+</head>
+<body>
+<div id="prog"></div>
+<button id="menu">☰ Contents</button>
+<nav class="side" id="side"><a class="back" href="index.html">← All courses</a><h1>Hypothesis Testing, Power &amp; Design</h1><small>12 chapters · 11 labs · exam</small><div id="nav"></div></nav>
+<div class="meter"><div id="mtxt">Mastery: 0%</div><div class="bar"><i id="mbar"></i></div></div>
+
+<main>
+<header class="hero">
+ <h1>Hypothesis testing, power and experimental design.</h1>
+ <p>The p-value course taught how to read a test result. This page is about the other half: <em>designing</em> the study so that a real effect has a fair chance of being found, and knowing what to believe when it is or is not. It covers the Neyman–Pearson framework, power and minimum detectable effects, sample-size planning, effect sizes, the post-hoc power fallacy, Type S and Type M errors, variance reduction (CUPED), allocation, cluster-randomised designs, group-sequential monitoring, and power for heavy-tailed business metrics. It is the toolkit behind every A/B test, champion-challenger comparison and pilot you will ever run.</p>
+ <div class="chips"><span class="chip"><b>Part I</b> Power</span><span class="chip"><b>Part II</b> Effect sizes and misreadings</span><span class="chip"><b>Part III</b> Designing for power</span><span class="chip"><b>Part IV</b> Sequential and messy metrics</span></div>
+ <div class="co tip"><b>How to use this</b>Most labs are exact (no simulation noise); the ones that simulate say so. Power numbers use the normal or t distribution exactly (noncentral t where relevant). Prerequisites: the P-value course (chapters 1–9), Confidence Intervals and Sampling Distributions pages.</div>
+</header>
+
+<div class="part">Part I · Power</div>
+
+<section class="ch" id="c1">
+<h2><span class="num">1</span>Anatomy of a test <span class="lvl b">Beginner</span></h2>
+<p>A test chooses between a null hypothesis H₀ (no effect) and an alternative H₁ by computing a statistic and rejecting H₀ when it falls in a <b>rejection region</b>. Two error rates describe it:</p>
+<div class="tw"><table>
+<tr><th></th><th>H₀ true</th><th>H₁ true</th></tr>
+<tr><td><b>Reject H₀</b></td><td>Type I error, probability α (the <b>size</b>)</td><td>Correct: probability 1 − β = <b>power</b></td></tr>
+<tr><td><b>Keep H₀</b></td><td>Correct: probability 1 − α</td><td>Type II error, probability β</td></tr>
+</table></div>
+<p>α is chosen in advance and controls false alarms; power is a property of the <em>design</em> (sample size, noise, true effect, α). In the standard z-test of a mean, the statistic is N(0,1) under H₀ and N(λ, 1) under H₁ with <b>noncentrality</b> λ = δ/SE = d·√n, the true effect measured in standard errors. Power is the area of the H₁ curve beyond the critical value.</p>
+<p>The <b>Neyman–Pearson lemma</b> says that for a simple null against a simple alternative, the likelihood-ratio test has the highest power among all tests of the same size. For one-sided problems in common families the same test is uniformly most powerful; for two-sided problems no uniformly best test exists, which is why practical tests are built from likelihood-ratio, Wald or score statistics (see the p-value course, chapter 7).</p>
+<div class="card"><h4>Lab 1 · α, β and power on one picture</h4>
+ <p class="sub">One-sample z-test of H₀: μ = 0 with known σ = 1. Grey: the statistic's distribution if H₀ is true. Blue: if the true effect is d standard deviations. Red region: false alarms (α). Orange region: missed detections (β). Green: power.</p>
+ <div class="ctl"><label>true effect d (SD units) <input type="range" id="c1d" min="0" max="150" step="1" value="30"><output id="c1dv"></output></label><label>sample size n <input type="range" id="c1n" min="4" max="400" step="1" value="50"><output id="c1nv"></output></label><label>α <select id="c1a"><option value="0.1">0.10</option><option value="0.05" selected>0.05</option><option value="0.01">0.01</option><option value="0.001">0.001</option></select></label><label>test <select id="c1s"><option value="2">two-sided</option><option value="1">one-sided</option></select></label></div>
+ <canvas class="tl" id="c1cv"></canvas><div class="stats" id="c1st"></div><div class="read" id="c1rd"></div></div>
+</section>
+
+<section class="ch" id="c2">
+<h2><span class="num">2</span>The power function and the minimum detectable effect <span class="lvl i">Intermediate</span></h2>
+<p>Power is not one number but a <b>function of the true effect</b>. At d = 0 it equals α; it rises with d, with n, with α, and with lower noise. Four levers, in order of how freely you can pull them: sample size n, noise (variance reduction, Chapter 7), α (rarely negotiable), and the effect itself (not yours to choose). When effects are small, you reach for the first two.</p>
+<p>The <b>minimum detectable effect</b> (MDE) is the smallest true effect with a chosen power (usually 80%). For a two-sided test at α = 0.05 with 80% power, the true effect must be about (1.96 + 0.84) = <b>2.8 standard errors</b>. That is a useful mental yardstick: if your standard error is 1 percentage point, an experiment can reliably detect lifts of about 2.8 points and above.</p>
+<p>With σ estimated, the test is a t-test and power comes from the <b>noncentral t</b> distribution; the loss versus the z-test matters only at small n.</p>
+<div class="card"><h4>Lab 2 · Power curves and the MDE</h4>
+ <p class="sub">Two-group comparison with n per group. The curves show exact power against the true effect d for half, the chosen, and double the sample size. The dashed line marks 80% power; the table gives each curve's MDE.</p>
+ <div class="ctl"><label>n per group <input type="range" id="c2n" min="5" max="400" step="1" value="30"><output id="c2nv"></output></label><label>α (two-sided) <select id="c2a"><option value="0.1">0.10</option><option value="0.05" selected>0.05</option><option value="0.01">0.01</option></select></label><label>test <select id="c2t"><option value="t">t-test (σ estimated)</option><option value="z">z-test (σ known)</option></select></label></div>
+ <canvas class="tl" id="c2cv"></canvas><div class="tw" id="c2tb"></div><div class="read" id="c2rd"></div></div>
+</section>
+
+<section class="ch" id="c3">
+<h2><span class="num">3</span>Sample-size planning from power <span class="lvl i">Intermediate</span></h2>
+<p>Solve the power equation for n. For a two-sided test with standardised effect d:</p>
+<div class="f">two groups, n per group:   n = 2 (z_{1−α/2} + z_{power})² / d²           one sample:   n = (z_{1−α/2} + z_{power})² / d²
+two proportions p₁, p₂:     n = ( z_{1−α/2}·√(2p̄q̄) + z_{power}·√(p₁q₁ + p₂q₂) )² / (p₁ − p₂)²</div>
+<p>Four practical rules. (1) Plan for the <b>smallest effect worth acting on</b>, not the effect you hope for. (2) Required n grows like 1/d²: halving the effect quadruples n. (3) Moving from 80% to 90% power multiplies n by about 1.34. (4) Inflate for attrition, non-compliance and unusable units. For <b>non-inferiority</b> the test is one-sided with a margin, so α is not split across two tails.</p>
+<div class="card"><h4>Lab 3 · Sample-size calculator with curves</h4>
+ <p class="sub">The curves show the required n per group (log scale) against the effect, for four power levels; the marker is your setting. For means the effect is Cohen’s d; for proportions it is the relative lift on the baseline rate (an A/B test). The table gives n for other powers and α.</p>
+ <div class="ctl"><label>design <select id="c3t"><option value="0">two means (n per group)</option><option value="1">two proportions, A/B test (n per group)</option><option value="2">one mean (n)</option></select></label><label><span id="c3el">effect d</span> <input type="range" id="c3e" min="5" max="150" step="1" value="30"><output id="c3ev"></output></label><label>baseline rate (%) <input type="range" id="c3b" min="1" max="60" step="1" value="10"><output id="c3bv"></output></label><label>power % <input type="range" id="c3p" min="50" max="99" step="1" value="80"><output id="c3pv"></output></label><label>α <select id="c3a"><option value="0.1">0.10</option><option value="0.05" selected>0.05</option><option value="0.01">0.01</option></select></label></div>
+ <canvas class="tl" id="c3cv"></canvas><div class="tw" id="c3tb"></div><div class="read" id="c3rd"></div></div>
+</section>
+
+<div class="part">Part II · Effect sizes and common misreadings</div>
+
+<section class="ch" id="c4">
+<h2><span class="num">4</span>Effect sizes: saying how big, in a unit people understand <span class="lvl i">Intermediate</span></h2>
+<p>A p-value says whether an effect is detectable; an <b>effect size</b> says how large it is. Different audiences need different scales:</p>
+<div class="tw"><table>
+<tr><th>Scale</th><th>Definition</th><th>Reads as</th></tr>
+<tr><td>Cohen’s d (Hedges’ g with a small-sample correction)</td><td>(μ₁ − μ₂)/σ</td><td>Difference in SD units; rough labels 0.2 / 0.5 / 0.8 are conventions, not laws</td></tr>
+<tr><td>Probability of superiority = AUC</td><td>P(X₁ &gt; X₂) = Φ(d/√2) for normal groups</td><td>Chance that a random treated unit beats a random control; the same number as an AUC</td></tr>
+<tr><td>Correlation r</td><td>d/√(d² + 4) for equal groups</td><td>Share of variance explained is r²</td></tr>
+<tr><td>Risk difference, relative risk, odds ratio</td><td>p₁ − p₂, p₁/p₂, [p₁/(1−p₁)]/[p₂/(1−p₂)]</td><td>Absolute vs relative; the odds ratio overstates the relative risk when events are common</td></tr>
+<tr><td>Number needed to treat</td><td>1 / (p₁ − p₂)</td><td>Units treated per one extra success</td></tr>
+</table></div>
+<p>Report the effect on the scale the decision uses, with an interval. A relative lift of 20% on a 1% base rate is 0.2 points: statistically tiny to a CEO even if it is statistically huge to a p-value.</p>
+<div class="card"><h4>Lab 4 · One effect, many scales</h4>
+ <p class="sub">Left of the table: two normal populations separated by d. Below: the same idea for a binary outcome with a baseline rate and a relative lift. Move d and watch the common-language effect sizes (superiority, overlap) respond.</p>
+ <div class="ctl"><label>continuous effect d <input type="range" id="c4d" min="0" max="200" step="1" value="50"><output id="c4dv"></output></label><label>baseline rate % <input type="range" id="c4p" min="1" max="60" step="1" value="10"><output id="c4pv"></output></label><label>relative lift % <input type="range" id="c4l" min="1" max="100" step="1" value="20"><output id="c4lv"></output></label></div>
+ <canvas class="tl" id="c4cv"></canvas><div class="tw" id="c4tb"></div><div class="read" id="c4rd"></div></div>
+</section>
+
+<section class="ch" id="c5">
+<h2><span class="num">5</span>The “observed power” fallacy <span class="lvl a">Advanced</span></h2>
+<p>A tempting post-mortem for a non-significant result is to compute the “power” of the test at the effect you <em>observed</em>, and conclude “power was high, so the null is probably true” or “power was low, so the result is meaningless”. Both inferences fail. Observed power is a one-to-one function of the p-value (it only re-expresses it), so it adds no information. A result with p = 0.05 always has observed power of about 50%; any p above 0.05 gives below 50%. A non-significant result with “high observed power” cannot occur.</p>
+<p>The right post-hoc questions are: what effects does the confidence interval rule out, and what was the power against an effect size that would matter (chosen <em>before</em> seeing the data)? A related, more useful number is the <b>replication probability</b>: if the true effect were drawn from the data's own uncertainty, the chance that an identical new study is significant. It is lower than observed power and shows how fragile results near p = 0.05 are.</p>
+<div class="card"><h4>Lab 5 · Observed power is just the p-value in disguise</h4>
+ <p class="sub">Two-sided z-test at α = 0.05. The blue curve: observed power as a function of the p-value. Green: the probability that an exact replication is significant, if the truth is distributed around the observed estimate with the data's own uncertainty (flat prior).</p>
+ <div class="ctl"><label>observed p-value <input type="range" id="c5p" min="0" max="400" step="1" value="300"><output id="c5pv"></output></label></div>
+ <canvas class="tl" id="c5cv"></canvas><div class="stats" id="c5st"></div><div class="read" id="c5rd"></div></div>
+</section>
+
+<section class="ch" id="c6">
+<h2><span class="num">6</span>Type S and Type M errors: what significance does to your estimates <span class="lvl e">Expert</span></h2>
+<p>Gelman and Carlin proposed two errors beyond Type I and II for studies whose effects are small compared with their noise:</p>
+<ul>
+<li><b>Type S (sign) error</b>: among significant results, the share whose estimated effect has the wrong sign.</li>
+<li><b>Type M (magnitude) error</b>, or the <b>exaggeration ratio</b>: among significant results, the average |estimate| divided by the true effect.</li>
+</ul>
+<p>The mechanism is the <b>significance filter</b>: when power is low, only unusually large estimates cross the threshold, so the significant ones are inflated, sometimes by a factor of two to ten, and a few have the wrong sign. This is why published (and shipped) effects from small experiments shrink on replication, the winner’s curse of the p-value course (chapter 14).</p>
+<div class="card"><h4>Lab 6 · The significance filter, by simulation</h4>
+ <p class="sub">20,000 simulated two-group studies with a true effect d and n per group (σ = 1). Blue: all estimates. Red: only the significant ones (two-sided, α = 0.05). The white line is the truth.</p>
+ <div class="ctl"><label>true effect d <input type="range" id="c6d" min="1" max="100" step="1" value="20"><output id="c6dv"></output></label><label>n per group <input type="range" id="c6n" min="5" max="500" step="1" value="30"><output id="c6nv"></output></label><button id="c6go">Re-simulate</button></div>
+ <canvas class="tl" id="c6cv"></canvas><div class="stats" id="c6st"></div><div class="read" id="c6rd"></div></div>
+</section>
+
+<div class="part">Part III · Designing for power</div>
+
+<section class="ch" id="c7">
+<h2><span class="num">7</span>Variance reduction: ANCOVA, CUPED and stratification <span class="lvl a">Advanced</span></h2>
+<p>If a pre-experiment covariate X (last month’s spend, prior score) predicts the outcome Y, subtracting its predictable part removes noise without touching the treatment effect. <b>CUPED</b> (controlled-experiment using pre-experiment data) is the regression-adjusted estimator Y* = Y − θ(X − X̄) with θ = Cov(Y,X)/Var(X). Its variance is that of the raw difference times <b>(1 − ρ²)</b>, where ρ is the correlation between X and Y: with ρ = 0.7 the variance falls by about half, which is the same as doubling the sample.</p>
+<p>Rules: the covariate must be measured <em>before</em> randomisation (otherwise treatment contaminates it); in a randomised experiment the adjustment is unbiased whatever the model; stratifying or blocking the randomisation on a strong predictor gives a similar gain by design. The same idea underlies regression adjustment (ANCOVA) in clinical trials.</p>
+<div class="card"><h4>Lab 7 · CUPED versus the raw difference</h4>
+ <p class="sub">3,000 simulated experiments. Outcome Y has unit variance and correlation ρ with a pre-period covariate; the treatment adds the chosen effect. Compare the distribution of the two estimators and their power at α = 0.05.</p>
+ <div class="ctl"><label>correlation ρ(X, Y) % <input type="range" id="c7r" min="0" max="95" step="1" value="60"><output id="c7rv"></output></label><label>true effect <input type="range" id="c7e" min="0" max="50" step="1" value="20"><output id="c7ev"></output></label><label>n per group <input type="range" id="c7n" min="20" max="500" step="10" value="100"><output id="c7nv"></output></label><button id="c7go">Re-simulate</button></div>
+ <canvas class="tl" id="c7cv"></canvas><div class="stats" id="c7st"></div><div class="read" id="c7rd"></div></div>
+</section>
+
+<section class="ch" id="c8">
+<h2><span class="num">8</span>Allocation: who gets the units <span class="lvl a">Advanced</span></h2>
+<p>With total sample N, the standard error of a two-group difference is √(σ₁²/n₁ + σ₂²/n₂). It is smallest at <b>Neyman allocation</b> n₁ : n₂ = σ₁ : σ₂, so the noisier arm gets more units. With unequal cost per unit (c₁, c₂) the optimum becomes n₁ : n₂ = (σ₁/σ₂)·√(c₂/c₁). With equal variances and costs, 50/50 is optimal. Departures from the optimum cost less than people fear (a 70/30 split with equal variances needs about 19% more data), which is why risk-averse rollouts that give the new treatment a small share are affordable but not free.</p>
+<div class="card"><h4>Lab 8 · Power against the share allocated to the treatment arm</h4>
+ <p class="sub">Fixed budget: the control arm costs 1 per unit, the treatment arm costs the chosen multiple. The curve shows power as the treatment share varies (exact, normal approximation, two-sided α = 0.05). The effect is in units of the control arm’s SD.</p>
+ <div class="ctl"><label>SD of treatment ÷ SD of control <input type="range" id="c8s" min="25" max="400" step="5" value="200"><output id="c8sv"></output></label><label>cost per treated ÷ per control <input type="range" id="c8w" min="20" max="500" step="5" value="100"><output id="c8wv"></output></label><label>budget (units if all control) <input type="range" id="c8N" min="40" max="2000" step="10" value="400"><output id="c8Nv"></output></label><label>effect d <input type="range" id="c8d" min="5" max="100" step="1" value="30"><output id="c8dv"></output></label></div>
+ <canvas class="tl" id="c8cv"></canvas><div class="stats" id="c8st"></div><div class="read" id="c8rd"></div></div>
+</section>
+
+<section class="ch" id="c9">
+<h2><span class="num">9</span>Cluster-randomised designs <span class="lvl e">Expert</span></h2>
+<p>When whole branches, regions, advisers or classrooms are randomised, outcomes within a cluster are correlated (intra-cluster correlation ρ), and the <b>design effect</b> is DE = 1 + (m − 1)ρ for clusters of size m. The effective sample size per arm is K·m/DE for K clusters, and the standard error of the arm difference is σ·√(2·DE/(K·m)). Two consequences: <b>power is limited by the number of clusters, not the number of people</b>: as m → ∞ the standard error falls only to σ√(2ρ/K); and with few clusters the test has K − 1 degrees of freedom per arm, so small-K designs lose more power than the normal approximation suggests. Randomise at the level at which the intervention is delivered, and analyse at that level (cluster means, mixed models or cluster-robust standard errors).</p>
+<div class="card"><h4>Lab 9 · Clusters versus cluster size</h4>
+ <p class="sub">Exact power (noncentral t with 2(K − 1) degrees of freedom) against cluster size m for half, the chosen, and double the number of clusters per arm; effect in SD units; α = 0.05 two-sided. Note how every curve flattens.</p>
+ <div class="ctl"><label>intra-cluster correlation % <input type="range" id="c9r" min="0" max="50" step="1" value="5"><output id="c9rv"></output></label><label>cluster size m <input type="range" id="c9m" min="1" max="500" step="1" value="50"><output id="c9mv"></output></label><label>clusters per arm K <input type="range" id="c9k" min="2" max="200" step="1" value="20"><output id="c9kv"></output></label><label>effect d <input type="range" id="c9d" min="5" max="100" step="1" value="30"><output id="c9dv"></output></label></div>
+ <canvas class="tl" id="c9cv"></canvas><div class="stats" id="c9st"></div><div class="read" id="c9rd"></div></div>
+</section>
+
+<div class="part">Part IV · Sequential monitoring and messy metrics</div>
+
+<section class="ch" id="c10">
+<h2><span class="num">10</span>Looking more than once: group-sequential designs <span class="lvl e">Expert</span></h2>
+<p>Peeking at an ongoing experiment and stopping at the first p &lt; 0.05 inflates the false-positive rate (five equally spaced looks give about 14%). The principled alternative is a <b>group-sequential design</b>: plan K looks and spend the α budget across them with a <b>stopping boundary</b>. Two classic families: <b>Pocock</b> uses the same critical value at every look (about 2.29 for K = 3), which stops early easily but ends with a stiff final bar; <b>O’Brien–Fleming</b> uses a very high bar early (3.47 at the first of three looks) and a final bar close to the fixed-sample 1.96, so it keeps nearly full power. Modern alternatives include α-spending functions (Lan–DeMets) and always-valid p-values or confidence sequences (mSPRT) for continuous monitoring. Remember that estimates after early stopping are biased upward (Chapter 6 again), and plan futility stops as well as efficacy stops.</p>
+<div class="card"><h4>Lab 10 · Three ways of looking</h4>
+ <p class="sub">5,000 simulated trials with K equally spaced looks. “Naive” stops at the first |z| &gt; 1.96. Left: the critical value at each look. Right: how often each rule rejects (false-positive rate when the true effect is 0, power otherwise). The effect is the expected z-statistic at the final look.</p>
+ <div class="ctl"><label>number of looks K <select id="c10k"><option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="5" selected>5</option></select></label><label>expected final z <input type="range" id="c10e" min="0" max="40" step="1" value="0"><output id="c10ev"></output></label><button id="c10go">Re-simulate</button></div>
+ <div class="two"><canvas class="sm" id="c10cv"></canvas><canvas class="sm" id="c10cv2"></canvas></div><div class="stats" id="c10st"></div><div class="read" id="c10rd"></div></div>
+</section>
+
+<section class="ch" id="c11">
+<h2><span class="num">11</span>Power for heavy-tailed business metrics <span class="lvl e">Expert</span></h2>
+<p>Revenue, balances and transaction amounts are right-skewed with a few very large values. The t-test on raw means is valid asymptotically but its <b>power can be poor</b>, because a handful of outliers dominate the variance. Options: transform (log), trim or cap (winsorise), use a rank test (Mann–Whitney), or model the metric in parts (conversion, then amount given conversion). Each changes the <em>estimand</em>: the raw mean answers “what happens to total revenue”, the log test answers “what happens to the typical (geometric-mean) user”, the rank test “does a random treated user beat a random control”. Choose the test whose question matches the decision, then use <b>simulation</b> to plan power: it is the only general tool when the metric or design is messy.</p>
+<div class="card"><h4>Lab 11 · Power of four tests on lognormal revenue</h4>
+ <p class="sub">Revenue per user is lognormal with the chosen spread; the treatment multiplies every user’s revenue by (1 + lift), so the ratio of means, of medians and of geometric means are all equal to the lift and the tests are fairly compared. 1,000 simulated experiments, α = 0.05.</p>
+ <div class="ctl"><label>spread σ (log scale) <input type="range" id="c11s" min="20" max="200" step="5" value="120"><output id="c11sv"></output></label><label>lift % <input type="range" id="c11l" min="0" max="50" step="1" value="10"><output id="c11lv"></output></label><label>n per group <input type="range" id="c11n" min="0" max="3" step="1" value="1"><output id="c11nv"></output></label><button id="c11go">Run</button></div>
+ <canvas class="tl" id="c11cv"></canvas><div class="tw" id="c11tb"></div><div class="read" id="c11rd"></div></div>
+</section>
+
+<section class="ch" id="c12">
+<h2><span class="num">12</span>Final exam, mastery checklist, cheat sheet <span class="lvl e">Expert</span></h2>
+<h3>Exam (18 questions — click an answer)</h3>
+<div id="quiz"></div>
+<div class="card"><h4>Score</h4><div class="stats" id="qscore"></div><button class="alt" id="qreset">Reset exam</button></div>
+<h3>Mastery checklist — tick when you can do it without notes</h3>
+<div class="card chk" id="chk"></div>
+<h3>Cheat sheet</h3>
+<div class="tw"><table>
+<tr><th>Idea</th><th>One line</th></tr>
+<tr><td>Errors</td><td>α = P(reject | H₀); power = P(reject | H₁) = 1 − β</td></tr>
+<tr><td>Noncentrality</td><td>λ = effect / SE; power is the area of N(λ,1) beyond the critical value</td></tr>
+<tr><td>MDE</td><td>≈ 2.8 SE for 80% power at two-sided α = 0.05 (z₁₋α/₂ + z_power)</td></tr>
+<tr><td>Sample size</td><td>n = 2(z + z)²/d² per group; halve the effect ⇒ 4× n; 90% instead of 80% power ⇒ ×1.34</td></tr>
+<tr><td>Effect sizes</td><td>Report d, risk difference, OR/RR, NNT, AUC = Φ(d/√2); always with an interval</td></tr>
+<tr><td>Observed power</td><td>A function of p; p = 0.05 ⇒ ~50%; adds nothing. Use the CI and pre-specified MDE instead</td></tr>
+<tr><td>Type S / M</td><td>Low power + significance filter ⇒ exaggerated, occasionally wrong-signed estimates</td></tr>
+<tr><td>CUPED</td><td>Variance × (1 − ρ²); covariate must be pre-treatment</td></tr>
+<tr><td>Allocation</td><td>n₁:n₂ = (σ₁/σ₂)·√(c₂/c₁); 50/50 for equal variance and cost</td></tr>
+<tr><td>Clusters</td><td>DE = 1 + (m − 1)ρ; power limited by number of clusters; plateau as m grows</td></tr>
+<tr><td>Sequential</td><td>Peeking inflates α (5 looks ≈ 14%); Pocock = constant bound, O’Brien–Fleming = strict early, ~1.98 at the end</td></tr>
+<tr><td>Heavy tails</td><td>Raw-mean tests lose power; log, cap or rank change the estimand; plan power by simulation</td></tr>
+</table></div>
+<div class="co tip"><b>Next on the roadmap</b>Stage 3 begins with item 11, linear regression done properly. Multiple testing (Stage 4) is already covered in the p-value course, chapter 12.</div>
+</section>
+</main>
+<script>
+/*MATH*/
+function lgamma(x){const c=[76.18009172947146,-86.50532032941677,24.01409824083091,-1.231739572450155,0.1208650973866179e-2,-0.5395239384953e-5];let y=x,t=x+5.5;t-=(x+.5)*Math.log(t);let s=1.000000000190015;for(let j=0;j<6;j++)s+=c[j]/++y;return -t+Math.log(2.5066282746310005*s/x);}
+function gser(a,x){let ap=a,sum=1/a,del=sum;for(let n=0;n<1000;n++){ap++;del*=x/ap;sum+=del;if(Math.abs(del)<Math.abs(sum)*1e-15)break;}return sum*Math.exp(-x+a*Math.log(x)-lgamma(a));}
+function gcf(a,x){let b=x+1-a,c=1/1e-300,d=1/b,h=d;for(let i=1;i<1000;i++){const an=-i*(i-a);b+=2;d=an*d+b;if(Math.abs(d)<1e-300)d=1e-300;c=b+an/c;if(Math.abs(c)<1e-300)c=1e-300;d=1/d;const del=d*c;h*=del;if(Math.abs(del-1)<1e-15)break;}return Math.exp(-x+a*Math.log(x)-lgamma(a))*h;}
+function gammaQ(a,x){if(x<=0)return 1;return x<a+1?1-gser(a,x):gcf(a,x);}
+function betacf(a,b,x){const qab=a+b,qap=a+1,qam=a-1;let c=1,d=1-qab*x/qap;if(Math.abs(d)<1e-300)d=1e-300;d=1/d;let h=d;for(let m=1;m<=1000;m++){const m2=2*m;let aa=m*(b-m)*x/((qam+m2)*(a+m2));d=1+aa*d;if(Math.abs(d)<1e-300)d=1e-300;c=1+aa/c;if(Math.abs(c)<1e-300)c=1e-300;d=1/d;h*=d*c;aa=-(a+m)*(qab+m)*x/((a+m2)*(qap+m2));d=1+aa*d;if(Math.abs(d)<1e-300)d=1e-300;c=1+aa/c;if(Math.abs(c)<1e-300)c=1e-300;d=1/d;const del=d*c;h*=del;if(Math.abs(del-1)<1e-15)break;}return h;}
+function betai(a,b,x){if(x<=0)return 0;if(x>=1)return 1;const bt=Math.exp(lgamma(a+b)-lgamma(a)-lgamma(b)+a*Math.log(x)+b*Math.log(1-x));return x<(a+1)/(a+b+2)?bt*betacf(a,b,x)/a:1-bt*betacf(b,a,1-x)/b;}
+function normSf(z){const q=0.5*gammaQ(.5,z*z/2);return z>=0?q:1-q;}
+function normCdf(z){return normSf(-z);}
+function npdf(x){return Math.exp(-x*x/2)/2.5066282746310002;}
+function lbin(n,k){return lgamma(n+1)-lgamma(k+1)-lgamma(n-k+1);}
+function binom(n,k,p){return Math.exp(lbin(n,k)+k*Math.log(p)+(n-k)*Math.log(1-p));}
+function betapdf(x,a,b){return x<=0||x>=1?0:Math.exp(lgamma(a+b)-lgamma(a)-lgamma(b)+(a-1)*Math.log(x)+(b-1)*Math.log(1-x));}
+function betacdf(x,a,b){return betai(a,b,x);}
+function gampdf(x,a,r){return x<=0?0:Math.exp(a*Math.log(r)+(a-1)*Math.log(x)-r*x-lgamma(a));}
+function gamcdf(x,a,r){return x<=0?0:1-gammaQ(a,r*x);}
+function randn(){let u=0;while(!u)u=Math.random();return Math.sqrt(-2*Math.log(u))*Math.cos(2*Math.PI*Math.random());}
+function gammaS(a){if(a<1)return gammaS(a+1)*Math.pow(Math.random(),1/a);const d=a-1/3,c=1/Math.sqrt(9*d);for(;;){let x,v;do{x=randn();v=1+c*x}while(v<=0);v=v*v*v;const u=Math.random();if(Math.log(u)<.5*x*x+d-d*v+d*Math.log(v))return d*v;}}
+function betaS(a,b){const x=gammaS(a),y=gammaS(b);return x/(x+y);}
+function binS(n,p){let k=0;for(let i=0;i<n;i++)if(Math.random()<p)k++;return k;}
+function mean(a){let s=0;for(const v of a)s+=v;return s/a.length;}
+function qc(cdf,lo,hi,p,it){for(let i=0;i<(it||100);i++){const m=(lo+hi)/2;if(cdf(m)<p)lo=m;else hi=m}return(lo+hi)/2;}
+function qb(a,b,p){return qc(x=>betai(a,b,x),0,1,p,50);}
+function tcdf(x,v){const t=.5*betai(v/2,.5,v/(v+x*x));return x>0?1-t:t}
+function qn(p){return qc(normCdf,-9,9,p,70)}
+function pois(k,l){return Math.exp(-l+k*Math.log(l)-lgamma(k+1))}
+function binF(n,p){let k=0;for(;;){if(n<=0||p<=0)return k;if(p>=1)return k+n;if(n<=40){for(let i=0;i<n;i++)if(Math.random()<p)k++;return k}const a=1+(n>>1),bb=1+n-a,x=betaS(a,bb);if(x>=p){n=a-1;p=p/x}else{k+=a;n=bb-1;p=(p-x)/(1-x)}}}
+/*ENDMATH*/
+
+const $=id=>document.getElementById(id), val=id=>+$(id).value;
+const C={fg:'#e8ebf5',mu:'#8a93ab',gr:'#232a3d',a:'#6ea8ff',r:'#ff6b81',y:'#ffd166',g:'#4ade80',p:'#c084fc',t:'#5eead4'};
+const store={get(k,d){try{const v=JSON.parse(localStorage.getItem(k));return v==null?d:v}catch(e){return d}},set(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}};
+function stat(l,v,c){return `<div class="stat ${c||''}"><b>${v}</b><span>${l}</span></div>`}
+function f3(x){if(!isFinite(x))return String(x);const a=Math.abs(x);if(a!==0&&(a<1e-3||a>=1e6))return x.toExponential(2);return String(+x.toFixed(a<1?4:a<100?3:a<1000?2:0))}
+function pc(x){return f3(100*x)+'%'}
+const resizers=[];
+function reg(fn){fn();resizers.push(fn)}
+function on(ids,fn){ids.split(' ').forEach(i=>{const e=$(i);e.addEventListener('input',fn);e.addEventListener('change',fn)})}
+let rt;window.addEventListener('resize',()=>{clearTimeout(rt);rt=setTimeout(()=>resizers.forEach(f=>f()),150)});
+document.querySelectorAll('input[type=range]').forEach(i=>{const o=$(i.id+'v');if(!o)return;const f=()=>{o.textContent=i.value};i.addEventListener('input',f);f()});
+
+function nice(x){const e=Math.pow(10,Math.floor(Math.log10(x))),f=x/e;return (f<1.5?1:f<3?2:f<7?5:10)*e}
+function mk(cv,x0,x1,ymax,o){o=o||{};const y0=o.y0||0,dpr=window.devicePixelRatio||1,r=cv.getBoundingClientRect(),w=r.width||600,h=r.height||270;
+ cv.width=w*dpr;cv.height=h*dpr;const g=cv.getContext('2d');g.setTransform(dpr,0,0,dpr,0,0);g.clearRect(0,0,w,h);
+ const L=o.L||42,R=12,T=14,B=28,X=x=>L+(x-x0)/(x1-x0)*(w-L-R),Y=y=>h-B-(y-y0)/(ymax-y0)*(h-T-B);
+ g.font='11px system-ui';g.lineWidth=1;g.strokeStyle=C.gr;g.fillStyle=C.mu;
+ if(!o.noGrid){const sx=nice((x1-x0)/7);for(let x=Math.ceil(x0/sx-1e-9)*sx;!o.noX&&x<=x1+1e-9;x+=sx){g.beginPath();g.moveTo(X(x),T);g.lineTo(X(x),h-B);g.stroke();g.textAlign='center';g.fillText(String(+x.toFixed(6)),X(x),h-B+15)}
+ const sy=nice((ymax-y0)/4);for(let y=Math.ceil(y0/sy-1e-9)*sy;y<=ymax+1e-9;y+=sy){g.beginPath();g.moveTo(L,Y(y));g.lineTo(w-R,Y(y));g.stroke();g.textAlign='right';g.fillText(String(+y.toFixed(4)),L-5,Y(y)+3)}}
+ return{g,w,h,X,Y,L,R,T,B,
+  line(f,col,lw,a,b,n,dash){a=a==null?x0:a;b=b==null?x1:b;n=n||260;g.save();if(dash)g.setLineDash([5,4]);g.beginPath();g.strokeStyle=col;g.lineWidth=lw||2;let st=false;for(let i=0;i<=n;i++){const x=a+(b-a)*i/n,y=f(x);if(!isFinite(y)){st=false;continue}st?g.lineTo(X(x),Y(y)):g.moveTo(X(x),Y(y));st=true}g.stroke();g.restore()},
+  area(f,a,b,col,n){a=Math.max(a,x0);b=Math.min(b,x1);if(b<=a)return;n=n||200;g.beginPath();g.moveTo(X(a),Y(0));for(let i=0;i<=n;i++){const x=a+(b-a)*i/n;g.lineTo(X(x),Y(f(x)))}g.lineTo(X(b),Y(0));g.closePath();g.fillStyle=col;g.fill()},
+  vline(x,col,lab,dash){g.save();g.strokeStyle=col;g.lineWidth=1.6;if(dash)g.setLineDash([5,4]);g.beginPath();g.moveTo(X(x),T);g.lineTo(X(x),h-B);g.stroke();g.restore();if(lab){g.fillStyle=col;g.textAlign='center';g.fillText(lab,Math.min(Math.max(X(x),34),w-34),T+10)}},
+  hline(y,col,lab){g.save();g.strokeStyle=col;g.lineWidth=1.4;g.setLineDash([5,4]);g.beginPath();g.moveTo(L,Y(y));g.lineTo(w-R,Y(y));g.stroke();g.restore();if(lab){g.fillStyle=col;g.textAlign='right';g.fillText(lab,w-R-3,Y(y)-4)}},
+  text(s,x,y,col,al){g.fillStyle=col||C.fg;g.textAlign=al||'left';g.fillText(s,x,y)}};}
+
+/* ---------- shared helpers for this page ---------- */
+const D={
+ norm:{n:'Normal(0,1)',s:()=>randn(),mu:0,sd:1,sk:0},
+ unif:{n:'Uniform(0,1)',s:()=>Math.random(),mu:.5,sd:Math.sqrt(1/12),sk:0},
+ expo:{n:'Exponential(1)',s:()=>-Math.log(1-Math.random()),mu:1,sd:1,sk:2},
+ logn:{n:'Lognormal(0,1)',s:()=>Math.exp(randn()),mu:Math.exp(.5),sd:Math.sqrt((Math.E-1)*Math.E),sk:(Math.E+2)*Math.sqrt(Math.E-1),disc:0},
+ b05:{n:'Bernoulli(0.5)',s:()=>Math.random()<.5?1:0,mu:.5,sd:.5,sk:0,disc:1},
+ b05s:{n:'Bernoulli(0.05)',s:()=>Math.random()<.05?1:0,mu:.05,sd:Math.sqrt(.0475),sk:.9/Math.sqrt(.0475),disc:1},
+ bimo:{n:'Two humps',s:()=>(Math.random()<.5?-2:2)+.5*randn(),mu:0,sd:Math.sqrt(4.25),sk:0},
+ par5:{n:'Pareto(α=5)',s:()=>Math.pow(1-Math.random(),-.2),mu:1.25,sd:Math.sqrt(5/48),sk:6*Math.sqrt(.6)},
+ cauchy:{n:'Cauchy (no mean)',s:()=>Math.tan(Math.PI*(Math.random()-.5)),mu:NaN,sd:Infinity,sk:NaN}
+};
+function fillSel(id,keys,def){const e=$(id);e.innerHTML=keys.map(k=>`<option value="${k}">${D[k].n}</option>`).join('');e.value=def}
+const PAL=[C.a,C.r,C.y,C.g,C.p,C.t,'#ff9f43','#9aa4bf'];
+function tgrid(N,M){const T=[];let prev=0;for(let i=0;i<M;i++){let n=Math.round(Math.pow(10,Math.log10(N)*i/(M-1)));if(i===M-1)n=N;n=Math.max(prev+1,n);if(n>N)break;T.push(n);prev=n}if(T[T.length-1]!==N)T[T.length-1]=N;return T}
+function nlab(n){return n>=1e6?(n/1e6)+'M':n>=1000?(n/1000)+'k':String(n)}
+function customGrid(P,xt,yt){const g=P.g;g.save();g.strokeStyle=C.gr;g.fillStyle=C.mu;g.font='11px system-ui';g.lineWidth=1;
+ xt.forEach(([v,l])=>{g.beginPath();g.moveTo(P.X(v),P.T);g.lineTo(P.X(v),P.h-P.B);g.stroke();g.textAlign='center';g.fillText(l,P.X(v),P.h-P.B+15)});
+ yt.forEach(([v,l])=>{g.beginPath();g.moveTo(P.L,P.Y(v));g.lineTo(P.w-P.R,P.Y(v));g.stroke();g.textAlign='right';g.fillText(l,P.L-5,P.Y(v)+3)});g.restore()}
+function clip(P,fn){const g=P.g;g.save();g.beginPath();g.rect(P.L,P.T,P.w-P.L-P.R,P.h-P.T-P.B);g.clip();fn();g.restore()}
+function poly(P,pts,col,lw,dash){const g=P.g;g.save();if(dash)g.setLineDash([5,4]);g.strokeStyle=col;g.lineWidth=lw||2;g.beginPath();pts.forEach(([x,y],i)=>i?g.lineTo(P.X(x),P.Y(y)):g.moveTo(P.X(x),P.Y(y)));g.stroke();g.restore()}
+function dots(P,pts,col,r){const g=P.g;g.fillStyle=col;pts.forEach(([x,y])=>{g.beginPath();g.arc(P.X(x),P.Y(y),r||3,0,7);g.fill()})}
+function niceTicks(lo,hi,k){const st=nice((hi-lo)/(k||5)),a=[];for(let v=Math.ceil(lo/st-1e-9)*st;v<=hi+1e-9;v+=st)a.push([v,String(+v.toFixed(6))]);return a}
+function logTicks(lo,hi){const a=[];for(let e=Math.ceil(lo-1e-9);e<=hi+1e-9;e++)a.push([e,nlab(Math.pow(10,e))]);return a}
+function mom(a){const n=a.length;let m=0;for(const v of a)m+=v;m/=n;let v2=0,v3=0,v4=0;for(const v of a){const d=v-m;v2+=d*d;v3+=d*d*d;v4+=d*d*d*d}v2/=n;v3/=n;v4/=n;const sd=Math.sqrt(v2);return{n,m,sd,sk:sd>0?v3/(sd*sd*sd):0,ku:v2>0?v4/(v2*v2)-3:0}}
+function ksN(z){const a=Array.from(z).sort((x,y)=>x-y),n=a.length;let d=0;for(let i=0;i<n;i++){const F=normCdf(a[i]);d=Math.max(d,Math.abs((i+1)/n-F),Math.abs(i/n-F))}return d}
+/* histogram of data as density with optional overlay curves [{f,col,lw,dash}] */
+function hist(cv,data,lo,hi,bins,ov,col){const cnt=new Float64Array(bins),bw=(hi-lo)/bins;let n=0;for(const v of data){if(v<lo||v>=hi)continue;cnt[Math.floor((v-lo)/bw)]++;n++}
+ const N=data.length;let ym=0;for(let i=0;i<bins;i++){cnt[i]/=N*bw;ym=Math.max(ym,cnt[i])}
+ (ov||[]).forEach(o=>{for(let i=0;i<=80;i++)ym=Math.max(ym,o.f(lo+(hi-lo)*i/80)||0)});
+ const P=mk(cv,lo,hi,ym*1.12);
+ P.g.fillStyle=col||'rgba(110,168,255,.5)';for(let i=0;i<bins;i++){if(cnt[i]<=0)continue;const a=P.X(lo+i*bw),b=P.X(lo+(i+1)*bw);P.g.fillRect(a,P.Y(cnt[i]),Math.max(1,b-a-1),P.Y(0)-P.Y(cnt[i]))}
+ (ov||[]).forEach(o=>P.line(o.f,o.col,o.lw||2.4,lo,hi,200,o.dash));return P}
+const fmt=x=>f3(x);
+
+/* ---------- shared for this page ---------- */
+const POPS=['norm','unif','expo','logn','bimo','par5'];
+D.norm.med=0;D.norm.q90=1.2815516;D.unif.med=.5;D.unif.q90=.9;D.expo.med=Math.LN2;D.expo.q90=Math.log(10);D.logn.med=1;D.logn.q90=Math.exp(1.2815516);
+D.bimo.med=0;D.bimo.q90=qc(x=>.5*normCdf((x+2)/.5)+.5*normCdf((x-2)/.5),-10,10,.9,80);D.par5.med=Math.pow(2,.2);D.par5.q90=Math.pow(10,.2);
+const SF={mean:a=>mean(a),median:a=>{const b=Float64Array.from(a).sort(),n=b.length;return n%2?b[(n-1)/2]:(b[n/2-1]+b[n/2])/2},sd:a=>{const n=a.length,m=mean(a);let s=0;for(const v of a)s+=(v-m)*(v-m);return Math.sqrt(s/(n-1))},q90:a=>{const b=Float64Array.from(a).sort();return b[Math.round(.9*(b.length-1))]}};
+function truth(key,st){const d=D[key];return st==='mean'?d.mu:st==='median'?d.med:st==='sd'?d.sd:d.q90}
+const SNAME={mean:'sample mean',median:'sample median',sd:'sample SD',q90:'90th percentile'};
+const N10=[2,3,5,10,20,50,100,200,500,1000];
+function pct(a,p){const b=Float64Array.from(a).sort();return b[Math.min(b.length-1,Math.max(0,Math.floor(p*b.length)))]}
+function histLines(cv,arrs,cols,lo,hi,bins,vl){const bw=(hi-lo)/bins,dens=arrs.map(a=>{const c=new Float64Array(bins);for(const v of a){if(v<lo||v>=hi)continue;c[Math.floor((v-lo)/bw)]++}for(let i=0;i<bins;i++)c[i]/=a.length*bw;return c});let ym=0;dens.forEach(c=>c.forEach(v=>ym=Math.max(ym,v)));const P=mk(cv,lo,hi,ym*1.15||1);
+ dens.forEach((c,k)=>{const pts=[];for(let i=0;i<bins;i++){pts.push([lo+i*bw,c[i]]);pts.push([lo+(i+1)*bw,c[i]])}clip(P,()=>poly(P,pts,cols[k],2.2))});(vl||[]).forEach(v=>P.vline(v[0],v[1],v[2],v[3]));return P}
+function sdOf(a){return mom(a).sd}
+
+/* ---------- ML helpers ---------- */
+function digamma(x){let r=0;while(x<6){r-=1/x;x++}const f=1/(x*x);return r+Math.log(x)-.5/x-f*(1/12-f*(1/120-f/252))}
+function trigamma(x){let r=0;while(x<6){r+=1/(x*x);x++}const f=1/(x*x);return r+1/x+.5*f+f/x*(1/6-f*(1/30-f/42))}
+function poisS(l){if(l<=0)return 0;if(l<30){const L=Math.exp(-l);let k=0,p=1;do{k++;p*=Math.random()}while(p>L);return k-1}const m=Math.floor(.875*l),g=gammaS(m);return g<l?m+poisS(l-g):binF(m-1,l/g)}
+function llb(k,n,p){return(k?k*Math.log(p):0)+(n-k?(n-k)*Math.log(1-p):0)}
+function lrInt(k,n,cut){const ph=k/n,l0=llb(k,n,ph),g=p=>2*(l0-llb(k,n,p))-cut;let lo=0,hi=1;
+ if(k>0){let a=1e-12,b=ph;for(let i=0;i<70;i++){const m=(a+b)/2;if(g(m)>0)a=m;else b=m}lo=(a+b)/2}
+ if(k<n){let a=ph,b=1-1e-12;for(let i=0;i<70;i++){const m=(a+b)/2;if(g(m)>0)b=m;else a=m}hi=(a+b)/2}return[lo,hi]}
+function solveAlpha(s){if(!(s>1e-9))return 1e6;let a=(3-s+Math.sqrt((3-s)*(3-s)+24*s))/(12*s);for(let i=0;i<8;i++){const f=Math.log(a)-digamma(a)-s,fp=1/a-trigamma(a);let n=a-f/fp;if(!(n>0))n=a/2;a=n}return a}
+function normPdfAt(x,m,s){return Math.exp(-(x-m)*(x-m)/(2*s*s))/(s*2.5066282746)}
+/* ---------- Power helpers ---------- */
+function idx(id,arr,ff){const e=$(id),o=$(id+'v'),f=()=>{o.textContent=ff?ff(arr[+e.value]):arr[+e.value]};e.addEventListener('input',f);f()}
+function scl(id,ff){const e=$(id),o=$(id+'v'),f=()=>{o.textContent=ff(+e.value)};e.addEventListener('input',f);f()}
+function Phi(x){const z=Math.abs(x)/Math.SQRT2,t=1/(1+.5*z),r=t*Math.exp(-z*z-1.26551223+t*(1.00002368+t*(.37409196+t*(.09678418+t*(-.18628806+t*(.27886807+t*(-1.13520398+t*(1.48851587+t*(-.82215223+t*.17087277)))))))));return x>=0?1-.5*r:.5*r}
+const _tq={};function tq(v,p){const k=v+'_'+p;return _tq[k]||(_tq[k]=qc(x=>tcdf(x,v),0,500,p,80))}
+const _zq={};function zq(p){return _zq[p]||(_zq[p]=qn(p))}
+function ntCdf(t,v,lam){const hi=Math.sqrt(v)+8,N=240,h=hi/N,c=-(v/2-1)*Math.LN2-lgamma(v/2);let s=0;for(let i=0;i<=N;i++){const r=i*h;let f;if(r===0)f=v===1?Math.exp(c):0;else f=Math.exp((v-1)*Math.log(r)-r*r/2+c);const w=i===0||i===N?1:i%2?4:2;s+=w*f*Phi(t*r/Math.sqrt(v)-lam)}return s*h/3}
+function powZ(lam,al,two){return two?Phi(lam-zq(1-al/2))+Phi(-lam-zq(1-al/2)):Phi(lam-zq(1-al))}
+function powT(lam,v,al,two){if(two){const tc=tq(v,1-al/2);return 1-ntCdf(tc,v,lam)+ntCdf(-tc,v,lam)}const tc=tq(v,1-al);return 1-ntCdf(tc,v,lam)}
+function logY(P,lo,hi){return logTicks(lo,hi)}
+function pctTicks(a,b,st){const r=[];for(let v=a;v<=b+1e-9;v+=st)r.push([v,Math.round(v*100)+'%']);return r}
+
+/* ---------- Ch1 z-test picture ---------- */
+(function(){scl('c1d',v=>fmt(v/100));
+ function draw(){const d=val('c1d')/100,n=val('c1n'),al=+$('c1a').value,two=+$('c1s').value===2,lam=d*Math.sqrt(n),zc=two?zq(1-al/2):zq(1-al);
+  const lo=Math.min(-4,lam-4),hi=Math.max(4,lam+4),P=mk($('c1cv'),lo,hi,.46,{L:42});const f0=x=>npdf(x),f1=x=>npdf(x-lam);
+  P.area(f1,lo,two?-zc:lo,'rgba(74,222,128,.0)',1);
+  // beta region (H1 inside acceptance), power region, alpha regions
+  P.area(f1,two?-zc:lo,zc,'rgba(255,159,67,.45)',200);P.area(f1,zc,hi,'rgba(74,222,128,.45)',200);if(two)P.area(f1,lo,-zc,'rgba(74,222,128,.45)',200);
+  P.area(f0,zc,hi,'rgba(255,107,129,.6)',200);if(two)P.area(f0,lo,-zc,'rgba(255,107,129,.6)',200);
+  P.line(f0,C.mu,2.2,lo,hi,300);P.line(f1,C.a,2.6,lo,hi,300);P.vline(zc,C.fg,'critical '+fmt(zc),true);if(two)P.vline(-zc,C.fg,null,true);
+  P.text('— H₀: N(0,1)',P.L+8,P.T+26,C.mu);P.text('— H₁: N('+fmt(lam)+',1)',P.L+8,P.T+42,C.a);P.text('z-statistic',P.w/2,P.h-2,C.mu,'center');
+  const pw=powZ(lam,al,two);
+  $('c1st').innerHTML=stat('noncentrality λ = d√n',fmt(lam),'in')+stat('size α',fmt(al),'hot')+stat('β (miss)',fmt(1-pw),'warn')+stat('power 1 − β',pc(pw),pw>=.8?'ok':'warn')+stat('critical value',(two?'±':'')+fmt(zc),'');
+  $('c1rd').innerHTML=`The true effect is ${fmt(d)} SD, so with n = ${n} the statistic is centred at λ = ${fmt(lam)} instead of 0. The test rejects when |z| exceeds ${fmt(zc)}; the red area (${fmt(al)}) is the false-alarm rate when H₀ is true; the green area (${pc(pw)}) is the chance of detecting this effect; the orange area (${pc(1-pw)}) is the chance of missing it. Slide α down and the critical value moves right: false alarms fall, but so does power. Slide n up and the blue curve moves right, away from the grey one. ${d===0?'At d = 0 the “power” equals α: with no effect, the only thing you can detect is a false alarm.':''} ${pw<.5?'Power is below 50% here, so a coin flip would find the effect more often than this test.':''}`}
+ on('c1d c1n c1a c1s',draw);reg(draw);})();
+
+/* ---------- Ch2 power curves and MDE ---------- */
+(function(){function pw(d,n,al,tt){const lam=d*Math.sqrt(n/2);return tt==='t'?powT(lam,2*(n-1),al,true):powZ(lam,al,true)}
+ function mde(n,al,tt,target){let lo=0,hi=10;for(let i=0;i<40;i++){const m=(lo+hi)/2;if(pw(m,n,al,tt)<target)lo=m;else hi=m}return(lo+hi)/2}
+ function draw(){const n=val('c2n'),al=+$('c2a').value,tt=$('c2t').value,ns=[Math.max(3,Math.round(n/2)),n,2*n],cols=[C.t,C.a,C.p],dmax=Math.min(4.5,4.4/Math.sqrt(ns[0]/2)+.05);
+  const P=mk($('c2cv'),0,dmax,1.03,{y0:0,noGrid:true,L:46});customGrid(P,niceTicks(0,dmax,7),pctTicks(0,1,.2));P.hline(.8,C.y,'80%');
+  ns.forEach((m,j)=>{const pts=[];for(let i=0;i<=60;i++){const d=dmax*i/60;pts.push([d,pw(d,m,al,tt)])}poly(P,pts,cols[j],j===1?3.2:1.8);const md=mde(m,al,tt,.8);dots(P,[[md,.8]],cols[j],4)});
+  let x=P.L+8;ns.forEach((m,j)=>{const s='— n = '+m;P.text(s,x,P.T+12,cols[j]);x+=P.g.measureText(s).width+16});P.text('true effect d (SD units)',P.w/2,P.h-2,C.mu,'center');
+  $('c2tb').innerHTML='<table><tr><th>n per group</th><th>degrees of freedom</th><th>MDE at 80% power</th><th>MDE at 90% power</th><th>MDE ÷ SE (80%)</th></tr>'+ns.map((m,j)=>`<tr><td style="color:${cols[j]}"><b>${m}</b></td><td>${tt==='t'?2*(m-1):'∞'}</td><td>${fmt(mde(m,al,tt,.8))}</td><td>${fmt(mde(m,al,tt,.9))}</td><td>${fmt(mde(m,al,tt,.8)/Math.sqrt(2/m))}</td></tr>`).join('')+'</table>';
+  const m1=mde(n,al,tt,.8),mz=mde(n,al,'z',.8);
+  $('c2rd').innerHTML=`With ${n} per group, an effect must be about ${fmt(m1)} SD to be detected 80% of the time, which is ${fmt(m1/Math.sqrt(2/n))} standard errors (the rule of thumb is 2.8 at α = 0.05). Doubling the sample to ${2*n} shrinks the MDE only by √2, to ${fmt(mde(2*n,al,tt,.8))}. ${tt==='t'&&n<40?`The t-test needs a slightly larger effect than the z-test (${fmt(mz)}) because σ is estimated.`:''} At d = 0 every curve starts at α = ${fmt(al)}.`}
+ on('c2n c2a c2t',draw);reg(draw);})();
+
+/* ---------- Ch3 sample size calculator ---------- */
+(function(){scl('c3e',v=>fmt(effOf(v)));scl('c3p',v=>v+'%');scl('c3b',v=>v+'%');
+ function ty(){return+$('c3t').value}
+ function effOf(v){return ty()===1?v/10:v/100}
+ function nreq(pw,al,e,b){const za=zq(1-al/2),zb=zq(pw);if(ty()===1){const p1=b/100,p2=p1*(1+e/100),pb=(p1+p2)/2;return Math.pow(za*Math.sqrt(2*pb*(1-pb))+zb*Math.sqrt(p1*(1-p1)+p2*(1-p2)),2)/Math.pow(p2-p1,2)}
+  return(ty()===0?2:1)*Math.pow(za+zb,2)/(e*e)}
+ function exactT(pw,al,d){const n0=Math.max(2,Math.floor(nreq(pw,al,d,0))-1);for(let n=n0;n<n0+40;n++){const lam=ty()===0?d*Math.sqrt(n/2):d*Math.sqrt(n),v=ty()===0?2*(n-1):n-1;if(v>=1&&powT(lam,v,al,true)>=pw)return n}return NaN}
+ function draw(){const t=ty(),pw=val('c3p')/100,al=+$('c3a').value,b=val('c3b'),e=effOf(val('c3e'));$('c3el').textContent=t===1?'relative lift (%)':'effect d';$('c3b').disabled=t!==1;$('c3ev').textContent=fmt(e)+(t===1?'%':'');
+  const x0=t===1?.5:.05,x1=t===1?15:1.5,PW=[.7,.8,.9,.95],cols=[C.t,C.a,C.y,C.p];let lmax=0,lmin=99;const curves=PW.map(p=>{const pts=[];for(let i=0;i<=60;i++){const x=x0+(x1-x0)*i/60,n=nreq(p,al,x,b);pts.push([x,Math.log10(Math.max(n,1))]);lmax=Math.max(lmax,Math.log10(Math.max(n,1)));lmin=Math.min(lmin,Math.log10(Math.max(n,1)))}return pts});
+  const lo=Math.max(0,Math.floor(lmin)),hi=Math.min(11,Math.ceil(lmax)+(lmax%1>.9?0:0)),P=mk($('c3cv'),x0,x1,hi,{y0:lo,noGrid:true,L:60});customGrid(P,niceTicks(x0,x1,7),logTicks(lo,hi));
+  clip(P,()=>curves.forEach((pts,j)=>poly(P,pts,cols[j],Math.abs(PW[j]-pw)<.005?3.4:1.5)));let x=P.L+8;PW.forEach((p,j)=>{const s='— '+Math.round(p*100)+'% power';P.text(s,x,P.T+12,cols[j]);x+=P.g.measureText(s).width+14});
+  const n=Math.ceil(nreq(pw,al,e,b));dots(P,[[e,Math.log10(Math.max(1,n))]],C.fg,5);P.text(t===1?'relative lift (%)':'effect d',P.w/2,P.h-2,C.mu,'center');
+  const ps=[.7,.8,.9,.95],als=[.1,.05,.01];$('c3tb').innerHTML='<table><tr><th>power \\ α</th>'+als.map(a=>`<th>${a}</th>`).join('')+'</tr>'+ps.map(p=>`<tr><td><b>${Math.round(p*100)}%</b></td>`+als.map(a=>`<td style="${Math.abs(p-pw)<.005&&Math.abs(a-al)<1e-9?'color:'+C.g+';font-weight:700':''}">${Math.ceil(nreq(p,a,e,b)).toLocaleString()}</td>`).join('')+'</tr>').join('')+'</table>';
+  let ex='';if(t!==1){const ne=exactT(pw,al,e);ex=` An exact t-test calculation gives ${isNaN(ne)?'—':ne}${t===0?' per group':''} (the normal formula is a little low at small n).`}
+  $('c3rd').innerHTML=t===1?`Detecting a lift from ${b}% to ${fmt(b*(1+e/100))}% (${fmt(e)}% relative, ${fmt(b*e/100)} points) with ${Math.round(pw*100)}% power at α = ${al} needs <b>${n.toLocaleString()} users per group</b>, ${(2*n).toLocaleString()} in total. The requirement grows like 1/(absolute lift)²: halve the lift and it quadruples.`:`Detecting d = ${fmt(e)} with ${Math.round(pw*100)}% power at α = ${al} needs <b>${n.toLocaleString()}${t===0?' per group':' observations'}</b>.${ex} Halving d to ${fmt(e/2)} would need about ${Math.ceil(nreq(pw,al,e/2,b)).toLocaleString()}.`}
+ on('c3t c3e c3b c3p c3a',draw);$('c3t').addEventListener('change',()=>{const t=ty(),e=$('c3e');e.value=t===1?20:30;draw()});reg(draw);})();
+
+/* ---------- Ch4 effect sizes ---------- */
+(function(){scl('c4d',v=>fmt(v/100));scl('c4p',v=>v+'%');scl('c4l',v=>v+'%');
+ function draw(){const d=val('c4d')/100,p0=val('c4p')/100,lift=val('c4l')/100,p1=Math.min(.999,p0*(1+lift));
+  const lo=-3.5,hi=3.5+d,P=mk($('c4cv'),lo,hi,.46,{L:42});P.area(x=>Math.min(npdf(x),npdf(x-d)),lo,hi,'rgba(192,132,252,.35)',300);P.line(x=>npdf(x),C.mu,2.4,lo,hi,300);P.line(x=>npdf(x-d),C.a,2.4,lo,hi,300);P.vline(0,C.mu,null,true);P.vline(d,C.a,null,true);
+  P.text('control N(0,1)',P.L+8,P.T+26,C.mu);P.text('treated N('+fmt(d)+',1)',P.L+8,P.T+42,C.a);P.text('purple: overlap',P.L+8,P.T+58,C.p);
+  const ps=normCdf(d/Math.SQRT2),ovl=2*normCdf(-d/2),u3=normCdf(d),r=d/Math.sqrt(d*d+4),rd=p1-p0,rr=p1/p0,or=(p1/(1-p1))/(p0/(1-p0)),h=2*Math.asin(Math.sqrt(p1))-2*Math.asin(Math.sqrt(p0));
+  $('c4tb').innerHTML=`<table><tr><th>Scale</th><th>Value</th><th>Reads as</th></tr><tr><td><b>Cohen’s d</b></td><td>${fmt(d)}</td><td>means differ by ${fmt(d)} standard deviations</td></tr><tr><td><b>Probability of superiority = AUC</b></td><td>${pc(ps)}</td><td>a random treated unit beats a random control ${pc(ps)} of the time</td></tr><tr><td><b>Overlap of the two distributions</b></td><td>${pc(ovl)}</td><td>share of the area the two curves have in common</td></tr><tr><td><b>Cohen’s U₃</b></td><td>${pc(u3)}</td><td>share of controls below the treated median</td></tr><tr><td><b>Correlation r</b></td><td>${fmt(r)} (r² = ${fmt(r*r)})</td><td>variance in the outcome explained by group</td></tr><tr><td colspan="3" style="color:${C.mu}">Binary outcome: baseline ${pc(p0)}, relative lift ${pc(lift)}</td></tr><tr><td><b>Treated rate</b></td><td>${pc(p1)}</td><td></td></tr><tr><td><b>Risk difference</b></td><td>${f3(100*rd)} points</td><td>absolute change</td></tr><tr><td><b>Relative risk</b></td><td>${fmt(rr)}</td><td>ratio of rates</td></tr><tr><td><b>Odds ratio</b></td><td>${fmt(or)}</td><td>${or>rr*1.05?'larger than the relative risk because events are not rare':'close to the relative risk because events are rare'}</td></tr><tr><td><b>Number needed to treat</b></td><td>${fmt(1/rd)}</td><td>units treated per one extra success</td></tr><tr><td><b>Cohen’s h</b></td><td>${fmt(h)}</td><td>effect size for proportions on the arcsine scale</td></tr></table>`;
+  $('c4rd').innerHTML=`At d = ${fmt(d)} the two groups overlap ${pc(ovl)} and a random treated unit beats a random control ${pc(ps)} of the time; that is also the AUC of a score separating the groups. “Small” (0.2) corresponds to a superiority probability of only ${pc(normCdf(.2/Math.SQRT2))}. For the binary case, a ${pc(lift)} relative lift on a ${pc(p0)} base is just ${f3(100*rd)} percentage points, and it takes ${fmt(1/rd)} treated units to produce one extra success. Decide which scale your audience needs before you decide which number to lead with.`}
+ on('c4d c4p c4l',draw);reg(draw);})();
+
+/* ---------- Ch5 observed power ---------- */
+(function(){scl('c5p',v=>f3(Math.pow(10,-4+v/100)));let curve=null;
+ const op=z=>Phi(z-1.959964)+Phi(-z-1.959964),rp=z=>Phi((z-1.959964)/Math.SQRT2)+Phi((-z-1.959964)/Math.SQRT2);
+ function build(){curve=[[],[]];for(let i=0;i<=100;i++){const lp=-4+4*i/100,z=qn(1-Math.pow(10,lp)/2);curve[0].push([lp,op(z)]);curve[1].push([lp,rp(z)])}}
+ function draw(){if(!curve)build();const p=Math.pow(10,-4+val('c5p')/100),z=qn(1-Math.min(p,.9999)/2),lp=Math.log10(p);
+  const P=mk($('c5cv'),-4,0,1.03,{y0:0,noGrid:true,L:46});customGrid(P,[[-4,'0.0001'],[-3,'0.001'],[-2,'0.01'],[-1,'0.1'],[0,'1']],pctTicks(0,1,.2));P.hline(.5,C.mu,'50%');P.vline(Math.log10(.05),C.r,'p = 0.05',true);
+  poly(P,curve[0],C.a,2.8);poly(P,curve[1],C.g,2.8);dots(P,[[lp,op(z)]],C.a,5.5);dots(P,[[lp,rp(z)]],C.g,5.5);P.vline(lp,C.y,null,true);
+  P.text('— observed power',P.L+8,P.T+12,C.a);P.text('— replication probability',P.L+130,P.T+12,C.g);P.text('observed p-value (log scale)',P.w/2,P.h-2,C.mu,'center');
+  $('c5st').innerHTML=stat('p-value',f3(p),'in')+stat('z-statistic',fmt(z),'')+stat('observed power',pc(op(z)),'hot')+stat('replication probability',pc(rp(z)),'warn');
+  $('c5rd').innerHTML=`A two-sided p of ${f3(p)} means |z| = ${fmt(z)}. Plug that effect back in as if it were the truth and the test would have ${pc(op(z))} power: this number is a re-labelling of the p-value, carrying no new information. At p = 0.05 it is 50%; for any non-significant p it is below 50%, so “the result was not significant even though power was high” can never be said of observed power. The replication probability, which also allows for the estimate's own uncertainty, is lower still (${pc(rp(z))}). ${p>.05?'A non-significant p-value mostly says the study was uninformative about this effect; look at the confidence interval for what it rules out.':p>.005?'A result near p = 0.01 replicates in barely two-thirds of exact repeats.':''}`}
+ on('c5p',draw);reg(draw);})();
+
+/* ---------- Ch6 Type S / Type M ---------- */
+(function(){scl('c6d',v=>fmt(v/100));
+ function draw(){const d=val('c6d')/100,n=val('c6n'),se=Math.sqrt(2/n),R=20000,lo=Math.min(-3.6*se,d-3.6*se),hi=Math.max(3.6*se,d+3.6*se),bins=64,bw=(hi-lo)/bins,ca=new Float64Array(bins),cs=new Float64Array(bins);let ns=0,sa=0,sw=0,ss=0;
+  for(let r=0;r<R;r++){const e=d+se*randn(),i=Math.floor((e-lo)/bw);if(i>=0&&i<bins)ca[i]++;if(Math.abs(e)>1.959964*se){ns++;sa+=Math.abs(e);ss+=e;if(e<0)sw++;if(i>=0&&i<bins)cs[i]++}}
+  let ym=0;for(let i=0;i<bins;i++)ym=Math.max(ym,ca[i]/(R*bw));const P=mk($('c6cv'),lo,hi,ym*1.15,{L:42}),g=P.g;
+  for(let i=0;i<bins;i++){const x0=P.X(lo+i*bw),x1=P.X(lo+(i+1)*bw);g.fillStyle='rgba(110,168,255,.45)';g.fillRect(x0,P.Y(ca[i]/(R*bw)),Math.max(1,x1-x0-1),P.Y(0)-P.Y(ca[i]/(R*bw)));g.fillStyle='rgba(255,107,129,.8)';g.fillRect(x0,P.Y(cs[i]/(R*bw)),Math.max(1,x1-x0-1),P.Y(0)-P.Y(cs[i]/(R*bw)))}
+  P.vline(d,C.fg,'true d',true);P.vline(1.959964*se,C.y,null,true);P.vline(-1.959964*se,C.y,null,true);P.text('blue: all estimates · red: significant ones · yellow: significance cut-offs',P.L+8,P.T+14,C.mu);P.text('estimated effect',P.w/2,P.h-2,C.mu,'center');
+  const power=ns/R,ex=ns?sa/ns/d:NaN,ts=ns?sw/ns:NaN,nneed=2*Math.pow(1.959964+.8416,2)/(d*d);
+  $('c6st').innerHTML=stat('power',pc(power),power>=.8?'ok':'hot')+stat('exaggeration (Type M)',ns?fmt(ex)+'×':'—',ex>1.5?'hot':'ok')+stat('wrong-sign share (Type S)',ns?pc(ts):'—',ts>.02?'hot':'ok')+stat('mean significant estimate',ns?fmt(ss/ns):'—','warn')+stat('n per group for 80% power',Math.ceil(nneed).toLocaleString(),'in');
+  $('c6rd').innerHTML=`True effect ${fmt(d)}, n = ${n} per group, so power is ${pc(power)}. ${ns?`Among the ${pc(power)} of studies that reach significance, the average estimate is ${fmt(sa/ns)} in absolute value, <b>${fmt(ex)} times the truth</b>, and ${pc(ts)} of them have the wrong sign. The filter keeps only the lucky overshoots.`:'Almost nothing reaches significance here.'} Raise n until power passes 80% and the exaggeration falls toward 1. This is why an effect reported by a small, barely significant experiment should be shrunk before it goes into a business case.`}
+ on('c6d c6n',draw);$('c6go').onclick=draw;reg(draw);})();
+
+/* ---------- Ch7 CUPED ---------- */
+(function(){scl('c7r',v=>fmt(v/100));scl('c7e',v=>fmt(v/100));
+ function draw(){const rho=val('c7r')/100,tau=val('c7e')/100,n=val('c7n'),R=3000,c=Math.sqrt(1-rho*rho),tc=tq(2*n-2,.975),er=new Float64Array(R),ec=new Float64Array(R);let rr=0,rc=0;
+  const x=new Float64Array(2*n),y=new Float64Array(2*n);
+  for(let r=0;r<R;r++){let sx0=0,sx1=0,sy0=0,sy1=0;for(let i=0;i<2*n;i++){const t=i>=n?1:0,xi=randn(),yi=rho*xi+c*randn()+tau*t;x[i]=xi;y[i]=yi;if(t){sx1+=xi;sy1+=yi}else{sx0+=xi;sy0+=yi}}
+   const mx0=sx0/n,mx1=sx1/n,my0=sy0/n,my1=sy1/n;let sxy=0,sxx=0,v0=0,v1=0;for(let i=0;i<2*n;i++){const t=i>=n,mx=t?mx1:mx0,my=t?my1:my0,dx=x[i]-mx,dy=y[i]-my;sxy+=dx*dy;sxx+=dx*dx;if(t)v1+=dy*dy;else v0+=dy*dy}
+   const th=sxy/sxx,raw=my1-my0,adj=raw-th*(mx1-mx0);er[r]=raw;ec[r]=adj;let sr=0;for(let i=0;i<2*n;i++){const t=i>=n,mx=t?mx1:mx0,my=t?my1:my0,e=(y[i]-my)-th*(x[i]-mx);sr+=e*e}
+   const seA=Math.sqrt(sr/(2*n-3)*(2/n));const seRaw=Math.sqrt((v0/(n-1)+v1/(n-1))/n);if(Math.abs(raw)/seRaw>tc)rr++;if(Math.abs(adj)/seA>tc)rc++}
+  const sr=sdOf(er),sc=sdOf(ec),w=4.2*sr,P=histLines($('c7cv'),[er,ec],[C.r,C.g],tau-w,tau+w,50,[[tau,C.fg,'true effect',true]]);P.text('— raw difference in means',P.L+8,P.T+26,C.r);P.text('— CUPED / ANCOVA estimate',P.L+8,P.T+42,C.g);
+  const lab=tau===0?'false-positive rate':'power';
+  $('c7st').innerHTML=stat(lab+', raw',pc(rr/R),'warn')+stat(lab+', CUPED',pc(rc/R),'ok')+stat('SD of raw estimate',fmt(sr),'')+stat('SD of CUPED estimate',fmt(sc),'ok')+stat('SD ratio (theory √(1−ρ²))',fmt(sc/sr)+' ('+fmt(c)+')','in')+stat('equal to n × ',fmt(1/(1-rho*rho)),'in');
+  $('c7rd').innerHTML=`With ρ = ${fmt(rho)} the variance of the adjusted estimator is ${fmt(1-rho*rho)} of the raw one (simulated SD ratio ${fmt(sc/sr)} against √(1−ρ²) = ${fmt(c)}). ${tau===0?`With no true effect both tests reject about 5% of the time: the adjustment sharpens the estimate without creating false positives.`:`Power rises from ${pc(rr/R)} to ${pc(rc/R)}. A CUPED analysis on ${n} per group is worth ${fmt(n/(1-rho*rho))} per group of raw data.`} Both estimators are centred on the true effect (the red and green curves share a centre); only the spread differs. Set ρ = 0 and the gain disappears.`}
+ on('c7r c7e c7n',draw);$('c7go').onclick=draw;reg(draw);})();
+
+/* ---------- Ch8 allocation ---------- */
+(function(){scl('c8s',v=>fmt(v/100));scl('c8w',v=>fmt(v/100));scl('c8N',v=>v);scl('c8d',v=>fmt(v/100));
+ function draw(){const s=val('c8s')/100,cr=val('c8w')/100,Bd=val('c8N'),d=val('c8d')/100;
+  const pw=f=>{const N=Bd/(f*cr+(1-f)),se=Math.sqrt(s*s/(f*N)+1/((1-f)*N));return powZ(d/se,.05,true)},r=s/Math.sqrt(cr),fo=r/(1+r),pts=[];for(let i=2;i<=98;i++)pts.push([i/100,pw(i/100)]);
+  const P=mk($('c8cv'),0,1,1.03,{y0:0,noGrid:true,L:46});customGrid(P,niceTicks(0,1,10),pctTicks(0,1,.2));poly(P,pts,C.a,3);P.vline(.5,C.mu,'50 / 50',true);P.vline(fo,C.g,'optimum '+Math.round(fo*100)+'%',true);dots(P,[[.5,pw(.5)],[fo,pw(fo)]],C.y,5);P.text('share of units allocated to the treatment arm',P.w/2,P.h-2,C.mu,'center');P.text('power',P.L+8,P.T+14,C.mu);
+  const n50=Bd/(.5*cr+.5),no=Bd/(fo*cr+1-fo),se=f=>{const N=Bd/(f*cr+1-f);return Math.sqrt(s*s/(f*N)+1/((1-f)*N))};
+  $('c8st').innerHTML=stat('optimal treatment share',pc(fo),'ok')+stat('power at 50/50',pc(pw(.5)),'warn')+stat('power at the optimum',pc(pw(fo)),'ok')+stat('units affordable: 50/50 vs optimum',Math.round(n50)+' vs '+Math.round(no),'in')+stat('SE at 50/50 vs optimum',fmt(se(.5))+' vs '+fmt(se(fo)),'')+stat('Neyman ratio n₁:n₂',fmt(r),'');
+  $('c8rd').innerHTML=`The treatment arm has ${fmt(s)}× the control SD and costs ${fmt(cr)}× per unit, so the optimal ratio is n₁ : n₂ = (σ₁/σ₂)·√(c₂/c₁) = ${fmt(r)}, a treatment share of ${pc(fo)}. Moving from 50/50 to the optimum raises power from ${pc(pw(.5))} to ${pc(pw(fo))}. ${Math.abs(s-1)<.01&&Math.abs(cr-1)<.01?'With equal spreads and costs, 50/50 is optimal and the curve is symmetric.':'The curve is flat near its peak, so a moderate departure from the optimum (for safety or operational reasons) costs little.'}`}
+ on('c8s c8w c8N c8d',draw);reg(draw);})();
+
+/* ---------- Ch9 clusters ---------- */
+(function(){scl('c9r',v=>v+'%');scl('c9m',v=>v);scl('c9k',v=>v);scl('c9d',v=>fmt(v/100));
+ function pw(d,rho,m,K){const de=1+(m-1)*rho,se=Math.sqrt(2*de/(K*m));return powT(d/se,2*(K-1),.05,true)}
+ function draw(){const rho=val('c9r')/100,m=val('c9m'),K=val('c9k'),d=val('c9d')/100,Ks=[Math.max(2,Math.round(K/2)),K,2*K],cols=[C.t,C.a,C.p];
+  const lo=0,hi=Math.log10(500),P=mk($('c9cv'),lo,hi,1.03,{y0:0,noGrid:true,L:46});customGrid(P,[[0,'1'],[1,'10'],[2,'100'],[Math.log10(500),'500']],pctTicks(0,1,.2));P.hline(.8,C.y,'80%');
+  Ks.forEach((k,j)=>{const pts=[];for(let i=0;i<=40;i++){const x=hi*i/40;pts.push([x,pw(d,rho,Math.pow(10,x),k)])}poly(P,pts,cols[j],j===1?3.2:1.8)});
+  P.vline(Math.log10(m),C.fg,'m = '+m,true);dots(P,[[Math.log10(m),pw(d,rho,m,K)]],C.fg,5);let x=P.L+8;Ks.forEach((k,j)=>{const s='— K = '+k;P.text(s,x,P.T+12,cols[j]);x+=P.g.measureText(s).width+16});P.text('cluster size m (log scale)',P.w/2,P.h-2,C.mu,'center');
+  const de=1+(m-1)*rho,plateau=rho>0?powT(d/Math.sqrt(2*rho/K),2*(K-1),.05,true):1;
+  let a=2,b=2;while(b<5000&&pw(d,rho,m,b)<.8)b*=2;let need;if(pw(d,rho,m,b)<.8)need='>5000';else{a=Math.max(2,Math.floor(b/2));while(a<b-1){const mid=Math.floor((a+b)/2);if(pw(d,rho,m,mid)<.8)a=mid;else b=mid}need=pw(d,rho,m,a)>=.8?a:b}
+  $('c9st').innerHTML=stat('design effect',fmt(de),de>2?'hot':'ok')+stat('effective n per arm',fmt(K*m/de),'in')+stat('rows per arm',(K*m).toLocaleString(),'')+stat('power now',pc(pw(d,rho,m,K)),pw(d,rho,m,K)>=.8?'ok':'warn')+stat('power ceiling as m → ∞',pc(plateau),'warn')+stat('clusters per arm for 80%',need,'ok');
+  $('c9rd').innerHTML=`With ρ = ${pc(rho)} and clusters of ${m}, the design effect is ${fmt(de)}: your ${(K*m).toLocaleString()} rows per arm carry the information of ${fmt(K*m/de)}. Power is ${pc(pw(d,rho,m,K))}. ${rho>0?`No matter how large the clusters grow, ${K} clusters per arm can never exceed ${pc(plateau)} power for this effect; the curves flatten because the cluster-level noise does not shrink with m.`:'With ρ = 0 the clusters behave like independent units and more rows always help.'} The cheap lever is more clusters (you would need ${need} per arm for 80%), not more people per cluster.`}
+ on('c9r c9m c9k c9d',draw);reg(draw);})();
+
+/* ---------- Ch10 group sequential ---------- */
+(function(){scl('c10e',v=>fmt(v/10));
+ const POC={2:2.178,3:2.289,4:2.361,5:2.413},OBF={2:[2.797,1.977],3:[3.471,2.454,2.004],4:[4.049,2.863,2.337,2.024],5:[4.562,3.226,2.634,2.281,2.040]};
+ function draw(){const K=+$('c10k').value,th=val('c10e')/10,R=5000,bnd=[Array(K).fill(1.959964),Array(K).fill(POC[K]),OBF[K]],nm=['naive (1.96 at every look)','Pocock','O’Brien–Fleming'],cols=[C.r,C.y,C.g],rej=[0,0,0],info=[0,0,0];
+  for(let r=0;r<R;r++){let B=0,stop=[0,0,0],done=[false,false,false];for(let k=1;k<=K;k++){B+=th/K+randn()/Math.sqrt(K);const z=B/Math.sqrt(k/K);for(let j=0;j<3;j++){if(!done[j]&&Math.abs(z)>bnd[j][k-1]){done[j]=true;rej[j]++;stop[j]=k}}}for(let j=0;j<3;j++)info[j]+=(done[j]?stop[j]:K)/K}
+  const P=mk($('c10cv'),.5,K+.5,5.2,{y0:0,noGrid:true,L:40});customGrid(P,Array.from({length:K},(_,i)=>[i+1,String(i+1)]),niceTicks(0,5,5));bnd.forEach((b,j)=>{poly(P,b.map((v,i)=>[i+1,v]),cols[j],2.6);dots(P,b.map((v,i)=>[i+1,v]),cols[j],3.5)});P.text('critical |z| at each look',P.L+8,P.T+12,C.mu);P.text('look number',P.w/2,P.h-2,C.mu,'center');
+  const ym=Math.max(.1,Math.max(...rej)/R*1.25),Q=mk($('c10cv2'),0,3,ym,{y0:0,noGrid:true,L:46});customGrid(Q,[],niceTicks(0,ym,4).map(([v])=>[v,Math.round(v*100)+'%']));rej.forEach((v,j)=>{const g=Q.g,h=v/R;g.fillStyle=cols[j];g.globalAlpha=.7;g.fillRect(Q.X(j+.2),Q.Y(h),Q.X(j+.8)-Q.X(j+.2),Q.Y(0)-Q.Y(h));g.globalAlpha=1;Q.text(pc(h),Q.X(j+.5),Q.Y(h)-6,C.fg,'center');Q.text(['naive','Pocock','OBF'][j],Q.X(j+.5),Q.h-10,cols[j],'center')});if(th===0)Q.hline(.05,C.fg,'5%');Q.text(th===0?'false-positive rate':'power',Q.L+8,Q.T+12,C.mu);
+  $('c10st').innerHTML=nm.map((n,j)=>stat(n+': '+(th===0?'false-positive rate':'power'),pc(rej[j]/R),th===0?(Math.abs(rej[j]/R-.05)>.012?'hot':'ok'):'in')).join('')+stat('average information used (naive / Pocock / OBF)',info.map(v=>pc(v/R)).join(' / '),'warn');
+  $('c10rd').innerHTML=th===0?`With no true effect and ${K} looks, stopping at the first |z| &gt; 1.96 gives a false-positive rate of ${pc(rej[0]/R)}, not 5%. Pocock (critical value ${POC[K]} at every look) and O’Brien–Fleming (${bnd[2].map(v=>v.toFixed(2)).join(', ')}) both return to about 5%. Set the expected final z to 2.8 to compare power: O’Brien–Fleming gives up almost nothing against a single fixed-sample test, while Pocock's flat bar costs some power at the end but stops earlier when the effect is large.`:`With an expected final z of ${fmt(th)}, the rules reject ${pc(rej[1]/R)} (Pocock) and ${pc(rej[2]/R)} (O’Brien–Fleming) of the time, using on average ${pc(info[1]/R)} and ${pc(info[2]/R)} of the planned data. The naive rule's ${pc(rej[0]/R)} looks higher only because it is not controlling error: switch the effect to 0 to see its inflated false-positive rate.`}
+ on('c10k c10e',draw);$('c10go').onclick=draw;reg(draw);})();
+
+/* ---------- Ch11 heavy-tailed power ---------- */
+(function(){const NL=[200,500,1000,3000];idx('c11n',NL);scl('c11s',v=>fmt(v/100));scl('c11l',v=>v+'%');let busy=false,res=null;
+ const NM=['Welch t on raw revenue','Welch t on log revenue','Mann–Whitney (ranks)','Welch t after capping at the 99th percentile'],CL=[C.r,C.g,C.a,C.y],ES=['ratio of means (total revenue)','ratio of geometric means','P(treated beats control)','mean of capped revenue'];
+ function welchZ(a,b){const n=a.length,m=n;let sa=0,sb=0;for(let i=0;i<n;i++){sa+=a[i];sb+=b[i]}const ma=sa/n,mb=sb/m;let va=0,vb=0;for(let i=0;i<n;i++){va+=(a[i]-ma)*(a[i]-ma);vb+=(b[i]-mb)*(b[i]-mb)}return(mb-ma)/Math.sqrt(va/(n-1)/n+vb/(m-1)/m)}
+ function run(){if(busy)return;busy=true;$('c11go').disabled=true;const s=val('c11s')/100,lift=val('c11l')/100,n=NL[val('c11n')],R=1000,sh=Math.log(1+lift),rej=[0,0,0,0];let r=0;
+  (function step(){const t0=performance.now();while(r<R&&performance.now()-t0<40){const l0=new Float64Array(n),l1=new Float64Array(n),x0=new Float64Array(n),x1=new Float64Array(n);for(let i=0;i<n;i++){l0[i]=s*randn();l1[i]=s*randn()+sh;x0[i]=Math.exp(l0[i]);x1[i]=Math.exp(l1[i])}
+   if(Math.abs(welchZ(x0,x1))>1.96)rej[0]++;if(Math.abs(welchZ(l0,l1))>1.96)rej[1]++;
+   const a=Float64Array.from(x0).sort(),b=Float64Array.from(x1).sort();let j=0,U=0;for(let i=0;i<n;i++){while(j<n&&a[j]<b[i])j++;U+=j}if(Math.abs((U-n*n/2)/Math.sqrt(n*n*(2*n+1)/12))>1.96)rej[2]++;
+   const all=new Float64Array(2*n);all.set(a);all.set(b,n);all.sort();const cap=all[Math.floor(.99*2*n)],c0=x0.map(v=>Math.min(v,cap)),c1=x1.map(v=>Math.min(v,cap));if(Math.abs(welchZ(c0,c1))>1.96)rej[3]++;r++}
+   if(r<R){$('c11rd').textContent='Running… '+r+' / '+R;setTimeout(step,0)}else{res={s,lift,n,rej:rej.map(v=>v/R),R};busy=false;$('c11go').disabled=false;draw()}})()}
+ function draw(){if(!res)return;const{s,lift,n,rej}=res,P=mk($('c11cv'),0,4,1.03,{y0:0,noGrid:true,L:46});customGrid(P,[],pctTicks(0,1,.2));rej.forEach((v,j)=>{const g=P.g;g.fillStyle=CL[j];g.globalAlpha=.7;g.fillRect(P.X(j+.15),P.Y(v),P.X(j+.85)-P.X(j+.15),P.Y(0)-P.Y(v));g.globalAlpha=1;P.text(pc(v),P.X(j+.5),P.Y(v)-6,C.fg,'center');P.text(['raw t','log t','ranks','capped t'][j],P.X(j+.5),P.h-10,CL[j],'center')});if(lift===0)P.hline(.05,C.fg,'5%');
+  $('c11tb').innerHTML='<table><tr><th>Test</th><th>'+(lift===0?'False-positive rate':'Power')+'</th><th>What it is about</th></tr>'+NM.map((nm,j)=>`<tr><td style="color:${CL[j]}"><b>${nm}</b></td><td>${pc(rej[j])} (±${f3(100*1.96*Math.sqrt(rej[j]*(1-rej[j])/res.R))}%)</td><td>${ES[j]}</td></tr>`).join('')+'</table>';
+  const cv=Math.sqrt(Math.exp(s*s)-1);$('c11rd').innerHTML=`Revenue here has a coefficient of variation of ${fmt(cv)} (σ = ${fmt(s)} on the log scale). With ${n} users per group and a true ${pc(lift)} lift, the raw-mean t-test has ${pc(rej[0])} power, the log test ${pc(rej[1])}, the rank test ${pc(rej[2])}, and the capped test ${pc(rej[3])}. ${rej[1]>rej[0]+.1?`Outliers swamp the raw mean's variance, so tests that tame the tail find the same effect much more often.`:'With a mild tail all four behave similarly.'} The tests are not interchangeable: they answer different questions (last column), and only the raw-mean test speaks directly about total revenue. When the business cares about the total, either accept the lower power, use CUPED to cut the noise, or cap with a pre-agreed rule.`}
+ $('c11go').onclick=run;$('c11n').addEventListener('change',run);$('c11s').addEventListener('change',run);$('c11l').addEventListener('change',run);run();resizers.push(draw);})();
+const QZ=[
+{l:'Beginner',q:'What is the power of a test?',o:['The probability of rejecting H₀ when H₀ is true','The probability of rejecting H₀ when the alternative is true','The probability that H₀ is true','One minus the p-value'],a:1,e:'Power = P(reject H₀ | H₁ true) = 1 − β. The probability of rejecting a true H₀ is the size α.'},
+{l:'Beginner',q:'A test is run at α = 0.05. What does that number control?',o:['The chance that the alternative is true','The probability of rejecting H₀ when H₀ is actually true (the Type I error rate)','The probability of missing a real effect','The probability that the result replicates'],a:1,e:'α is the long-run false-alarm rate under H₀; it says nothing directly about the probability that a particular rejection is a false positive.'},
+{l:'Intermediate',q:'Holding everything else fixed, which change does NOT increase the power of a test?',o:['A larger sample size','A larger true effect','Lowering α from 0.05 to 0.01','Reducing the outcome variance'],a:2,e:'A stricter α moves the critical value outward, so fewer true effects are detected. The other three all raise the noncentrality λ = effect/SE.'},
+{l:'Intermediate',q:'For a two-sided test at α = 0.05, the true effect needs to be about how many standard errors for 80% power?',o:['1.96','2.8','3.9','5'],a:1,e:'z₁₋α/₂ + z₀.₈ = 1.96 + 0.84 ≈ 2.8 standard errors.'},
+{l:'Intermediate',q:'Two-sample comparison of means, d = 0.5, α = 0.05 two-sided, 80% power. Required n per group is about…',o:['32','64','128','256'],a:1,e:'n = 2(1.96 + 0.84)²/0.5² ≈ 63 (64 with the exact t calculation).'},
+{l:'Intermediate',q:'You want to detect an effect half as large as before with the same power and α. The required sample size is about…',o:['Half','The same','Twice','Four times'],a:3,e:'n ∝ 1/d². Halving d quadruples n.'},
+{l:'Intermediate',q:'A study has p = 0.05 (two-sided). Its “observed power” (power computed at the observed effect) is about…',o:['5%','50%','80%','95%'],a:1,e:'Observed power is a function of the p-value; at p = 0.05 the observed effect sits exactly at the critical value, so power is 50%. It adds no information beyond p.'},
+{l:'Advanced',q:'A badly underpowered study obtains a significant result. Compared with the true effect, its estimate is most likely…',o:['Unbiased','Exaggerated (Type M error), and occasionally of the wrong sign (Type S)','Too small','Exact, because it is significant'],a:1,e:'The significance filter keeps only unusually large estimates when power is low, so significant results overstate the effect.'},
+{l:'Advanced',q:'What does the Neyman–Pearson lemma say?',o:['The p-value is uniformly distributed under H₀','For simple H₀ against simple H₁, the likelihood-ratio test is the most powerful test of its size','Every test has power above its size','Two-sided tests are always uniformly most powerful'],a:1,e:'It establishes the optimality of likelihood-ratio tests for simple hypotheses, the starting point for most test construction.'},
+{l:'Advanced',q:'A pre-experiment covariate correlates ρ = 0.7 with the outcome. CUPED reduces the variance of the effect estimate by about…',o:['30%','49%','70%','No reduction'],a:1,e:'The variance factor is 1 − ρ² = 1 − 0.49 = 0.51, so the variance falls by about 49%, like doubling the sample.'},
+{l:'Advanced',q:'Equal cost per unit; σ₁ = 2σ₂. The allocation that minimises the SE of the difference is n₁ : n₂ =',o:['1 : 1','2 : 1','4 : 1','1 : 2'],a:1,e:'Neyman allocation is proportional to the standard deviations: n₁/n₂ = σ₁/σ₂ = 2.'},
+{l:'Advanced',q:'You randomise 20 branches per arm, 50 customers each, with intra-cluster correlation 0.05. The design effect is about…',o:['1','2.5','3.45','50'],a:2,e:'DE = 1 + (m − 1)ρ = 1 + 49 × 0.05 = 3.45.'},
+{l:'Advanced',q:'In a cluster-randomised design with a fixed number of clusters, adding more customers per cluster…',o:['Raises power without limit','Raises power only up to a ceiling set by the number of clusters and ρ','Has no effect on power','Always lowers power'],a:1,e:'As m → ∞ the SE tends to σ√(2ρ/K), not zero. More clusters is the effective lever.'},
+{l:'Advanced',q:'You test five times during an experiment at α = 0.05 each time and stop at the first significant result. The overall false-positive rate is about…',o:['5%','14%','25%','50%'],a:1,e:'Five equally spaced looks give roughly 14% (Armitage, McPherson and Rowe). Group-sequential boundaries restore 5%.'},
+{l:'Expert',q:'Compared with Pocock boundaries, O’Brien–Fleming boundaries…',o:['Are constant across looks','Are very strict at early looks and close to 1.96 at the final look, so little power is lost','Allow early stopping on weak evidence','Ignore the number of looks'],a:1,e:'OBF spends almost no α early (e.g. 3.47 at the first of three looks) and keeps the final critical value near the fixed-sample value; Pocock uses one constant boundary.'},
+{l:'Expert',q:'Revenue per user is very right-skewed. A t-test on raw means has low power. Switching to a log transform or a rank test…',o:['Is the same test, so power is unchanged','Often raises power but changes the estimand (geometric mean or probability of superiority), so the decision question must still match','Always tests the mean difference','Lowers the false-positive rate'],a:1,e:'Transforms and rank tests tame outliers, but they answer a different question from the raw mean; pick the estimand first, then the test.'},
+{l:'Expert',q:'The probability of superiority P(X₁ > X₂) for two normal groups with equal SD and d = 0.5 is about…',o:['50%','64%','76%','95%'],a:1,e:'Φ(d/√2) = Φ(0.354) ≈ 0.64. This is also the AUC of a score that separates the groups with d = 0.5.'},
+{l:'Expert',q:'A trial fails to reject H₀; the 95% CI for the effect is [−0.1, 0.9] and effects above 0.3 would matter. The correct reading is…',o:['There is no effect','Inconclusive: the data are compatible with no effect and with an important effect','The effect is exactly 0.4','Power must have been high'],a:1,e:'Absence of significance is not evidence of absence. The interval includes both 0 and values that matter, so the study was uninformative.'}
+];
+(function(){const st=store.get('pd_quiz',{});
+ function render(){const box=$('quiz');box.innerHTML='';
+  QZ.forEach((q,i)=>{const d=document.createElement('div');d.className='q'+(st[i]!=null?' done':'');d.innerHTML=`<div class="qh">Q${i+1} · ${q.l}</div><div style="margin:4px 0 6px"><b>${q.q}</b></div>`;
+   q.o.forEach((o,j)=>{const b=document.createElement('button');b.className='opt';b.textContent=o;if(st[i]!=null){if(j===q.a)b.classList.add('good');else if(j===st[i])b.classList.add('bad')}b.onclick=()=>{if(st[i]!=null)return;st[i]=j;store.set('pd_quiz',st);render();meter()};d.appendChild(b)});
+   const e=document.createElement('div');e.className='ex';e.innerHTML=(st[i]===q.a?'✅ ':'❌ ')+q.e;d.appendChild(e);box.appendChild(d)});
+  const ans=Object.keys(st).length,ok=QZ.filter((q,i)=>st[i]===q.a).length;
+  $('qscore').innerHTML=stat('answered',ans+' / '+QZ.length,'in')+stat('correct',ok,'ok')+stat('score',ans?Math.round(100*ok/ans)+'%':'—',ok/Math.max(ans,1)>=.8?'ok':'warn')+stat('verdict',ans<QZ.length?'keep going':ok>=16?'power master':ok>=13?'strong':'review ch. 1–6','')}
+ $('qreset').onclick=()=>{Object.keys(st).forEach(k=>delete st[k]);store.set('pd_quiz',st);render();meter()};
+ window.__qst=st;render();})();
+const CHK=['Define size, power, Type I and Type II errors and draw the two-distribution picture.','State the Neyman–Pearson lemma and say when a uniformly most powerful test exists.','Compute power for a z-test and explain how the t-test changes it.','Find the minimum detectable effect and explain the 2.8-standard-error rule.','Compute sample size for two means, two proportions and one mean, with the 1/d² behaviour.','Plan an A/B test: smallest effect worth acting on, baseline, power, attrition.','Report an effect on several scales (d, AUC, risk difference, OR, NNT) and choose among them.','Explain why observed (post-hoc) power is uninformative.','Define Type S and Type M errors and explain the significance filter.','Explain CUPED/ANCOVA and its (1 − ρ²) variance factor and the pre-treatment requirement.','Compute optimal allocation with unequal variances and costs.','Compute a design effect and explain why clusters, not rows, drive power.','Explain how peeking inflates α and compare Pocock with O’Brien–Fleming boundaries.','Plan power by simulation for a heavy-tailed or otherwise messy metric and match the test to the estimand.'];
+(function(){const st=store.get('pd_chk',{}),box=$('chk');CHK.forEach((t,i)=>{const l=document.createElement('label'),c=document.createElement('input');c.type='checkbox';c.checked=!!st[i];c.onchange=()=>{st[i]=c.checked;store.set('pd_chk',st);meter()};l.appendChild(c);const s=document.createElement('span');s.textContent=t;l.appendChild(s);box.appendChild(l)});window.__cst=st;})();
+function meter(){const q=window.__qst||{},c=window.__cst||{};const ok=QZ.filter((x,i)=>q[i]===x.a).length,ck=Object.values(c).filter(Boolean).length;const p=Math.round(100*(.6*ok/QZ.length+.4*ck/CHK.length));$('mtxt').textContent='Mastery: '+p+'%  (exam + checklist)';$('mbar').style.width=p+'%';store.set('mastery_pd',p)}
+meter();
+
+/* ---------- Navigation ---------- */
+(function(){const nav=$('nav');let html='';
+ document.querySelectorAll('main .part, main section.ch').forEach(el=>{if(el.classList.contains('part'))html+=`<div class="pt">${el.textContent}</div>`;else{const h=el.querySelector('h2'),num=h.querySelector('.num').textContent,t=Array.from(h.childNodes).filter(n=>n.nodeType===3).map(n=>n.textContent).join('').trim();html+=`<a href="#${el.id}" data-id="${el.id}">${num}. ${t}</a>`}});
+ nav.innerHTML=html;const links=nav.querySelectorAll('a'),io=new IntersectionObserver(es=>{es.forEach(e=>{if(e.isIntersecting)links.forEach(a=>a.classList.toggle('on',a.dataset.id===e.target.id))})},{rootMargin:'-20% 0px -70% 0px'});
+ document.querySelectorAll('section.ch').forEach(s=>io.observe(s));
+ $('menu').onclick=()=>$('side').classList.toggle('open');nav.addEventListener('click',e=>{if(e.target.tagName==='A')$('side').classList.remove('open')});
+ window.addEventListener('scroll',()=>{const h=document.documentElement;$('prog').style.width=(100*h.scrollTop/(h.scrollHeight-h.clientHeight))+'%'},{passive:true});})();
+</script>
+</body>
+</html>

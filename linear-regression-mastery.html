@@ -1,0 +1,605 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Linear Regression Mastery</title>
+<style>
+:root{--bg:#0b0e17;--panel:#121726;--panel2:#171d30;--line:#232a3d;--fg:#e8ebf5;--mu:#8a93ab;--a:#6ea8ff;--r:#ff6b81;--y:#ffd166;--g:#4ade80;--p:#c084fc;--t:#5eead4}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;background:var(--bg);color:var(--fg);font:16px/1.7 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+a{color:var(--a)}
+#prog{position:fixed;top:0;left:0;height:3px;background:linear-gradient(90deg,var(--a),var(--p),var(--r));width:0;z-index:50}
+.side{position:fixed;left:0;top:0;bottom:0;width:290px;background:#0e1220;border-right:1px solid var(--line);overflow:auto;padding:18px 14px 90px;z-index:40;transition:transform .25s}
+.side h1{font-size:15px;margin:0 0 2px}
+.side small{color:var(--mu)}
+.side .pt{margin:16px 0 4px;font-size:11px;text-transform:uppercase;letter-spacing:1.3px;color:var(--p)}
+.side a{display:block;color:var(--mu);text-decoration:none;padding:5px 9px;border-radius:7px;font-size:13.5px;line-height:1.35}
+.side a:hover{background:var(--panel);color:var(--fg)}
+.side a.on{background:var(--panel2);color:var(--fg);box-shadow:inset 3px 0 var(--a)}
+.side a.back{color:var(--t);padding-left:0;margin-bottom:6px}
+.meter{position:fixed;left:0;bottom:0;width:290px;background:#0e1220;border-top:1px solid var(--line);padding:10px 16px;z-index:41;font-size:12px;color:var(--mu)}
+.meter .bar{height:7px;background:var(--line);border-radius:6px;margin-top:5px;overflow:hidden}
+.meter .bar i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--g),var(--t));transition:width .4s}
+#menu{display:none;position:fixed;top:10px;left:10px;z-index:60;background:var(--panel2);color:var(--fg);border:1px solid var(--line);border-radius:9px;padding:7px 12px;font-size:14px;cursor:pointer}
+main{margin-left:290px;padding:0 34px 120px;max-width:1090px}
+.hero{padding:70px 0 30px}
+.hero h1{font-size:clamp(32px,5vw,56px);line-height:1.08;margin:0 0 14px;background:linear-gradient(100deg,#fff,var(--y) 40%,var(--r));-webkit-background-clip:text;background-clip:text;color:transparent}
+.hero p{font-size:19px;color:#c3c9dc;max-width:780px}
+.chips{display:flex;flex-wrap:wrap;gap:8px;margin:18px 0}
+.chip{border:1px solid var(--line);background:var(--panel);padding:5px 12px;border-radius:99px;font-size:13px;color:var(--mu)}
+.chip b{color:var(--fg)}
+.part{margin:90px 0 0;padding-top:22px;border-top:1px solid var(--line);font-size:12px;letter-spacing:2px;text-transform:uppercase;color:var(--p)}
+section.ch{padding-top:30px}
+h2{font-size:30px;line-height:1.2;margin:10px 0 8px;display:flex;gap:12px;align-items:center;flex-wrap:wrap}
+h2 .num{display:inline-grid;place-items:center;width:40px;height:40px;border-radius:12px;background:var(--panel2);border:1px solid var(--line);font-size:18px;color:var(--a)}
+.lvl{font-size:11px;font-weight:600;letter-spacing:.8px;text-transform:uppercase;padding:3px 9px;border-radius:99px;border:1px solid}
+.lvl.b{color:var(--g);border-color:#1f5c3a}.lvl.i{color:var(--a);border-color:#244a85}.lvl.a{color:var(--y);border-color:#6b5420}.lvl.e{color:var(--r);border-color:#7a2c3a}
+h3{font-size:19px;margin:30px 0 6px;color:#fff}
+p{margin:10px 0}li{margin:5px 0}
+code,.f{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace}
+code{background:var(--panel2);padding:1px 6px;border-radius:5px;font-size:.9em}
+.f{display:block;white-space:pre-wrap;background:#0e1322;border:1px solid var(--line);border-left:3px solid var(--a);padding:12px 16px;border-radius:9px;margin:14px 0;overflow-x:auto;font-size:15px;color:#dbe4ff;line-height:1.8}
+.co{border-radius:12px;padding:13px 17px;margin:16px 0;border:1px solid var(--line);background:var(--panel)}
+.co>b:first-child{display:block;margin-bottom:2px;font-size:12px;letter-spacing:1px;text-transform:uppercase}
+.co.def{border-left:4px solid var(--a)}.co.def>b:first-child{color:var(--a)}
+.co.warn{border-left:4px solid var(--r)}.co.warn>b:first-child{color:var(--r)}
+.co.tip{border-left:4px solid var(--g)}.co.tip>b:first-child{color:var(--g)}
+.co.key{border-left:4px solid var(--y);background:#171608}.co.key>b:first-child{color:var(--y)}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:18px 20px;margin:22px 0;box-shadow:0 8px 30px rgba(0,0,0,.25)}
+.card>h4{margin:0 0 3px;font-size:13px;letter-spacing:1.2px;text-transform:uppercase;color:var(--t)}
+.card>p.sub{margin:0 0 12px;color:var(--mu);font-size:14.5px}
+.ctl{display:flex;flex-wrap:wrap;gap:10px 22px;align-items:center;margin:8px 0 10px}
+.ctl label{display:flex;gap:8px;align-items:center;font-size:14px;color:#c3c9dc}
+.ctl output{min-width:38px;font-family:ui-monospace,monospace;color:var(--y);font-size:13px}
+input[type=range]{accent-color:var(--a);width:150px}
+input[type=checkbox]{accent-color:var(--a)}
+select,input[type=number],input[type=text]{background:#0e1322;color:var(--fg);border:1px solid var(--line);border-radius:8px;padding:6px 9px;font:inherit;font-size:14px}
+button{background:linear-gradient(180deg,#2c4a80,#233b68);color:#fff;border:1px solid #3a5a98;border-radius:9px;padding:7px 14px;font:inherit;font-size:14px;cursor:pointer}
+button:hover{filter:brightness(1.15)}
+button.alt{background:var(--panel2);border-color:var(--line);color:var(--fg)}
+canvas{width:100%;height:270px;display:block;background:#0e1322;border:1px solid var(--line);border-radius:10px;margin-top:6px}
+canvas.sm{height:210px}canvas.tl{height:330px}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(125px,1fr));gap:9px;margin:12px 0}
+.stat{background:#0e1322;border:1px solid var(--line);border-radius:10px;padding:8px 11px}
+.stat b{display:block;font-size:17px;font-family:ui-monospace,monospace}
+.stat span{font-size:11.5px;color:var(--mu);text-transform:uppercase;letter-spacing:.7px}
+.stat.hot b{color:var(--r)}.stat.ok b{color:var(--g)}.stat.warn b{color:var(--y)}.stat.in b{color:var(--a)}
+.read{margin:8px 0 0;padding:10px 14px;background:#0e1322;border:1px dashed #33406a;border-radius:10px;font-size:14.5px;color:#d3dbf3}
+table{border-collapse:collapse;width:100%;margin:12px 0;font-size:14px}
+th,td{border:1px solid var(--line);padding:7px 10px;text-align:left;vertical-align:top}
+th{background:var(--panel2);font-size:12px;text-transform:uppercase;letter-spacing:.6px;color:var(--mu)}
+td.n{font-family:ui-monospace,monospace;text-align:right}
+.tw{overflow-x:auto}
+.pill{display:inline-block;padding:1px 9px;border-radius:99px;font-size:12px;font-weight:600}
+.pill.r{background:#3a1520;color:var(--r)}.pill.g{background:#10321f;color:var(--g)}.pill.y{background:#3a2f0e;color:var(--y)}.pill.m{background:#202637;color:var(--mu)}
+details{background:var(--panel);border:1px solid var(--line);border-radius:11px;padding:9px 15px;margin:9px 0}
+details summary{cursor:pointer;font-weight:600}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.q{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:14px 18px;margin:14px 0}
+.q .qh{font-size:12px;letter-spacing:1px;text-transform:uppercase;color:var(--mu)}
+.q .opt{display:block;width:100%;text-align:left;margin:6px 0;background:#0e1322;border:1px solid var(--line);color:var(--fg);border-radius:9px;padding:9px 12px}
+.q .opt.good{border-color:var(--g);background:#0e2418}.q .opt.bad{border-color:var(--r);background:#2a1119}
+.q .ex{display:none;margin-top:8px;font-size:14.5px;color:#c3c9dc}
+.q.done .ex{display:block}
+.chk label{display:flex;gap:10px;align-items:flex-start;padding:6px 0;cursor:pointer}
+.chk input{margin-top:6px;accent-color:var(--g);width:17px;height:17px}
+.sigrow{display:grid;grid-template-columns:minmax(170px,2fr) 1fr 1fr auto;gap:8px 14px;align-items:center;padding:6px 0;border-top:1px dashed #1b2236}
+.sigrow:first-of-type{border-top:0}
+.sigrow label{display:flex;gap:6px;align-items:center;font-size:13.5px;color:#c3c9dc}
+@media(max-width:900px){
+ .side{transform:translateX(-100%)}.side.open{transform:none}.meter{display:none}
+ #menu{display:block}main{margin-left:0;padding:0 16px 100px}.two{grid-template-columns:1fr}.hero{padding-top:60px}
+ .sigrow{grid-template-columns:1fr 1fr}
+}
+</style>
+</head>
+<body>
+<div id="prog"></div>
+<button id="menu">☰ Contents</button>
+<nav class="side" id="side"><a class="back" href="index.html">← All courses</a><h1>Linear Regression</h1><small>12 chapters · 11 labs · exam</small><div id="nav"></div></nav>
+<div class="meter"><div id="mtxt">Mastery: 0%</div><div class="bar"><i id="mbar"></i></div></div>
+
+<main>
+<header class="hero">
+ <h1>Linear regression, done properly.</h1>
+ <p>Regression is the workhorse of applied statistics and the foundation of almost everything in Stages 3 to 5 of the roadmap: logistic regression, regularisation, causal estimates, survival models and mixed models are all extensions of it. This page covers what a regression coefficient really means, the geometry behind “controlling for”, omitted-variable bias and bad controls, the sampling theory of the estimates, R² and overfitting, confidence versus prediction intervals, residual diagnostics, leverage and influence, heteroskedasticity and robust errors, measurement error and regression to the mean, and the interpretation traps of log transforms. Each idea is a lab you can break.</p>
+ <div class="chips"><span class="chip"><b>Part I</b> Meaning and geometry</span><span class="chip"><b>Part II</b> Inference and fit</span><span class="chip"><b>Part III</b> Diagnostics</span><span class="chip"><b>Part IV</b> Pitfalls</span></div>
+ <div class="co tip"><b>How to use this</b>Simulations use known true coefficients, so you can see directly when an estimator is right or wrong. Sliders that run thousands of simulations update when you release them or press the button. Prerequisites: Random Variables (covariance), Sampling Distributions and Confidence Intervals pages.</div>
+</header>
+
+<div class="part">Part I · Meaning and geometry</div>
+
+<section class="ch" id="c1">
+<h2><span class="num">1</span>What regression estimates and how least squares picks a line <span class="lvl b">Beginner</span></h2>
+<p>A regression models the <b>conditional mean</b> E[Y | X], the average outcome for units with given predictor values. The simple linear model is y = β₀ + β₁x + ε, and <b>ordinary least squares</b> (OLS) chooses the line that minimises the sum of squared residuals SSE = Σ(yᵢ − β₀ − β₁xᵢ)². The solution has a closed form:</p>
+<div class="f">β̂₁ = Cov(x, y) / Var(x) = r · (s_y / s_x)          β̂₀ = ȳ − β̂₁ x̄</div>
+<p>Consequences worth remembering: the fitted line passes through (x̄, ȳ); the residuals sum to zero and are uncorrelated with x; and the slope is the <em>average difference in y between units one unit apart in x</em>, an association, not a causal effect unless further assumptions hold (Chapter 3). The name “regression” comes from Galton’s observation that children of tall parents are shorter on average than their parents (Chapter 10).</p>
+<div class="card"><h4>Lab 1 · Be the least-squares line</h4>
+ <p class="sub">Data come from y = 2 + 0.5x + noise. Drag the blue candidate line’s intercept and slope; the red segments are its residuals. The yellow line is the OLS fit. No candidate can have a smaller sum of squared residuals than OLS.</p>
+ <div class="ctl"><label>candidate intercept <input type="range" id="c1a" min="-200" max="600" step="1" value="0"><output id="c1av"></output></label><label>candidate slope <input type="range" id="c1b" min="-100" max="200" step="1" value="100"><output id="c1bv"></output></label><label>n <input type="range" id="c1n" min="10" max="200" step="1" value="40"><output id="c1nv"></output></label><label>noise SD <input type="range" id="c1s" min="2" max="30" step="1" value="10"><output id="c1sv"></output></label><button id="c1go">New data</button><button class="alt" id="c1snap">Snap candidate to OLS</button></div>
+ <canvas class="tl" id="c1cv"></canvas><div class="stats" id="c1st"></div><div class="read" id="c1rd"></div></div>
+</section>
+
+<section class="ch" id="c2">
+<h2><span class="num">2</span>Matrix form, projection and “controlling for” <span class="lvl i">Intermediate</span></h2>
+<p>With several predictors, write y = Xβ + ε with X the n × p design matrix (a column of ones plus the predictors). The OLS solution is β̂ = (XᵀX)⁻¹Xᵀy and the fitted values ŷ = Hy, where H = X(XᵀX)⁻¹Xᵀ is the <b>hat matrix</b>: OLS <em>projects</em> y onto the space spanned by the columns of X, and the residual vector is perpendicular to that space. Its diagonal entries hᵢᵢ are the leverages used in Chapter 8.</p>
+<p>The <b>Frisch–Waugh–Lovell theorem</b> says what “holding the other variables constant” means: the coefficient on x₁ in a multiple regression equals the slope from regressing (y purged of the other predictors) on (x₁ purged of the other predictors). Each coefficient is the relationship between the <em>parts of y and x₁ that the other variables cannot explain</em>. When x₁ and x₂ are strongly correlated there is little left of x₁ after purging, and its coefficient becomes imprecise (the multicollinearity of the next course page).</p>
+<div class="card"><h4>Lab 2 · Frisch–Waugh–Lovell, visibly</h4>
+ <p class="sub">y = 1·x₁ + b₂·x₂ + noise, with x₁ and x₂ correlated. Left: y against x₁ alone (short regression). Right: the partial-regression plot, the residuals of y on x₂ against the residuals of x₁ on x₂. Its slope is exactly the multiple-regression coefficient.</p>
+ <div class="ctl"><label>correlation of x₁, x₂ % <input type="range" id="c2r" min="0" max="95" step="1" value="70"><output id="c2rv"></output></label><label>effect b₂ of x₂ <input type="range" id="c2b" min="-20" max="20" step="1" value="12"><output id="c2bv"></output></label><label>n <input type="range" id="c2n" min="50" max="500" step="10" value="200"><output id="c2nv"></output></label><button id="c2go">New data</button></div>
+ <div class="two"><canvas class="sm" id="c2cv"></canvas><canvas class="sm" id="c2cv2"></canvas></div><div class="stats" id="c2st"></div><div class="read" id="c2rd"></div></div>
+</section>
+
+<section class="ch" id="c3">
+<h2><span class="num">3</span>Omitted variables, confounders and bad controls <span class="lvl a">Advanced</span></h2>
+<p>If the true model is y = β₁x₁ + β₂x₂ + ε and you regress y on x₁ alone, the slope converges to <b>β₁ + β₂·δ</b>, where δ is the slope of x₂ on x₁. The bias is the product of “how much the omitted variable matters” and “how correlated it is with the included one”. That is <b>omitted-variable bias</b>, the central threat to causal readings of regression.</p>
+<p>The remedy is not “add every variable”. What to adjust for depends on the causal structure:</p>
+<div class="tw"><table>
+<tr><th>Role of the extra variable Z</th><th>Structure</th><th>Adjust for it?</th></tr>
+<tr><td><b>Confounder</b></td><td>Z → X and Z → Y</td><td>Yes: omitting it biases the effect of X</td></tr>
+<tr><td><b>Mediator</b></td><td>X → Z → Y</td><td>Not if you want the <em>total</em> effect; adjusting estimates only the direct effect</td></tr>
+<tr><td><b>Collider</b></td><td>X → Z ← Y</td><td>No: adjusting creates a spurious association between X and Y</td></tr>
+</table></div>
+<div class="card"><h4>Lab 3 · Controlling helps, does nothing, or hurts</h4>
+ <p class="sub">1,500 simulated samples per setting. Red: the effect of X on Y estimated <em>without</em> the extra variable. Green: <em>with</em> it. The white line is the target effect (for the mediator case, the total effect).</p>
+ <div class="ctl"><label>role of Z <select id="c3s"><option value="conf">confounder (Z → X, Z → Y)</option><option value="med">mediator (X → Z → Y)</option><option value="col">collider (X → Z ← Y)</option></select></label><label>strength <input type="range" id="c3k" min="0" max="95" step="1" value="70"><output id="c3kv"></output></label><label>n <input type="range" id="c3n" min="50" max="500" step="10" value="200"><output id="c3nv"></output></label><button id="c3go">Re-simulate</button></div>
+ <canvas class="tl" id="c3cv"></canvas><div class="stats" id="c3st"></div><div class="read" id="c3rd"></div></div>
+</section>
+
+<div class="part">Part II · Inference and fit</div>
+
+<section class="ch" id="c4">
+<h2><span class="num">4</span>How precise is a coefficient? <span class="lvl i">Intermediate</span></h2>
+<p>Under the classical assumptions (a linear mean, errors with mean zero given X, constant variance σ², uncorrelated errors; plus normality for exact small-sample results), β̂ has mean β and covariance σ²(XᵀX)⁻¹. For a simple regression:</p>
+<div class="f">SE(β̂₁) = σ / √( Σ(xᵢ − x̄)² ) = σ / ( s_x √(n − 1) )         t = (β̂₁ − β₁) / SE  ~  t with n − 2 degrees of freedom</div>
+<p>Three levers on precision: <b>more data</b> (n), <b>less noise</b> (σ) and <b>more spread in x</b>, which is a design choice in experiments. By the Gauss–Markov theorem OLS is the best linear unbiased estimator under the first four assumptions; normality is only needed for exact t and F tests in small samples. Violations of the other assumptions have different costs: nonlinearity and endogeneity bias the coefficients; heteroskedasticity and correlated errors leave them unbiased but make the standard errors wrong (Chapters 7 and 9).</p>
+<div class="card"><h4>Lab 4 · The sampling distribution of a slope</h4>
+ <p class="sub">True model y = 1 + 0.5x + noise with a fixed x design. 3,000 new samples of y are drawn; the histogram is the distribution of the estimated slope, with the theoretical normal curve overlaid. The interval β̂ ± t·SE is checked for coverage.</p>
+ <div class="ctl"><label>n <input type="range" id="c4n" min="10" max="500" step="1" value="50"><output id="c4nv"></output></label><label>noise SD σ <input type="range" id="c4s" min="5" max="50" step="1" value="10"><output id="c4sv"></output></label><label>spread of x (SD) <input type="range" id="c4x" min="5" max="50" step="1" value="20"><output id="c4xv"></output></label><button id="c4go">New design</button></div>
+ <canvas class="tl" id="c4cv"></canvas><div class="stats" id="c4st"></div><div class="read" id="c4rd"></div></div>
+</section>
+
+<section class="ch" id="c5">
+<h2><span class="num">5</span>R², adjusted R², the F-test and overfitting <span class="lvl a">Advanced</span></h2>
+<p>R² = 1 − SSE/SST is the share of the outcome’s variance explained <em>in the sample</em>. It <b>never decreases when a predictor is added</b>, even a useless one, because a bigger model can always fit the training noise a little better. Adjusted R² = 1 − (1 − R²)(n − 1)/(n − p − 1) penalises the extra parameters; the overall F-test and the information criteria of the model-selection course do the same job more formally. What matters for prediction is <b>out-of-sample R²</b>, which for an over-fitted model can be negative: worse than predicting the mean.</p>
+<div class="card"><h4>Lab 5 · Adding useless predictors</h4>
+ <p class="sub">One real predictor (true R² set below) plus p pure-noise predictors. Curves: training R² (red), adjusted R² (blue) and R² on 300 new observations (green), averaged over 40 simulated data sets. The marker is the chosen p.</p>
+ <div class="ctl"><label>sample size n <input type="range" id="c5n" min="20" max="200" step="1" value="50"><output id="c5nv"></output></label><label>useless predictors p <input type="range" id="c5p" min="0" max="40" step="1" value="10"><output id="c5pv"></output></label><label>true R² % <input type="range" id="c5r" min="0" max="60" step="1" value="20"><output id="c5rv"></output></label><button id="c5go">Re-simulate</button></div>
+ <canvas class="tl" id="c5cv"></canvas><div class="stats" id="c5st"></div><div class="read" id="c5rd"></div></div>
+</section>
+
+<section class="ch" id="c6">
+<h2><span class="num">6</span>Confidence band versus prediction band <span class="lvl a">Advanced</span></h2>
+<p>A regression gives two different intervals at a point x₀. The <b>confidence interval for the mean response</b> ŷ₀ ± t·s·√(h₀) covers the true average outcome at x₀; the <b>prediction interval</b> ŷ₀ ± t·s·√(1 + h₀) covers a <em>new individual</em>, and includes the irreducible scatter. Here h₀ = 1/n + (x₀ − x̄)²/Σ(xᵢ − x̄)² is the leverage of the new point: both bands are narrowest at x̄ and widen away from it, which is why <b>extrapolation</b> is dangerous. The prediction band never shrinks below ±1.96σ however much data you have.</p>
+<div class="card"><h4>Lab 6 · Two bands, one line</h4>
+ <p class="sub">Data from y = 1 + 0.5x + noise with x between 2 and 8. Blue: 95% confidence band for the mean. Purple: 95% prediction band. Slide x₀ outside [2, 8] to extrapolate. Coverage at x₀ is checked over 2,000 fresh samples.</p>
+ <div class="ctl"><label>n <input type="range" id="c6n" min="10" max="200" step="1" value="30"><output id="c6nv"></output></label><label>noise SD σ <input type="range" id="c6s" min="5" max="40" step="1" value="15"><output id="c6sv"></output></label><label>prediction point x₀ <input type="range" id="c6x" min="0" max="100" step="1" value="50"><output id="c6xv"></output></label><button id="c6go">New data</button></div>
+ <canvas class="tl" id="c6cv"></canvas><div class="stats" id="c6st"></div><div class="read" id="c6rd"></div></div>
+</section>
+
+<div class="part">Part III · Diagnostics</div>
+
+<section class="ch" id="c7">
+<h2><span class="num">7</span>Residual diagnostics: what to plot and what each failure costs <span class="lvl a">Advanced</span></h2>
+<p>Check a fitted model by looking at its residuals, not at R². The standard checks and what they reveal:</p>
+<div class="tw"><table>
+<tr><th>Plot or test</th><th>Pattern</th><th>Meaning and damage</th></tr>
+<tr><td>Residuals vs fitted (or vs x)</td><td>Curve</td><td>Nonlinearity: the mean model is wrong, so coefficients are biased; add terms or transform</td></tr>
+<tr><td>Residuals vs fitted</td><td>Funnel</td><td>Heteroskedasticity: coefficients unbiased, SEs wrong (Breusch–Pagan test)</td></tr>
+<tr><td>Normal Q–Q plot</td><td>Heavy tails or skew</td><td>Non-normal errors: matters little for large n, but ruins prediction intervals (Jarque–Bera test)</td></tr>
+<tr><td>Leverage, Cook’s distance</td><td>One or few extreme points</td><td>Influence: the fit is driven by individual observations (Chapter 8)</td></tr>
+<tr><td>Residuals vs time or order</td><td>Runs or waves</td><td>Autocorrelation: SEs too small (see time-series course page later)</td></tr>
+</table></div>
+<div class="card"><h4>Lab 7 · Five data sets, three diagnostic plots</h4>
+ <p class="sub">Pick a scenario. The same straight line is fitted every time. Top: data and fit. Bottom left: residuals against fitted values. Bottom right: normal Q–Q plot of the standardised residuals (points on the diagonal mean normal errors). The table runs formal checks.</p>
+ <div class="ctl"><label>scenario <select id="c7s"><option value="good">well specified</option><option value="curved">curvature</option><option value="hetero">heteroskedastic</option><option value="heavy">heavy-tailed errors</option><option value="outlier">one outlier</option></select></label><label>n <input type="range" id="c7n" min="30" max="300" step="5" value="100"><output id="c7nv"></output></label><button id="c7go">New data</button></div>
+ <canvas class="tl" id="c7cv"></canvas><div class="two"><canvas class="sm" id="c7cv2"></canvas><canvas class="sm" id="c7cv3"></canvas></div><div class="tw" id="c7tb"></div><div class="read" id="c7rd"></div></div>
+</section>
+
+<section class="ch" id="c8">
+<h2><span class="num">8</span>Leverage, outliers and influence <span class="lvl e">Expert</span></h2>
+<p>Three ideas are often confused. <b>Leverage</b> hᵢ measures how unusual a point’s x is: for a simple regression hᵢ = 1/n + (xᵢ − x̄)²/Σ(x − x̄)², with average 2/n. An <b>outlier</b> has an unusual y given x (a large residual). A point is <b>influential</b> when removing it changes the fit substantially, which needs both: high leverage and a residual that is not small. <b>Cook’s distance</b> Dᵢ = rᵢ²/p · hᵢ/(1 − hᵢ) combines them (rᵢ the standardised residual, p the number of coefficients); values above about 4/n deserve a look and above 1 are alarming. A high-leverage point that lies right on the line is harmless; it just makes the fit more precise.</p>
+<div class="card"><h4>Lab 8 · Move one point and watch the line</h4>
+ <p class="sub">Twenty ordinary points (grey) plus one you control (large dot). The grey line is the fit without it; the yellow line is the fit with it. Move the point far to the right and off the line to see leverage and influence combine.</p>
+ <div class="ctl"><label>x of the extra point <input type="range" id="c8x" min="0" max="160" step="1" value="140"><output id="c8xv"></output></label><label>y of the extra point <input type="range" id="c8y" min="-50" max="200" step="1" value="20"><output id="c8yv"></output></label><button id="c8go">New base data</button></div>
+ <canvas class="tl" id="c8cv"></canvas><div class="stats" id="c8st"></div><div class="read" id="c8rd"></div></div>
+</section>
+
+<section class="ch" id="c9">
+<h2><span class="num">9</span>Heteroskedasticity: robust standard errors and weighted least squares <span class="lvl e">Expert</span></h2>
+<p>When the error variance depends on x, OLS stays unbiased but the classical standard errors are wrong, possibly in either direction. Fixes, in the order most analysts reach for them: <b>heteroskedasticity-consistent (“robust”, “sandwich”) standard errors</b> HC0–HC3, which estimate Var(β̂) by (XᵀX)⁻¹ XᵀΩ̂X (XᵀX)⁻¹ with Ω̂ = diag(eᵢ²) (HC0), rescaled by n/(n − p) (HC1) or divided by (1 − hᵢ)² (HC3, preferred in small samples because it corrects for leverage); <b>weighted least squares</b> if you know or can model the variance, which also gains efficiency; or a transformation of y. If observations are grouped (customers, branches), use <b>cluster-robust</b> errors instead.</p>
+<div class="card"><h4>Lab 9 · Which standard error can you trust?</h4>
+ <p class="sub">y = 1 + 0.5x + σ(x)ε with x ~ Exponential(1) (skewed, so some points have high leverage) and σ(x) = 0.5 + k·x. 2,000 simulated data sets; the table gives each estimator’s average SE relative to the true SD of the slope, and the coverage of its 95% t-interval.</p>
+ <div class="ctl"><label>heteroskedasticity k <input type="range" id="c9k" min="0" max="100" step="1" value="40"><output id="c9kv"></output></label><label>n <input type="range" id="c9n" min="0" max="3" step="1" value="1"><output id="c9nv"></output></label><button id="c9go">Re-simulate</button></div>
+ <canvas class="tl" id="c9cv"></canvas><div class="tw" id="c9tb"></div><div class="read" id="c9rd"></div></div>
+</section>
+
+<div class="part">Part IV · Pitfalls</div>
+
+<section class="ch" id="c10">
+<h2><span class="num">10</span>Measurement error and regression to the mean <span class="lvl e">Expert</span></h2>
+<p>Two effects that look like findings but are artefacts of noise.</p>
+<p><b>Attenuation.</b> If a predictor is measured with random error, its estimated slope shrinks toward zero by the <b>reliability</b> λ = Var(true x)/(Var(true x) + Var(error)). A noisy credit score or self-reported income will understate its own importance, and its confounding adjustments will be incomplete.</p>
+<p><b>Regression to the mean.</b> Two imperfectly correlated measurements (before and after) will show that units selected for being extreme on the first measurement are, on average, less extreme on the second, even with no intervention: the expected shift is the fraction (1 − ρ) of the way back to the mean. A group flagged as “high risk this year” will look better next year whether or not you did anything.</p>
+<div class="card"><h4>Lab 10 · Two artefacts of noise</h4>
+ <p class="sub">Attenuation: the true x has coefficient 1, but you only see x plus error. Regression to the mean: no treatment at all, yet the top 10% on the first measurement (red) fall back on the second.</p>
+ <div class="ctl"><label>mode <select id="c10m"><option value="att">attenuation (measurement error in x)</option><option value="rtm">regression to the mean</option></select></label><label><span id="c10l">reliability of x %</span> <input type="range" id="c10r" min="20" max="99" step="1" value="60"><output id="c10rv"></output></label><button id="c10go">New data</button></div>
+ <canvas class="tl" id="c10cv"></canvas><div class="stats" id="c10st"></div><div class="read" id="c10rd"></div></div>
+</section>
+
+<section class="ch" id="c11">
+<h2><span class="num">11</span>Transformations, interpretation and retransformation bias <span class="lvl e">Expert</span></h2>
+<p>How to read a coefficient depends on the scale of the variables:</p>
+<div class="tw"><table>
+<tr><th>Model</th><th>A one-unit increase in x is associated with…</th></tr>
+<tr><td>y on x (level–level)</td><td>a change of β in y</td></tr>
+<tr><td>log y on x (log–level)</td><td>a change of about 100·β % in y (exactly 100(e^β − 1) %)</td></tr>
+<tr><td>log y on log x (log–log)</td><td>a 1% change in x goes with a β % change in y (an elasticity)</td></tr>
+<tr><td>y on a dummy</td><td>the difference in group means</td></tr>
+</table></div>
+<p>A log model is natural for positive, right-skewed outcomes such as balances or revenue, and often fixes both curvature and heteroskedasticity. But predictions need care: exp(prediction of log y) estimates the <em>median</em>, not the mean, of y; the mean is larger by a factor of about exp(σ²/2). Duan’s <b>smearing estimator</b> (multiply by the average of exp(residual)) corrects this without assuming normality. Forgetting it makes totals (portfolio loss, revenue forecasts) systematically too low.</p>
+<div class="card"><h4>Lab 11 · Log model, retransformation and the lost factor</h4>
+ <p class="sub">True model: log y = 1 + 0.25x + σε, so E[y | x] = exp(1 + 0.25x + σ²/2). Compare the raw-scale line fit, the naive back-transform exp(prediction) (the median), and the smearing-corrected prediction at the chosen x.</p>
+ <div class="ctl"><label>log-scale noise σ <input type="range" id="c11s" min="20" max="150" step="1" value="80"><output id="c11sv"></output></label><label>n <input type="range" id="c11n" min="30" max="500" step="1" value="150"><output id="c11nv"></output></label><label>prediction point x₀ <input type="range" id="c11x" min="0" max="100" step="1" value="80"><output id="c11xv"></output></label><button id="c11go">New data</button></div>
+ <canvas class="tl" id="c11cv"></canvas><div class="tw" id="c11tb"></div><div class="read" id="c11rd"></div></div>
+</section>
+
+<section class="ch" id="c12">
+<h2><span class="num">12</span>Final exam, mastery checklist, cheat sheet <span class="lvl e">Expert</span></h2>
+<h3>Exam (18 questions — click an answer)</h3>
+<div id="quiz"></div>
+<div class="card"><h4>Score</h4><div class="stats" id="qscore"></div><button class="alt" id="qreset">Reset exam</button></div>
+<h3>Mastery checklist — tick when you can do it without notes</h3>
+<div class="card chk" id="chk"></div>
+<h3>Cheat sheet</h3>
+<div class="tw"><table>
+<tr><th>Idea</th><th>One line</th></tr>
+<tr><td>OLS</td><td>β̂ = (XᵀX)⁻¹Xᵀy; slope = Cov(x,y)/Var(x); residuals ⟂ columns of X</td></tr>
+<tr><td>FWL</td><td>A coefficient is the slope of residualised y on residualised x</td></tr>
+<tr><td>Omitted variable</td><td>Bias of the short regression = β₂ · δ; control for confounders, not mediators or colliders</td></tr>
+<tr><td>Precision</td><td>SE(β̂₁) = σ/(s_x√(n−1)): more n, less noise, more spread in x</td></tr>
+<tr><td>Assumptions</td><td>Linearity/exogeneity ⇒ unbiased; constant variance and independence ⇒ correct SEs; normality ⇒ exact small-n tests</td></tr>
+<tr><td>R²</td><td>Rises with every added predictor; use adjusted R² or out-of-sample R²</td></tr>
+<tr><td>Intervals</td><td>CI for the mean: √h₀; PI for a new point: √(1 + h₀); both widen away from x̄</td></tr>
+<tr><td>Diagnostics</td><td>Residuals vs fitted (curve, funnel), Q–Q (tails), leverage and Cook’s D (influence)</td></tr>
+<tr><td>Influence</td><td>Needs high leverage and a sizeable residual; Cook’s D &gt; 4/n looks, &gt; 1 alarms</td></tr>
+<tr><td>Robust SE</td><td>HC3 for small n; WLS if variance is modelled; cluster-robust for grouped data</td></tr>
+<tr><td>Measurement error</td><td>Slope on a noisy x shrinks by the reliability λ</td></tr>
+<tr><td>Regression to the mean</td><td>Units selected for an extreme first value regress toward the mean by (1 − ρ) with no intervention</td></tr>
+<tr><td>Log models</td><td>log y ⇒ ≈ 100β % per unit; exp(prediction) is the median: multiply by the smearing factor for means</td></tr>
+</table></div>
+<div class="co tip"><b>Next on the roadmap</b>Item 12, multicollinearity, interactions and nonlinearity (VIF, centring, splines, interpreting interactions), then item 13, generalised linear models.</div>
+</section>
+</main>
+<script>
+/*MATH*/
+function lgamma(x){const c=[76.18009172947146,-86.50532032941677,24.01409824083091,-1.231739572450155,0.1208650973866179e-2,-0.5395239384953e-5];let y=x,t=x+5.5;t-=(x+.5)*Math.log(t);let s=1.000000000190015;for(let j=0;j<6;j++)s+=c[j]/++y;return -t+Math.log(2.5066282746310005*s/x);}
+function gser(a,x){let ap=a,sum=1/a,del=sum;for(let n=0;n<1000;n++){ap++;del*=x/ap;sum+=del;if(Math.abs(del)<Math.abs(sum)*1e-15)break;}return sum*Math.exp(-x+a*Math.log(x)-lgamma(a));}
+function gcf(a,x){let b=x+1-a,c=1/1e-300,d=1/b,h=d;for(let i=1;i<1000;i++){const an=-i*(i-a);b+=2;d=an*d+b;if(Math.abs(d)<1e-300)d=1e-300;c=b+an/c;if(Math.abs(c)<1e-300)c=1e-300;d=1/d;const del=d*c;h*=del;if(Math.abs(del-1)<1e-15)break;}return Math.exp(-x+a*Math.log(x)-lgamma(a))*h;}
+function gammaQ(a,x){if(x<=0)return 1;return x<a+1?1-gser(a,x):gcf(a,x);}
+function betacf(a,b,x){const qab=a+b,qap=a+1,qam=a-1;let c=1,d=1-qab*x/qap;if(Math.abs(d)<1e-300)d=1e-300;d=1/d;let h=d;for(let m=1;m<=1000;m++){const m2=2*m;let aa=m*(b-m)*x/((qam+m2)*(a+m2));d=1+aa*d;if(Math.abs(d)<1e-300)d=1e-300;c=1+aa/c;if(Math.abs(c)<1e-300)c=1e-300;d=1/d;h*=d*c;aa=-(a+m)*(qab+m)*x/((a+m2)*(qap+m2));d=1+aa*d;if(Math.abs(d)<1e-300)d=1e-300;c=1+aa/c;if(Math.abs(c)<1e-300)c=1e-300;d=1/d;const del=d*c;h*=del;if(Math.abs(del-1)<1e-15)break;}return h;}
+function betai(a,b,x){if(x<=0)return 0;if(x>=1)return 1;const bt=Math.exp(lgamma(a+b)-lgamma(a)-lgamma(b)+a*Math.log(x)+b*Math.log(1-x));return x<(a+1)/(a+b+2)?bt*betacf(a,b,x)/a:1-bt*betacf(b,a,1-x)/b;}
+function normSf(z){const q=0.5*gammaQ(.5,z*z/2);return z>=0?q:1-q;}
+function normCdf(z){return normSf(-z);}
+function npdf(x){return Math.exp(-x*x/2)/2.5066282746310002;}
+function lbin(n,k){return lgamma(n+1)-lgamma(k+1)-lgamma(n-k+1);}
+function binom(n,k,p){return Math.exp(lbin(n,k)+k*Math.log(p)+(n-k)*Math.log(1-p));}
+function betapdf(x,a,b){return x<=0||x>=1?0:Math.exp(lgamma(a+b)-lgamma(a)-lgamma(b)+(a-1)*Math.log(x)+(b-1)*Math.log(1-x));}
+function betacdf(x,a,b){return betai(a,b,x);}
+function gampdf(x,a,r){return x<=0?0:Math.exp(a*Math.log(r)+(a-1)*Math.log(x)-r*x-lgamma(a));}
+function gamcdf(x,a,r){return x<=0?0:1-gammaQ(a,r*x);}
+function randn(){let u=0;while(!u)u=Math.random();return Math.sqrt(-2*Math.log(u))*Math.cos(2*Math.PI*Math.random());}
+function gammaS(a){if(a<1)return gammaS(a+1)*Math.pow(Math.random(),1/a);const d=a-1/3,c=1/Math.sqrt(9*d);for(;;){let x,v;do{x=randn();v=1+c*x}while(v<=0);v=v*v*v;const u=Math.random();if(Math.log(u)<.5*x*x+d-d*v+d*Math.log(v))return d*v;}}
+function betaS(a,b){const x=gammaS(a),y=gammaS(b);return x/(x+y);}
+function binS(n,p){let k=0;for(let i=0;i<n;i++)if(Math.random()<p)k++;return k;}
+function mean(a){let s=0;for(const v of a)s+=v;return s/a.length;}
+function qc(cdf,lo,hi,p,it){for(let i=0;i<(it||100);i++){const m=(lo+hi)/2;if(cdf(m)<p)lo=m;else hi=m}return(lo+hi)/2;}
+function qb(a,b,p){return qc(x=>betai(a,b,x),0,1,p,50);}
+function tcdf(x,v){const t=.5*betai(v/2,.5,v/(v+x*x));return x>0?1-t:t}
+function qn(p){return qc(normCdf,-9,9,p,70)}
+function pois(k,l){return Math.exp(-l+k*Math.log(l)-lgamma(k+1))}
+function binF(n,p){let k=0;for(;;){if(n<=0||p<=0)return k;if(p>=1)return k+n;if(n<=40){for(let i=0;i<n;i++)if(Math.random()<p)k++;return k}const a=1+(n>>1),bb=1+n-a,x=betaS(a,bb);if(x>=p){n=a-1;p=p/x}else{k+=a;n=bb-1;p=(p-x)/(1-x)}}}
+/*ENDMATH*/
+
+const $=id=>document.getElementById(id), val=id=>+$(id).value;
+const C={fg:'#e8ebf5',mu:'#8a93ab',gr:'#232a3d',a:'#6ea8ff',r:'#ff6b81',y:'#ffd166',g:'#4ade80',p:'#c084fc',t:'#5eead4'};
+const store={get(k,d){try{const v=JSON.parse(localStorage.getItem(k));return v==null?d:v}catch(e){return d}},set(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}};
+function stat(l,v,c){return `<div class="stat ${c||''}"><b>${v}</b><span>${l}</span></div>`}
+function f3(x){if(!isFinite(x))return String(x);const a=Math.abs(x);if(a!==0&&(a<1e-3||a>=1e6))return x.toExponential(2);return String(+x.toFixed(a<1?4:a<100?3:a<1000?2:0))}
+function pc(x){return f3(100*x)+'%'}
+const resizers=[];
+function reg(fn){fn();resizers.push(fn)}
+function on(ids,fn){ids.split(' ').forEach(i=>{const e=$(i);e.addEventListener('input',fn);e.addEventListener('change',fn)})}
+let rt;window.addEventListener('resize',()=>{clearTimeout(rt);rt=setTimeout(()=>resizers.forEach(f=>f()),150)});
+document.querySelectorAll('input[type=range]').forEach(i=>{const o=$(i.id+'v');if(!o)return;const f=()=>{o.textContent=i.value};i.addEventListener('input',f);f()});
+
+function nice(x){const e=Math.pow(10,Math.floor(Math.log10(x))),f=x/e;return (f<1.5?1:f<3?2:f<7?5:10)*e}
+function mk(cv,x0,x1,ymax,o){o=o||{};const y0=o.y0||0,dpr=window.devicePixelRatio||1,r=cv.getBoundingClientRect(),w=r.width||600,h=r.height||270;
+ cv.width=w*dpr;cv.height=h*dpr;const g=cv.getContext('2d');g.setTransform(dpr,0,0,dpr,0,0);g.clearRect(0,0,w,h);
+ const L=o.L||42,R=12,T=14,B=28,X=x=>L+(x-x0)/(x1-x0)*(w-L-R),Y=y=>h-B-(y-y0)/(ymax-y0)*(h-T-B);
+ g.font='11px system-ui';g.lineWidth=1;g.strokeStyle=C.gr;g.fillStyle=C.mu;
+ if(!o.noGrid){const sx=nice((x1-x0)/7);for(let x=Math.ceil(x0/sx-1e-9)*sx;!o.noX&&x<=x1+1e-9;x+=sx){g.beginPath();g.moveTo(X(x),T);g.lineTo(X(x),h-B);g.stroke();g.textAlign='center';g.fillText(String(+x.toFixed(6)),X(x),h-B+15)}
+ const sy=nice((ymax-y0)/4);for(let y=Math.ceil(y0/sy-1e-9)*sy;y<=ymax+1e-9;y+=sy){g.beginPath();g.moveTo(L,Y(y));g.lineTo(w-R,Y(y));g.stroke();g.textAlign='right';g.fillText(String(+y.toFixed(4)),L-5,Y(y)+3)}}
+ return{g,w,h,X,Y,L,R,T,B,
+  line(f,col,lw,a,b,n,dash){a=a==null?x0:a;b=b==null?x1:b;n=n||260;g.save();if(dash)g.setLineDash([5,4]);g.beginPath();g.strokeStyle=col;g.lineWidth=lw||2;let st=false;for(let i=0;i<=n;i++){const x=a+(b-a)*i/n,y=f(x);if(!isFinite(y)){st=false;continue}st?g.lineTo(X(x),Y(y)):g.moveTo(X(x),Y(y));st=true}g.stroke();g.restore()},
+  area(f,a,b,col,n){a=Math.max(a,x0);b=Math.min(b,x1);if(b<=a)return;n=n||200;g.beginPath();g.moveTo(X(a),Y(0));for(let i=0;i<=n;i++){const x=a+(b-a)*i/n;g.lineTo(X(x),Y(f(x)))}g.lineTo(X(b),Y(0));g.closePath();g.fillStyle=col;g.fill()},
+  vline(x,col,lab,dash){g.save();g.strokeStyle=col;g.lineWidth=1.6;if(dash)g.setLineDash([5,4]);g.beginPath();g.moveTo(X(x),T);g.lineTo(X(x),h-B);g.stroke();g.restore();if(lab){g.fillStyle=col;g.textAlign='center';g.fillText(lab,Math.min(Math.max(X(x),34),w-34),T+10)}},
+  hline(y,col,lab){g.save();g.strokeStyle=col;g.lineWidth=1.4;g.setLineDash([5,4]);g.beginPath();g.moveTo(L,Y(y));g.lineTo(w-R,Y(y));g.stroke();g.restore();if(lab){g.fillStyle=col;g.textAlign='right';g.fillText(lab,w-R-3,Y(y)-4)}},
+  text(s,x,y,col,al){g.fillStyle=col||C.fg;g.textAlign=al||'left';g.fillText(s,x,y)}};}
+
+/* ---------- shared helpers for this page ---------- */
+const D={
+ norm:{n:'Normal(0,1)',s:()=>randn(),mu:0,sd:1,sk:0},
+ unif:{n:'Uniform(0,1)',s:()=>Math.random(),mu:.5,sd:Math.sqrt(1/12),sk:0},
+ expo:{n:'Exponential(1)',s:()=>-Math.log(1-Math.random()),mu:1,sd:1,sk:2},
+ logn:{n:'Lognormal(0,1)',s:()=>Math.exp(randn()),mu:Math.exp(.5),sd:Math.sqrt((Math.E-1)*Math.E),sk:(Math.E+2)*Math.sqrt(Math.E-1),disc:0},
+ b05:{n:'Bernoulli(0.5)',s:()=>Math.random()<.5?1:0,mu:.5,sd:.5,sk:0,disc:1},
+ b05s:{n:'Bernoulli(0.05)',s:()=>Math.random()<.05?1:0,mu:.05,sd:Math.sqrt(.0475),sk:.9/Math.sqrt(.0475),disc:1},
+ bimo:{n:'Two humps',s:()=>(Math.random()<.5?-2:2)+.5*randn(),mu:0,sd:Math.sqrt(4.25),sk:0},
+ par5:{n:'Pareto(α=5)',s:()=>Math.pow(1-Math.random(),-.2),mu:1.25,sd:Math.sqrt(5/48),sk:6*Math.sqrt(.6)},
+ cauchy:{n:'Cauchy (no mean)',s:()=>Math.tan(Math.PI*(Math.random()-.5)),mu:NaN,sd:Infinity,sk:NaN}
+};
+function fillSel(id,keys,def){const e=$(id);e.innerHTML=keys.map(k=>`<option value="${k}">${D[k].n}</option>`).join('');e.value=def}
+const PAL=[C.a,C.r,C.y,C.g,C.p,C.t,'#ff9f43','#9aa4bf'];
+function tgrid(N,M){const T=[];let prev=0;for(let i=0;i<M;i++){let n=Math.round(Math.pow(10,Math.log10(N)*i/(M-1)));if(i===M-1)n=N;n=Math.max(prev+1,n);if(n>N)break;T.push(n);prev=n}if(T[T.length-1]!==N)T[T.length-1]=N;return T}
+function nlab(n){return n>=1e6?(n/1e6)+'M':n>=1000?(n/1000)+'k':String(n)}
+function customGrid(P,xt,yt){const g=P.g;g.save();g.strokeStyle=C.gr;g.fillStyle=C.mu;g.font='11px system-ui';g.lineWidth=1;
+ xt.forEach(([v,l])=>{g.beginPath();g.moveTo(P.X(v),P.T);g.lineTo(P.X(v),P.h-P.B);g.stroke();g.textAlign='center';g.fillText(l,P.X(v),P.h-P.B+15)});
+ yt.forEach(([v,l])=>{g.beginPath();g.moveTo(P.L,P.Y(v));g.lineTo(P.w-P.R,P.Y(v));g.stroke();g.textAlign='right';g.fillText(l,P.L-5,P.Y(v)+3)});g.restore()}
+function clip(P,fn){const g=P.g;g.save();g.beginPath();g.rect(P.L,P.T,P.w-P.L-P.R,P.h-P.T-P.B);g.clip();fn();g.restore()}
+function poly(P,pts,col,lw,dash){const g=P.g;g.save();if(dash)g.setLineDash([5,4]);g.strokeStyle=col;g.lineWidth=lw||2;g.beginPath();pts.forEach(([x,y],i)=>i?g.lineTo(P.X(x),P.Y(y)):g.moveTo(P.X(x),P.Y(y)));g.stroke();g.restore()}
+function dots(P,pts,col,r){const g=P.g;g.fillStyle=col;pts.forEach(([x,y])=>{g.beginPath();g.arc(P.X(x),P.Y(y),r||3,0,7);g.fill()})}
+function niceTicks(lo,hi,k){const st=nice((hi-lo)/(k||5)),a=[];for(let v=Math.ceil(lo/st-1e-9)*st;v<=hi+1e-9;v+=st)a.push([v,String(+v.toFixed(6))]);return a}
+function logTicks(lo,hi){const a=[];for(let e=Math.ceil(lo-1e-9);e<=hi+1e-9;e++)a.push([e,nlab(Math.pow(10,e))]);return a}
+function mom(a){const n=a.length;let m=0;for(const v of a)m+=v;m/=n;let v2=0,v3=0,v4=0;for(const v of a){const d=v-m;v2+=d*d;v3+=d*d*d;v4+=d*d*d*d}v2/=n;v3/=n;v4/=n;const sd=Math.sqrt(v2);return{n,m,sd,sk:sd>0?v3/(sd*sd*sd):0,ku:v2>0?v4/(v2*v2)-3:0}}
+function ksN(z){const a=Array.from(z).sort((x,y)=>x-y),n=a.length;let d=0;for(let i=0;i<n;i++){const F=normCdf(a[i]);d=Math.max(d,Math.abs((i+1)/n-F),Math.abs(i/n-F))}return d}
+/* histogram of data as density with optional overlay curves [{f,col,lw,dash}] */
+function hist(cv,data,lo,hi,bins,ov,col){const cnt=new Float64Array(bins),bw=(hi-lo)/bins;let n=0;for(const v of data){if(v<lo||v>=hi)continue;cnt[Math.floor((v-lo)/bw)]++;n++}
+ const N=data.length;let ym=0;for(let i=0;i<bins;i++){cnt[i]/=N*bw;ym=Math.max(ym,cnt[i])}
+ (ov||[]).forEach(o=>{for(let i=0;i<=80;i++)ym=Math.max(ym,o.f(lo+(hi-lo)*i/80)||0)});
+ const P=mk(cv,lo,hi,ym*1.12);
+ P.g.fillStyle=col||'rgba(110,168,255,.5)';for(let i=0;i<bins;i++){if(cnt[i]<=0)continue;const a=P.X(lo+i*bw),b=P.X(lo+(i+1)*bw);P.g.fillRect(a,P.Y(cnt[i]),Math.max(1,b-a-1),P.Y(0)-P.Y(cnt[i]))}
+ (ov||[]).forEach(o=>P.line(o.f,o.col,o.lw||2.4,lo,hi,200,o.dash));return P}
+const fmt=x=>f3(x);
+
+/* ---------- shared for this page ---------- */
+const POPS=['norm','unif','expo','logn','bimo','par5'];
+D.norm.med=0;D.norm.q90=1.2815516;D.unif.med=.5;D.unif.q90=.9;D.expo.med=Math.LN2;D.expo.q90=Math.log(10);D.logn.med=1;D.logn.q90=Math.exp(1.2815516);
+D.bimo.med=0;D.bimo.q90=qc(x=>.5*normCdf((x+2)/.5)+.5*normCdf((x-2)/.5),-10,10,.9,80);D.par5.med=Math.pow(2,.2);D.par5.q90=Math.pow(10,.2);
+const SF={mean:a=>mean(a),median:a=>{const b=Float64Array.from(a).sort(),n=b.length;return n%2?b[(n-1)/2]:(b[n/2-1]+b[n/2])/2},sd:a=>{const n=a.length,m=mean(a);let s=0;for(const v of a)s+=(v-m)*(v-m);return Math.sqrt(s/(n-1))},q90:a=>{const b=Float64Array.from(a).sort();return b[Math.round(.9*(b.length-1))]}};
+function truth(key,st){const d=D[key];return st==='mean'?d.mu:st==='median'?d.med:st==='sd'?d.sd:d.q90}
+const SNAME={mean:'sample mean',median:'sample median',sd:'sample SD',q90:'90th percentile'};
+const N10=[2,3,5,10,20,50,100,200,500,1000];
+function pct(a,p){const b=Float64Array.from(a).sort();return b[Math.min(b.length-1,Math.max(0,Math.floor(p*b.length)))]}
+function histLines(cv,arrs,cols,lo,hi,bins,vl){const bw=(hi-lo)/bins,dens=arrs.map(a=>{const c=new Float64Array(bins);for(const v of a){if(v<lo||v>=hi)continue;c[Math.floor((v-lo)/bw)]++}for(let i=0;i<bins;i++)c[i]/=a.length*bw;return c});let ym=0;dens.forEach(c=>c.forEach(v=>ym=Math.max(ym,v)));const P=mk(cv,lo,hi,ym*1.15||1);
+ dens.forEach((c,k)=>{const pts=[];for(let i=0;i<bins;i++){pts.push([lo+i*bw,c[i]]);pts.push([lo+(i+1)*bw,c[i]])}clip(P,()=>poly(P,pts,cols[k],2.2))});(vl||[]).forEach(v=>P.vline(v[0],v[1],v[2],v[3]));return P}
+function sdOf(a){return mom(a).sd}
+
+/* ---------- ML helpers ---------- */
+function digamma(x){let r=0;while(x<6){r-=1/x;x++}const f=1/(x*x);return r+Math.log(x)-.5/x-f*(1/12-f*(1/120-f/252))}
+function trigamma(x){let r=0;while(x<6){r+=1/(x*x);x++}const f=1/(x*x);return r+1/x+.5*f+f/x*(1/6-f*(1/30-f/42))}
+function poisS(l){if(l<=0)return 0;if(l<30){const L=Math.exp(-l);let k=0,p=1;do{k++;p*=Math.random()}while(p>L);return k-1}const m=Math.floor(.875*l),g=gammaS(m);return g<l?m+poisS(l-g):binF(m-1,l/g)}
+function llb(k,n,p){return(k?k*Math.log(p):0)+(n-k?(n-k)*Math.log(1-p):0)}
+function lrInt(k,n,cut){const ph=k/n,l0=llb(k,n,ph),g=p=>2*(l0-llb(k,n,p))-cut;let lo=0,hi=1;
+ if(k>0){let a=1e-12,b=ph;for(let i=0;i<70;i++){const m=(a+b)/2;if(g(m)>0)a=m;else b=m}lo=(a+b)/2}
+ if(k<n){let a=ph,b=1-1e-12;for(let i=0;i<70;i++){const m=(a+b)/2;if(g(m)>0)b=m;else a=m}hi=(a+b)/2}return[lo,hi]}
+function solveAlpha(s){if(!(s>1e-9))return 1e6;let a=(3-s+Math.sqrt((3-s)*(3-s)+24*s))/(12*s);for(let i=0;i<8;i++){const f=Math.log(a)-digamma(a)-s,fp=1/a-trigamma(a);let n=a-f/fp;if(!(n>0))n=a/2;a=n}return a}
+function normPdfAt(x,m,s){return Math.exp(-(x-m)*(x-m)/(2*s*s))/(s*2.5066282746)}
+/* ---------- Regression helpers ---------- */
+function idx(id,arr,ff){const e=$(id),o=$(id+'v'),f=()=>{o.textContent=ff?ff(arr[+e.value]):arr[+e.value]};e.addEventListener('input',f);f()}
+function scl(id,ff){const e=$(id),o=$(id+'v'),f=()=>{o.textContent=ff(+e.value)};e.addEventListener('input',f);f()}
+function pctTicks(a,b,st){const r=[];for(let v=a;v<=b+1e-9;v+=st)r.push([v,Math.round(v*100)+'%']);return r}
+const _tq={};function tq(v,p){const k=v+'_'+p;return _tq[k]||(_tq[k]=qc(x=>tcdf(x,v),0,500,p,80))}
+function simple(x,y){const n=x.length;let xm=0,ym=0;for(let i=0;i<n;i++){xm+=x[i];ym+=y[i]}xm/=n;ym/=n;let sxx=0,sxy=0,syy=0;for(let i=0;i<n;i++){const dx=x[i]-xm,dy=y[i]-ym;sxx+=dx*dx;sxy+=dx*dy;syy+=dy*dy}const b=sxy/sxx,a=ym-b*xm,res=new Float64Array(n);let sse=0;for(let i=0;i<n;i++){res[i]=y[i]-a-b*x[i];sse+=res[i]*res[i]}return{n,xm,ym,sxx,sxy,syy,b,a,res,sse,sst:syy,r2:1-sse/syy}}
+function gj(A,B){const p=A.length;const M=A.map((r,i)=>Array.from(r).concat(B?[B[i]]:[]));for(let c=0;c<p;c++){let m=c;for(let r=c+1;r<p;r++)if(Math.abs(M[r][c])>Math.abs(M[m][c]))m=r;[M[c],M[m]]=[M[m],M[c]];const d=M[c][c]||1e-12;for(let k=c;k<M[c].length;k++)M[c][k]/=d;for(let r=0;r<p;r++)if(r!==c){const f=M[r][c];if(f!==0)for(let k=c;k<M[c].length;k++)M[r][k]-=f*M[c][k]}}return M}
+function olsMulti(cols,y,needInv){const n=y.length,k=cols.length,p=k+1,A=[],B=new Float64Array(p);for(let i=0;i<p;i++)A.push(new Float64Array(p));
+ for(let r=0;r<n;r++){const row=[1];for(let j=0;j<k;j++)row.push(cols[j][r]);for(let i=0;i<p;i++){B[i]+=row[i]*y[r];for(let j=i;j<p;j++)A[i][j]+=row[i]*row[j]}}
+ for(let i=0;i<p;i++){for(let j=0;j<i;j++)A[i][j]=A[j][i];if(i>0)A[i][i]+=1e-9}
+ let beta,inv=null;if(needInv){const I=[];for(let i=0;i<p;i++){const e=new Float64Array(p);e[i]=1;I.push(e)}const M=gj(A,null);const aug=A.map((r,i)=>Array.from(r).concat(Array.from(I[i])));
+  const m=aug;for(let c=0;c<p;c++){let q=c;for(let r=c+1;r<p;r++)if(Math.abs(m[r][c])>Math.abs(m[q][c]))q=r;[m[c],m[q]]=[m[q],m[c]];const d=m[c][c]||1e-12;for(let kk=0;kk<2*p;kk++)m[c][kk]/=d;for(let r=0;r<p;r++)if(r!==c){const f=m[r][c];if(f!==0)for(let kk=0;kk<2*p;kk++)m[r][kk]-=f*m[c][kk]}}
+  inv=m.map(r=>r.slice(p));beta=inv.map(r=>{let s=0;for(let j=0;j<p;j++)s+=r[j]*B[j];return s})}
+ else{const M=gj(A,B);beta=M.map(r=>r[p])}
+ const res=new Float64Array(n);let sse=0;for(let r=0;r<n;r++){let f=beta[0];for(let j=0;j<k;j++)f+=beta[j+1]*cols[j][r];res[r]=y[r]-f;sse+=res[r]*res[r]}
+ const out={beta,res,sse,n,p};if(inv){const s2=sse/(n-p);out.s2=s2;out.se=inv.map((r,i)=>Math.sqrt(s2*r[i]))}return out}
+function scatterAxes(cv,xs,ys,xlo,xhi,ylo,yhi,L){return mk(cv,xlo,xhi,yhi,{y0:ylo,L:L||44})}
+function range(a,pad){let lo=1e99,hi=-1e99;for(const v of a){if(v<lo)lo=v;if(v>hi)hi=v}const w=(hi-lo)||1;return[lo-(pad||.05)*w,hi+(pad||.05)*w]}
+
+/* ---------- Ch1 be the least-squares line ---------- */
+(function(){scl('c1a',v=>fmt(v/100));scl('c1b',v=>fmt(v/100));scl('c1s',v=>fmt(v/10));let S=null;
+ function gen(){const n=val('c1n'),sg=val('c1s')/10,x=new Float64Array(n),y=new Float64Array(n);for(let i=0;i<n;i++){x[i]=10*Math.random();y[i]=2+.5*x[i]+sg*randn()}S={x,y,f:simple(x,y)};draw()}
+ function draw(){if(!S)return;const{x,y,f}=S,a=val('c1a')/100,b=val('c1b')/100,n=x.length,[ylo,yhi]=range(y,.08),P=mk($('c1cv'),0,10,yhi,{y0:ylo});let sse=0;for(let i=0;i<n;i++){const r=y[i]-a-b*x[i];sse+=r*r}
+  clip(P,()=>{const g=P.g;for(let i=0;i<n;i++){g.strokeStyle='rgba(255,107,129,.55)';g.lineWidth=1.4;g.beginPath();g.moveTo(P.X(x[i]),P.Y(y[i]));g.lineTo(P.X(x[i]),P.Y(a+b*x[i]));g.stroke()}P.line(t=>f.a+f.b*t,C.y,2.6,0,10,2);P.line(t=>a+b*t,C.a,2.6,0,10,2)});dots(P,Array.from(x,(v,i)=>[v,y[i]]),'rgba(232,235,245,.85)',3);
+  P.text('— OLS line',P.L+8,P.T+14,C.y);P.text('— your candidate',P.L+90,P.T+14,C.a);
+  $('c1st').innerHTML=stat('your sum of squared residuals',fmt(sse),sse<=f.sse*1.0001?'ok':'hot')+stat('OLS minimum',fmt(f.sse),'ok')+stat('yours ÷ minimum',fmt(sse/f.sse),sse/f.sse<1.05?'ok':'warn')+stat('OLS intercept / slope',fmt(f.a)+' / '+fmt(f.b),'in')+stat('R² of OLS',fmt(f.r2),'')+stat('residuals sum to',f3(f.res.reduce((s,v)=>s+v,0)),'');
+  $('c1rd').innerHTML=`Your line leaves a sum of squared residuals of ${fmt(sse)}; the least-squares line gets ${fmt(f.sse)}, the smallest possible. ${sse/f.sse<1.02?'You are essentially on the OLS line.':'Move the sliders toward the OLS values and watch the red segments shorten.'} The OLS line passes through the point of means (${fmt(f.xm)}, ${fmt(f.ym)}), its residuals sum to zero, and its slope ${fmt(f.b)} equals Cov(x,y)/Var(x). The true model has intercept 2 and slope 0.5: with ${n} noisy points OLS lands near, not on, those values.`}
+ $('c1go').onclick=gen;$('c1snap').onclick=()=>{const f=S.f,a=$('c1a'),b=$('c1b');a.value=Math.max(+a.min,Math.min(+a.max,Math.round(f.a*100)));b.value=Math.max(+b.min,Math.min(+b.max,Math.round(f.b*100)));a.dispatchEvent(new Event('input'));b.dispatchEvent(new Event('input'))};
+ on('c1a c1b',draw);on('c1n c1s',gen);gen();resizers.push(draw);})();
+
+/* ---------- Ch2 Frisch-Waugh-Lovell ---------- */
+(function(){scl('c2r',v=>fmt(v/100));scl('c2b',v=>fmt(v/10));let S=null;
+ function gen(){const n=val('c2n'),rho=val('c2r')/100,b2=val('c2b')/10,x1=new Float64Array(n),x2=new Float64Array(n),y=new Float64Array(n),c=Math.sqrt(1-rho*rho);for(let i=0;i<n;i++){x1[i]=randn();x2[i]=rho*x1[i]+c*randn();y[i]=x1[i]+b2*x2[i]+randn()}
+  const sh=simple(x1,y),lg=olsMulti([x1,x2],y),ry=simple(x2,y).res,rx=simple(x2,x1).res,fw=simple(rx,ry);S={x1,x2,y,sh,lg,ry,rx,fw,rho,b2};draw()}
+ function draw(){if(!S)return;const{x1,y,sh,lg,ry,rx,fw,rho,b2}=S,n=x1.length,m=Math.min(n,300);
+  const[x0,x1h]=range(x1,.05),[y0,y1]=range(y,.08),P=mk($('c2cv'),x0,x1h,y1,{y0});clip(P,()=>{P.line(t=>sh.a+sh.b*t,C.r,2.6,x0,x1h,2);P.line(t=>t+sh.ym-sh.xm,C.fg,1.6,x0,x1h,2,true)});dots(P,Array.from({length:m},(_,i)=>[x1[i],y[i]]),'rgba(110,168,255,.7)',2.4);P.text('y against x₁ (short regression)',P.L+8,P.T+14,C.mu);P.text('red: short slope '+fmt(sh.b)+' · dashed: true slope 1',P.L+8,P.T+30,C.r);
+  const[a0,a1]=range(rx,.05),[c0,c1]=range(ry,.08),Q=mk($('c2cv2'),a0,a1,c1,{y0:c0});clip(Q,()=>Q.line(t=>fw.b*t,C.g,2.6,a0,a1,2));dots(Q,Array.from({length:m},(_,i)=>[rx[i],ry[i]]),'rgba(110,168,255,.7)',2.4);Q.text('partial plot: y | x₂ against x₁ | x₂',Q.L+8,Q.T+14,C.mu);Q.text('green slope '+fmt(fw.b),Q.L+8,Q.T+30,C.g);
+  $('c2st').innerHTML=stat('short regression slope',fmt(sh.b),Math.abs(sh.b-1)>.1?'hot':'ok')+stat('predicted: 1 + b₂·δ',fmt(1+b2*rho),'in')+stat('multiple regression coefficient',fmt(lg.beta[1]),'ok')+stat('FWL partial-plot slope',fmt(fw.b),'ok')+stat('|multiple − FWL|',f3(Math.abs(lg.beta[1]-fw.b)),'')+stat('true coefficient',1,'');
+  $('c2rd').innerHTML=`The multiple regression gives ${fmt(lg.beta[1])} for x₁ and the partial-regression plot has slope ${fmt(fw.b)}: they are the same number (difference ${f3(Math.abs(lg.beta[1]-fw.b))}). That is the Frisch–Waugh–Lovell theorem: “controlling for x₂” means regressing the part of y that x₂ cannot explain on the part of x₁ that x₂ cannot explain. The short regression, which ignores x₂, gets ${fmt(sh.b)}, close to the predicted 1 + b₂δ = ${fmt(1+b2*rho)}. With b₂ = 0 or correlation 0 the two agree; the stronger both are, the larger the omitted-variable bias.`}
+ on('c2r c2b c2n',gen);$('c2go').onclick=gen;gen();resizers.push(draw);})();
+
+/* ---------- Ch3 omitted variables, mediators, colliders ---------- */
+(function(){scl('c3k',v=>fmt(v/100));let S=null;
+ function coef(x,w,y){return olsMulti([x,w],y).beta[1]}
+ function run(){const sc=$('c3s').value,s=val('c3k')/100,n=val('c3n'),R=1500,sh=new Float64Array(R),lg=new Float64Array(R),x=new Float64Array(n),z=new Float64Array(n),y=new Float64Array(n),c=Math.sqrt(1-s*s);let target=.5;
+  for(let r=0;r<R;r++){for(let i=0;i<n;i++){if(sc==='conf'){const zz=randn();z[i]=zz;x[i]=s*zz+c*randn();y[i]=.5*x[i]+.8*zz+randn()}else if(sc==='med'){x[i]=randn();z[i]=s*x[i]+c*randn();y[i]=.5*x[i]+.7*z[i]+randn()}else{x[i]=randn();y[i]=.5*x[i]+randn();z[i]=2*s*(x[i]+y[i])+randn()}}
+   sh[r]=simple(x,y).b;lg[r]=coef(x,z,y)}
+  if(sc==='med')target=.5+.7*s;S={sc,s,n,sh,lg,target};draw()}
+ function draw(){if(!S)return;const{sc,s,sh,lg,target}=S,m1=mean(sh),m2=mean(lg),w=4*Math.max(sdOf(sh),sdOf(lg));
+  const P=histLines($('c3cv'),[sh,lg],[C.r,C.g],Math.min(target,m1,m2)-w,Math.max(target,m1,m2)+w,50,[[target,C.fg,'target',true]]);P.text('— without Z',P.L+8,P.T+26,C.r);P.text('— with Z as a control',P.L+8,P.T+42,C.g);
+  $('c3st').innerHTML=stat('target effect',fmt(target),'in')+stat('mean, without Z',fmt(m1),Math.abs(m1-target)>.05?'hot':'ok')+stat('mean, with Z',fmt(m2),Math.abs(m2-target)>.05?'hot':'ok')+stat('bias without Z',fmt(m1-target),'')+stat('bias with Z',fmt(m2-target),'');
+  const txt={conf:`Z causes both X and Y. Leaving it out biases the effect of X by ${fmt(m1-target)} (omitted-variable bias, growing with the strength). Controlling for it removes the bias (mean ${fmt(m2)}).`,med:`Z sits on the path from X to Y. The target here is the <em>total</em> effect of X (${fmt(target)}, direct 0.5 plus the part passing through Z). The short regression recovers it; controlling for the mediator estimates only the direct effect (0.5) and under-states the total.`,col:`Z is caused by both X and Y. The true effect of X is 0.5. Without Z the estimate is right (${fmt(m1)}). Conditioning on the collider creates a spurious negative association and drags the estimate to ${fmt(m2)}: adding a variable made it worse.`};
+  $('c3rd').innerHTML=txt[sc]+' Set the strength to 0 and all three cases agree: the structure, not the number of controls, decides.'}
+ on('c3s c3k c3n',run);$('c3go').onclick=run;$('c3s').addEventListener('change',run);run();resizers.push(draw);})();
+
+/* ---------- Ch4 sampling distribution of a slope ---------- */
+(function(){scl('c4s',v=>fmt(v/10));scl('c4x',v=>fmt(v/10));let D0=null;
+ function design(){const n=val('c4n'),sx=val('c4x')/10,x=new Float64Array(n);let xm=0;for(let i=0;i<n;i++){x[i]=sx*randn();xm+=x[i]}xm/=n;let sxx=0;for(let i=0;i<n;i++)sxx+=(x[i]-xm)*(x[i]-xm);D0={x,xm,sxx,n};draw()}
+ function draw(){if(!D0)return;const{x,xm,sxx,n}=D0,sg=val('c4s')/10,R=3000,bs=new Float64Array(R),tc=tq(n-2,.975);let ses=0,cvt=0,cvz=0;const y=new Float64Array(n);
+  for(let r=0;r<R;r++){let ym=0,sxy=0;for(let i=0;i<n;i++){y[i]=1+.5*x[i]+sg*randn();ym+=y[i]}ym/=n;for(let i=0;i<n;i++)sxy+=(x[i]-xm)*(y[i]-ym);const b=sxy/sxx,a=ym-b*xm;let sse=0;for(let i=0;i<n;i++){const e=y[i]-a-b*x[i];sse+=e*e}const se=Math.sqrt(sse/(n-2)/sxx);bs[r]=b;ses+=se;if(Math.abs(b-.5)<=tc*se)cvt++;if(Math.abs(b-.5)<=1.96*se)cvz++}
+  const se0=sg/Math.sqrt(sxx),w=4*se0;hist($('c4cv'),bs,.5-w,.5+w,50,[{f:t=>normPdfAt(t,.5,se0),col:C.a}]).vline(.5,C.fg,'true slope 0.5',true);
+  $('c4st').innerHTML=stat('theoretical SE σ/√Sxx',fmt(se0),'ok')+stat('simulated SD of slope',fmt(sdOf(bs)),'ok')+stat('average estimated SE',fmt(ses/R),'in')+stat('t-interval coverage',pc(cvt/R),Math.abs(cvt/R-.95)>.02?'hot':'ok')+stat('mean of estimates',fmt(mean(bs)),'')+stat('Sxx',fmt(sxx),'');
+  $('c4rd').innerHTML=`The slope estimate is centred on the truth (mean ${fmt(mean(bs))}) with a spread of ${fmt(sdOf(bs))}, matching σ/√Sxx = ${fmt(se0)}; the average <em>estimated</em> SE is ${fmt(ses/R)} and the t-interval covers ${pc(cvt/R)}. To halve the standard error you can quadruple n (n = ${4*n}), halve the noise (σ = ${fmt(sg/2)}), or double the spread of x (SD = ${fmt(2*val('c4x')/10)}), and the last is free if you control the design. When all x values are bunched together, Sxx is small and the slope is poorly determined.`}
+ on('c4n c4x',design);on('c4s',draw);$('c4go').onclick=design;design();resizers.push(draw);})();
+
+/* ---------- Ch5 R2 and overfitting ---------- */
+(function(){let S=null;
+ function run(){const n=val('c5n'),ps=val('c5p'),rt=val('c5r')/100,beta=Math.sqrt(rt/(1-rt+1e-9)),R=40,NT=300;const base=[0,1,2,3,5,8,12,16,20,25,30,35,40,ps];const grid=Array.from(new Set(base)).filter(p=>p<=n-4).sort((a,b)=>a-b);const pm=grid[grid.length-1];
+  const acc=grid.map(()=>[0,0,0]);
+  for(let r=0;r<R;r++){const cols=[],tcols=[];for(let j=0;j<=pm;j++){cols.push(new Float64Array(n));tcols.push(new Float64Array(NT));for(let i=0;i<n;i++)cols[j][i]=randn();for(let i=0;i<NT;i++)tcols[j][i]=randn()}
+   const y=new Float64Array(n),yt=new Float64Array(NT);for(let i=0;i<n;i++)y[i]=beta*cols[0][i]+randn();for(let i=0;i<NT;i++)yt[i]=beta*tcols[0][i]+randn();const ym=mean(y);let sst=0;for(const v of y)sst+=(v-ym)*(v-ym);let sstt=0;for(const v of yt)sstt+=(v-ym)*(v-ym);
+   grid.forEach((p,gi)=>{const k=p+1,o=olsMulti(cols.slice(0,k),y,false);const r2=1-o.sse/sst,adj=1-(1-r2)*(n-1)/(n-k-1);let se=0;for(let i=0;i<NT;i++){let f=o.beta[0];for(let j=0;j<k;j++)f+=o.beta[j+1]*tcols[j][i];se+=(yt[i]-f)*(yt[i]-f)}acc[gi][0]+=r2/R;acc[gi][1]+=adj/R;acc[gi][2]+=(1-se/sstt)/R})}
+  S={n,ps,rt,grid,acc};draw()}
+ function draw(){if(!S)return;const{n,ps,rt,grid,acc}=S;let mn=0;acc.forEach(a=>mn=Math.min(mn,a[1],a[2]));const y0=Math.max(-1.2,Math.floor((mn-.05)*10)/10),xm=grid[grid.length-1]||1,P=mk($('c5cv'),0,Math.max(xm,1),1.05,{y0,noGrid:true,L:46});customGrid(P,niceTicks(0,Math.max(xm,1),8),(()=>{const r=[];for(let v=y0;v<=1.001;v+=y0<-.5?.2:.1)r.push([v,(Math.round(v*10)/10).toString()]);return r})());P.hline(0,C.mu);
+  const cols=[C.r,C.a,C.g],nm=['training R²','adjusted R²','R² on new data'];clip(P,()=>[0,1,2].forEach(j=>{poly(P,grid.map((p,i)=>[p,acc[i][j]]),cols[j],2.6);dots(P,grid.map((p,i)=>[p,acc[i][j]]),cols[j],3)}));P.vline(ps,C.y,'p = '+ps,true);let x=P.L+8;nm.forEach((s,j)=>{P.text('— '+s,x,P.T+26,cols[j]);x+=P.g.measureText('— '+s).width+14});P.text('number of useless predictors p',P.w/2,P.h-2,C.mu,'center');
+  const gi=grid.indexOf(ps),a=acc[gi>=0?gi:0];
+  $('c5st').innerHTML=stat('training R²',fmt(a[0]),'hot')+stat('adjusted R²',fmt(a[1]),'in')+stat('R² on new data',fmt(a[2]),a[2]<0?'hot':'ok')+stat('true R²',fmt(rt),'')+stat('parameters ÷ n',fmt((ps+2)/n),'');
+  $('c5rd').innerHTML=`With ${ps} useless predictors added to one real one (true R² ${fmt(rt)}), the fit to the training data reaches R² = ${fmt(a[0])}, and adjusted R² is ${fmt(a[1])}, close to the truth. On fresh data the same model explains only ${fmt(a[2])}${a[2]<0?', which is <b>worse than predicting the mean</b>':''}. Training R² can only rise as predictors are added; the gap to out-of-sample R² is the overfit. It grows with the ratio of parameters to n, so the same p is harmless at n = 200 and ruinous at n = 30.`}
+ $('c5go').onclick=run;on('c5n c5r',run);$('c5p').addEventListener('change',run);scl('c5p',v=>v);scl('c5r',v=>v+'%');run();resizers.push(draw);})();
+
+/* ---------- Ch6 CI vs PI ---------- */
+(function(){scl('c6s',v=>fmt(v/10));scl('c6x',v=>fmt(v/10));let S=null;
+ function gen(){const n=val('c6n'),sg=val('c6s')/10,x=new Float64Array(n),y=new Float64Array(n);for(let i=0;i<n;i++){x[i]=2+6*Math.random();y[i]=1+.5*x[i]+sg*randn()}S={x,y,f:simple(x,y),sg};draw()}
+ function draw(){if(!S)return;const{x,y,f,sg}=S,n=x.length,x0=val('c6x')/10,tc=tq(n-2,.975),s=Math.sqrt(f.sse/(n-2)),h=t=>1/n+(t-f.xm)*(t-f.xm)/f.sxx,yh=t=>f.a+f.b*t,ci=t=>tc*s*Math.sqrt(h(t)),pi=t=>tc*s*Math.sqrt(1+h(t));
+  let lo=1e9,hi=-1e9;for(const t of [0,10]){lo=Math.min(lo,yh(t)-pi(t));hi=Math.max(hi,yh(t)+pi(t))}for(const v of y){lo=Math.min(lo,v);hi=Math.max(hi,v)}const P=mk($('c6cv'),0,10,hi+.3,{y0:lo-.3}),g=P.g;
+  function band(fn,col){g.beginPath();for(let i=0;i<=100;i++){const t=10*i/100;i?g.lineTo(P.X(t),P.Y(yh(t)+fn(t))):g.moveTo(P.X(t),P.Y(yh(t)+fn(t)))}for(let i=100;i>=0;i--){const t=10*i/100;g.lineTo(P.X(t),P.Y(yh(t)-fn(t)))}g.closePath();g.fillStyle=col;g.fill()}
+  band(pi,'rgba(192,132,252,.15)');band(ci,'rgba(110,168,255,.28)');P.line(yh,C.y,2.6,0,10,2);P.line(t=>1+.5*t,C.fg,1.4,0,10,2,true);dots(P,Array.from(x,(v,i)=>[v,y[i]]),'rgba(232,235,245,.85)',3);
+  P.vline(x0,C.g,'x₀',true);g.strokeStyle=C.p;g.lineWidth=5;g.beginPath();g.moveTo(P.X(x0)+6,P.Y(yh(x0)-pi(x0)));g.lineTo(P.X(x0)+6,P.Y(yh(x0)+pi(x0)));g.stroke();g.strokeStyle=C.a;g.beginPath();g.moveTo(P.X(x0)-6,P.Y(yh(x0)-ci(x0)));g.lineTo(P.X(x0)-6,P.Y(yh(x0)+ci(x0)));g.stroke();
+  P.text('blue band: CI for the mean · purple band: PI for a new observation · dashed: true line',P.L+8,P.T+14,C.mu);
+  const R=2000,tm=1+.5*x0;let c1=0,c2=0;for(let r=0;r<R;r++){const yy=new Float64Array(n);for(let i=0;i<n;i++)yy[i]=1+.5*x[i]+sg*randn();const q=simple(x,yy),ss=Math.sqrt(q.sse/(n-2)),hh=1/n+(x0-q.xm)*(x0-q.xm)/q.sxx,m=q.a+q.b*x0,ynew=tm+sg*randn();if(Math.abs(m-tm)<=tc*ss*Math.sqrt(hh))c1++;if(Math.abs(ynew-m)<=tc*ss*Math.sqrt(1+hh))c2++}
+  $('c6st').innerHTML=stat('fitted value at x₀',fmt(yh(x0)),'in')+stat('CI half-width',fmt(ci(x0)),'ok')+stat('PI half-width',fmt(pi(x0)),'warn')+stat('leverage h₀',fmt(h(x0)),h(x0)>.3?'hot':'')+stat('CI covers the mean',pc(c1/R),'ok')+stat('PI covers a new y',pc(c2/R),'ok');
+  $('c6rd').innerHTML=`At x₀ = ${fmt(x0)} the mean outcome is estimated as ${fmt(yh(x0))} ± ${fmt(ci(x0))}, but a single new observation is only predictable to ± ${fmt(pi(x0))}: the individual scatter σ = ${fmt(sg)} dominates. Both intervals cover correctly (${pc(c1/R)}, ${pc(c2/R)}). ${x0<2||x0>8?`<b>x₀ is outside the observed range (2 to 8).</b> The leverage ${fmt(h(x0))} is large, so the bands flare; and they assume the line is still straight out there, which the data cannot confirm.`:'Slide x₀ outside [2, 8] and watch the bands flare.'} More data shrinks the CI toward zero but the PI never goes below ±${fmt(1.96*sg)}.`}
+ on('c6n c6s',gen);on('c6x',draw);$('c6go').onclick=gen;gen();resizers.push(draw);})();
+
+/* ---------- Ch7 diagnostics ---------- */
+(function(){let S=null;
+ function t3(){let c=0;for(let i=0;i<3;i++){const z=randn();c+=z*z}return randn()/Math.sqrt(c/3)}
+ function gen(){const sc=$('c7s').value,n=val('c7n'),x=new Float64Array(n),y=new Float64Array(n);for(let i=0;i<n;i++){const t=10*Math.random();x[i]=t;let e=.8*randn(),m=1+.5*t;if(sc==='curved')m+=.12*(t-5)*(t-5)*1.5-1.5;if(sc==='hetero')e=(.15+.2*t)*randn();if(sc==='heavy')e=.7*t3();y[i]=m+e}
+  if(sc==='outlier'){x[0]=9.5;y[0]=1+.5*9.5-7}S={x,y};draw()}
+ function draw(){if(!S)return;const{x,y}=S,n=x.length,f=simple(x,y),h=i=>1/n+(x[i]-f.xm)*(x[i]-f.xm)/f.sxx,s2=f.sse/(n-2),s=Math.sqrt(s2);
+  const fit=Array.from(x,v=>f.a+f.b*v),sr=Array.from(f.res,(e,i)=>e/(s*Math.sqrt(1-h(i))));let cdmax=0,cdi=0;sr.forEach((r,i)=>{const d=r*r*h(i)/((1-h(i))*2);if(d>cdmax){cdmax=d;cdi=i}});
+  const[ylo,yhi]=range(y,.08),P=mk($('c7cv'),0,10,yhi,{y0:ylo});clip(P,()=>P.line(t=>f.a+f.b*t,C.y,2.6,0,10,2));dots(P,Array.from(x,(v,i)=>[v,y[i]]),'rgba(232,235,245,.8)',3);P.text('data and fitted line',P.L+8,P.T+14,C.mu);
+  const[f0,f1]=range(fit,.05),[r0,r1]=range(f.res,.1),Q=mk($('c7cv2'),f0,f1,r1,{y0:r0});Q.hline(0,C.mu);dots(Q,fit.map((v,i)=>[v,f.res[i]]),'rgba(110,168,255,.75)',2.6);Q.text('residuals vs fitted',Q.L+8,Q.T+14,C.mu);
+  const so=sr.slice().sort((a,b)=>a-b),qq=so.map((v,i)=>[qn((i+.5)/n),v]),lim=Math.max(3.2,...so.map(Math.abs)),W=mk($('c7cv3'),-lim,lim,lim,{y0:-lim});W.line(t=>t,C.fg,1.4,-lim,lim,2,true);dots(W,qq,'rgba(192,132,252,.85)',2.6);W.text('normal Q–Q plot',W.L+8,W.T+14,C.mu);
+  const e2=Array.from(f.res,e=>e*e),bp=simple(x,e2),LM=n*bp.r2,pbp=gammaQ(.5,LM/2),
+   mo=mom(f.res),JB=n/6*(mo.sk*mo.sk+mo.ku*mo.ku/4),pjb=Math.exp(-JB/2),
+   x2=Float64Array.from(x,v=>(v-f.xm)*(v-f.xm)),rs=olsMulti([Float64Array.from(x,v=>v-f.xm),x2],y,true),tr=rs.beta[2]/rs.se[2],pr=2*(1-tcdf(Math.abs(tr),n-3));
+  const row=(a,b,p,v)=>`<tr><td>${a}</td><td>${b}</td><td>${p==null?'—':f3(p)}</td><td style="color:${p!=null&&p<.05||v?C.r:C.g}">${v||(p<.05?'violated':'no evidence')}</td></tr>`;
+  $('c7tb').innerHTML='<table><tr><th>check</th><th>statistic</th><th>p-value</th><th>verdict</th></tr>'+row('Breusch–Pagan (constant variance)','LM = '+fmt(LM),pbp)+row('Jarque–Bera (normal errors)','JB = '+fmt(JB),pjb)+row('RESET-style (x² term, curvature)','t = '+fmt(tr),pr)+row('Largest Cook’s distance','D = '+fmt(cdmax)+' (obs '+(cdi+1)+')',null,cdmax>1?'influential':cdmax>4/n?'look at it':'fine')+'</table>';
+  const sc=$('c7s').value,msg={good:'The residuals form a flat, patternless band, the Q–Q points hug the diagonal and no test rejects (apart from the 5% that will by chance). The line can be trusted.',curved:'The residuals bend into a U: the straight line is the wrong shape. Standard errors are meaningless here and the fix is a better mean model (a square, a spline, a log), not a robust SE.',hetero:'The residual band fans out to the right. The slope is still unbiased but the classical SE is wrong; use robust (HC) errors or model the variance (Lab 9).',heavy:'The Q–Q plot bends away at both ends: heavy tails. OLS stays unbiased, but it is inefficient and a few points carry much weight; consider a robust fit or check for data errors.',outlier:'One point sits far below the line at high x: a large residual with high leverage, giving a big Cook’s D. Investigate it before deciding anything (Lab 8).'}[sc];
+  $('c7rd').innerHTML=msg+' Plots first, tests second: with large n the tests reject trivial departures, with small n they miss serious ones.'}
+ on('c7s c7n',gen);$('c7go').onclick=gen;scl('c7n',v=>v);gen();resizers.push(draw);})();
+
+/* ---------- Ch8 leverage, outliers, influence ---------- */
+(function(){scl('c8x',v=>fmt(v/10));scl('c8y',v=>fmt(v/10));let B=null;
+ function gen(){const x=[],y=[];for(let i=0;i<20;i++){const t=1+8*Math.random();x.push(t);y.push(2+.5*t+.8*randn())}B={x,y};draw()}
+ function draw(){if(!B)return;const px=val('c8x')/10,py=val('c8y')/10,x=B.x.concat([px]),y=B.y.concat([py]),n=21,f0=simple(B.x,B.y),f=simple(x,y),s2=f.sse/(n-2),h=i=>1/n+(x[i]-f.xm)*(x[i]-f.xm)/f.sxx,h21=h(20),e21=f.res[20],sr=e21/Math.sqrt(s2*(1-h21)),cd=e21*e21*h21/(2*s2*(1-h21)*(1-h21));
+  const dfb=(f.b-f0.b)/(Math.sqrt(s2/f.sxx));let hmax=0;for(let i=0;i<20;i++)hmax=Math.max(hmax,h(i));
+  const P=mk($('c8cv'),0,16,20,{y0:-5});clip(P,()=>{P.line(t=>f0.a+f0.b*t,C.mu,2.4,0,16,2);P.line(t=>f.a+f.b*t,C.y,2.6,0,16,2);P.line(t=>2+.5*t,C.fg,1.2,0,16,2,true)});dots(P,B.x.map((v,i)=>[v,B.y[i]]),'rgba(232,235,245,.8)',3.2);dots(P,[[px,py]],C.r,6.5);
+  P.text('grey: fit without the red point · yellow: fit with it · dashed: truth',P.L+8,P.T+14,C.mu);
+  const infl=cd>1?'hot':cd>4/n?'warn':'ok';
+  $('c8st').innerHTML=stat('leverage h of the point',fmt(h21),h21>4/n?'hot':h21>2*2/n?'warn':'ok')+stat('average leverage 2/n',fmt(2/n),'')+stat('standardised residual',fmt(sr),Math.abs(sr)>3?'hot':Math.abs(sr)>2?'warn':'ok')+stat('Cook’s distance',fmt(cd),infl)+stat('slope without / with',fmt(f0.b)+' / '+fmt(f.b),'in')+stat('DFBETA (slope shift in SEs)',fmt(dfb),Math.abs(dfb)>2/Math.sqrt(n)*2?'hot':'');
+  $('c8rd').innerHTML=`The red point has leverage ${fmt(h21)} (typical ${fmt(2/n)}) and a standardised residual of ${fmt(sr)}, so Cook’s distance is ${fmt(cd)}. Removing it would move the slope from ${fmt(f.b)} to ${fmt(f0.b)}. ${h21>.3&&Math.abs(sr)<1.5?'It has high leverage but sits on the line, so it is <b>harmless</b> (it even sharpens the slope).':h21<.12&&Math.abs(sr)>2.5?'It is an outlier in y but near the centre of x, so it moves the intercept a little and the slope hardly at all.':h21>.3&&Math.abs(sr)>=1.5?'High leverage <b>and</b> a large residual: this is an influential point that pulls the fit toward itself.':'It looks like an ordinary observation.'} Influence = leverage × residual: both are needed.`}
+ on('c8x c8y',draw);$('c8go').onclick=gen;gen();resizers.push(draw);})();
+
+/* ---------- Ch9 heteroskedasticity ---------- */
+(function(){const NL=[30,60,120,300];idx('c9n',NL);scl('c9k',v=>fmt(v/50));let busy=false;
+ function run(){if(busy)return;busy=true;const n=NL[val('c9n')],k=val('c9k')/50,R=2000,tc=tq(n-2,.975),NM=['classical','HC0','HC1','HC3','WLS (known σ)'];
+  const cov=[0,0,0,0,0],se=[0,0,0,0,0],bs=new Float64Array(R),bw=new Float64Array(R),x=new Float64Array(n),y=new Float64Array(n),w=new Float64Array(n);
+  for(let r=0;r<R;r++){for(let i=0;i<n;i++){x[i]=-Math.log(1-Math.random());const sg=.5+k*x[i];y[i]=1+.5*x[i]+sg*randn();w[i]=1/(sg*sg)}
+   const f=simple(x,y);let s0=0,s3=0;for(let i=0;i<n;i++){const hh=1/n+(x[i]-f.xm)*(x[i]-f.xm)/f.sxx,d=(x[i]-f.xm)*(x[i]-f.xm)*f.res[i]*f.res[i];s0+=d;s3+=d/((1-hh)*(1-hh))}
+   const v=[f.sse/(n-2)/f.sxx,s0/(f.sxx*f.sxx),s0/(f.sxx*f.sxx)*n/(n-2),s3/(f.sxx*f.sxx)];
+   let sw=0,swx=0,swy=0;for(let i=0;i<n;i++){sw+=w[i];swx+=w[i]*x[i];swy+=w[i]*y[i]}const xw=swx/sw,yw=swy/sw;let sxx=0,sxy=0;for(let i=0;i<n;i++){sxx+=w[i]*(x[i]-xw)*(x[i]-xw);sxy+=w[i]*(x[i]-xw)*(y[i]-yw)}const b2=sxy/sxx;
+   bs[r]=f.b;bw[r]=b2;for(let j=0;j<4;j++){const s=Math.sqrt(v[j]);se[j]+=s;if(Math.abs(f.b-.5)<=tc*s)cov[j]++}const sw1=Math.sqrt(1/sxx);se[4]+=sw1;if(Math.abs(b2-.5)<=tc*sw1)cov[4]++}
+  const sd0=sdOf(bs),sd1=sdOf(bw);
+  const P=mk($('c9cv'),0,5,1,{y0:0,noGrid:true,L:46});customGrid(P,[],[0,.25,.5,.75,.95,1].map(v=>[v,Math.round(v*100)+'%']));P.hline(.95,C.y,'nominal 95%');const bwid=(P.w-P.L-P.R)/5;
+  cov.forEach((c,j)=>{const v=c/R,xx=P.L+bwid*(j+.18),ww=bwid*.64;P.g.fillStyle=Math.abs(v-.95)<.015?C.g:Math.abs(v-.95)<.04?C.y:C.r;P.g.fillRect(xx,P.Y(v),ww,P.Y(0)-P.Y(v));P.g.fillStyle=C.fg;P.g.textAlign='center';P.g.fillText(pc(v),xx+ww/2,P.Y(v)-4);P.g.fillStyle=C.mu;P.g.fillText(NM[j],xx+ww/2,P.h-P.B+15)});
+  $('c9tb').innerHTML='<table><tr><th>estimator</th><th>average SE ÷ true SD of slope</th><th>95% interval coverage</th></tr>'+NM.map((m,j)=>`<tr><td>${m}</td><td>${fmt(se[j]/R/(j<4?sd0:sd1))}</td><td>${pc(cov[j]/R)}</td></tr>`).join('')+`</table><div class="sub" style="margin-top:6px">SD of the OLS slope ${fmt(sd0)} · SD of the WLS slope ${fmt(sd1)} (efficiency gain: variance ÷ ${fmt(sd0*sd0/(sd1*sd1))})</div>`;
+  $('c9rd').innerHTML=k===0?`With k = 0 the errors are homoskedastic and every method is fine; the robust ones are just a little noisier at n = ${n}.`:`At k = ${fmt(k)} the classical standard error is ${fmt(se[0]/R/sd0)} of the true spread and its interval covers only ${pc(cov[0]/R)}. The sandwich estimators fix most of it; HC0 still runs small at n = ${n} (${pc(cov[1]/R)}), HC3 is the most cautious (${pc(cov[3]/R)}). WLS with the true weights is both correct and more precise (variance ratio ${fmt(sd0*sd0/(sd1*sd1))}), but the weights are rarely known: in practice use OLS with HC3 errors.`;busy=false}
+ $('c9go').onclick=run;on('c9n',run);$('c9k').addEventListener('change',run);run();})();
+
+/* ---------- Ch10 attenuation and regression to the mean ---------- */
+(function(){let S=null;scl('c10r',v=>v+'%');
+ function run(){const mode=$('c10m').value,lam=val('c10r')/100;$('c10l').textContent=mode==='att'?'reliability of x %':'correlation of the two measurements %';
+  const n=400,R=400;let m=0;
+  if(mode==='att'){const xs=new Float64Array(n),ys=new Float64Array(n),xt=new Float64Array(n),sdE=Math.sqrt((1-lam)/lam);for(let i=0;i<n;i++){xt[i]=randn();xs[i]=xt[i]+sdE*randn();ys[i]=xt[i]+randn()}
+   const f=simple(xs,ys),ft=simple(xt,ys);for(let r=0;r<R;r++){const a=new Float64Array(60),b=new Float64Array(60);for(let i=0;i<60;i++){const t=randn();a[i]=t+sdE*randn();b[i]=t+randn()}m+=simple(a,b).b/R}S={mode,lam,xs,ys,f,ft,m}}
+  else{const a=new Float64Array(n),b=new Float64Array(n),c=Math.sqrt(1-lam);let ra=[],rb=[];for(let i=0;i<n;i++){const t=Math.sqrt(lam)*randn();a[i]=t+c*randn();b[i]=t+c*randn()}
+   const cut=pct(a,.9);for(let i=0;i<n;i++)if(a[i]>=cut){ra.push(a[i]);rb.push(b[i])}S={mode,lam,a,b,cut,ma:mean(ra),mb:mean(rb)}}
+  draw()}
+ function draw(){if(!S)return;if(S.mode==='att'){const{lam,xs,ys,f,ft,m}=S,[x0,x1]=range(xs,.05),[y0,y1]=range(ys,.08),P=mk($('c10cv'),x0,x1,y1,{y0});clip(P,()=>{P.line(t=>t,C.fg,1.6,x0,x1,2,true);P.line(t=>ft.a+ft.b*t,C.g,2,x0,x1,2);P.line(t=>f.a+f.b*t,C.r,2.8,x0,x1,2)});dots(P,Array.from(xs,(v,i)=>[v,ys[i]]).slice(0,300),'rgba(110,168,255,.6)',2.4);P.text('red: fit on the noisy x · green: fit on the true x · dashed: slope 1',P.L+8,P.T+14,C.mu);
+   $('c10st').innerHTML=stat('true slope',1,'in')+stat('slope using noisy x',fmt(f.b),'hot')+stat('average over 400 samples (n=60)',fmt(m),'')+stat('predicted: reliability λ',fmt(lam),'ok')+stat('slope using true x',fmt(ft.b),'ok');
+   $('c10rd').innerHTML=`The coefficient is estimated at ${fmt(f.b)} instead of 1, close to the reliability ${fmt(lam)}: the noise in x spreads the points sideways and flattens the line. More data does not help, since the bias is not sampling error. With reliability 100% the two lines coincide.`}
+  else{const{lam,a,b,cut,ma,mb}=S,P=mk($('c10cv'),-4,4,4,{y0:-4});P.line(t=>t,C.fg,1.4,-4,4,2,true);clip(P,()=>P.line(t=>lam*t,C.a,2.2,-4,4,2));const top=[],rest=[];for(let i=0;i<a.length;i++)(a[i]>=cut?top:rest).push([a[i],b[i]]);dots(P,rest.slice(0,300),'rgba(138,147,171,.55)',2.4);dots(P,top,C.r,3.6);P.vline(cut,C.y,'top 10%',true);P.text('first measurement →, second measurement ↑ · blue: E[2nd | 1st]',P.L+8,P.T+14,C.mu);
+   $('c10st').innerHTML=stat('top-10% mean, 1st measure',fmt(ma),'in')+stat('same units, 2nd measure',fmt(mb),'hot')+stat('fall back by',fmt(ma-mb),'')+stat('predicted fraction retained ρ',fmt(lam),'ok')+stat('observed retained',fmt(mb/ma),'');
+   $('c10rd').innerHTML=`Units chosen for an extreme first score average ${fmt(ma)}; on the second score the same units average ${fmt(mb)}, retaining a fraction ${fmt(mb/ma)} of the extremeness (theory: ρ = ${fmt(lam)}). Nothing happened to them. Any “intervention” applied to the selected group would be credited with this drift; a randomised control group suffers the same drift and cancels it.`}}
+ on('c10m c10r',run);$('c10go').onclick=run;run();resizers.push(draw);})();
+
+/* ---------- Ch11 log models and retransformation ---------- */
+(function(){scl('c11s',v=>fmt(v/100));scl('c11n',v=>v);scl('c11x',v=>fmt(v/10));let S=null;
+ function run(){const sg=val('c11s')/100,n=val('c11n'),R=300;S={sg,n};const acc=[0,0,0,0],data=[];
+  for(let r=0;r<R;r++){const x=new Float64Array(n),ly=new Float64Array(n),y=new Float64Array(n);for(let i=0;i<n;i++){x[i]=10*Math.random();ly[i]=1+.25*x[i]+sg*randn();y[i]=Math.exp(ly[i])}
+   const f=simple(x,ly),g=simple(x,y),s2=f.sse/(n-2);let sm=0;for(const e of f.res)sm+=Math.exp(e);sm/=n;
+   const est=[g.a+g.b*5,Math.exp(f.a+f.b*5),Math.exp(f.a+f.b*5+s2/2),Math.exp(f.a+f.b*5)*sm],tr=Math.exp(1+.25*5+sg*sg/2);est.forEach((v,j)=>acc[j]+=v/tr/R);if(r===0)data.push({x,y,f,g,sm,s2})}
+  S.acc=acc;S.d=data[0];S.tr=Math.exp(1+.25*5+sg*sg/2);draw()}
+ function draw(){if(!S)return;const{sg,acc,d}=S,x0=val('c11x')/10,{x,y,f,g,sm,s2}=d,tm=t=>Math.exp(1+.25*t+sg*sg/2),srt=Float64Array.from(y).sort(),ymax=Math.max(srt[Math.floor(.97*srt.length)],tm(10)*1.5),P=mk($('c11cv'),0,10,ymax,{y0:0});
+  clip(P,()=>{P.line(tm,C.fg,2,0,10,100,true);P.line(t=>g.a+g.b*t,C.r,2.4,0,10,2);P.line(t=>Math.exp(f.a+f.b*t),C.a,2.4,0,10,100);P.line(t=>Math.exp(f.a+f.b*t)*sm,C.g,2.8,0,10,100)});dots(P,Array.from(x,(v,i)=>[v,y[i]]).slice(0,300),'rgba(232,235,245,.5)',2.4);
+  P.text('dashed: true mean · red: straight line on y · blue: exp(fit) · green: exp(fit) × smearing',P.L+8,P.T+14,C.mu);
+  const tr=tm(x0),pr=[g.a+g.b*x0,Math.exp(f.a+f.b*x0),Math.exp(f.a+f.b*x0+s2/2),Math.exp(f.a+f.b*x0)*sm],nm=['straight-line OLS on y','exp(prediction) — the median','exp(prediction + s²/2) (normal errors)','exp(prediction) × smearing factor'];
+  $('c11tb').innerHTML=`<table><tr><th>estimate of E[y | x₀ = ${fmt(x0)}]</th><th>this data set</th><th>÷ truth (${fmt(tr)})</th><th>average ÷ truth at x = 5 (300 sets)</th></tr>`+nm.map((m,j)=>`<tr><td>${m}</td><td>${fmt(pr[j])}</td><td>${fmt(pr[j]/tr)}</td><td>${fmt(acc[j])}</td></tr>`).join('')+'</table>';
+  $('c11rd').innerHTML=`The coefficient on x is ${fmt(f.b)} (true 0.25), meaning each extra unit of x multiplies y by about e^${fmt(f.b)} = ${fmt(Math.exp(f.b))}, roughly ${fmt(100*(Math.exp(f.b)-1))}% more. But exp(prediction) estimates the <em>median</em>: it under-states the mean by the factor e^(σ²/2) = ${fmt(Math.exp(sg*sg/2))} here, and the shortfall grows with σ. The smearing factor ${fmt(sm)} (the average of exp(residual)) repairs it without assuming normality; the straight line misses the shape altogether.`}
+ on('c11s c11n',run);$('c11x').addEventListener('input',draw);$('c11go').onclick=run;run();resizers.push(draw);})();
+const QZ=[
+{l:'Beginner',q:'What does the ordinary least-squares line minimise?',o:['The sum of absolute residuals','The sum of squared vertical distances from the points to the line','The largest residual','The number of points off the line'],a:1,e:'OLS picks the intercept and slope minimising Σ(yᵢ − a − bxᵢ)². The simple-regression slope is Cov(x,y)/Var(x).'},
+{l:'Beginner',q:'In an OLS fit with an intercept, the residuals…',o:['Sum to zero and are uncorrelated with every predictor','Are all positive','Have the same sign as the predictor','Are normally distributed by construction'],a:0,e:'The normal equations XᵀE = 0 force the residuals to sum to zero and be orthogonal to each column of X. Normality is an assumption, not a result.'},
+{l:'Intermediate',q:'In the multiple regression of y on x₁ and x₂, the coefficient of x₁ equals the slope from regressing…',o:['y on x₁','The residual of y on x₂ against the residual of x₁ on x₂','y on x₁ + x₂','x₁ on y'],a:1,e:'This is the Frisch–Waugh–Lovell theorem: “controlling for x₂” means partialling x₂ out of both y and x₁.'},
+{l:'Intermediate',q:'The true model is y = β₁x₁ + β₂x₂ + ε, and x₂ = δx₁ + u. You regress y on x₁ only. The expected slope is…',o:['β₁','β₁ + β₂δ','β₁ − β₂δ','β₁δ'],a:1,e:'Omitted-variable bias = β₂δ: the omitted variable’s effect times its regression on the included one.'},
+{l:'Intermediate',q:'Z is caused by both X and Y. What happens if you control for Z when estimating the effect of X on Y?',o:['Nothing; controls never hurt','It removes confounding','It opens a spurious path and biases the estimate (collider bias)','It reduces the standard error only'],a:2,e:'Conditioning on a collider induces an association between its causes. Controls must be chosen from the causal structure, not added by default.'},
+{l:'Intermediate',q:'Which change does NOT reduce the standard error of a regression slope?',o:['More observations','Larger spread of x','Smaller noise σ','Adding observations all at the same x value as the existing mean'],a:3,e:'SE = σ/√Sxx. Points at the mean of x add n but nothing to Sxx = Σ(x − x̄)².'},
+{l:'Intermediate',q:'Adding a pure-noise predictor to a regression will…',o:['Never change R²','Never decrease training R² (and typically raise it slightly) but may lower adjusted R² and test R²','Always lower R²','Make coefficients unbiased'],a:1,e:'Training R² cannot fall when a column is added. Adjusted R² penalises the lost degree of freedom, and out-of-sample fit usually worsens.'},
+{l:'Advanced',q:'The Gauss–Markov theorem says that OLS is…',o:['The best estimator among all estimators, whatever the error distribution','The best linear unbiased estimator when errors have zero mean, equal variance and are uncorrelated','Consistent only with normal errors','Unbiased only when R² is high'],a:1,e:'BLUE needs no normality; it needs correct mean specification, homoskedasticity and uncorrelated errors. Normality is only needed for exact finite-sample t and F tests.'},
+{l:'Advanced',q:'A 95% prediction interval for a new observation differs from the 95% confidence interval for the mean response because…',o:['It uses a different confidence level','It adds the error variance σ² of the new observation, so it never shrinks below ±1.96σ','It ignores the uncertainty in the line','It is always twice as wide'],a:1,e:'Var(ŷ₀ − y₀) = σ²(1 + h₀). More data kills the h₀ part but not the individual noise σ².'},
+{l:'Advanced',q:'A single point has high leverage and lies exactly on the line implied by the other points. Its effect on the fit is…',o:['Large; it will drag the line','Small: leverage matters only when combined with a large residual','Large because Cook’s D is always above 1','Undefined'],a:1,e:'Cook’s distance is proportional to residual² × h/(1 − h)². With a small residual a high-leverage point is harmless and even improves precision.'},
+{l:'Advanced',q:'In simple regression with n points, the average leverage is…',o:['1/n','2/n','n/2','0.5'],a:1,e:'Σhᵢ = trace of the hat matrix = number of parameters p = 2, so the mean is p/n = 2/n. Points above 2p/n or 3p/n deserve a look.'},
+{l:'Advanced',q:'The residuals-versus-fitted plot fans out from left to right. The best response when the goal is valid inference on the slope is…',o:['Drop the right-hand points','Keep OLS and report heteroskedasticity-robust (HC3) standard errors','Take the square root of R²','Nothing; the slope is biased'],a:1,e:'The slope remains unbiased; only the classical SE is wrong. Sandwich SEs fix inference; WLS can add efficiency if the variance model is right.'},
+{l:'Advanced',q:'In small samples the HC0 sandwich standard error tends to…',o:['Be too large','Be too small, with HC1 and especially HC3 correcting it','Equal the classical SE','Be exact'],a:1,e:'HC0 ignores that residuals are shrunk by leverage. HC1 rescales by n/(n − p), HC3 divides each squared residual by (1 − h)², which is the safest default.'},
+{l:'Expert',q:'A predictor with reliability 0.6 is measured with random error. The OLS slope converges to about…',o:['The true slope','0.6 × the true slope (attenuation) in a simple regression','1/0.6 × the true slope','Zero'],a:1,e:'Classical measurement error in x biases the slope toward zero by the reliability ratio λ = Var(x*)/(Var(x*) + Var(error)). It does not vanish with n.'},
+{l:'Expert',q:'The bottom decile of schools on this year’s test score are given extra help and improve next year. Why is this weak evidence for the help?',o:['Test scores are unreliable in schools','Regression to the mean: groups selected on an extreme, noisy score move back on average even with no treatment','Selection bias is impossible here','The help could have lowered scores'],a:1,e:'The expected return toward the mean is the fraction (1 − ρ) of the gap. Only a comparison with a randomly chosen or similarly selected control group separates it from a treatment effect.'},
+{l:'Expert',q:'In log y = α + βx + ε, with β = 0.08, a one-unit increase in x is associated with…',o:['An 8 unit increase in y','About an 8% increase in y (exactly e^0.08 − 1 ≈ 8.3%)','A 0.08% increase in y','A 0.08 increase in log x'],a:1,e:'The coefficient on x in a log-y model is a proportional change: exact factor e^β, ≈ 100β% for small β.'},
+{l:'Expert',q:'You fit log y on x and report exp(prediction) as the expected value of y. Compared with the true E[y|x] this is…',o:['Unbiased','Too low by about the factor e^(σ²/2) with normal log-errors (it is the median); multiply by e^(s²/2) or a smearing factor','Too high by e^(σ²/2)','Too low only when σ = 0'],a:1,e:'E[e^{ε}] = e^{σ²/2} > 1. The back-transformed log prediction is a median; the smearing estimator (mean of exp residuals) fixes the mean without assuming normality.'},
+{l:'Expert',q:'Students are sampled within 40 classrooms and the treatment is assigned by classroom. The regression SEs should be…',o:['Classical, since each student is a row','Clustered at the classroom level, because errors within a class are correlated and the effective sample size is closer to 40 than to the number of students','Divided by √(class size)','Ignored; only point estimates matter'],a:1,e:'Cluster-robust (or multilevel) inference accounts for within-cluster correlation; treating rows as independent understates the SE, often drastically.'}
+];
+(function(){const st=store.get('lr_quiz',{});
+ function render(){const box=$('quiz');box.innerHTML='';
+  QZ.forEach((q,i)=>{const d=document.createElement('div');d.className='q'+(st[i]!=null?' done':'');d.innerHTML=`<div class="qh">Q${i+1} · ${q.l}</div><div style="margin:4px 0 6px"><b>${q.q}</b></div>`;
+   q.o.forEach((o,j)=>{const b=document.createElement('button');b.className='opt';b.textContent=o;if(st[i]!=null){if(j===q.a)b.classList.add('good');else if(j===st[i])b.classList.add('bad')}b.onclick=()=>{if(st[i]!=null)return;st[i]=j;store.set('lr_quiz',st);render();meter()};d.appendChild(b)});
+   const e=document.createElement('div');e.className='ex';e.innerHTML=(st[i]===q.a?'✅ ':'❌ ')+q.e;d.appendChild(e);box.appendChild(d)});
+  const ans=Object.keys(st).length,ok=QZ.filter((q,i)=>st[i]===q.a).length;
+  $('qscore').innerHTML=stat('answered',ans+' / '+QZ.length,'in')+stat('correct',ok,'ok')+stat('score',ans?Math.round(100*ok/ans)+'%':'—',ok/Math.max(ans,1)>=.8?'ok':'warn')+stat('verdict',ans<QZ.length?'keep going':ok>=16?'regression master':ok>=13?'strong':'review ch. 1–8','')}
+ $('qreset').onclick=()=>{Object.keys(st).forEach(k=>delete st[k]);store.set('lr_quiz',st);render();meter()};
+ window.__qst=st;render();})();
+const CHK=['Derive the OLS slope and intercept and state what the line estimates (the conditional mean).','Write the matrix form β̂ = (XᵀX)⁻¹Xᵀy and explain the projection and hat-matrix picture.','Explain Frisch–Waugh–Lovell and what “controlling for” does.','Compute omitted-variable bias β₂δ and sign it.','Tell a confounder, mediator and collider apart and say which to adjust for.','Derive the standard error of a slope and name its three drivers.','State the Gauss–Markov assumptions and what each buys you.','Explain R², adjusted R² and why training R² overstates fit.','Build a confidence interval for the mean and a prediction interval for a new case and explain the difference.','Read residual-versus-fitted, Q–Q and scale-location plots and match patterns to violations.','Compute leverage, standardised residuals, Cook’s D and DFBETA and tell outlier from influential point.','Use HC3 and cluster-robust standard errors and know when WLS helps.','Explain attenuation bias and regression to the mean with examples.','Interpret log-transformed coefficients and retransform predictions with a smearing factor.'];
+(function(){const st=store.get('lr_chk',{}),box=$('chk');CHK.forEach((t,i)=>{const l=document.createElement('label'),c=document.createElement('input');c.type='checkbox';c.checked=!!st[i];c.onchange=()=>{st[i]=c.checked;store.set('lr_chk',st);meter()};l.appendChild(c);const s=document.createElement('span');s.textContent=t;l.appendChild(s);box.appendChild(l)});window.__cst=st;})();
+function meter(){const q=window.__qst||{},c=window.__cst||{};const ok=QZ.filter((x,i)=>q[i]===x.a).length,ck=Object.values(c).filter(Boolean).length;const p=Math.round(100*(.6*ok/QZ.length+.4*ck/CHK.length));$('mtxt').textContent='Mastery: '+p+'%  (exam + checklist)';$('mbar').style.width=p+'%';store.set('mastery_lr',p)}
+meter();
+
+/* ---------- Navigation ---------- */
+(function(){const nav=$('nav');let html='';
+ document.querySelectorAll('main .part, main section.ch').forEach(el=>{if(el.classList.contains('part'))html+=`<div class="pt">${el.textContent}</div>`;else{const h=el.querySelector('h2'),num=h.querySelector('.num').textContent,t=Array.from(h.childNodes).filter(n=>n.nodeType===3).map(n=>n.textContent).join('').trim();html+=`<a href="#${el.id}" data-id="${el.id}">${num}. ${t}</a>`}});
+ nav.innerHTML=html;const links=nav.querySelectorAll('a'),io=new IntersectionObserver(es=>{es.forEach(e=>{if(e.isIntersecting)links.forEach(a=>a.classList.toggle('on',a.dataset.id===e.target.id))})},{rootMargin:'-20% 0px -70% 0px'});
+ document.querySelectorAll('section.ch').forEach(s=>io.observe(s));
+ $('menu').onclick=()=>$('side').classList.toggle('open');nav.addEventListener('click',e=>{if(e.target.tagName==='A')$('side').classList.remove('open')});
+ window.addEventListener('scroll',()=>{const h=document.documentElement;$('prog').style.width=(100*h.scrollTop/(h.scrollHeight-h.clientHeight))+'%'},{passive:true});})();
+</script>
+</body>
+</html>
