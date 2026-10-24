@@ -1,0 +1,647 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Imbalanced and Rare Events Mastery</title>
+<style>
+:root{--bg:#0b0e17;--panel:#121726;--panel2:#171d30;--line:#232a3d;--fg:#e8ebf5;--mu:#8a93ab;--a:#6ea8ff;--r:#ff6b81;--y:#ffd166;--g:#4ade80;--p:#c084fc;--t:#5eead4}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;background:var(--bg);color:var(--fg);font:16px/1.7 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+a{color:var(--a)}
+#prog{position:fixed;top:0;left:0;height:3px;background:linear-gradient(90deg,var(--a),var(--p),var(--r));width:0;z-index:50}
+.side{position:fixed;left:0;top:0;bottom:0;width:290px;background:#0e1220;border-right:1px solid var(--line);overflow:auto;padding:18px 14px 90px;z-index:40;transition:transform .25s}
+.side h1{font-size:15px;margin:0 0 2px}
+.side small{color:var(--mu)}
+.side .pt{margin:16px 0 4px;font-size:11px;text-transform:uppercase;letter-spacing:1.3px;color:var(--p)}
+.side a{display:block;color:var(--mu);text-decoration:none;padding:5px 9px;border-radius:7px;font-size:13.5px;line-height:1.35}
+.side a:hover{background:var(--panel);color:var(--fg)}
+.side a.on{background:var(--panel2);color:var(--fg);box-shadow:inset 3px 0 var(--a)}
+.side a.back{color:var(--t);padding-left:0;margin-bottom:6px}
+.meter{position:fixed;left:0;bottom:0;width:290px;background:#0e1220;border-top:1px solid var(--line);padding:10px 16px;z-index:41;font-size:12px;color:var(--mu)}
+.meter .bar{height:7px;background:var(--line);border-radius:6px;margin-top:5px;overflow:hidden}
+.meter .bar i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--g),var(--t));transition:width .4s}
+#menu{display:none;position:fixed;top:10px;left:10px;z-index:60;background:var(--panel2);color:var(--fg);border:1px solid var(--line);border-radius:9px;padding:7px 12px;font-size:14px;cursor:pointer}
+main{margin-left:290px;padding:0 34px 120px;max-width:1090px}
+.hero{padding:70px 0 30px}
+.hero h1{font-size:clamp(32px,5vw,56px);line-height:1.08;margin:0 0 14px;background:linear-gradient(100deg,#fff,var(--y) 40%,var(--r));-webkit-background-clip:text;background-clip:text;color:transparent}
+.hero p{font-size:19px;color:#c3c9dc;max-width:780px}
+.chips{display:flex;flex-wrap:wrap;gap:8px;margin:18px 0}
+.chip{border:1px solid var(--line);background:var(--panel);padding:5px 12px;border-radius:99px;font-size:13px;color:var(--mu)}
+.chip b{color:var(--fg)}
+.part{margin:90px 0 0;padding-top:22px;border-top:1px solid var(--line);font-size:12px;letter-spacing:2px;text-transform:uppercase;color:var(--p)}
+section.ch{padding-top:30px}
+h2{font-size:30px;line-height:1.2;margin:10px 0 8px;display:flex;gap:12px;align-items:center;flex-wrap:wrap}
+h2 .num{display:inline-grid;place-items:center;width:40px;height:40px;border-radius:12px;background:var(--panel2);border:1px solid var(--line);font-size:18px;color:var(--a)}
+.lvl{font-size:11px;font-weight:600;letter-spacing:.8px;text-transform:uppercase;padding:3px 9px;border-radius:99px;border:1px solid}
+.lvl.b{color:var(--g);border-color:#1f5c3a}.lvl.i{color:var(--a);border-color:#244a85}.lvl.a{color:var(--y);border-color:#6b5420}.lvl.e{color:var(--r);border-color:#7a2c3a}
+h3{font-size:19px;margin:30px 0 6px;color:#fff}
+p{margin:10px 0}li{margin:5px 0}
+code,.f{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace}
+code{background:var(--panel2);padding:1px 6px;border-radius:5px;font-size:.9em}
+.f{display:block;white-space:pre-wrap;background:#0e1322;border:1px solid var(--line);border-left:3px solid var(--a);padding:12px 16px;border-radius:9px;margin:14px 0;overflow-x:auto;font-size:15px;color:#dbe4ff;line-height:1.8}
+.co{border-radius:12px;padding:13px 17px;margin:16px 0;border:1px solid var(--line);background:var(--panel)}
+.co>b:first-child{display:block;margin-bottom:2px;font-size:12px;letter-spacing:1px;text-transform:uppercase}
+.co.def{border-left:4px solid var(--a)}.co.def>b:first-child{color:var(--a)}
+.co.warn{border-left:4px solid var(--r)}.co.warn>b:first-child{color:var(--r)}
+.co.tip{border-left:4px solid var(--g)}.co.tip>b:first-child{color:var(--g)}
+.co.key{border-left:4px solid var(--y);background:#171608}.co.key>b:first-child{color:var(--y)}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:18px 20px;margin:22px 0;box-shadow:0 8px 30px rgba(0,0,0,.25)}
+.card>h4{margin:0 0 3px;font-size:13px;letter-spacing:1.2px;text-transform:uppercase;color:var(--t)}
+.card>p.sub{margin:0 0 12px;color:var(--mu);font-size:14.5px}
+.ctl{display:flex;flex-wrap:wrap;gap:10px 22px;align-items:center;margin:8px 0 10px}
+.ctl label{display:flex;gap:8px;align-items:center;font-size:14px;color:#c3c9dc}
+.ctl output{min-width:38px;font-family:ui-monospace,monospace;color:var(--y);font-size:13px}
+input[type=range]{accent-color:var(--a);width:150px}
+input[type=checkbox]{accent-color:var(--a)}
+select,input[type=number],input[type=text]{background:#0e1322;color:var(--fg);border:1px solid var(--line);border-radius:8px;padding:6px 9px;font:inherit;font-size:14px}
+button{background:linear-gradient(180deg,#2c4a80,#233b68);color:#fff;border:1px solid #3a5a98;border-radius:9px;padding:7px 14px;font:inherit;font-size:14px;cursor:pointer}
+button:hover{filter:brightness(1.15)}
+button.alt{background:var(--panel2);border-color:var(--line);color:var(--fg)}
+canvas{width:100%;height:270px;display:block;background:#0e1322;border:1px solid var(--line);border-radius:10px;margin-top:6px}
+canvas.sm{height:210px}canvas.tl{height:330px}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(125px,1fr));gap:9px;margin:12px 0}
+.stat{background:#0e1322;border:1px solid var(--line);border-radius:10px;padding:8px 11px}
+.stat b{display:block;font-size:17px;font-family:ui-monospace,monospace}
+.stat span{font-size:11.5px;color:var(--mu);text-transform:uppercase;letter-spacing:.7px}
+.stat.hot b{color:var(--r)}.stat.ok b{color:var(--g)}.stat.warn b{color:var(--y)}.stat.in b{color:var(--a)}
+.read{margin:8px 0 0;padding:10px 14px;background:#0e1322;border:1px dashed #33406a;border-radius:10px;font-size:14.5px;color:#d3dbf3}
+table{border-collapse:collapse;width:100%;margin:12px 0;font-size:14px}
+th,td{border:1px solid var(--line);padding:7px 10px;text-align:left;vertical-align:top}
+th{background:var(--panel2);font-size:12px;text-transform:uppercase;letter-spacing:.6px;color:var(--mu)}
+td.n{font-family:ui-monospace,monospace;text-align:right}
+.tw{overflow-x:auto}
+.pill{display:inline-block;padding:1px 9px;border-radius:99px;font-size:12px;font-weight:600}
+.pill.r{background:#3a1520;color:var(--r)}.pill.g{background:#10321f;color:var(--g)}.pill.y{background:#3a2f0e;color:var(--y)}.pill.m{background:#202637;color:var(--mu)}
+details{background:var(--panel);border:1px solid var(--line);border-radius:11px;padding:9px 15px;margin:9px 0}
+details summary{cursor:pointer;font-weight:600}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.q{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:14px 18px;margin:14px 0}
+.q .qh{font-size:12px;letter-spacing:1px;text-transform:uppercase;color:var(--mu)}
+.q .opt{display:block;width:100%;text-align:left;margin:6px 0;background:#0e1322;border:1px solid var(--line);color:var(--fg);border-radius:9px;padding:9px 12px}
+.q .opt.good{border-color:var(--g);background:#0e2418}.q .opt.bad{border-color:var(--r);background:#2a1119}
+.q .ex{display:none;margin-top:8px;font-size:14.5px;color:#c3c9dc}
+.q.done .ex{display:block}
+.chk label{display:flex;gap:10px;align-items:flex-start;padding:6px 0;cursor:pointer}
+.chk input{margin-top:6px;accent-color:var(--g);width:17px;height:17px}
+.sigrow{display:grid;grid-template-columns:minmax(170px,2fr) 1fr 1fr auto;gap:8px 14px;align-items:center;padding:6px 0;border-top:1px dashed #1b2236}
+.sigrow:first-of-type{border-top:0}
+.sigrow label{display:flex;gap:6px;align-items:center;font-size:13.5px;color:#c3c9dc}
+@media(max-width:900px){
+ .side{transform:translateX(-100%)}.side.open{transform:none}.meter{display:none}
+ #menu{display:block}main{margin-left:0;padding:0 16px 100px}.two{grid-template-columns:1fr}.hero{padding-top:60px}
+ .sigrow{grid-template-columns:1fr 1fr}
+}
+</style>
+</head>
+<body>
+<div id="prog"></div>
+<button id="menu">☰ Contents</button>
+<nav class="side" id="side"><a class="back" href="index.html">← All courses</a><h1>Imbalanced &amp; Rare Events</h1><small>12 chapters · 11 labs · exam</small><div id="nav"></div></nav>
+<div class="meter"><div id="mtxt">Mastery: 0%</div><div class="bar"><i id="mbar"></i></div></div>
+
+<main>
+<header class="hero">
+ <h1>Imbalanced data and rare events: fraud, AML, default and churn done properly.</h1>
+ <p>When 1 case in 200 is the event you care about, ordinary habits fail: accuracy rewards doing nothing, ROC curves hide an avalanche of false alerts, coefficient estimates are noisy and biased, resampling tricks quietly break the probabilities, and a test set with 12 events cannot tell a good model from a lucky one. This page works through the whole problem: the right metrics and base-rate arithmetic, operating points under alert budgets, how many events you really need, what undersampling, oversampling, SMOTE and class weights do (and do not do), the exact prior correction, rare-event bias and Firth’s method, cost-sensitive learning, evaluating with few events, and estimating rates when almost nothing has happened. Every lab simulates from a known truth.</p>
+ <div class="chips"><span class="chip"><b>Part I</b> Metrics and base rates</span><span class="chip"><b>Part II</b> Fitting with few events</span><span class="chip"><b>Part III</b> Evaluating and estimating</span></div>
+ <div class="co tip"><b>How to use this</b>Sliders change the setting; heavy labs update when you release a slider or press the button. Prerequisites: the GLM, Model Selection, and Calibration pages (logistic regression, AUC, calibration, log-loss).</div>
+</header>
+
+<div class="part">Part I · Metrics and base rates</div>
+
+<section class="ch" id="c1">
+<h2><span class="num">1</span>The accuracy paradox <span class="lvl b">Beginner</span></h2>
+<p>If 0.5% of transactions are fraudulent, a “model” that never flags anything is 99.5% accurate and useless. With a confusion matrix of TP, FP, FN, TN the standard rates are: <b>recall</b> (sensitivity, TPR) = TP/(TP + FN); <b>specificity</b> (TNR) = TN/(TN + FP); <b>precision</b> (PPV) = TP/(TP + FP); <b>F1</b> = the harmonic mean of precision and recall; <b>balanced accuracy</b> = (recall + specificity)/2; and the <b>Matthews correlation coefficient</b> (MCC), a correlation between predicted and actual labels. Recall and specificity are properties of the classifier alone, but precision, accuracy and F1 also depend on the <em>prevalence</em>, which is why the same model looks different in every population.</p>
+<div class="card"><h4>Lab 1 · Same classifier, different base rate</h4>
+ <p class="sub">Choose a classifier by its sensitivity and specificity and a prevalence. The bars show every metric; the dashed line is the accuracy of “never flag anything”.</p>
+ <div class="ctl"><label>prevalence <input type="range" id="c1p" min="0" max="8" step="1" value="3"><output id="c1pv"></output></label><label>sensitivity % <input type="range" id="c1se" min="30" max="99" step="1" value="85"><output id="c1sev"></output></label><label>specificity % <input type="range" id="c1sp" min="80" max="99.9" step=".1" value="95"><output id="c1spv"></output></label></div>
+ <canvas class="tl" id="c1cv"></canvas><div class="stats" id="c1st"></div><div class="read" id="c1rd"></div></div>
+</section>
+
+<section class="ch" id="c2">
+<h2><span class="num">2</span>ROC curves versus precision–recall curves <span class="lvl i">Intermediate</span></h2>
+<p>The ROC curve plots TPR against FPR, and its AUC does not depend on prevalence: it is the probability that a random event outscores a random non-event. The <b>precision–recall (PR) curve</b> plots precision against recall; its baseline is the prevalence (a random model has precision π everywhere), and it collapses as the event becomes rarer, because the number of false positives scales with the huge negative class. <b>Average precision</b> (AP) summarises it. A point at FPR = 1% looks excellent on an ROC curve, but with 1,000,000 non-events it means 10,000 false alerts. For rare events, read the PR curve, partial AUC at low FPR, or recall at a fixed alert volume rather than the full ROC-AUC.</p>
+<div class="card"><h4>Lab 2 · ROC is unchanged, PR is not</h4>
+ <p class="sub">Scores are Normal(0, 1) for non-events and Normal(d, 1) for events (d = separation). The same scores are evaluated at the prevalence you choose (30,000 cases). Left: ROC; right: precision–recall with the prevalence baseline.</p>
+ <div class="ctl"><label>separation d <input type="range" id="c2d" min="5" max="35" step="1" value="20"><output id="c2dv"></output></label><label>prevalence <input type="range" id="c2p" min="0" max="8" step="1" value="3"><output id="c2pv"></output></label><button id="c2go">Re-simulate</button></div>
+ <div class="two"><canvas class="sm" id="c2cv"></canvas><canvas class="sm" id="c2cv2"></canvas></div><div class="stats" id="c2st"></div><div class="read" id="c2rd"></div></div>
+</section>
+
+<section class="ch" id="c3">
+<h2><span class="num">3</span>Base rates, precision and alert fatigue <span class="lvl a">Advanced</span></h2>
+<p>By Bayes’ theorem, a flag has precision</p>
+<div class="f">PPV = sens · π / [ sens · π + (1 − spec)(1 − π) ]</div>
+<p>With sensitivity 90%, specificity 95% and prevalence 0.5% the PPV is only 8%: 11 of 12 alerts are false. The binding constraint in AML, fraud and collections is usually <b>operational capacity</b>: investigators can review m cases a day. Then the question is how many true events are in the top m (the gain curve) and what each hit costs in reviewed cases (the inverse of precision). Raising the quality of the score helps most at small m, where you can afford to be selective; no threshold fixes a population with a tiny base rate and a weak model.</p>
+<div class="card"><h4>Lab 3 · What an alert budget buys</h4>
+ <p class="sub">100,000 cases a day, scores Normal(0,1) for non-events and Normal(d,1) for events. Left: expected events found against the number of alerts reviewed (the gain curve); right: precision against alerts. The marker is the daily capacity you choose.</p>
+ <div class="ctl"><label>separation d <input type="range" id="c3d" min="5" max="35" step="1" value="20"><output id="c3dv"></output></label><label>prevalence <input type="range" id="c3p" min="0" max="8" step="1" value="3"><output id="c3pv"></output></label><label>alerts per day <input type="range" id="c3a" min="50" max="5000" step="50" value="500"><output id="c3av"></output></label></div>
+ <div class="two"><canvas class="sm" id="c3cv"></canvas><canvas class="sm" id="c3cv2"></canvas></div><div class="stats" id="c3st"></div><div class="read" id="c3rd"></div></div>
+</section>
+
+<section class="ch" id="c4">
+<h2><span class="num">4</span>Choosing the operating point <span class="lvl a">Advanced</span></h2>
+<p>Three common ways to pick a threshold: (1) <b>maximise F1</b>; for calibrated probabilities the F1-optimal threshold equals half the maximal F1 value, so it is rarely 0.5; (2) <b>minimise expected cost</b>, flag when the calibrated probability exceeds c_FP/(c_FP + c_FN), where a missed fraud or default costs far more than a false alert; (3) <b>fix the capacity</b> and flag the top m cases. They give different answers, and the right one is set by the business problem, not by a default of 0.5. The threshold should be chosen on data not used to fit the model, and its uncertainty is large when events are few.</p>
+<div class="card"><h4>Lab 4 · Three rules, three thresholds</h4>
+ <p class="sub">Binormal scores (non-events N(0,1), events N(d,1)). Curves show precision, recall and F1 against the alert rate; the vertical markers show the F1-optimal, cost-optimal and capacity rules.</p>
+ <div class="ctl"><label>separation d <input type="range" id="c4d" min="5" max="35" step="1" value="20"><output id="c4dv"></output></label><label>prevalence <input type="range" id="c4p" min="0" max="8" step="1" value="3"><output id="c4pv"></output></label><label>cost of a miss ÷ cost of a false alert <input type="range" id="c4r" min="0" max="8" step="1" value="4"><output id="c4rv"></output></label><label>capacity (% of cases flagged) <input type="range" id="c4k" min="0" max="7" step="1" value="3"><output id="c4kv"></output></label></div>
+ <canvas class="tl" id="c4cv"></canvas><div class="stats" id="c4st"></div><div class="read" id="c4rd"></div></div>
+</section>
+
+<div class="part">Part II · Fitting with few events</div>
+
+<section class="ch" id="c5">
+<h2><span class="num">5</span>Events, not rows <span class="lvl a">Advanced</span></h2>
+<p>For a binary outcome the information about the effects comes from the <b>smaller class</b>. For a single standardised predictor the variance of the log-odds coefficient is about 1/[n π(1 − π)], so 10 million rows with 20 events carry about as much information as 20 events with a few thousand controls. The classic guide is at least <b>10 events per candidate parameter</b> (EPV); modern criteria (Riley et al.) ask for enough events to keep shrinkage above 0.9, optimism in R² small and the overall risk estimated to within a given precision, and often need more than 10 EPV. With too few events the fit overfits: forecasts are over-confident (calibration slope below 1), coefficients are too large, and out-of-sample performance is poor.</p>
+<div class="card"><h4>Lab 5 · How performance improves with the number of events</h4>
+ <p class="sub">Logistic regression with the chosen number of predictors (all with true effect 0.5, standard Normal) is fitted with exactly the stated number of events, the sample size being events ÷ prevalence. Using fresh predictors, we measure how far the fitted probabilities are from the true ones (KL divergence, left) and the calibration slope of the fitted log-odds (the regression slope of the true log-odds on the fitted ones, right; 1 is perfect). The dashed line marks 10 events per predictor.</p>
+ <div class="ctl"><label>predictors <input type="range" id="c5k" min="2" max="15" step="1" value="8"><output id="c5kv"></output></label><label>prevalence <input type="range" id="c5p" min="0" max="8" step="1" value="4"><output id="c5pv"></output></label><button id="c5go">Re-simulate</button></div>
+ <div class="two"><canvas class="sm" id="c5cv"></canvas><canvas class="sm" id="c5cv2"></canvas></div><div class="stats" id="c5st"></div><div class="read" id="c5rd"></div></div>
+</section>
+
+<section class="ch" id="c6">
+<h2><span class="num">6</span>Resampling and class weights: what they do and do not do <span class="lvl e">Expert</span></h2>
+<p><b>Random undersampling</b> drops non-events; <b>random oversampling</b> duplicates events; <b>SMOTE</b> invents synthetic events by interpolating between neighbouring ones; <b>class weights</b> give each event a larger weight in the loss. They are popular, but they add no real information about events (duplicates and interpolations are functions of the existing ones) and they change the effective prevalence the model sees, so the fitted probabilities no longer match reality. For well-specified models such as logistic regression, studies generally find no consistent gain in discrimination and a clear loss of calibration; for some flexible learners they may help the ranking in the low-score region. Two rules: resample <em>only within training folds</em> (resampling before splitting puts copies of validation events in the training data and inflates every metric) and, if you need probabilities, undo the prior shift (chapter 7).</p>
+<div class="card"><h4>Lab 6 · Five ways to train the same model</h4>
+ <p class="sub">Five predictors, event rate as chosen, logistic fit. Methods: plain, 1:1 undersampling, 1:1 oversampling, SMOTE-like interpolation between random pairs of events, and balanced class weights. Averages over 20 data sets on 20,000 fresh cases: AUC, share of events in the top 5% of scores, mean predicted probability against the true prevalence, and log-loss before and after the exact prior correction.</p>
+ <div class="ctl"><label>cases <input type="range" id="c6n" min="0" max="3" step="1" value="2"><output id="c6nv"></output></label><label>prevalence <input type="range" id="c6p" min="0" max="8" step="1" value="3"><output id="c6pv"></output></label><button id="c6go">Re-simulate</button></div>
+ <div class="two"><canvas class="sm" id="c6cv"></canvas><canvas class="sm" id="c6cv2"></canvas></div><div class="tw" id="c6tb"></div><div class="stats" id="c6st"></div><div class="read" id="c6rd"></div></div>
+</section>
+
+<section class="ch" id="c7">
+<h2><span class="num">7</span>Prior correction and the cost of discarding data <span class="lvl e">Expert</span></h2>
+<p>If non-events are kept with probability r and events are all kept, the logistic model fitted to the sample has the <em>same slopes</em> but an intercept shifted by −ln r (King and Zeng). The correction is exact for this sampling design: <b>corrected intercept = fitted intercept + ln r</b> (equivalently, add ln of the ratio of population odds to sample odds). The price is variance: the discarded non-events carried information. For small prevalence π, the variance of the coefficients is inflated by roughly (1 + π/r), and more when the predictors are strong, so keeping r far above the prevalence costs little, while pushing the sample to 1:1 at a rare prevalence of 1% (r ≈ 1%) doubles the variance. Undersampling is therefore best seen as a computational shortcut for huge data, not a way to improve a model, and when used the intercept must be corrected.</p>
+<div class="card"><h4>Lab 7 · Slopes unaffected, intercept shifted by ln r, variance inflated</h4>
+ <p class="sub">20,000 cases, three predictors (effect 0.7). All events are kept; non-events kept with fraction r. Left: the average fitted intercept without and with the ln r correction, against the truth. Right: the SD of a slope coefficient relative to the full-data fit, against the approximation √(1 + π/r).</p>
+ <div class="ctl"><label>prevalence <input type="range" id="c7p" min="0" max="8" step="1" value="3"><output id="c7pv"></output></label><button id="c7go">Re-simulate</button></div>
+ <div class="two"><canvas class="sm" id="c7cv"></canvas><canvas class="sm" id="c7cv2"></canvas></div><div class="stats" id="c7st"></div><div class="read" id="c7rd"></div></div>
+</section>
+
+<section class="ch" id="c8">
+<h2><span class="num">8</span>Rare-event bias, separation and Firth’s method <span class="lvl e">Expert</span></h2>
+<p>Maximum likelihood for logistic regression is only asymptotically unbiased; with few events the coefficients are biased away from zero and, as King and Zeng showed, the predicted probability of a rare event tends to be too small. Worse, with few events and several predictors a combination can <b>separate</b> events from non-events perfectly (<em>complete or quasi-complete separation</em>): the likelihood then increases forever and the maximum likelihood estimate is infinite, producing absurd coefficients and standard errors. <b>Firth’s penalised likelihood</b> (a Jeffreys-prior penalty) removes the leading bias term, always gives finite estimates, and handles separation; profile-likelihood intervals are then preferred to Wald intervals. One caveat: the Firth penalty pulls predicted probabilities toward ½, so for very rare events the forecasts can be too high; variants such as FLIC and FLAC, or a recalibrated intercept, fix this. Ridge or Bayesian priors serve a similar purpose.</p>
+<div class="card"><h4>Lab 8 · Maximum likelihood versus Firth with few events</h4>
+ <p class="sub">The true model has an intercept set to give the chosen prevalence and slope 1 on the predictor of interest (plus the extra predictors with slope 0.5 each). Over 300 data sets of the chosen size: the distribution of the estimated slope for ML (red) and Firth (blue), with the truth marked.</p>
+ <div class="ctl"><label>cases <input type="range" id="c8n" min="100" max="2000" step="100" value="400"><output id="c8nv"></output></label><label>prevalence <input type="range" id="c8p" min="0" max="8" step="1" value="4"><output id="c8pv"></output></label><label>extra predictors <input type="range" id="c8k" min="0" max="6" step="1" value="3"><output id="c8kv"></output></label><button id="c8go">Re-simulate</button></div>
+ <canvas class="tl" id="c8cv"></canvas><div class="stats" id="c8st"></div><div class="read" id="c8rd"></div></div>
+</section>
+
+<section class="ch" id="c9">
+<h2><span class="num">9</span>Cost-sensitive learning: weights versus thresholds <span class="lvl e">Expert</span></h2>
+<p>If a miss costs w times a false alert, the best rule on <em>calibrated</em> probabilities is to flag when p ≥ 1/(1 + w). Training a model with weight w on the events multiplies the odds by w, so the weighted model’s probability is ≥ ½ exactly when the original p ≥ 1/(1 + w): <b>weighting and moving the threshold are the same decision rule</b> for a correct model. The difference is statistical: the weighted fit has higher variance (it up-weights a few events) and loses calibration, whereas fitting plainly and then choosing the threshold keeps usable probabilities. Loss modifications such as focal loss follow the same logic; they matter for flexible learners, not for the decision-theoretic principle.</p>
+<div class="card"><h4>Lab 9 · Expected cost: plain at 0.5, plain at t*, weighted at 0.5</h4>
+ <p class="sub">Four predictors (effect 0.6), 10,000 training cases, evaluated on 20,000 fresh ones; cost = (cost of a miss × misses + false alerts) per 1,000 cases, averaged over 30 data sets. “Oracle” uses the true probabilities at the cost-optimal threshold.</p>
+ <div class="ctl"><label>cost of a miss ÷ cost of a false alert <input type="range" id="c9r" min="0" max="8" step="1" value="4"><output id="c9rv"></output></label><label>prevalence <input type="range" id="c9p" min="0" max="8" step="1" value="3"><output id="c9pv"></output></label><button id="c9go">Re-simulate</button></div>
+ <canvas class="tl" id="c9cv"></canvas><div class="stats" id="c9st"></div><div class="read" id="c9rd"></div></div>
+</section>
+
+<div class="part">Part III · Evaluating and estimating</div>
+
+<section class="ch" id="c10">
+<h2><span class="num">10</span>Evaluating with few events <span class="lvl e">Expert</span></h2>
+<p>Every metric inherits the noise of the small class. The standard error of the AUC is driven by the number of events and non-events (Hanley and McNeil); with 20 events the 95% interval for an AUC of 0.85 is roughly ±0.1, and the PR-AUC and recall at a fixed alert volume are noisier still. Practical rules: use <b>stratified</b> splits and folds so every fold has events (random 5-fold CV with 25 events can leave a fold with 1 or 2); use <b>repeated</b> CV or bootstrap and report intervals; pool out-of-fold predictions to draw one PR curve; keep an <b>out-of-time</b> test set, and never choose the threshold on the test set. A model improvement smaller than the interval is not evidence.</p>
+<div class="card"><h4>Lab 10 · Noise in the metrics, and events per fold</h4>
+ <p class="sub">Left: the standard deviation of AUC, average precision (AP) and recall at 1% FPR when a test set has the given number of events (sample size = events ÷ prevalence, binormal scores), over 100 repetitions; the marker is your event count. Right: events per fold in random 5-fold CV with the chosen total number of events (binomial), against the stratified split (always equal).</p>
+ <div class="ctl"><label>prevalence <input type="range" id="c10p" min="0" max="8" step="1" value="3"><output id="c10pv"></output></label><label>separation d <input type="range" id="c10d" min="5" max="35" step="1" value="20"><output id="c10dv"></output></label><label>total events <input type="range" id="c10t" min="10" max="200" step="5" value="30"><output id="c10tv"></output></label><button id="c10go">Re-simulate</button></div>
+ <div class="two"><canvas class="sm" id="c10cv"></canvas><canvas class="sm" id="c10cv2"></canvas></div><div class="stats" id="c10st"></div><div class="read" id="c10rd"></div></div>
+</section>
+
+<section class="ch" id="c11">
+<h2><span class="num">11</span>Estimating a rare rate: when almost nothing has happened <span class="lvl e">Expert</span></h2>
+<p>A low-default portfolio with 0 defaults in 500 obligors does not have a default rate of 0. Estimating a rare proportion needs intervals that behave. The <b>Wald interval</b> p̂ ± 1.96 √(p̂(1 − p̂)/n) collapses to a point at 0 events and has poor coverage. The <b>Clopper–Pearson</b> (exact) interval guarantees at least 95% coverage (conservative); <b>Wilson</b> and <b>Jeffreys</b> (a Beta(½,½) prior) are close to nominal on average. At zero events the 95% upper bound is about 3/n (the “rule of three”); in credit risk the Pluto–Tasche approach for low-default portfolios builds a prudent upper estimate in the same spirit (and the Basel framework asks for conservative margins). Rating-grade back-testing with a handful of defaults has little power, so combine grades, use external information, and report upper bounds, not point estimates alone.</p>
+<div class="card"><h4>Lab 11 · Exact coverage of four intervals for a rare proportion</h4>
+ <p class="sub">For n cases and true rate p, the coverage of each nominal 95% interval is computed exactly by summing over every possible number of events. Curves: coverage against the true rate (0.05% to 5%). The bottom row of statistics shows what the intervals say after 0 events.</p>
+ <div class="ctl"><label>cases n <input type="range" id="c11n" min="0" max="4" step="1" value="2"><output id="c11nv"></output></label></div>
+ <canvas class="tl" id="c11cv"></canvas><div class="stats" id="c11st"></div><div class="read" id="c11rd"></div></div>
+</section>
+
+<section class="ch" id="c12">
+<h2><span class="num">12</span>Final exam, mastery checklist, cheat sheet <span class="lvl e">Expert</span></h2>
+<h3>Exam (18 questions — click an answer)</h3>
+<div id="quiz"></div>
+<div class="card"><h4>Score</h4><div class="stats" id="qscore"></div><button class="alt" id="qreset">Reset exam</button></div>
+<h3>Mastery checklist — tick when you can do it without notes</h3>
+<div class="card chk" id="chk"></div>
+<h3>Cheat sheet</h3>
+<div class="tw"><table>
+<tr><th>Idea</th><th>One line</th></tr>
+<tr><td>Accuracy paradox</td><td>Predicting “no event” is 99.5% accurate at 0.5% prevalence; use recall, precision, PR curves, MCC</td></tr>
+<tr><td>ROC vs PR</td><td>ROC-AUC is prevalence-free; precision falls with prevalence; PR baseline = prevalence</td></tr>
+<tr><td>PPV</td><td>sens·π / [sens·π + (1 − spec)(1 − π)]; tiny π means most alerts are false</td></tr>
+<tr><td>Operating point</td><td>F1 (threshold ≈ F*/2 for calibrated p), cost t* = c_FP/(c_FP + c_FN), or capacity top-m</td></tr>
+<tr><td>Information</td><td>Comes from events; ≥ 10 events per parameter is a minimum, check Riley-type criteria</td></tr>
+<tr><td>Resampling</td><td>No new information; shifts probabilities; do only inside training folds</td></tr>
+<tr><td>Prior correction</td><td>Undersample non-events with fraction r: add ln r to the intercept; slope variance × ≈ (1 + π/r)</td></tr>
+<tr><td>Rare-event bias</td><td>ML under-predicts event probability, can separate; use Firth, ridge or Bayesian priors</td></tr>
+<tr><td>Cost-sensitive</td><td>Weight w on events ≡ threshold 1/(1 + w) for a correct model; weighting costs variance and calibration</td></tr>
+<tr><td>Evaluation</td><td>Stratify, repeat, report intervals; out-of-time test; don’t tune the threshold on the test set</td></tr>
+<tr><td>Rare rates</td><td>Wald fails; Clopper–Pearson (conservative), Wilson, Jeffreys; 0 events → upper bound ≈ 3/n</td></tr>
+</table></div>
+<div class="co tip"><b>Next on the roadmap</b>Item 18 continues Stage 4: survival and time-to-event analysis.</div>
+</section>
+</main>
+<script>
+/*MATH*/
+function lgamma(x){const c=[76.18009172947146,-86.50532032941677,24.01409824083091,-1.231739572450155,0.1208650973866179e-2,-0.5395239384953e-5];let y=x,t=x+5.5;t-=(x+.5)*Math.log(t);let s=1.000000000190015;for(let j=0;j<6;j++)s+=c[j]/++y;return -t+Math.log(2.5066282746310005*s/x);}
+function gser(a,x){let ap=a,sum=1/a,del=sum;for(let n=0;n<1000;n++){ap++;del*=x/ap;sum+=del;if(Math.abs(del)<Math.abs(sum)*1e-15)break;}return sum*Math.exp(-x+a*Math.log(x)-lgamma(a));}
+function gcf(a,x){let b=x+1-a,c=1/1e-300,d=1/b,h=d;for(let i=1;i<1000;i++){const an=-i*(i-a);b+=2;d=an*d+b;if(Math.abs(d)<1e-300)d=1e-300;c=b+an/c;if(Math.abs(c)<1e-300)c=1e-300;d=1/d;const del=d*c;h*=del;if(Math.abs(del-1)<1e-15)break;}return Math.exp(-x+a*Math.log(x)-lgamma(a))*h;}
+function gammaQ(a,x){if(x<=0)return 1;return x<a+1?1-gser(a,x):gcf(a,x);}
+function betacf(a,b,x){const qab=a+b,qap=a+1,qam=a-1;let c=1,d=1-qab*x/qap;if(Math.abs(d)<1e-300)d=1e-300;d=1/d;let h=d;for(let m=1;m<=1000;m++){const m2=2*m;let aa=m*(b-m)*x/((qam+m2)*(a+m2));d=1+aa*d;if(Math.abs(d)<1e-300)d=1e-300;c=1+aa/c;if(Math.abs(c)<1e-300)c=1e-300;d=1/d;h*=d*c;aa=-(a+m)*(qab+m)*x/((a+m2)*(qap+m2));d=1+aa*d;if(Math.abs(d)<1e-300)d=1e-300;c=1+aa/c;if(Math.abs(c)<1e-300)c=1e-300;d=1/d;const del=d*c;h*=del;if(Math.abs(del-1)<1e-15)break;}return h;}
+function betai(a,b,x){if(x<=0)return 0;if(x>=1)return 1;const bt=Math.exp(lgamma(a+b)-lgamma(a)-lgamma(b)+a*Math.log(x)+b*Math.log(1-x));return x<(a+1)/(a+b+2)?bt*betacf(a,b,x)/a:1-bt*betacf(b,a,1-x)/b;}
+function normSf(z){const q=0.5*gammaQ(.5,z*z/2);return z>=0?q:1-q;}
+function normCdf(z){return normSf(-z);}
+function npdf(x){return Math.exp(-x*x/2)/2.5066282746310002;}
+function lbin(n,k){return lgamma(n+1)-lgamma(k+1)-lgamma(n-k+1);}
+function binom(n,k,p){return Math.exp(lbin(n,k)+k*Math.log(p)+(n-k)*Math.log(1-p));}
+function betapdf(x,a,b){return x<=0||x>=1?0:Math.exp(lgamma(a+b)-lgamma(a)-lgamma(b)+(a-1)*Math.log(x)+(b-1)*Math.log(1-x));}
+function betacdf(x,a,b){return betai(a,b,x);}
+function gampdf(x,a,r){return x<=0?0:Math.exp(a*Math.log(r)+(a-1)*Math.log(x)-r*x-lgamma(a));}
+function gamcdf(x,a,r){return x<=0?0:1-gammaQ(a,r*x);}
+function randn(){let u=0;while(!u)u=Math.random();return Math.sqrt(-2*Math.log(u))*Math.cos(2*Math.PI*Math.random());}
+function gammaS(a){if(a<1)return gammaS(a+1)*Math.pow(Math.random(),1/a);const d=a-1/3,c=1/Math.sqrt(9*d);for(;;){let x,v;do{x=randn();v=1+c*x}while(v<=0);v=v*v*v;const u=Math.random();if(Math.log(u)<.5*x*x+d-d*v+d*Math.log(v))return d*v;}}
+function betaS(a,b){const x=gammaS(a),y=gammaS(b);return x/(x+y);}
+function binS(n,p){let k=0;for(let i=0;i<n;i++)if(Math.random()<p)k++;return k;}
+function mean(a){let s=0;for(const v of a)s+=v;return s/a.length;}
+function qc(cdf,lo,hi,p,it){for(let i=0;i<(it||100);i++){const m=(lo+hi)/2;if(cdf(m)<p)lo=m;else hi=m}return(lo+hi)/2;}
+function qb(a,b,p){return qc(x=>betai(a,b,x),0,1,p,50);}
+function tcdf(x,v){const t=.5*betai(v/2,.5,v/(v+x*x));return x>0?1-t:t}
+function qn(p){return qc(normCdf,-9,9,p,70)}
+function pois(k,l){return Math.exp(-l+k*Math.log(l)-lgamma(k+1))}
+function binF(n,p){let k=0;for(;;){if(n<=0||p<=0)return k;if(p>=1)return k+n;if(n<=40){for(let i=0;i<n;i++)if(Math.random()<p)k++;return k}const a=1+(n>>1),bb=1+n-a,x=betaS(a,bb);if(x>=p){n=a-1;p=p/x}else{k+=a;n=bb-1;p=(p-x)/(1-x)}}}
+/*ENDMATH*/
+
+const $=id=>document.getElementById(id), val=id=>+$(id).value;
+const C={fg:'#e8ebf5',mu:'#8a93ab',gr:'#232a3d',a:'#6ea8ff',r:'#ff6b81',y:'#ffd166',g:'#4ade80',p:'#c084fc',t:'#5eead4'};
+const store={get(k,d){try{const v=JSON.parse(localStorage.getItem(k));return v==null?d:v}catch(e){return d}},set(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}};
+function stat(l,v,c){return `<div class="stat ${c||''}"><b>${v}</b><span>${l}</span></div>`}
+function f3(x){if(!isFinite(x))return String(x);const a=Math.abs(x);if(a!==0&&(a<1e-3||a>=1e6))return x.toExponential(2);return String(+x.toFixed(a<1?4:a<100?3:a<1000?2:0))}
+function pc(x){return f3(100*x)+'%'}
+const resizers=[];
+function reg(fn){fn();resizers.push(fn)}
+function on(ids,fn){ids.split(' ').forEach(i=>{const e=$(i);e.addEventListener('input',fn);e.addEventListener('change',fn)})}
+let rt;window.addEventListener('resize',()=>{clearTimeout(rt);rt=setTimeout(()=>resizers.forEach(f=>f()),150)});
+document.querySelectorAll('input[type=range]').forEach(i=>{const o=$(i.id+'v');if(!o)return;const f=()=>{o.textContent=i.value};i.addEventListener('input',f);f()});
+
+function nice(x){const e=Math.pow(10,Math.floor(Math.log10(x))),f=x/e;return (f<1.5?1:f<3?2:f<7?5:10)*e}
+function mk(cv,x0,x1,ymax,o){o=o||{};const y0=o.y0||0,dpr=window.devicePixelRatio||1,r=cv.getBoundingClientRect(),w=r.width||600,h=r.height||270;
+ cv.width=w*dpr;cv.height=h*dpr;const g=cv.getContext('2d');g.setTransform(dpr,0,0,dpr,0,0);g.clearRect(0,0,w,h);
+ const L=o.L||42,R=12,T=14,B=28,X=x=>L+(x-x0)/(x1-x0)*(w-L-R),Y=y=>h-B-(y-y0)/(ymax-y0)*(h-T-B);
+ g.font='11px system-ui';g.lineWidth=1;g.strokeStyle=C.gr;g.fillStyle=C.mu;
+ if(!o.noGrid){const sx=nice((x1-x0)/7);for(let x=Math.ceil(x0/sx-1e-9)*sx;!o.noX&&x<=x1+1e-9;x+=sx){g.beginPath();g.moveTo(X(x),T);g.lineTo(X(x),h-B);g.stroke();g.textAlign='center';g.fillText(String(+x.toFixed(6)),X(x),h-B+15)}
+ const sy=nice((ymax-y0)/4);for(let y=Math.ceil(y0/sy-1e-9)*sy;y<=ymax+1e-9;y+=sy){g.beginPath();g.moveTo(L,Y(y));g.lineTo(w-R,Y(y));g.stroke();g.textAlign='right';g.fillText(String(+y.toFixed(4)),L-5,Y(y)+3)}}
+ return{g,w,h,X,Y,L,R,T,B,
+  line(f,col,lw,a,b,n,dash){a=a==null?x0:a;b=b==null?x1:b;n=n||260;g.save();if(dash)g.setLineDash([5,4]);g.beginPath();g.strokeStyle=col;g.lineWidth=lw||2;let st=false;for(let i=0;i<=n;i++){const x=a+(b-a)*i/n,y=f(x);if(!isFinite(y)){st=false;continue}st?g.lineTo(X(x),Y(y)):g.moveTo(X(x),Y(y));st=true}g.stroke();g.restore()},
+  area(f,a,b,col,n){a=Math.max(a,x0);b=Math.min(b,x1);if(b<=a)return;n=n||200;g.beginPath();g.moveTo(X(a),Y(0));for(let i=0;i<=n;i++){const x=a+(b-a)*i/n;g.lineTo(X(x),Y(f(x)))}g.lineTo(X(b),Y(0));g.closePath();g.fillStyle=col;g.fill()},
+  vline(x,col,lab,dash){g.save();g.strokeStyle=col;g.lineWidth=1.6;if(dash)g.setLineDash([5,4]);g.beginPath();g.moveTo(X(x),T);g.lineTo(X(x),h-B);g.stroke();g.restore();if(lab){g.fillStyle=col;g.textAlign='center';g.fillText(lab,Math.min(Math.max(X(x),34),w-34),T+10)}},
+  hline(y,col,lab){g.save();g.strokeStyle=col;g.lineWidth=1.4;g.setLineDash([5,4]);g.beginPath();g.moveTo(L,Y(y));g.lineTo(w-R,Y(y));g.stroke();g.restore();if(lab){g.fillStyle=col;g.textAlign='right';g.fillText(lab,w-R-3,Y(y)-4)}},
+  text(s,x,y,col,al){g.fillStyle=col||C.fg;g.textAlign=al||'left';g.fillText(s,x,y)}};}
+
+/* ---------- shared helpers for this page ---------- */
+const D={
+ norm:{n:'Normal(0,1)',s:()=>randn(),mu:0,sd:1,sk:0},
+ unif:{n:'Uniform(0,1)',s:()=>Math.random(),mu:.5,sd:Math.sqrt(1/12),sk:0},
+ expo:{n:'Exponential(1)',s:()=>-Math.log(1-Math.random()),mu:1,sd:1,sk:2},
+ logn:{n:'Lognormal(0,1)',s:()=>Math.exp(randn()),mu:Math.exp(.5),sd:Math.sqrt((Math.E-1)*Math.E),sk:(Math.E+2)*Math.sqrt(Math.E-1),disc:0},
+ b05:{n:'Bernoulli(0.5)',s:()=>Math.random()<.5?1:0,mu:.5,sd:.5,sk:0,disc:1},
+ b05s:{n:'Bernoulli(0.05)',s:()=>Math.random()<.05?1:0,mu:.05,sd:Math.sqrt(.0475),sk:.9/Math.sqrt(.0475),disc:1},
+ bimo:{n:'Two humps',s:()=>(Math.random()<.5?-2:2)+.5*randn(),mu:0,sd:Math.sqrt(4.25),sk:0},
+ par5:{n:'Pareto(α=5)',s:()=>Math.pow(1-Math.random(),-.2),mu:1.25,sd:Math.sqrt(5/48),sk:6*Math.sqrt(.6)},
+ cauchy:{n:'Cauchy (no mean)',s:()=>Math.tan(Math.PI*(Math.random()-.5)),mu:NaN,sd:Infinity,sk:NaN}
+};
+function fillSel(id,keys,def){const e=$(id);e.innerHTML=keys.map(k=>`<option value="${k}">${D[k].n}</option>`).join('');e.value=def}
+const PAL=[C.a,C.r,C.y,C.g,C.p,C.t,'#ff9f43','#9aa4bf'];
+function tgrid(N,M){const T=[];let prev=0;for(let i=0;i<M;i++){let n=Math.round(Math.pow(10,Math.log10(N)*i/(M-1)));if(i===M-1)n=N;n=Math.max(prev+1,n);if(n>N)break;T.push(n);prev=n}if(T[T.length-1]!==N)T[T.length-1]=N;return T}
+function nlab(n){return n>=1e6?(n/1e6)+'M':n>=1000?(n/1000)+'k':String(n)}
+function customGrid(P,xt,yt){const g=P.g;g.save();g.strokeStyle=C.gr;g.fillStyle=C.mu;g.font='11px system-ui';g.lineWidth=1;
+ xt.forEach(([v,l])=>{g.beginPath();g.moveTo(P.X(v),P.T);g.lineTo(P.X(v),P.h-P.B);g.stroke();g.textAlign='center';g.fillText(l,P.X(v),P.h-P.B+15)});
+ yt.forEach(([v,l])=>{g.beginPath();g.moveTo(P.L,P.Y(v));g.lineTo(P.w-P.R,P.Y(v));g.stroke();g.textAlign='right';g.fillText(l,P.L-5,P.Y(v)+3)});g.restore()}
+function clip(P,fn){const g=P.g;g.save();g.beginPath();g.rect(P.L,P.T,P.w-P.L-P.R,P.h-P.T-P.B);g.clip();fn();g.restore()}
+function poly(P,pts,col,lw,dash){const g=P.g;g.save();if(dash)g.setLineDash([5,4]);g.strokeStyle=col;g.lineWidth=lw||2;g.beginPath();pts.forEach(([x,y],i)=>i?g.lineTo(P.X(x),P.Y(y)):g.moveTo(P.X(x),P.Y(y)));g.stroke();g.restore()}
+function dots(P,pts,col,r){const g=P.g;g.fillStyle=col;pts.forEach(([x,y])=>{g.beginPath();g.arc(P.X(x),P.Y(y),r||3,0,7);g.fill()})}
+function niceTicks(lo,hi,k){const st=nice((hi-lo)/(k||5)),a=[];for(let v=Math.ceil(lo/st-1e-9)*st;v<=hi+1e-9;v+=st)a.push([v,String(+v.toFixed(6))]);return a}
+function logTicks(lo,hi){const a=[];for(let e=Math.ceil(lo-1e-9);e<=hi+1e-9;e++)a.push([e,nlab(Math.pow(10,e))]);return a}
+function mom(a){const n=a.length;let m=0;for(const v of a)m+=v;m/=n;let v2=0,v3=0,v4=0;for(const v of a){const d=v-m;v2+=d*d;v3+=d*d*d;v4+=d*d*d*d}v2/=n;v3/=n;v4/=n;const sd=Math.sqrt(v2);return{n,m,sd,sk:sd>0?v3/(sd*sd*sd):0,ku:v2>0?v4/(v2*v2)-3:0}}
+function ksN(z){const a=Array.from(z).sort((x,y)=>x-y),n=a.length;let d=0;for(let i=0;i<n;i++){const F=normCdf(a[i]);d=Math.max(d,Math.abs((i+1)/n-F),Math.abs(i/n-F))}return d}
+/* histogram of data as density with optional overlay curves [{f,col,lw,dash}] */
+function hist(cv,data,lo,hi,bins,ov,col){const cnt=new Float64Array(bins),bw=(hi-lo)/bins;let n=0;for(const v of data){if(v<lo||v>=hi)continue;cnt[Math.floor((v-lo)/bw)]++;n++}
+ const N=data.length;let ym=0;for(let i=0;i<bins;i++){cnt[i]/=N*bw;ym=Math.max(ym,cnt[i])}
+ (ov||[]).forEach(o=>{for(let i=0;i<=80;i++)ym=Math.max(ym,o.f(lo+(hi-lo)*i/80)||0)});
+ const P=mk(cv,lo,hi,ym*1.12);
+ P.g.fillStyle=col||'rgba(110,168,255,.5)';for(let i=0;i<bins;i++){if(cnt[i]<=0)continue;const a=P.X(lo+i*bw),b=P.X(lo+(i+1)*bw);P.g.fillRect(a,P.Y(cnt[i]),Math.max(1,b-a-1),P.Y(0)-P.Y(cnt[i]))}
+ (ov||[]).forEach(o=>P.line(o.f,o.col,o.lw||2.4,lo,hi,200,o.dash));return P}
+const fmt=x=>f3(x);
+
+/* ---------- shared for this page ---------- */
+const POPS=['norm','unif','expo','logn','bimo','par5'];
+D.norm.med=0;D.norm.q90=1.2815516;D.unif.med=.5;D.unif.q90=.9;D.expo.med=Math.LN2;D.expo.q90=Math.log(10);D.logn.med=1;D.logn.q90=Math.exp(1.2815516);
+D.bimo.med=0;D.bimo.q90=qc(x=>.5*normCdf((x+2)/.5)+.5*normCdf((x-2)/.5),-10,10,.9,80);D.par5.med=Math.pow(2,.2);D.par5.q90=Math.pow(10,.2);
+const SF={mean:a=>mean(a),median:a=>{const b=Float64Array.from(a).sort(),n=b.length;return n%2?b[(n-1)/2]:(b[n/2-1]+b[n/2])/2},sd:a=>{const n=a.length,m=mean(a);let s=0;for(const v of a)s+=(v-m)*(v-m);return Math.sqrt(s/(n-1))},q90:a=>{const b=Float64Array.from(a).sort();return b[Math.round(.9*(b.length-1))]}};
+function truth(key,st){const d=D[key];return st==='mean'?d.mu:st==='median'?d.med:st==='sd'?d.sd:d.q90}
+const SNAME={mean:'sample mean',median:'sample median',sd:'sample SD',q90:'90th percentile'};
+const N10=[2,3,5,10,20,50,100,200,500,1000];
+function pct(a,p){const b=Float64Array.from(a).sort();return b[Math.min(b.length-1,Math.max(0,Math.floor(p*b.length)))]}
+function histLines(cv,arrs,cols,lo,hi,bins,vl){const bw=(hi-lo)/bins,dens=arrs.map(a=>{const c=new Float64Array(bins);for(const v of a){if(v<lo||v>=hi)continue;c[Math.floor((v-lo)/bw)]++}for(let i=0;i<bins;i++)c[i]/=a.length*bw;return c});let ym=0;dens.forEach(c=>c.forEach(v=>ym=Math.max(ym,v)));const P=mk(cv,lo,hi,ym*1.15||1);
+ dens.forEach((c,k)=>{const pts=[];for(let i=0;i<bins;i++){pts.push([lo+i*bw,c[i]]);pts.push([lo+(i+1)*bw,c[i]])}clip(P,()=>poly(P,pts,cols[k],2.2))});(vl||[]).forEach(v=>P.vline(v[0],v[1],v[2],v[3]));return P}
+function sdOf(a){return mom(a).sd}
+
+/* ---------- ML helpers ---------- */
+function digamma(x){let r=0;while(x<6){r-=1/x;x++}const f=1/(x*x);return r+Math.log(x)-.5/x-f*(1/12-f*(1/120-f/252))}
+function trigamma(x){let r=0;while(x<6){r+=1/(x*x);x++}const f=1/(x*x);return r+1/x+.5*f+f/x*(1/6-f*(1/30-f/42))}
+function poisS(l){if(l<=0)return 0;if(l<30){const L=Math.exp(-l);let k=0,p=1;do{k++;p*=Math.random()}while(p>L);return k-1}const m=Math.floor(.875*l),g=gammaS(m);return g<l?m+poisS(l-g):binF(m-1,l/g)}
+function llb(k,n,p){return(k?k*Math.log(p):0)+(n-k?(n-k)*Math.log(1-p):0)}
+function lrInt(k,n,cut){const ph=k/n,l0=llb(k,n,ph),g=p=>2*(l0-llb(k,n,p))-cut;let lo=0,hi=1;
+ if(k>0){let a=1e-12,b=ph;for(let i=0;i<70;i++){const m=(a+b)/2;if(g(m)>0)a=m;else b=m}lo=(a+b)/2}
+ if(k<n){let a=ph,b=1-1e-12;for(let i=0;i<70;i++){const m=(a+b)/2;if(g(m)>0)b=m;else a=m}hi=(a+b)/2}return[lo,hi]}
+function solveAlpha(s){if(!(s>1e-9))return 1e6;let a=(3-s+Math.sqrt((3-s)*(3-s)+24*s))/(12*s);for(let i=0;i<8;i++){const f=Math.log(a)-digamma(a)-s,fp=1/a-trigamma(a);let n=a-f/fp;if(!(n>0))n=a/2;a=n}return a}
+function normPdfAt(x,m,s){return Math.exp(-(x-m)*(x-m)/(2*s*s))/(s*2.5066282746)}
+/* ---------- Regression helpers ---------- */
+function idx(id,arr,ff){const e=$(id),o=$(id+'v'),f=()=>{o.textContent=ff?ff(arr[+e.value]):arr[+e.value]};e.addEventListener('input',f);f()}
+function scl(id,ff){const e=$(id),o=$(id+'v'),f=()=>{o.textContent=ff(+e.value)};e.addEventListener('input',f);f()}
+function pctTicks(a,b,st){const r=[];for(let v=a;v<=b+1e-9;v+=st)r.push([v,Math.round(v*100)+'%']);return r}
+const _tq={};function tq(v,p){const k=v+'_'+p;return _tq[k]||(_tq[k]=qc(x=>tcdf(x,v),0,500,p,80))}
+function simple(x,y){const n=x.length;let xm=0,ym=0;for(let i=0;i<n;i++){xm+=x[i];ym+=y[i]}xm/=n;ym/=n;let sxx=0,sxy=0,syy=0;for(let i=0;i<n;i++){const dx=x[i]-xm,dy=y[i]-ym;sxx+=dx*dx;sxy+=dx*dy;syy+=dy*dy}const b=sxy/sxx,a=ym-b*xm,res=new Float64Array(n);let sse=0;for(let i=0;i<n;i++){res[i]=y[i]-a-b*x[i];sse+=res[i]*res[i]}return{n,xm,ym,sxx,sxy,syy,b,a,res,sse,sst:syy,r2:1-sse/syy}}
+function gj(A,B){const p=A.length;const M=A.map((r,i)=>Array.from(r).concat(B?[B[i]]:[]));for(let c=0;c<p;c++){let m=c;for(let r=c+1;r<p;r++)if(Math.abs(M[r][c])>Math.abs(M[m][c]))m=r;[M[c],M[m]]=[M[m],M[c]];const d=M[c][c]||1e-12;for(let k=c;k<M[c].length;k++)M[c][k]/=d;for(let r=0;r<p;r++)if(r!==c){const f=M[r][c];if(f!==0)for(let k=c;k<M[c].length;k++)M[r][k]-=f*M[c][k]}}return M}
+function olsMulti(cols,y,needInv){const n=y.length,k=cols.length,p=k+1,A=[],B=new Float64Array(p);for(let i=0;i<p;i++)A.push(new Float64Array(p));
+ for(let r=0;r<n;r++){const row=[1];for(let j=0;j<k;j++)row.push(cols[j][r]);for(let i=0;i<p;i++){B[i]+=row[i]*y[r];for(let j=i;j<p;j++)A[i][j]+=row[i]*row[j]}}
+ for(let i=0;i<p;i++){for(let j=0;j<i;j++)A[i][j]=A[j][i];if(i>0)A[i][i]+=1e-9}
+ let beta,inv=null;if(needInv){const I=[];for(let i=0;i<p;i++){const e=new Float64Array(p);e[i]=1;I.push(e)}const M=gj(A,null);const aug=A.map((r,i)=>Array.from(r).concat(Array.from(I[i])));
+  const m=aug;for(let c=0;c<p;c++){let q=c;for(let r=c+1;r<p;r++)if(Math.abs(m[r][c])>Math.abs(m[q][c]))q=r;[m[c],m[q]]=[m[q],m[c]];const d=m[c][c]||1e-12;for(let kk=0;kk<2*p;kk++)m[c][kk]/=d;for(let r=0;r<p;r++)if(r!==c){const f=m[r][c];if(f!==0)for(let kk=0;kk<2*p;kk++)m[r][kk]-=f*m[c][kk]}}
+  inv=m.map(r=>r.slice(p));beta=inv.map(r=>{let s=0;for(let j=0;j<p;j++)s+=r[j]*B[j];return s})}
+ else{const M=gj(A,B);beta=M.map(r=>r[p])}
+ const res=new Float64Array(n);let sse=0;for(let r=0;r<n;r++){let f=beta[0];for(let j=0;j<k;j++)f+=beta[j+1]*cols[j][r];res[r]=y[r]-f;sse+=res[r]*res[r]}
+ const out={beta,res,sse,n,p,inv};if(inv){const s2=sse/(n-p);out.s2=s2;out.se=inv.map((r,i)=>Math.sqrt(s2*r[i]))}return out}
+function scatterAxes(cv,xs,ys,xlo,xhi,ylo,yhi,L){return mk(cv,xlo,xhi,yhi,{y0:ylo,L:L||44})}
+function range(a,pad){let lo=1e99,hi=-1e99;for(const v of a){if(v<lo)lo=v;if(v>hi)hi=v}const w=(hi-lo)||1;return[lo-(pad||.05)*w,hi+(pad||.05)*w]}
+
+
+function bars(P,groups,cols,yt){/* groups: array of arrays of values (0..1) */const g=P.g,G=groups.length,B=groups[0].length,W=(P.w-P.L-P.R)/G;groups.forEach((vals,gi)=>vals.forEach((v,bi)=>{const bw=W*.78/B,x=P.L+W*gi+W*.11+bw*bi;g.fillStyle=cols[bi];g.fillRect(x,P.Y(v),bw-2,P.Y(0)-P.Y(v));g.fillStyle=C.fg;g.textAlign='center';g.font='10px system-ui';g.fillText(Math.round(v*100)+'%',x+bw/2-1,P.Y(v)-3)}));g.font='11px system-ui'}
+function gridG(P,yt,labels){customGrid(P,[],yt);const G=labels.length,W=(P.w-P.L-P.R)/G;P.g.fillStyle=C.mu;P.g.textAlign='center';labels.forEach((l,i)=>P.g.fillText(l,P.L+W*(i+.5),P.h-P.B+15))}
+function legend(P,items,y){let x=P.L+8;items.forEach(([s,c])=>{P.text('■ '+s,x,y,c);x+=P.g.measureText('■ '+s).width+16})}
+
+/* ---------- GLM machinery ---------- */
+const LK={logit:{mu:e=>1/(1+Math.exp(-e)),d:e=>{const m=1/(1+Math.exp(-e));return m*(1-m)}},
+ probit:{mu:e=>normCdf(e),d:e=>npdf(e)},
+ cll:{mu:e=>1-Math.exp(-Math.exp(e)),d:e=>Math.exp(e-Math.exp(e))},
+ log:{mu:e=>Math.exp(e),d:e=>Math.exp(e)}};
+function minv(A){const p=A.length,m=A.map((r,i)=>{const row=Array.from(r);for(let j=0;j<p;j++)row.push(i===j?1:0);return row});
+ for(let c=0;c<p;c++){let q=c;for(let r=c+1;r<p;r++)if(Math.abs(m[r][c])>Math.abs(m[q][c]))q=r;[m[c],m[q]]=[m[q],m[c]];const d=m[c][c]||1e-12;for(let k=0;k<2*p;k++)m[c][k]/=d;for(let r=0;r<p;r++)if(r!==c){const f=m[r][c];if(f!==0)for(let k=0;k<2*p;k++)m[r][k]-=f*m[c][k]}}
+ return m.map(r=>r.slice(p))}
+function glm(cols,y,o){o=o||{};const n=y.length,k=cols.length,p=k+1,fam=o.fam||'binom',L=LK[o.link||(fam==='pois'?'log':'logit')],off=o.off,X=[new Float64Array(n).fill(1)].concat(cols),V=m=>fam==='pois'?m:m*(1-m);
+ let b=new Float64Array(p);if(o.init)b=Float64Array.from(o.init);else if(fam==='pois'){let m=0;for(const v of y)m+=v;b[0]=Math.log(Math.max(m/n,1e-3))-(off?mean(off):0)}
+ function ev(b){const eta=new Float64Array(n),mu=new Float64Array(n);let ll=0;for(let i=0;i<n;i++){let e=off?off[i]:0;for(let j=0;j<p;j++)e+=b[j]*X[j][i];e=Math.max(-30,Math.min(30,e));eta[i]=e;let m=L.mu(e);m=fam==='binom'?Math.min(1-1e-12,Math.max(1e-12,m)):Math.max(m,1e-12);mu[i]=m;ll+=fam==='pois'?y[i]*Math.log(m)-m-lgamma(y[i]+1):y[i]*Math.log(m)+(1-y[i])*Math.log(1-m)}return{eta,mu,ll}}
+ function info(c){const A=[];for(let i=0;i<p;i++)A.push(new Float64Array(p));const w=new Float64Array(n);for(let r=0;r<n;r++){const d=L.d(c.eta[r]),wi=d*d/V(c.mu[r]);w[r]=wi;for(let i=0;i<p;i++){const xi=X[i][r]*wi;for(let j=i;j<p;j++)A[i][j]+=xi*X[j][r]}}for(let i=0;i<p;i++)for(let j=0;j<i;j++)A[i][j]=A[j][i];return{A,w}}
+ let cur=ev(b),it=0,conv=false,maxit=o.maxit==null?40:o.maxit;
+ for(;it<maxit;it++){const{A,w}=info(cur),Ai=minv(A),g=new Float64Array(p);
+  for(let r=0;r<n;r++){const d=L.d(cur.eta[r]),v=V(cur.mu[r]);let s=(y[r]-cur.mu[r])*d/v;if(o.firth){let h=0;for(let i=0;i<p;i++)for(let j=0;j<p;j++)h+=X[i][r]*Ai[i][j]*X[j][r];h*=w[r];s+=h*(.5-cur.mu[r])}for(let i=0;i<p;i++)g[i]+=X[i][r]*s}
+  const st=new Float64Array(p);let mx=0;for(let i=0;i<p;i++){let s=0;for(let j=0;j<p;j++)s+=Ai[i][j]*g[j];st[i]=s}
+  if(o.firth){for(let i=0;i<p;i++){st[i]=Math.max(-1,Math.min(1,st[i]));mx=Math.max(mx,Math.abs(st[i]))}b=b.map((v,i)=>v+st[i]);cur=ev(b);if(mx<1e-8){conv=true;it++;break}}
+  else{let a=1,nb,nc;for(let h=0;h<25;h++){nb=b.map((v,i)=>v+a*st[i]);nc=ev(nb);if(nc.ll>=cur.ll-1e-10)break;a/=2}for(let i=0;i<p;i++)mx=Math.max(mx,Math.abs(a*st[i]));const dl=Math.abs(nc.ll-cur.ll);b=nb;cur=nc;if(mx<1e-8||dl<1e-11){conv=true;it++;break}}}
+ const{A,w}=info(cur),Ai=minv(A),se=Ai.map((r,i)=>Math.sqrt(Math.max(r[i],0)));let dev;
+ if(fam==='binom')dev=-2*cur.ll;else{dev=0;for(let i=0;i<n;i++){const yy=y[i],m=cur.mu[i];dev+=2*((yy>0?yy*Math.log(yy/m):0)-(yy-m))}}
+ return{beta:b,mu:cur.mu,eta:cur.eta,ll:cur.ll,dev,inv:Ai,se,iter:it,conv,X,w,p,n,A}}
+function auc(sc,y){const n=y.length,idx=Array.from({length:n},(_,i)=>i).sort((a,b)=>sc[a]-sc[b]);let rk=0,np=0,i=0;while(i<n){let j=i;while(j+1<n&&sc[idx[j+1]]===sc[idx[i]])j++;const r=(i+j)/2+1;for(let t=i;t<=j;t++)if(y[idx[t]]===1){rk+=r;np++}i=j+1}const nn=n-np;return np&&nn?(rk-np*(np+1)/2)/(np*nn):.5}
+function sepTest(x,y){let a1=1e99,b1=-1e99,a0=1e99,b0=-1e99,n1=0,n0=0;for(let i=0;i<x.length;i++){if(y[i]===1){n1++;a1=Math.min(a1,x[i]);b1=Math.max(b1,x[i])}else{n0++;a0=Math.min(a0,x[i]);b0=Math.max(b0,x[i])}}return n1>0&&n0>0&&(a1>b0||a0>b1)}
+const sig=e=>1/(1+Math.exp(-e));
+function lgt(p){return Math.log(p/(1-p))}
+function binaryData(n,a,b,sd){const x=new Float64Array(n),y=new Float64Array(n);for(let i=0;i<n;i++){x[i]=(sd||1)*randn();y[i]=Math.random()<sig(a+b*x[i])?1:0}return{x,y}}
+function heat(P,gx,gy,vals,x0,x1,y0,y1){const g=P.g,nx=gx,ny=gy;let mn=1e99,mx=-1e99;vals.forEach(v=>{if(isFinite(v)){mn=Math.min(mn,v);mx=Math.max(mx,v)}});mn=Math.max(mn,mx-30);for(let i=0;i<nx;i++)for(let j=0;j<ny;j++){const v=vals[i*ny+j],t=isFinite(v)?Math.max(0,Math.min(1,(v-mn)/(mx-mn))):0,tt=Math.pow(t,1.6),c=Math.round(40+190*tt);g.fillStyle=`rgb(${Math.round(20+60*tt)},${Math.round(30+100*tt)},${c})`;const xa=P.X(x0+(x1-x0)*i/nx),xb=P.X(x0+(x1-x0)*(i+1)/nx),ya=P.Y(y0+(y1-y0)*j/ny),yb=P.Y(y0+(y1-y0)*(j+1)/ny);g.fillRect(xa,Math.min(ya,yb),xb-xa+1,Math.abs(ya-yb)+1)}}
+
+/* ---------- regularisation machinery ---------- */
+function eigSym(A){const p=A.length,a=A.map(r=>Float64Array.from(r)),V=[];for(let i=0;i<p;i++){const r=new Float64Array(p);r[i]=1;V.push(r)}
+ for(let sw=0;sw<60;sw++){let off=0;for(let i=0;i<p;i++)for(let j=i+1;j<p;j++)off+=a[i][j]*a[i][j];if(off<1e-22)break;
+  for(let pp=0;pp<p-1;pp++)for(let q=pp+1;q<p;q++){if(Math.abs(a[pp][q])<1e-15)continue;const th=(a[q][q]-a[pp][pp])/(2*a[pp][q]),t=(th>=0?1:-1)/(Math.abs(th)+Math.sqrt(th*th+1)),c=1/Math.sqrt(t*t+1),s=t*c;
+   for(let k=0;k<p;k++){const x=a[k][pp],y=a[k][q];a[k][pp]=c*x-s*y;a[k][q]=s*x+c*y}
+   for(let k=0;k<p;k++){const x=a[pp][k],y=a[q][k];a[pp][k]=c*x-s*y;a[q][k]=s*x+c*y}
+   for(let k=0;k<p;k++){const x=V[k][pp],y=V[k][q];V[k][pp]=c*x-s*y;V[k][q]=s*x+c*y}}}
+ return{d:a.map((r,i)=>r[i]),V}}
+function stdz(cols,y){const n=y.length,p=cols.length,mu=[],sd=[],Z=[];for(let j=0;j<p;j++){let m=0;for(let i=0;i<n;i++)m+=cols[j][i];m/=n;let v=0;for(let i=0;i<n;i++){const d=cols[j][i]-m;v+=d*d}const s=Math.sqrt(v/n)||1;mu.push(m);sd.push(s);const z=new Float64Array(n);for(let i=0;i<n;i++)z[i]=(cols[j][i]-m)/s;Z.push(z)}let ym=0;for(const v of y)ym+=v;ym/=n;return{Z,mu,sd,ym,yc:Float64Array.from(y,v=>v-ym),n,p}}
+function gramOf(Z,yc,idx){const p=Z.length,n=idx?idx.length:yc.length,G=[],c=new Float64Array(p);for(let i=0;i<p;i++)G.push(new Float64Array(p));
+ for(let r=0;r<n;r++){const i=idx?idx[r]:r;for(let a=0;a<p;a++){const za=Z[a][i];c[a]+=za*yc[i];for(let b=a;b<p;b++)G[a][b]+=za*Z[b][i]}}
+ for(let a=0;a<p;a++){c[a]/=n;for(let b=a;b<p;b++){G[a][b]/=n;G[b][a]=G[a][b]}}return{G,c,n}}
+function gramMinus(F,Z,yc,val){const p=F.c.length,nv=val.length,nt=F.n-nv,G=[],c=new Float64Array(p);for(let i=0;i<p;i++){G.push(new Float64Array(p));c[i]=F.c[i]*F.n}for(let a=0;a<p;a++)for(let b=0;b<p;b++)G[a][b]=F.G[a][b]*F.n;
+ for(const i of val)for(let a=0;a<p;a++){const za=Z[a][i];c[a]-=za*yc[i];for(let b=0;b<p;b++)G[a][b]-=za*Z[b][i]}
+ for(let a=0;a<p;a++){c[a]/=nt;for(let b=0;b<p;b++)G[a][b]/=nt}return{G,c,n:nt}}
+function cd(G,c,lam,al,b0,maxit){const p=c.length,b=b0?Float64Array.from(b0):new Float64Array(p),l1=lam*al,l2=lam*(1-al);for(let it=0;it<(maxit||300);it++){let mx=0;for(let j=0;j<p;j++){let r=c[j];const Gj=G[j];for(let k=0;k<p;k++)if(k!==j&&b[k]!==0)r-=Gj[k]*b[k];const den=Gj[j]+l2,nb=Math.abs(r)>l1?(r>0?1:-1)*(Math.abs(r)-l1)/den:0;mx=Math.max(mx,Math.abs(nb-b[j])*Math.sqrt(Gj[j]));b[j]=nb}if(mx<1e-8)break}return b}
+function lamGrid(c,al,K,ratio){let mx=0;for(const v of c)mx=Math.max(mx,Math.abs(v));mx/=Math.max(al,.01);const r=[];for(let k=0;k<K;k++)r.push(mx*Math.pow(ratio||1e-3,k/(K-1)));return r}
+function ridgeEig(G){const e=eigSym(G);return e}
+function ridgeFromEig(e,c,lam){const p=c.length,vc=new Float64Array(p);for(let k=0;k<p;k++){let s=0;for(let j=0;j<p;j++)s+=e.V[j][k]*c[j];vc[k]=s/(e.d[k]+lam)}const b=new Float64Array(p);for(let j=0;j<p;j++){let s=0;for(let k=0;k<p;k++)s+=e.V[j][k]*vc[k];b[j]=s}return b}
+function dfRidge(e,lam){let s=0;for(const d of e.d)s+=Math.max(d,0)/(Math.max(d,0)+lam);return s}
+function foldsOf(n,K){const f=Int32Array.from({length:n},(_,i)=>i%K);for(let i=n-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[f[i],f[j]]=[f[j],f[i]]}return f}
+/* K-fold CV for enet (al>0) or ridge (al==='ridge'); returns {cv,se,lams,iMin,i1se} */
+function cvEnet(S,al,lams,K){const n=S.n,{Z,yc}=S,F=gramOf(Z,yc),fold=foldsOf(n,K),L=lams.length,err=[];for(let l=0;l<L;l++)err.push(new Float64Array(K));
+ for(let f=0;f<K;f++){const val=[];for(let i=0;i<n;i++)if(fold[i]===f)val.push(i);const T=gramMinus(F,Z,yc,val);let b=null,eg=null;if(al==='ridge')eg=eigSym(T.G);
+  for(let l=0;l<L;l++){b=al==='ridge'?ridgeFromEig(eg,T.c,lams[l]):cd(T.G,T.c,lams[l],al,b);let s=0;for(const i of val){let e=yc[i];for(let j=0;j<Z.length;j++)e-=b[j]*Z[j][i];s+=e*e}err[l][f]=s/val.length}}
+ const cv=[],se=[];for(let l=0;l<L;l++){cv.push(mean(err[l]));se.push(sdOf(err[l])/Math.sqrt(K))}let iMin=0;cv.forEach((v,i)=>{if(v<cv[iMin])iMin=i});let i1=iMin;for(let l=0;l<L;l++)if(cv[l]<=cv[iMin]+se[iMin]){i1=l;break}
+ return{cv,se,lams,iMin,i1se:i1,F}}
+function pathOf(F,al,lams){const out=[];let b=null;for(const l of lams){b=cd(F.G,F.c,l,al,b);out.push(b)}return out}
+function genReg(n,p,beta,rho,sg){const z0=new Float64Array(n).map(()=>randn()),cols=[],y=new Float64Array(n),s=Math.sqrt(rho),t=Math.sqrt(1-rho);for(let j=0;j<p;j++){const c=new Float64Array(n);for(let i=0;i<n;i++)c[i]=s*z0[i]+t*randn();cols.push(c)}for(let i=0;i<n;i++){let m=0;for(let j=0;j<beta.length&&j<p;j++)m+=beta[j]*cols[j][i];y[i]=m+sg*randn()}return{cols,y}}
+/* excess prediction error of standardised coefficients b under equicorrelated truth */
+function excessErr(S,b,beta,rho,p){let s=0;const bo=new Float64Array(p);for(let j=0;j<p;j++)bo[j]=b[j]/S.sd[j]-(beta[j]||0);let sum=0,sq=0;for(let j=0;j<p;j++){sum+=bo[j];sq+=bo[j]*bo[j]}return(1-rho)*sq+rho*sum*sum}
+function pctOf(a,q){const b=Float64Array.from(a).sort();return b[Math.min(b.length-1,Math.max(0,Math.floor(q*b.length)))]}
+function ridgeLogit(Z,y,lam,maxit){const n=y.length,p=Z.length,b=new Float64Array(p+1);for(let it=0;it<(maxit||25);it++){const A=[],g=new Float64Array(p+1);for(let i=0;i<=p;i++)A.push(new Float64Array(p+1));let mx=0;
+  for(let r=0;r<n;r++){let e=b[0];for(let j=0;j<p;j++)e+=b[j+1]*Z[j][r];e=Math.max(-25,Math.min(25,e));const m=1/(1+Math.exp(-e)),w=Math.max(m*(1-m),1e-9),x=[1];for(let j=0;j<p;j++)x.push(Z[j][r]);for(let i=0;i<=p;i++){g[i]+=x[i]*(y[r]-m);for(let j=i;j<=p;j++)A[i][j]+=w*x[i]*x[j]}}
+  for(let i=0;i<=p;i++)for(let j=0;j<i;j++)A[i][j]=A[j][i];for(let i=1;i<=p;i++){A[i][i]+=lam;g[i]-=lam*b[i]}A[0][0]+=1e-8;
+  const Ai=minv(A),st=Ai.map(r=>{let s=0;for(let j=0;j<=p;j++)s+=r[j]*g[j];return s});for(let i=0;i<=p;i++){const s=Math.max(-4,Math.min(4,st[i]));b[i]+=s;mx=Math.max(mx,Math.abs(s))}if(mx<1e-7)break}return b}
+
+/* ---------- helpers for imbalanced-data page ---------- */
+const PV=[.001,.002,.005,.01,.02,.05,.1,.2,.3],PVL=PV.map(v=>f3(v*100)+'%'),CR=[1,2,5,10,20,50,100,200,500],CAP=[.001,.002,.005,.01,.02,.05,.1,.2];
+const sp=x=>Math.max(x,0)+Math.log1p(Math.exp(-Math.abs(x)));
+const mapA=(a,f)=>Float64Array.from(a,f);
+function sdv(a){const m=mean(a);let s=0;for(const v of a)s+=(v-m)*(v-m);return Math.sqrt(s/Math.max(a.length-1,1))}
+function medOf(a){const b=Float64Array.from(a).sort();return b.length?b[b.length>>1]:NaN}
+function b0For(pi,s2){return qn(pi)*Math.sqrt(2.89+s2)}
+function barV(cv,vals,cols,labs,ymax,ff){const P=mk(cv,0,vals.length,ymax,{y0:0,noGrid:true,L:50});customGrid(P,[],niceTicks(0,ymax,5));const W=(P.w-P.L-P.R)/vals.length,g=P.g;vals.forEach((v,i)=>{const w=W*.5,x=P.L+W*i+W*.25;g.fillStyle=cols[i];g.fillRect(x,P.Y(v),w,P.Y(0)-P.Y(v));g.fillStyle=C.fg;g.textAlign='center';g.fillText((ff||fmt)(v),x+w/2,P.Y(v)-4);g.fillStyle=C.mu;g.fillText(labs[i],x+w/2,P.h-P.B+15)});return P}
+function barG(cv,groups,cols,labs,ymax,ff){const P=mk(cv,0,groups.length,ymax,{y0:0,noGrid:true,L:50});customGrid(P,[],niceTicks(0,ymax,5));const W=(P.w-P.L-P.R)/groups.length,g=P.g;groups.forEach((vs,i)=>{const bw=W*.8/vs.length;vs.forEach((v,j)=>{const x=P.L+W*i+W*.1+bw*j;g.fillStyle=cols[j];g.fillRect(x,P.Y(Math.min(v,ymax)),bw-2,P.Y(0)-P.Y(Math.min(v,ymax)));g.fillStyle=C.fg;g.textAlign='center';g.font='10px system-ui';g.fillText((ff||fmt)(v),x+bw/2-1,P.Y(Math.min(v,ymax))-3)});g.font='11px system-ui';g.fillStyle=C.mu;g.textAlign='center';g.fillText(labs[i],P.L+W*(i+.5),P.h-P.B+15)});return P}
+function wlogit(Z,y,w,lam,maxit){const n=y.length,p=Z.length,b=new Float64Array(p+1);for(let it=0;it<(maxit||25);it++){const A=[],g=new Float64Array(p+1);for(let i=0;i<=p;i++)A.push(new Float64Array(p+1));let mx=0;
+  for(let r=0;r<n;r++){let e=b[0];for(let j=0;j<p;j++)e+=b[j+1]*Z[j][r];e=Math.max(-25,Math.min(25,e));const m=1/(1+Math.exp(-e)),wr=w?w[r]:1,ww=Math.max(m*(1-m),1e-9)*wr,x=[1];for(let j=0;j<p;j++)x.push(Z[j][r]);for(let i=0;i<=p;i++){g[i]+=wr*x[i]*(y[r]-m);for(let j=i;j<=p;j++)A[i][j]+=ww*x[i]*x[j]}}
+  for(let i=0;i<=p;i++)for(let j=0;j<i;j++)A[i][j]=A[j][i];for(let i=1;i<=p;i++){A[i][i]+=lam;g[i]-=lam*b[i]}A[0][0]+=1e-8;
+  const Ai=minv(A),st=Ai.map(r=>{let s=0;for(let j=0;j<=p;j++)s+=r[j]*g[j];return s});for(let i=0;i<=p;i++){const s=Math.max(-4,Math.min(4,st[i]));b[i]+=s;mx=Math.max(mx,Math.abs(s))}if(mx<1e-7)break}return b}
+/* rank statistics for binormal-type scores: pos and neg score arrays */
+function rankStats(pos,neg){const P=pos.length,N=neg.length,s=new Float64Array(P+N),l=new Uint8Array(P+N);for(let i=0;i<P;i++){s[i]=pos[i];l[i]=1}for(let i=0;i<N;i++)s[P+i]=neg[i];const ix=Array.from({length:P+N},(_,i)=>i).sort((a,b)=>s[b]-s[a]);let tp=0,fp=0,ap=0,au=0,rec1=-1;const fpMax=Math.floor(.01*N);
+ for(const i of ix){if(l[i]){tp++;ap+=tp/(tp+fp);au+=N-fp}else{if(fp===fpMax&&rec1<0)rec1=tp/P;fp++}}if(rec1<0)rec1=1;return{auc:au/(P*N),ap:ap/P,rec1}}
+function curvePts(pos,neg,maxPts){const P=pos.length,N=neg.length,s=new Float64Array(P+N),l=new Uint8Array(P+N);for(let i=0;i<P;i++){s[i]=pos[i];l[i]=1}for(let i=0;i<N;i++)s[P+i]=neg[i];const ix=Array.from({length:P+N},(_,i)=>i).sort((a,b)=>s[b]-s[a]),roc=[[0,0]],pr=[],step=Math.max(1,Math.floor((P+N)/maxPts));let tp=0,fp=0;ix.forEach((i,k)=>{if(l[i])tp++;else fp++;if(k%step===0||k===P+N-1){roc.push([fp/N,tp/P]);pr.push([tp/P,tp/(tp+fp)])}});return{roc,pr}}
+const bn=(n,m)=>Float64Array.from({length:n},()=>m+randn());
+const tpr=(t,d)=>normSf(t-d),fpr=t=>normSf(t);
+function thrForRate(rate,pi,d){let lo=-8,hi=d+8;for(let i=0;i<60;i++){const m=(lo+hi)/2,r=pi*tpr(m,d)+(1-pi)*fpr(m);if(r>rate)lo=m;else hi=m}return(lo+hi)/2}
+
+/* ---------- Ch1 accuracy paradox ---------- */
+(function(){idx('c1p',PV,v=>f3(v*100)+'%');scl('c1se',v=>v+'%');scl('c1sp',v=>(+v).toFixed(1)+'%');
+ function run(){const pi=PV[val('c1p')],se=val('c1se')/100,sc=val('c1sp')/100,TP=se*pi,FN=(1-se)*pi,FP=(1-sc)*(1-pi),TN=sc*(1-pi),acc=TP+TN,bal=(se+sc)/2,prec=TP/(TP+FP),f1=2*prec*se/(prec+se),mcc=(TP*TN-FP*FN)/Math.sqrt((TP+FP)*(TP+FN)*(TN+FP)*(TN+FN));
+  const P=barV($('c1cv'),[acc,bal,prec,se,f1,Math.max(mcc,0)],[C.a,C.t,C.r,C.g,C.y,C.p],['accuracy','balanced accuracy','precision (PPV)','recall','F1','MCC'],1.12);P.hline(1-pi,C.y,'never flag: accuracy '+pc(1-pi));
+  $('c1st').innerHTML=stat('alerts per 100,000 cases',Math.round(1e5*(TP+FP)),'')+stat('of which false alerts',Math.round(1e5*FP),'hot')+stat('events in 100,000',Math.round(1e5*pi),'')+stat('events missed',Math.round(1e5*FN),'warn')+stat('precision',pc(prec),prec<.3?'hot':'ok')+stat('false alerts per true hit',fmt(FP/TP),'');
+  $('c1rd').innerHTML=`At a prevalence of ${pc(pi)} the “never flag anything” rule is ${pc(1-pi)} accurate, and this classifier (recall ${pc(se)}, specificity ${pc(sc)}) scores ${pc(acc)} on accuracy: ${acc<1-pi?'worse than doing nothing, while catching most of the events':'barely better, while catching most of the events'}. Its precision is ${pc(prec)}: for every true hit there are ${fmt(FP/TP)} false alerts. Recall and specificity did not change with prevalence; precision, accuracy, F1 and MCC did. Try the same classifier at 20% prevalence.`}
+ on('c1p c1se c1sp',run);run();})();
+
+/* ---------- Ch2 ROC vs PR ---------- */
+(function(){scl('c2d',v=>fmt(v/10));idx('c2p',PV,v=>f3(v*100)+'%');
+ function run(){const d=val('c2d')/10,pi=PV[val('c2p')],N=30000,np=Math.max(10,Math.round(pi*N)),pos=bn(np,d),neg=bn(N-np,0),rs=rankStats(pos,neg),cv=curvePts(pos,neg,300),P1=mk($('c2cv'),0,1,1,{y0:0,L:44}),P2=mk($('c2cv2'),0,1,1,{y0:0,L:44});
+  P1.line(x=>x,C.mu,1.4,0,1,2,true);poly(P1,cv.roc,C.a,2.6);P1.text('ROC: true positive rate ↑',P1.L+6,P1.T+12,C.mu);P1.text('false positive rate →',P1.w-P1.R-120,P1.h-P1.B-6,C.mu);
+  P2.hline(np/N,C.mu,'random: '+pc(np/N));poly(P2,cv.pr,C.r,2.6);P2.text('PR: precision ↑',P2.L+6,P2.T+12,C.mu);P2.text('recall →',P2.w-P2.R-60,P2.h-P2.B-6,C.mu);
+  const q=cv.pr.find(p=>p[0]>=.5),prec50=q?q[1]:NaN;
+  $('c2st').innerHTML=stat('ROC-AUC (theory '+fmt(normCdf(d/Math.SQRT2))+')',fmt(rs.auc),'in')+stat('average precision',fmt(rs.ap),rs.ap<.3?'hot':'ok')+stat('baseline AP = prevalence',pc(np/N),'')+stat('recall at 1% FPR',pc(rs.rec1),'')+stat('precision at 50% recall',fmt(prec50),prec50<.3?'hot':'')+stat('false alerts per hit at 50% recall',fmt(1/prec50-1),'warn');
+  $('c2rd').innerHTML=`With d = ${fmt(d)} the ROC-AUC is ${fmt(rs.auc)} whatever the prevalence, because it only compares events with non-events. The PR curve, however, depends on the base rate: at ${pc(pi)} the average precision is ${fmt(rs.ap)} against a random baseline of ${pc(np/N)}. At 50% recall the precision is ${fmt(prec50)}, so each hit costs ${fmt(1/prec50-1)} false alerts, a fact the ROC plot does not show. Move the prevalence slider from 30% to 0.1% with d fixed: the ROC curve stays the same and the PR curve collapses.`}
+ on('c2d c2p',()=>{});['c2d','c2p'].forEach(i=>$(i).addEventListener('change',run));$('c2go').onclick=run;run();})();
+
+/* ---------- Ch3 alert budgets ---------- */
+(function(){scl('c3d',v=>fmt(v/10));idx('c3p',PV,v=>f3(v*100)+'%');scl('c3a',v=>v);
+ function run(){const d=val('c3d')/10,pi=PV[val('c3p')],V=1e5,A=val('c3a'),xs=Array.from({length:60},(_,i)=>100*(i+1)),hits=a=>V*pi*tpr(thrForRate(a/V,pi,d),d),H=xs.map(hits),ev=V*pi,
+  P1=mk($('c3cv'),0,6000,Math.max(...H,ev)*1.05,{y0:0,L:50}),P2=mk($('c3cv2'),0,6000,1,{y0:0,L:44});
+  poly(P1,xs.map((a,i)=>[a,H[i]]),C.a,2.6);poly(P1,xs.map(a=>[a,a*pi]),C.mu,1.6,true);poly(P1,xs.map(a=>[a,Math.min(a,ev)]),C.g,1.6,true);P1.vline(A,C.y,'capacity',true);P1.text('events found per day ↑',P1.L+6,P1.T+26,C.mu);P1.text('alerts reviewed per day →',P1.w-P1.R-140,P1.h-P1.B-6,C.mu);legend(P1,[['model',C.a],['random',C.mu],['perfect',C.g]],P1.T+12);
+  poly(P2,xs.map((a,i)=>[a,H[i]/a]),C.r,2.6);P2.hline(pi,C.mu,'prevalence');P2.vline(A,C.y,'capacity',true);P2.text('precision ↑',P2.L+6,P2.T+12,C.mu);P2.text('alerts per day →',P2.w-P2.R-100,P2.h-P2.B-6,C.mu);
+  const h=hits(A),pr=h/A;
+  $('c3st').innerHTML=stat('events per day',fmt(ev),'')+stat('events found at capacity',fmt(h),'in')+stat('share of all events found',pc(h/ev),h/ev<.5?'warn':'ok')+stat('precision at capacity',pc(pr),pr<.1?'hot':'')+stat('cases reviewed per hit',fmt(A/h),'warn')+stat('events missed per day',fmt(ev-h),'hot');
+  $('c3rd').innerHTML=`Of 100,000 daily cases about ${fmt(ev)} are events. Reviewing the top ${A} alerts finds ${fmt(h)} of them (${pc(h/ev)}), with a precision of ${pc(pr)}: ${fmt(A/h)} reviews per hit, and ${fmt(ev-h)} events a day are missed. Doubling the capacity to ${2*A} would find ${fmt(hits(2*A))} (+${fmt(hits(2*A)-h)}) at a precision of ${pc(hits(2*A)/(2*A))}. The gain curve shows the diminishing returns; improving the model (larger d) lifts the whole curve, most visibly at small capacities.`}
+ on('c3d c3p c3a',run);run();})();
+
+/* ---------- Ch4 operating points ---------- */
+(function(){scl('c4d',v=>fmt(v/10));idx('c4p',PV,v=>f3(v*100)+'%');idx('c4r',CR,v=>v+' : 1');idx('c4k',CAP,v=>f3(v*100)+'%');
+ function run(){const d=val('c4d')/10,pi=PV[val('c4p')],c=CR[val('c4r')],cap=CAP[val('c4k')],ts=Array.from({length:240},(_,i)=>-1.5+(d+5)*i/239),
+  M=t=>{const T=tpr(t,d),F=fpr(t),al=pi*T+(1-pi)*F,pr=al>0?pi*T/al:1;return{T,F,al,pr,f1:2*pr*T/(pr+T||1),cost:1000*(c*pi*(1-T)+(1-pi)*F)}},R=ts.map(M),mxc=Math.max(...R.map(r=>r.cost));
+  let iF=0,iC=0;R.forEach((r,i)=>{if(r.f1>R[iF].f1)iF=i;if(r.cost<R[iC].cost)iC=i});const tF=ts[iF],tC=ts[iC],tK=thrForRate(cap,pi,d),mF=M(tF),mC=M(tC),mK=M(tK),P=mk($('c4cv'),ts[0],ts[ts.length-1],1.05,{y0:0,L:44});
+  poly(P,ts.map((t,i)=>[t,R[i].pr]),C.r,2.3);poly(P,ts.map((t,i)=>[t,R[i].T]),C.g,2.3);poly(P,ts.map((t,i)=>[t,R[i].f1]),C.y,2.3);poly(P,ts.map((t,i)=>[t,R[i].cost/mxc]),C.a,2.3,true);
+  P.vline(tF,C.y,'F1',true);P.vline(tC,C.a,'cost',true);P.vline(tK,C.p,'capacity',true);legend(P,[['precision',C.r],['recall',C.g],['F1',C.y],['cost (scaled)',C.a]],P.T+26);P.text('score threshold →',P.w-P.R-100,P.h-P.B-6,C.mu);
+  const row=m=>fmt(1000*m.al)+' · '+fmt(m.pr)+' · '+fmt(m.T);
+  $('c4st').innerHTML=stat('F1 rule: threshold',fmt(tF),'warn')+stat('cost rule: threshold',fmt(tC),'in')+stat('capacity rule: threshold',fmt(tK),'')+stat('F1: alerts/1000 · precision · recall',row(mF),'')+stat('cost: alerts/1000 · precision · recall',row(mC),'')+stat('capacity: alerts/1000 · precision · recall',row(mK),'')+stat('expected cost per 1,000: F1 · cost · capacity',fmt(mF.cost)+' · '+fmt(mC.cost)+' · '+fmt(mK.cost),'hot');
+  $('c4rd').innerHTML=`When a miss costs ${c} times a false alert, the cost-optimal rule flags ${fmt(1000*mC.al)} cases per 1,000 and catches ${pc(mC.T)} of events with a precision of ${fmt(mC.pr)}; the F1 rule flags ${fmt(1000*mF.al)} (recall ${pc(mF.T)}), and a fixed capacity of ${pc(cap)} flags ${fmt(1000*mK.al)} (recall ${pc(mK.T)}). Their expected costs per 1,000 cases are ${fmt(mC.cost)}, ${fmt(mF.cost)} and ${fmt(mK.cost)}. The cost rule wins by construction when the cost ratio is right; with a ratio of 1 and a small prevalence it flags very little. There is no universal threshold: state the cost or capacity assumption, then derive it.`}
+ on('c4d c4p c4r c4k',run);run();})();
+
+/* ---------- Ch5 events not rows ---------- */
+(function(){scl('c5k',v=>v);idx('c5p',PV,v=>f3(v*100)+'%');const EG=[10,20,40,80,160,320,640],NCAP=20000,NT=4000;
+ function run(){const k=val('c5k'),pi=PV[val('c5p')],s2=.25*k,b0=b0For(pi,s2),med=[],slo=[],ns=[];
+  EG.forEach(E=>{const n=Math.round(E/pi);if(n>NCAP){med.push(null);slo.push(null);ns.push(n);return}const R=Math.max(4,Math.min(30,Math.floor(1.5e8/(n*(k+1)*(k+1)*10)))),kl=[],sl=[];
+   for(let r=0;r<R;r++){const Z=[],T=[];for(let j=0;j<k;j++){Z.push(Float64Array.from({length:n},randn));T.push(Float64Array.from({length:NT},randn))}const y=Float64Array.from({length:n},(_,i)=>{let e=b0;for(let j=0;j<k;j++)e+=.5*Z[j][i];return Math.random()<sig(e)?1:0}),b=wlogit(Z,y,null,1e-4,25);
+    let K=0,sxy=0,sxx=0,mx=0,my=0;const L=new Float64Array(NT),H=new Float64Array(NT);for(let i=0;i<NT;i++){let l=b0,h=b[0];for(let j=0;j<k;j++){l+=.5*T[j][i];h+=b[j+1]*T[j][i]}h=Math.max(-30,Math.min(30,h));L[i]=l;H[i]=h;const p=sig(l);K+=p*(sp(-h)-sp(-l))+(1-p)*(sp(h)-sp(l));mx+=h;my+=l}mx/=NT;my/=NT;for(let i=0;i<NT;i++){sxy+=(H[i]-mx)*(L[i]-my);sxx+=(H[i]-mx)*(H[i]-mx)}kl.push(K/NT);sl.push(sxy/Math.max(sxx,1e-9))}
+   med.push(medOf(kl));slo.push(medOf(sl));ns.push(n)});
+  const ok=EG.map((_,i)=>i).filter(i=>med[i]!=null),P1=mk($('c5cv'),-.3,EG.length-.7,1,{y0:0,noGrid:true,L:48}),P2=mk($('c5cv2'),-.3,EG.length-.7,1,{y0:0,noGrid:true,L:44}),xt=EG.map((e,i)=>[i,String(e)]);
+  if(!ok.length){$('c5st').innerHTML='';$('c5rd').textContent='At this prevalence even the smallest event count needs more than 20,000 cases, so the lab skips it. Choose a higher prevalence.';return}
+  const lv=ok.map(i=>Math.log10(med[i])),lo=Math.floor(Math.min(...lv)),hi=Math.ceil(Math.max(...lv)),Q1=mk($('c5cv'),-.3,EG.length-.7,hi,{y0:lo,noGrid:true,L:48});customGrid(Q1,xt,Array.from({length:hi-lo+1},(_,i)=>[lo+i,f3(Math.pow(10,lo+i))]));poly(Q1,ok.map(i=>[i,Math.log10(med[i])]),C.r,2.6);dots(Q1,ok.map(i=>[i,Math.log10(med[i])]),C.r,3.4);Q1.text('KL distance to the true probabilities ↓ (log scale)',Q1.L+6,Q1.T+12,C.mu);Q1.text('expected events in the training data →',Q1.w-Q1.R-200,Q1.h-Q1.B-6,C.mu);
+  const sm=Math.max(1.15,...ok.map(i=>slo[i])),Q2=mk($('c5cv2'),-.3,EG.length-.7,sm*1.05,{y0:0,noGrid:true,L:44});customGrid(Q2,xt,niceTicks(0,sm*1.05,5));poly(Q2,ok.map(i=>[i,slo[i]]),C.a,2.6);dots(Q2,ok.map(i=>[i,slo[i]]),C.a,3.4);Q2.hline(1,C.g,'calibrated');Q2.text('calibration slope of the fitted log-odds ↑',Q2.L+6,Q2.T+12,C.mu);
+  const xe=Math.log2(k);[Q1,Q2].forEach(Q=>Q.vline(xe,C.y,'10 per predictor',true));
+  const j90=ok.find(i=>slo[i]>=.9);
+  $('c5st').innerHTML=stat('KL at fewest events',fmt(med[ok[0]]),'hot')+stat('KL at most events',fmt(med[ok[ok.length-1]]),'ok')+stat('slope at fewest events',fmt(slo[ok[0]]),slo[ok[0]]<.8?'hot':'')+stat('slope at most events',fmt(slo[ok[ok.length-1]]),'ok')+stat('events for slope ≥ 0.9',j90==null?'more than '+EG[ok[ok.length-1]]:EG[j90]+' ('+fmt(EG[j90]/k)+' per predictor)','in')+stat('cases needed at the top',nlab(ns[ok[ok.length-1]]),'');
+  $('c5rd').innerHTML=`With ${k} candidate predictors and a prevalence of ${pc(pi)}, the fitted probabilities are far from the truth when there are ${EG[ok[0]]} events (KL ${fmt(med[ok[0]])}, slope ${fmt(slo[ok[0]])}: forecasts too extreme), and the distance falls steadily as events accumulate (${fmt(med[ok[ok.length-1]])} at ${EG[ok[ok.length-1]]}). ${j90==null?'The slope never reaches 0.9 in this range.':'The slope first exceeds 0.9 at '+EG[j90]+' events, '+fmt(EG[j90]/k)+' per predictor'+(EG[j90]/k>10?', more than the classic 10 per predictor.':'.')} Note the horizontal axis: it counts <em>events</em>. Quadrupling the number of non-events (a lower prevalence at the same event count) changes almost nothing.`}
+ ['c5k','c5p'].forEach(i=>$(i).addEventListener('change',run));$('c5go').onclick=run;run();})();
+
+/* ---------- Ch6 resampling methods ---------- */
+(function(){const NS=[2000,5000,10000,20000],NT=20000,K=5,BETA=.6,NM=['plain','undersample','oversample','SMOTE-like','class weights'];idx('c6n',NS,v=>v);idx('c6p',PV,v=>f3(v*100)+'%');
+ function run(){const n=NS[val('c6n')],pi=PV[val('c6p')],b0=b0For(pi,BETA*BETA*K),R=20,acc=NM.map(()=>({auc:0,top:0,ratio:0,llr:0,llc:0}));let evs=0;
+  for(let r=0;r<R;r++){const gen=m=>{const Z=[];for(let j=0;j<K;j++)Z.push(Float64Array.from({length:m},randn));const y=Float64Array.from({length:m},(_,i)=>{let e=b0;for(let j=0;j<K;j++)e+=BETA*Z[j][i];return Math.random()<sig(e)?1:0});return{Z,y}},tr=gen(n),te=gen(NT);let pos=[],neg=[];tr.y.forEach((v,i)=>(v?pos:neg).push(i));while(pos.length<5){const j=Math.floor(Math.random()*neg.length),i=neg.splice(j,1)[0];tr.y[i]=1;pos.push(i)}evs+=pos.length/R;const yb=pos.length/n,lg=lgt(yb),rows=ix=>({Z:tr.Z.map(c=>Float64Array.from(ix,i=>c[i])),y:Float64Array.from(ix,i=>tr.y[i])}),pk=a=>a[Math.floor(Math.random()*a.length)];
+   const sets=[];sets.push({Z:tr.Z,y:tr.y,w:null,lg:0});
+   {const keep=neg.slice().sort(()=>Math.random()-.5).slice(0,pos.length),s=rows(pos.concat(keep));sets.push({Z:s.Z,y:s.y,w:null,lg:lg})}
+   {const ix=neg.concat(pos);for(let t=0;t<neg.length-pos.length;t++)ix.push(pk(pos));const s=rows(ix);sets.push({Z:s.Z,y:s.y,w:null,lg:lg})}
+   {const m=neg.length-pos.length,Z=tr.Z.map(c=>{const a=Float64Array.from(c);return Array.from(a)}),y=Array.from(tr.y);const extra=tr.Z.map(()=>[]);for(let t=0;t<m;t++){const a=pk(pos),b=pk(pos),u=Math.random();tr.Z.forEach((c,j)=>extra[j].push(c[a]+u*(c[b]-c[a])));y.push(1)}sets.push({Z:Z.map((c,j)=>Float64Array.from(c.concat(extra[j]))),y:Float64Array.from(y),w:null,lg:lg})}
+   {const w=Float64Array.from(tr.y,v=>v?neg.length/pos.length:1);sets.push({Z:tr.Z,y:tr.y,w,lg:lg})}
+   sets.forEach((s,mi)=>{const b=wlogit(s.Z,s.y,s.w,1e-4,25),e=new Float64Array(NT);for(let i=0;i<NT;i++){let h=b[0];for(let j=0;j<K;j++)h+=b[j+1]*te.Z[j][i];e[i]=Math.max(-30,Math.min(30,h))}const ord=Array.from({length:NT},(_,i)=>i).sort((a,c)=>e[c]-e[a]),np=te.y.reduce((a,v)=>a+v,0);let top=0;for(let i=0;i<Math.floor(.05*NT);i++)top+=te.y[ord[i]];let ll=0,llc=0,mq=0;for(let i=0;i<NT;i++){const h=e[i],hc=Math.max(-30,Math.min(30,h+s.lg));ll+=te.y[i]*sp(-h)+(1-te.y[i])*sp(h);llc+=te.y[i]*sp(-hc)+(1-te.y[i])*sp(hc);mq+=sig(h)}const a=acc[mi];a.auc+=auc(e,te.y)/R;a.top+=top/np/R;a.ratio+=mq/NT/(np/NT)/R;a.llr+=ll/NT/R;a.llc+=llc/NT/R})}
+  const tb=['<table><tr><th>method</th><th>AUC</th><th>events in top 5%</th><th>mean forecast ÷ true rate</th><th>log-loss raw</th><th>log-loss after prior correction</th></tr>'].concat(acc.map((a,i)=>`<tr><td>${NM[i]}</td><td>${fmt(a.auc)}</td><td>${pc(a.top)}</td><td>${fmt(a.ratio)}</td><td>${fmt(a.llr)}</td><td>${fmt(a.llc)}</td></tr>`)).join('')+'</table>';$('c6tb').innerHTML=tb;
+  const cols=[C.mu,C.r,C.y,C.p,C.a],mr=Math.max(...acc.map(a=>a.ratio)),P1=barV($('c6cv'),acc.map(a=>a.ratio),cols,NM,mr*1.15,x=>fmt(x)+'×');P1.hline(1,C.g,'calibrated');P1.text('mean forecast ÷ true event rate',P1.L+6,P1.T+12,C.mu);
+  const ml=Math.max(...acc.map(a=>Math.max(a.llr,a.llc))),P2=barG($('c6cv2'),acc.map(a=>[a.llr,a.llc]),[C.r,C.g],NM,ml*1.15);legend(P2,[['log-loss raw',C.r],['after prior correction',C.g]],P2.T+12);
+  const a0=acc[0],bestAuc=Math.max(...acc.map(a=>a.auc));
+  $('c6st').innerHTML=stat('events in training',fmt(evs),'')+stat('plain AUC',fmt(a0.auc),'in')+stat('best AUC of any method',fmt(bestAuc),bestAuc-a0.auc<.01?'warn':'ok')+stat('plain log-loss',fmt(a0.llr),'ok')+stat('resampled raw log-loss (range)',fmt(Math.min(...acc.slice(1).map(a=>a.llr)))+' – '+fmt(Math.max(...acc.slice(1).map(a=>a.llr))),'hot');
+  $('c6rd').innerHTML=`With about ${fmt(evs)} events the five methods have AUCs between ${fmt(Math.min(...acc.map(a=>a.auc)))} and ${fmt(bestAuc)}: balancing did not improve the ranking of this correctly specified logistic model. What it did change is the probability scale: the resampled and weighted models forecast an average of ${fmt(acc[1].ratio)} times the real event rate, so their raw log-loss (${fmt(acc[1].llr)}) is far worse than the plain fit’s (${fmt(a0.llr)}). After adding the exact prior correction logit(ȳ) (the training prevalence) the log-loss falls to ${fmt(acc[1].llc)}, but never beats the plain model, and the resampled models show a little more noise. The lesson is not that resampling is always useless but that it is a tool that must be justified by a validated gain and paired with the correction.`}
+ ['c6n','c6p'].forEach(i=>$(i).addEventListener('change',run));$('c6go').onclick=run;run();})();
+
+/* ---------- Ch7 prior correction and variance cost ---------- */
+(function(){idx('c7p',PV,v=>f3(v*100)+'%');const RG=[1,.5,.2,.1,.05,.02,.01],N=20000,K=3,BETA=.7;
+ function run(){const pi=PV[val('c7p')],b0=b0For(pi,BETA*BETA*K),R=60,ic=RG.map(()=>[]),sl=RG.map(()=>[]);let ev=0;
+  for(let r=0;r<R;r++){const Z=[];for(let j=0;j<K;j++)Z.push(Float64Array.from({length:N},randn));const y=Float64Array.from({length:N},(_,i)=>{let e=b0;for(let j=0;j<K;j++)e+=BETA*Z[j][i];return Math.random()<sig(e)?1:0});ev+=y.reduce((a,v)=>a+v,0)/R;
+   RG.forEach((q,ri)=>{const ix=[];for(let i=0;i<N;i++)if(y[i]||Math.random()<q)ix.push(i);const b=wlogit(Z.map(c=>Float64Array.from(ix,i=>c[i])),Float64Array.from(ix,i=>y[i]),null,1e-6,25);ic[ri].push(b[0]);sl[ri].push(b[1])})}
+  const mi=ic.map(a=>mean(a)),mc=mi.map((v,i)=>v+Math.log(RG[i])),sd=sl.map(a=>sdv(a)),rat=sd.map(v=>v/sd[0]),pa=ev/N,th=RG.map(q=>Math.sqrt((1+pa/q)/(1+pa))),xt=RG.map((q,i)=>[i,String(q)]);
+  const lo=Math.min(...mi,...mc,b0)-.3,hi=Math.max(...mi,...mc,b0)+.3,P1=mk($('c7cv'),-.3,RG.length-.7,hi,{y0:lo,noGrid:true,L:44});customGrid(P1,xt,niceTicks(lo,hi,5));P1.hline(b0,C.g,'true intercept');poly(P1,mi.map((v,i)=>[i,v]),C.r,2.6);dots(P1,mi.map((v,i)=>[i,v]),C.r,3.4);poly(P1,mc.map((v,i)=>[i,v]),C.a,2.6);dots(P1,mc.map((v,i)=>[i,v]),C.a,3.4);legend(P1,[['fitted intercept',C.r],['+ ln r',C.a]],P1.T+12);P1.text('fraction of non-events kept r →',P1.w-P1.R-170,P1.h-P1.B-6,C.mu);
+  const my=Math.max(...rat,...th)*1.1,P2=mk($('c7cv2'),-.3,RG.length-.7,my,{y0:.8,noGrid:true,L:44});customGrid(P2,xt,niceTicks(.8,my,5));poly(P2,rat.map((v,i)=>[i,v]),C.r,2.6);dots(P2,rat.map((v,i)=>[i,v]),C.r,3.4);poly(P2,th.map((v,i)=>[i,v]),C.y,2,true);legend(P2,[['empirical SD ratio',C.r],['√(1+π/r) approximation',C.y]],P2.T+12);P2.text('SD of slope ÷ SD with all the data',P2.L+6,P2.T+28,C.mu);
+  $('c7st').innerHTML=stat('true intercept',fmt(b0),'ok')+stat('fitted intercept at r = 0.01',fmt(mi[6]),'hot')+stat('plus ln r = '+fmt(Math.log(.01)),fmt(mc[6]),'in')+stat('SD ratio at r = 0.1 (theory '+fmt(th[3])+')',fmt(rat[3]),'')+stat('SD ratio at r = 0.01 (theory '+fmt(th[6])+')',fmt(rat[6]),'warn')+stat('events per data set',fmt(ev),'');
+  $('c7rd').innerHTML=`Keeping 1% of the non-events moves the fitted intercept from ${fmt(mi[0])} (all data) to ${fmt(mi[6])}, a shift of ${fmt(mi[6]-mi[0])} against ln(0.01) = ${fmt(Math.log(.01))} in theory; adding ln r gives ${fmt(mc[6])}, back on the true ${fmt(b0)}. The slopes keep their expected values, but their standard deviation grows: ${fmt(rat[3])}× at r = 0.1 and ${fmt(rat[6])}× at r = 0.01, roughly following the approximation √(1 + π/r) = ${fmt(th[6])} (which understates the loss when predictors are strong). With about ${fmt(ev)} events in the full data, undersampling to r around ${fmt(Math.max(pa*10,.1))} (ten times the prevalence) costs little accuracy; going to 1:1 when π is small throws away real information.`}
+ $('c7p').addEventListener('change',run);$('c7go').onclick=run;run();})();
+
+/* ---------- Ch8 ML vs Firth ---------- */
+(function(){scl('c8n',v=>v);idx('c8p',PV,v=>f3(v*100)+'%');scl('c8k',v=>v);
+ function run(){const n=val('c8n'),pi=PV[val('c8p')],k=val('c8k'),b0=b0For(pi,1+.25*k),R=Math.max(60,Math.min(300,Math.floor(8e7/(n*(k+2)*(k+2)*15)))),NT=3000,lo=-2,hi=6,ml=[],fi=[],rm=[],rf=[];let skipped=0;
+  for(let r=0;r<R;r++){const Z=[Float64Array.from({length:n},randn)];for(let j=0;j<k;j++)Z.push(Float64Array.from({length:n},randn));const y=Float64Array.from({length:n},(_,i)=>{let e=b0+Z[0][i];for(let j=1;j<=k;j++)e+=.5*Z[j][i];return Math.random()<sig(e)?1:0}),ne=y.reduce((a,v)=>a+v,0);if(ne<1||ne>=n){skipped++;continue}
+   const a=glm(Z,y,{maxit:40}),f=glm(Z,y,{firth:true,maxit:60});ml.push(Math.max(lo,Math.min(hi-1e-9,a.beta[1])));fi.push(Math.max(lo,Math.min(hi-1e-9,f.beta[1])));
+   let m0=0,ma=0,mf=0;for(let i=0;i<NT;i++){let l=b0,ea=a.beta[0],ef=f.beta[0];const x0=randn();l+=x0;ea+=a.beta[1]*x0;ef+=f.beta[1]*x0;for(let j=1;j<=k;j++){const x=randn();l+=.5*x;ea+=a.beta[j+1]*x;ef+=f.beta[j+1]*x}m0+=sig(l);ma+=sig(Math.max(-30,Math.min(30,ea)));mf+=sig(Math.max(-30,Math.min(30,ef)))}rm.push(ma/m0);rf.push(mf/m0)}
+  const u=ml.length;if(!u){$('c8st').innerHTML='';$('c8rd').textContent='No data set had an event; raise the prevalence or the number of cases.';return}
+  const P=histLines($('c8cv'),[ml,fi],[C.r,C.a],lo,hi,32,[[1,C.g,'truth',true]]);legend(P,[['maximum likelihood',C.r],['Firth',C.a]],P.T+12);P.text('estimated slope (values beyond 6 piled at the edge)',P.L+6,P.T+28,C.mu);
+  const rmse=a=>Math.sqrt(mean(a.map(v=>(v-1)*(v-1)))),sep=a=>a.filter(v=>v>=hi-.01).length/a.length;
+  $('c8st').innerHTML=stat('usable data sets',u+' of '+R,'')+stat('ML: mean · median slope',fmt(mean(ml))+' · '+fmt(medOf(ml)),'hot')+stat('Firth: mean · median slope',fmt(mean(fi))+' · '+fmt(medOf(fi)),'in')+stat('RMSE of slope: ML · Firth',fmt(rmse(ml))+' · '+fmt(rmse(fi)),'')+stat('ML slope ≥ 6 (separation or blow-up)',pc(sep(ml)),sep(ml)>.05?'hot':'')+stat('mean forecast ÷ true rate: ML · Firth',fmt(mean(rm))+' · '+fmt(mean(rf)),'warn');
+  $('c8rd').innerHTML=`With ${n} cases at ${pc(pi)} prevalence (${fmt(n*pi)} events expected) and ${k+1} predictors, the ML slope has mean ${fmt(mean(ml))} and median ${fmt(medOf(ml))} against a truth of 1: the median shows the typical overshoot, the mean is also dragged by data sets where events are perfectly separated (${pc(sep(ml))} of them have a slope above 6). Firth’s estimate has mean ${fmt(mean(fi))}, a smaller RMSE (${fmt(rmse(fi))} against ${fmt(rmse(ml))}) and no blow-ups. On fresh data the ML forecasts average ${fmt(mean(rm))} times the true event probability and Firth’s ${fmt(mean(rf))}: Firth’s penalty pulls rare-event probabilities toward ½, so if you use the probabilities, recalibrate the intercept afterwards. With plentiful events (more cases, higher prevalence) the two coincide.`}
+ ['c8n','c8p','c8k'].forEach(i=>$(i).addEventListener('change',run));$('c8go').onclick=run;run();})();
+
+/* ---------- Ch9 weights vs thresholds ---------- */
+(function(){idx('c9r',CR,v=>v+' : 1');idx('c9p',PV,v=>f3(v*100)+'%');const K=4,BETA=.6,NTR=10000,NT=20000;
+ function run(){const w=CR[val('c9r')],pi=PV[val('c9p')],b0=b0For(pi,BETA*BETA*K),R=30,NM=['flag nobody','plain at 0.5','plain at t*','weighted at 0.5','oracle at t*'],cs=NM.map(()=>[]);let fl=0;
+  for(let r=0;r<R;r++){const gen=m=>{const Z=[];for(let j=0;j<K;j++)Z.push(Float64Array.from({length:m},randn));const L=Float64Array.from({length:m},(_,i)=>{let e=b0;for(let j=0;j<K;j++)e+=BETA*Z[j][i];return e}),y=Float64Array.from(L,v=>Math.random()<sig(v)?1:0);return{Z,L,y}},tr=gen(NTR),te=gen(NT);if(tr.y.reduce((a,v)=>a+v,0)<3){r--;fl++;if(fl>50)break;continue}
+   const bp=wlogit(tr.Z,tr.y,null,1e-4,25),bw=wlogit(tr.Z,tr.y,Float64Array.from(tr.y,v=>v?w:1),1e-4,25),eta=b=>Float64Array.from({length:NT},(_,i)=>{let e=b[0];for(let j=0;j<K;j++)e+=b[j+1]*te.Z[j][i];return e}),ep=eta(bp),ew=eta(bw),lt=-Math.log(w),cost=(flag)=>{let fn=0,fp=0;for(let i=0;i<NT;i++){const f=flag(i);if(te.y[i]&&!f)fn++;if(!te.y[i]&&f)fp++}return 1000*(w*fn+fp)/NT};
+   cs[0].push(cost(()=>false));cs[1].push(cost(i=>ep[i]>0));cs[2].push(cost(i=>ep[i]>=lt));cs[3].push(cost(i=>ew[i]>0));cs[4].push(cost(i=>te.L[i]>=lt))}
+  const m=cs.map(a=>mean(a)),s=cs.map(a=>sdv(a)),P=barV($('c9cv'),m,[C.mu,C.r,C.a,C.y,C.g],NM,Math.max(...m)*1.15,x=>fmt(x));P.text('expected cost per 1,000 cases (miss = '+w+', false alert = 1)',P.L+6,P.T+12,C.mu);
+  $('c9st').innerHTML=NM.map((nm,i)=>stat(nm+' (SD '+fmt(s[i])+')',fmt(m[i]),i===2||i===3?'in':i===4?'ok':i===1?'hot':'')).join('')+stat('weighted ÷ plain at t*',fmt(m[3]/m[2]),'');
+  $('c9rd').innerHTML=`With a miss costing ${w} false alerts, the plain model at the default 0.5 threshold costs ${fmt(m[1])} per 1,000 cases (${m[1]>m[0]?'worse than flagging nobody at '+fmt(m[0]):'against '+fmt(m[0])+' for flagging nobody'}). Moving the threshold to t* = 1/(1 + ${w}) = ${fmt(1/(1+w))} gives ${fmt(m[2])}; training with weight ${w} on the events and using 0.5 gives ${fmt(m[3])}, the same decision rule in expectation. The oracle with the true probabilities costs ${fmt(m[4])}, the floor. The difference between the weighted and the thresholded model is the sampling noise: the SD across data sets is ${fmt(s[3])} for weighting and ${fmt(s[2])} for thresholding, and the weighted probabilities are no longer calibrated.`}
+ ['c9r','c9p'].forEach(i=>$(i).addEventListener('change',run));$('c9go').onclick=run;run();})();
+
+/* ---------- Ch10 evaluation with few events ---------- */
+(function(){scl('c10d',v=>fmt(v/10));idx('c10p',PV,v=>f3(v*100)+'%');scl('c10t',v=>v);const EG=[5,10,20,40,80,160],CAPN=30000;
+ function stats(E,pi,d,R){const n=Math.round(E/pi);if(n>CAPN)return null;const a=[],b=[],c=[];for(let r=0;r<R;r++){const rs=rankStats(bn(E,d),bn(n-E,0));a.push(rs.auc);b.push(rs.ap);c.push(rs.rec1)}return{auc:a,ap:b,rec:c,n}}
+ function run(){const pi=PV[val('c10p')],d=val('c10d')/10,E0=val('c10t'),R=60,res=EG.map(E=>stats(E,pi,d,R)),A=normCdf(d/Math.SQRT2),hm=E=>{const n=Math.round(E/pi),N=n-E,Q1=A/(2-A),Q2=2*A*A/(1+A);return Math.sqrt((A*(1-A)+(E-1)*(Q1-A*A)+(N-1)*(Q2-A*A))/(E*N))};
+  const ok=EG.map((_,i)=>i).filter(i=>res[i]),P1=mk($('c10cv'),-.3,EG.length-.7,.5,{y0:0,noGrid:true,L:44});customGrid(P1,EG.map((e,i)=>[i,String(e)]),niceTicks(0,.5,5));
+  if(ok.length){const sA=ok.map(i=>[i,sdv(res[i].auc)]),sP=ok.map(i=>[i,sdv(res[i].ap)]),sR=ok.map(i=>[i,sdv(res[i].rec)]);poly(P1,sA,C.a,2.6);poly(P1,sP,C.r,2.6);poly(P1,sR,C.g,2.6);dots(P1,sA,C.a,3);dots(P1,sP,C.r,3);dots(P1,sR,C.g,3);poly(P1,ok.map(i=>[i,hm(EG[i])]),C.a,1.6,true);P1.vline(Math.log2(E0/5),C.y,'your events',true)}
+  legend(P1,[['AUC',C.a],['average precision',C.r],['recall at 1% FPR',C.g],['--- Hanley–McNeil AUC',C.a]],P1.T+26);P1.text('SD of the metric over test sets ↓',P1.L+6,P1.T+12,C.mu);P1.text('events in the test set →',P1.w-P1.R-130,P1.h-P1.B-6,C.mu);
+  const K=5,pk=1/K,kmax=Math.min(E0,Math.ceil(E0/K+4*Math.sqrt(E0*pk*(1-pk))+2)),pm=Array.from({length:kmax+1},(_,k)=>binom(E0,k,pk)),P2=mk($('c10cv2'),-.5,kmax+.5,Math.max(...pm)*1.15,{y0:0,L:44});pm.forEach((v,k)=>{P2.g.fillStyle=C.a;P2.g.fillRect(P2.X(k-.4),P2.Y(v),P2.X(k+.4)-P2.X(k-.4),P2.Y(0)-P2.Y(v))});P2.vline(E0/K,C.g,'stratified',true);P2.text('events in one fold of random 5-fold CV',P2.L+6,P2.T+12,C.mu);
+  const low=pm.reduce((s,v,k)=>s+(k<E0/K/2?v:0),0),zero=binom(E0,0,pk),own=stats(E0,pi,d,R),ci=own?[mean(own.auc)-1.96*sdv(own.auc),mean(own.auc)+1.96*sdv(own.auc)]:null;
+  $('c10st').innerHTML=(own?stat('AUC with '+E0+' test events (95% range)',fmt(ci[0])+' – '+fmt(ci[1]),'warn')+stat('SD of AP · recall at 1% FPR',fmt(sdv(own.ap))+' · '+fmt(sdv(own.rec)),'')+stat('cases in that test set',nlab(own.n),''):stat('test set size for '+E0+' events','over '+nlab(CAPN)+' cases (skipped)',''))+stat('expected events per fold',fmt(E0/K),'')+stat('random fold with under half the expected events',pc(low),low>.1?'hot':'')+stat('random fold with zero events',pc(zero),zero>.01?'hot':'');
+  $('c10rd').innerHTML=(own?`With ${E0} events in the test set the AUC of a model whose true AUC is ${fmt(A)} wanders over ${fmt(ci[0])} to ${fmt(ci[1])} (95%), average precision and recall at a fixed FPR are noisier still (SD ${fmt(sdv(own.ap))} and ${fmt(sdv(own.rec))}), and the dashed Hanley–McNeil line tracks the AUC curve. `:'')+`In random 5-fold cross-validation with ${E0} events each fold is expected to contain ${fmt(E0/K)}, but ${pc(low)} of the folds get fewer than half of that and ${pc(zero)} get none; stratified folds always have ${fmt(E0/K)}. Report intervals, repeat the CV with several stratified splits, and do not rank models whose metrics differ by less than the noise.`}
+ ['c10d','c10p','c10t'].forEach(i=>$(i).addEventListener('change',run));$('c10go').onclick=run;run();})();
+
+/* ---------- Ch11 coverage of intervals for rare proportions ---------- */
+(function(){const NN=[100,300,1000,3000,10000];idx('c11n',NN,v=>v);
+ function run(){const n=NN[val('c11n')],kmax=Math.min(n,Math.ceil(n*.05+10*Math.sqrt(n*.05)+20)),I=[[],[],[],[]],z=1.96;
+  for(let k=0;k<=kmax;k++){const ph=k/n,se=Math.sqrt(ph*(1-ph)/n);I[0].push([ph-z*se,ph+z*se]);const d=1+z*z/n,c=(ph+z*z/(2*n))/d,h=z*Math.sqrt(ph*(1-ph)/n+z*z/(4*n*n))/d;I[1].push([Math.max(0,c-h),Math.min(1,c+h)]);I[2].push([k===0?0:qb(k,n-k+1,.025),k===n?1:qb(k+1,n-k,.975)]);I[3].push([k===0?0:qb(k+.5,n-k+.5,.025),k===n?1:qb(k+.5,n-k+.5,.975)])}
+  const LP=Array.from({length:120},(_,i)=>-3.301+2*i/119),cov=[0,1,2,3].map(()=>[]);
+  LP.forEach(lp=>{const p=Math.pow(10,lp),pm=[];for(let k=0;k<=kmax;k++)pm.push(binom(n,k,p));[0,1,2,3].forEach(m=>{let s=0;for(let k=0;k<=kmax;k++)if(I[m][k][0]<=p&&p<=I[m][k][1])s+=pm[k];cov[m].push(Math.min(1,s))})});
+  const NM=['Wald','Wilson','Clopper–Pearson (exact)','Jeffreys'],CO=[C.r,C.y,C.a,C.g],P=mk($('c11cv'),-3.301,-1.301,1.02,{y0:.3,noGrid:true,L:44});customGrid(P,[[-3.301,'0.05%'],[-3,'0.1%'],[-2.5,'0.3%'],[-2,'1%'],[-1.5,'3%'],[-1.301,'5%']],niceTicks(.3,1,7));P.hline(.95,C.fg,'95%');clip(P,()=>[0,1,2,3].forEach(m=>poly(P,LP.map((lp,i)=>[lp,cov[m][i]]),CO[m],2.3)));legend(P,NM.map((s,i)=>[s,CO[i]]),P.T+12);P.text('coverage of the nominal 95% interval ↑ (axis starts at 30%)',P.L+6,P.T+28,C.mu);P.text('true rate p →',P.w-P.R-80,P.h-P.B-6,C.mu);
+  const av=cov.map(a=>mean(a)),mn=cov.map(a=>Math.min(...a)),up=[3/n,I[2][0][1],I[1][0][1],I[3][0][1]];
+  $('c11st').innerHTML=NM.map((s,i)=>stat(s+': average · worst coverage',pc(av[i])+' · '+pc(mn[i]),i===0?'hot':i===2?'in':'')).join('')+stat('upper 95% bound after 0 events: 3/n · exact · Wilson · Jeffreys',up.map(v=>f3(v*100)+'%').join(' · '),'warn');
+  $('c11rd').innerHTML=`With n = ${n} cases and rates between 0.05% and 5%, the Wald interval covers on average only ${pc(av[0])} and as little as ${pc(mn[0])}: at 0 events it is the single point 0, which cannot cover a positive p. The exact Clopper–Pearson interval never falls below ${pc(mn[2])} (it is conservative, averaging ${pc(av[2])}); Wilson and Jeffreys average ${pc(av[1])} and ${pc(av[3])} with dips at particular rates (coverage is a jagged function because the number of events is an integer). After 0 events in ${n} cases the 95% upper bound is ${f3(3/n*100)}% by the rule of three and ${f3(I[2][0][1]*100)}% by the exact interval. Use an interval of this kind, and an upper bound, whenever the number of events is in single digits.`}
+ $('c11n').addEventListener('change',run);run();})();
+const QZ=[
+{l:'Beginner',q:'1 transaction in 200 is fraudulent. A model that never raises an alert has an accuracy of…',o:['0.5%','50%','99.5%','It cannot be computed'],a:2,e:'It is right on all 199 of every 200 cases. Accuracy is a poor metric at low prevalence.'},
+{l:'Beginner',q:'Which of these changes when the prevalence changes but the classifier stays the same?',o:['Recall (sensitivity)','Specificity','Precision (PPV)','Both recall and specificity'],a:2,e:'Recall and specificity are conditional on the true class; precision depends on how many non-events there are.'},
+{l:'Intermediate',q:'The ROC-AUC of a model stays 0.9 when the prevalence falls from 20% to 0.2%. The PR-AUC (average precision)…',o:['Also stays the same','Falls sharply, because the baseline precision equals the prevalence and false alerts dominate','Rises','Becomes undefined'],a:1,e:'ROC compares events with non-events; PR depends on the prevalence.'},
+{l:'Intermediate',q:'Sensitivity 90%, specificity 95%, prevalence 0.5%. The precision is about…',o:['90%','50%','8%','0.5%'],a:2,e:'PPV = 0.0045/(0.0045 + 0.04975) ≈ 8.3%: eleven of twelve alerts are false.'},
+{l:'Intermediate',q:'A team can review 300 alerts a day. The right way to set the operating point is…',o:['Threshold of 0.5','Take the top 300 scores by risk (capacity rule) and look at the gain curve','Maximise accuracy','Use the ROC-AUC'],a:1,e:'With a fixed review budget, the question is how many events are in the top m cases, i.e. the gain curve and precision at m.'},
+{l:'Intermediate',q:'With calibrated probabilities and a miss costing 19 times a false alert, flag a case when the probability is at least…',o:['0.5','0.19','0.05','0.95'],a:2,e:'t* = c_FP/(c_FP + c_FN) = 1/(1 + 19) = 0.05.'},
+{l:'Advanced',q:'Where does most of the information about the coefficients of a logistic model come from when the prevalence is 0.2%?',o:['The number of rows','The number of events','The number of predictors','The class balance of the test set'],a:1,e:'The variance of a coefficient is about 1/(nπ(1 − π)σ²): it is driven by the number of events nπ.'},
+{l:'Advanced',q:'A model with 12 candidate predictors is fitted on 60 events. Compared with the 10-events-per-predictor rule this is…',o:['More than enough','Below it (5 events per predictor): expect over-fitting and over-confident forecasts','Exactly right','Irrelevant for logistic regression'],a:1,e:'60/12 = 5 events per candidate parameter, so shrinkage (a penalty or fewer predictors) is needed.'},
+{l:'Advanced',q:'You oversample the events with SMOTE and then run 5-fold cross-validation on the enlarged data. The estimate of performance is…',o:['Unbiased','Optimistic: synthetic copies of validation events leak into the training folds; resample inside each training fold only','Pessimistic','Unaffected'],a:1,e:'Resampling before splitting puts neighbours of the held-out events in the training data.'},
+{l:'Advanced',q:'You trained on a data set in which non-events were kept with probability r = 0.05. To recover the population probabilities you should…',o:['Retrain with weights','Add ln(0.05) to the fitted intercept (i.e. logit forecast + ln r)','Multiply all probabilities by 0.05','Nothing: logistic regression is invariant'],a:1,e:'The slopes are unbiased and the intercept is inflated by −ln r, so the correction is intercept + ln r.'},
+{l:'Advanced',q:'Compared with the full data, 1:1 undersampling at a prevalence of 1% (r ≈ 0.01) makes the variance of the slopes about…',o:['Unchanged','Twice as large (factor 1 + π/r ≈ 2)','100 times larger','Smaller'],a:1,e:'The discarded non-events carried information; the inflation is about 1 + π/r.'},
+{l:'Advanced',q:'Which statement about weighting the events by w and using a threshold of 0.5 is correct for a correct logistic model?',o:['It is equivalent to using the unweighted model with threshold 1/(1 + w), but the probabilities are no longer calibrated','It improves the AUC','It is calibrated','It is equivalent to a threshold of w'],a:0,e:'Weighting multiplies the odds by w; the decision rule is the same, the probability scale is distorted and variance is higher.'},
+{l:'Expert',q:'With few events, maximum-likelihood logistic regression tends to…',o:['Be unbiased in all samples','Give coefficients that are too large and under-estimate the probability of the event; it can also fail through separation','Give coefficients that are too small','Always converge to a finite value'],a:1,e:'King and Zeng: rare-event bias in the intercept and slopes; separation gives infinite estimates. Firth’s penalised likelihood fixes both.'},
+{l:'Expert',q:'Firth’s method is described by which of the following?',o:['A resampling procedure','Penalising the likelihood with the Jeffreys prior term, removing first-order bias and giving finite estimates under separation','Deleting predictors','Adding synthetic events'],a:1,e:'The penalty ½ log|I(β)| reduces bias and keeps estimates finite.'},
+{l:'Expert',q:'A test set contains 18 events. Which conclusion is justified?',o:['The AUC is known to ±0.01','The AUC has a wide interval (perhaps ±0.1); compare models with paired methods, report intervals and repeat','Any AUC above 0.8 is significant','The test set is large because it has 20,000 rows'],a:1,e:'The uncertainty is driven by the 18 events, not by the number of rows.'},
+{l:'Expert',q:'Why should folds be stratified when the event rate is 1% and there are 40 events?',o:['To increase the AUC','To ensure each fold has about 8 events; random folds can have very few or none','To balance the classes','To avoid using a test set'],a:1,e:'Random splitting leaves some folds with few events, so the fold metrics are noisy or undefined.'},
+{l:'Expert',q:'A portfolio has 0 defaults in 500 obligors. A 95% upper bound for the default rate is about…',o:['0%','3/500 = 0.6% (rule of three), and the exact interval gives about 0.6%','5%','There is no meaningful bound'],a:1,e:'The one-sided exact bound is 1 − 0.05^{1/500} ≈ 0.6%; the Wald interval wrongly gives [0, 0].'},
+{l:'Expert',q:'Which interval for a rare proportion has coverage that can fall far below 95%?',o:['Clopper–Pearson (exact)','Wald (normal approximation)','Jeffreys','Wilson'],a:1,e:'At low rates the Wald interval often collapses at 0 events and under-covers badly. Exact, Wilson and Jeffreys behave better.'}
+];
+(function(){const st=store.get('im_quiz',{});
+ function render(){const box=$('quiz');box.innerHTML='';
+  QZ.forEach((q,i)=>{const d=document.createElement('div');d.className='q'+(st[i]!=null?' done':'');d.innerHTML=`<div class="qh">Q${i+1} · ${q.l}</div><div style="margin:4px 0 6px"><b>${q.q}</b></div>`;
+   q.o.forEach((o,j)=>{const b=document.createElement('button');b.className='opt';b.textContent=o;if(st[i]!=null){if(j===q.a)b.classList.add('good');else if(j===st[i])b.classList.add('bad')}b.onclick=()=>{if(st[i]!=null)return;st[i]=j;store.set('im_quiz',st);render();meter()};d.appendChild(b)});
+   const e=document.createElement('div');e.className='ex';e.innerHTML=(st[i]===q.a?'✅ ':'❌ ')+q.e;d.appendChild(e);box.appendChild(d)});
+  const ans=Object.keys(st).length,ok=QZ.filter((q,i)=>st[i]===q.a).length;
+  $('qscore').innerHTML=stat('answered',ans+' / '+QZ.length,'in')+stat('correct',ok,'ok')+stat('score',ans?Math.round(100*ok/ans)+'%':'—',ok/Math.max(ans,1)>=.8?'ok':'warn')+stat('verdict',ans<QZ.length?'keep going':ok>=16?'rare-event master':ok>=13?'strong':'review ch. 1–8','')}
+ $('qreset').onclick=()=>{Object.keys(st).forEach(k=>delete st[k]);store.set('im_quiz',st);render();meter()};
+ window.__qst=st;render();})();
+const CHK=['Explain the accuracy paradox and compute precision, recall, F1, MCC from a confusion matrix.','Explain why ROC-AUC ignores prevalence and PR curves do not.','Compute precision from sensitivity, specificity and prevalence (Bayes).','Use a gain curve to evaluate an alert budget.','Choose a threshold by F1, by cost, and by capacity, and say when each applies.','Count events per predictor and judge whether a model is over-parameterised.','State what undersampling, oversampling, SMOTE and weights do (and do not) change.','Apply the prior correction (add ln r) and quantify the variance cost.','Explain rare-event bias and separation, and use Firth or ridge/Bayesian priors.','Show that weighting by w equals a threshold of 1/(1 + w) for a correct model.','Stratify and repeat CV; report intervals for AUC, AP and recall with few events.','Choose between Wald, Wilson, exact and Jeffreys intervals; give a bound after 0 events.','Keep resampling inside training folds and the test set untouched.','Write the imbalanced-data section of a model-validation report.'];
+(function(){const st=store.get('im_chk',{}),box=$('chk');CHK.forEach((t,i)=>{const l=document.createElement('label'),c=document.createElement('input');c.type='checkbox';c.checked=!!st[i];c.onchange=()=>{st[i]=c.checked;store.set('im_chk',st);meter()};l.appendChild(c);const s=document.createElement('span');s.textContent=t;l.appendChild(s);box.appendChild(l)});window.__cst=st;})();
+function meter(){const q=window.__qst||{},c=window.__cst||{};const ok=QZ.filter((x,i)=>q[i]===x.a).length,ck=Object.values(c).filter(Boolean).length;const p=Math.round(100*(.6*ok/QZ.length+.4*ck/CHK.length));$('mtxt').textContent='Mastery: '+p+'%  (exam + checklist)';$('mbar').style.width=p+'%';store.set('mastery_im',p)}
+meter();
+
+/* ---------- Navigation ---------- */
+(function(){const nav=$('nav');let html='';
+ document.querySelectorAll('main .part, main section.ch').forEach(el=>{if(el.classList.contains('part'))html+=`<div class="pt">${el.textContent}</div>`;else{const h=el.querySelector('h2'),num=h.querySelector('.num').textContent,t=Array.from(h.childNodes).filter(n=>n.nodeType===3).map(n=>n.textContent).join('').trim();html+=`<a href="#${el.id}" data-id="${el.id}">${num}. ${t}</a>`}});
+ nav.innerHTML=html;const links=nav.querySelectorAll('a'),io=new IntersectionObserver(es=>{es.forEach(e=>{if(e.isIntersecting)links.forEach(a=>a.classList.toggle('on',a.dataset.id===e.target.id))})},{rootMargin:'-20% 0px -70% 0px'});
+ document.querySelectorAll('section.ch').forEach(s=>io.observe(s));
+ $('menu').onclick=()=>$('side').classList.toggle('open');nav.addEventListener('click',e=>{if(e.target.tagName==='A')$('side').classList.remove('open')});
+ window.addEventListener('scroll',()=>{const h=document.documentElement;$('prog').style.width=(100*h.scrollTop/(h.scrollHeight-h.clientHeight))+'%'},{passive:true});})();
+</script>
+</body>
+</html>
