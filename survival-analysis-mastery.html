@@ -1,0 +1,688 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Survival Analysis Mastery</title>
+<style>
+:root{--bg:#0b0e17;--panel:#121726;--panel2:#171d30;--line:#232a3d;--fg:#e8ebf5;--mu:#8a93ab;--a:#6ea8ff;--r:#ff6b81;--y:#ffd166;--g:#4ade80;--p:#c084fc;--t:#5eead4}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;background:var(--bg);color:var(--fg);font:16px/1.7 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+a{color:var(--a)}
+#prog{position:fixed;top:0;left:0;height:3px;background:linear-gradient(90deg,var(--a),var(--p),var(--r));width:0;z-index:50}
+.side{position:fixed;left:0;top:0;bottom:0;width:290px;background:#0e1220;border-right:1px solid var(--line);overflow:auto;padding:18px 14px 90px;z-index:40;transition:transform .25s}
+.side h1{font-size:15px;margin:0 0 2px}
+.side small{color:var(--mu)}
+.side .pt{margin:16px 0 4px;font-size:11px;text-transform:uppercase;letter-spacing:1.3px;color:var(--p)}
+.side a{display:block;color:var(--mu);text-decoration:none;padding:5px 9px;border-radius:7px;font-size:13.5px;line-height:1.35}
+.side a:hover{background:var(--panel);color:var(--fg)}
+.side a.on{background:var(--panel2);color:var(--fg);box-shadow:inset 3px 0 var(--a)}
+.side a.back{color:var(--t);padding-left:0;margin-bottom:6px}
+.meter{position:fixed;left:0;bottom:0;width:290px;background:#0e1220;border-top:1px solid var(--line);padding:10px 16px;z-index:41;font-size:12px;color:var(--mu)}
+.meter .bar{height:7px;background:var(--line);border-radius:6px;margin-top:5px;overflow:hidden}
+.meter .bar i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--g),var(--t));transition:width .4s}
+#menu{display:none;position:fixed;top:10px;left:10px;z-index:60;background:var(--panel2);color:var(--fg);border:1px solid var(--line);border-radius:9px;padding:7px 12px;font-size:14px;cursor:pointer}
+main{margin-left:290px;padding:0 34px 120px;max-width:1090px}
+.hero{padding:70px 0 30px}
+.hero h1{font-size:clamp(32px,5vw,56px);line-height:1.08;margin:0 0 14px;background:linear-gradient(100deg,#fff,var(--y) 40%,var(--r));-webkit-background-clip:text;background-clip:text;color:transparent}
+.hero p{font-size:19px;color:#c3c9dc;max-width:780px}
+.chips{display:flex;flex-wrap:wrap;gap:8px;margin:18px 0}
+.chip{border:1px solid var(--line);background:var(--panel);padding:5px 12px;border-radius:99px;font-size:13px;color:var(--mu)}
+.chip b{color:var(--fg)}
+.part{margin:90px 0 0;padding-top:22px;border-top:1px solid var(--line);font-size:12px;letter-spacing:2px;text-transform:uppercase;color:var(--p)}
+section.ch{padding-top:30px}
+h2{font-size:30px;line-height:1.2;margin:10px 0 8px;display:flex;gap:12px;align-items:center;flex-wrap:wrap}
+h2 .num{display:inline-grid;place-items:center;width:40px;height:40px;border-radius:12px;background:var(--panel2);border:1px solid var(--line);font-size:18px;color:var(--a)}
+.lvl{font-size:11px;font-weight:600;letter-spacing:.8px;text-transform:uppercase;padding:3px 9px;border-radius:99px;border:1px solid}
+.lvl.b{color:var(--g);border-color:#1f5c3a}.lvl.i{color:var(--a);border-color:#244a85}.lvl.a{color:var(--y);border-color:#6b5420}.lvl.e{color:var(--r);border-color:#7a2c3a}
+h3{font-size:19px;margin:30px 0 6px;color:#fff}
+p{margin:10px 0}li{margin:5px 0}
+code,.f{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace}
+code{background:var(--panel2);padding:1px 6px;border-radius:5px;font-size:.9em}
+.f{display:block;white-space:pre-wrap;background:#0e1322;border:1px solid var(--line);border-left:3px solid var(--a);padding:12px 16px;border-radius:9px;margin:14px 0;overflow-x:auto;font-size:15px;color:#dbe4ff;line-height:1.8}
+.co{border-radius:12px;padding:13px 17px;margin:16px 0;border:1px solid var(--line);background:var(--panel)}
+.co>b:first-child{display:block;margin-bottom:2px;font-size:12px;letter-spacing:1px;text-transform:uppercase}
+.co.def{border-left:4px solid var(--a)}.co.def>b:first-child{color:var(--a)}
+.co.warn{border-left:4px solid var(--r)}.co.warn>b:first-child{color:var(--r)}
+.co.tip{border-left:4px solid var(--g)}.co.tip>b:first-child{color:var(--g)}
+.co.key{border-left:4px solid var(--y);background:#171608}.co.key>b:first-child{color:var(--y)}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:18px 20px;margin:22px 0;box-shadow:0 8px 30px rgba(0,0,0,.25)}
+.card>h4{margin:0 0 3px;font-size:13px;letter-spacing:1.2px;text-transform:uppercase;color:var(--t)}
+.card>p.sub{margin:0 0 12px;color:var(--mu);font-size:14.5px}
+.ctl{display:flex;flex-wrap:wrap;gap:10px 22px;align-items:center;margin:8px 0 10px}
+.ctl label{display:flex;gap:8px;align-items:center;font-size:14px;color:#c3c9dc}
+.ctl output{min-width:38px;font-family:ui-monospace,monospace;color:var(--y);font-size:13px}
+input[type=range]{accent-color:var(--a);width:150px}
+input[type=checkbox]{accent-color:var(--a)}
+select,input[type=number],input[type=text]{background:#0e1322;color:var(--fg);border:1px solid var(--line);border-radius:8px;padding:6px 9px;font:inherit;font-size:14px}
+button{background:linear-gradient(180deg,#2c4a80,#233b68);color:#fff;border:1px solid #3a5a98;border-radius:9px;padding:7px 14px;font:inherit;font-size:14px;cursor:pointer}
+button:hover{filter:brightness(1.15)}
+button.alt{background:var(--panel2);border-color:var(--line);color:var(--fg)}
+canvas{width:100%;height:270px;display:block;background:#0e1322;border:1px solid var(--line);border-radius:10px;margin-top:6px}
+canvas.sm{height:210px}canvas.tl{height:330px}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(125px,1fr));gap:9px;margin:12px 0}
+.stat{background:#0e1322;border:1px solid var(--line);border-radius:10px;padding:8px 11px}
+.stat b{display:block;font-size:17px;font-family:ui-monospace,monospace}
+.stat span{font-size:11.5px;color:var(--mu);text-transform:uppercase;letter-spacing:.7px}
+.stat.hot b{color:var(--r)}.stat.ok b{color:var(--g)}.stat.warn b{color:var(--y)}.stat.in b{color:var(--a)}
+.read{margin:8px 0 0;padding:10px 14px;background:#0e1322;border:1px dashed #33406a;border-radius:10px;font-size:14.5px;color:#d3dbf3}
+table{border-collapse:collapse;width:100%;margin:12px 0;font-size:14px}
+th,td{border:1px solid var(--line);padding:7px 10px;text-align:left;vertical-align:top}
+th{background:var(--panel2);font-size:12px;text-transform:uppercase;letter-spacing:.6px;color:var(--mu)}
+td.n{font-family:ui-monospace,monospace;text-align:right}
+.tw{overflow-x:auto}
+.pill{display:inline-block;padding:1px 9px;border-radius:99px;font-size:12px;font-weight:600}
+.pill.r{background:#3a1520;color:var(--r)}.pill.g{background:#10321f;color:var(--g)}.pill.y{background:#3a2f0e;color:var(--y)}.pill.m{background:#202637;color:var(--mu)}
+details{background:var(--panel);border:1px solid var(--line);border-radius:11px;padding:9px 15px;margin:9px 0}
+details summary{cursor:pointer;font-weight:600}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.q{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:14px 18px;margin:14px 0}
+.q .qh{font-size:12px;letter-spacing:1px;text-transform:uppercase;color:var(--mu)}
+.q .opt{display:block;width:100%;text-align:left;margin:6px 0;background:#0e1322;border:1px solid var(--line);color:var(--fg);border-radius:9px;padding:9px 12px}
+.q .opt.good{border-color:var(--g);background:#0e2418}.q .opt.bad{border-color:var(--r);background:#2a1119}
+.q .ex{display:none;margin-top:8px;font-size:14.5px;color:#c3c9dc}
+.q.done .ex{display:block}
+.chk label{display:flex;gap:10px;align-items:flex-start;padding:6px 0;cursor:pointer}
+.chk input{margin-top:6px;accent-color:var(--g);width:17px;height:17px}
+.sigrow{display:grid;grid-template-columns:minmax(170px,2fr) 1fr 1fr auto;gap:8px 14px;align-items:center;padding:6px 0;border-top:1px dashed #1b2236}
+.sigrow:first-of-type{border-top:0}
+.sigrow label{display:flex;gap:6px;align-items:center;font-size:13.5px;color:#c3c9dc}
+@media(max-width:900px){
+ .side{transform:translateX(-100%)}.side.open{transform:none}.meter{display:none}
+ #menu{display:block}main{margin-left:0;padding:0 16px 100px}.two{grid-template-columns:1fr}.hero{padding-top:60px}
+ .sigrow{grid-template-columns:1fr 1fr}
+}
+</style>
+</head>
+<body>
+<div id="prog"></div>
+<button id="menu">☰ Contents</button>
+<nav class="side" id="side"><a class="back" href="index.html">← All courses</a><h1>Survival Analysis</h1><small>12 chapters · 11 labs · exam</small><div id="nav"></div></nav>
+<div class="meter"><div id="mtxt">Mastery: 0%</div><div class="bar"><i id="mbar"></i></div></div>
+
+<main>
+<header class="hero">
+ <h1>Survival and time-to-event analysis: censoring, hazards, Kaplan–Meier, Cox and beyond.</h1>
+ <p>How long until a loan defaults, a customer churns, an account is closed or a case is flagged? The outcome is a <em>time</em>, and some subjects are still “alive” when you stop watching (censored). Ignoring that, by averaging the observed times, dropping the censored cases, or fitting a plain classifier on “event within follow-up”, gives biased answers. This page builds the whole toolkit from the ground up: censoring, the survival and hazard functions, the Kaplan–Meier estimator, the log-rank test and its weights, the Cox model and what it does and does not tell you, checking proportional hazards, competing risks, discrete-time (person-period) models for credit and churn, evaluating survival models with censored data, and parametric extrapolation. Every lab simulates from a known truth.</p>
+ <div class="chips"><span class="chip"><b>Part I</b> Time-to-event basics</span><span class="chip"><b>Part II</b> Regression and its assumptions</span><span class="chip"><b>Part III</b> Credit, churn and prediction</span></div>
+ <div class="co tip"><b>How to use this</b>Sliders change the setting; heavy labs update when you release a slider or press the button. Prerequisites: the Maximum Likelihood, GLM, and Imbalanced Data pages (likelihood, logistic regression, rare events).</div>
+</header>
+
+<div class="part">Part I · Time-to-event basics</div>
+
+<section class="ch" id="c1">
+<h2><span class="num">1</span>Why time-to-event data is different <span class="lvl b">Beginner</span></h2>
+<p>For each subject we want the time T until an event, but we often only see that T exceeds some time C at which we lost sight of the subject or the study ended: the observation is <b>right-censored</b>, and we record the time min(T, C) and an indicator of whether it was the event. Censoring carries real information (“survived at least this long”) and must be used, not discarded. Related notions: <b>left truncation</b> (delayed entry: subjects only enter the data if they have already survived to some time, as with a loan book observed from a given date) and <b>interval censoring</b> (event known only to lie between two inspection dates). The main working assumption is <b>non-informative censoring</b>: the reason for censoring is unrelated to the subject’s remaining time to event, given the covariates.</p>
+<p>The naive fixes fail: the average of observed times mixes events with censoring and under-states the typical time; the average of event times only (dropping censored subjects) favours early events and under-states it more; treating “censored” as “no event” in a classifier makes the probability depend on how long you happened to watch. The correct estimators use each subject’s time at risk.</p>
+<div class="card"><h4>Lab 1 · Four ways to estimate the average survival time</h4>
+ <p class="sub">True times are exponential with mean 10. Independent exponential censoring is generated to achieve the chosen censoring share. Bars: average estimate over 300 data sets of (1) the mean of all observed times, (2) the mean of event times only, (3) total time at risk ÷ number of events (the exponential maximum-likelihood estimate), (4) the Kaplan–Meier median ÷ ln 2.</p>
+ <div class="ctl"><label>subjects <input type="range" id="c1n" min="50" max="2000" step="50" value="500"><output id="c1nv"></output></label><label>censored share % <input type="range" id="c1q" min="0" max="90" step="5" value="40"><output id="c1qv"></output></label><button id="c1go">Re-simulate</button></div>
+ <canvas class="tl" id="c1cv"></canvas><div class="stats" id="c1st"></div><div class="read" id="c1rd"></div></div>
+</section>
+
+<section class="ch" id="c2">
+<h2><span class="num">2</span>Survival, hazard and cumulative hazard <span class="lvl i">Intermediate</span></h2>
+<p>Four equivalent descriptions of the distribution of T: the <b>survival function</b> S(t) = P(T &gt; t); the density f(t); the <b>hazard</b> h(t) = f(t)/S(t), the instantaneous event rate among those still at risk; and the <b>cumulative hazard</b> H(t) = ∫₀ᵗ h(u)du, with S(t) = exp(−H(t)). The mean is ∫₀^∞ S(t)dt and the <b>restricted mean survival time</b> RMST(τ) = ∫₀^τ S(t)dt is the average time event-free up to τ, a quantity that is always estimable. Shapes of the hazard are what distinguish models: constant (exponential), monotone (Weibull: decreasing for shape &lt; 1, as with early churn or infant mortality; increasing for shape &gt; 1, as with wear-out), or rising then falling (log-normal, log-logistic: loans that are most at risk in their second year).</p>
+<div class="card"><h4>Lab 2 · Survival and hazard shapes</h4>
+ <p class="sub">All families are scaled to a median of 10 so you can compare shapes. Left: S(t); right: the hazard h(t). The stats give the mean, the restricted mean up to the chosen horizon, and the hazard at several times.</p>
+ <div class="ctl"><label>family <select id="c2f"><option value="exp">Exponential</option><option value="wei" selected>Weibull</option><option value="lnorm">Log-normal</option><option value="llog">Log-logistic</option></select></label><label>shape <input type="range" id="c2s" min="30" max="300" step="5" value="150"><output id="c2sv"></output></label><label>horizon τ <input type="range" id="c2h" min="6" max="60" step="1" value="24"><output id="c2hv"></output></label></div>
+ <div class="two"><canvas class="sm" id="c2cv"></canvas><canvas class="sm" id="c2cv2"></canvas></div><div class="stats" id="c2st"></div><div class="read" id="c2rd"></div></div>
+</section>
+
+<section class="ch" id="c3">
+<h2><span class="num">3</span>The Kaplan–Meier estimator <span class="lvl a">Advanced</span></h2>
+<p>At each distinct event time t_j let n_j be the number at risk and d_j the number of events. The <b>product-limit estimator</b> is</p>
+<div class="f">Ŝ(t) = ∏_{t_j ≤ t} (1 − d_j / n_j)       Var[Ŝ(t)] ≈ Ŝ(t)² Σ_{t_j ≤ t} d_j / [n_j (n_j − d_j)]  (Greenwood)</div>
+<p>It is the non-parametric maximum-likelihood estimate under non-informative censoring. Confidence bands are best built on the log(−log) scale, which keeps them inside [0, 1]. The curve is a step function; its tail is unstable because few subjects remain at risk, so always show the <b>number at risk</b>. The median is the first time Ŝ ≤ 0.5 (not reached if the curve never gets there). The naive estimate “1 − fraction who have had the event by t” treats censored subjects as survivors forever and over-states survival.</p>
+<div class="card"><h4>Lab 3 · Kaplan–Meier against the truth</h4>
+ <p class="sub">Weibull event times (median 10, shape as set) with exponential censoring at the chosen median follow-up. Black: Kaplan–Meier with the 95% log-log band; dashed green: the true survival; dotted red: the naive “not yet seen to fail” curve that treats censored as survivors.</p>
+ <div class="ctl"><label>subjects <input type="range" id="c3n" min="20" max="1000" step="10" value="150"><output id="c3nv"></output></label><label>median follow-up <input type="range" id="c3m" min="3" max="60" step="1" value="20"><output id="c3mv"></output></label><label>Weibull shape <input type="range" id="c3k" min="5" max="30" step="1" value="15"><output id="c3kv"></output></label><button id="c3go">Re-simulate</button></div>
+ <canvas class="tl" id="c3cv"></canvas><div class="stats" id="c3st"></div><div class="read" id="c3rd"></div></div>
+</section>
+
+<section class="ch" id="c4">
+<h2><span class="num">4</span>Comparing groups: the log-rank test and its weights <span class="lvl a">Advanced</span></h2>
+<p>At each event time the <b>log-rank test</b> compares the observed number of events in group 1 with the number expected if both groups shared the same hazard, then sums the differences over all event times. It is the most powerful test under <b>proportional hazards</b>. Weighting the times gives the Fleming–Harrington family G(ρ, γ): weights S(t−)^ρ [1 − S(t−)]^γ put more weight on early differences (ρ &gt; 0, as the Gehan–Wilcoxon test does) or late ones (γ &gt; 0). If the survival curves cross, the plain log-rank test can have almost no power; use a weighted test, a combination (max-combo), or compare restricted mean survival times. Always accompany a p-value with an effect size and the curves.</p>
+<div class="card"><h4>Lab 4 · Which test detects which difference?</h4>
+ <p class="sub">Group 0 has a constant hazard of 0.08 per month; group 1’s hazard is that times the effect, in the pattern chosen: proportional, early only (months 0–8), late only (after month 8), or crossing (effect early, reversed later). Left: the true survival curves. Right: the power (300 trials, 5% level) of the log-rank test, an early-weighted test G(1,0), a late-weighted test G(0,1), and the best of the three with a Bonferroni correction.</p>
+ <div class="ctl"><label>pattern <select id="c4s"><option value="ph">proportional hazards</option><option value="early">early effect only</option><option value="late">late effect only</option><option value="cross">crossing curves</option></select></label><label>subjects per group <input type="range" id="c4n" min="30" max="400" step="10" value="100"><output id="c4nv"></output></label><label>hazard ratio (effect) <input type="range" id="c4h" min="40" max="90" step="5" value="60"><output id="c4hv"></output></label><button id="c4go">Re-simulate</button></div>
+ <div class="two"><canvas class="sm" id="c4cv"></canvas><canvas class="sm" id="c4cv2"></canvas></div><div class="stats" id="c4st"></div><div class="read" id="c4rd"></div></div>
+</section>
+
+<div class="part">Part II · Regression and its assumptions</div>
+
+<section class="ch" id="c5">
+<h2><span class="num">5</span>The Cox proportional hazards model <span class="lvl a">Advanced</span></h2>
+<p>The Cox model writes the hazard for covariates x as h(t | x) = h₀(t) · exp(xᵀβ), with an unspecified baseline hazard h₀(t). The coefficients are estimated by maximising the <b>partial likelihood</b></p>
+<div class="f">PL(β) = ∏_{events i} exp(x_iᵀβ) / Σ_{j ∈ R(t_i)} exp(x_jᵀβ)</div>
+<p>in which each event time contributes the probability that the subject who had the event was the one, among all still at risk, to fail. The baseline hazard cancels, yet the estimator is consistent and nearly fully efficient. exp(β) is the <b>hazard ratio</b> per unit of x. The information is carried by the <em>events</em> (so the events-per-parameter rules of the previous chapter apply). Correct handling of censoring matters: dropping the censored subjects, or treating their censoring times as events, distorts both estimates and standard errors.</p>
+<div class="card"><h4>Lab 5 · Cox regression, done right and done wrong</h4>
+ <p class="sub">One Normal covariate with true log hazard ratio β, Weibull baseline (shape 1.5), exponential censoring at the chosen median. Over 200 data sets: the distribution of the estimated β from (a) the Cox model with proper censoring, (b) Cox after dropping all censored subjects, (c) Cox after treating every censoring time as an event. Stats include the coverage of the 95% interval of (a).</p>
+ <div class="ctl"><label>subjects <input type="range" id="c5n" min="100" max="1500" step="100" value="500"><output id="c5nv"></output></label><label>true β <input type="range" id="c5b" min="0" max="15" step="1" value="7"><output id="c5bv"></output></label><label>median follow-up <input type="range" id="c5m" min="3" max="60" step="1" value="15"><output id="c5mv"></output></label><button id="c5go">Re-simulate</button></div>
+ <canvas class="tl" id="c5cv"></canvas><div class="stats" id="c5st"></div><div class="read" id="c5rd"></div></div>
+</section>
+
+<section class="ch" id="c6">
+<h2><span class="num">6</span>From hazard ratios to absolute risk <span class="lvl a">Advanced</span></h2>
+<p>A hazard ratio is a <em>relative</em> measure: it says that one group’s instantaneous risk is a multiple of another’s, but not how many events to expect. To predict, estimate the baseline cumulative hazard with the <b>Breslow estimator</b>, Ĥ₀(t) = Σ_{t_j ≤ t} d_j / Σ_{R(t_j)} exp(xᵀβ̂), and then Ŝ(t | x) = exp(−Ĥ₀(t) · exp(xᵀβ̂)). The same hazard ratio therefore implies very different absolute risk differences depending on the baseline risk: a ratio of 2 on a 1% risk adds one percentage point, on a 30% risk about nineteen. The ranking quality of the linear predictor is summarised by Harrell’s <b>concordance index</b> (C): among comparable pairs, the share in which the subject with the higher predicted risk fails first.</p>
+<div class="card"><h4>Lab 6 · Predicted survival curves and the same HR at different baselines</h4>
+ <p class="sub">Covariate x is Normal; true log hazard ratio β; Weibull baseline whose median (at x = 0) you set. Curves: fitted survival for x = −1, 0, 1 (solid) against the true curves (dashed) with random exponential censoring (median twice the baseline median).</p>
+ <div class="ctl"><label>true β <input type="range" id="c6b" min="2" max="15" step="1" value="8"><output id="c6bv"></output></label><label>baseline Weibull shape <input type="range" id="c6k" min="6" max="25" step="1" value="15"><output id="c6kv"></output></label><label>baseline median <input type="range" id="c6m" min="3" max="100" step="1" value="10"><output id="c6mv"></output></label><label>subjects <input type="range" id="c6n" min="200" max="2000" step="100" value="600"><output id="c6nv"></output></label><button id="c6go">Re-simulate</button></div>
+ <canvas class="tl" id="c6cv"></canvas><div class="stats" id="c6st"></div><div class="read" id="c6rd"></div></div>
+</section>
+
+<section class="ch" id="c7">
+<h2><span class="num">7</span>Checking proportional hazards <span class="lvl e">Expert</span></h2>
+<p>The Cox model assumes that the hazard ratio is constant over time. Real effects often <b>wane</b> (a retention offer works at first), <b>grow</b>, or cross. Diagnostics: log(−log Ŝ) curves that should be parallel; <b>Schoenfeld residuals</b> plotted against time (a trend means non-proportional); the Grambsch–Therneau test; and adding a covariate × log(time) interaction. When the assumption fails the Cox coefficient is a <em>weighted average</em> of the changing log hazard ratio, with weights depending on the number of events and the censoring pattern, so the “hazard ratio” you report changes with the length of follow-up. Remedies: stratify by the offending variable, model the time-varying effect (piecewise or interaction), report restricted mean survival time differences, or use a model without the assumption (AFT, discrete-time with time interactions).</p>
+<div class="card"><h4>Lab 7 · A waning effect and the Cox hazard ratio</h4>
+ <p class="sub">A binary treatment has a log hazard ratio that decays from the initial value as β₀·exp(−t/τ). Subjects are followed for L months (administrative censoring). Line: the true hazard ratio at each time. Dots: the average Cox hazard ratio when follow-up is L = 6, 12, 24, 36 or 48 months (60 trials each), with the percentage of trials in which the Schoenfeld test (the correlation of residuals with time) rejects proportionality.</p>
+ <div class="ctl"><label>initial log hazard ratio (−) <input type="range" id="c7b" min="5" max="25" step="1" value="14"><output id="c7bv"></output></label><label>waning time τ (months) <input type="range" id="c7t" min="2" max="60" step="1" value="12"><output id="c7tv"></output></label><label>subjects <input type="range" id="c7n" min="200" max="1500" step="100" value="600"><output id="c7nv"></output></label><button id="c7go">Re-simulate</button></div>
+ <canvas class="tl" id="c7cv"></canvas><div class="stats" id="c7st"></div><div class="read" id="c7rd"></div></div>
+</section>
+
+<section class="ch" id="c8">
+<h2><span class="num">8</span>Competing risks <span class="lvl e">Expert</span></h2>
+<p>When an event of another type removes the subject from risk of the event of interest (a loan prepays before it defaults, a customer dies or is closed by the bank before churning), the events are <b>competing risks</b>. Treating the competing event as censoring and computing 1 − KM answers a hypothetical question (“what if the other event could not happen?”) and overstates the real cumulative probability; with several causes the 1 − KM curves can add up to more than 1. The correct estimate of the probability of cause k by time t is the <b>cumulative incidence function</b> F_k(t) = ∫₀ᵗ S(u−) dΛ_k(u) (the Aalen–Johansen estimator), where S is the all-cause survival. Cause-specific hazards (with Cox models) describe the mechanism; the Fine–Gray subdistribution hazard models the cumulative incidence directly and is used for prediction.</p>
+<div class="card"><h4>Lab 8 · 1 − KM versus the cumulative incidence</h4>
+ <p class="sub">Cause 1 (the event of interest) has hazard 0.02 per month; cause 2 has a hazard that is a multiple of it. Administrative censoring at 60 months. Lines: true cumulative incidence of cause 1 (green), Aalen–Johansen (blue), 1 − KM treating cause 2 as censoring (red).</p>
+ <div class="ctl"><label>cause-2 hazard ÷ cause-1 hazard <input type="range" id="c8r" min="0" max="5" step="1" value="3"><output id="c8rv"></output></label><label>subjects <input type="range" id="c8n" min="200" max="5000" step="200" value="2000"><output id="c8nv"></output></label><button id="c8go">Re-simulate</button></div>
+ <canvas class="tl" id="c8cv"></canvas><div class="stats" id="c8st"></div><div class="read" id="c8rd"></div></div>
+</section>
+
+<div class="part">Part III · Credit, churn and prediction</div>
+
+<section class="ch" id="c9">
+<h2><span class="num">9</span>Discrete-time (person-period) models <span class="lvl a">Advanced</span></h2>
+<p>Credit and churn data are recorded monthly. The <b>discrete-time hazard</b> is h_t = P(event in period t | at risk at the start of t). Expand each subject into one row per period at risk, with the event indicator equal to 1 only in the period of the event, and fit a <b>logistic regression</b> on a flexible function of time (period dummies or a spline) plus covariates. The survival curve is Ŝ(t) = ∏_{s ≤ t}(1 − ĥ_s), and the model handles censoring, left truncation and <b>time-varying covariates</b> (macroeconomic indicators, utilisation, days past due) naturally. This is the standard route to a term structure of default probabilities (lifetime PDs for IFRS 9 or Ind AS 109 expected credit loss). With small hazards its coefficients are close to those of the Cox model; the price is a large expanded data set.</p>
+<div class="card"><h4>Lab 9 · Person-period logistic hazards versus naive estimates</h4>
+ <p class="sub">Monthly hazard h_t = sigmoid(a_t + βx) over 12 months with the time pattern you choose and 3% random censoring per month. Left: true hazard by month (red) against the person-period fit (blue) for x = 0. Right: the survival curve for x = 0: truth (green), person-period fit (blue), Kaplan–Meier (black) and the naive “events ÷ subjects” estimate that counts censored subjects as survivors (red).</p>
+ <div class="ctl"><label>subjects <input type="range" id="c9n" min="300" max="3000" step="100" value="1500"><output id="c9nv"></output></label><label>true β <input type="range" id="c9b" min="0" max="15" step="1" value="6"><output id="c9bv"></output></label><label>time pattern <select id="c9p"><option value="rise">rising hazard</option><option value="fall">falling hazard</option><option value="hump">hump</option></select></label><button id="c9go">Re-simulate</button></div>
+ <div class="two"><canvas class="sm" id="c9cv"></canvas><canvas class="sm" id="c9cv2"></canvas></div><div class="stats" id="c9st"></div><div class="read" id="c9rd"></div></div>
+</section>
+
+<section class="ch" id="c10">
+<h2><span class="num">10</span>Evaluating survival models under censoring <span class="lvl e">Expert</span></h2>
+<p>With censored data the usual metrics need care. <b>Harrell’s C</b> only uses comparable pairs and so depends on the censoring pattern; Uno’s C reweights by the inverse probability of censoring (IPCW). At a horizon t* one wants the <b>time-dependent AUC</b> (cases: event by t*, controls: event-free beyond t*) and the <b>Brier score</b> and calibration of predicted risk at t*. Subjects censored before t* have unknown status: dropping them, or counting them as non-events, biases the AUC and the observed risk; IPCW weighting (with the Kaplan–Meier estimate of the censoring distribution), or the Kaplan–Meier estimate of observed risk within risk groups, corrects it. Validate on out-of-time data and report calibration at the horizon relevant to the decision.</p>
+<div class="card"><h4>Lab 10 · Horizon AUC with censored data</h4>
+ <p class="sub">Risk score x (true log hazard ratio 0.8, Weibull baseline). We know every subject’s full event time, so we can compute the true AUC at the horizon, and then compare what you would compute from the censored data: dropping subjects censored before the horizon, counting them as non-events, and the IPCW estimator. Averages over 20 data sets.</p>
+ <div class="ctl"><label>subjects <input type="range" id="c10n" min="500" max="2000" step="100" value="1000"><output id="c10nv"></output></label><label>median censoring time <input type="range" id="c10m" min="3" max="60" step="1" value="12"><output id="c10mv"></output></label><label>horizon t* <input type="range" id="c10h" min="6" max="36" step="1" value="12"><output id="c10hv"></output></label><button id="c10go">Re-simulate</button></div>
+ <canvas class="tl" id="c10cv"></canvas><div class="stats" id="c10st"></div><div class="read" id="c10rd"></div></div>
+</section>
+
+<section class="ch" id="c11">
+<h2><span class="num">11</span>Parametric models and the danger of extrapolation <span class="lvl e">Expert</span></h2>
+<p>Parametric survival models assume a distribution for T and fit its parameters by maximum likelihood: each event contributes log f(t), each censored subject log S(t). The <b>accelerated failure time</b> form, log T = xᵀβ + σε, gives coefficients interpreted as time ratios; the Weibull is both a PH and an AFT model. Parametric models give smooth curves and extrapolate beyond the follow-up, which is what lifetime expected-loss calculations and cost-effectiveness models need, but the extrapolation is determined by the assumed family and not by the data. Several families can fit the observed window equally well (similar AIC) and diverge sharply afterwards. Use clinical or business knowledge for the tail, compare candidates visually with the Kaplan–Meier curve, and report the range, not one number. Cure or mixture models allow a fraction of subjects who never have the event.</p>
+<div class="card"><h4>Lab 11 · Four parametric fits and the unseen tail</h4>
+ <p class="sub">Event times are generated from the chosen true family (median 10) and followed for L months. Exponential, Weibull, log-normal and log-logistic models are fitted by maximum likelihood and extended to 60 months. Black: Kaplan–Meier; dashed green: truth; the vertical line marks the end of follow-up.</p>
+ <div class="ctl"><label>true family <select id="c11t"><option value="wei">Weibull (shape 1.6)</option><option value="lnorm">Log-normal (σ 1)</option><option value="llog">Log-logistic (shape 2)</option></select></label><label>subjects <input type="range" id="c11n" min="50" max="1000" step="50" value="200"><output id="c11nv"></output></label><label>follow-up L <input type="range" id="c11l" min="6" max="36" step="1" value="12"><output id="c11lv"></output></label><button id="c11go">Re-simulate</button></div>
+ <canvas class="tl" id="c11cv"></canvas><div class="stats" id="c11st"></div><div class="read" id="c11rd"></div></div>
+</section>
+
+<section class="ch" id="c12">
+<h2><span class="num">12</span>Final exam, mastery checklist, cheat sheet <span class="lvl e">Expert</span></h2>
+<h3>Exam (18 questions — click an answer)</h3>
+<div id="quiz"></div>
+<div class="card"><h4>Score</h4><div class="stats" id="qscore"></div><button class="alt" id="qreset">Reset exam</button></div>
+<h3>Mastery checklist — tick when you can do it without notes</h3>
+<div class="card chk" id="chk"></div>
+<h3>Cheat sheet</h3>
+<div class="tw"><table>
+<tr><th>Idea</th><th>One line</th></tr>
+<tr><td>Censoring</td><td>Right-censored: we know T &gt; c; assume non-informative; never drop or recode as non-events</td></tr>
+<tr><td>S, h, H</td><td>S = exp(−H); h = f/S; mean = ∫S; RMST(τ) = ∫₀^τ S</td></tr>
+<tr><td>Kaplan–Meier</td><td>Ŝ = ∏(1 − d/n); Greenwood variance; log-log CI; show numbers at risk</td></tr>
+<tr><td>Log-rank</td><td>Observed − expected events by group; best under PH; weights G(ρ, γ) for early/late effects; crossing curves need other tests or RMST</td></tr>
+<tr><td>Cox</td><td>h = h₀(t)exp(xβ); partial likelihood; HR = exp(β); information is the number of events</td></tr>
+<tr><td>Prediction</td><td>Ĥ₀ by Breslow; Ŝ(t|x) = exp(−Ĥ₀ e^{xβ}); HR ≠ absolute risk; C-index for ranking</td></tr>
+<tr><td>PH check</td><td>Schoenfeld residuals, log-log plots, time interactions; if violated the HR is a follow-up-dependent average</td></tr>
+<tr><td>Competing risks</td><td>1 − KM overstates; use cumulative incidence (Aalen–Johansen); cause-specific vs Fine–Gray</td></tr>
+<tr><td>Discrete time</td><td>Person-period logistic hazards; Ŝ = ∏(1 − ĥ); time-varying covariates; lifetime PD term structure</td></tr>
+<tr><td>Evaluation</td><td>Horizon AUC, Brier and calibration with IPCW or KM; Harrell’s C depends on censoring</td></tr>
+<tr><td>Parametric</td><td>Likelihood: events log f, censored log S; AFT time ratios; extrapolation is assumption-driven</td></tr>
+</table></div>
+<div class="co tip"><b>Next on the roadmap</b>Item 19 continues Stage 4: missing data.</div>
+</section>
+</main>
+<script>
+/*MATH*/
+function lgamma(x){const c=[76.18009172947146,-86.50532032941677,24.01409824083091,-1.231739572450155,0.1208650973866179e-2,-0.5395239384953e-5];let y=x,t=x+5.5;t-=(x+.5)*Math.log(t);let s=1.000000000190015;for(let j=0;j<6;j++)s+=c[j]/++y;return -t+Math.log(2.5066282746310005*s/x);}
+function gser(a,x){let ap=a,sum=1/a,del=sum;for(let n=0;n<1000;n++){ap++;del*=x/ap;sum+=del;if(Math.abs(del)<Math.abs(sum)*1e-15)break;}return sum*Math.exp(-x+a*Math.log(x)-lgamma(a));}
+function gcf(a,x){let b=x+1-a,c=1/1e-300,d=1/b,h=d;for(let i=1;i<1000;i++){const an=-i*(i-a);b+=2;d=an*d+b;if(Math.abs(d)<1e-300)d=1e-300;c=b+an/c;if(Math.abs(c)<1e-300)c=1e-300;d=1/d;const del=d*c;h*=del;if(Math.abs(del-1)<1e-15)break;}return Math.exp(-x+a*Math.log(x)-lgamma(a))*h;}
+function gammaQ(a,x){if(x<=0)return 1;return x<a+1?1-gser(a,x):gcf(a,x);}
+function betacf(a,b,x){const qab=a+b,qap=a+1,qam=a-1;let c=1,d=1-qab*x/qap;if(Math.abs(d)<1e-300)d=1e-300;d=1/d;let h=d;for(let m=1;m<=1000;m++){const m2=2*m;let aa=m*(b-m)*x/((qam+m2)*(a+m2));d=1+aa*d;if(Math.abs(d)<1e-300)d=1e-300;c=1+aa/c;if(Math.abs(c)<1e-300)c=1e-300;d=1/d;h*=d*c;aa=-(a+m)*(qab+m)*x/((a+m2)*(qap+m2));d=1+aa*d;if(Math.abs(d)<1e-300)d=1e-300;c=1+aa/c;if(Math.abs(c)<1e-300)c=1e-300;d=1/d;const del=d*c;h*=del;if(Math.abs(del-1)<1e-15)break;}return h;}
+function betai(a,b,x){if(x<=0)return 0;if(x>=1)return 1;const bt=Math.exp(lgamma(a+b)-lgamma(a)-lgamma(b)+a*Math.log(x)+b*Math.log(1-x));return x<(a+1)/(a+b+2)?bt*betacf(a,b,x)/a:1-bt*betacf(b,a,1-x)/b;}
+function normSf(z){const q=0.5*gammaQ(.5,z*z/2);return z>=0?q:1-q;}
+function normCdf(z){return normSf(-z);}
+function npdf(x){return Math.exp(-x*x/2)/2.5066282746310002;}
+function lbin(n,k){return lgamma(n+1)-lgamma(k+1)-lgamma(n-k+1);}
+function binom(n,k,p){return Math.exp(lbin(n,k)+k*Math.log(p)+(n-k)*Math.log(1-p));}
+function betapdf(x,a,b){return x<=0||x>=1?0:Math.exp(lgamma(a+b)-lgamma(a)-lgamma(b)+(a-1)*Math.log(x)+(b-1)*Math.log(1-x));}
+function betacdf(x,a,b){return betai(a,b,x);}
+function gampdf(x,a,r){return x<=0?0:Math.exp(a*Math.log(r)+(a-1)*Math.log(x)-r*x-lgamma(a));}
+function gamcdf(x,a,r){return x<=0?0:1-gammaQ(a,r*x);}
+function randn(){let u=0;while(!u)u=Math.random();return Math.sqrt(-2*Math.log(u))*Math.cos(2*Math.PI*Math.random());}
+function gammaS(a){if(a<1)return gammaS(a+1)*Math.pow(Math.random(),1/a);const d=a-1/3,c=1/Math.sqrt(9*d);for(;;){let x,v;do{x=randn();v=1+c*x}while(v<=0);v=v*v*v;const u=Math.random();if(Math.log(u)<.5*x*x+d-d*v+d*Math.log(v))return d*v;}}
+function betaS(a,b){const x=gammaS(a),y=gammaS(b);return x/(x+y);}
+function binS(n,p){let k=0;for(let i=0;i<n;i++)if(Math.random()<p)k++;return k;}
+function mean(a){let s=0;for(const v of a)s+=v;return s/a.length;}
+function qc(cdf,lo,hi,p,it){for(let i=0;i<(it||100);i++){const m=(lo+hi)/2;if(cdf(m)<p)lo=m;else hi=m}return(lo+hi)/2;}
+function qb(a,b,p){return qc(x=>betai(a,b,x),0,1,p,50);}
+function tcdf(x,v){const t=.5*betai(v/2,.5,v/(v+x*x));return x>0?1-t:t}
+function qn(p){return qc(normCdf,-9,9,p,70)}
+function pois(k,l){return Math.exp(-l+k*Math.log(l)-lgamma(k+1))}
+function binF(n,p){let k=0;for(;;){if(n<=0||p<=0)return k;if(p>=1)return k+n;if(n<=40){for(let i=0;i<n;i++)if(Math.random()<p)k++;return k}const a=1+(n>>1),bb=1+n-a,x=betaS(a,bb);if(x>=p){n=a-1;p=p/x}else{k+=a;n=bb-1;p=(p-x)/(1-x)}}}
+/*ENDMATH*/
+
+const $=id=>document.getElementById(id), val=id=>+$(id).value;
+const C={fg:'#e8ebf5',mu:'#8a93ab',gr:'#232a3d',a:'#6ea8ff',r:'#ff6b81',y:'#ffd166',g:'#4ade80',p:'#c084fc',t:'#5eead4'};
+const store={get(k,d){try{const v=JSON.parse(localStorage.getItem(k));return v==null?d:v}catch(e){return d}},set(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}};
+function stat(l,v,c){return `<div class="stat ${c||''}"><b>${v}</b><span>${l}</span></div>`}
+function f3(x){if(!isFinite(x))return String(x);const a=Math.abs(x);if(a!==0&&(a<1e-3||a>=1e6))return x.toExponential(2);return String(+x.toFixed(a<1?4:a<100?3:a<1000?2:0))}
+function pc(x){return f3(100*x)+'%'}
+const resizers=[];
+function reg(fn){fn();resizers.push(fn)}
+function on(ids,fn){ids.split(' ').forEach(i=>{const e=$(i);e.addEventListener('input',fn);e.addEventListener('change',fn)})}
+let rt;window.addEventListener('resize',()=>{clearTimeout(rt);rt=setTimeout(()=>resizers.forEach(f=>f()),150)});
+document.querySelectorAll('input[type=range]').forEach(i=>{const o=$(i.id+'v');if(!o)return;const f=()=>{o.textContent=i.value};i.addEventListener('input',f);f()});
+
+function nice(x){const e=Math.pow(10,Math.floor(Math.log10(x))),f=x/e;return (f<1.5?1:f<3?2:f<7?5:10)*e}
+function mk(cv,x0,x1,ymax,o){o=o||{};const y0=o.y0||0,dpr=window.devicePixelRatio||1,r=cv.getBoundingClientRect(),w=r.width||600,h=r.height||270;
+ cv.width=w*dpr;cv.height=h*dpr;const g=cv.getContext('2d');g.setTransform(dpr,0,0,dpr,0,0);g.clearRect(0,0,w,h);
+ const L=o.L||42,R=12,T=14,B=28,X=x=>L+(x-x0)/(x1-x0)*(w-L-R),Y=y=>h-B-(y-y0)/(ymax-y0)*(h-T-B);
+ g.font='11px system-ui';g.lineWidth=1;g.strokeStyle=C.gr;g.fillStyle=C.mu;
+ if(!o.noGrid){const sx=nice((x1-x0)/7);for(let x=Math.ceil(x0/sx-1e-9)*sx;!o.noX&&x<=x1+1e-9;x+=sx){g.beginPath();g.moveTo(X(x),T);g.lineTo(X(x),h-B);g.stroke();g.textAlign='center';g.fillText(String(+x.toFixed(6)),X(x),h-B+15)}
+ const sy=nice((ymax-y0)/4);for(let y=Math.ceil(y0/sy-1e-9)*sy;y<=ymax+1e-9;y+=sy){g.beginPath();g.moveTo(L,Y(y));g.lineTo(w-R,Y(y));g.stroke();g.textAlign='right';g.fillText(String(+y.toFixed(4)),L-5,Y(y)+3)}}
+ return{g,w,h,X,Y,L,R,T,B,
+  line(f,col,lw,a,b,n,dash){a=a==null?x0:a;b=b==null?x1:b;n=n||260;g.save();if(dash)g.setLineDash([5,4]);g.beginPath();g.strokeStyle=col;g.lineWidth=lw||2;let st=false;for(let i=0;i<=n;i++){const x=a+(b-a)*i/n,y=f(x);if(!isFinite(y)){st=false;continue}st?g.lineTo(X(x),Y(y)):g.moveTo(X(x),Y(y));st=true}g.stroke();g.restore()},
+  area(f,a,b,col,n){a=Math.max(a,x0);b=Math.min(b,x1);if(b<=a)return;n=n||200;g.beginPath();g.moveTo(X(a),Y(0));for(let i=0;i<=n;i++){const x=a+(b-a)*i/n;g.lineTo(X(x),Y(f(x)))}g.lineTo(X(b),Y(0));g.closePath();g.fillStyle=col;g.fill()},
+  vline(x,col,lab,dash){g.save();g.strokeStyle=col;g.lineWidth=1.6;if(dash)g.setLineDash([5,4]);g.beginPath();g.moveTo(X(x),T);g.lineTo(X(x),h-B);g.stroke();g.restore();if(lab){g.fillStyle=col;g.textAlign='center';g.fillText(lab,Math.min(Math.max(X(x),34),w-34),T+10)}},
+  hline(y,col,lab){g.save();g.strokeStyle=col;g.lineWidth=1.4;g.setLineDash([5,4]);g.beginPath();g.moveTo(L,Y(y));g.lineTo(w-R,Y(y));g.stroke();g.restore();if(lab){g.fillStyle=col;g.textAlign='right';g.fillText(lab,w-R-3,Y(y)-4)}},
+  text(s,x,y,col,al){g.fillStyle=col||C.fg;g.textAlign=al||'left';g.fillText(s,x,y)}};}
+
+/* ---------- shared helpers for this page ---------- */
+const D={
+ norm:{n:'Normal(0,1)',s:()=>randn(),mu:0,sd:1,sk:0},
+ unif:{n:'Uniform(0,1)',s:()=>Math.random(),mu:.5,sd:Math.sqrt(1/12),sk:0},
+ expo:{n:'Exponential(1)',s:()=>-Math.log(1-Math.random()),mu:1,sd:1,sk:2},
+ logn:{n:'Lognormal(0,1)',s:()=>Math.exp(randn()),mu:Math.exp(.5),sd:Math.sqrt((Math.E-1)*Math.E),sk:(Math.E+2)*Math.sqrt(Math.E-1),disc:0},
+ b05:{n:'Bernoulli(0.5)',s:()=>Math.random()<.5?1:0,mu:.5,sd:.5,sk:0,disc:1},
+ b05s:{n:'Bernoulli(0.05)',s:()=>Math.random()<.05?1:0,mu:.05,sd:Math.sqrt(.0475),sk:.9/Math.sqrt(.0475),disc:1},
+ bimo:{n:'Two humps',s:()=>(Math.random()<.5?-2:2)+.5*randn(),mu:0,sd:Math.sqrt(4.25),sk:0},
+ par5:{n:'Pareto(α=5)',s:()=>Math.pow(1-Math.random(),-.2),mu:1.25,sd:Math.sqrt(5/48),sk:6*Math.sqrt(.6)},
+ cauchy:{n:'Cauchy (no mean)',s:()=>Math.tan(Math.PI*(Math.random()-.5)),mu:NaN,sd:Infinity,sk:NaN}
+};
+function fillSel(id,keys,def){const e=$(id);e.innerHTML=keys.map(k=>`<option value="${k}">${D[k].n}</option>`).join('');e.value=def}
+const PAL=[C.a,C.r,C.y,C.g,C.p,C.t,'#ff9f43','#9aa4bf'];
+function tgrid(N,M){const T=[];let prev=0;for(let i=0;i<M;i++){let n=Math.round(Math.pow(10,Math.log10(N)*i/(M-1)));if(i===M-1)n=N;n=Math.max(prev+1,n);if(n>N)break;T.push(n);prev=n}if(T[T.length-1]!==N)T[T.length-1]=N;return T}
+function nlab(n){return n>=1e6?(n/1e6)+'M':n>=1000?(n/1000)+'k':String(n)}
+function customGrid(P,xt,yt){const g=P.g;g.save();g.strokeStyle=C.gr;g.fillStyle=C.mu;g.font='11px system-ui';g.lineWidth=1;
+ xt.forEach(([v,l])=>{g.beginPath();g.moveTo(P.X(v),P.T);g.lineTo(P.X(v),P.h-P.B);g.stroke();g.textAlign='center';g.fillText(l,P.X(v),P.h-P.B+15)});
+ yt.forEach(([v,l])=>{g.beginPath();g.moveTo(P.L,P.Y(v));g.lineTo(P.w-P.R,P.Y(v));g.stroke();g.textAlign='right';g.fillText(l,P.L-5,P.Y(v)+3)});g.restore()}
+function clip(P,fn){const g=P.g;g.save();g.beginPath();g.rect(P.L,P.T,P.w-P.L-P.R,P.h-P.T-P.B);g.clip();fn();g.restore()}
+function poly(P,pts,col,lw,dash){const g=P.g;g.save();if(dash)g.setLineDash([5,4]);g.strokeStyle=col;g.lineWidth=lw||2;g.beginPath();pts.forEach(([x,y],i)=>i?g.lineTo(P.X(x),P.Y(y)):g.moveTo(P.X(x),P.Y(y)));g.stroke();g.restore()}
+function dots(P,pts,col,r){const g=P.g;g.fillStyle=col;pts.forEach(([x,y])=>{g.beginPath();g.arc(P.X(x),P.Y(y),r||3,0,7);g.fill()})}
+function niceTicks(lo,hi,k){const st=nice((hi-lo)/(k||5)),a=[];for(let v=Math.ceil(lo/st-1e-9)*st;v<=hi+1e-9;v+=st)a.push([v,String(+v.toFixed(6))]);return a}
+function logTicks(lo,hi){const a=[];for(let e=Math.ceil(lo-1e-9);e<=hi+1e-9;e++)a.push([e,nlab(Math.pow(10,e))]);return a}
+function mom(a){const n=a.length;let m=0;for(const v of a)m+=v;m/=n;let v2=0,v3=0,v4=0;for(const v of a){const d=v-m;v2+=d*d;v3+=d*d*d;v4+=d*d*d*d}v2/=n;v3/=n;v4/=n;const sd=Math.sqrt(v2);return{n,m,sd,sk:sd>0?v3/(sd*sd*sd):0,ku:v2>0?v4/(v2*v2)-3:0}}
+function ksN(z){const a=Array.from(z).sort((x,y)=>x-y),n=a.length;let d=0;for(let i=0;i<n;i++){const F=normCdf(a[i]);d=Math.max(d,Math.abs((i+1)/n-F),Math.abs(i/n-F))}return d}
+/* histogram of data as density with optional overlay curves [{f,col,lw,dash}] */
+function hist(cv,data,lo,hi,bins,ov,col){const cnt=new Float64Array(bins),bw=(hi-lo)/bins;let n=0;for(const v of data){if(v<lo||v>=hi)continue;cnt[Math.floor((v-lo)/bw)]++;n++}
+ const N=data.length;let ym=0;for(let i=0;i<bins;i++){cnt[i]/=N*bw;ym=Math.max(ym,cnt[i])}
+ (ov||[]).forEach(o=>{for(let i=0;i<=80;i++)ym=Math.max(ym,o.f(lo+(hi-lo)*i/80)||0)});
+ const P=mk(cv,lo,hi,ym*1.12);
+ P.g.fillStyle=col||'rgba(110,168,255,.5)';for(let i=0;i<bins;i++){if(cnt[i]<=0)continue;const a=P.X(lo+i*bw),b=P.X(lo+(i+1)*bw);P.g.fillRect(a,P.Y(cnt[i]),Math.max(1,b-a-1),P.Y(0)-P.Y(cnt[i]))}
+ (ov||[]).forEach(o=>P.line(o.f,o.col,o.lw||2.4,lo,hi,200,o.dash));return P}
+const fmt=x=>f3(x);
+
+/* ---------- shared for this page ---------- */
+const POPS=['norm','unif','expo','logn','bimo','par5'];
+D.norm.med=0;D.norm.q90=1.2815516;D.unif.med=.5;D.unif.q90=.9;D.expo.med=Math.LN2;D.expo.q90=Math.log(10);D.logn.med=1;D.logn.q90=Math.exp(1.2815516);
+D.bimo.med=0;D.bimo.q90=qc(x=>.5*normCdf((x+2)/.5)+.5*normCdf((x-2)/.5),-10,10,.9,80);D.par5.med=Math.pow(2,.2);D.par5.q90=Math.pow(10,.2);
+const SF={mean:a=>mean(a),median:a=>{const b=Float64Array.from(a).sort(),n=b.length;return n%2?b[(n-1)/2]:(b[n/2-1]+b[n/2])/2},sd:a=>{const n=a.length,m=mean(a);let s=0;for(const v of a)s+=(v-m)*(v-m);return Math.sqrt(s/(n-1))},q90:a=>{const b=Float64Array.from(a).sort();return b[Math.round(.9*(b.length-1))]}};
+function truth(key,st){const d=D[key];return st==='mean'?d.mu:st==='median'?d.med:st==='sd'?d.sd:d.q90}
+const SNAME={mean:'sample mean',median:'sample median',sd:'sample SD',q90:'90th percentile'};
+const N10=[2,3,5,10,20,50,100,200,500,1000];
+function pct(a,p){const b=Float64Array.from(a).sort();return b[Math.min(b.length-1,Math.max(0,Math.floor(p*b.length)))]}
+function histLines(cv,arrs,cols,lo,hi,bins,vl){const bw=(hi-lo)/bins,dens=arrs.map(a=>{const c=new Float64Array(bins);for(const v of a){if(v<lo||v>=hi)continue;c[Math.floor((v-lo)/bw)]++}for(let i=0;i<bins;i++)c[i]/=a.length*bw;return c});let ym=0;dens.forEach(c=>c.forEach(v=>ym=Math.max(ym,v)));const P=mk(cv,lo,hi,ym*1.15||1);
+ dens.forEach((c,k)=>{const pts=[];for(let i=0;i<bins;i++){pts.push([lo+i*bw,c[i]]);pts.push([lo+(i+1)*bw,c[i]])}clip(P,()=>poly(P,pts,cols[k],2.2))});(vl||[]).forEach(v=>P.vline(v[0],v[1],v[2],v[3]));return P}
+function sdOf(a){return mom(a).sd}
+
+/* ---------- ML helpers ---------- */
+function digamma(x){let r=0;while(x<6){r-=1/x;x++}const f=1/(x*x);return r+Math.log(x)-.5/x-f*(1/12-f*(1/120-f/252))}
+function trigamma(x){let r=0;while(x<6){r+=1/(x*x);x++}const f=1/(x*x);return r+1/x+.5*f+f/x*(1/6-f*(1/30-f/42))}
+function poisS(l){if(l<=0)return 0;if(l<30){const L=Math.exp(-l);let k=0,p=1;do{k++;p*=Math.random()}while(p>L);return k-1}const m=Math.floor(.875*l),g=gammaS(m);return g<l?m+poisS(l-g):binF(m-1,l/g)}
+function llb(k,n,p){return(k?k*Math.log(p):0)+(n-k?(n-k)*Math.log(1-p):0)}
+function lrInt(k,n,cut){const ph=k/n,l0=llb(k,n,ph),g=p=>2*(l0-llb(k,n,p))-cut;let lo=0,hi=1;
+ if(k>0){let a=1e-12,b=ph;for(let i=0;i<70;i++){const m=(a+b)/2;if(g(m)>0)a=m;else b=m}lo=(a+b)/2}
+ if(k<n){let a=ph,b=1-1e-12;for(let i=0;i<70;i++){const m=(a+b)/2;if(g(m)>0)b=m;else a=m}hi=(a+b)/2}return[lo,hi]}
+function solveAlpha(s){if(!(s>1e-9))return 1e6;let a=(3-s+Math.sqrt((3-s)*(3-s)+24*s))/(12*s);for(let i=0;i<8;i++){const f=Math.log(a)-digamma(a)-s,fp=1/a-trigamma(a);let n=a-f/fp;if(!(n>0))n=a/2;a=n}return a}
+function normPdfAt(x,m,s){return Math.exp(-(x-m)*(x-m)/(2*s*s))/(s*2.5066282746)}
+/* ---------- Regression helpers ---------- */
+function idx(id,arr,ff){const e=$(id),o=$(id+'v'),f=()=>{o.textContent=ff?ff(arr[+e.value]):arr[+e.value]};e.addEventListener('input',f);f()}
+function scl(id,ff){const e=$(id),o=$(id+'v'),f=()=>{o.textContent=ff(+e.value)};e.addEventListener('input',f);f()}
+function pctTicks(a,b,st){const r=[];for(let v=a;v<=b+1e-9;v+=st)r.push([v,Math.round(v*100)+'%']);return r}
+const _tq={};function tq(v,p){const k=v+'_'+p;return _tq[k]||(_tq[k]=qc(x=>tcdf(x,v),0,500,p,80))}
+function simple(x,y){const n=x.length;let xm=0,ym=0;for(let i=0;i<n;i++){xm+=x[i];ym+=y[i]}xm/=n;ym/=n;let sxx=0,sxy=0,syy=0;for(let i=0;i<n;i++){const dx=x[i]-xm,dy=y[i]-ym;sxx+=dx*dx;sxy+=dx*dy;syy+=dy*dy}const b=sxy/sxx,a=ym-b*xm,res=new Float64Array(n);let sse=0;for(let i=0;i<n;i++){res[i]=y[i]-a-b*x[i];sse+=res[i]*res[i]}return{n,xm,ym,sxx,sxy,syy,b,a,res,sse,sst:syy,r2:1-sse/syy}}
+function gj(A,B){const p=A.length;const M=A.map((r,i)=>Array.from(r).concat(B?[B[i]]:[]));for(let c=0;c<p;c++){let m=c;for(let r=c+1;r<p;r++)if(Math.abs(M[r][c])>Math.abs(M[m][c]))m=r;[M[c],M[m]]=[M[m],M[c]];const d=M[c][c]||1e-12;for(let k=c;k<M[c].length;k++)M[c][k]/=d;for(let r=0;r<p;r++)if(r!==c){const f=M[r][c];if(f!==0)for(let k=c;k<M[c].length;k++)M[r][k]-=f*M[c][k]}}return M}
+function olsMulti(cols,y,needInv){const n=y.length,k=cols.length,p=k+1,A=[],B=new Float64Array(p);for(let i=0;i<p;i++)A.push(new Float64Array(p));
+ for(let r=0;r<n;r++){const row=[1];for(let j=0;j<k;j++)row.push(cols[j][r]);for(let i=0;i<p;i++){B[i]+=row[i]*y[r];for(let j=i;j<p;j++)A[i][j]+=row[i]*row[j]}}
+ for(let i=0;i<p;i++){for(let j=0;j<i;j++)A[i][j]=A[j][i];if(i>0)A[i][i]+=1e-9}
+ let beta,inv=null;if(needInv){const I=[];for(let i=0;i<p;i++){const e=new Float64Array(p);e[i]=1;I.push(e)}const M=gj(A,null);const aug=A.map((r,i)=>Array.from(r).concat(Array.from(I[i])));
+  const m=aug;for(let c=0;c<p;c++){let q=c;for(let r=c+1;r<p;r++)if(Math.abs(m[r][c])>Math.abs(m[q][c]))q=r;[m[c],m[q]]=[m[q],m[c]];const d=m[c][c]||1e-12;for(let kk=0;kk<2*p;kk++)m[c][kk]/=d;for(let r=0;r<p;r++)if(r!==c){const f=m[r][c];if(f!==0)for(let kk=0;kk<2*p;kk++)m[r][kk]-=f*m[c][kk]}}
+  inv=m.map(r=>r.slice(p));beta=inv.map(r=>{let s=0;for(let j=0;j<p;j++)s+=r[j]*B[j];return s})}
+ else{const M=gj(A,B);beta=M.map(r=>r[p])}
+ const res=new Float64Array(n);let sse=0;for(let r=0;r<n;r++){let f=beta[0];for(let j=0;j<k;j++)f+=beta[j+1]*cols[j][r];res[r]=y[r]-f;sse+=res[r]*res[r]}
+ const out={beta,res,sse,n,p,inv};if(inv){const s2=sse/(n-p);out.s2=s2;out.se=inv.map((r,i)=>Math.sqrt(s2*r[i]))}return out}
+function scatterAxes(cv,xs,ys,xlo,xhi,ylo,yhi,L){return mk(cv,xlo,xhi,yhi,{y0:ylo,L:L||44})}
+function range(a,pad){let lo=1e99,hi=-1e99;for(const v of a){if(v<lo)lo=v;if(v>hi)hi=v}const w=(hi-lo)||1;return[lo-(pad||.05)*w,hi+(pad||.05)*w]}
+
+
+function bars(P,groups,cols,yt){/* groups: array of arrays of values (0..1) */const g=P.g,G=groups.length,B=groups[0].length,W=(P.w-P.L-P.R)/G;groups.forEach((vals,gi)=>vals.forEach((v,bi)=>{const bw=W*.78/B,x=P.L+W*gi+W*.11+bw*bi;g.fillStyle=cols[bi];g.fillRect(x,P.Y(v),bw-2,P.Y(0)-P.Y(v));g.fillStyle=C.fg;g.textAlign='center';g.font='10px system-ui';g.fillText(Math.round(v*100)+'%',x+bw/2-1,P.Y(v)-3)}));g.font='11px system-ui'}
+function gridG(P,yt,labels){customGrid(P,[],yt);const G=labels.length,W=(P.w-P.L-P.R)/G;P.g.fillStyle=C.mu;P.g.textAlign='center';labels.forEach((l,i)=>P.g.fillText(l,P.L+W*(i+.5),P.h-P.B+15))}
+function legend(P,items,y){let x=P.L+8;items.forEach(([s,c])=>{P.text('■ '+s,x,y,c);x+=P.g.measureText('■ '+s).width+16})}
+
+/* ---------- GLM machinery ---------- */
+const LK={logit:{mu:e=>1/(1+Math.exp(-e)),d:e=>{const m=1/(1+Math.exp(-e));return m*(1-m)}},
+ probit:{mu:e=>normCdf(e),d:e=>npdf(e)},
+ cll:{mu:e=>1-Math.exp(-Math.exp(e)),d:e=>Math.exp(e-Math.exp(e))},
+ log:{mu:e=>Math.exp(e),d:e=>Math.exp(e)}};
+function minv(A){const p=A.length,m=A.map((r,i)=>{const row=Array.from(r);for(let j=0;j<p;j++)row.push(i===j?1:0);return row});
+ for(let c=0;c<p;c++){let q=c;for(let r=c+1;r<p;r++)if(Math.abs(m[r][c])>Math.abs(m[q][c]))q=r;[m[c],m[q]]=[m[q],m[c]];const d=m[c][c]||1e-12;for(let k=0;k<2*p;k++)m[c][k]/=d;for(let r=0;r<p;r++)if(r!==c){const f=m[r][c];if(f!==0)for(let k=0;k<2*p;k++)m[r][k]-=f*m[c][k]}}
+ return m.map(r=>r.slice(p))}
+function glm(cols,y,o){o=o||{};const n=y.length,k=cols.length,p=k+1,fam=o.fam||'binom',L=LK[o.link||(fam==='pois'?'log':'logit')],off=o.off,X=[new Float64Array(n).fill(1)].concat(cols),V=m=>fam==='pois'?m:m*(1-m);
+ let b=new Float64Array(p);if(o.init)b=Float64Array.from(o.init);else if(fam==='pois'){let m=0;for(const v of y)m+=v;b[0]=Math.log(Math.max(m/n,1e-3))-(off?mean(off):0)}
+ function ev(b){const eta=new Float64Array(n),mu=new Float64Array(n);let ll=0;for(let i=0;i<n;i++){let e=off?off[i]:0;for(let j=0;j<p;j++)e+=b[j]*X[j][i];e=Math.max(-30,Math.min(30,e));eta[i]=e;let m=L.mu(e);m=fam==='binom'?Math.min(1-1e-12,Math.max(1e-12,m)):Math.max(m,1e-12);mu[i]=m;ll+=fam==='pois'?y[i]*Math.log(m)-m-lgamma(y[i]+1):y[i]*Math.log(m)+(1-y[i])*Math.log(1-m)}return{eta,mu,ll}}
+ function info(c){const A=[];for(let i=0;i<p;i++)A.push(new Float64Array(p));const w=new Float64Array(n);for(let r=0;r<n;r++){const d=L.d(c.eta[r]),wi=d*d/V(c.mu[r]);w[r]=wi;for(let i=0;i<p;i++){const xi=X[i][r]*wi;for(let j=i;j<p;j++)A[i][j]+=xi*X[j][r]}}for(let i=0;i<p;i++)for(let j=0;j<i;j++)A[i][j]=A[j][i];return{A,w}}
+ let cur=ev(b),it=0,conv=false,maxit=o.maxit==null?40:o.maxit;
+ for(;it<maxit;it++){const{A,w}=info(cur),Ai=minv(A),g=new Float64Array(p);
+  for(let r=0;r<n;r++){const d=L.d(cur.eta[r]),v=V(cur.mu[r]);let s=(y[r]-cur.mu[r])*d/v;if(o.firth){let h=0;for(let i=0;i<p;i++)for(let j=0;j<p;j++)h+=X[i][r]*Ai[i][j]*X[j][r];h*=w[r];s+=h*(.5-cur.mu[r])}for(let i=0;i<p;i++)g[i]+=X[i][r]*s}
+  const st=new Float64Array(p);let mx=0;for(let i=0;i<p;i++){let s=0;for(let j=0;j<p;j++)s+=Ai[i][j]*g[j];st[i]=s}
+  if(o.firth){for(let i=0;i<p;i++){st[i]=Math.max(-1,Math.min(1,st[i]));mx=Math.max(mx,Math.abs(st[i]))}b=b.map((v,i)=>v+st[i]);cur=ev(b);if(mx<1e-8){conv=true;it++;break}}
+  else{let a=1,nb,nc;for(let h=0;h<25;h++){nb=b.map((v,i)=>v+a*st[i]);nc=ev(nb);if(nc.ll>=cur.ll-1e-10)break;a/=2}for(let i=0;i<p;i++)mx=Math.max(mx,Math.abs(a*st[i]));const dl=Math.abs(nc.ll-cur.ll);b=nb;cur=nc;if(mx<1e-8||dl<1e-11){conv=true;it++;break}}}
+ const{A,w}=info(cur),Ai=minv(A),se=Ai.map((r,i)=>Math.sqrt(Math.max(r[i],0)));let dev;
+ if(fam==='binom')dev=-2*cur.ll;else{dev=0;for(let i=0;i<n;i++){const yy=y[i],m=cur.mu[i];dev+=2*((yy>0?yy*Math.log(yy/m):0)-(yy-m))}}
+ return{beta:b,mu:cur.mu,eta:cur.eta,ll:cur.ll,dev,inv:Ai,se,iter:it,conv,X,w,p,n,A}}
+function auc(sc,y){const n=y.length,idx=Array.from({length:n},(_,i)=>i).sort((a,b)=>sc[a]-sc[b]);let rk=0,np=0,i=0;while(i<n){let j=i;while(j+1<n&&sc[idx[j+1]]===sc[idx[i]])j++;const r=(i+j)/2+1;for(let t=i;t<=j;t++)if(y[idx[t]]===1){rk+=r;np++}i=j+1}const nn=n-np;return np&&nn?(rk-np*(np+1)/2)/(np*nn):.5}
+function sepTest(x,y){let a1=1e99,b1=-1e99,a0=1e99,b0=-1e99,n1=0,n0=0;for(let i=0;i<x.length;i++){if(y[i]===1){n1++;a1=Math.min(a1,x[i]);b1=Math.max(b1,x[i])}else{n0++;a0=Math.min(a0,x[i]);b0=Math.max(b0,x[i])}}return n1>0&&n0>0&&(a1>b0||a0>b1)}
+const sig=e=>1/(1+Math.exp(-e));
+function lgt(p){return Math.log(p/(1-p))}
+function binaryData(n,a,b,sd){const x=new Float64Array(n),y=new Float64Array(n);for(let i=0;i<n;i++){x[i]=(sd||1)*randn();y[i]=Math.random()<sig(a+b*x[i])?1:0}return{x,y}}
+function heat(P,gx,gy,vals,x0,x1,y0,y1){const g=P.g,nx=gx,ny=gy;let mn=1e99,mx=-1e99;vals.forEach(v=>{if(isFinite(v)){mn=Math.min(mn,v);mx=Math.max(mx,v)}});mn=Math.max(mn,mx-30);for(let i=0;i<nx;i++)for(let j=0;j<ny;j++){const v=vals[i*ny+j],t=isFinite(v)?Math.max(0,Math.min(1,(v-mn)/(mx-mn))):0,tt=Math.pow(t,1.6),c=Math.round(40+190*tt);g.fillStyle=`rgb(${Math.round(20+60*tt)},${Math.round(30+100*tt)},${c})`;const xa=P.X(x0+(x1-x0)*i/nx),xb=P.X(x0+(x1-x0)*(i+1)/nx),ya=P.Y(y0+(y1-y0)*j/ny),yb=P.Y(y0+(y1-y0)*(j+1)/ny);g.fillRect(xa,Math.min(ya,yb),xb-xa+1,Math.abs(ya-yb)+1)}}
+
+/* ---------- regularisation machinery ---------- */
+function eigSym(A){const p=A.length,a=A.map(r=>Float64Array.from(r)),V=[];for(let i=0;i<p;i++){const r=new Float64Array(p);r[i]=1;V.push(r)}
+ for(let sw=0;sw<60;sw++){let off=0;for(let i=0;i<p;i++)for(let j=i+1;j<p;j++)off+=a[i][j]*a[i][j];if(off<1e-22)break;
+  for(let pp=0;pp<p-1;pp++)for(let q=pp+1;q<p;q++){if(Math.abs(a[pp][q])<1e-15)continue;const th=(a[q][q]-a[pp][pp])/(2*a[pp][q]),t=(th>=0?1:-1)/(Math.abs(th)+Math.sqrt(th*th+1)),c=1/Math.sqrt(t*t+1),s=t*c;
+   for(let k=0;k<p;k++){const x=a[k][pp],y=a[k][q];a[k][pp]=c*x-s*y;a[k][q]=s*x+c*y}
+   for(let k=0;k<p;k++){const x=a[pp][k],y=a[q][k];a[pp][k]=c*x-s*y;a[q][k]=s*x+c*y}
+   for(let k=0;k<p;k++){const x=V[k][pp],y=V[k][q];V[k][pp]=c*x-s*y;V[k][q]=s*x+c*y}}}
+ return{d:a.map((r,i)=>r[i]),V}}
+function stdz(cols,y){const n=y.length,p=cols.length,mu=[],sd=[],Z=[];for(let j=0;j<p;j++){let m=0;for(let i=0;i<n;i++)m+=cols[j][i];m/=n;let v=0;for(let i=0;i<n;i++){const d=cols[j][i]-m;v+=d*d}const s=Math.sqrt(v/n)||1;mu.push(m);sd.push(s);const z=new Float64Array(n);for(let i=0;i<n;i++)z[i]=(cols[j][i]-m)/s;Z.push(z)}let ym=0;for(const v of y)ym+=v;ym/=n;return{Z,mu,sd,ym,yc:Float64Array.from(y,v=>v-ym),n,p}}
+function gramOf(Z,yc,idx){const p=Z.length,n=idx?idx.length:yc.length,G=[],c=new Float64Array(p);for(let i=0;i<p;i++)G.push(new Float64Array(p));
+ for(let r=0;r<n;r++){const i=idx?idx[r]:r;for(let a=0;a<p;a++){const za=Z[a][i];c[a]+=za*yc[i];for(let b=a;b<p;b++)G[a][b]+=za*Z[b][i]}}
+ for(let a=0;a<p;a++){c[a]/=n;for(let b=a;b<p;b++){G[a][b]/=n;G[b][a]=G[a][b]}}return{G,c,n}}
+function gramMinus(F,Z,yc,val){const p=F.c.length,nv=val.length,nt=F.n-nv,G=[],c=new Float64Array(p);for(let i=0;i<p;i++){G.push(new Float64Array(p));c[i]=F.c[i]*F.n}for(let a=0;a<p;a++)for(let b=0;b<p;b++)G[a][b]=F.G[a][b]*F.n;
+ for(const i of val)for(let a=0;a<p;a++){const za=Z[a][i];c[a]-=za*yc[i];for(let b=0;b<p;b++)G[a][b]-=za*Z[b][i]}
+ for(let a=0;a<p;a++){c[a]/=nt;for(let b=0;b<p;b++)G[a][b]/=nt}return{G,c,n:nt}}
+function cd(G,c,lam,al,b0,maxit){const p=c.length,b=b0?Float64Array.from(b0):new Float64Array(p),l1=lam*al,l2=lam*(1-al);for(let it=0;it<(maxit||300);it++){let mx=0;for(let j=0;j<p;j++){let r=c[j];const Gj=G[j];for(let k=0;k<p;k++)if(k!==j&&b[k]!==0)r-=Gj[k]*b[k];const den=Gj[j]+l2,nb=Math.abs(r)>l1?(r>0?1:-1)*(Math.abs(r)-l1)/den:0;mx=Math.max(mx,Math.abs(nb-b[j])*Math.sqrt(Gj[j]));b[j]=nb}if(mx<1e-8)break}return b}
+function lamGrid(c,al,K,ratio){let mx=0;for(const v of c)mx=Math.max(mx,Math.abs(v));mx/=Math.max(al,.01);const r=[];for(let k=0;k<K;k++)r.push(mx*Math.pow(ratio||1e-3,k/(K-1)));return r}
+function ridgeEig(G){const e=eigSym(G);return e}
+function ridgeFromEig(e,c,lam){const p=c.length,vc=new Float64Array(p);for(let k=0;k<p;k++){let s=0;for(let j=0;j<p;j++)s+=e.V[j][k]*c[j];vc[k]=s/(e.d[k]+lam)}const b=new Float64Array(p);for(let j=0;j<p;j++){let s=0;for(let k=0;k<p;k++)s+=e.V[j][k]*vc[k];b[j]=s}return b}
+function dfRidge(e,lam){let s=0;for(const d of e.d)s+=Math.max(d,0)/(Math.max(d,0)+lam);return s}
+function foldsOf(n,K){const f=Int32Array.from({length:n},(_,i)=>i%K);for(let i=n-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[f[i],f[j]]=[f[j],f[i]]}return f}
+/* K-fold CV for enet (al>0) or ridge (al==='ridge'); returns {cv,se,lams,iMin,i1se} */
+function cvEnet(S,al,lams,K){const n=S.n,{Z,yc}=S,F=gramOf(Z,yc),fold=foldsOf(n,K),L=lams.length,err=[];for(let l=0;l<L;l++)err.push(new Float64Array(K));
+ for(let f=0;f<K;f++){const val=[];for(let i=0;i<n;i++)if(fold[i]===f)val.push(i);const T=gramMinus(F,Z,yc,val);let b=null,eg=null;if(al==='ridge')eg=eigSym(T.G);
+  for(let l=0;l<L;l++){b=al==='ridge'?ridgeFromEig(eg,T.c,lams[l]):cd(T.G,T.c,lams[l],al,b);let s=0;for(const i of val){let e=yc[i];for(let j=0;j<Z.length;j++)e-=b[j]*Z[j][i];s+=e*e}err[l][f]=s/val.length}}
+ const cv=[],se=[];for(let l=0;l<L;l++){cv.push(mean(err[l]));se.push(sdOf(err[l])/Math.sqrt(K))}let iMin=0;cv.forEach((v,i)=>{if(v<cv[iMin])iMin=i});let i1=iMin;for(let l=0;l<L;l++)if(cv[l]<=cv[iMin]+se[iMin]){i1=l;break}
+ return{cv,se,lams,iMin,i1se:i1,F}}
+function pathOf(F,al,lams){const out=[];let b=null;for(const l of lams){b=cd(F.G,F.c,l,al,b);out.push(b)}return out}
+function genReg(n,p,beta,rho,sg){const z0=new Float64Array(n).map(()=>randn()),cols=[],y=new Float64Array(n),s=Math.sqrt(rho),t=Math.sqrt(1-rho);for(let j=0;j<p;j++){const c=new Float64Array(n);for(let i=0;i<n;i++)c[i]=s*z0[i]+t*randn();cols.push(c)}for(let i=0;i<n;i++){let m=0;for(let j=0;j<beta.length&&j<p;j++)m+=beta[j]*cols[j][i];y[i]=m+sg*randn()}return{cols,y}}
+/* excess prediction error of standardised coefficients b under equicorrelated truth */
+function excessErr(S,b,beta,rho,p){let s=0;const bo=new Float64Array(p);for(let j=0;j<p;j++)bo[j]=b[j]/S.sd[j]-(beta[j]||0);let sum=0,sq=0;for(let j=0;j<p;j++){sum+=bo[j];sq+=bo[j]*bo[j]}return(1-rho)*sq+rho*sum*sum}
+function pctOf(a,q){const b=Float64Array.from(a).sort();return b[Math.min(b.length-1,Math.max(0,Math.floor(q*b.length)))]}
+function ridgeLogit(Z,y,lam,maxit){const n=y.length,p=Z.length,b=new Float64Array(p+1);for(let it=0;it<(maxit||25);it++){const A=[],g=new Float64Array(p+1);for(let i=0;i<=p;i++)A.push(new Float64Array(p+1));let mx=0;
+  for(let r=0;r<n;r++){let e=b[0];for(let j=0;j<p;j++)e+=b[j+1]*Z[j][r];e=Math.max(-25,Math.min(25,e));const m=1/(1+Math.exp(-e)),w=Math.max(m*(1-m),1e-9),x=[1];for(let j=0;j<p;j++)x.push(Z[j][r]);for(let i=0;i<=p;i++){g[i]+=x[i]*(y[r]-m);for(let j=i;j<=p;j++)A[i][j]+=w*x[i]*x[j]}}
+  for(let i=0;i<=p;i++)for(let j=0;j<i;j++)A[i][j]=A[j][i];for(let i=1;i<=p;i++){A[i][i]+=lam;g[i]-=lam*b[i]}A[0][0]+=1e-8;
+  const Ai=minv(A),st=Ai.map(r=>{let s=0;for(let j=0;j<=p;j++)s+=r[j]*g[j];return s});for(let i=0;i<=p;i++){const s=Math.max(-4,Math.min(4,st[i]));b[i]+=s;mx=Math.max(mx,Math.abs(s))}if(mx<1e-7)break}return b}
+
+/* ---------- survival helpers ---------- */
+const LN2=Math.LN2,U01=()=>1-Math.random();
+const mapA=(a,f)=>Float64Array.from(a,f);
+function sdv(a){const m=mean(a);let s=0;for(const v of a)s+=(v-m)*(v-m);return Math.sqrt(s/Math.max(a.length-1,1))}
+function medOf(a){const b=Float64Array.from(a).sort();return b.length?b[b.length>>1]:NaN}
+function barV(cv,vals,cols,labs,ymax,ff){const P=mk(cv,0,vals.length,ymax,{y0:0,noGrid:true,L:50});customGrid(P,[],niceTicks(0,ymax,5));const W=(P.w-P.L-P.R)/vals.length,g=P.g;vals.forEach((v,i)=>{const w=W*.5,x=P.L+W*i+W*.25;g.fillStyle=cols[i];g.fillRect(x,P.Y(v),w,P.Y(0)-P.Y(v));g.fillStyle=C.fg;g.textAlign='center';g.fillText((ff||fmt)(v),x+w/2,P.Y(v)-4);g.fillStyle=C.mu;g.fillText(labs[i],x+w/2,P.h-P.B+15)});return P}
+const sortIdx=t=>Array.from({length:t.length},(_,i)=>i).sort((a,b)=>t[a]-t[b]);
+const expT=rate=>-Math.log(U01())/rate;
+const expMedT=med=>med/LN2*-Math.log(U01());
+const weiT=(k,scale)=>scale*Math.pow(-Math.log(U01()),1/k);
+function pwT(edges,haz){let E=-Math.log(U01()),t0=0;for(let k=0;k<haz.length;k++){const t1=k<edges.length?edges[k]:Infinity,H=haz[k]*(t1-t0);if(E<=H||k===haz.length-1)return t0+E/haz[k];E-=H;t0=t1}}
+/* Kaplan–Meier */
+function km(time,status){const n=time.length,ix=sortIdx(time);let atRisk=n,S=1,G=0,i=0;const ts=[],Ss=[],nr=[],dv=[],gv=[];while(i<n){const t=time[ix[i]];let d=0,c=0,j=i;while(j<n&&time[ix[j]]===t){if(status[ix[j]])d++;else c++;j++}if(d>0){S*=1-d/atRisk;if(atRisk>d)G+=d/(atRisk*(atRisk-d));ts.push(t);Ss.push(S);nr.push(atRisk);dv.push(d);gv.push(G)}atRisk-=d+c;i=j}return{t:ts,S:Ss,n:nr,d:dv,G:gv,N:n}}
+function kmIdx(k,t){let lo=-1,hi=k.t.length-1;while(lo<hi){const m=(lo+hi+1)>>1;if(k.t[m]<=t)lo=m;else hi=m-1}return lo}
+function kmAt(k,t){const i=kmIdx(k,t);return i<0?1:k.S[i]}
+function kmCI(k,t){const i=kmIdx(k,t);if(i<0)return[1,1,1];const S=k.S[i];if(S<=0||S>=1)return[S,S,S];const se=Math.sqrt(k.G[i])/Math.abs(Math.log(S)),e=Math.exp(1.96*se);return[S,Math.pow(S,e),Math.pow(S,1/e)]}
+function kmMedian(k){for(let i=0;i<k.t.length;i++)if(k.S[i]<=.5)return k.t[i];return Infinity}
+function atRiskAt(time,t){let c=0;for(const v of time)if(v>=t)c++;return c}
+/* Cox partial likelihood, Breslow ties; X = array of Float64Array columns */
+function coxFit(X,time,status){const n=time.length,p=X.length,ix=sortIdx(time),xs=ix.map(i=>X.map(c=>c[i])),ts=ix.map(i=>time[i]),ds=ix.map(i=>status[i]);
+ const pass=b=>{let s0=0;const s1=new Float64Array(p),s2=[];for(let a=0;a<p;a++)s2.push(new Float64Array(p));let ll=0;const U=new Float64Array(p),I=[];for(let a=0;a<p;a++)I.push(new Float64Array(p));
+  let i=n-1;while(i>=0){let j=i;const t=ts[i];while(j>=0&&ts[j]===t){const x=xs[j];let e=0;for(let a=0;a<p;a++)e+=b[a]*x[a];e=Math.exp(Math.max(-30,Math.min(30,e)));s0+=e;for(let a=0;a<p;a++){s1[a]+=e*x[a];for(let c=a;c<p;c++)s2[a][c]+=e*x[a]*x[c]}j--}
+   let d=0;const sx=new Float64Array(p);let se=0;for(let m=j+1;m<=i;m++)if(ds[m]){d++;let e=0;for(let a=0;a<p;a++){sx[a]+=xs[m][a];e+=b[a]*xs[m][a]}se+=e}
+   if(d){ll+=se-d*Math.log(s0);for(let a=0;a<p;a++){U[a]+=sx[a]-d*s1[a]/s0;for(let c=a;c<p;c++)I[a][c]+=d*(s2[a][c]/s0-s1[a]*s1[c]/(s0*s0))}}i=j}
+  for(let a=0;a<p;a++)for(let c=0;c<a;c++)I[a][c]=I[c][a];return{ll,U,I}};
+ let b=new Float64Array(p),P=pass(b);const ll0=P.ll;let conv=false;
+ for(let it=0;it<30;it++){const Ai=minv(P.I.map(r=>Array.from(r))),dl=Ai.map(r=>{let s=0;for(let c=0;c<p;c++)s+=r[c]*P.U[c];return s});let h=1,nb,P2;for(let q=0;q<12;q++){nb=b.map((v,i)=>v+h*Math.max(-3,Math.min(3,dl[i])));P2=pass(nb);if(P2.ll>=P.ll-1e-9)break;h/=2}let mx=0;for(let i=0;i<p;i++)mx=Math.max(mx,Math.abs(nb[i]-b[i]));b=nb;P=P2;if(mx<1e-7){conv=true;break}}
+ const Ai=minv(P.I.map(r=>Array.from(r)));return{beta:b,se:Ai.map((r,i)=>Math.sqrt(Math.max(r[i],0))),ll:P.ll,ll0,conv,inv:Ai}}
+function breslow(time,status,eta){const n=time.length,ix=sortIdx(time);let s0=0,i=n-1;const out=[];while(i>=0){let j=i;const t=time[ix[i]];let d=0;while(j>=0&&time[ix[j]]===t){s0+=Math.exp(eta[ix[j]]);if(status[ix[j]])d++;j--}if(d)out.push([t,d/s0]);i=j}out.reverse();let H=0;return{t:out.map(o=>o[0]),H:out.map(o=>(H+=o[1]))}}
+function H0At(b,t){let lo=-1,hi=b.t.length-1;while(lo<hi){const m=(lo+hi+1)>>1;if(b.t[m]<=t)lo=m;else hi=m-1}return lo<0?0:b.H[lo]}
+function cIndex(time,status,score){let c=0,tot=0;const n=time.length;for(let i=0;i<n;i++){if(!status[i])continue;for(let j=0;j<n;j++){if(time[j]>time[i]){tot++;if(score[i]>score[j])c++;else if(score[i]===score[j])c+=.5}}}return c/tot}
+/* weighted log-rank (Fleming–Harrington G(rho,gamma)) for two groups; returns {z,p} */
+function logrank(time,status,grp,rho,gam){const n=time.length,ix=sortIdx(time);let nn=n,n1=0;for(let i=0;i<n;i++)n1+=grp[i];let S=1,U=0,V=0,i=0;while(i<n){const t=time[ix[i]];let d=0,d1=0,l=0,l1=0,j=i;while(j<n&&time[ix[j]]===t){const k=ix[j];if(status[k]){d++;d1+=grp[k]}l++;l1+=grp[k];j++}
+  if(d>0){const w=Math.pow(S,rho)*Math.pow(1-S,gam),e=d*n1/nn;U+=w*(d1-e);if(nn>1)V+=w*w*d*(n1/nn)*(1-n1/nn)*(nn-d)/(nn-1);S*=1-d/nn}nn-=l;n1-=l1;i=j}
+ const z=V>0?U/Math.sqrt(V):0;return{z,p:2*normSf(Math.abs(z))}}
+/* Nelder–Mead */
+function nmMin(f,x0,step,iters){const n=x0.length;let S=[x0.slice()];for(let i=0;i<n;i++){const x=x0.slice();x[i]+=step;S.push(x)}let F=S.map(f);for(let it=0;it<(iters||500);it++){const o=S.map((_,i)=>i).sort((a,b)=>F[a]-F[b]);S=o.map(i=>S[i]);F=o.map(i=>F[i]);if(it>30&&Math.abs(F[n]-F[0])<1e-10)break;const c=Array.from({length:n},(_,j)=>{let s=0;for(let i=0;i<n;i++)s+=S[i][j];return s/n}),w=S[n],xr=c.map((v,j)=>v+(v-w[j])),fr=f(xr);
+  if(fr<F[0]){const xe=c.map((v,j)=>v+2*(v-w[j])),fe=f(xe);if(fe<fr){S[n]=xe;F[n]=fe}else{S[n]=xr;F[n]=fr}}else if(fr<F[n-1]){S[n]=xr;F[n]=fr}else{const xc=c.map((v,j)=>v+.5*(w[j]-v)),fc=f(xc);if(fc<F[n]){S[n]=xc;F[n]=fc}else{for(let i=1;i<=n;i++){S[i]=S[i].map((v,j)=>S[0][j]+.5*(v-S[0][j]));F[i]=f(S[i])}}}}
+ return{x:S[0],f:F[0]}}
+/* families scaled to median 10 (shape s) */
+const FAM={
+ exp:{S:(t,s)=>Math.exp(-LN2*t/10),h:(t,s)=>LN2/10,T:s=>expT(LN2/10)},
+ wei:{S:(t,s)=>{const sc=10/Math.pow(LN2,1/s);return Math.exp(-Math.pow(t/sc,s))},h:(t,s)=>{const sc=10/Math.pow(LN2,1/s);return s/sc*Math.pow(t/sc,s-1)},T:s=>weiT(s,10/Math.pow(LN2,1/s))},
+ lnorm:{S:(t,s)=>t<=0?1:normSf((Math.log(t)-Math.log(10))/s),h:(t,s)=>{if(t<=0)return 0;const z=(Math.log(t)-Math.log(10))/s;return normPdfAt(z,0,1)/(s*t*Math.max(normSf(z),1e-300))},T:s=>10*Math.exp(s*randn())},
+ llog:{S:(t,s)=>1/(1+Math.pow(t/10,s)),h:(t,s)=>s/10*Math.pow(t/10,s-1)/(1+Math.pow(t/10,s)),T:s=>{const u=U01();return 10*Math.pow(1/u-1,1/s)}}
+};
+function trapz(f,a,b,m){let s=0;const h=(b-a)/m;for(let i=0;i<m;i++)s+=.5*h*(f(a+i*h)+f(a+(i+1)*h));return s}
+/* Schoenfeld-residual / time-rank correlation test for one covariate */
+function schoenTest(time,status,x,beta){const n=time.length,ix=sortIdx(time);let s0=0,s1=0,i=n-1;const res=[];while(i>=0){let j=i;const t=time[ix[i]];while(j>=0&&time[ix[j]]===t){const e=Math.exp(beta*x[ix[j]]);s0+=e;s1+=e*x[ix[j]];j--}for(let m=j+1;m<=i;m++)if(status[ix[m]])res.push(x[ix[m]]-s1/s0);i=j}
+ const d=res.length;if(d<4)return{p:1,r:0};const rk=res.map((_,k)=>d-k);let mr=0,mk_=0;for(let k=0;k<d;k++){mr+=res[k];mk_+=rk[k]}mr/=d;mk_/=d;let sxy=0,sxx=0,syy=0;for(let k=0;k<d;k++){sxy+=(res[k]-mr)*(rk[k]-mk_);sxx+=(res[k]-mr)**2;syy+=(rk[k]-mk_)**2}const r=sxy/Math.sqrt(sxx*syy),t=r*Math.sqrt((d-2)/Math.max(1-r*r,1e-12));return{r,p:2*(1-tcdf(Math.abs(t),d-2))}}
+
+function wlogit(Z,y,w,lam,maxit){const n=y.length,p=Z.length,b=new Float64Array(p+1);for(let it=0;it<(maxit||25);it++){const A=[],g=new Float64Array(p+1);for(let i=0;i<=p;i++)A.push(new Float64Array(p+1));let mx=0;
+  for(let r=0;r<n;r++){let e=b[0];for(let j=0;j<p;j++)e+=b[j+1]*Z[j][r];e=Math.max(-25,Math.min(25,e));const m=1/(1+Math.exp(-e)),wr=w?w[r]:1,ww=Math.max(m*(1-m),1e-9)*wr,x=[1];for(let j=0;j<p;j++)x.push(Z[j][r]);for(let i=0;i<=p;i++){g[i]+=wr*x[i]*(y[r]-m);for(let j=i;j<=p;j++)A[i][j]+=ww*x[i]*x[j]}}
+  for(let i=0;i<=p;i++)for(let j=0;j<i;j++)A[i][j]=A[j][i];for(let i=1;i<=p;i++){A[i][i]+=lam;g[i]-=lam*b[i]}A[0][0]+=1e-8;
+  const Ai=minv(A),st=Ai.map(r=>{let s=0;for(let j=0;j<=p;j++)s+=r[j]*g[j];return s});for(let i=0;i<=p;i++){const s=Math.max(-4,Math.min(4,st[i]));b[i]+=s;mx=Math.max(mx,Math.abs(s))}if(mx<1e-7)break}return b}
+
+/* ---------- Ch1 naive estimators ---------- */
+(function(){scl('c1n',v=>v);scl('c1q',v=>v+'%');
+ function run(){const n=val('c1n'),q=val('c1q')/100,lam=.1,gam=q>0?lam*q/(1-q):0,R=300,acc=[0,0,0,0],cnt=[0,0,0,0],sq=[0,0,0,0];
+  for(let r=0;r<R;r++){const t=new Float64Array(n),s=new Uint8Array(n);let sum=0,se=0,d=0,sev=0;for(let i=0;i<n;i++){const T=expT(lam),Cc=gam>0?expT(gam):Infinity,o=Math.min(T,Cc);t[i]=o;s[i]=T<=Cc?1:0;sum+=o;if(s[i]){d++;sev+=o}}
+   const est=[sum/n,d?sev/d:NaN,d?sum/d:NaN,(()=>{const m=kmMedian(km(t,s));return isFinite(m)?m/LN2:NaN})()];est.forEach((v,i)=>{if(isFinite(v)){acc[i]+=v;sq[i]+=v*v;cnt[i]++}})}
+  const m=acc.map((a,i)=>a/Math.max(cnt[i],1)),sd=m.map((v,i)=>Math.sqrt(Math.max(sq[i]/Math.max(cnt[i],1)-v*v,0))),NM=['mean of observed times','mean of event times only','time at risk ÷ events','Kaplan–Meier median ÷ ln 2'];
+  const P=barV($('c1cv'),m,[C.r,C.y,C.g,C.a],NM,Math.max(10,...m)*1.2,x=>fmt(x));P.hline(10,C.fg,'truth: 10');
+  $('c1st').innerHTML=NM.map((s,i)=>stat(s+' (SD '+fmt(sd[i])+')',fmt(m[i]),i>1?'ok':'hot')).join('')+stat('events per data set',fmt(n*(1-q)),'');
+  $('c1rd').innerHTML=`With ${pc(q)} of the subjects censored, the mean of the observed times is ${fmt(m[0])} and the mean of the event times alone ${fmt(m[1])}: both far below the true mean of 10, because censored subjects are cut off before they can show long times, and dropping them throws away exactly the long survivors. The two estimators that use the time at risk, total follow-up ÷ events (${fmt(m[2])}) and the Kaplan–Meier median (${fmt(m[3])}), are centred on 10, with a spread that depends on the number of events (${fmt(n*(1-q))} here) and not on the number of subjects. Raise the censored share to 90% to see the variance blow up while the bias stays small.`}
+ on('c1n c1q',()=>{});['c1n','c1q'].forEach(i=>$(i).addEventListener('change',run));$('c1go').onclick=run;run();})();
+
+/* ---------- Ch2 shapes ---------- */
+(function(){scl('c2s',v=>fmt(v/100));scl('c2h',v=>v);
+ function meanOf(f,s){return f==='exp'?10/LN2:f==='wei'?10/Math.pow(LN2,1/s)*Math.exp(lgamma(1+1/s)):f==='lnorm'?10*Math.exp(s*s/2):(s>1?10*(Math.PI/s)/Math.sin(Math.PI/s):Infinity)}
+ function run(){const f=$('c2f').value,s=val('c2s')/100,F=FAM[f],tau=val('c2h'),ts=Array.from({length:200},(_,i)=>.2*(i+1)),hs=ts.map(t=>F.h(t,s)),hm=Math.min(Math.max(...hs)*1.1,Math.max(.5,3*F.h(10,s)+.2));
+  const P1=mk($('c2cv'),0,40,1.02,{y0:0,L:44}),P2=mk($('c2cv2'),0,40,hm,{y0:0,L:44});poly(P1,[[0,1]].concat(ts.map(t=>[t,F.S(t,s)])),C.a,2.6);P1.hline(.5,C.mu,'median');P1.vline(tau,C.y,'τ',true);P1.text('survival S(t) ↑',P1.L+6,P1.T+12,C.mu);P1.text('time →',P1.w-P1.R-40,P1.h-P1.B-6,C.mu);
+  clip(P2,()=>poly(P2,ts.map((t,i)=>[t,hs[i]]),C.r,2.6));P2.text('hazard h(t) ↑',P2.L+6,P2.T+12,C.mu);P2.text('time →',P2.w-P2.R-40,P2.h-P2.B-6,C.mu);
+  const mu=meanOf(f,s),rm=trapz(t=>F.S(t,s),0,tau,400),h1=F.h(1,s),h10=F.h(10,s),h30=F.h(30,s),up=(a,b)=>b>a*1.05,shape=f==='exp'?'constant':(up(h1,h10)&&up(h30,h10)?'rises then falls':up(h1,h10)&&up(h10,h30)?'increasing':up(h10,h1)&&up(h30,h10)?'decreasing':'roughly flat');
+  $('c2st').innerHTML=stat('median',10,'')+stat('mean',isFinite(mu)?fmt(mu):'infinite',mu>15?'warn':'')+stat('restricted mean up to τ = '+tau,fmt(rm),'in')+stat('hazard at t = 1 · 10 · 30',fmt(h1)+' · '+fmt(h10)+' · '+fmt(h30),'')+stat('S(τ)',pc(F.S(tau,s)),'')+stat('hazard shape',shape,'ok');
+  $('c2rd').innerHTML=`The ${{exp:'exponential',wei:'Weibull',lnorm:'log-normal',llog:'log-logistic'}[f]} model with these settings has a ${shape} hazard (${fmt(h1)} at month 1, ${fmt(h10)} at month 10, ${fmt(h30)} at month 30). All four families share the median of 10, yet the mean is ${isFinite(mu)?fmt(mu):'infinite'} and the restricted mean up to ${tau} months is ${fmt(rm)}: the median says nothing about the tail. The restricted mean is the area under the left curve up to τ, always finite and estimable from data that stop at τ, which is why it is used to compare treatments or retention programmes.`}
+ on('c2f c2s c2h',run);run();})();
+
+/* ---------- Ch3 Kaplan–Meier ---------- */
+(function(){scl('c3n',v=>v);scl('c3m',v=>v);scl('c3k',v=>fmt(v/10));
+ function steps(k,fn,tmax){const pts=[[0,1]];let prev=1;k.t.forEach((t,i)=>{if(t>tmax)return;pts.push([t,prev]);prev=fn(i);pts.push([t,prev])});pts.push([tmax,prev]);return pts}
+ function run(){const n=val('c3n'),m=val('c3m'),kk=val('c3k')/10,F=FAM.wei,t=new Float64Array(n),s=new Uint8Array(n);let cens=0;for(let i=0;i<n;i++){const T=F.T(kk),Cc=expMedT(m);t[i]=Math.min(T,Cc);s[i]=T<=Cc?1:0;if(!s[i])cens++}
+  const k=km(t,s),tmax=40,ci=k.t.map(x=>kmCI(k,x)),P=mk($('c3cv'),0,tmax,1.02,{y0:0,L:44}),lo=steps(k,i=>ci[i][1],tmax),hi=steps(k,i=>ci[i][2],tmax);
+  P.g.fillStyle='rgba(110,168,255,.22)';P.g.beginPath();hi.forEach(([x,y],i)=>i?P.g.lineTo(P.X(x),P.Y(y)):P.g.moveTo(P.X(x),P.Y(y)));lo.slice().reverse().forEach(([x,y])=>P.g.lineTo(P.X(x),P.Y(y)));P.g.closePath();P.g.fill();
+  const nv=[];{let ev=0;k.t.forEach((x,i)=>{ev+=k.d[i]});}const evT=[];for(let i=0;i<n;i++)if(s[i])evT.push(t[i]);evT.sort((a,b)=>a-b);const naive=[[0,1]];let c=0;evT.forEach(x=>{if(x>tmax)return;naive.push([x,1-c/n]);c++;naive.push([x,1-c/n])});naive.push([tmax,1-c/n]);
+  P.line(x=>F.S(x,kk),C.g,2.4,0,tmax,200,true);poly(P,naive,C.r,2,true);poly(P,steps(k,i=>k.S[i],tmax),C.fg,2.4);P.hline(.5,C.mu,'');legend(P,[['Kaplan–Meier + 95% band',C.fg],['true',C.g],['naive (censored count as alive)',C.r]],P.T+12);P.text('time →',P.w-P.R-40,P.h-P.B-6,C.mu);
+  const med=kmMedian(k),lowM=k.t.find((x,i)=>ci[i][1]<=.5),hiM=k.t.find((x,i)=>ci[i][2]<=.5),sT=FAM.wei.S(10,kk),a10=kmCI(k,10),nv10=(c=>{let z=0;for(const v of t)if(v>=c)z++;return z});
+  $('c3st').innerHTML=stat('censored',pc(cens/n),'')+stat('Kaplan–Meier median',isFinite(med)?fmt(med):'not reached','in')+stat('median 95% CI',(lowM==null?'–':fmt(lowM))+' – '+(hiM==null?'∞':fmt(hiM)),'')+stat('S(10): KM · true · naive',pc(a10[0])+' · '+pc(sT)+' · '+pc(1-evT.filter(x=>x<=10).length/n),'ok')+stat('at risk at 10 · 20 · 30',nv10(10)+' · '+nv10(20)+' · '+nv10(30),'warn');
+  $('c3rd').innerHTML=`${pc(cens/n)} of the ${n} subjects are censored. The Kaplan–Meier curve follows the true survival (dashed) closely until the number at risk gets small (${nv10(20)} at month 20, ${nv10(30)} at month 30), where its band widens; the true S(10) = ${pc(sT)} is ${a10[1]<=sT&&sT<=a10[2]?'inside':'outside'} the 95% interval ${pc(a10[1])}–${pc(a10[2])}. The naive curve, which counts censored subjects as survivors, estimates S(10) as ${pc(1-evT.filter(x=>x<=10).length/n)}: biased upward, and the more so the heavier the censoring. Shorten the follow-up to 5 months and watch the naive curve flatten while Kaplan–Meier stays centred on the truth.`}
+ on('c3n c3m c3k',()=>{});['c3n','c3m','c3k'].forEach(i=>$(i).addEventListener('change',run));$('c3go').onclick=run;run();})();
+
+/* ---------- Ch4 log-rank power ---------- */
+(function(){scl('c4n',v=>v);scl('c4h',v=>fmt(v/100));const H0=.08;
+ function haz(sc,hr){return sc==='ph'?[H0*hr,H0*hr]:sc==='early'?[H0*hr,H0]:sc==='late'?[H0,H0*hr]:[H0*hr,H0/hr]}
+ const Spw=(h,t)=>Math.exp(-(h[0]*Math.min(t,8)+h[1]*Math.max(t-8,0)));
+ function run(){const sc=$('c4s').value,n=val('c4n'),hr=val('c4h')/100,h1=haz(sc,hr),R=300,pw=[0,0,0,0];
+  for(let r=0;r<R;r++){const N=2*n,t=new Float64Array(N),s=new Uint8Array(N),g=new Uint8Array(N);for(let i=0;i<N;i++){g[i]=i<n?0:1;const T=pwT([8],g[i]?h1:[H0,H0]),Cc=Math.min(36,expMedT(60));t[i]=Math.min(T,Cc);s[i]=T<=Cc?1:0}
+   const p=[logrank(t,s,g,0,0).p,logrank(t,s,g,1,0).p,logrank(t,s,g,0,1).p];p.forEach((v,i)=>{if(v<.05)pw[i]++});if(Math.min(...p)<.05/3)pw[3]++}
+  const P=mk($('c4cv'),0,36,1.02,{y0:0,L:44});P.line(t=>Spw([H0,H0],t),C.a,2.6,0,36,200);P.line(t=>Spw(h1,t),C.r,2.6,0,36,200);P.vline(8,C.mu,'month 8',true);legend(P,[['group 0',C.a],['group 1',C.r]],P.T+12);P.text('true survival',P.L+6,P.T+28,C.mu);P.text('months →',P.w-P.R-60,P.h-P.B-6,C.mu);
+  const pr=pw.map(v=>v/R),NM=['log-rank','early-weighted G(1,0)','late-weighted G(0,1)','best of three (Bonferroni)'];barV($('c4cv2'),pr,[C.a,C.y,C.p,C.g],NM.map(s=>s.replace(' (Bonferroni)','')),1.12,x=>Math.round(x*100)+'%');
+  const best=pr.indexOf(Math.max(...pr.slice(0,3)));
+  $('c4st').innerHTML=NM.map((s,i)=>stat('power: '+s,pc(pr[i]),i===best?'ok':'')).join('')+stat('S at month 36: group 0 · group 1',pc(Spw([H0,H0],36))+' · '+pc(Spw(h1,36)),'');
+  $('c4rd').innerHTML=sc==='ph'?`With proportional hazards (ratio ${fmt(hr)}) the log-rank test has the most power (${pc(pr[0])}); the weighted tests give up a little.`:sc==='early'?`The effect exists only in the first 8 months, so the early-weighted test is strongest (${pc(pr[1])} against ${pc(pr[0])} for log-rank and ${pc(pr[2])} for the late-weighted one).`:sc==='late'?`The effect starts after month 8, so the late-weighted test wins (${pc(pr[2])} against ${pc(pr[0])} for log-rank and ${pc(pr[1])} for the early-weighted one), a pattern typical of treatments that need time to work.`:`The curves cross at about month 8: early weights see group 1 doing better, late weights see it doing worse, and the plain log-rank test (${pc(pr[0])}) lets the two cancel. Weighted tests, restricted mean survival time, or a combination are the safer choice, and a single p-value should never replace looking at the curves.`;
+  $('c4rd').innerHTML+=` (Power estimated from ${R} simulated trials of ${n} subjects per group, administrative censoring at 36 months.)`}
+ ['c4s','c4n','c4h'].forEach(i=>$(i).addEventListener('change',run));$('c4go').onclick=run;run();})();
+
+/* ---------- Ch5 Cox right and wrong ---------- */
+(function(){scl('c5n',v=>v);scl('c5b',v=>fmt(v/10));scl('c5m',v=>v);const K=1.5;
+ function run(){const n=val('c5n'),b=val('c5b')/10,m=val('c5m'),R=200,h0=LN2/Math.pow(10,K),A=[],B=[],Cc=[],se=[];let cov=0,ev=0;
+  for(let r=0;r<R;r++){const x=Float64Array.from({length:n},randn),t=new Float64Array(n),s=new Uint8Array(n);for(let i=0;i<n;i++){const T=Math.pow(-Math.log(U01())/(h0*Math.exp(b*x[i])),1/K),c=expMedT(m);t[i]=Math.min(T,c);s[i]=T<=c?1:0}
+   let d=0;for(let i=0;i<n;i++)d+=s[i];if(d<5)continue;ev+=d;const f=coxFit([x],t,s);A.push(f.beta[0]);se.push(f.se[0]);if(Math.abs(f.beta[0]-b)<=1.96*f.se[0])cov++;
+   const ix=[];for(let i=0;i<n;i++)if(s[i])ix.push(i);B.push(coxFit([Float64Array.from(ix,i=>x[i])],Float64Array.from(ix,i=>t[i]),Uint8Array.from(ix,()=>1)).beta[0]);Cc.push(coxFit([x],t,new Uint8Array(n).fill(1)).beta[0])}
+  const u=A.length,lo=Math.min(-.2,b-1),hi=Math.max(.2,b+1),cl=a=>a.map(v=>Math.max(lo,Math.min(hi-1e-9,v))),P=histLines($('c5cv'),[cl(A),cl(B),cl(Cc)],[C.g,C.r,C.y],lo,hi,36,[[b,C.fg,'truth',true]]);legend(P,[['Cox, correct',C.g],['drop censored',C.r],['censored as events',C.y]],P.T+12);P.text('estimated β',P.w-P.R-80,P.h-P.B-6,C.mu);
+  $('c5st').innerHTML=stat('events per data set',fmt(ev/u),'')+stat('correct Cox: mean · SD of β̂',fmt(mean(A))+' · '+fmt(sdv(A)),'ok')+stat('mean standard error',fmt(mean(se)),'in')+stat('95% interval coverage',pc(cov/u),'')+stat('drop censored: mean β̂',fmt(mean(B)),'hot')+stat('censored as events: mean β̂',fmt(mean(Cc)),'hot');
+  $('c5rd').innerHTML=`The correctly handled Cox estimate is centred on the truth (${fmt(b)}): mean ${fmt(mean(A))}, empirical SD ${fmt(sdv(A))} against an average reported standard error of ${fmt(mean(se))}, and its 95% interval covers ${pc(cov/u)} of the time. Dropping censored subjects gives a mean of ${fmt(mean(B))}, and treating censoring times as events gives ${fmt(mean(Cc))}: ${Math.abs(mean(B)-b)>.03||Math.abs(mean(Cc)-b)>.03?'both are shifted away from the truth, and their standard errors would not be reliable either':'close here because the censoring is light'}. Make the follow-up shorter (heavier censoring) and the distortion grows. Also note how the SD shrinks with the number of events (${fmt(ev/u)}), not with n.`}
+ ['c5n','c5b','c5m'].forEach(i=>$(i).addEventListener('change',run));$('c5go').onclick=run;run();})();
+
+/* ---------- Ch6 predicted survival ---------- */
+(function(){scl('c6b',v=>fmt(v/10));scl('c6k',v=>fmt(v/10));scl('c6m',v=>v);scl('c6n',v=>v);
+ function run(){const b=val('c6b')/10,K=val('c6k')/10,m=val('c6m'),n=val('c6n'),h0=LN2/Math.pow(m,K),x=Float64Array.from({length:n},randn),t=new Float64Array(n),s=new Uint8Array(n);
+  for(let i=0;i<n;i++){const T=Math.pow(-Math.log(U01())/(h0*Math.exp(b*x[i])),1/K),c=expMedT(2*m);t[i]=Math.min(T,c);s[i]=T<=c?1:0}
+  const f=coxFit([x],t,s),bh=f.beta[0],eta=mapA(x,v=>bh*v),B=breslow(t,s,eta),tmax=3*m,xs=[-1,0,1],cols=[C.g,C.a,C.r],P=mk($('c6cv'),0,tmax,1.02,{y0:0,L:44});
+  xs.forEach((xv,i)=>{P.line(u=>Math.exp(-h0*Math.pow(u,K)*Math.exp(b*xv)),cols[i],1.8,0,tmax,200,true);poly(P,[[0,1]].concat(B.t.filter(u=>u<=tmax).map(u=>[u,Math.exp(-H0At(B,u)*Math.exp(bh*xv))])),cols[i],2.6)});legend(P,[['x = −1',C.g],['x = 0',C.a],['x = 1',C.r]],P.T+12);P.text('solid: fitted · dashed: true',P.L+6,P.T+28,C.mu);P.text('time →',P.w-P.R-40,P.h-P.B-6,C.mu);
+  const T0=m,tr=xv=>1-Math.exp(-h0*Math.pow(T0,K)*Math.exp(b*xv)),fr=xv=>1-Math.exp(-H0At(B,T0)*Math.exp(bh*xv)),ci=n<=1200?cIndex(t,s,eta):NaN;
+  $('c6st').innerHTML=stat('hazard ratio per unit: fitted · true',fmt(Math.exp(bh))+' · '+fmt(Math.exp(b)),'in')+stat('Harrell C',isFinite(ci)?fmt(ci):'(n too large)','')+stat('risk by t = '+m+': x = −1 · x = 1 (true)',pc(tr(-1))+' · '+pc(tr(1)),'')+stat('same, fitted',pc(fr(-1))+' · '+pc(fr(1)),'ok')+stat('absolute risk difference (true)',pc(tr(1)-tr(-1)),'warn')+stat('events',s.reduce((a,v)=>a+v,0),'');
+  $('c6rd').innerHTML=`The fitted hazard ratio ${fmt(Math.exp(bh))} (true ${fmt(Math.exp(b))}) is the same wherever you evaluate it, but the absolute difference in risk between x = 1 and x = −1 by month ${m} is ${pc(tr(1)-tr(-1))}: it depends on how high the baseline risk is. Raise the baseline median to 100 months and the very same hazard ratio gives a far smaller absolute difference over the same horizon. The Breslow-based fitted curves track the truth well inside the observed range and become noisy where few subjects remain at risk.`}
+ ['c6b','c6k','c6m','c6n'].forEach(i=>$(i).addEventListener('change',run));$('c6go').onclick=run;run();})();
+
+/* ---------- Ch7 waning effect and the Cox HR ---------- */
+(function(){scl('c7b',v=>fmt(v/10));scl('c7t',v=>v);scl('c7n',v=>v);const LS=[6,12,24,36,48],H0=.04,W=.5,EDGES=Array.from({length:120},(_,i)=>W*(i+1));
+ function run(){const b0=val('c7b')/10,tau=val('c7t'),n=val('c7n'),R=60,hz=EDGES.concat([60]).map((t,i)=>H0*Math.exp(-b0*Math.exp(-(i*W+W/2)/tau))),hr=LS.map(()=>[]),rej=LS.map(()=>0);
+  for(let r=0;r<R;r++){const T=new Float64Array(n),x=new Float64Array(n);for(let i=0;i<n;i++){x[i]=i<n/2?0:1;T[i]=x[i]?pwT(EDGES,hz):expT(H0)}
+   LS.forEach((L,li)=>{const t=mapA(T,v=>Math.min(v,L)),s=Uint8Array.from(T,v=>v<=L?1:0),f=coxFit([x],t,s);hr[li].push(Math.exp(f.beta[0]));if(schoenTest(t,s,x,f.beta[0]).p<.05)rej[li]++})}
+  const mh=hr.map(a=>mean(a)),P=mk($('c7cv'),0,50,1.15,{y0:0,L:44}),trueHR=t=>Math.exp(-b0*Math.exp(-t/tau));
+  P.hline(1,C.mu,'no effect');P.line(trueHR,C.g,2.6,0,48,200);poly(P,LS.map((L,i)=>[L,mh[i]]),C.a,2,true);dots(P,LS.map((L,i)=>[L,mh[i]]),C.a,5);LS.forEach((L,i)=>P.text(Math.round(100*rej[i]/R)+'% reject',P.X(L),P.Y(mh[i])-10,C.fg,'center'));
+  legend(P,[['true HR(t)',C.g],['Cox HR with follow-up L',C.a]],P.T+12);P.text('follow-up L (months) / time →',P.w-P.R-170,P.h-P.B-6,C.mu);
+  $('c7st').innerHTML=stat('true HR at t = 0 · 12 · 48',fmt(trueHR(0))+' · '+fmt(trueHR(12))+' · '+fmt(trueHR(48)),'in')+stat('Cox HR: L = 6 · 12 · 24 · 48',[0,1,2,4].map(i=>fmt(mh[i])).join(' · '),'warn')+stat('proportionality rejected at L = 12',pc(rej[1]/R),'')+stat('rejected at L = 48',pc(rej[4]/R),'hot')+stat('size of drift in the Cox HR',fmt(mh[4]-mh[0]),'');
+  $('c7rd').innerHTML=`The true hazard ratio rises from ${fmt(trueHR(0))} at the start towards 1 as the effect wanes (${fmt(trueHR(12))} at month 12, ${fmt(trueHR(48))} at month 48), yet the Cox model reports one number: ${fmt(mh[0])} when subjects are followed for 6 months and ${fmt(mh[4])} after 48. Each is an average over the follow-up window, so the “hazard ratio” of a study depends on how long it ran. The Schoenfeld test flags the violation in ${pc(rej[1]/R)} of the trials at L = 12 and ${pc(rej[4]/R)} at L = 48 (with ${n} subjects); with a larger τ (a more persistent effect) the curve flattens and the rejection rate falls to the nominal 5%.`}
+ ['c7b','c7t','c7n'].forEach(i=>$(i).addEventListener('change',run));$('c7go').onclick=run;run();})();
+
+/* ---------- Ch8 competing risks ---------- */
+(function(){const RT=[0,.25,.5,1,2,4];idx('c8r',RT,v=>v);scl('c8n',v=>v);const L1=.02;
+ function run(){const r2=RT[val('c8r')],l2=r2*L1,n=val('c8n'),t=new Float64Array(n),cause=new Uint8Array(n);
+  for(let i=0;i<n;i++){const T1=expT(L1),T2=l2>0?expT(l2):Infinity,T=Math.min(T1,T2);if(T>60){t[i]=60;cause[i]=0}else{t[i]=T;cause[i]=T1<=T2?1:2}}
+  const stat1=Uint8Array.from(cause,v=>v===1?1:0),stat2=Uint8Array.from(cause,v=>v===2?1:0),statAll=Uint8Array.from(cause,v=>v>0?1:0),k1=km(t,stat1),k2=km(t,stat2),ix=sortIdx(t);
+  let atRisk=n,Sp=1,F=0,i=0;const aj=[[0,0]];while(i<n){const tt=t[ix[i]];let d=0,d1=0,c=0,j=i;while(j<n&&t[ix[j]]===tt){if(cause[ix[j]]>0)d++;if(cause[ix[j]]===1)d1++;c++;j++}if(d>0){F+=Sp*d1/atRisk;Sp*=1-d/atRisk;aj.push([tt,F])}atRisk-=c;i=j}
+  const trueF=u=>L1/(L1+l2)*(1-Math.exp(-(L1+l2)*u)),ajAt=u=>{let v=0;for(const p of aj){if(p[0]<=u)v=p[1];else break}return v},naive=u=>1-kmAt(k1,u),naive2=u=>1-kmAt(k2,u),ymax=Math.max(naive(60),trueF(60))*1.15+.02,P=mk($('c8cv'),0,60,ymax,{y0:0,L:44});
+  P.line(trueF,C.g,2.6,0,60,200,true);poly(P,[[0,0]].concat(k1.t.map(u=>[u,naive(u)])),C.r,2.4);poly(P,aj,C.a,2.4);legend(P,[['true cumulative incidence',C.g],['Aalen–Johansen',C.a],['1 − KM (cause 2 as censoring)',C.r]],P.T+12);P.text('months →',P.w-P.R-50,P.h-P.B-6,C.mu);
+  $('c8st').innerHTML=stat('true P(cause 1 by 36 months)',pc(trueF(36)),'in')+stat('Aalen–Johansen',pc(ajAt(36)),'ok')+stat('1 − KM',pc(naive(36)),'hot')+stat('1 − KM overstates by (60 months)',pc(naive(60)-trueF(60)),'warn')+stat('sum of both 1 − KM at 60 months',pc(naive(60)+naive2(60)),naive(60)+naive2(60)>1?'hot':'')+stat('subjects with cause 2',pc(cause.filter(v=>v===2).length/n),'');
+  $('c8rd').innerHTML=l2===0?`With no competing event the three curves coincide: 1 − KM and the cumulative incidence are the same thing when nothing else can remove subjects.`:`With a competing hazard ${fmt(r2)} times the cause-1 hazard, the true probability of cause 1 by 36 months is ${pc(trueF(36))}. The Aalen–Johansen estimate gives ${pc(ajAt(36))}, while 1 − KM, which keeps subjects who had the competing event “at risk” for ever, gives ${pc(naive(36))}. Add the two 1 − KM curves for the two causes and you get ${pc(naive(60)+naive2(60))} at 60 months${naive(60)+naive2(60)>1?', more than 100%':''}. The 1 − KM curve is the answer to a hypothetical question (no competing event); the cumulative incidence is the probability that actually happens.`}
+ ['c8r','c8n'].forEach(i=>$(i).addEventListener('change',run));$('c8go').onclick=run;run();})();
+
+/* ---------- Ch9 discrete-time models ---------- */
+(function(){scl('c9n',v=>v);scl('c9b',v=>fmt(v/10));const NP=12,PAT={rise:t=>-4+.25*t,fall:t=>-1.2-.25*(t-1),hump:t=>-1.8-.08*(t-6)*(t-6)};
+ function run(){const n=val('c9n'),b=val('c9b')/10,a=PAT[$('c9p').value],x=Float64Array.from({length:n},randn),per=[],xr=[],yr=[],tm=new Float64Array(n),st=new Uint8Array(n);
+  for(let i=0;i<n;i++){let ended=false;for(let t=1;t<=NP&&!ended;t++){const h=sig(a(t)+b*x[i]),ev=Math.random()<h;per.push(t);xr.push(x[i]);yr.push(ev?1:0);if(ev){tm[i]=t;st[i]=1;ended=true}else if(t===NP){tm[i]=t;st[i]=0}else if(Math.random()<.03){tm[i]=t;st[i]=0;ended=true}}}
+  const m=per.length,cols=[];for(let t=2;t<=NP;t++)cols.push(Float64Array.from(per,v=>v===t?1:0));cols.push(Float64Array.from(xr));const fit=wlogit(cols,Float64Array.from(yr),null,1e-6,30),hh=t=>sig(fit[0]+(t>1?fit[t-1]:0)),bhat=fit[NP];
+  const hTrue=Array.from({length:NP},(_,i)=>sig(a(i+1))),hFit=Array.from({length:NP},(_,i)=>hh(i+1)),hmax=Math.max(...hTrue,...hFit)*1.2,P1=mk($('c9cv'),.5,NP+.5,hmax,{y0:0,L:44});poly(P1,hTrue.map((v,i)=>[i+1,v]),C.r,2.6);dots(P1,hTrue.map((v,i)=>[i+1,v]),C.r,3);poly(P1,hFit.map((v,i)=>[i+1,v]),C.a,2.6,true);dots(P1,hFit.map((v,i)=>[i+1,v]),C.a,3);legend(P1,[['true hazard (x = 0)',C.r],['person-period fit',C.a]],P1.T+12);P1.text('month →',P1.w-P1.R-50,P1.h-P1.B-6,C.mu);
+  const GH=Array.from({length:81},(_,i)=>-4+8*i/80),gw=GH.map(z=>normPdfAt(z,0,1)),gs=gw.reduce((s,v)=>s+v,0),sTrue=t=>{let s=0;GH.forEach((z,k)=>{let S=1;for(let u=1;u<=t;u++)S*=1-sig(a(u)+b*z);s+=gw[k]*S});return s/gs},sPP=t=>{let s=0;for(let i=0;i<n;i++){let S=1;for(let u=1;u<=t;u++)S*=1-sig(fit[0]+(u>1?fit[u-1]:0)+bhat*x[i]);s+=S}return s/n},k=km(tm,st),ts=Array.from({length:NP},(_,i)=>i+1),nv=u=>1-tm.reduce((c,v,i)=>c+(st[i]&&v<=u?1:0),0)/n,P2=mk($('c9cv2'),0,NP,1.02,{y0:Math.min(.5,sTrue(NP)-.05)},{});
+  const y0=Math.max(0,Math.min(sTrue(NP),nv(NP))-.08),Q=mk($('c9cv2'),0,NP,1.01,{y0:y0,L:44});Q.line(u=>sTrue(Math.floor(u)),C.g,2.4,0,NP,12,true);poly(Q,[[0,1]].concat(ts.map(u=>[u,sTrue(u)])),C.g,2.4,true);poly(Q,[[0,1]].concat(ts.map(u=>[u,sPP(u)])),C.a,2.6);poly(Q,[[0,1]].concat(ts.map(u=>[u,kmAt(k,u)])),C.fg,2,true);poly(Q,[[0,1]].concat(ts.map(u=>[u,nv(u)])),C.r,2.4);legend(Q,[['true',C.g],['person-period',C.a],['Kaplan–Meier',C.fg],['naive',C.r]],Q.T+12);Q.text('marginal survival, month →',Q.L+6,Q.T+28,C.mu);
+  $('c9st').innerHTML=stat('person-period rows',m,'')+stat('β̂ (true '+fmt(b)+')',fmt(bhat),'in')+stat('12-month default: true',pc(1-sTrue(NP)),'')+stat('person-period',pc(1-sPP(NP)),'ok')+stat('Kaplan–Meier',pc(1-kmAt(k,NP)),'ok')+stat('naive events ÷ subjects',pc(1-nv(NP)),'hot');
+  $('c9rd').innerHTML=`The ${n} subjects expand into ${m} person-period rows. A logistic regression with a dummy for every month and the covariate recovers the true monthly hazards (blue against red) and the covariate effect (β̂ = ${fmt(bhat)} against ${fmt(b)}); multiplying the fitted (1 − hazard) terms gives a lifetime survival curve that matches the Kaplan–Meier estimate and the truth. The naive estimate, events ÷ subjects, calls censored subjects survivors and reports a 12-month default rate of ${pc(1-nv(NP))} against the true ${pc(1-sTrue(NP))}. Time-varying covariates simply become columns of the person-period data.`}
+ ['c9n','c9b','c9p'].forEach(i=>$(i).addEventListener('change',run));$('c9go').onclick=run;run();})();
+
+/* ---------- Ch10 horizon AUC with censoring ---------- */
+(function(){scl('c10n',v=>v);scl('c10m',v=>v);scl('c10h',v=>v);const B=.8,K=1.3,h0=LN2/Math.pow(10,K);
+ function aucL(sc,lab,use){const a=[],b=[];for(let i=0;i<lab.length;i++){if(!use[i])continue;(lab[i]?a:b).push(sc[i])}let c=0;for(const p of a)for(const q of b){if(p>q)c++;else if(p===q)c+=.5}return c/(a.length*b.length)}
+ function run(){const n=val('c10n'),m=val('c10m'),h=val('c10h'),R=n<=1000?20:10,acc=[0,0,0,0],cc=[0,0],risk=[0,0,0];
+  for(let r=0;r<R;r++){const x=Float64Array.from({length:n},randn),T=new Float64Array(n),t=new Float64Array(n),s=new Uint8Array(n);for(let i=0;i<n;i++){T[i]=Math.pow(-Math.log(U01())/(h0*Math.exp(B*x[i])),1/K);const c=expMedT(m);t[i]=Math.min(T[i],c);s[i]=T[i]<=c?1:0}
+   const ones=new Uint8Array(n).fill(1),labT=Uint8Array.from(T,v=>v<=h?1:0),all=new Uint8Array(n).fill(1);acc[0]+=aucL(x,labT,all)/R;
+   const labO=Uint8Array.from(t,(v,i)=>s[i]&&v<=h?1:0),keep=Uint8Array.from(t,(v,i)=>(s[i]||v>h)?1:0);acc[1]+=aucL(x,labO,keep)/R;acc[2]+=aucL(x,labO,all)/R;
+   const kc=km(t,Uint8Array.from(s,v=>1-v)),G=u=>kmAt(kc,u-1e-9);let num=0,wsum=0,nctl=0;const ctl=[];for(let j=0;j<n;j++)if(t[j]>h){ctl.push(x[j]);nctl++}for(let i=0;i<n;i++)if(s[i]&&t[i]<=h){const w=1/Math.max(G(t[i]),1e-3);wsum+=w;let c=0;for(const q of ctl){if(x[i]>q)c++;else if(x[i]===q)c+=.5}num+=w*c}acc[3]+=(num/(wsum*nctl))/R;
+   if(n<=1500){cc[0]+=cIndex(T,ones,x)/R;cc[1]+=cIndex(t,s,x)/R}
+   const kk=km(t,s);risk[0]+=labT.reduce((a,v)=>a+v,0)/n/R;risk[1]+=labO.reduce((a,v)=>a+v,0)/n/R;risk[2]+=(1-kmAt(kk,h))/R}
+  const NM=['truth (full data)','drop censored before t*','censored = non-event','IPCW'],P=barV($('c10cv'),acc,[C.g,C.y,C.r,C.a],NM,1.05,x=>fmt(x));P.text('AUC at horizon t* = '+h,P.L+6,P.T+12,C.mu);
+  $('c10st').innerHTML=NM.map((s,i)=>stat('AUC: '+s,fmt(acc[i]),i===3?'ok':i===0?'in':'warn')).join('')+stat('risk by t*: true · naive · KM',pc(risk[0])+' · '+pc(risk[1])+' · '+pc(risk[2]),'')+stat('Harrell C: full data · observed',n<=1500?fmt(cc[0])+' · '+fmt(cc[1]):'(n large: skipped)','');
+  $('c10rd').innerHTML=`Because we generated the full event times, the true AUC at ${h} months is ${fmt(acc[0])}. With a median censoring time of ${m} months the practical estimates are: dropping subjects censored before t* gives ${fmt(acc[1])}, treating them as non-events gives ${fmt(acc[2])}, and the IPCW estimator gives ${fmt(acc[3])}. The observed risk by t* is ${pc(risk[1])} when censored subjects count as non-events, against ${pc(risk[2])} from Kaplan–Meier and ${pc(risk[0])} in truth. The heavier the censoring, the larger the distortion of the naive versions; the weighted and Kaplan–Meier versions stay close to the truth.`}
+ ['c10n','c10m','c10h'].forEach(i=>$(i).addEventListener('change',run));$('c10go').onclick=run;run();})();
+
+/* ---------- Ch11 parametric fits and extrapolation ---------- */
+(function(){scl('c11n',v=>v);scl('c11l',v=>v);const SH={wei:1.6,lnorm:1,llog:2};
+ function run(){const fam=$('c11t').value,sh=SH[fam],n=val('c11n'),L=val('c11l'),t=new Float64Array(n),s=new Uint8Array(n);let d=0,tot=0;for(let i=0;i<n;i++){const T=FAM[fam].T(sh);t[i]=Math.min(T,L);s[i]=T<=L?1:0;d+=s[i];tot+=t[i]}
+  const nll={
+   wei:p=>{const k=Math.exp(p[0]),l=Math.exp(p[1]);let z=0;for(let i=0;i<n;i++){const u=Math.pow(t[i]/l,k);z+=s[i]?(Math.log(k)-Math.log(l)+(k-1)*(Math.log(t[i])-Math.log(l))-u):-u}return isFinite(z)?-z:1e12},
+   lnorm:p=>{const mu=p[0],sg=Math.exp(p[1]);let z=0;for(let i=0;i<n;i++){const q=(Math.log(t[i])-mu)/sg;z+=s[i]?-Math.log(sg*t[i]*2.5066282746)-q*q/2:Math.log(Math.max(normSf(q),1e-300))}return isFinite(z)?-z:1e12},
+   llog:p=>{const a=Math.exp(p[0]),k=Math.exp(p[1]);let z=0;for(let i=0;i<n;i++){const u=Math.pow(t[i]/a,k);z+=s[i]?Math.log(k)-Math.log(a)+(k-1)*(Math.log(t[i])-Math.log(a))-2*Math.log(1+u):-Math.log(1+u)}return isFinite(z)?-z:1e12}};
+  const lam=d/Math.max(tot,1e-9),fe=-(d*Math.log(Math.max(lam,1e-12))-lam*tot),fw=nmMin(nll.wei,[0,Math.log(10)],.3),fl=nmMin(nll.lnorm,[Math.log(10),0],.3),fg=nmMin(nll.llog,[Math.log(10),.4],.3),
+   Sf={exp:u=>Math.exp(-lam*u),wei:u=>Math.exp(-Math.pow(u/Math.exp(fw.x[1]),Math.exp(fw.x[0]))),lnorm:u=>normSf((Math.log(u)-fl.x[0])/Math.exp(fl.x[1])),llog:u=>1/(1+Math.pow(u/Math.exp(fg.x[0]),Math.exp(fg.x[1])))},
+   aic=[2*1+2*fe,2*2+2*fw.f,2*2+2*fl.f,2*2+2*fg.f],NM=['exponential','Weibull','log-normal','log-logistic'],CO=[C.mu,C.y,C.p,C.t],keys=['exp','wei','lnorm','llog'],k=km(t,s),P=mk($('c11cv'),0,60,1.02,{y0:0,L:44}),truth=u=>FAM[fam].S(u,sh);
+  P.vline(L,C.mu,'end of follow-up',true);P.line(truth,C.g,2.6,.05,60,240,true);keys.forEach((kk,i)=>P.line(u=>Sf[kk](u),CO[i],2,.05,60,240));const kp=[[0,1]];k.t.forEach((u,i)=>{if(u>L)return;kp.push([u,i?k.S[i-1]:1]);kp.push([u,k.S[i]])});kp.push([L,k.S[k.S.length-1]||1]);poly(P,kp,C.fg,2.8);
+  legend(P,NM.map((s,i)=>[s,CO[i]]).concat([['truth',C.g],['KM',C.fg]]),P.T+12);P.text('months →',P.w-P.R-50,P.h-P.B-6,C.mu);
+  const bi=aic.indexOf(Math.min(...aic));
+  $('c11st').innerHTML=stat('AIC: exp · Weibull · log-normal · log-logistic',aic.map(v=>fmt(v)).join(' · '),'in')+stat('best by AIC',NM[bi],'ok')+stat('events observed',d+' of '+n,'')+stat('S(60) truth',pc(truth(60)),'')+stat('S(60) fitted: '+NM.join(' · '),keys.map(kk=>pc(Sf[kk](60))).join(' · '),'warn')+stat('S(L) truth · KM',pc(truth(L))+' · '+pc(kmAt(k,L)),'');
+  $('c11rd').innerHTML=`Inside the observed window (up to ${L} months, ${d} events) the four models give nearly the same curve, and their AICs are within ${fmt(Math.max(...aic)-Math.min(...aic))} of each other${Math.max(...aic)-Math.min(...aic)<6?' (not enough to separate them)':''}. Beyond month ${L} they part company: the predicted 60-month survival ranges from ${pc(Math.min(...keys.map(kk=>Sf[kk](60))))} to ${pc(Math.max(...keys.map(kk=>Sf[kk](60))))}, against a true ${pc(truth(60))}. The data cannot tell you which tail is right; only the follow-up can, or knowledge of the process. Lengthen the follow-up to 36 months and the spread narrows, shorten it to 6 and it widens.`}
+ ['c11t','c11n','c11l'].forEach(i=>$(i).addEventListener('change',run));$('c11go').onclick=run;run();})();
+const QZ=[
+{l:'Beginner',q:'A loan is still performing when the data are extracted. Its time to default is…',o:['Zero','Right-censored: we only know that it is longer than the observed time','Missing and must be deleted','Equal to the average time to default'],a:1,e:'Right censoring: T &gt; c. The subject contributes information about survival up to c.'},
+{l:'Beginner',q:'Which relationship between the survival function S(t) and the cumulative hazard H(t) is correct?',o:['S(t) = H(t)','S(t) = exp(−H(t))','S(t) = 1 − H(t)','S(t) = log H(t)'],a:1,e:'H(t) = −log S(t), so S(t) = exp(−H(t)).'},
+{l:'Intermediate',q:'To estimate the average time to default you compute the mean of the observed times of all loans (defaulted and censored). This is…',o:['Unbiased','Biased downward, because censored loans are cut off before their event','Biased upward','Equal to the Kaplan–Meier median'],a:1,e:'Censoring truncates the follow-up of long-surviving subjects, so the observed mean understates the true one.'},
+{l:'Intermediate',q:'A Weibull model with shape less than 1 has a hazard that…',o:['Is constant','Increases over time','Decreases over time (early churn, infant mortality)','Rises then falls'],a:2,e:'h(t) ∝ t^{k−1}; for k &lt; 1 the exponent is negative so the hazard falls.'},
+{l:'Intermediate',q:'The Kaplan–Meier estimate at time t is…',o:['The fraction of subjects who have had the event by t','The product over event times ≤ t of (1 − d/n), with n the number at risk','The fraction of subjects not yet censored','The exponential of minus the average hazard'],a:1,e:'Ŝ(t) = ∏(1 − dⱼ/nⱼ) uses the risk set at each event time.'},
+{l:'Intermediate',q:'The restricted mean survival time up to τ is…',o:['The median survival time','The area under the survival curve from 0 to τ: the average event-free time within τ','The survival probability at τ','Always infinite'],a:1,e:'RMST(τ) = ∫₀^τ S(t) dt, always finite and estimable if follow-up reaches τ.'},
+{l:'Advanced',q:'The Cox model estimates the coefficients without specifying the baseline hazard because…',o:['The baseline hazard is zero','The partial likelihood compares, at each event time, the failing subject with the others at risk, and the baseline hazard cancels','It assumes exponential survival','It ignores censored subjects'],a:1,e:'In exp(xᵢβ)/Σⱼ∈R exp(xⱼβ) the common factor h₀(tᵢ) cancels.'},
+{l:'Advanced',q:'A hazard ratio of 2 for a risk factor means…',o:['The risk is 2 percentage points higher','At every time the instantaneous event rate is twice as high; the absolute risk difference depends on the baseline risk','The median survival is halved exactly','Twice as many subjects have the factor'],a:1,e:'Hazard ratios are relative measures; to get absolute risk use the baseline cumulative hazard.'},
+{l:'Advanced',q:'You fit a Cox model after deleting all censored subjects. The main problem is…',o:['None: censored subjects carry no information','Selection: only subjects whose event occurred before censoring remain, biasing the estimates and standard errors; censored subjects contribute to the risk sets','Too many ties','The model becomes parametric'],a:1,e:'Censored subjects stay in the risk sets until their censoring time; dropping them distorts the risk sets.'},
+{l:'Advanced',q:'The log-rank test is most powerful when…',o:['The curves cross','The hazards are proportional','Only early differences exist','The groups have different censoring'],a:1,e:'It is the locally most powerful test under proportional hazards; crossing curves can cancel out.'},
+{l:'Advanced',q:'Treatment effect appears only after month 8. Which test is best placed to detect it?',o:['Gehan–Wilcoxon (early weights)','A late-weighted Fleming–Harrington test, G(0,1), or an RMST comparison','The chi-square test of final status','The paired t-test'],a:1,e:'Weights S^ρ(1 − S)^γ with γ &gt; 0 emphasise late differences.'},
+{l:'Advanced',q:'Why might lifetime-PD models use person-period (discrete-time) logistic regression?',o:['It is the only way to handle censoring','It handles censoring and time-varying covariates, gives a hazard per period and a term structure of default probabilities','It needs fewer rows than Cox','It does not require time as a variable'],a:1,e:'Each row is a subject-period with an event indicator; survival is the product of (1 − hazard).'},
+{l:'Expert',q:'The hazard ratio from a Cox model changes when the study follows subjects longer. The most likely reason is…',o:['A coding error','Non-proportional hazards: the estimate is an average of a time-varying hazard ratio weighted by events and censoring','The Cox model needs more covariates','The baseline hazard is estimated'],a:1,e:'If the effect wanes or grows the Cox coefficient averages over the follow-up window.'},
+{l:'Expert',q:'A loan can default or prepay. You estimate default probability as 1 − KM, treating prepayments as censored. This…',o:['Is unbiased for the probability of default','Overstates the cumulative probability of default because prepaid loans are treated as if they could still default; use the cumulative incidence function','Understates it','Is the same as Fine–Gray'],a:1,e:'Competing events remove subjects from risk; the correct estimate integrates S(u−) dΛ₁(u), the Aalen–Johansen estimator.'},
+{l:'Expert',q:'In a Schoenfeld-residual test for proportional hazards, a significant correlation of the residuals with time suggests…',o:['The covariate is irrelevant','The effect of the covariate changes over time: the PH assumption is violated','The data have no censoring','The model is perfectly calibrated'],a:1,e:'A trend of the scaled residuals over time indicates a time-varying coefficient.'},
+{l:'Expert',q:'When estimating the AUC at 12 months from censored data, counting subjects censored before 12 months as non-events…',o:['Is unbiased','Misclassifies subjects who might have had the event, biasing the AUC and the risk; use IPCW or Kaplan–Meier-based estimates','Always raises the AUC','Is required by the Cox model'],a:1,e:'Status at the horizon is unknown for those censored earlier; inverse-probability-of-censoring weights account for them.'},
+{l:'Expert',q:'Four parametric survival models fit 12 months of data equally well (similar AIC). The predictions of the 60-month survival…',o:['Will be similar','Can differ widely: extrapolation is determined by the assumed distribution, not by the data','Are exactly the Kaplan–Meier values','Are all unbiased'],a:1,e:'Distribution tails differ; the data beyond the follow-up are missing, so uncertainty is large and should be reported.'},
+{l:'Expert',q:'Harrell’s concordance index, computed on a data set with heavy censoring, is…',o:['Always unbiased','Dependent on the censoring pattern; Uno’s IPCW version corrects this','Equal to the AUC at the median','Not affected by follow-up length'],a:1,e:'Only comparable pairs enter Harrell’s C, so the result depends on how much follow-up the data have.'}
+];
+(function(){const st=store.get('sv_quiz',{});
+ function render(){const box=$('quiz');box.innerHTML='';
+  QZ.forEach((q,i)=>{const d=document.createElement('div');d.className='q'+(st[i]!=null?' done':'');d.innerHTML=`<div class="qh">Q${i+1} · ${q.l}</div><div style="margin:4px 0 6px"><b>${q.q}</b></div>`;
+   q.o.forEach((o,j)=>{const b=document.createElement('button');b.className='opt';b.textContent=o;if(st[i]!=null){if(j===q.a)b.classList.add('good');else if(j===st[i])b.classList.add('bad')}b.onclick=()=>{if(st[i]!=null)return;st[i]=j;store.set('sv_quiz',st);render();meter()};d.appendChild(b)});
+   const e=document.createElement('div');e.className='ex';e.innerHTML=(st[i]===q.a?'✅ ':'❌ ')+q.e;d.appendChild(e);box.appendChild(d)});
+  const ans=Object.keys(st).length,ok=QZ.filter((q,i)=>st[i]===q.a).length;
+  $('qscore').innerHTML=stat('answered',ans+' / '+QZ.length,'in')+stat('correct',ok,'ok')+stat('score',ans?Math.round(100*ok/ans)+'%':'—',ok/Math.max(ans,1)>=.8?'ok':'warn')+stat('verdict',ans<QZ.length?'keep going':ok>=16?'survival master':ok>=13?'strong':'review ch. 1–8','')}
+ $('qreset').onclick=()=>{Object.keys(st).forEach(k=>delete st[k]);store.set('sv_quiz',st);render();meter()};
+ window.__qst=st;render();})();
+const CHK=['Explain right censoring, truncation and the non-informative-censoring assumption.','Relate S, f, h and H and compute a mean and a restricted mean from S.','Compute a Kaplan–Meier curve and a Greenwood log-log interval by hand.','Explain what the log-rank test does and when weights are needed.','Write the Cox model and the partial likelihood and interpret a hazard ratio.','Turn a Cox fit into absolute risk with the Breslow baseline.','Check proportional hazards and say what to do when it fails.','Distinguish 1 − KM from the cumulative incidence in competing risks.','Build a person-period data set and a discrete-time hazard model.','Evaluate a survival model with horizon AUC, Brier and calibration under censoring.','Compare parametric families and describe the risk of extrapolation.','Spot the naive mistakes: dropping censored, counting them as non-events, ignoring time.','Choose between Cox, discrete-time and parametric models for a credit or churn problem.','Write the survival-analysis section of a model-validation report.'];
+(function(){const st=store.get('sv_chk',{}),box=$('chk');CHK.forEach((t,i)=>{const l=document.createElement('label'),c=document.createElement('input');c.type='checkbox';c.checked=!!st[i];c.onchange=()=>{st[i]=c.checked;store.set('sv_chk',st);meter()};l.appendChild(c);const s=document.createElement('span');s.textContent=t;l.appendChild(s);box.appendChild(l)});window.__cst=st;})();
+function meter(){const q=window.__qst||{},c=window.__cst||{};const ok=QZ.filter((x,i)=>q[i]===x.a).length,ck=Object.values(c).filter(Boolean).length;const p=Math.round(100*(.6*ok/QZ.length+.4*ck/CHK.length));$('mtxt').textContent='Mastery: '+p+'%  (exam + checklist)';$('mbar').style.width=p+'%';store.set('mastery_sv',p)}
+meter();
+
+/* ---------- Navigation ---------- */
+(function(){const nav=$('nav');let html='';
+ document.querySelectorAll('main .part, main section.ch').forEach(el=>{if(el.classList.contains('part'))html+=`<div class="pt">${el.textContent}</div>`;else{const h=el.querySelector('h2'),num=h.querySelector('.num').textContent,t=Array.from(h.childNodes).filter(n=>n.nodeType===3).map(n=>n.textContent).join('').trim();html+=`<a href="#${el.id}" data-id="${el.id}">${num}. ${t}</a>`}});
+ nav.innerHTML=html;const links=nav.querySelectorAll('a'),io=new IntersectionObserver(es=>{es.forEach(e=>{if(e.isIntersecting)links.forEach(a=>a.classList.toggle('on',a.dataset.id===e.target.id))})},{rootMargin:'-20% 0px -70% 0px'});
+ document.querySelectorAll('section.ch').forEach(s=>io.observe(s));
+ $('menu').onclick=()=>$('side').classList.toggle('open');nav.addEventListener('click',e=>{if(e.target.tagName==='A')$('side').classList.remove('open')});
+ window.addEventListener('scroll',()=>{const h=document.documentElement;$('prog').style.width=(100*h.scrollTop/(h.scrollHeight-h.clientHeight))+'%'},{passive:true});})();
+</script>
+</body>
+</html>
