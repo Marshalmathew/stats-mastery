@@ -1,0 +1,640 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Model Selection Mastery</title>
+<style>
+:root{--bg:#0b0e17;--panel:#121726;--panel2:#171d30;--line:#232a3d;--fg:#e8ebf5;--mu:#8a93ab;--a:#6ea8ff;--r:#ff6b81;--y:#ffd166;--g:#4ade80;--p:#c084fc;--t:#5eead4}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;background:var(--bg);color:var(--fg);font:16px/1.7 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+a{color:var(--a)}
+#prog{position:fixed;top:0;left:0;height:3px;background:linear-gradient(90deg,var(--a),var(--p),var(--r));width:0;z-index:50}
+.side{position:fixed;left:0;top:0;bottom:0;width:290px;background:#0e1220;border-right:1px solid var(--line);overflow:auto;padding:18px 14px 90px;z-index:40;transition:transform .25s}
+.side h1{font-size:15px;margin:0 0 2px}
+.side small{color:var(--mu)}
+.side .pt{margin:16px 0 4px;font-size:11px;text-transform:uppercase;letter-spacing:1.3px;color:var(--p)}
+.side a{display:block;color:var(--mu);text-decoration:none;padding:5px 9px;border-radius:7px;font-size:13.5px;line-height:1.35}
+.side a:hover{background:var(--panel);color:var(--fg)}
+.side a.on{background:var(--panel2);color:var(--fg);box-shadow:inset 3px 0 var(--a)}
+.side a.back{color:var(--t);padding-left:0;margin-bottom:6px}
+.meter{position:fixed;left:0;bottom:0;width:290px;background:#0e1220;border-top:1px solid var(--line);padding:10px 16px;z-index:41;font-size:12px;color:var(--mu)}
+.meter .bar{height:7px;background:var(--line);border-radius:6px;margin-top:5px;overflow:hidden}
+.meter .bar i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--g),var(--t));transition:width .4s}
+#menu{display:none;position:fixed;top:10px;left:10px;z-index:60;background:var(--panel2);color:var(--fg);border:1px solid var(--line);border-radius:9px;padding:7px 12px;font-size:14px;cursor:pointer}
+main{margin-left:290px;padding:0 34px 120px;max-width:1090px}
+.hero{padding:70px 0 30px}
+.hero h1{font-size:clamp(32px,5vw,56px);line-height:1.08;margin:0 0 14px;background:linear-gradient(100deg,#fff,var(--y) 40%,var(--r));-webkit-background-clip:text;background-clip:text;color:transparent}
+.hero p{font-size:19px;color:#c3c9dc;max-width:780px}
+.chips{display:flex;flex-wrap:wrap;gap:8px;margin:18px 0}
+.chip{border:1px solid var(--line);background:var(--panel);padding:5px 12px;border-radius:99px;font-size:13px;color:var(--mu)}
+.chip b{color:var(--fg)}
+.part{margin:90px 0 0;padding-top:22px;border-top:1px solid var(--line);font-size:12px;letter-spacing:2px;text-transform:uppercase;color:var(--p)}
+section.ch{padding-top:30px}
+h2{font-size:30px;line-height:1.2;margin:10px 0 8px;display:flex;gap:12px;align-items:center;flex-wrap:wrap}
+h2 .num{display:inline-grid;place-items:center;width:40px;height:40px;border-radius:12px;background:var(--panel2);border:1px solid var(--line);font-size:18px;color:var(--a)}
+.lvl{font-size:11px;font-weight:600;letter-spacing:.8px;text-transform:uppercase;padding:3px 9px;border-radius:99px;border:1px solid}
+.lvl.b{color:var(--g);border-color:#1f5c3a}.lvl.i{color:var(--a);border-color:#244a85}.lvl.a{color:var(--y);border-color:#6b5420}.lvl.e{color:var(--r);border-color:#7a2c3a}
+h3{font-size:19px;margin:30px 0 6px;color:#fff}
+p{margin:10px 0}li{margin:5px 0}
+code,.f{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace}
+code{background:var(--panel2);padding:1px 6px;border-radius:5px;font-size:.9em}
+.f{display:block;white-space:pre-wrap;background:#0e1322;border:1px solid var(--line);border-left:3px solid var(--a);padding:12px 16px;border-radius:9px;margin:14px 0;overflow-x:auto;font-size:15px;color:#dbe4ff;line-height:1.8}
+.co{border-radius:12px;padding:13px 17px;margin:16px 0;border:1px solid var(--line);background:var(--panel)}
+.co>b:first-child{display:block;margin-bottom:2px;font-size:12px;letter-spacing:1px;text-transform:uppercase}
+.co.def{border-left:4px solid var(--a)}.co.def>b:first-child{color:var(--a)}
+.co.warn{border-left:4px solid var(--r)}.co.warn>b:first-child{color:var(--r)}
+.co.tip{border-left:4px solid var(--g)}.co.tip>b:first-child{color:var(--g)}
+.co.key{border-left:4px solid var(--y);background:#171608}.co.key>b:first-child{color:var(--y)}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:18px 20px;margin:22px 0;box-shadow:0 8px 30px rgba(0,0,0,.25)}
+.card>h4{margin:0 0 3px;font-size:13px;letter-spacing:1.2px;text-transform:uppercase;color:var(--t)}
+.card>p.sub{margin:0 0 12px;color:var(--mu);font-size:14.5px}
+.ctl{display:flex;flex-wrap:wrap;gap:10px 22px;align-items:center;margin:8px 0 10px}
+.ctl label{display:flex;gap:8px;align-items:center;font-size:14px;color:#c3c9dc}
+.ctl output{min-width:38px;font-family:ui-monospace,monospace;color:var(--y);font-size:13px}
+input[type=range]{accent-color:var(--a);width:150px}
+input[type=checkbox]{accent-color:var(--a)}
+select,input[type=number],input[type=text]{background:#0e1322;color:var(--fg);border:1px solid var(--line);border-radius:8px;padding:6px 9px;font:inherit;font-size:14px}
+button{background:linear-gradient(180deg,#2c4a80,#233b68);color:#fff;border:1px solid #3a5a98;border-radius:9px;padding:7px 14px;font:inherit;font-size:14px;cursor:pointer}
+button:hover{filter:brightness(1.15)}
+button.alt{background:var(--panel2);border-color:var(--line);color:var(--fg)}
+canvas{width:100%;height:270px;display:block;background:#0e1322;border:1px solid var(--line);border-radius:10px;margin-top:6px}
+canvas.sm{height:210px}canvas.tl{height:330px}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(125px,1fr));gap:9px;margin:12px 0}
+.stat{background:#0e1322;border:1px solid var(--line);border-radius:10px;padding:8px 11px}
+.stat b{display:block;font-size:17px;font-family:ui-monospace,monospace}
+.stat span{font-size:11.5px;color:var(--mu);text-transform:uppercase;letter-spacing:.7px}
+.stat.hot b{color:var(--r)}.stat.ok b{color:var(--g)}.stat.warn b{color:var(--y)}.stat.in b{color:var(--a)}
+.read{margin:8px 0 0;padding:10px 14px;background:#0e1322;border:1px dashed #33406a;border-radius:10px;font-size:14.5px;color:#d3dbf3}
+table{border-collapse:collapse;width:100%;margin:12px 0;font-size:14px}
+th,td{border:1px solid var(--line);padding:7px 10px;text-align:left;vertical-align:top}
+th{background:var(--panel2);font-size:12px;text-transform:uppercase;letter-spacing:.6px;color:var(--mu)}
+td.n{font-family:ui-monospace,monospace;text-align:right}
+.tw{overflow-x:auto}
+.pill{display:inline-block;padding:1px 9px;border-radius:99px;font-size:12px;font-weight:600}
+.pill.r{background:#3a1520;color:var(--r)}.pill.g{background:#10321f;color:var(--g)}.pill.y{background:#3a2f0e;color:var(--y)}.pill.m{background:#202637;color:var(--mu)}
+details{background:var(--panel);border:1px solid var(--line);border-radius:11px;padding:9px 15px;margin:9px 0}
+details summary{cursor:pointer;font-weight:600}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.q{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:14px 18px;margin:14px 0}
+.q .qh{font-size:12px;letter-spacing:1px;text-transform:uppercase;color:var(--mu)}
+.q .opt{display:block;width:100%;text-align:left;margin:6px 0;background:#0e1322;border:1px solid var(--line);color:var(--fg);border-radius:9px;padding:9px 12px}
+.q .opt.good{border-color:var(--g);background:#0e2418}.q .opt.bad{border-color:var(--r);background:#2a1119}
+.q .ex{display:none;margin-top:8px;font-size:14.5px;color:#c3c9dc}
+.q.done .ex{display:block}
+.chk label{display:flex;gap:10px;align-items:flex-start;padding:6px 0;cursor:pointer}
+.chk input{margin-top:6px;accent-color:var(--g);width:17px;height:17px}
+.sigrow{display:grid;grid-template-columns:minmax(170px,2fr) 1fr 1fr auto;gap:8px 14px;align-items:center;padding:6px 0;border-top:1px dashed #1b2236}
+.sigrow:first-of-type{border-top:0}
+.sigrow label{display:flex;gap:6px;align-items:center;font-size:13.5px;color:#c3c9dc}
+@media(max-width:900px){
+ .side{transform:translateX(-100%)}.side.open{transform:none}.meter{display:none}
+ #menu{display:block}main{margin-left:0;padding:0 16px 100px}.two{grid-template-columns:1fr}.hero{padding-top:60px}
+ .sigrow{grid-template-columns:1fr 1fr}
+}
+</style>
+</head>
+<body>
+<div id="prog"></div>
+<button id="menu">☰ Contents</button>
+<nav class="side" id="side"><a class="back" href="index.html">← All courses</a><h1>Model Selection</h1><small>12 chapters · 11 labs · exam</small><div id="nav"></div></nav>
+<div class="meter"><div id="mtxt">Mastery: 0%</div><div class="bar"><i id="mbar"></i></div></div>
+
+<main>
+<header class="hero">
+ <h1>Model selection: AIC, BIC, cross-validation and honest error.</h1>
+ <p>Every real modelling project involves choosing: which variables, how flexible, which family, how much to regularise. The danger is that the same data are used both to choose and to judge, and the winner of a contest among many candidates looks better than it really is. This page covers the bias–variance decomposition, why training error lies, the information criteria AIC and BIC and when they disagree, cross-validation done correctly (and the leaks that ruin it), selection bias and nested validation, the problems of stepwise methods, model averaging, and validation for time-ordered data. It completes Stage 3.</p>
+ <div class="chips"><span class="chip"><b>Part I</b> Error and criteria</span><span class="chip"><b>Part II</b> Cross-validation</span><span class="chip"><b>Part III</b> Selection in practice</span></div>
+ <div class="co tip"><b>How to use this</b>Each lab simulates data from a known truth so you can see the true error of every choice. Heavy labs update when you release a slider or press the button. Prerequisites: Linear Regression, Regularisation and Generalised Linear Models pages.</div>
+</header>
+
+<div class="part">Part I · Error and criteria</div>
+
+<section class="ch" id="c1">
+<h2><span class="num">1</span>Bias, variance and the shape of prediction error <span class="lvl b">Beginner</span></h2>
+<p>At a point x₀ the expected squared prediction error of a fitted model decomposes into three parts:</p>
+<div class="f">E[(y₀ − f̂(x₀))²] = σ² (irreducible noise) + Bias[f̂(x₀)]² + Var[f̂(x₀)]</div>
+<p>A simple model (low flexibility) cannot follow the true curve: high bias, low variance. A flexible model follows the truth on average but changes wildly from sample to sample: low bias, high variance. Total error is U-shaped in flexibility, and model selection is the search for the bottom of the U, using only one sample. Note that the bias and variance here are properties of the <em>procedure</em> over repeated samples; you never see them in your single data set, which is why they must be estimated indirectly.</p>
+<div class="card"><h4>Lab 1 · Decomposing the error of polynomial fits</h4>
+ <p class="sub">The truth is a smooth curve on [−1, 1]. For each degree, 300 data sets are drawn and the fit evaluated at 40 points. Bars: average squared bias (red), variance (blue) and their sum plus noise (white line). The minimum of the sum is the best flexibility.</p>
+ <div class="ctl"><label>n <input type="range" id="c1n" min="20" max="200" step="5" value="40"><output id="c1nv"></output></label><label>noise SD <input type="range" id="c1s" min="2" max="15" step="1" value="5"><output id="c1sv"></output></label><button id="c1go">Re-simulate</button></div>
+ <canvas class="tl" id="c1cv"></canvas><div class="stats" id="c1st"></div><div class="read" id="c1rd"></div></div>
+</section>
+
+<section class="ch" id="c2">
+<h2><span class="num">2</span>Training error is optimistic <span class="lvl i">Intermediate</span></h2>
+<p>The residual error on the data used to fit a model always understates its error on new data, because the fit has adapted to the noise in that sample. For a linear model with k parameters and error variance σ² the <b>expected optimism</b> is exactly 2kσ²/n: test error ≈ training error + 2kσ²/n. This is the basis of <b>Mallows’ C_p</b> (and of AIC for Gaussian models): estimate the test error without a test set by adding a complexity penalty to the training error. Anything chosen by minimising training error alone (R², RSS) will always choose the largest model.</p>
+<div class="card"><h4>Lab 2 · Training error, test error and the Cp estimate</h4>
+ <p class="sub">Five of the predictors are real; the others are noise. For each number of predictors, over 60 data sets: the training MSE (red), the true expected test MSE (green) and the Cp estimate, training MSE + 2kσ²/n (blue). The Cp curve tracks the test curve; the training curve falls forever.</p>
+ <div class="ctl"><label>n <input type="range" id="c2n" min="30" max="300" step="10" value="60"><output id="c2nv"></output></label><button id="c2go">Re-simulate</button></div>
+ <canvas class="tl" id="c2cv"></canvas><div class="stats" id="c2st"></div><div class="read" id="c2rd"></div></div>
+</section>
+
+<section class="ch" id="c3">
+<h2><span class="num">3</span>AIC and BIC: two criteria, two goals <span class="lvl a">Advanced</span></h2>
+<p>For a model with maximised log-likelihood ℓ̂, k parameters and n observations:</p>
+<div class="f">AIC = −2ℓ̂ + 2k          AICc = AIC + 2k(k+1)/(n − k − 1)          BIC = −2ℓ̂ + k log n</div>
+<p>Pick the model with the smallest value. <b>AIC</b> estimates out-of-sample log-loss (Kullback–Leibler distance to the truth) and is <em>efficient</em>: it aims for the best predictions, tolerating a few useless extras (it overfits mildly even with infinite data). <b>BIC</b> approximates the log marginal likelihood (a Bayes factor) and is <em>consistent</em>: if the true model is among the candidates, it finds it as n grows; it penalises more strongly once log n &gt; 2 (n ≥ 8) and tends to choose smaller models. AICc corrects AIC for small n and should be used when n/k &lt; 40. There is no universal winner: use AIC/CV for prediction, BIC when you want a parsimonious “explanatory” model and believe a simple truth exists.</p>
+<div class="card"><h4>Lab 3 · Which size do AIC and BIC choose?</h4>
+ <p class="sub">Nested models with 0 to 12 predictors, of which the first 4 are real (each with the effect you choose, noise SD 1). Bars show how often each model size is chosen over 300 data sets. The true size is 4.</p>
+ <div class="ctl"><label>n <input type="range" id="c3n" min="30" max="1000" step="10" value="100"><output id="c3nv"></output></label><label>effect of each real predictor <input type="range" id="c3b" min="5" max="60" step="1" value="30"><output id="c3bv"></output></label><button id="c3go">Re-simulate</button></div>
+ <canvas class="tl" id="c3cv"></canvas><div class="stats" id="c3st"></div><div class="read" id="c3rd"></div></div>
+</section>
+
+<div class="part">Part II · Cross-validation</div>
+
+<section class="ch" id="c4">
+<h2><span class="num">4</span>Cross-validation: K-fold, leave-one-out and the bias–variance of CV itself <span class="lvl a">Advanced</span></h2>
+<p>Cross-validation estimates out-of-sample error by repeatedly holding data out. In <b>K-fold CV</b> the data are split into K parts; each part is predicted by a model fitted on the other K−1. <b>Leave-one-out</b> (LOO, K = n) is nearly unbiased but its n fitted models are almost identical, so the estimates are highly correlated and the result can be high-variance; for linear models it needs no refitting: LOO error = mean[(eᵢ/(1 − hᵢ))²], where hᵢ is the leverage. Small K (2 to 5) trains on much less data than the final model, so it is pessimistically biased; K = 5 or 10 is the usual compromise. The CV estimate is itself noisy, particularly with small n or rare events, so report it with a standard error.</p>
+<div class="card"><h4>Lab 4 · How good are different CV estimates?</h4>
+ <p class="sub">Polynomial regression of the degree you choose, with true curve and noise as in Lab 1. Over 200 data sets, each CV estimate is compared with the true error of the model fitted on the full sample. The table gives its average bias and standard deviation. The LOO shortcut is checked against brute-force refitting.</p>
+ <div class="ctl"><label>polynomial degree <input type="range" id="c4d" min="1" max="10" step="1" value="5"><output id="c4dv"></output></label><label>n <input type="range" id="c4n" min="20" max="150" step="5" value="40"><output id="c4nv"></output></label><button id="c4go">Re-simulate</button></div>
+ <canvas class="tl" id="c4cv"></canvas><div class="tw" id="c4tb"></div><div class="read" id="c4rd"></div></div>
+</section>
+
+<section class="ch" id="c5">
+<h2><span class="num">5</span>Leakage: the way cross-validation is most often ruined <span class="lvl e">Expert</span></h2>
+<p>Cross-validation only works if <em>every</em> data-dependent step of the pipeline is repeated inside each training fold: feature screening, standardisation, imputation, resampling, encoding, tuning. If you select the 10 best of 1,000 predictors using the whole data set and then cross-validate a model on those 10, the held-out folds have already influenced the selection, and pure noise will appear to predict. The same applies to any target-aware step, to duplicates and near-duplicates (the same customer in training and validation folds), and to variables that encode the future. Such errors produce models that look excellent in development and fail in production, which is exactly what model-risk reviewers look for.</p>
+<div class="card"><h4>Lab 5 · A model with no skill that “validates”</h4>
+ <p class="sub">The outcome is pure noise: no predictor has any relationship with it. We keep the k predictors most correlated with y and fit least squares. “Leaky CV” screens on all data first; “proper CV” screens inside each fold. A skill of 0 means no better than predicting the mean.</p>
+ <div class="ctl"><label>n <input type="range" id="c5n" min="30" max="200" step="5" value="60"><output id="c5nv"></output></label><label>candidate predictors <input type="range" id="c5p" min="20" max="2000" step="20" value="500"><output id="c5pv"></output></label><label>kept k <input type="range" id="c5k" min="1" max="20" step="1" value="8"><output id="c5kv"></output></label><button id="c5go">Re-simulate</button></div>
+ <canvas class="tl" id="c5cv"></canvas><div class="stats" id="c5st"></div><div class="read" id="c5rd"></div></div>
+</section>
+
+<section class="ch" id="c6">
+<h2><span class="num">6</span>The winner’s curse of selection, and nested validation <span class="lvl e">Expert</span></h2>
+<p>Even a correctly done CV is not an unbiased estimate of the <em>selected</em> model’s performance. If you evaluate M candidates by CV and keep the best, its score is the maximum of M noisy estimates and is optimistic; the more candidates (and the noisier the CV), the worse. The remedy is a final, untouched <b>test set</b>, or <b>nested cross-validation</b>: an outer loop evaluates the whole “select-then-fit” procedure on held-out data while an inner loop does the selection. The outer score estimates the performance of the <em>procedure</em>, which is what you will actually deploy.</p>
+<div class="card"><h4>Lab 6 · Best of M candidates</h4>
+ <p class="sub">Each candidate model uses one predictor (n = 60). Predictor 1 has the real effect you set (possibly zero); the rest are noise. For each M the best candidate by 5-fold CV is chosen. Bars show skill (1 − MSE/variance): the winner’s CV score (red), the honest nested-CV score of the whole procedure (blue) and the true skill on new data (green).</p>
+ <div class="ctl"><label>true R² of predictor 1 % <input type="range" id="c6s" min="0" max="25" step="1" value="3"><output id="c6sv"></output></label><button id="c6go">Re-simulate</button></div>
+ <canvas class="tl" id="c6cv"></canvas><div class="stats" id="c6st"></div><div class="read" id="c6rd"></div></div>
+</section>
+
+<div class="part">Part III · Selection in practice</div>
+
+<section class="ch" id="c7">
+<h2><span class="num">7</span>Stepwise selection and its false discoveries <span class="lvl a">Advanced</span></h2>
+<p>Forward, backward and stepwise selection add or drop variables by p-values or F-statistics. They are fast and simple but have well-known defects: the final model’s R², F-test and coefficient p-values are all computed as if the model had been specified in advance, so they are badly over-optimistic; the coefficients of selected variables are biased away from zero; the choice is unstable under small changes in the data; and the procedure is not guaranteed to find the best subset. Regularisation, cross-validated selection, or pre-specification on subject-matter grounds are better.</p>
+<div class="card"><h4>Lab 7 · Forward selection on pure noise</h4>
+ <p class="sub">The outcome is unrelated to every predictor. Forward selection adds the best remaining predictor while its F-to-enter exceeds 4 (roughly p &lt; 0.05). The histogram shows the overall F-test p-value of the final model in 300 data sets. If the output were honest it would be flat.</p>
+ <div class="ctl"><label>n <input type="range" id="c7n" min="30" max="300" step="10" value="60"><output id="c7nv"></output></label><label>candidate predictors <input type="range" id="c7p" min="5" max="60" step="1" value="30"><output id="c7pv"></output></label><button id="c7go">Re-simulate</button></div>
+ <canvas class="tl" id="c7cv"></canvas><div class="stats" id="c7st"></div><div class="read" id="c7rd"></div></div>
+</section>
+
+<section class="ch" id="c8">
+<h2><span class="num">8</span>Model uncertainty: Akaike weights and model averaging <span class="lvl a">Advanced</span></h2>
+<p>When several models fit nearly equally well, choosing one and acting as if it were known discards the uncertainty about the choice. Differences in AIC convert to <b>Akaike weights</b>, wᵢ = exp(−Δᵢ/2)/Σexp(−Δⱼ/2), the relative support for each model; models within about 2 AIC units of the best are essentially tied. A <b>model-averaged</b> prediction, Σwᵢf̂ᵢ, is usually more accurate than the single winner (it behaves like a smoothed version of selection and is less sensitive to small changes), and the weights are an honest summary of how much the data can say. Bayesian model averaging does the same with BIC-like weights.</p>
+<div class="card"><h4>Lab 8 · Winner versus weighted average</h4>
+ <p class="sub">Four candidates: intercept only, x₁, x₂, and x₁ + x₂ (the truth: effects 0.4 and 0.3, noise SD 1, predictors correlated as set). Over 300 data sets: how often each model has the lowest AIC, its average Akaike weight, and the true excess prediction error of the winner and of the weighted average.</p>
+ <div class="ctl"><label>n <input type="range" id="c8n" min="20" max="400" step="10" value="60"><output id="c8nv"></output></label><label>predictor correlation % <input type="range" id="c8r" min="0" max="95" step="1" value="60"><output id="c8rv"></output></label><button id="c8go">Re-simulate</button></div>
+ <canvas class="tl" id="c8cv"></canvas><div class="stats" id="c8st"></div><div class="read" id="c8rd"></div></div>
+</section>
+
+<section class="ch" id="c9">
+<h2><span class="num">9</span>Validation for time-ordered data <span class="lvl e">Expert</span></h2>
+<p>Random K-fold CV assumes that observations are exchangeable. When they are ordered in time (credit performance, transactions, markets) neighbours are correlated and the model will be used on the <em>future</em>. Random folds then put near-copies of the validation points in the training set and report error far below the true forward-looking error, especially for flexible models that can fit smooth, slowly-varying noise. Use <b>out-of-time validation</b>: train on the past, validate on the following period; for tuning, use <b>rolling-origin (forward-chaining)</b> CV with training windows that always precede the validation window. Regulatory model validation expects out-of-time and out-of-sample tests in addition to random splits.</p>
+<div class="card"><h4>Lab 9 · Random CV versus rolling-origin versus the real future</h4>
+ <p class="sub">y = x + u, where u is autocorrelated noise. The model contains x plus a polynomial in time of the degree you choose. For each estimator: the average error estimate over 200 series, against the true error on the 20% of the series that follows the training period.</p>
+ <div class="ctl"><label>autocorrelation of noise <input type="range" id="c9a" min="0" max="95" step="1" value="80"><output id="c9av"></output></label><label>time polynomial degree <input type="range" id="c9g" min="0" max="8" step="1" value="3"><output id="c9gv"></output></label><label>n <input type="range" id="c9n" min="60" max="400" step="10" value="150"><output id="c9nv"></output></label><button id="c9go">Re-simulate</button></div>
+ <canvas class="tl" id="c9cv"></canvas><div class="stats" id="c9st"></div><div class="read" id="c9rd"></div></div>
+</section>
+
+<section class="ch" id="c10">
+<h2><span class="num">10</span>Selecting on the right metric: AUC, log-loss and calibration <span class="lvl a">Advanced</span></h2>
+<p>Criteria differ in what they reward. AUC measures only the <em>ranking</em> and is insensitive to over-fitted probabilities; log-loss and the Brier score are proper scoring rules that also punish miscalibrated or over-confident probabilities. A model chosen on AUC may rank well yet give poor probabilities, which matters for pricing, provisioning and capital. Choose the metric that matches the decision: ranking or targeting (AUC, lift, KS), probability use (log-loss, Brier, calibration), cost-weighted decisions (expected cost at a threshold). Also see how selection by information criterion (AIC, BIC) lands relative to the best validation score.</p>
+<div class="card"><h4>Lab 10 · Test AUC versus test log-loss as predictors are added</h4>
+ <p class="sub">Logistic models with the first k of 20 predictors (5 real, each effect 0.8), n training cases. Curves are averaged over 20 data sets on 3,000 fresh cases: left, AUC (higher is better); right, log-loss (lower is better). Markers show the k chosen on average by AIC and BIC.</p>
+ <div class="ctl"><label>n <input type="range" id="c10n" min="80" max="600" step="10" value="150"><output id="c10nv"></output></label><button id="c10go">Re-simulate</button></div>
+ <div class="two"><canvas class="sm" id="c10cv"></canvas><canvas class="sm" id="c10cv2"></canvas></div><div class="stats" id="c10st"></div><div class="read" id="c10rd"></div></div>
+</section>
+
+<section class="ch" id="c11">
+<h2><span class="num">11</span>Instability, bagging and averaging over subsets <span class="lvl e">Expert</span></h2>
+<p>Subset selection is a discontinuous procedure: a small change in the data can swap a variable in or out, and prediction error then has a large variance component. <b>Bagging</b> (bootstrap aggregation) re-runs the selection on bootstrap samples and averages the resulting coefficients, which smooths out the instability; averaging over models with Akaike weights does the same without resampling; shrinkage (ridge, lasso) is another smooth alternative. In practice all of these beat a single stepwise or best-subset choice, particularly when predictors are correlated and the effects are small.</p>
+<div class="card"><h4>Lab 11 · Best subset, averaging, bagging, full model</h4>
+ <p class="sub">Eight predictors with effects (1, 0.7, 0.5, 0.3, 0.2, 0, 0, 0) × 0.5 and noise SD 1. All 255 subsets are compared. Bars: true excess prediction error (lower is better) of the best-AIC subset, the Akaike-weighted average, bagging (10 bootstrap selections) and the full model, over 80 data sets.</p>
+ <div class="ctl"><label>n <input type="range" id="c11n" min="30" max="300" step="10" value="60"><output id="c11nv"></output></label><label>predictor correlation % <input type="range" id="c11r" min="0" max="90" step="1" value="40"><output id="c11rv"></output></label><button id="c11go">Re-simulate</button></div>
+ <canvas class="tl" id="c11cv"></canvas><div class="stats" id="c11st"></div><div class="read" id="c11rd"></div></div>
+</section>
+
+<section class="ch" id="c12">
+<h2><span class="num">12</span>Final exam, mastery checklist, cheat sheet <span class="lvl e">Expert</span></h2>
+<h3>Exam (18 questions — click an answer)</h3>
+<div id="quiz"></div>
+<div class="card"><h4>Score</h4><div class="stats" id="qscore"></div><button class="alt" id="qreset">Reset exam</button></div>
+<h3>Mastery checklist — tick when you can do it without notes</h3>
+<div class="card chk" id="chk"></div>
+<h3>Cheat sheet</h3>
+<div class="tw"><table>
+<tr><th>Idea</th><th>One line</th></tr>
+<tr><td>Error decomposition</td><td>E[error] = σ² + bias² + variance; U-shaped in flexibility</td></tr>
+<tr><td>Optimism</td><td>Test error ≈ training error + 2kσ²/n (Cp); training error always prefers the biggest model</td></tr>
+<tr><td>AIC</td><td>−2ℓ + 2k; aims at prediction (efficient); AICc for small n/k</td></tr>
+<tr><td>BIC</td><td>−2ℓ + k log n; approximates marginal likelihood; consistent; prefers smaller models</td></tr>
+<tr><td>Akaike weights</td><td>w ∝ exp(−Δ/2); Δ &lt; 2 means essentially tied; average predictions across models</td></tr>
+<tr><td>K-fold CV</td><td>K = 5–10; LOO nearly unbiased but high variance; LOO shortcut e/(1 − h) for linear models</td></tr>
+<tr><td>Leakage</td><td>Repeat every data-dependent step (screening, scaling, imputation) inside each fold</td></tr>
+<tr><td>Winner’s curse</td><td>Best-of-M CV score is optimistic; use a test set or nested CV for the whole procedure</td></tr>
+<tr><td>Stepwise</td><td>Invalid p-values, inflated R², unstable; prefer shrinkage or pre-specification</td></tr>
+<tr><td>Time-ordered data</td><td>Out-of-time and rolling-origin validation; random CV leaks neighbours</td></tr>
+<tr><td>Metrics</td><td>AUC for ranking; log-loss/Brier for probabilities; match the decision</td></tr>
+<tr><td>Instability</td><td>Bagging, model averaging or shrinkage reduce the variance of selection</td></tr>
+</table></div>
+<div class="co tip"><b>Next on the roadmap</b>Item 16 opens Stage 4, applied modelling: calibration and proper scoring rules.</div>
+</section>
+</main>
+<script>
+/*MATH*/
+function lgamma(x){const c=[76.18009172947146,-86.50532032941677,24.01409824083091,-1.231739572450155,0.1208650973866179e-2,-0.5395239384953e-5];let y=x,t=x+5.5;t-=(x+.5)*Math.log(t);let s=1.000000000190015;for(let j=0;j<6;j++)s+=c[j]/++y;return -t+Math.log(2.5066282746310005*s/x);}
+function gser(a,x){let ap=a,sum=1/a,del=sum;for(let n=0;n<1000;n++){ap++;del*=x/ap;sum+=del;if(Math.abs(del)<Math.abs(sum)*1e-15)break;}return sum*Math.exp(-x+a*Math.log(x)-lgamma(a));}
+function gcf(a,x){let b=x+1-a,c=1/1e-300,d=1/b,h=d;for(let i=1;i<1000;i++){const an=-i*(i-a);b+=2;d=an*d+b;if(Math.abs(d)<1e-300)d=1e-300;c=b+an/c;if(Math.abs(c)<1e-300)c=1e-300;d=1/d;const del=d*c;h*=del;if(Math.abs(del-1)<1e-15)break;}return Math.exp(-x+a*Math.log(x)-lgamma(a))*h;}
+function gammaQ(a,x){if(x<=0)return 1;return x<a+1?1-gser(a,x):gcf(a,x);}
+function betacf(a,b,x){const qab=a+b,qap=a+1,qam=a-1;let c=1,d=1-qab*x/qap;if(Math.abs(d)<1e-300)d=1e-300;d=1/d;let h=d;for(let m=1;m<=1000;m++){const m2=2*m;let aa=m*(b-m)*x/((qam+m2)*(a+m2));d=1+aa*d;if(Math.abs(d)<1e-300)d=1e-300;c=1+aa/c;if(Math.abs(c)<1e-300)c=1e-300;d=1/d;h*=d*c;aa=-(a+m)*(qab+m)*x/((a+m2)*(qap+m2));d=1+aa*d;if(Math.abs(d)<1e-300)d=1e-300;c=1+aa/c;if(Math.abs(c)<1e-300)c=1e-300;d=1/d;const del=d*c;h*=del;if(Math.abs(del-1)<1e-15)break;}return h;}
+function betai(a,b,x){if(x<=0)return 0;if(x>=1)return 1;const bt=Math.exp(lgamma(a+b)-lgamma(a)-lgamma(b)+a*Math.log(x)+b*Math.log(1-x));return x<(a+1)/(a+b+2)?bt*betacf(a,b,x)/a:1-bt*betacf(b,a,1-x)/b;}
+function normSf(z){const q=0.5*gammaQ(.5,z*z/2);return z>=0?q:1-q;}
+function normCdf(z){return normSf(-z);}
+function npdf(x){return Math.exp(-x*x/2)/2.5066282746310002;}
+function lbin(n,k){return lgamma(n+1)-lgamma(k+1)-lgamma(n-k+1);}
+function binom(n,k,p){return Math.exp(lbin(n,k)+k*Math.log(p)+(n-k)*Math.log(1-p));}
+function betapdf(x,a,b){return x<=0||x>=1?0:Math.exp(lgamma(a+b)-lgamma(a)-lgamma(b)+(a-1)*Math.log(x)+(b-1)*Math.log(1-x));}
+function betacdf(x,a,b){return betai(a,b,x);}
+function gampdf(x,a,r){return x<=0?0:Math.exp(a*Math.log(r)+(a-1)*Math.log(x)-r*x-lgamma(a));}
+function gamcdf(x,a,r){return x<=0?0:1-gammaQ(a,r*x);}
+function randn(){let u=0;while(!u)u=Math.random();return Math.sqrt(-2*Math.log(u))*Math.cos(2*Math.PI*Math.random());}
+function gammaS(a){if(a<1)return gammaS(a+1)*Math.pow(Math.random(),1/a);const d=a-1/3,c=1/Math.sqrt(9*d);for(;;){let x,v;do{x=randn();v=1+c*x}while(v<=0);v=v*v*v;const u=Math.random();if(Math.log(u)<.5*x*x+d-d*v+d*Math.log(v))return d*v;}}
+function betaS(a,b){const x=gammaS(a),y=gammaS(b);return x/(x+y);}
+function binS(n,p){let k=0;for(let i=0;i<n;i++)if(Math.random()<p)k++;return k;}
+function mean(a){let s=0;for(const v of a)s+=v;return s/a.length;}
+function qc(cdf,lo,hi,p,it){for(let i=0;i<(it||100);i++){const m=(lo+hi)/2;if(cdf(m)<p)lo=m;else hi=m}return(lo+hi)/2;}
+function qb(a,b,p){return qc(x=>betai(a,b,x),0,1,p,50);}
+function tcdf(x,v){const t=.5*betai(v/2,.5,v/(v+x*x));return x>0?1-t:t}
+function qn(p){return qc(normCdf,-9,9,p,70)}
+function pois(k,l){return Math.exp(-l+k*Math.log(l)-lgamma(k+1))}
+function binF(n,p){let k=0;for(;;){if(n<=0||p<=0)return k;if(p>=1)return k+n;if(n<=40){for(let i=0;i<n;i++)if(Math.random()<p)k++;return k}const a=1+(n>>1),bb=1+n-a,x=betaS(a,bb);if(x>=p){n=a-1;p=p/x}else{k+=a;n=bb-1;p=(p-x)/(1-x)}}}
+/*ENDMATH*/
+
+const $=id=>document.getElementById(id), val=id=>+$(id).value;
+const C={fg:'#e8ebf5',mu:'#8a93ab',gr:'#232a3d',a:'#6ea8ff',r:'#ff6b81',y:'#ffd166',g:'#4ade80',p:'#c084fc',t:'#5eead4'};
+const store={get(k,d){try{const v=JSON.parse(localStorage.getItem(k));return v==null?d:v}catch(e){return d}},set(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}};
+function stat(l,v,c){return `<div class="stat ${c||''}"><b>${v}</b><span>${l}</span></div>`}
+function f3(x){if(!isFinite(x))return String(x);const a=Math.abs(x);if(a!==0&&(a<1e-3||a>=1e6))return x.toExponential(2);return String(+x.toFixed(a<1?4:a<100?3:a<1000?2:0))}
+function pc(x){return f3(100*x)+'%'}
+const resizers=[];
+function reg(fn){fn();resizers.push(fn)}
+function on(ids,fn){ids.split(' ').forEach(i=>{const e=$(i);e.addEventListener('input',fn);e.addEventListener('change',fn)})}
+let rt;window.addEventListener('resize',()=>{clearTimeout(rt);rt=setTimeout(()=>resizers.forEach(f=>f()),150)});
+document.querySelectorAll('input[type=range]').forEach(i=>{const o=$(i.id+'v');if(!o)return;const f=()=>{o.textContent=i.value};i.addEventListener('input',f);f()});
+
+function nice(x){const e=Math.pow(10,Math.floor(Math.log10(x))),f=x/e;return (f<1.5?1:f<3?2:f<7?5:10)*e}
+function mk(cv,x0,x1,ymax,o){o=o||{};const y0=o.y0||0,dpr=window.devicePixelRatio||1,r=cv.getBoundingClientRect(),w=r.width||600,h=r.height||270;
+ cv.width=w*dpr;cv.height=h*dpr;const g=cv.getContext('2d');g.setTransform(dpr,0,0,dpr,0,0);g.clearRect(0,0,w,h);
+ const L=o.L||42,R=12,T=14,B=28,X=x=>L+(x-x0)/(x1-x0)*(w-L-R),Y=y=>h-B-(y-y0)/(ymax-y0)*(h-T-B);
+ g.font='11px system-ui';g.lineWidth=1;g.strokeStyle=C.gr;g.fillStyle=C.mu;
+ if(!o.noGrid){const sx=nice((x1-x0)/7);for(let x=Math.ceil(x0/sx-1e-9)*sx;!o.noX&&x<=x1+1e-9;x+=sx){g.beginPath();g.moveTo(X(x),T);g.lineTo(X(x),h-B);g.stroke();g.textAlign='center';g.fillText(String(+x.toFixed(6)),X(x),h-B+15)}
+ const sy=nice((ymax-y0)/4);for(let y=Math.ceil(y0/sy-1e-9)*sy;y<=ymax+1e-9;y+=sy){g.beginPath();g.moveTo(L,Y(y));g.lineTo(w-R,Y(y));g.stroke();g.textAlign='right';g.fillText(String(+y.toFixed(4)),L-5,Y(y)+3)}}
+ return{g,w,h,X,Y,L,R,T,B,
+  line(f,col,lw,a,b,n,dash){a=a==null?x0:a;b=b==null?x1:b;n=n||260;g.save();if(dash)g.setLineDash([5,4]);g.beginPath();g.strokeStyle=col;g.lineWidth=lw||2;let st=false;for(let i=0;i<=n;i++){const x=a+(b-a)*i/n,y=f(x);if(!isFinite(y)){st=false;continue}st?g.lineTo(X(x),Y(y)):g.moveTo(X(x),Y(y));st=true}g.stroke();g.restore()},
+  area(f,a,b,col,n){a=Math.max(a,x0);b=Math.min(b,x1);if(b<=a)return;n=n||200;g.beginPath();g.moveTo(X(a),Y(0));for(let i=0;i<=n;i++){const x=a+(b-a)*i/n;g.lineTo(X(x),Y(f(x)))}g.lineTo(X(b),Y(0));g.closePath();g.fillStyle=col;g.fill()},
+  vline(x,col,lab,dash){g.save();g.strokeStyle=col;g.lineWidth=1.6;if(dash)g.setLineDash([5,4]);g.beginPath();g.moveTo(X(x),T);g.lineTo(X(x),h-B);g.stroke();g.restore();if(lab){g.fillStyle=col;g.textAlign='center';g.fillText(lab,Math.min(Math.max(X(x),34),w-34),T+10)}},
+  hline(y,col,lab){g.save();g.strokeStyle=col;g.lineWidth=1.4;g.setLineDash([5,4]);g.beginPath();g.moveTo(L,Y(y));g.lineTo(w-R,Y(y));g.stroke();g.restore();if(lab){g.fillStyle=col;g.textAlign='right';g.fillText(lab,w-R-3,Y(y)-4)}},
+  text(s,x,y,col,al){g.fillStyle=col||C.fg;g.textAlign=al||'left';g.fillText(s,x,y)}};}
+
+/* ---------- shared helpers for this page ---------- */
+const D={
+ norm:{n:'Normal(0,1)',s:()=>randn(),mu:0,sd:1,sk:0},
+ unif:{n:'Uniform(0,1)',s:()=>Math.random(),mu:.5,sd:Math.sqrt(1/12),sk:0},
+ expo:{n:'Exponential(1)',s:()=>-Math.log(1-Math.random()),mu:1,sd:1,sk:2},
+ logn:{n:'Lognormal(0,1)',s:()=>Math.exp(randn()),mu:Math.exp(.5),sd:Math.sqrt((Math.E-1)*Math.E),sk:(Math.E+2)*Math.sqrt(Math.E-1),disc:0},
+ b05:{n:'Bernoulli(0.5)',s:()=>Math.random()<.5?1:0,mu:.5,sd:.5,sk:0,disc:1},
+ b05s:{n:'Bernoulli(0.05)',s:()=>Math.random()<.05?1:0,mu:.05,sd:Math.sqrt(.0475),sk:.9/Math.sqrt(.0475),disc:1},
+ bimo:{n:'Two humps',s:()=>(Math.random()<.5?-2:2)+.5*randn(),mu:0,sd:Math.sqrt(4.25),sk:0},
+ par5:{n:'Pareto(α=5)',s:()=>Math.pow(1-Math.random(),-.2),mu:1.25,sd:Math.sqrt(5/48),sk:6*Math.sqrt(.6)},
+ cauchy:{n:'Cauchy (no mean)',s:()=>Math.tan(Math.PI*(Math.random()-.5)),mu:NaN,sd:Infinity,sk:NaN}
+};
+function fillSel(id,keys,def){const e=$(id);e.innerHTML=keys.map(k=>`<option value="${k}">${D[k].n}</option>`).join('');e.value=def}
+const PAL=[C.a,C.r,C.y,C.g,C.p,C.t,'#ff9f43','#9aa4bf'];
+function tgrid(N,M){const T=[];let prev=0;for(let i=0;i<M;i++){let n=Math.round(Math.pow(10,Math.log10(N)*i/(M-1)));if(i===M-1)n=N;n=Math.max(prev+1,n);if(n>N)break;T.push(n);prev=n}if(T[T.length-1]!==N)T[T.length-1]=N;return T}
+function nlab(n){return n>=1e6?(n/1e6)+'M':n>=1000?(n/1000)+'k':String(n)}
+function customGrid(P,xt,yt){const g=P.g;g.save();g.strokeStyle=C.gr;g.fillStyle=C.mu;g.font='11px system-ui';g.lineWidth=1;
+ xt.forEach(([v,l])=>{g.beginPath();g.moveTo(P.X(v),P.T);g.lineTo(P.X(v),P.h-P.B);g.stroke();g.textAlign='center';g.fillText(l,P.X(v),P.h-P.B+15)});
+ yt.forEach(([v,l])=>{g.beginPath();g.moveTo(P.L,P.Y(v));g.lineTo(P.w-P.R,P.Y(v));g.stroke();g.textAlign='right';g.fillText(l,P.L-5,P.Y(v)+3)});g.restore()}
+function clip(P,fn){const g=P.g;g.save();g.beginPath();g.rect(P.L,P.T,P.w-P.L-P.R,P.h-P.T-P.B);g.clip();fn();g.restore()}
+function poly(P,pts,col,lw,dash){const g=P.g;g.save();if(dash)g.setLineDash([5,4]);g.strokeStyle=col;g.lineWidth=lw||2;g.beginPath();pts.forEach(([x,y],i)=>i?g.lineTo(P.X(x),P.Y(y)):g.moveTo(P.X(x),P.Y(y)));g.stroke();g.restore()}
+function dots(P,pts,col,r){const g=P.g;g.fillStyle=col;pts.forEach(([x,y])=>{g.beginPath();g.arc(P.X(x),P.Y(y),r||3,0,7);g.fill()})}
+function niceTicks(lo,hi,k){const st=nice((hi-lo)/(k||5)),a=[];for(let v=Math.ceil(lo/st-1e-9)*st;v<=hi+1e-9;v+=st)a.push([v,String(+v.toFixed(6))]);return a}
+function logTicks(lo,hi){const a=[];for(let e=Math.ceil(lo-1e-9);e<=hi+1e-9;e++)a.push([e,nlab(Math.pow(10,e))]);return a}
+function mom(a){const n=a.length;let m=0;for(const v of a)m+=v;m/=n;let v2=0,v3=0,v4=0;for(const v of a){const d=v-m;v2+=d*d;v3+=d*d*d;v4+=d*d*d*d}v2/=n;v3/=n;v4/=n;const sd=Math.sqrt(v2);return{n,m,sd,sk:sd>0?v3/(sd*sd*sd):0,ku:v2>0?v4/(v2*v2)-3:0}}
+function ksN(z){const a=Array.from(z).sort((x,y)=>x-y),n=a.length;let d=0;for(let i=0;i<n;i++){const F=normCdf(a[i]);d=Math.max(d,Math.abs((i+1)/n-F),Math.abs(i/n-F))}return d}
+/* histogram of data as density with optional overlay curves [{f,col,lw,dash}] */
+function hist(cv,data,lo,hi,bins,ov,col){const cnt=new Float64Array(bins),bw=(hi-lo)/bins;let n=0;for(const v of data){if(v<lo||v>=hi)continue;cnt[Math.floor((v-lo)/bw)]++;n++}
+ const N=data.length;let ym=0;for(let i=0;i<bins;i++){cnt[i]/=N*bw;ym=Math.max(ym,cnt[i])}
+ (ov||[]).forEach(o=>{for(let i=0;i<=80;i++)ym=Math.max(ym,o.f(lo+(hi-lo)*i/80)||0)});
+ const P=mk(cv,lo,hi,ym*1.12);
+ P.g.fillStyle=col||'rgba(110,168,255,.5)';for(let i=0;i<bins;i++){if(cnt[i]<=0)continue;const a=P.X(lo+i*bw),b=P.X(lo+(i+1)*bw);P.g.fillRect(a,P.Y(cnt[i]),Math.max(1,b-a-1),P.Y(0)-P.Y(cnt[i]))}
+ (ov||[]).forEach(o=>P.line(o.f,o.col,o.lw||2.4,lo,hi,200,o.dash));return P}
+const fmt=x=>f3(x);
+
+/* ---------- shared for this page ---------- */
+const POPS=['norm','unif','expo','logn','bimo','par5'];
+D.norm.med=0;D.norm.q90=1.2815516;D.unif.med=.5;D.unif.q90=.9;D.expo.med=Math.LN2;D.expo.q90=Math.log(10);D.logn.med=1;D.logn.q90=Math.exp(1.2815516);
+D.bimo.med=0;D.bimo.q90=qc(x=>.5*normCdf((x+2)/.5)+.5*normCdf((x-2)/.5),-10,10,.9,80);D.par5.med=Math.pow(2,.2);D.par5.q90=Math.pow(10,.2);
+const SF={mean:a=>mean(a),median:a=>{const b=Float64Array.from(a).sort(),n=b.length;return n%2?b[(n-1)/2]:(b[n/2-1]+b[n/2])/2},sd:a=>{const n=a.length,m=mean(a);let s=0;for(const v of a)s+=(v-m)*(v-m);return Math.sqrt(s/(n-1))},q90:a=>{const b=Float64Array.from(a).sort();return b[Math.round(.9*(b.length-1))]}};
+function truth(key,st){const d=D[key];return st==='mean'?d.mu:st==='median'?d.med:st==='sd'?d.sd:d.q90}
+const SNAME={mean:'sample mean',median:'sample median',sd:'sample SD',q90:'90th percentile'};
+const N10=[2,3,5,10,20,50,100,200,500,1000];
+function pct(a,p){const b=Float64Array.from(a).sort();return b[Math.min(b.length-1,Math.max(0,Math.floor(p*b.length)))]}
+function histLines(cv,arrs,cols,lo,hi,bins,vl){const bw=(hi-lo)/bins,dens=arrs.map(a=>{const c=new Float64Array(bins);for(const v of a){if(v<lo||v>=hi)continue;c[Math.floor((v-lo)/bw)]++}for(let i=0;i<bins;i++)c[i]/=a.length*bw;return c});let ym=0;dens.forEach(c=>c.forEach(v=>ym=Math.max(ym,v)));const P=mk(cv,lo,hi,ym*1.15||1);
+ dens.forEach((c,k)=>{const pts=[];for(let i=0;i<bins;i++){pts.push([lo+i*bw,c[i]]);pts.push([lo+(i+1)*bw,c[i]])}clip(P,()=>poly(P,pts,cols[k],2.2))});(vl||[]).forEach(v=>P.vline(v[0],v[1],v[2],v[3]));return P}
+function sdOf(a){return mom(a).sd}
+
+/* ---------- ML helpers ---------- */
+function digamma(x){let r=0;while(x<6){r-=1/x;x++}const f=1/(x*x);return r+Math.log(x)-.5/x-f*(1/12-f*(1/120-f/252))}
+function trigamma(x){let r=0;while(x<6){r+=1/(x*x);x++}const f=1/(x*x);return r+1/x+.5*f+f/x*(1/6-f*(1/30-f/42))}
+function poisS(l){if(l<=0)return 0;if(l<30){const L=Math.exp(-l);let k=0,p=1;do{k++;p*=Math.random()}while(p>L);return k-1}const m=Math.floor(.875*l),g=gammaS(m);return g<l?m+poisS(l-g):binF(m-1,l/g)}
+function llb(k,n,p){return(k?k*Math.log(p):0)+(n-k?(n-k)*Math.log(1-p):0)}
+function lrInt(k,n,cut){const ph=k/n,l0=llb(k,n,ph),g=p=>2*(l0-llb(k,n,p))-cut;let lo=0,hi=1;
+ if(k>0){let a=1e-12,b=ph;for(let i=0;i<70;i++){const m=(a+b)/2;if(g(m)>0)a=m;else b=m}lo=(a+b)/2}
+ if(k<n){let a=ph,b=1-1e-12;for(let i=0;i<70;i++){const m=(a+b)/2;if(g(m)>0)b=m;else a=m}hi=(a+b)/2}return[lo,hi]}
+function solveAlpha(s){if(!(s>1e-9))return 1e6;let a=(3-s+Math.sqrt((3-s)*(3-s)+24*s))/(12*s);for(let i=0;i<8;i++){const f=Math.log(a)-digamma(a)-s,fp=1/a-trigamma(a);let n=a-f/fp;if(!(n>0))n=a/2;a=n}return a}
+function normPdfAt(x,m,s){return Math.exp(-(x-m)*(x-m)/(2*s*s))/(s*2.5066282746)}
+/* ---------- Regression helpers ---------- */
+function idx(id,arr,ff){const e=$(id),o=$(id+'v'),f=()=>{o.textContent=ff?ff(arr[+e.value]):arr[+e.value]};e.addEventListener('input',f);f()}
+function scl(id,ff){const e=$(id),o=$(id+'v'),f=()=>{o.textContent=ff(+e.value)};e.addEventListener('input',f);f()}
+function pctTicks(a,b,st){const r=[];for(let v=a;v<=b+1e-9;v+=st)r.push([v,Math.round(v*100)+'%']);return r}
+const _tq={};function tq(v,p){const k=v+'_'+p;return _tq[k]||(_tq[k]=qc(x=>tcdf(x,v),0,500,p,80))}
+function simple(x,y){const n=x.length;let xm=0,ym=0;for(let i=0;i<n;i++){xm+=x[i];ym+=y[i]}xm/=n;ym/=n;let sxx=0,sxy=0,syy=0;for(let i=0;i<n;i++){const dx=x[i]-xm,dy=y[i]-ym;sxx+=dx*dx;sxy+=dx*dy;syy+=dy*dy}const b=sxy/sxx,a=ym-b*xm,res=new Float64Array(n);let sse=0;for(let i=0;i<n;i++){res[i]=y[i]-a-b*x[i];sse+=res[i]*res[i]}return{n,xm,ym,sxx,sxy,syy,b,a,res,sse,sst:syy,r2:1-sse/syy}}
+function gj(A,B){const p=A.length;const M=A.map((r,i)=>Array.from(r).concat(B?[B[i]]:[]));for(let c=0;c<p;c++){let m=c;for(let r=c+1;r<p;r++)if(Math.abs(M[r][c])>Math.abs(M[m][c]))m=r;[M[c],M[m]]=[M[m],M[c]];const d=M[c][c]||1e-12;for(let k=c;k<M[c].length;k++)M[c][k]/=d;for(let r=0;r<p;r++)if(r!==c){const f=M[r][c];if(f!==0)for(let k=c;k<M[c].length;k++)M[r][k]-=f*M[c][k]}}return M}
+function olsMulti(cols,y,needInv){const n=y.length,k=cols.length,p=k+1,A=[],B=new Float64Array(p);for(let i=0;i<p;i++)A.push(new Float64Array(p));
+ for(let r=0;r<n;r++){const row=[1];for(let j=0;j<k;j++)row.push(cols[j][r]);for(let i=0;i<p;i++){B[i]+=row[i]*y[r];for(let j=i;j<p;j++)A[i][j]+=row[i]*row[j]}}
+ for(let i=0;i<p;i++){for(let j=0;j<i;j++)A[i][j]=A[j][i];if(i>0)A[i][i]+=1e-9}
+ let beta,inv=null;if(needInv){const I=[];for(let i=0;i<p;i++){const e=new Float64Array(p);e[i]=1;I.push(e)}const M=gj(A,null);const aug=A.map((r,i)=>Array.from(r).concat(Array.from(I[i])));
+  const m=aug;for(let c=0;c<p;c++){let q=c;for(let r=c+1;r<p;r++)if(Math.abs(m[r][c])>Math.abs(m[q][c]))q=r;[m[c],m[q]]=[m[q],m[c]];const d=m[c][c]||1e-12;for(let kk=0;kk<2*p;kk++)m[c][kk]/=d;for(let r=0;r<p;r++)if(r!==c){const f=m[r][c];if(f!==0)for(let kk=0;kk<2*p;kk++)m[r][kk]-=f*m[c][kk]}}
+  inv=m.map(r=>r.slice(p));beta=inv.map(r=>{let s=0;for(let j=0;j<p;j++)s+=r[j]*B[j];return s})}
+ else{const M=gj(A,B);beta=M.map(r=>r[p])}
+ const res=new Float64Array(n);let sse=0;for(let r=0;r<n;r++){let f=beta[0];for(let j=0;j<k;j++)f+=beta[j+1]*cols[j][r];res[r]=y[r]-f;sse+=res[r]*res[r]}
+ const out={beta,res,sse,n,p,inv};if(inv){const s2=sse/(n-p);out.s2=s2;out.se=inv.map((r,i)=>Math.sqrt(s2*r[i]))}return out}
+function scatterAxes(cv,xs,ys,xlo,xhi,ylo,yhi,L){return mk(cv,xlo,xhi,yhi,{y0:ylo,L:L||44})}
+function range(a,pad){let lo=1e99,hi=-1e99;for(const v of a){if(v<lo)lo=v;if(v>hi)hi=v}const w=(hi-lo)||1;return[lo-(pad||.05)*w,hi+(pad||.05)*w]}
+
+
+function bars(P,groups,cols,yt){/* groups: array of arrays of values (0..1) */const g=P.g,G=groups.length,B=groups[0].length,W=(P.w-P.L-P.R)/G;groups.forEach((vals,gi)=>vals.forEach((v,bi)=>{const bw=W*.78/B,x=P.L+W*gi+W*.11+bw*bi;g.fillStyle=cols[bi];g.fillRect(x,P.Y(v),bw-2,P.Y(0)-P.Y(v));g.fillStyle=C.fg;g.textAlign='center';g.font='10px system-ui';g.fillText(Math.round(v*100)+'%',x+bw/2-1,P.Y(v)-3)}));g.font='11px system-ui'}
+function gridG(P,yt,labels){customGrid(P,[],yt);const G=labels.length,W=(P.w-P.L-P.R)/G;P.g.fillStyle=C.mu;P.g.textAlign='center';labels.forEach((l,i)=>P.g.fillText(l,P.L+W*(i+.5),P.h-P.B+15))}
+function legend(P,items,y){let x=P.L+8;items.forEach(([s,c])=>{P.text('■ '+s,x,y,c);x+=P.g.measureText('■ '+s).width+16})}
+
+/* ---------- GLM machinery ---------- */
+const LK={logit:{mu:e=>1/(1+Math.exp(-e)),d:e=>{const m=1/(1+Math.exp(-e));return m*(1-m)}},
+ probit:{mu:e=>normCdf(e),d:e=>npdf(e)},
+ cll:{mu:e=>1-Math.exp(-Math.exp(e)),d:e=>Math.exp(e-Math.exp(e))},
+ log:{mu:e=>Math.exp(e),d:e=>Math.exp(e)}};
+function minv(A){const p=A.length,m=A.map((r,i)=>{const row=Array.from(r);for(let j=0;j<p;j++)row.push(i===j?1:0);return row});
+ for(let c=0;c<p;c++){let q=c;for(let r=c+1;r<p;r++)if(Math.abs(m[r][c])>Math.abs(m[q][c]))q=r;[m[c],m[q]]=[m[q],m[c]];const d=m[c][c]||1e-12;for(let k=0;k<2*p;k++)m[c][k]/=d;for(let r=0;r<p;r++)if(r!==c){const f=m[r][c];if(f!==0)for(let k=0;k<2*p;k++)m[r][k]-=f*m[c][k]}}
+ return m.map(r=>r.slice(p))}
+function glm(cols,y,o){o=o||{};const n=y.length,k=cols.length,p=k+1,fam=o.fam||'binom',L=LK[o.link||(fam==='pois'?'log':'logit')],off=o.off,X=[new Float64Array(n).fill(1)].concat(cols),V=m=>fam==='pois'?m:m*(1-m);
+ let b=new Float64Array(p);if(o.init)b=Float64Array.from(o.init);else if(fam==='pois'){let m=0;for(const v of y)m+=v;b[0]=Math.log(Math.max(m/n,1e-3))-(off?mean(off):0)}
+ function ev(b){const eta=new Float64Array(n),mu=new Float64Array(n);let ll=0;for(let i=0;i<n;i++){let e=off?off[i]:0;for(let j=0;j<p;j++)e+=b[j]*X[j][i];e=Math.max(-30,Math.min(30,e));eta[i]=e;let m=L.mu(e);m=fam==='binom'?Math.min(1-1e-12,Math.max(1e-12,m)):Math.max(m,1e-12);mu[i]=m;ll+=fam==='pois'?y[i]*Math.log(m)-m-lgamma(y[i]+1):y[i]*Math.log(m)+(1-y[i])*Math.log(1-m)}return{eta,mu,ll}}
+ function info(c){const A=[];for(let i=0;i<p;i++)A.push(new Float64Array(p));const w=new Float64Array(n);for(let r=0;r<n;r++){const d=L.d(c.eta[r]),wi=d*d/V(c.mu[r]);w[r]=wi;for(let i=0;i<p;i++){const xi=X[i][r]*wi;for(let j=i;j<p;j++)A[i][j]+=xi*X[j][r]}}for(let i=0;i<p;i++)for(let j=0;j<i;j++)A[i][j]=A[j][i];return{A,w}}
+ let cur=ev(b),it=0,conv=false,maxit=o.maxit==null?40:o.maxit;
+ for(;it<maxit;it++){const{A,w}=info(cur),Ai=minv(A),g=new Float64Array(p);
+  for(let r=0;r<n;r++){const d=L.d(cur.eta[r]),v=V(cur.mu[r]);let s=(y[r]-cur.mu[r])*d/v;if(o.firth){let h=0;for(let i=0;i<p;i++)for(let j=0;j<p;j++)h+=X[i][r]*Ai[i][j]*X[j][r];h*=w[r];s+=h*(.5-cur.mu[r])}for(let i=0;i<p;i++)g[i]+=X[i][r]*s}
+  const st=new Float64Array(p);let mx=0;for(let i=0;i<p;i++){let s=0;for(let j=0;j<p;j++)s+=Ai[i][j]*g[j];st[i]=s}
+  if(o.firth){for(let i=0;i<p;i++){st[i]=Math.max(-1,Math.min(1,st[i]));mx=Math.max(mx,Math.abs(st[i]))}b=b.map((v,i)=>v+st[i]);cur=ev(b);if(mx<1e-8){conv=true;it++;break}}
+  else{let a=1,nb,nc;for(let h=0;h<25;h++){nb=b.map((v,i)=>v+a*st[i]);nc=ev(nb);if(nc.ll>=cur.ll-1e-10)break;a/=2}for(let i=0;i<p;i++)mx=Math.max(mx,Math.abs(a*st[i]));const dl=Math.abs(nc.ll-cur.ll);b=nb;cur=nc;if(mx<1e-8||dl<1e-11){conv=true;it++;break}}}
+ const{A,w}=info(cur),Ai=minv(A),se=Ai.map((r,i)=>Math.sqrt(Math.max(r[i],0)));let dev;
+ if(fam==='binom')dev=-2*cur.ll;else{dev=0;for(let i=0;i<n;i++){const yy=y[i],m=cur.mu[i];dev+=2*((yy>0?yy*Math.log(yy/m):0)-(yy-m))}}
+ return{beta:b,mu:cur.mu,eta:cur.eta,ll:cur.ll,dev,inv:Ai,se,iter:it,conv,X,w,p,n,A}}
+function auc(sc,y){const n=y.length,idx=Array.from({length:n},(_,i)=>i).sort((a,b)=>sc[a]-sc[b]);let rk=0,np=0,i=0;while(i<n){let j=i;while(j+1<n&&sc[idx[j+1]]===sc[idx[i]])j++;const r=(i+j)/2+1;for(let t=i;t<=j;t++)if(y[idx[t]]===1){rk+=r;np++}i=j+1}const nn=n-np;return np&&nn?(rk-np*(np+1)/2)/(np*nn):.5}
+function sepTest(x,y){let a1=1e99,b1=-1e99,a0=1e99,b0=-1e99,n1=0,n0=0;for(let i=0;i<x.length;i++){if(y[i]===1){n1++;a1=Math.min(a1,x[i]);b1=Math.max(b1,x[i])}else{n0++;a0=Math.min(a0,x[i]);b0=Math.max(b0,x[i])}}return n1>0&&n0>0&&(a1>b0||a0>b1)}
+const sig=e=>1/(1+Math.exp(-e));
+function lgt(p){return Math.log(p/(1-p))}
+function binaryData(n,a,b,sd){const x=new Float64Array(n),y=new Float64Array(n);for(let i=0;i<n;i++){x[i]=(sd||1)*randn();y[i]=Math.random()<sig(a+b*x[i])?1:0}return{x,y}}
+function heat(P,gx,gy,vals,x0,x1,y0,y1){const g=P.g,nx=gx,ny=gy;let mn=1e99,mx=-1e99;vals.forEach(v=>{if(isFinite(v)){mn=Math.min(mn,v);mx=Math.max(mx,v)}});mn=Math.max(mn,mx-30);for(let i=0;i<nx;i++)for(let j=0;j<ny;j++){const v=vals[i*ny+j],t=isFinite(v)?Math.max(0,Math.min(1,(v-mn)/(mx-mn))):0,tt=Math.pow(t,1.6),c=Math.round(40+190*tt);g.fillStyle=`rgb(${Math.round(20+60*tt)},${Math.round(30+100*tt)},${c})`;const xa=P.X(x0+(x1-x0)*i/nx),xb=P.X(x0+(x1-x0)*(i+1)/nx),ya=P.Y(y0+(y1-y0)*j/ny),yb=P.Y(y0+(y1-y0)*(j+1)/ny);g.fillRect(xa,Math.min(ya,yb),xb-xa+1,Math.abs(ya-yb)+1)}}
+
+/* ---------- regularisation machinery ---------- */
+function eigSym(A){const p=A.length,a=A.map(r=>Float64Array.from(r)),V=[];for(let i=0;i<p;i++){const r=new Float64Array(p);r[i]=1;V.push(r)}
+ for(let sw=0;sw<60;sw++){let off=0;for(let i=0;i<p;i++)for(let j=i+1;j<p;j++)off+=a[i][j]*a[i][j];if(off<1e-22)break;
+  for(let pp=0;pp<p-1;pp++)for(let q=pp+1;q<p;q++){if(Math.abs(a[pp][q])<1e-15)continue;const th=(a[q][q]-a[pp][pp])/(2*a[pp][q]),t=(th>=0?1:-1)/(Math.abs(th)+Math.sqrt(th*th+1)),c=1/Math.sqrt(t*t+1),s=t*c;
+   for(let k=0;k<p;k++){const x=a[k][pp],y=a[k][q];a[k][pp]=c*x-s*y;a[k][q]=s*x+c*y}
+   for(let k=0;k<p;k++){const x=a[pp][k],y=a[q][k];a[pp][k]=c*x-s*y;a[q][k]=s*x+c*y}
+   for(let k=0;k<p;k++){const x=V[k][pp],y=V[k][q];V[k][pp]=c*x-s*y;V[k][q]=s*x+c*y}}}
+ return{d:a.map((r,i)=>r[i]),V}}
+function stdz(cols,y){const n=y.length,p=cols.length,mu=[],sd=[],Z=[];for(let j=0;j<p;j++){let m=0;for(let i=0;i<n;i++)m+=cols[j][i];m/=n;let v=0;for(let i=0;i<n;i++){const d=cols[j][i]-m;v+=d*d}const s=Math.sqrt(v/n)||1;mu.push(m);sd.push(s);const z=new Float64Array(n);for(let i=0;i<n;i++)z[i]=(cols[j][i]-m)/s;Z.push(z)}let ym=0;for(const v of y)ym+=v;ym/=n;return{Z,mu,sd,ym,yc:Float64Array.from(y,v=>v-ym),n,p}}
+function gramOf(Z,yc,idx){const p=Z.length,n=idx?idx.length:yc.length,G=[],c=new Float64Array(p);for(let i=0;i<p;i++)G.push(new Float64Array(p));
+ for(let r=0;r<n;r++){const i=idx?idx[r]:r;for(let a=0;a<p;a++){const za=Z[a][i];c[a]+=za*yc[i];for(let b=a;b<p;b++)G[a][b]+=za*Z[b][i]}}
+ for(let a=0;a<p;a++){c[a]/=n;for(let b=a;b<p;b++){G[a][b]/=n;G[b][a]=G[a][b]}}return{G,c,n}}
+function gramMinus(F,Z,yc,val){const p=F.c.length,nv=val.length,nt=F.n-nv,G=[],c=new Float64Array(p);for(let i=0;i<p;i++){G.push(new Float64Array(p));c[i]=F.c[i]*F.n}for(let a=0;a<p;a++)for(let b=0;b<p;b++)G[a][b]=F.G[a][b]*F.n;
+ for(const i of val)for(let a=0;a<p;a++){const za=Z[a][i];c[a]-=za*yc[i];for(let b=0;b<p;b++)G[a][b]-=za*Z[b][i]}
+ for(let a=0;a<p;a++){c[a]/=nt;for(let b=0;b<p;b++)G[a][b]/=nt}return{G,c,n:nt}}
+function cd(G,c,lam,al,b0,maxit){const p=c.length,b=b0?Float64Array.from(b0):new Float64Array(p),l1=lam*al,l2=lam*(1-al);for(let it=0;it<(maxit||300);it++){let mx=0;for(let j=0;j<p;j++){let r=c[j];const Gj=G[j];for(let k=0;k<p;k++)if(k!==j&&b[k]!==0)r-=Gj[k]*b[k];const den=Gj[j]+l2,nb=Math.abs(r)>l1?(r>0?1:-1)*(Math.abs(r)-l1)/den:0;mx=Math.max(mx,Math.abs(nb-b[j])*Math.sqrt(Gj[j]));b[j]=nb}if(mx<1e-8)break}return b}
+function lamGrid(c,al,K,ratio){let mx=0;for(const v of c)mx=Math.max(mx,Math.abs(v));mx/=Math.max(al,.01);const r=[];for(let k=0;k<K;k++)r.push(mx*Math.pow(ratio||1e-3,k/(K-1)));return r}
+function ridgeEig(G){const e=eigSym(G);return e}
+function ridgeFromEig(e,c,lam){const p=c.length,vc=new Float64Array(p);for(let k=0;k<p;k++){let s=0;for(let j=0;j<p;j++)s+=e.V[j][k]*c[j];vc[k]=s/(e.d[k]+lam)}const b=new Float64Array(p);for(let j=0;j<p;j++){let s=0;for(let k=0;k<p;k++)s+=e.V[j][k]*vc[k];b[j]=s}return b}
+function dfRidge(e,lam){let s=0;for(const d of e.d)s+=Math.max(d,0)/(Math.max(d,0)+lam);return s}
+function foldsOf(n,K){const f=Int32Array.from({length:n},(_,i)=>i%K);for(let i=n-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[f[i],f[j]]=[f[j],f[i]]}return f}
+/* K-fold CV for enet (al>0) or ridge (al==='ridge'); returns {cv,se,lams,iMin,i1se} */
+function cvEnet(S,al,lams,K){const n=S.n,{Z,yc}=S,F=gramOf(Z,yc),fold=foldsOf(n,K),L=lams.length,err=[];for(let l=0;l<L;l++)err.push(new Float64Array(K));
+ for(let f=0;f<K;f++){const val=[];for(let i=0;i<n;i++)if(fold[i]===f)val.push(i);const T=gramMinus(F,Z,yc,val);let b=null,eg=null;if(al==='ridge')eg=eigSym(T.G);
+  for(let l=0;l<L;l++){b=al==='ridge'?ridgeFromEig(eg,T.c,lams[l]):cd(T.G,T.c,lams[l],al,b);let s=0;for(const i of val){let e=yc[i];for(let j=0;j<Z.length;j++)e-=b[j]*Z[j][i];s+=e*e}err[l][f]=s/val.length}}
+ const cv=[],se=[];for(let l=0;l<L;l++){cv.push(mean(err[l]));se.push(sdOf(err[l])/Math.sqrt(K))}let iMin=0;cv.forEach((v,i)=>{if(v<cv[iMin])iMin=i});let i1=iMin;for(let l=0;l<L;l++)if(cv[l]<=cv[iMin]+se[iMin]){i1=l;break}
+ return{cv,se,lams,iMin,i1se:i1,F}}
+function pathOf(F,al,lams){const out=[];let b=null;for(const l of lams){b=cd(F.G,F.c,l,al,b);out.push(b)}return out}
+function genReg(n,p,beta,rho,sg){const z0=new Float64Array(n).map(()=>randn()),cols=[],y=new Float64Array(n),s=Math.sqrt(rho),t=Math.sqrt(1-rho);for(let j=0;j<p;j++){const c=new Float64Array(n);for(let i=0;i<n;i++)c[i]=s*z0[i]+t*randn();cols.push(c)}for(let i=0;i<n;i++){let m=0;for(let j=0;j<beta.length&&j<p;j++)m+=beta[j]*cols[j][i];y[i]=m+sg*randn()}return{cols,y}}
+/* excess prediction error of standardised coefficients b under equicorrelated truth */
+function excessErr(S,b,beta,rho,p){let s=0;const bo=new Float64Array(p);for(let j=0;j<p;j++)bo[j]=b[j]/S.sd[j]-(beta[j]||0);let sum=0,sq=0;for(let j=0;j<p;j++){sum+=bo[j];sq+=bo[j]*bo[j]}return(1-rho)*sq+rho*sum*sum}
+function pctOf(a,q){const b=Float64Array.from(a).sort();return b[Math.min(b.length-1,Math.max(0,Math.floor(q*b.length)))]}
+function ridgeLogit(Z,y,lam,maxit){const n=y.length,p=Z.length,b=new Float64Array(p+1);for(let it=0;it<(maxit||25);it++){const A=[],g=new Float64Array(p+1);for(let i=0;i<=p;i++)A.push(new Float64Array(p+1));let mx=0;
+  for(let r=0;r<n;r++){let e=b[0];for(let j=0;j<p;j++)e+=b[j+1]*Z[j][r];e=Math.max(-25,Math.min(25,e));const m=1/(1+Math.exp(-e)),w=Math.max(m*(1-m),1e-9),x=[1];for(let j=0;j<p;j++)x.push(Z[j][r]);for(let i=0;i<=p;i++){g[i]+=x[i]*(y[r]-m);for(let j=i;j<=p;j++)A[i][j]+=w*x[i]*x[j]}}
+  for(let i=0;i<=p;i++)for(let j=0;j<i;j++)A[i][j]=A[j][i];for(let i=1;i<=p;i++){A[i][i]+=lam;g[i]-=lam*b[i]}A[0][0]+=1e-8;
+  const Ai=minv(A),st=Ai.map(r=>{let s=0;for(let j=0;j<=p;j++)s+=r[j]*g[j];return s});for(let i=0;i<=p;i++){const s=Math.max(-4,Math.min(4,st[i]));b[i]+=s;mx=Math.max(mx,Math.abs(s))}if(mx<1e-7)break}return b}
+
+/* ---------- helpers for this page ---------- */
+const fT=x=>Math.sin(2.5*x)+.6*x;
+function polyD(xs,d){const c=[];for(let j=1;j<=d;j++)c.push(Float64Array.from(xs,v=>Math.pow(v,j)));return c}
+function predP(o,x,d){let s=o.beta[0],p=1;for(let j=1;j<=d;j++){p*=x;s+=o.beta[j]*p}return s}
+function bars2(P,groups,cols,fv){const g=P.g,G=groups.length,B=groups[0].length,W=(P.w-P.L-P.R)/G;groups.forEach((vals,gi)=>vals.forEach((v,bi)=>{const bw=W*.78/B,x=P.L+W*gi+W*.11+bw*bi,y0=P.Y(0),y1=P.Y(v);g.fillStyle=cols[bi];g.fillRect(x,Math.min(y0,y1),bw-2,Math.abs(y0-y1));g.fillStyle=C.fg;g.textAlign='center';g.font='10px system-ui';g.fillText(fv?fv(v):Math.round(v*100)+'%',x+bw/2-1,v>=0?y1-3:y1+11)}));g.font='11px system-ui'}
+function fitS(x,y,idx){let sx=0,sy=0;const n=idx.length;for(const i of idx){sx+=x[i];sy+=y[i]}const mx=sx/n,my=sy/n;let sxx=0,sxy=0;for(const i of idx){sxx+=(x[i]-mx)*(x[i]-mx);sxy+=(x[i]-mx)*(y[i]-my)}const b=sxx>0?sxy/sxx:0;return[my-b*mx,b]}
+
+/* ---------- Ch1 bias-variance decomposition ---------- */
+(function(){scl('c1n',v=>v);scl('c1s',v=>fmt(v/10));
+ function run(){const n=val('c1n'),sg=val('c1s')/10,R=300,D=10,G=40,xg=Array.from({length:G},(_,i)=>-1+2*i/(G-1)),sum=[],sq=[];for(let d=0;d<D;d++){sum.push(new Float64Array(G));sq.push(new Float64Array(G))}
+  for(let r=0;r<R;r++){const x=Float64Array.from({length:n},()=>2*Math.random()-1),y=Float64Array.from(x,v=>fT(v)+sg*randn());for(let d=1;d<=D;d++){const o=olsMulti(polyD(x,d),y);for(let g=0;g<G;g++){const p=predP(o,xg[g],d);sum[d-1][g]+=p;sq[d-1][g]+=p*p}}}
+  const bias=[],vr=[],tot=[];for(let d=0;d<D;d++){let b=0,v=0;for(let g=0;g<G;g++){const m=sum[d][g]/R;b+=(m-fT(xg[g]))*(m-fT(xg[g]));v+=sq[d][g]/R-m*m}bias.push(b/G);vr.push(v/G);tot.push(b/G+v/G+sg*sg)}
+  let bi=0;tot.forEach((t,i)=>{if(t<tot[bi])bi=i});const ymax=Math.min(Math.max(...tot),Math.max(5*tot[bi],sg*sg*3))*1.05,P=mk($('c1cv'),.5,D+.5,ymax,{y0:0,noGrid:true,L:46});customGrid(P,Array.from({length:D},(_,i)=>[i+1,String(i+1)]),niceTicks(0,ymax,5));P.hline(sg*sg,C.mu,'noise σ²');
+  clip(P,()=>{[[bias,C.r],[vr,C.a]].forEach(([a,c])=>{poly(P,a.map((v,i)=>[i+1,v]),c,2.4);dots(P,a.map((v,i)=>[i+1,v]),c,3)});poly(P,tot.map((v,i)=>[i+1,v]),C.fg,2.8)});legend(P,[['bias²',C.r],['variance',C.a],['total error',C.fg]],P.T+26);P.vline(bi+1,C.g,'best',true);P.text('polynomial degree',P.w/2,P.h-2,C.mu,'center');
+  $('c1st').innerHTML=stat('best degree',bi+1,'ok')+stat('total error at best',fmt(tot[bi]),'')+stat('bias² at degree 1',fmt(bias[0]),'hot')+stat('variance at degree 10',fmt(vr[D-1]),'hot')+stat('noise floor σ²',fmt(sg*sg),'');
+  $('c1rd').innerHTML=`Low degrees are dominated by bias² (${fmt(bias[0])} at degree 1: a line cannot follow the curve); high degrees by variance (${fmt(vr[D-1])} at degree 10). Their sum bottoms out at degree ${bi+1} with total error ${fmt(tot[bi])}, only ${fmt(tot[bi]-sg*sg)} above the irreducible noise. Try fewer observations or more noise: variance grows, and the best model becomes simpler. More data pushes the optimum to higher degrees.`}
+ $('c1n').addEventListener('change',run);$('c1s').addEventListener('change',run);$('c1go').onclick=run;run();})();
+
+/* ---------- Ch2 optimism ---------- */
+(function(){scl('c2n',v=>v);const BT=[1.2,1,.8,.6,.4];
+ function run(){const n=val('c2n'),PG=[0,1,2,3,4,5,6,8,10,12,15,20,25].filter(p=>p<=n-6),R=60,res=PG.map(()=>[0,0,0]);
+  PG.forEach((p,gi)=>{for(let r=0;r<R;r++){const d=genReg(n,Math.max(p,5),BT,0,1),cols=d.cols.slice(0,p),o=olsMulti(cols,d.y);let ex=o.beta[0]*o.beta[0];for(let j=0;j<5;j++){const b=j<p?o.beta[j+1]:0;ex+=(b-BT[j])*(b-BT[j])}for(let j=5;j<p;j++)ex+=o.beta[j+1]*o.beta[j+1];res[gi][0]+=o.sse/n/R;res[gi][1]+=(1+ex)/R;res[gi][2]+=(o.sse/n+2*(p+1)/n)/R}});
+  const ymax=Math.max(...res.flat())*1.08,P=mk($('c2cv'),-.5,PG[PG.length-1]+.5,ymax,{y0:0});P.hline(1,C.mu,'noise 1');[[0,C.r],[1,C.g],[2,C.a]].forEach(([j,c])=>{poly(P,PG.map((p,i)=>[p,res[i][j]]),c,2.6);dots(P,PG.map((p,i)=>[p,res[i][j]]),c,3.5)});legend(P,[['training MSE',C.r],['true test MSE',C.g],['Cp = train + 2kσ²/n',C.a]],P.T+26);P.vline(5,C.y,'5 real predictors',true);P.text('number of predictors in the model',P.w/2,P.h-2,C.mu,'center');
+  let bt=0,bc=0;PG.forEach((p,i)=>{if(res[i][1]<res[bt][1])bt=i;if(res[i][2]<res[bc][2])bc=i});const L=PG.length-1;
+  $('c2st').innerHTML=stat('largest model: training MSE',fmt(res[L][0]),'hot')+stat('largest model: true test MSE',fmt(res[L][1]),'warn')+stat('best true test MSE at p =',PG[bt],'ok')+stat('Cp is smallest at p =',PG[bc],'in')+stat('optimism at largest p',fmt(res[L][1]-res[L][0]),'')+stat('predicted 2(p+1)σ²/n',fmt(2*(PG[L]+1)/n),'');
+  $('c2rd').innerHTML=`The training error falls all the way down to ${fmt(res[L][0])} with ${PG[L]} predictors, while the true test error has its minimum near p = ${PG[bt]} (${fmt(res[bt][1])}) and then rises to ${fmt(res[L][1])}. The gap between them, the optimism, is ${fmt(res[L][1]-res[L][0])} at the largest model, close to the predicted 2(p+1)σ²/n = ${fmt(2*(PG[L]+1)/n)}. Cp, which only uses the training data and the known σ², follows the test curve and is smallest at p = ${PG[bc]}, close to the true optimum. Minimising training error would always pick the biggest model.`}
+ $('c2n').addEventListener('change',run);$('c2go').onclick=run;run();})();
+
+/* ---------- Ch3 AIC vs BIC ---------- */
+(function(){scl('c3n',v=>v);scl('c3b',v=>fmt(v/100));
+ function run(){const n=val('c3n'),b=val('c3b')/100,R=300,K=12,BT=[b,b,b,b],cnt=[new Float64Array(K+1),new Float64Array(K+1),new Float64Array(K+1)];
+  for(let r=0;r<R;r++){const d=genReg(n,K,BT,0,1),S=stdz(d.cols,d.y),F=gramOf(S.Z,S.yc);let yy=0;for(const v of S.yc)yy+=v*v;yy/=n;const ic=[[],[],[]];
+   for(let k=0;k<=K;k++){let rss=yy;if(k>0){const G=F.G.slice(0,k).map(r_=>Array.from(r_).slice(0,k)),cc=Array.from(F.c).slice(0,k),sol=gj(G,cc).map(r_=>r_[k]);rss=yy-cc.reduce((s,v,i)=>s+v*sol[i],0)}const base=n*Math.log(Math.max(rss,1e-12));ic[0].push(base+2*(k+1));ic[1].push(base+2*(k+1)+2*(k+1)*(k+2)/Math.max(n-k-2,1));ic[2].push(base+(k+1)*Math.log(n))}
+   ic.forEach((a,m)=>{let bi=0;a.forEach((v,i)=>{if(v<a[bi])bi=i});cnt[m][bi]++})}
+  const P=mk($('c3cv'),0,1,1.22,{y0:0,noGrid:true,L:46});gridG(P,[0,.25,.5,.75,1].map(v=>[v,Math.round(v*100)+'%']),Array.from({length:K+1},(_,k)=>String(k)));bars(P,Array.from({length:K+1},(_,k)=>[cnt[0][k]/R,cnt[2][k]/R]),[C.r,C.a]);legend(P,[['AIC',C.r],['BIC',C.a],['(true model size = 4)',C.mu]],P.T+12);
+  const ms=m=>cnt[m].reduce((s,v,k)=>s+v*k,0)/R;
+  $('c3st').innerHTML=stat('AIC picks exactly 4',pc(cnt[0][4]/R),'in')+stat('BIC picks exactly 4',pc(cnt[2][4]/R),'in')+stat('AIC mean size',fmt(ms(0)),'')+stat('BIC mean size',fmt(ms(2)),'')+stat('AIC picks more than 4',pc(cnt[0].slice(5).reduce((s,v)=>s+v,0)/R),'warn')+stat('BIC picks fewer than 4',pc(cnt[2].slice(0,4).reduce((s,v)=>s+v,0)/R),'warn');
+  $('c3rd').innerHTML=`With n = ${n} and effects of ${fmt(b)} each, AIC selects the true size in ${pc(cnt[0][4]/R)} of the data sets and tends to over-fit (it picks more than 4 variables ${pc(cnt[0].slice(5).reduce((s,v)=>s+v,0)/R)} of the time); BIC finds it in ${pc(cnt[2][4]/R)} and, when n is large, almost never over-fits. When effects are weak or n small, BIC’s heavier penalty (log n = ${fmt(Math.log(n))} per parameter against AIC’s 2) causes it to <em>miss</em> real predictors (it picks fewer than 4 in ${pc(cnt[2].slice(0,4).reduce((s,v)=>s+v,0)/R)}). This is the efficiency (AIC) versus consistency (BIC) trade-off: neither is uniformly better.`}
+ $('c3n').addEventListener('change',run);$('c3b').addEventListener('change',run);$('c3go').onclick=run;run();})();
+
+/* ---------- Ch4 CV estimators ---------- */
+(function(){scl('c4d',v=>v);scl('c4n',v=>v);
+ function cvK(x,y,d,K){const n=x.length,f=foldsOf(n,K);let s=0;for(let k=0;k<K;k++){const tr=[],va=[];for(let i=0;i<n;i++)(f[i]===k?va:tr).push(i);const o=olsMulti(polyD(tr.map(i=>x[i]),d),tr.map(i=>y[i]));for(const i of va){const e=y[i]-predP(o,x[i],d);s+=e*e}}return s/n}
+ function loo(x,y,d){const o=olsMulti(polyD(x,d),y,true),n=x.length;let s=0;for(let i=0;i<n;i++){const v=[1];let p=1;for(let j=1;j<=d;j++){p*=x[i];v.push(p)}let h=0;for(let a=0;a<=d;a++)for(let b=0;b<=d;b++)h+=v[a]*o.inv[a][b]*v[b];const e=o.res[i]/(1-h);s+=e*e}return s/n}
+ function looBrute(x,y,d){const n=x.length;let s=0;for(let i=0;i<n;i++){const tr=[];for(let j=0;j<n;j++)if(j!==i)tr.push(j);const o=olsMulti(polyD(tr.map(j=>x[j]),d),tr.map(j=>y[j]));const e=y[i]-predP(o,x[i],d);s+=e*e}return s/n}
+ function run(){const n=val('c4n'),d=Math.min(val('c4d'),n-6),R=200,sg=.5,NM=['2-fold','5-fold','10-fold','leave-one-out'],est=NM.map(()=>[]),tru=[];let chk=0;
+  for(let r=0;r<R;r++){const x=Float64Array.from({length:n},()=>2*Math.random()-1),y=Float64Array.from(x,v=>fT(v)+sg*randn()),o=olsMulti(polyD(x,d),y);let e=0;for(let g=0;g<100;g++){const t=-1+2*(g+.5)/100,u=predP(o,t,d)-fT(t);e+=u*u}tru.push(sg*sg+e/100);est[0].push(cvK(x,y,d,2));est[1].push(cvK(x,y,d,5));est[2].push(cvK(x,y,d,10));est[3].push(loo(x,y,d));if(r===0)chk=Math.abs(loo(x,y,d)-looBrute(x,y,d))}
+  const mt=mean(tru),rows=est.map((a,i)=>{const m=mean(a);let rm=0;a.forEach((v,j)=>{rm+=(v-tru[j])*(v-tru[j])});return{n:NM[i],m,sd:sdOf(a),bias:m-mt,rmse:Math.sqrt(rm/R)}});
+  const ymax=Math.max(...rows.map(q=>q.m+q.sd),mt)*1.15,P=mk($('c4cv'),0,4,ymax,{y0:0,noGrid:true,L:46});gridG(P,[],[]);customGrid(P,[],niceTicks(0,ymax,5));P.hline(mt,C.g,'true error '+fmt(mt));const W=(P.w-P.L-P.R)/4;
+  rows.forEach((q,i)=>{const w=W*.5,x=P.L+W*i+W*.25;P.g.fillStyle=C.a;P.g.fillRect(x,P.Y(q.m),w,P.Y(0)-P.Y(q.m));P.g.strokeStyle=C.fg;P.g.lineWidth=2;P.g.beginPath();P.g.moveTo(x+w/2,P.Y(q.m-q.sd));P.g.lineTo(x+w/2,P.Y(q.m+q.sd));P.g.stroke();P.g.fillStyle=C.mu;P.g.textAlign='center';P.g.fillText(q.n,x+w/2,P.h-P.B+15)});P.text('bars: mean CV estimate · line: ± 1 SD across data sets',P.L+8,P.T+12,C.mu);
+  $('c4tb').innerHTML='<table><tr><th>estimator</th><th>mean estimate</th><th>bias vs true error</th><th>SD of the estimate</th><th>RMSE vs true error</th></tr>'+rows.map(q=>`<tr><td>${q.n}</td><td>${fmt(q.m)}</td><td>${fmt(q.bias)}</td><td>${fmt(q.sd)}</td><td>${fmt(q.rmse)}</td></tr>`).join('')+`</table><div class="sub" style="margin-top:6px">mean true error of the model fitted on the full sample: ${fmt(mt)} · LOO shortcut e/(1 − h) versus brute-force refitting: difference ${chk.toExponential(1)}</div>`;
+  const best=rows.reduce((a,q)=>q.rmse<a.rmse?q:a,rows[0]);
+  $('c4rd').innerHTML=`2-fold CV trains on only half the data, so it over-states the error (bias ${fmt(rows[0].bias)}); 5- and 10-fold are nearly unbiased; leave-one-out has the smallest bias (${fmt(rows[3].bias)}) but not the smallest spread. The estimator with the lowest RMSE against the true error here is <b>${best.n}</b> (${fmt(best.rmse)}). Note how large the SD of every estimate is (${fmt(rows[1].sd)} for 5-fold): with n = ${n} a single CV number is imprecise, so report its standard error. The leave-one-out shortcut matches brute-force refitting to machine precision.`}
+ $('c4d').addEventListener('change',run);$('c4n').addEventListener('change',run);$('c4go').onclick=run;run();})();
+
+/* ---------- Ch5 leakage ---------- */
+(function(){scl('c5n',v=>v);scl('c5p',v=>v);scl('c5k',v=>v);
+ function topK(X,yc,idx,k){const n=idx.length,p=X.length,sc=new Float64Array(p);let my=0;for(const i of idx)my+=yc[i];my/=n;for(let j=0;j<p;j++){let m=0;for(const i of idx)m+=X[j][i];m/=n;let sxy=0,sxx=0;for(const i of idx){const a=X[j][i]-m;sxy+=a*(yc[i]-my);sxx+=a*a}sc[j]=sxx>0?Math.abs(sxy)/Math.sqrt(sxx):0}return Array.from({length:p},(_,j)=>j).sort((a,b)=>sc[b]-sc[a]).slice(0,k)}
+ function run(){const n=val('c5n'),p=val('c5p'),k=Math.min(val('c5k'),Math.floor(n/3)),R=30,K=5,acc=[0,0,0];
+  for(let r=0;r<R;r++){const X=[];for(let j=0;j<p;j++)X.push(Float64Array.from({length:n},randn));const y=Float64Array.from({length:n},randn);let my=0;for(const v of y)my+=v;my/=n;let vy=0;for(const v of y)vy+=(v-my)*(v-my);vy/=n;const all=Array.from({length:n},(_,i)=>i),sel=topK(X,y,all,k),f=foldsOf(n,K);let eL=0,eP=0;
+   for(let q=0;q<K;q++){const tr=[],va=[];for(let i=0;i<n;i++)(f[i]===q?va:tr).push(i);const sp=topK(X,y,tr,k);[[sel,0],[sp,1]].forEach(([s,w])=>{const o=olsMulti(s.map(j=>tr.map(i=>X[j][i])),tr.map(i=>y[i]));let e=0;for(const i of va){let fh=o.beta[0];s.forEach((j,m)=>{fh+=o.beta[m+1]*X[j][i]});e+=(y[i]-fh)*(y[i]-fh)}if(w)eP+=e;else eL+=e})}
+   const of=olsMulti(sel.map(j=>X[j]),y);let et=0;const NT=400;for(let t=0;t<NT;t++){let fh=of.beta[0],yt=randn();for(let m=0;m<k;m++)fh+=of.beta[m+1]*randn();et+=(yt-fh)*(yt-fh)}
+   acc[0]+=(1-eL/n/vy)/R;acc[1]+=(1-eP/n/vy)/R;acc[2]+=(1-et/NT/1)/R}
+  const P=mk($('c5cv'),0,3,.8,{y0:-.6,noGrid:true,L:46});customGrid(P,[],[-.6,-.4,-.2,0,.2,.4,.6,.8].map(v=>[v,String(v)]));P.hline(0,C.mu,'no skill');bars2(P,acc.map(v=>[v]),[C.r],v=>fmt(v));const W=(P.w-P.L-P.R)/3;P.g.fillStyle=C.mu;P.g.textAlign='center';['leaky CV (screen first)','proper CV (screen inside folds)','true skill on new data'].forEach((t,i)=>P.g.fillText(t,P.L+W*(i+.5),P.h-P.B+15));
+  $('c5st').innerHTML=stat('leaky CV skill',fmt(acc[0]),acc[0]>.1?'hot':'')+stat('proper CV skill',fmt(acc[1]),'ok')+stat('true skill on new data',fmt(acc[2]),'ok')+stat('candidates ÷ n',fmt(p/n),'')+stat('kept predictors',k,'');
+  $('c5rd').innerHTML=`Every predictor is pure noise, yet screening on the full data first and then cross-validating gives a “skill” of ${fmt(acc[0])}: the folds’ validation points already voted on which predictors to keep. Doing the screening inside each fold gives ${fmt(acc[1])}, near the true value ${fmt(acc[2])} (no better than the mean, slightly worse because of fitted noise). The more candidates per observation (${fmt(p/n)} here) and the fewer variables kept, the larger the false skill. Any step that looks at y belongs inside the loop.`}
+ on('c5n c5p c5k',()=>{});['c5n','c5p','c5k'].forEach(i=>$(i).addEventListener('change',run));$('c5go').onclick=run;run();})();
+
+/* ---------- Ch6 winner's curse and nested CV ---------- */
+(function(){scl('c6s',v=>v+'%');const MS=[1,5,20,50,200];
+ function cvScores(X,y,idx,K,M){const n=idx.length,f=foldsOf(n,K),sc=new Float64Array(M);for(let q=0;q<K;q++){const tr=[],va=[];for(let a=0;a<n;a++)(f[a]===q?va:tr).push(idx[a]);for(let j=0;j<M;j++){const[a0,b0]=fitS(X[j],y,tr);let e=0;for(const i of va){const r=y[i]-a0-b0*X[j][i];e+=r*r}sc[j]+=e}}return sc}
+ function run(){const r2=val('c6s')/100,beta=Math.sqrt(r2/(1-r2)),n=60,R=60,res=MS.map(()=>[0,0,0]),vy0=beta*beta+1;
+  MS.forEach((M,gi)=>{for(let r=0;r<R;r++){const X=[];for(let j=0;j<M;j++)X.push(Float64Array.from({length:n},randn));const y=Float64Array.from(X[0],v=>beta*v+randn());let my=0;for(const v of y)my+=v;my/=n;let vy=0;for(const v of y)vy+=(v-my)*(v-my);vy/=n;const all=Array.from({length:n},(_,i)=>i),sc=cvScores(X,y,all,5,M);let bj=0;sc.forEach((v,j)=>{if(v<sc[bj])bj=j});res[gi][0]+=(1-sc[bj]/n/vy)/R;
+   const[a,b]=fitS(X[bj],y,all),mse=bj===0?1+(beta-b)*(beta-b)+a*a:vy0+a*a+b*b;res[gi][2]+=(1-mse/vy0)/R;
+   const f=foldsOf(n,5);let en=0;for(let q=0;q<5;q++){const tr=[],va=[];for(let i=0;i<n;i++)(f[i]===q?va:tr).push(i);const is=cvScores(X,y,tr,5,M);let jj=0;is.forEach((v,j)=>{if(v<is[jj])jj=j});const[a2,b2]=fitS(X[jj],y,tr);for(const i of va){const e=y[i]-a2-b2*X[jj][i];en+=e*e}}res[gi][1]+=(1-en/n/vy)/R}});
+  const P=mk($('c6cv'),0,5,Math.max(.4,...res.flat())*1.2,{y0:Math.min(-.15,...res.flat())*1.3,noGrid:true,L:46});const tk=[];for(let v=-.4;v<=.8;v+=.1)tk.push([v,(Math.round(v*10)/10).toString()]);customGrid(P,[],tk);P.hline(0,C.mu);gridG(P,[],[]);bars2(P,res,[C.r,C.a,C.g],v=>fmt(v));const W=(P.w-P.L-P.R)/5;P.g.fillStyle=C.mu;P.g.textAlign='center';MS.forEach((M,i)=>P.g.fillText('M = '+M,P.L+W*(i+.5),P.h-P.B+15));legend(P,[['winner’s own CV score',C.r],['nested CV of the procedure',C.a],['true skill of the winner',C.g]],P.T+12);
+  const L=res.length-1;
+  $('c6st').innerHTML=stat('M = 200: winner’s CV skill',fmt(res[L][0]),res[L][0]>.05?'hot':'')+stat('M = 200: nested CV',fmt(res[L][1]),'in')+stat('M = 200: true skill',fmt(res[L][2]),'ok')+stat('M = 1: CV / true',fmt(res[0][0])+' / '+fmt(res[0][2]),'');
+  $('c6rd').innerHTML=`With a single candidate the CV score is about right (${fmt(res[0][0])} versus true ${fmt(res[0][2])}). Choosing the best of 200 raises the winner’s own CV skill to ${fmt(res[L][0])} while its true skill is ${fmt(res[L][2])}: the maximum of many noisy estimates is optimistic even though each CV estimate was honest. Nested CV, which repeats the entire selection inside each outer fold, reports ${fmt(res[L][1])}, close to the truth. The selection itself is part of the model and must be validated with it; keep a final untouched test set.`}
+ $('c6s').addEventListener('change',run);$('c6go').onclick=run;run();})();
+
+/* ---------- Ch7 forward selection on noise ---------- */
+(function(){scl('c7n',v=>v);scl('c7p',v=>v);
+ function forward(Xc,yc,n,p){const xx=new Float64Array(p),xr=new Float64Array(p);let rss=0;for(const v of yc)rss+=v*v;const yy=rss;for(let j=0;j<p;j++){let a=0,b=0;for(let i=0;i<n;i++){a+=Xc[j][i]*Xc[j][i];b+=Xc[j][i]*yc[i]}xx[j]=a;xr[j]=b}const sel=[],Q=[];
+  for(let k=0;k<Math.min(15,n-8);k++){let bj=-1,bs=0;for(let j=0;j<p;j++){if(sel.includes(j)||xx[j]<1e-9)continue;const s=xr[j]*xr[j]/xx[j];if(s>bs){bs=s;bj=j}}if(bj<0)break;const rn=rss-bs,F=bs/(rn/(n-k-2));if(!(F>4))break;
+   const xp=Float64Array.from(Xc[bj]);for(const q of Q){let d=0;for(let i=0;i<n;i++)d+=q[i]*Xc[bj][i];for(let i=0;i<n;i++)xp[i]-=d*q[i]}const nm=Math.sqrt(xx[bj]),q=xp.map(v=>v/Math.sqrt(xx[bj]));void nm;const yq=xr[bj]/Math.sqrt(xx[bj]);
+   for(let j=0;j<p;j++){let d=0;for(let i=0;i<n;i++)d+=Xc[j][i]*q[i];xx[j]-=d*d;xr[j]-=yq*d}rss=rn;sel.push(bj);Q.push(q)}
+  return{sel,rss,yy}}
+ function run(){const n=val('c7n'),p=val('c7p'),R=300,pv=[],ks=[];let r2s=0,anySig=0,none=0,sigVars=0,vars=0;
+  for(let r=0;r<R;r++){const X=[];for(let j=0;j<p;j++){const c=Float64Array.from({length:n},randn);let m=0;for(const v of c)m+=v;m/=n;X.push(c.map(v=>v-m))}const y=Float64Array.from({length:n},randn);let my=0;for(const v of y)my+=v;my/=n;const yc=y.map(v=>v-my),f=forward(X,yc,n,p),k=f.sel.length;
+   if(!k){none++;continue}const r2=1-f.rss/f.yy,F=(r2/k)/((1-r2)/(n-k-1)),pval=betai((n-k-1)/2,k/2,(n-k-1)/((n-k-1)+k*F));pv.push(pval);ks.push(k);r2s+=r2;const o=olsMulti(f.sel.map(j=>X[j]),yc,true),tc=tq(n-k-1,.975);let any=false;for(let m=0;m<k;m++){vars++;if(Math.abs(o.beta[m+1]/o.se[m+1])>tc){sigVars++;any=true}}if(any)anySig++}
+  const m=pv.length;hist($('c7cv'),pv,0,1,20,[{f:()=>1,col:C.a}]).text('overall F-test p-value of the selected model (blue line: what an honest test would give)',70,28,C.mu);
+  $('c7st').innerHTML=stat('models with at least one variable',pc(m/R),'')+stat('average variables selected',fmt(mean(ks)),'in')+stat('average R² of the final model',fmt(r2s/m),'warn')+stat('overall p < 0.05',pc(pv.filter(v=>v<.05).length/m),'hot')+stat('selected variables “significant” at 5%',pc(sigVars/Math.max(vars,1)),'hot')+stat('models with ≥ 1 “significant” variable',pc(anySig/m),'hot');
+  $('c7rd').innerHTML=`The outcome is unrelated to every predictor, yet forward selection finds on average ${fmt(mean(ks))} “significant” predictors out of ${p} and reports R² = ${fmt(r2s/m)}. The final model’s overall F-test gives p &lt; 0.05 in ${pc(pv.filter(v=>v<.05).length/m)} of the data sets (an honest test would give 5%), and ${pc(sigVars/Math.max(vars,1))} of the selected coefficients look significant. The tests were computed as if the model had been written down in advance; the selection used the data first. Adjust by validating the whole procedure on fresh data, or use shrinkage.`}
+ $('c7n').addEventListener('change',run);$('c7p').addEventListener('change',run);$('c7go').onclick=run;run();})();
+
+/* ---------- Ch8 Akaike weights and averaging ---------- */
+(function(){scl('c8n',v=>v);scl('c8r',v=>fmt(v/100));
+ function run(){const n=val('c8n'),rho=val('c8r')/100,R=300,BT=[.4,.3],NM=['intercept only','x₁ only','x₂ only','x₁ + x₂'],sets=[[],[0],[1],[0,1]],win=new Float64Array(4),wavg=new Float64Array(4),ex={win:0,avg:0,full:0};
+  for(let r=0;r<R;r++){const d=genReg(n,2,BT,rho,1),S=stdz(d.cols,d.y),F=gramOf(S.Z,S.yc);let yy=0;for(const v of S.yc)yy+=v*v;yy/=n;const bs=[],aic=[];sets.forEach(s=>{const b=new Float64Array(2);let rss=yy;if(s.length){const G=s.map(a=>s.map(c=>F.G[a][c])),cc=s.map(a=>F.c[a]),sol=gj(G,cc).map(r_=>r_[s.length]);s.forEach((a,i)=>{b[a]=sol[i]});rss=yy-cc.reduce((t,v,i)=>t+v*sol[i],0)}bs.push(b);aic.push(n*Math.log(Math.max(rss,1e-12))+2*(s.length+1))});
+   const mn=Math.min(...aic),w=aic.map(a=>Math.exp(-(a-mn)/2)),sw=w.reduce((a,b)=>a+b,0);let bi=aic.indexOf(mn);win[bi]++;const ba=new Float64Array(2);w.forEach((wi,m)=>{wavg[m]+=wi/sw/R;ba[0]+=wi/sw*bs[m][0];ba[1]+=wi/sw*bs[m][1]});
+   ex.win+=excessErr(S,bs[bi],BT,rho,2)/R;ex.avg+=excessErr(S,ba,BT,rho,2)/R;ex.full+=excessErr(S,bs[3],BT,rho,2)/R}
+  const P=mk($('c8cv'),0,1,1.22,{y0:0,noGrid:true,L:46});gridG(P,[0,.25,.5,.75,1].map(v=>[v,Math.round(v*100)+'%']),NM);bars(P,NM.map((_,m)=>[win[m]/R,wavg[m]]),[C.r,C.a]);legend(P,[['chosen by lowest AIC',C.r],['average Akaike weight',C.a]],P.T+12);
+  $('c8st').innerHTML=stat('excess error: AIC winner',fmt(ex.win),'')+stat('excess error: weighted average',fmt(ex.avg),ex.avg<ex.win?'ok':'warn')+stat('excess error: full model',fmt(ex.full),'')+stat('true model chosen',pc(win[3]/R),'in')+stat('average weight on the true model',pc(wavg[3]),'');
+  $('c8rd').innerHTML=`The true model (x₁ + x₂) has the lowest AIC in only ${pc(win[3]/R)} of the data sets and carries an average Akaike weight of ${pc(wavg[3])}: the data cannot tell it from its simpler rivals when n = ${n}${rho>.5?' and the predictors are correlated':''}. The single winner has an average excess prediction error of ${fmt(ex.win)}; averaging the four models with their weights gives ${fmt(ex.avg)}${ex.avg<ex.win?', lower because it hedges across the models that the data support':''}; always fitting the full model gives ${fmt(ex.full)}. Weights near each other mean you are choosing on noise.`}
+ $('c8n').addEventListener('change',run);$('c8r').addEventListener('change',run);$('c8go').onclick=run;run();})();
+
+/* ---------- Ch9 time-ordered validation ---------- */
+(function(){scl('c9a',v=>fmt(v/100));scl('c9g',v=>v);scl('c9n',v=>v);
+ function design(idx,x,tau,g){const c=[Float64Array.from(idx,i=>x[i])];for(let j=1;j<=g;j++)c.push(Float64Array.from(idx,i=>Math.pow(tau[i],j)));return c}
+ function pred(o,i,x,tau,g){let s=o.beta[0]+o.beta[1]*x[i];for(let j=1;j<=g;j++)s+=o.beta[j+1]*Math.pow(tau[i],j);return s}
+ function fitIdx(idx,x,y,tau,g){return olsMulti(design(idx,x,tau,g),Float64Array.from(idx,i=>y[i]))}
+ function mseOn(o,idx,x,y,tau,g){let s=0;for(const i of idx){const e=y[i]-pred(o,i,x,tau,g);s+=e*e}return s/idx.length}
+ function run(){const n=val('c9n'),phi=val('c9a')/100,g=val('c9g'),m=Math.floor(.2*n),N=n+m,R=200,acc=[0,0,0];const rng=(a,b)=>Array.from({length:b-a},(_,i)=>a+i);
+  for(let r=0;r<R;r++){const x=Float64Array.from({length:N},randn),u=new Float64Array(N),s=Math.sqrt(1-phi*phi);u[0]=randn();for(let t=1;t<N;t++)u[t]=phi*u[t-1]+s*randn();const y=Float64Array.from(x,(v,t)=>v+u[t]),tau=Float64Array.from({length:N},(_,t)=>-1+2*t/(n-1));
+   const f=foldsOf(n,5);let e1=0;for(let q=0;q<5;q++){const tr=[],va=[];for(let i=0;i<n;i++)(f[i]===q?va:tr).push(i);e1+=mseOn(fitIdx(tr,x,y,tau,g),va,x,y,tau,g)*va.length}acc[0]+=e1/n/R;
+   let e2=0;[.5,.65,.8].forEach(fr=>{const o=Math.floor(fr*n),h=Math.floor(.15*n);e2+=mseOn(fitIdx(rng(0,o),x,y,tau,g),rng(o,Math.min(o+h,n)),x,y,tau,g)/3});acc[1]+=e2/R;acc[2]+=mseOn(fitIdx(rng(0,n),x,y,tau,g),rng(n,N),x,y,tau,g)/R}
+  const ymax=Math.min(Math.max(...acc)*1.15,Math.max(acc[0],acc[1])*6+1),P=mk($('c9cv'),0,3,ymax,{y0:0,noGrid:true,L:46});customGrid(P,[],niceTicks(0,ymax,5));P.hline(1,C.mu,'noise floor 1');const W=(P.w-P.L-P.R)/3,cols=[C.r,C.a,C.g],lab=['random 5-fold CV','rolling-origin CV','true error on the future'];acc.forEach((v,i)=>{const w=W*.5,x=P.L+W*i+W*.25,vv=Math.min(v,ymax);P.g.fillStyle=cols[i];P.g.fillRect(x,P.Y(vv),w,P.Y(0)-P.Y(vv));P.g.fillStyle=C.fg;P.g.textAlign='center';P.g.fillText(fmt(v),x+w/2,P.Y(vv)-4);P.g.fillStyle=C.mu;P.g.fillText(lab[i],x+w/2,P.h-P.B+15)});
+  $('c9st').innerHTML=stat('random CV estimate',fmt(acc[0]),acc[0]<acc[2]*.7?'hot':'')+stat('rolling-origin estimate',fmt(acc[1]),'in')+stat('true future error',fmt(acc[2]),'ok')+stat('random CV ÷ truth',fmt(acc[0]/acc[2]),'')+stat('rolling ÷ truth',fmt(acc[1]/acc[2]),'');
+  $('c9rd').innerHTML=`With noise autocorrelation ${fmt(phi)} and a degree-${g} time polynomial, random 5-fold CV reports an error of ${fmt(acc[0])}: each validation point has neighbours in the training set, so a flexible trend can interpolate the noise. Rolling-origin CV, which only ever predicts forward, reports ${fmt(acc[1])} (it is usually on the cautious side because its training windows are shorter and the flexible trend extrapolates badly), and the actual error on the next 20% of the series is ${fmt(acc[2])}. ${g===0||phi<.2?'With no flexible time term or no autocorrelation, the three agree: the leak needs both.':'The gap grows with autocorrelation and flexibility (try degree 0, or autocorrelation 0).'} Use time-ordered validation for anything that will be used on the future.`}
+ on('c9a c9g c9n',()=>{});['c9a','c9g','c9n'].forEach(i=>$(i).addEventListener('change',run));$('c9go').onclick=run;run();})();
+
+/* ---------- Ch10 AUC vs log-loss ---------- */
+(function(){scl('c10n',v=>v);const KS=[0,1,2,3,4,5,6,8,10,12,15,20],PT=20,TST=3000;
+ function run(){const n=val('c10n'),R=12,auc_=KS.map(()=>0),ll_=KS.map(()=>0),pk=[0,0];
+  for(let r=0;r<R;r++){const Z=[],T=[];for(let j=0;j<PT;j++){Z.push(Float64Array.from({length:n},randn));T.push(Float64Array.from({length:TST},randn))}const lin=(M,i)=>-.5+.8*(M[0][i]+M[1][i]+M[2][i]+M[3][i]+M[4][i]),y=Float64Array.from({length:n},(_,i)=>Math.random()<sig(lin(Z,i))?1:0),yt=Float64Array.from({length:TST},(_,i)=>Math.random()<sig(lin(T,i))?1:0);let bA=1e99,bB=1e99,kA=0,kB=0;
+   KS.forEach((k,gi)=>{const b=ridgeLogit(Z.slice(0,k),y,1e-3,30),sc=new Float64Array(TST);let ls=0;for(let i=0;i<TST;i++){let e=b[0];for(let j=0;j<k;j++)e+=b[j+1]*T[j][i];e=Math.max(-30,Math.min(30,e));sc[i]=e;const m=Math.min(1-1e-9,Math.max(1e-9,sig(e)));ls-=yt[i]*Math.log(m)+(1-yt[i])*Math.log(1-m)}auc_[gi]+=auc(sc,yt)/R;ll_[gi]+=ls/TST/R;
+    let tl=0;for(let i=0;i<n;i++){let e=b[0];for(let j=0;j<k;j++)e+=b[j+1]*Z[j][i];const m=Math.min(1-1e-9,Math.max(1e-9,sig(e)));tl+=y[i]*Math.log(m)+(1-y[i])*Math.log(1-m)}const aic=-2*tl+2*(k+1),bic=-2*tl+(k+1)*Math.log(n);if(aic<bA){bA=aic;kA=k}if(bic<bB){bB=bic;kB=k}});pk[0]+=kA/R;pk[1]+=kB/R}
+  const xi=k=>KS.indexOf(k),mk1=(cv,vals,lo,hi,better)=>{const P=mk(cv,-.5,20.5,hi,{y0:lo});poly(P,KS.map((k,i)=>[k,vals[i]]),better?C.g:C.r,2.6);dots(P,KS.map((k,i)=>[k,vals[i]]),better?C.g:C.r,3);P.vline(5,C.y,'5 real',true);P.vline(pk[0],C.a,'AIC',true);P.vline(pk[1],C.p,'BIC',true);return P};
+  const aL=Math.min(...auc_),aH=Math.max(...auc_),lL=Math.min(...ll_),lH=Math.max(...ll_),P1=mk1($('c10cv'),auc_,aL-.01,aH+.01,true),P2=mk1($('c10cv2'),ll_,lL*.95,Math.min(lH*1.05,lL*2),false);P1.text('test AUC ↑ better',P1.w-P1.R-150,P1.h-P1.B-10,C.mu);P2.text('test log-loss ↓ better',P2.w-P2.R-170,P2.h-P2.B-10,C.mu);
+  const ba=auc_.indexOf(aH),bl=ll_.indexOf(lL);
+  $('c10st').innerHTML=stat('best AUC at k =',KS[ba],'in')+stat('best log-loss at k =',KS[bl],'in')+stat('AUC at k = 20 vs best',fmt(auc_[11])+' vs '+fmt(aH),'')+stat('log-loss at k = 20 vs best',fmt(ll_[11])+' vs '+fmt(lL),ll_[11]>lL*1.1?'hot':'warn')+stat('average k chosen by AIC · BIC',fmt(pk[0])+' · '+fmt(pk[1]),'ok');
+  $('c10rd').innerHTML=`Adding noise predictors costs AUC only ${fmt(aH-auc_[11])} (from ${fmt(aH)} to ${fmt(auc_[11])}), but test log-loss goes from ${fmt(lL)} to ${fmt(ll_[11])}: the ranking survives overfitting better than the probabilities do. The best model by AUC uses ${KS[ba]} predictors and by log-loss ${KS[bl]}; AIC and BIC choose on average ${fmt(pk[0])} and ${fmt(pk[1])} (the truth is 5). If the probabilities are used, select on a proper scoring rule and check calibration.`}
+ $('c10n').addEventListener('change',run);$('c10go').onclick=run;run();})();
+
+/* ---------- Ch11 subset instability, averaging and bagging ---------- */
+(function(){scl('c11n',v=>v);scl('c11r',v=>fmt(v/100));const P_=8,BT=[.5,.35,.25,.15,.1,0,0,0];
+ function subsets(G,c,yy,n){const out=[];for(let mask=0;mask<(1<<P_);mask++){const s=[];for(let j=0;j<P_;j++)if(mask&(1<<j))s.push(j);const b=new Float64Array(P_);let rss=yy;if(s.length){const Gs=s.map(a=>s.map(q=>G[a][q])),cs=s.map(a=>c[a]),sol=gj(Gs,cs).map(r=>r[s.length]);s.forEach((a,i)=>{b[a]=sol[i]});rss=yy-cs.reduce((t,v,i)=>t+v*sol[i],0)}out.push({b,aic:n*Math.log(Math.max(rss,1e-12))+2*(s.length+1)})}return out}
+ function run(){const n=val('c11n'),rho=val('c11r')/100,R=80,B=10,ex=[0,0,0,0];
+  for(let r=0;r<R;r++){const d=genReg(n,P_,BT,rho,1),S=stdz(d.cols,d.y),F=gramOf(S.Z,S.yc);let yy=0;for(const v of S.yc)yy+=v*v;yy/=n;const all=subsets(F.G,F.c,yy,n);let bi=0;all.forEach((q,i)=>{if(q.aic<all[bi].aic)bi=i});
+   const mn=all[bi].aic,w=all.map(q=>Math.exp(-(q.aic-mn)/2)),sw=w.reduce((a,b)=>a+b,0),ba=new Float64Array(P_);all.forEach((q,i)=>{for(let j=0;j<P_;j++)ba[j]+=w[i]/sw*q.b[j]});
+   const bag=new Float64Array(P_);for(let k=0;k<B;k++){const idx=Array.from({length:n},()=>Math.floor(Math.random()*n)),Fb=gramOf(S.Z,S.yc,idx);let yb=0;for(const i of idx)yb+=S.yc[i]*S.yc[i];yb/=n;const sb=subsets(Fb.G,Fb.c,yb,n);let bj=0;sb.forEach((q,i)=>{if(q.aic<sb[bj].aic)bj=i});for(let j=0;j<P_;j++)bag[j]+=sb[bj].b[j]/B}
+   [all[bi].b,ba,bag,all[(1<<P_)-1].b].forEach((b,m)=>{ex[m]+=excessErr(S,b,BT,rho,P_)/R})}
+  const NM=['best-AIC subset','Akaike-weighted average','bagged selection','full model'],ymax=Math.max(...ex)*1.18,P=mk($('c11cv'),0,4,ymax,{y0:0,noGrid:true,L:46});customGrid(P,[],niceTicks(0,ymax,5));const W=(P.w-P.L-P.R)/4,cols=[C.r,C.a,C.g,C.mu];ex.forEach((v,i)=>{const w=W*.5,x=P.L+W*i+W*.25;P.g.fillStyle=cols[i];P.g.fillRect(x,P.Y(v),w,P.Y(0)-P.Y(v));P.g.fillStyle=C.fg;P.g.textAlign='center';P.g.fillText(fmt(v),x+w/2,P.Y(v)-4);P.g.fillStyle=C.mu;P.g.fillText(NM[i],x+w/2,P.h-P.B+15)});P.text('true excess prediction error (lower is better)',P.L+8,P.T+12,C.mu);
+  const bm=ex.indexOf(Math.min(...ex));
+  $('c11st').innerHTML=NM.map((m,i)=>stat(m,fmt(ex[i]),i===bm?'ok':'')).join('')+stat('best method',NM[bm],'in');
+  $('c11rd').innerHTML=`Best-subset selection gives an excess error of ${fmt(ex[0])}; averaging the 256 subsets with Akaike weights gives ${fmt(ex[1])}, and bagging the selection ${fmt(ex[2])}; the full model with all eight predictors gives ${fmt(ex[3])}. ${bm===0?'Here the single best subset happens to win.':'The smoothed procedures win because a single subset choice flips with small changes in the data and its variance adds to the error.'} With small effects, correlated predictors and moderate n the differences are largest; with a strong, sparse truth and large n they shrink, and the single best subset is fine.`}
+ $('c11n').addEventListener('change',run);$('c11r').addEventListener('change',run);$('c11go').onclick=run;run();})();
+const QZ=[
+{l:'Beginner',q:'Which of these will always decrease (or stay the same) when you add a predictor to a regression model?',o:['Test-set error','Training error (residual sum of squares)','AIC','The standard error of every coefficient'],a:1,e:'Training RSS cannot rise when a column is added, which is why it cannot be used to choose the model size.'},
+{l:'Beginner',q:'The expected prediction error of a model at a new point decomposes into…',o:['Bias + variance only','Irreducible noise + bias² + variance','Training error + test error','Variance of x + variance of y'],a:1,e:'Noise σ² cannot be reduced; bias² falls and variance rises with flexibility, giving the familiar U-shape.'},
+{l:'Intermediate',q:'In a linear model with k parameters, error variance σ² and n observations, the expected optimism (test error minus training error) is…',o:['kσ²/n','2kσ²/n','σ²/n','k/n'],a:1,e:'The optimism is 2kσ²/n, the basis for Mallows’ Cp and for AIC with Gaussian errors.'},
+{l:'Intermediate',q:'AIC differs from BIC mainly in that…',o:['AIC uses a penalty of 2k and BIC a penalty of k log n, so BIC prefers smaller models once n ≥ 8','AIC is only for logistic regression','BIC ignores the likelihood','They are identical for Gaussian models'],a:0,e:'Both are −2ℓ + penalty. AIC targets prediction; BIC approximates a marginal likelihood and is consistent for selecting a true model.'},
+{l:'Intermediate',q:'Which criterion is consistent: if the true model is among the candidates it will be chosen with probability tending to 1 as n grows?',o:['AIC','BIC','Training R²','Mallows’ Cp'],a:1,e:'BIC is consistent; AIC is efficient for prediction but retains a positive probability of choosing an over-large model.'},
+{l:'Intermediate',q:'For a linear model the leave-one-out CV error can be computed without refitting as…',o:['The mean of the squared ordinary residuals','The mean of (eᵢ / (1 − hᵢ))², with hᵢ the leverage','The training error divided by n','The average of the K-fold errors'],a:1,e:'The leave-one-out residual for point i is eᵢ/(1 − hᵢ), a consequence of the hat-matrix identities.'},
+{l:'Advanced',q:'2-fold cross-validation tends to…',o:['Be unbiased with the lowest variance','Over-estimate the error because the models are trained on only half of the data','Under-estimate the error','Be identical to leave-one-out'],a:1,e:'Models trained on much less data than the final model do worse, giving a pessimistically biased estimate. K = 5 or 10 balances bias and variance.'},
+{l:'Advanced',q:'You select the 20 predictors most correlated with y out of 5,000 using the whole data set, then run 10-fold CV on a model with those 20. The CV score is…',o:['An honest estimate of out-of-sample error','Optimistic, because the selection step saw the validation folds (leakage); screening must be repeated inside each fold','Pessimistic','Unaffected by the screening'],a:1,e:'Any data-dependent step must be inside the CV loop. With noise predictors this procedure can show substantial “skill” where there is none.'},
+{l:'Advanced',q:'You compare 200 candidate models by CV and report the best model’s CV score as its expected performance. This is…',o:['Unbiased','Optimistically biased (winner’s curse); estimate the whole selection procedure with nested CV or a held-out test set','Pessimistically biased','Exactly equal to the training error'],a:1,e:'The maximum of many noisy but unbiased estimates is biased upward. Evaluate the procedure, not the winner, on untouched data.'},
+{l:'Advanced',q:'Stepwise selection followed by the usual output of the final model produces…',o:['Valid p-values and confidence intervals','Over-optimistic R² and p-values, biased coefficients and unstable choices','Exactly the best-subset model','Unbiased coefficients'],a:1,e:'The inference ignores that the model was chosen from the data, so test statistics are far too extreme.'},
+{l:'Advanced',q:'Models with ΔAIC = 0, 1.2 and 9 have Akaike weights of roughly…',o:['0.5, 0.3, 0.2','0.58, 0.32, 0.01 (the first two are essentially tied; the third has little support)','1, 0, 0','0.33, 0.33, 0.33'],a:1,e:'w ∝ exp(−Δ/2): 1, 0.55, 0.011, which normalised give about 0.64, 0.35, 0.007 (close to the stated values): differences under 2 mean models are nearly equivalent.'},
+{l:'Advanced',q:'Why is a model-averaged prediction often more accurate than the prediction of the single model with the lowest AIC?',o:['It uses more variables','It smooths the discontinuous choice among models, reducing the variance of selection and respecting model uncertainty','It always has lower bias','It avoids the likelihood'],a:1,e:'Selection is unstable: small data changes flip the winner. Weighted averaging (or bagging, or shrinkage) smooths this.'},
+{l:'Expert',q:'A credit-risk model is tuned with random 10-fold CV on monthly data and shows excellent performance, but deteriorates on the next quarter. The most likely cause is…',o:['The CV was done with too few folds','Autocorrelation and drift: random folds put near-copies of validation points in training; use out-of-time and rolling-origin validation','The model was too simple','Using AIC instead of BIC'],a:1,e:'Time-ordered data violate exchangeability. Validation must mimic deployment: train on the past, predict the future.'},
+{l:'Expert',q:'Two logistic models have nearly identical test AUC, but one has much worse test log-loss. The likely explanation is…',o:['AUC and log-loss are the same measure','One model ranks cases about as well but produces over-confident or mis-calibrated probabilities (typically overfitting)','The better log-loss model has more events','The data were leaked'],a:1,e:'AUC depends only on ranking; log-loss (a proper scoring rule) also punishes miscalibration. Choose the metric that matches the decision.'},
+{l:'Expert',q:'Which statement about the standard error of a cross-validation estimate is correct?',o:['It is zero for leave-one-out','It is often large for small n or rare events, so the CV estimate should be reported with an uncertainty, and differences between models smaller than that are noise (the one-SE rule)','It is always smaller than the standard error of the training error','It does not depend on n'],a:1,e:'The CV curve is noisy and flat near its minimum; prefer the simplest model within one standard error of the best.'},
+{l:'Expert',q:'Bagging a subset-selection procedure helps mainly because…',o:['It lowers the bias of each selected model','It averages over bootstrap-chosen subsets, reducing the variance caused by the instability of the selection','It increases n','It eliminates the need for cross-validation'],a:1,e:'Averaging the predictions or coefficients across bootstrap selections smooths the jumps in the selected set.'},
+{l:'Expert',q:'Which of the following is the best protection against an over-optimistic performance claim in a model-risk review?',o:['A high training R²','A held-out out-of-time test set that was never used for selection or tuning, plus nested CV of the full pipeline','Reporting the best of many CV scores','Using the same CV folds for every model'],a:1,e:'The final evaluation must be independent of every choice made during development, including feature screening and hyperparameter search.'}
+];
+(function(){const st=store.get('ms_quiz',{});
+ function render(){const box=$('quiz');box.innerHTML='';
+  QZ.forEach((q,i)=>{const d=document.createElement('div');d.className='q'+(st[i]!=null?' done':'');d.innerHTML=`<div class="qh">Q${i+1} · ${q.l}</div><div style="margin:4px 0 6px"><b>${q.q}</b></div>`;
+   q.o.forEach((o,j)=>{const b=document.createElement('button');b.className='opt';b.textContent=o;if(st[i]!=null){if(j===q.a)b.classList.add('good');else if(j===st[i])b.classList.add('bad')}b.onclick=()=>{if(st[i]!=null)return;st[i]=j;store.set('ms_quiz',st);render();meter()};d.appendChild(b)});
+   const e=document.createElement('div');e.className='ex';e.innerHTML=(st[i]===q.a?'✅ ':'❌ ')+q.e;d.appendChild(e);box.appendChild(d)});
+  const ans=Object.keys(st).length,ok=QZ.filter((q,i)=>st[i]===q.a).length;
+  $('qscore').innerHTML=stat('answered',ans+' / '+QZ.length,'in')+stat('correct',ok,'ok')+stat('score',ans?Math.round(100*ok/ans)+'%':'—',ok/Math.max(ans,1)>=.8?'ok':'warn')+stat('verdict',ans<QZ.length?'keep going':ok>=16?'model-selection master':ok>=13?'strong':'review ch. 1–9','')}
+ $('qreset').onclick=()=>{Object.keys(st).forEach(k=>delete st[k]);store.set('ms_quiz',st);render();meter()};
+ window.__qst=st;render();})();
+const CHK=['State the bias–variance decomposition and sketch the U-shaped error curve.','Explain why training error is optimistic and derive/recall the 2kσ²/n optimism.','Compute AIC, AICc and BIC and state what each is designed to do.','Explain efficiency versus consistency and when AIC and BIC disagree.','Compute LOO CV for a linear model with the hat-matrix shortcut.','Choose K for K-fold CV and explain the bias and variance of CV.','Spot leakage in a pipeline and put every data-dependent step inside the folds.','Explain the winner’s curse and use nested CV or a final test set.','List the failures of stepwise selection.','Convert AIC differences into Akaike weights and average models.','Design out-of-time and rolling-origin validation for time-ordered data.','Choose between AUC, log-loss, Brier and cost-based metrics.','Explain how bagging, averaging and shrinkage stabilise selection.','Write a validation plan that a model-risk reviewer would accept.'];
+(function(){const st=store.get('ms_chk',{}),box=$('chk');CHK.forEach((t,i)=>{const l=document.createElement('label'),c=document.createElement('input');c.type='checkbox';c.checked=!!st[i];c.onchange=()=>{st[i]=c.checked;store.set('ms_chk',st);meter()};l.appendChild(c);const s=document.createElement('span');s.textContent=t;l.appendChild(s);box.appendChild(l)});window.__cst=st;})();
+function meter(){const q=window.__qst||{},c=window.__cst||{};const ok=QZ.filter((x,i)=>q[i]===x.a).length,ck=Object.values(c).filter(Boolean).length;const p=Math.round(100*(.6*ok/QZ.length+.4*ck/CHK.length));$('mtxt').textContent='Mastery: '+p+'%  (exam + checklist)';$('mbar').style.width=p+'%';store.set('mastery_ms',p)}
+meter();
+
+/* ---------- Navigation ---------- */
+(function(){const nav=$('nav');let html='';
+ document.querySelectorAll('main .part, main section.ch').forEach(el=>{if(el.classList.contains('part'))html+=`<div class="pt">${el.textContent}</div>`;else{const h=el.querySelector('h2'),num=h.querySelector('.num').textContent,t=Array.from(h.childNodes).filter(n=>n.nodeType===3).map(n=>n.textContent).join('').trim();html+=`<a href="#${el.id}" data-id="${el.id}">${num}. ${t}</a>`}});
+ nav.innerHTML=html;const links=nav.querySelectorAll('a'),io=new IntersectionObserver(es=>{es.forEach(e=>{if(e.isIntersecting)links.forEach(a=>a.classList.toggle('on',a.dataset.id===e.target.id))})},{rootMargin:'-20% 0px -70% 0px'});
+ document.querySelectorAll('section.ch').forEach(s=>io.observe(s));
+ $('menu').onclick=()=>$('side').classList.toggle('open');nav.addEventListener('click',e=>{if(e.target.tagName==='A')$('side').classList.remove('open')});
+ window.addEventListener('scroll',()=>{const h=document.documentElement;$('prog').style.width=(100*h.scrollTop/(h.scrollHeight-h.clientHeight))+'%'},{passive:true});})();
+</script>
+</body>
+</html>

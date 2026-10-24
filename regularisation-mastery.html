@@ -1,0 +1,625 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Regularisation Mastery</title>
+<style>
+:root{--bg:#0b0e17;--panel:#121726;--panel2:#171d30;--line:#232a3d;--fg:#e8ebf5;--mu:#8a93ab;--a:#6ea8ff;--r:#ff6b81;--y:#ffd166;--g:#4ade80;--p:#c084fc;--t:#5eead4}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;background:var(--bg);color:var(--fg);font:16px/1.7 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+a{color:var(--a)}
+#prog{position:fixed;top:0;left:0;height:3px;background:linear-gradient(90deg,var(--a),var(--p),var(--r));width:0;z-index:50}
+.side{position:fixed;left:0;top:0;bottom:0;width:290px;background:#0e1220;border-right:1px solid var(--line);overflow:auto;padding:18px 14px 90px;z-index:40;transition:transform .25s}
+.side h1{font-size:15px;margin:0 0 2px}
+.side small{color:var(--mu)}
+.side .pt{margin:16px 0 4px;font-size:11px;text-transform:uppercase;letter-spacing:1.3px;color:var(--p)}
+.side a{display:block;color:var(--mu);text-decoration:none;padding:5px 9px;border-radius:7px;font-size:13.5px;line-height:1.35}
+.side a:hover{background:var(--panel);color:var(--fg)}
+.side a.on{background:var(--panel2);color:var(--fg);box-shadow:inset 3px 0 var(--a)}
+.side a.back{color:var(--t);padding-left:0;margin-bottom:6px}
+.meter{position:fixed;left:0;bottom:0;width:290px;background:#0e1220;border-top:1px solid var(--line);padding:10px 16px;z-index:41;font-size:12px;color:var(--mu)}
+.meter .bar{height:7px;background:var(--line);border-radius:6px;margin-top:5px;overflow:hidden}
+.meter .bar i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--g),var(--t));transition:width .4s}
+#menu{display:none;position:fixed;top:10px;left:10px;z-index:60;background:var(--panel2);color:var(--fg);border:1px solid var(--line);border-radius:9px;padding:7px 12px;font-size:14px;cursor:pointer}
+main{margin-left:290px;padding:0 34px 120px;max-width:1090px}
+.hero{padding:70px 0 30px}
+.hero h1{font-size:clamp(32px,5vw,56px);line-height:1.08;margin:0 0 14px;background:linear-gradient(100deg,#fff,var(--y) 40%,var(--r));-webkit-background-clip:text;background-clip:text;color:transparent}
+.hero p{font-size:19px;color:#c3c9dc;max-width:780px}
+.chips{display:flex;flex-wrap:wrap;gap:8px;margin:18px 0}
+.chip{border:1px solid var(--line);background:var(--panel);padding:5px 12px;border-radius:99px;font-size:13px;color:var(--mu)}
+.chip b{color:var(--fg)}
+.part{margin:90px 0 0;padding-top:22px;border-top:1px solid var(--line);font-size:12px;letter-spacing:2px;text-transform:uppercase;color:var(--p)}
+section.ch{padding-top:30px}
+h2{font-size:30px;line-height:1.2;margin:10px 0 8px;display:flex;gap:12px;align-items:center;flex-wrap:wrap}
+h2 .num{display:inline-grid;place-items:center;width:40px;height:40px;border-radius:12px;background:var(--panel2);border:1px solid var(--line);font-size:18px;color:var(--a)}
+.lvl{font-size:11px;font-weight:600;letter-spacing:.8px;text-transform:uppercase;padding:3px 9px;border-radius:99px;border:1px solid}
+.lvl.b{color:var(--g);border-color:#1f5c3a}.lvl.i{color:var(--a);border-color:#244a85}.lvl.a{color:var(--y);border-color:#6b5420}.lvl.e{color:var(--r);border-color:#7a2c3a}
+h3{font-size:19px;margin:30px 0 6px;color:#fff}
+p{margin:10px 0}li{margin:5px 0}
+code,.f{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace}
+code{background:var(--panel2);padding:1px 6px;border-radius:5px;font-size:.9em}
+.f{display:block;white-space:pre-wrap;background:#0e1322;border:1px solid var(--line);border-left:3px solid var(--a);padding:12px 16px;border-radius:9px;margin:14px 0;overflow-x:auto;font-size:15px;color:#dbe4ff;line-height:1.8}
+.co{border-radius:12px;padding:13px 17px;margin:16px 0;border:1px solid var(--line);background:var(--panel)}
+.co>b:first-child{display:block;margin-bottom:2px;font-size:12px;letter-spacing:1px;text-transform:uppercase}
+.co.def{border-left:4px solid var(--a)}.co.def>b:first-child{color:var(--a)}
+.co.warn{border-left:4px solid var(--r)}.co.warn>b:first-child{color:var(--r)}
+.co.tip{border-left:4px solid var(--g)}.co.tip>b:first-child{color:var(--g)}
+.co.key{border-left:4px solid var(--y);background:#171608}.co.key>b:first-child{color:var(--y)}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:18px 20px;margin:22px 0;box-shadow:0 8px 30px rgba(0,0,0,.25)}
+.card>h4{margin:0 0 3px;font-size:13px;letter-spacing:1.2px;text-transform:uppercase;color:var(--t)}
+.card>p.sub{margin:0 0 12px;color:var(--mu);font-size:14.5px}
+.ctl{display:flex;flex-wrap:wrap;gap:10px 22px;align-items:center;margin:8px 0 10px}
+.ctl label{display:flex;gap:8px;align-items:center;font-size:14px;color:#c3c9dc}
+.ctl output{min-width:38px;font-family:ui-monospace,monospace;color:var(--y);font-size:13px}
+input[type=range]{accent-color:var(--a);width:150px}
+input[type=checkbox]{accent-color:var(--a)}
+select,input[type=number],input[type=text]{background:#0e1322;color:var(--fg);border:1px solid var(--line);border-radius:8px;padding:6px 9px;font:inherit;font-size:14px}
+button{background:linear-gradient(180deg,#2c4a80,#233b68);color:#fff;border:1px solid #3a5a98;border-radius:9px;padding:7px 14px;font:inherit;font-size:14px;cursor:pointer}
+button:hover{filter:brightness(1.15)}
+button.alt{background:var(--panel2);border-color:var(--line);color:var(--fg)}
+canvas{width:100%;height:270px;display:block;background:#0e1322;border:1px solid var(--line);border-radius:10px;margin-top:6px}
+canvas.sm{height:210px}canvas.tl{height:330px}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(125px,1fr));gap:9px;margin:12px 0}
+.stat{background:#0e1322;border:1px solid var(--line);border-radius:10px;padding:8px 11px}
+.stat b{display:block;font-size:17px;font-family:ui-monospace,monospace}
+.stat span{font-size:11.5px;color:var(--mu);text-transform:uppercase;letter-spacing:.7px}
+.stat.hot b{color:var(--r)}.stat.ok b{color:var(--g)}.stat.warn b{color:var(--y)}.stat.in b{color:var(--a)}
+.read{margin:8px 0 0;padding:10px 14px;background:#0e1322;border:1px dashed #33406a;border-radius:10px;font-size:14.5px;color:#d3dbf3}
+table{border-collapse:collapse;width:100%;margin:12px 0;font-size:14px}
+th,td{border:1px solid var(--line);padding:7px 10px;text-align:left;vertical-align:top}
+th{background:var(--panel2);font-size:12px;text-transform:uppercase;letter-spacing:.6px;color:var(--mu)}
+td.n{font-family:ui-monospace,monospace;text-align:right}
+.tw{overflow-x:auto}
+.pill{display:inline-block;padding:1px 9px;border-radius:99px;font-size:12px;font-weight:600}
+.pill.r{background:#3a1520;color:var(--r)}.pill.g{background:#10321f;color:var(--g)}.pill.y{background:#3a2f0e;color:var(--y)}.pill.m{background:#202637;color:var(--mu)}
+details{background:var(--panel);border:1px solid var(--line);border-radius:11px;padding:9px 15px;margin:9px 0}
+details summary{cursor:pointer;font-weight:600}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.q{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:14px 18px;margin:14px 0}
+.q .qh{font-size:12px;letter-spacing:1px;text-transform:uppercase;color:var(--mu)}
+.q .opt{display:block;width:100%;text-align:left;margin:6px 0;background:#0e1322;border:1px solid var(--line);color:var(--fg);border-radius:9px;padding:9px 12px}
+.q .opt.good{border-color:var(--g);background:#0e2418}.q .opt.bad{border-color:var(--r);background:#2a1119}
+.q .ex{display:none;margin-top:8px;font-size:14.5px;color:#c3c9dc}
+.q.done .ex{display:block}
+.chk label{display:flex;gap:10px;align-items:flex-start;padding:6px 0;cursor:pointer}
+.chk input{margin-top:6px;accent-color:var(--g);width:17px;height:17px}
+.sigrow{display:grid;grid-template-columns:minmax(170px,2fr) 1fr 1fr auto;gap:8px 14px;align-items:center;padding:6px 0;border-top:1px dashed #1b2236}
+.sigrow:first-of-type{border-top:0}
+.sigrow label{display:flex;gap:6px;align-items:center;font-size:13.5px;color:#c3c9dc}
+@media(max-width:900px){
+ .side{transform:translateX(-100%)}.side.open{transform:none}.meter{display:none}
+ #menu{display:block}main{margin-left:0;padding:0 16px 100px}.two{grid-template-columns:1fr}.hero{padding-top:60px}
+ .sigrow{grid-template-columns:1fr 1fr}
+}
+</style>
+</head>
+<body>
+<div id="prog"></div>
+<button id="menu">☰ Contents</button>
+<nav class="side" id="side"><a class="back" href="index.html">← All courses</a><h1>Regularisation</h1><small>12 chapters · 11 labs · exam</small><div id="nav"></div></nav>
+<div class="meter"><div id="mtxt">Mastery: 0%</div><div class="bar"><i id="mbar"></i></div></div>
+
+<main>
+<header class="hero">
+ <h1>Regularisation: ridge, lasso and elastic net.</h1>
+ <p>With many predictors, correlated predictors or modest data, the unbiased least-squares or maximum-likelihood fit is exactly the wrong thing to use: it has high variance and chases noise. Regularisation deliberately accepts a little bias in return for a large drop in variance by penalising the size of the coefficients. This page covers ridge (L2), lasso (L1) and elastic net, their geometry and solution algorithms, how to choose the penalty by cross-validation, what shrinkage does to inference, penalised logistic regression, and practical tools such as the adaptive lasso and stability selection.</p>
+ <div class="chips"><span class="chip"><b>Part I</b> Ridge</span><span class="chip"><b>Part II</b> Lasso and elastic net</span><span class="chip"><b>Part III</b> Choosing and using</span></div>
+ <div class="co tip"><b>How to use this</b>Every lab simulates data with known coefficients so you can see directly which estimator is closest to the truth. All penalised fits (closed-form ridge, coordinate-descent lasso, cross-validation) are written from scratch in this page. Heavy labs update when you release a slider. Prerequisites: Linear Regression, Collinearity/Interactions/Nonlinearity and Generalised Linear Models pages.</div>
+</header>
+
+<div class="part">Part I · Ridge</div>
+
+<section class="ch" id="c1">
+<h2><span class="num">1</span>Why shrink: variance dominates when p is large <span class="lvl b">Beginner</span></h2>
+<p>The expected prediction error of an estimator is noise + bias² + variance. Ordinary least squares has zero bias but its variance grows with the number of predictors (about σ²p/n for new data). When p is a sizeable fraction of n, OLS fits noise and predicts badly. A <b>penalty</b> pulls the coefficients toward zero, adding a little bias and removing a lot of variance. Ridge regression minimises
+
+ <span class="f" style="display:inline-block;margin:6px 0">Σ(yᵢ − β₀ − xᵢᵀβ)² + λ Σβⱼ²</span>
+
+ with the tuning parameter λ ≥ 0 controlling the shrinkage (λ = 0 is OLS; λ → ∞ gives the intercept-only model). Predictors must be standardised first, otherwise the penalty depends on units; the intercept is not penalised.</p>
+<div class="card"><h4>Lab 1 · OLS versus ridge as predictors multiply</h4>
+ <p class="sub">y depends on 10 true predictors (total R² as set); extra predictors are pure noise. Curves show average test mean-squared error against the number of predictors p. Ridge picks λ by generalised cross-validation on each training set. The dashed line is the irreducible noise (1).</p>
+ <div class="ctl"><label>training size n <input type="range" id="c1n" min="40" max="200" step="5" value="80"><output id="c1nv"></output></label><label>true R² % <input type="range" id="c1s" min="10" max="90" step="5" value="50"><output id="c1sv"></output></label><button id="c1go">Re-simulate</button></div>
+ <canvas class="tl" id="c1cv"></canvas><div class="stats" id="c1st"></div><div class="read" id="c1rd"></div></div>
+</section>
+
+<section class="ch" id="c2">
+<h2><span class="num">2</span>The ridge solution, shrinkage and effective degrees of freedom <span class="lvl i">Intermediate</span></h2>
+<p>Ridge has a closed form, β̂(λ) = (XᵀX + λI)⁻¹Xᵀy, which is always defined, even when XᵀX is singular (p &gt; n or exact collinearity). In the principal-component basis of X, each direction with variance dₖ² is shrunk by the factor dₖ²/(dₖ² + λ): directions with large variance are barely touched, low-variance directions (where the data are least informative, the cause of collinearity trouble) are shrunk hard. The <b>effective degrees of freedom</b> df(λ) = Σ dₖ²/(dₖ² + λ) falls smoothly from p to 0 and is the honest measure of model complexity. Coefficient paths of ridge shrink smoothly and never reach exactly zero; correlated predictors share the shrinkage.</p>
+<div class="card"><h4>Lab 2 · Ridge coefficient paths</h4>
+ <p class="sub">Eight predictors with the correlation you choose; true coefficients (3, −2, 0, 0, 1.5, 0, 0, 0), n = 100. Each line is one coefficient (standardised units) as λ grows. The white marker is the current λ; the table reports the effective degrees of freedom there.</p>
+ <div class="ctl"><label>correlation of predictors % <input type="range" id="c2r" min="0" max="95" step="1" value="60"><output id="c2rv"></output></label><label>log₁₀ λ <input type="range" id="c2l" min="-30" max="15" step="1" value="-5"><output id="c2lv"></output></label><button id="c2go">New data</button></div>
+ <canvas class="tl" id="c2cv"></canvas><div class="stats" id="c2st"></div><div class="read" id="c2rd"></div></div>
+</section>
+
+<section class="ch" id="c3">
+<h2><span class="num">3</span>Ridge and collinearity: trading bias for variance <span class="lvl a">Advanced</span></h2>
+<p>Previous pages showed that collinearity inflates the variance of OLS coefficients but not their bias. Ridge is the direct remedy for prediction: shrinking toward zero introduces a bias in each coefficient (they are under-estimated) but reduces the variance by more, so the mean squared error Var + Bias² falls. There is always some λ &gt; 0 for which ridge beats OLS in MSE for every coefficient, for any true β (the Hoerl–Kennard result); the improvement is largest when predictors are strongly correlated and noise is high. The price is that coefficients lose their unbiased interpretation, and standard errors and p-values are no longer straightforward.</p>
+<div class="card"><h4>Lab 3 · Bias, variance and MSE of the ridge coefficient</h4>
+ <p class="sub">y = x₁ + x₂ + noise (SD 2), with x₁ and x₂ standardised and correlated. 2,000 data sets: sampling distribution of the x₁ coefficient under OLS (red) and ridge (blue).</p>
+ <div class="ctl"><label>correlation % <input type="range" id="c3r" min="0" max="99" step="1" value="90"><output id="c3rv"></output></label><label>log₁₀ λ <input type="range" id="c3l" min="-30" max="10" step="1" value="-8"><output id="c3lv"></output></label><label>n <input type="range" id="c3n" min="30" max="300" step="5" value="60"><output id="c3nv"></output></label><button id="c3go">Re-simulate</button></div>
+ <canvas class="tl" id="c3cv"></canvas><div class="stats" id="c3st"></div><div class="read" id="c3rd"></div></div>
+</section>
+
+<div class="part">Part II · Lasso and elastic net</div>
+
+<section class="ch" id="c4">
+<h2><span class="num">4</span>The L1 penalty: soft-thresholding and the geometry of sparsity <span class="lvl i">Intermediate</span></h2>
+<p>The <b>lasso</b> replaces the squared penalty by the absolute value: minimise ½n⁻¹RSS + λΣ|βⱼ|. The change has a large consequence: many coefficients are set <em>exactly</em> to zero, so the lasso does estimation and variable selection in one step. With orthonormal predictors the lasso is the <b>soft-threshold</b> of the OLS estimate, β̂ = sign(z)(|z| − λ)₊: small estimates are zeroed, large ones are shrunk by a constant λ, while ridge shrinks every estimate proportionally, z/(1 + λ), and never reaches zero. Geometrically, the penalised problem is the contour of the loss touching a constraint region: a circle for ridge (no corners) and a diamond for the lasso, whose corners lie on the axes, so the first contact is often at a corner where a coefficient is zero.</p>
+<div class="card"><h4>Lab 4 · Contours, circle and diamond</h4>
+ <p class="sub">Left: two coefficients. The ellipses are contours of the least-squares loss centred at the OLS estimate (yellow dot). The lasso solution (red) sits where a contour touches the diamond ‖β‖₁ = const; the ridge solution (green) where it touches the circle. Right: the estimator as a function of the OLS value for one standardised coefficient: OLS (dashed), ridge (green), lasso (red).</p>
+ <div class="ctl"><label>OLS β̂₁ <input type="range" id="c4a" min="-40" max="40" step="1" value="20"><output id="c4av"></output></label><label>OLS β̂₂ <input type="range" id="c4b" min="-40" max="40" step="1" value="8"><output id="c4bv"></output></label><label>predictor correlation <input type="range" id="c4r" min="-90" max="90" step="1" value="60"><output id="c4rv"></output></label><label>λ <input type="range" id="c4l" min="0" max="200" step="1" value="50"><output id="c4lv"></output></label></div>
+ <div class="two"><canvas class="sm" id="c4cv"></canvas><canvas class="sm" id="c4cv2"></canvas></div><div class="stats" id="c4st"></div><div class="read" id="c4rd"></div></div>
+</section>
+
+<section class="ch" id="c5">
+<h2><span class="num">5</span>Coordinate descent and the lasso path <span class="lvl a">Advanced</span></h2>
+<p>The lasso has no closed form but is easy to compute: <b>coordinate descent</b> cycles through the coefficients, each time solving the one-dimensional problem exactly with a soft-threshold, and repeats until nothing changes. Starting at λ_max = max|xⱼᵀy|/n (where all coefficients are zero) and lowering λ in steps, with each solution as the starting point for the next (<em>warm starts</em>), yields the whole <b>regularisation path</b> in about the cost of one least-squares fit. Variables enter the model one by one as λ falls. The tuning parameter is chosen by K-fold cross-validation: the λ with the smallest CV error (<b>λ_min</b>), or the largest λ within one standard error of it (<b>λ_1se</b>), which gives a sparser model. The lasso can select at most n variables, and when predictors are correlated it tends to keep one of a group arbitrarily.</p>
+<div class="card"><h4>Lab 5 · A lasso path with cross-validation</h4>
+ <p class="sub">Five true predictors (blue paths) among p; the rest are noise (grey). Left: the coefficient paths against log₁₀ λ, with the CV choices marked (solid: λ_min, dashed: λ_1se). Right: the 10-fold CV error curve.</p>
+ <div class="ctl"><label>n <input type="range" id="c5n" min="50" max="400" step="10" value="150"><output id="c5nv"></output></label><label>predictors p <input type="range" id="c5p" min="10" max="60" step="1" value="30"><output id="c5pv"></output></label><label>noise SD <input type="range" id="c5s" min="5" max="60" step="1" value="20"><output id="c5sv"></output></label><button id="c5go">New data</button></div>
+ <div class="two"><canvas class="sm" id="c5cv"></canvas><canvas class="sm" id="c5cv2"></canvas></div><div class="stats" id="c5st"></div><div class="read" id="c5rd"></div></div>
+</section>
+
+<section class="ch" id="c6">
+<h2><span class="num">6</span>Elastic net and the grouping effect <span class="lvl a">Advanced</span></h2>
+<p>The <b>elastic net</b> mixes the two penalties, λ[α‖β‖₁ + (1 − α)½‖β‖₂²], with α = 1 the lasso and α = 0 ridge. The ridge part gives it the <b>grouping effect</b>: highly correlated predictors with similar effects receive similar coefficients and enter or leave together, whereas the lasso arbitrarily picks one member and its choice flips from sample to sample. The L1 part keeps the sparsity. The elastic net is the usual first choice when predictors come in correlated groups (banking ratios, balance and transaction aggregates over several windows, one-hot encodings of related categories), and it can select more than n variables.</p>
+<div class="card"><h4>Lab 6 · Lasso versus elastic net on a correlated group</h4>
+ <p class="sub">Six predictors in two groups of three, within-group correlation 0.9. Only the first group has an effect (coefficient 1 each). Bars give how often each predictor is selected over 250 data sets (n = 100, λ by 5-fold CV with the one-SE rule). Red: lasso. Blue: elastic net with your mixing α.</p>
+ <div class="ctl"><label>mixing α (1 = lasso) <input type="range" id="c6a" min="10" max="100" step="5" value="40"><output id="c6av"></output></label><button id="c6go">Re-simulate</button></div>
+ <canvas class="tl" id="c6cv"></canvas><div class="stats" id="c6st"></div><div class="read" id="c6rd"></div></div>
+</section>
+
+<div class="part">Part III · Choosing and using</div>
+
+<section class="ch" id="c7">
+<h2><span class="num">7</span>How well does cross-validation choose λ? <span class="lvl a">Advanced</span></h2>
+<p>The cross-validated λ is itself a random variable. Different samples give different choices, and the min and one-SE rules trade accuracy for sparsity. Because the CV curve is flat near its minimum, a wide range of λ values predicts about equally well; what matters more is avoiding the extremes. Practical points: standardise inside each fold (not before the split) to avoid leakage; use stratified folds for rare events; repeat CV with several random splits if the data set is small; and keep a final holdout if you will also compare many different models.</p>
+<div class="card"><h4>Lab 7 · Variability of the chosen λ</h4>
+ <p class="sub">p = 30 predictors with 5 true signals, correlation 0.2. For 60 data sets, histograms of log₁₀ λ chosen by the minimum rule (red) and the one-SE rule (blue). The statistics compare the true excess prediction error of each choice with the best λ in hindsight.</p>
+ <div class="ctl"><label>n <input type="range" id="c7n" min="50" max="400" step="10" value="120"><output id="c7nv"></output></label><label>method <select id="c7m"><option value="lasso">lasso</option><option value="ridge">ridge</option></select></label><button id="c7go">Re-simulate</button></div>
+ <canvas class="tl" id="c7cv"></canvas><div class="stats" id="c7st"></div><div class="read" id="c7rd"></div></div>
+</section>
+
+<section class="ch" id="c8">
+<h2><span class="num">8</span>Shrinkage bias and the problem of inference after selection <span class="lvl e">Expert</span></h2>
+<p>Penalised coefficients are biased toward zero by design, so they should not be read as effect sizes, and the usual standard errors, t-tests and confidence intervals no longer apply. Refitting ordinary least squares on the variables the lasso selected (<em>post-lasso</em>) removes the shrinkage but brings a different problem: the variables were chosen because they looked strong in <em>this</em> sample, so their refitted coefficients are inflated (the winner’s curse) and naive intervals undercover, while selected null variables look “significant” far more than 5% of the time. Valid inference after selection needs sample splitting, selective-inference corrections or the debiased lasso. Use the lasso for prediction and screening; use a pre-specified model, or a separate sample, for effect estimates and p-values.</p>
+<div class="card"><h4>Lab 8 · Winner’s curse after the lasso</h4>
+ <p class="sub">p = 20 predictors, only x₁ has an effect (the strength you choose, in noise SD units); the lasso with CV-chosen λ selects variables, then OLS is refitted on those. 500 data sets. The histogram shows the lasso and refit estimates of x₁ when it was selected.</p>
+ <div class="ctl"><label>true effect of x₁ <input type="range" id="c8s" min="0" max="100" step="5" value="30"><output id="c8sv"></output></label><label>n <input type="range" id="c8n" min="50" max="300" step="10" value="100"><output id="c8nv"></output></label><button id="c8go">Re-simulate</button></div>
+ <canvas class="tl" id="c8cv"></canvas><div class="tw" id="c8tb"></div><div class="read" id="c8rd"></div></div>
+</section>
+
+<section class="ch" id="c9">
+<h2><span class="num">9</span>Penalised logistic regression <span class="lvl a">Advanced</span></h2>
+<p>Every idea carries over to GLMs: maximise the log-likelihood minus the penalty. Ridge logistic regression solves by penalised IRLS, β ← (XᵀWX + λI)⁻¹(XᵀWz); the lasso version applies coordinate descent to the weighted quadratic approximation at each step (this is how glmnet works). Penalisation cures the two logistic problems of the last page: with <b>separation</b> the MLE diverges, whereas the penalised estimate is finite, and with few events per predictor the penalised model predicts better because it is less overfit. As in linear regression, choose λ by cross-validated deviance or log-loss, and remember that the intercept is shifted by any sampling you do (previous page).</p>
+<div class="card"><h4>Lab 9 · Ridge logistic against the MLE</h4>
+ <p class="sub">Six standardised predictors, two with real effects; n cases. Curves show average test log-loss (lower is better) against log₁₀ λ over 25 data sets; the red line is the unpenalised MLE (it can be dreadful when events are few). The best λ is marked.</p>
+ <div class="ctl"><label>n <input type="range" id="c9n" min="30" max="300" step="5" value="60"><output id="c9nv"></output></label><label>signal strength <input type="range" id="c9s" min="5" max="40" step="1" value="15"><output id="c9sv"></output></label><button id="c9go">Re-simulate</button></div>
+ <canvas class="tl" id="c9cv"></canvas><div class="stats" id="c9st"></div><div class="read" id="c9rd"></div></div>
+</section>
+
+<section class="ch" id="c10">
+<h2><span class="num">10</span>Adaptive lasso and selection consistency <span class="lvl e">Expert</span></h2>
+<p>The lasso shrinks every selected coefficient by the same amount, so it is biased on the large, true effects, and to keep noise variables out it must over-shrink; in consequence it tends to include extra variables and does not recover the true model even as n grows (unless strict “irrepresentable” conditions hold). The <b>adaptive lasso</b> fixes this by weighting the penalty: wⱼ = 1/|β̂ⱼ,OLS|^γ, so strong predictors are penalised lightly and weak ones heavily. Under mild conditions it has the <b>oracle property</b>: with enough data it selects the true variables and estimates them as if they were known. Other relatives: relaxed lasso (refit with less shrinkage), SCAD and MCP (non-convex penalties that stop shrinking large coefficients), the group lasso (select whole blocks, such as all dummies of a categorical variable).</p>
+<div class="card"><h4>Lab 10 · Exact model recovery as n grows</h4>
+ <p class="sub">p = 20 predictors (correlation 0.3), four true signals (1.5, −1.2, 1, −0.8), noise SD 1. For each sample size, 100 data sets with λ from 5-fold CV. Lines: how often each method selects exactly the true set. The table gives average true and false positives.</p>
+ <div class="ctl"><label>adaptive exponent γ <input type="range" id="c10g" min="5" max="30" step="1" value="10"><output id="c10gv"></output></label><button id="c10go">Re-simulate</button></div>
+ <canvas class="tl" id="c10cv"></canvas><div class="tw" id="c10tb"></div><div class="read" id="c10rd"></div></div>
+</section>
+
+<section class="ch" id="c11">
+<h2><span class="num">11</span>Stability selection: which variables can you trust? <span class="lvl e">Expert</span></h2>
+<p>A single lasso fit says little about which variables are reliably important: a different sample of the same data set could produce a different set. <b>Stability selection</b> repeats the lasso on many random half-samples (at a fixed moderately strong λ) and records how often each variable is selected. True signals are selected in most subsamples; noise variables, even correlated with signals, are selected only occasionally. Variables above a threshold (for example 60 to 80%) form the stable set, with a bound on the expected number of false selections. It is a practical way to present a short list of drivers to a non-technical audience (a regulator, a credit committee) with a stability number instead of a single yes/no.</p>
+<div class="card"><h4>Lab 11 · Selection frequencies across subsamples</h4>
+ <p class="sub">Four true signals among p predictors (equicorrelation 0.4), noise SD 1.5. Bars: how often each predictor is selected by the lasso over 100 random half-samples at the one-SE λ. Blue: true signals; grey: noise. The dashed line is a 60% stability threshold.</p>
+ <div class="ctl"><label>n <input type="range" id="c11n" min="60" max="400" step="10" value="120"><output id="c11nv"></output></label><label>predictors p <input type="range" id="c11p" min="10" max="40" step="1" value="20"><output id="c11pv"></output></label><button id="c11go">New data</button></div>
+ <canvas class="tl" id="c11cv"></canvas><div class="stats" id="c11st"></div><div class="read" id="c11rd"></div></div>
+</section>
+
+<section class="ch" id="c12">
+<h2><span class="num">12</span>Final exam, mastery checklist, cheat sheet <span class="lvl e">Expert</span></h2>
+<h3>Exam (18 questions — click an answer)</h3>
+<div id="quiz"></div>
+<div class="card"><h4>Score</h4><div class="stats" id="qscore"></div><button class="alt" id="qreset">Reset exam</button></div>
+<h3>Mastery checklist — tick when you can do it without notes</h3>
+<div class="card chk" id="chk"></div>
+<h3>Cheat sheet</h3>
+<div class="tw"><table>
+<tr><th>Idea</th><th>One line</th></tr>
+<tr><td>Why penalise</td><td>OLS variance ≈ σ²p/n; a little bias buys a large variance reduction</td></tr>
+<tr><td>Ridge</td><td>β̂ = (XᵀX + λI)⁻¹Xᵀy; shrinks along PCs by d²/(d²+λ); never exactly zero; df = Σd²/(d²+λ)</td></tr>
+<tr><td>Standardise</td><td>Always scale predictors before penalising; leave the intercept unpenalised; do it inside CV folds</td></tr>
+<tr><td>Lasso</td><td>L1 penalty ⇒ exact zeros; orthonormal case = soft-threshold sign(z)(|z|−λ)₊</td></tr>
+<tr><td>Algorithm</td><td>Coordinate descent with warm starts along a decreasing λ path; λ_max = max|xⱼᵀy|/n</td></tr>
+<tr><td>Elastic net</td><td>α‖β‖₁ + (1−α)½‖β‖²; grouping effect for correlated predictors; can select &gt; n</td></tr>
+<tr><td>Choosing λ</td><td>K-fold CV: λ_min (best) or λ_1se (sparser); λ itself is noisy</td></tr>
+<tr><td>Inference</td><td>Coefficients are biased; post-selection p-values and CIs are invalid; use splitting or debiasing</td></tr>
+<tr><td>Penalised GLMs</td><td>Penalised IRLS; cures separation; choose λ by CV log-loss or deviance</td></tr>
+<tr><td>Adaptive lasso</td><td>Weights 1/|β̂|^γ give the oracle property; lasso alone over-selects</td></tr>
+<tr><td>Stability selection</td><td>Selection frequency across half-samples; keep variables above ~60–80%</td></tr>
+<tr><td>Bayesian view</td><td>Ridge = Gaussian prior, lasso = Laplace prior, penalised estimate = posterior mode</td></tr>
+</table></div>
+<div class="co tip"><b>Next on the roadmap</b>Item 15, model selection: AIC, BIC, cross-validation theory and the bias in selecting among many models.</div>
+</section>
+</main>
+<script>
+/*MATH*/
+function lgamma(x){const c=[76.18009172947146,-86.50532032941677,24.01409824083091,-1.231739572450155,0.1208650973866179e-2,-0.5395239384953e-5];let y=x,t=x+5.5;t-=(x+.5)*Math.log(t);let s=1.000000000190015;for(let j=0;j<6;j++)s+=c[j]/++y;return -t+Math.log(2.5066282746310005*s/x);}
+function gser(a,x){let ap=a,sum=1/a,del=sum;for(let n=0;n<1000;n++){ap++;del*=x/ap;sum+=del;if(Math.abs(del)<Math.abs(sum)*1e-15)break;}return sum*Math.exp(-x+a*Math.log(x)-lgamma(a));}
+function gcf(a,x){let b=x+1-a,c=1/1e-300,d=1/b,h=d;for(let i=1;i<1000;i++){const an=-i*(i-a);b+=2;d=an*d+b;if(Math.abs(d)<1e-300)d=1e-300;c=b+an/c;if(Math.abs(c)<1e-300)c=1e-300;d=1/d;const del=d*c;h*=del;if(Math.abs(del-1)<1e-15)break;}return Math.exp(-x+a*Math.log(x)-lgamma(a))*h;}
+function gammaQ(a,x){if(x<=0)return 1;return x<a+1?1-gser(a,x):gcf(a,x);}
+function betacf(a,b,x){const qab=a+b,qap=a+1,qam=a-1;let c=1,d=1-qab*x/qap;if(Math.abs(d)<1e-300)d=1e-300;d=1/d;let h=d;for(let m=1;m<=1000;m++){const m2=2*m;let aa=m*(b-m)*x/((qam+m2)*(a+m2));d=1+aa*d;if(Math.abs(d)<1e-300)d=1e-300;c=1+aa/c;if(Math.abs(c)<1e-300)c=1e-300;d=1/d;h*=d*c;aa=-(a+m)*(qab+m)*x/((a+m2)*(qap+m2));d=1+aa*d;if(Math.abs(d)<1e-300)d=1e-300;c=1+aa/c;if(Math.abs(c)<1e-300)c=1e-300;d=1/d;const del=d*c;h*=del;if(Math.abs(del-1)<1e-15)break;}return h;}
+function betai(a,b,x){if(x<=0)return 0;if(x>=1)return 1;const bt=Math.exp(lgamma(a+b)-lgamma(a)-lgamma(b)+a*Math.log(x)+b*Math.log(1-x));return x<(a+1)/(a+b+2)?bt*betacf(a,b,x)/a:1-bt*betacf(b,a,1-x)/b;}
+function normSf(z){const q=0.5*gammaQ(.5,z*z/2);return z>=0?q:1-q;}
+function normCdf(z){return normSf(-z);}
+function npdf(x){return Math.exp(-x*x/2)/2.5066282746310002;}
+function lbin(n,k){return lgamma(n+1)-lgamma(k+1)-lgamma(n-k+1);}
+function binom(n,k,p){return Math.exp(lbin(n,k)+k*Math.log(p)+(n-k)*Math.log(1-p));}
+function betapdf(x,a,b){return x<=0||x>=1?0:Math.exp(lgamma(a+b)-lgamma(a)-lgamma(b)+(a-1)*Math.log(x)+(b-1)*Math.log(1-x));}
+function betacdf(x,a,b){return betai(a,b,x);}
+function gampdf(x,a,r){return x<=0?0:Math.exp(a*Math.log(r)+(a-1)*Math.log(x)-r*x-lgamma(a));}
+function gamcdf(x,a,r){return x<=0?0:1-gammaQ(a,r*x);}
+function randn(){let u=0;while(!u)u=Math.random();return Math.sqrt(-2*Math.log(u))*Math.cos(2*Math.PI*Math.random());}
+function gammaS(a){if(a<1)return gammaS(a+1)*Math.pow(Math.random(),1/a);const d=a-1/3,c=1/Math.sqrt(9*d);for(;;){let x,v;do{x=randn();v=1+c*x}while(v<=0);v=v*v*v;const u=Math.random();if(Math.log(u)<.5*x*x+d-d*v+d*Math.log(v))return d*v;}}
+function betaS(a,b){const x=gammaS(a),y=gammaS(b);return x/(x+y);}
+function binS(n,p){let k=0;for(let i=0;i<n;i++)if(Math.random()<p)k++;return k;}
+function mean(a){let s=0;for(const v of a)s+=v;return s/a.length;}
+function qc(cdf,lo,hi,p,it){for(let i=0;i<(it||100);i++){const m=(lo+hi)/2;if(cdf(m)<p)lo=m;else hi=m}return(lo+hi)/2;}
+function qb(a,b,p){return qc(x=>betai(a,b,x),0,1,p,50);}
+function tcdf(x,v){const t=.5*betai(v/2,.5,v/(v+x*x));return x>0?1-t:t}
+function qn(p){return qc(normCdf,-9,9,p,70)}
+function pois(k,l){return Math.exp(-l+k*Math.log(l)-lgamma(k+1))}
+function binF(n,p){let k=0;for(;;){if(n<=0||p<=0)return k;if(p>=1)return k+n;if(n<=40){for(let i=0;i<n;i++)if(Math.random()<p)k++;return k}const a=1+(n>>1),bb=1+n-a,x=betaS(a,bb);if(x>=p){n=a-1;p=p/x}else{k+=a;n=bb-1;p=(p-x)/(1-x)}}}
+/*ENDMATH*/
+
+const $=id=>document.getElementById(id), val=id=>+$(id).value;
+const C={fg:'#e8ebf5',mu:'#8a93ab',gr:'#232a3d',a:'#6ea8ff',r:'#ff6b81',y:'#ffd166',g:'#4ade80',p:'#c084fc',t:'#5eead4'};
+const store={get(k,d){try{const v=JSON.parse(localStorage.getItem(k));return v==null?d:v}catch(e){return d}},set(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}};
+function stat(l,v,c){return `<div class="stat ${c||''}"><b>${v}</b><span>${l}</span></div>`}
+function f3(x){if(!isFinite(x))return String(x);const a=Math.abs(x);if(a!==0&&(a<1e-3||a>=1e6))return x.toExponential(2);return String(+x.toFixed(a<1?4:a<100?3:a<1000?2:0))}
+function pc(x){return f3(100*x)+'%'}
+const resizers=[];
+function reg(fn){fn();resizers.push(fn)}
+function on(ids,fn){ids.split(' ').forEach(i=>{const e=$(i);e.addEventListener('input',fn);e.addEventListener('change',fn)})}
+let rt;window.addEventListener('resize',()=>{clearTimeout(rt);rt=setTimeout(()=>resizers.forEach(f=>f()),150)});
+document.querySelectorAll('input[type=range]').forEach(i=>{const o=$(i.id+'v');if(!o)return;const f=()=>{o.textContent=i.value};i.addEventListener('input',f);f()});
+
+function nice(x){const e=Math.pow(10,Math.floor(Math.log10(x))),f=x/e;return (f<1.5?1:f<3?2:f<7?5:10)*e}
+function mk(cv,x0,x1,ymax,o){o=o||{};const y0=o.y0||0,dpr=window.devicePixelRatio||1,r=cv.getBoundingClientRect(),w=r.width||600,h=r.height||270;
+ cv.width=w*dpr;cv.height=h*dpr;const g=cv.getContext('2d');g.setTransform(dpr,0,0,dpr,0,0);g.clearRect(0,0,w,h);
+ const L=o.L||42,R=12,T=14,B=28,X=x=>L+(x-x0)/(x1-x0)*(w-L-R),Y=y=>h-B-(y-y0)/(ymax-y0)*(h-T-B);
+ g.font='11px system-ui';g.lineWidth=1;g.strokeStyle=C.gr;g.fillStyle=C.mu;
+ if(!o.noGrid){const sx=nice((x1-x0)/7);for(let x=Math.ceil(x0/sx-1e-9)*sx;!o.noX&&x<=x1+1e-9;x+=sx){g.beginPath();g.moveTo(X(x),T);g.lineTo(X(x),h-B);g.stroke();g.textAlign='center';g.fillText(String(+x.toFixed(6)),X(x),h-B+15)}
+ const sy=nice((ymax-y0)/4);for(let y=Math.ceil(y0/sy-1e-9)*sy;y<=ymax+1e-9;y+=sy){g.beginPath();g.moveTo(L,Y(y));g.lineTo(w-R,Y(y));g.stroke();g.textAlign='right';g.fillText(String(+y.toFixed(4)),L-5,Y(y)+3)}}
+ return{g,w,h,X,Y,L,R,T,B,
+  line(f,col,lw,a,b,n,dash){a=a==null?x0:a;b=b==null?x1:b;n=n||260;g.save();if(dash)g.setLineDash([5,4]);g.beginPath();g.strokeStyle=col;g.lineWidth=lw||2;let st=false;for(let i=0;i<=n;i++){const x=a+(b-a)*i/n,y=f(x);if(!isFinite(y)){st=false;continue}st?g.lineTo(X(x),Y(y)):g.moveTo(X(x),Y(y));st=true}g.stroke();g.restore()},
+  area(f,a,b,col,n){a=Math.max(a,x0);b=Math.min(b,x1);if(b<=a)return;n=n||200;g.beginPath();g.moveTo(X(a),Y(0));for(let i=0;i<=n;i++){const x=a+(b-a)*i/n;g.lineTo(X(x),Y(f(x)))}g.lineTo(X(b),Y(0));g.closePath();g.fillStyle=col;g.fill()},
+  vline(x,col,lab,dash){g.save();g.strokeStyle=col;g.lineWidth=1.6;if(dash)g.setLineDash([5,4]);g.beginPath();g.moveTo(X(x),T);g.lineTo(X(x),h-B);g.stroke();g.restore();if(lab){g.fillStyle=col;g.textAlign='center';g.fillText(lab,Math.min(Math.max(X(x),34),w-34),T+10)}},
+  hline(y,col,lab){g.save();g.strokeStyle=col;g.lineWidth=1.4;g.setLineDash([5,4]);g.beginPath();g.moveTo(L,Y(y));g.lineTo(w-R,Y(y));g.stroke();g.restore();if(lab){g.fillStyle=col;g.textAlign='right';g.fillText(lab,w-R-3,Y(y)-4)}},
+  text(s,x,y,col,al){g.fillStyle=col||C.fg;g.textAlign=al||'left';g.fillText(s,x,y)}};}
+
+/* ---------- shared helpers for this page ---------- */
+const D={
+ norm:{n:'Normal(0,1)',s:()=>randn(),mu:0,sd:1,sk:0},
+ unif:{n:'Uniform(0,1)',s:()=>Math.random(),mu:.5,sd:Math.sqrt(1/12),sk:0},
+ expo:{n:'Exponential(1)',s:()=>-Math.log(1-Math.random()),mu:1,sd:1,sk:2},
+ logn:{n:'Lognormal(0,1)',s:()=>Math.exp(randn()),mu:Math.exp(.5),sd:Math.sqrt((Math.E-1)*Math.E),sk:(Math.E+2)*Math.sqrt(Math.E-1),disc:0},
+ b05:{n:'Bernoulli(0.5)',s:()=>Math.random()<.5?1:0,mu:.5,sd:.5,sk:0,disc:1},
+ b05s:{n:'Bernoulli(0.05)',s:()=>Math.random()<.05?1:0,mu:.05,sd:Math.sqrt(.0475),sk:.9/Math.sqrt(.0475),disc:1},
+ bimo:{n:'Two humps',s:()=>(Math.random()<.5?-2:2)+.5*randn(),mu:0,sd:Math.sqrt(4.25),sk:0},
+ par5:{n:'Pareto(α=5)',s:()=>Math.pow(1-Math.random(),-.2),mu:1.25,sd:Math.sqrt(5/48),sk:6*Math.sqrt(.6)},
+ cauchy:{n:'Cauchy (no mean)',s:()=>Math.tan(Math.PI*(Math.random()-.5)),mu:NaN,sd:Infinity,sk:NaN}
+};
+function fillSel(id,keys,def){const e=$(id);e.innerHTML=keys.map(k=>`<option value="${k}">${D[k].n}</option>`).join('');e.value=def}
+const PAL=[C.a,C.r,C.y,C.g,C.p,C.t,'#ff9f43','#9aa4bf'];
+function tgrid(N,M){const T=[];let prev=0;for(let i=0;i<M;i++){let n=Math.round(Math.pow(10,Math.log10(N)*i/(M-1)));if(i===M-1)n=N;n=Math.max(prev+1,n);if(n>N)break;T.push(n);prev=n}if(T[T.length-1]!==N)T[T.length-1]=N;return T}
+function nlab(n){return n>=1e6?(n/1e6)+'M':n>=1000?(n/1000)+'k':String(n)}
+function customGrid(P,xt,yt){const g=P.g;g.save();g.strokeStyle=C.gr;g.fillStyle=C.mu;g.font='11px system-ui';g.lineWidth=1;
+ xt.forEach(([v,l])=>{g.beginPath();g.moveTo(P.X(v),P.T);g.lineTo(P.X(v),P.h-P.B);g.stroke();g.textAlign='center';g.fillText(l,P.X(v),P.h-P.B+15)});
+ yt.forEach(([v,l])=>{g.beginPath();g.moveTo(P.L,P.Y(v));g.lineTo(P.w-P.R,P.Y(v));g.stroke();g.textAlign='right';g.fillText(l,P.L-5,P.Y(v)+3)});g.restore()}
+function clip(P,fn){const g=P.g;g.save();g.beginPath();g.rect(P.L,P.T,P.w-P.L-P.R,P.h-P.T-P.B);g.clip();fn();g.restore()}
+function poly(P,pts,col,lw,dash){const g=P.g;g.save();if(dash)g.setLineDash([5,4]);g.strokeStyle=col;g.lineWidth=lw||2;g.beginPath();pts.forEach(([x,y],i)=>i?g.lineTo(P.X(x),P.Y(y)):g.moveTo(P.X(x),P.Y(y)));g.stroke();g.restore()}
+function dots(P,pts,col,r){const g=P.g;g.fillStyle=col;pts.forEach(([x,y])=>{g.beginPath();g.arc(P.X(x),P.Y(y),r||3,0,7);g.fill()})}
+function niceTicks(lo,hi,k){const st=nice((hi-lo)/(k||5)),a=[];for(let v=Math.ceil(lo/st-1e-9)*st;v<=hi+1e-9;v+=st)a.push([v,String(+v.toFixed(6))]);return a}
+function logTicks(lo,hi){const a=[];for(let e=Math.ceil(lo-1e-9);e<=hi+1e-9;e++)a.push([e,nlab(Math.pow(10,e))]);return a}
+function mom(a){const n=a.length;let m=0;for(const v of a)m+=v;m/=n;let v2=0,v3=0,v4=0;for(const v of a){const d=v-m;v2+=d*d;v3+=d*d*d;v4+=d*d*d*d}v2/=n;v3/=n;v4/=n;const sd=Math.sqrt(v2);return{n,m,sd,sk:sd>0?v3/(sd*sd*sd):0,ku:v2>0?v4/(v2*v2)-3:0}}
+function ksN(z){const a=Array.from(z).sort((x,y)=>x-y),n=a.length;let d=0;for(let i=0;i<n;i++){const F=normCdf(a[i]);d=Math.max(d,Math.abs((i+1)/n-F),Math.abs(i/n-F))}return d}
+/* histogram of data as density with optional overlay curves [{f,col,lw,dash}] */
+function hist(cv,data,lo,hi,bins,ov,col){const cnt=new Float64Array(bins),bw=(hi-lo)/bins;let n=0;for(const v of data){if(v<lo||v>=hi)continue;cnt[Math.floor((v-lo)/bw)]++;n++}
+ const N=data.length;let ym=0;for(let i=0;i<bins;i++){cnt[i]/=N*bw;ym=Math.max(ym,cnt[i])}
+ (ov||[]).forEach(o=>{for(let i=0;i<=80;i++)ym=Math.max(ym,o.f(lo+(hi-lo)*i/80)||0)});
+ const P=mk(cv,lo,hi,ym*1.12);
+ P.g.fillStyle=col||'rgba(110,168,255,.5)';for(let i=0;i<bins;i++){if(cnt[i]<=0)continue;const a=P.X(lo+i*bw),b=P.X(lo+(i+1)*bw);P.g.fillRect(a,P.Y(cnt[i]),Math.max(1,b-a-1),P.Y(0)-P.Y(cnt[i]))}
+ (ov||[]).forEach(o=>P.line(o.f,o.col,o.lw||2.4,lo,hi,200,o.dash));return P}
+const fmt=x=>f3(x);
+
+/* ---------- shared for this page ---------- */
+const POPS=['norm','unif','expo','logn','bimo','par5'];
+D.norm.med=0;D.norm.q90=1.2815516;D.unif.med=.5;D.unif.q90=.9;D.expo.med=Math.LN2;D.expo.q90=Math.log(10);D.logn.med=1;D.logn.q90=Math.exp(1.2815516);
+D.bimo.med=0;D.bimo.q90=qc(x=>.5*normCdf((x+2)/.5)+.5*normCdf((x-2)/.5),-10,10,.9,80);D.par5.med=Math.pow(2,.2);D.par5.q90=Math.pow(10,.2);
+const SF={mean:a=>mean(a),median:a=>{const b=Float64Array.from(a).sort(),n=b.length;return n%2?b[(n-1)/2]:(b[n/2-1]+b[n/2])/2},sd:a=>{const n=a.length,m=mean(a);let s=0;for(const v of a)s+=(v-m)*(v-m);return Math.sqrt(s/(n-1))},q90:a=>{const b=Float64Array.from(a).sort();return b[Math.round(.9*(b.length-1))]}};
+function truth(key,st){const d=D[key];return st==='mean'?d.mu:st==='median'?d.med:st==='sd'?d.sd:d.q90}
+const SNAME={mean:'sample mean',median:'sample median',sd:'sample SD',q90:'90th percentile'};
+const N10=[2,3,5,10,20,50,100,200,500,1000];
+function pct(a,p){const b=Float64Array.from(a).sort();return b[Math.min(b.length-1,Math.max(0,Math.floor(p*b.length)))]}
+function histLines(cv,arrs,cols,lo,hi,bins,vl){const bw=(hi-lo)/bins,dens=arrs.map(a=>{const c=new Float64Array(bins);for(const v of a){if(v<lo||v>=hi)continue;c[Math.floor((v-lo)/bw)]++}for(let i=0;i<bins;i++)c[i]/=a.length*bw;return c});let ym=0;dens.forEach(c=>c.forEach(v=>ym=Math.max(ym,v)));const P=mk(cv,lo,hi,ym*1.15||1);
+ dens.forEach((c,k)=>{const pts=[];for(let i=0;i<bins;i++){pts.push([lo+i*bw,c[i]]);pts.push([lo+(i+1)*bw,c[i]])}clip(P,()=>poly(P,pts,cols[k],2.2))});(vl||[]).forEach(v=>P.vline(v[0],v[1],v[2],v[3]));return P}
+function sdOf(a){return mom(a).sd}
+
+/* ---------- ML helpers ---------- */
+function digamma(x){let r=0;while(x<6){r-=1/x;x++}const f=1/(x*x);return r+Math.log(x)-.5/x-f*(1/12-f*(1/120-f/252))}
+function trigamma(x){let r=0;while(x<6){r+=1/(x*x);x++}const f=1/(x*x);return r+1/x+.5*f+f/x*(1/6-f*(1/30-f/42))}
+function poisS(l){if(l<=0)return 0;if(l<30){const L=Math.exp(-l);let k=0,p=1;do{k++;p*=Math.random()}while(p>L);return k-1}const m=Math.floor(.875*l),g=gammaS(m);return g<l?m+poisS(l-g):binF(m-1,l/g)}
+function llb(k,n,p){return(k?k*Math.log(p):0)+(n-k?(n-k)*Math.log(1-p):0)}
+function lrInt(k,n,cut){const ph=k/n,l0=llb(k,n,ph),g=p=>2*(l0-llb(k,n,p))-cut;let lo=0,hi=1;
+ if(k>0){let a=1e-12,b=ph;for(let i=0;i<70;i++){const m=(a+b)/2;if(g(m)>0)a=m;else b=m}lo=(a+b)/2}
+ if(k<n){let a=ph,b=1-1e-12;for(let i=0;i<70;i++){const m=(a+b)/2;if(g(m)>0)b=m;else a=m}hi=(a+b)/2}return[lo,hi]}
+function solveAlpha(s){if(!(s>1e-9))return 1e6;let a=(3-s+Math.sqrt((3-s)*(3-s)+24*s))/(12*s);for(let i=0;i<8;i++){const f=Math.log(a)-digamma(a)-s,fp=1/a-trigamma(a);let n=a-f/fp;if(!(n>0))n=a/2;a=n}return a}
+function normPdfAt(x,m,s){return Math.exp(-(x-m)*(x-m)/(2*s*s))/(s*2.5066282746)}
+/* ---------- Regression helpers ---------- */
+function idx(id,arr,ff){const e=$(id),o=$(id+'v'),f=()=>{o.textContent=ff?ff(arr[+e.value]):arr[+e.value]};e.addEventListener('input',f);f()}
+function scl(id,ff){const e=$(id),o=$(id+'v'),f=()=>{o.textContent=ff(+e.value)};e.addEventListener('input',f);f()}
+function pctTicks(a,b,st){const r=[];for(let v=a;v<=b+1e-9;v+=st)r.push([v,Math.round(v*100)+'%']);return r}
+const _tq={};function tq(v,p){const k=v+'_'+p;return _tq[k]||(_tq[k]=qc(x=>tcdf(x,v),0,500,p,80))}
+function simple(x,y){const n=x.length;let xm=0,ym=0;for(let i=0;i<n;i++){xm+=x[i];ym+=y[i]}xm/=n;ym/=n;let sxx=0,sxy=0,syy=0;for(let i=0;i<n;i++){const dx=x[i]-xm,dy=y[i]-ym;sxx+=dx*dx;sxy+=dx*dy;syy+=dy*dy}const b=sxy/sxx,a=ym-b*xm,res=new Float64Array(n);let sse=0;for(let i=0;i<n;i++){res[i]=y[i]-a-b*x[i];sse+=res[i]*res[i]}return{n,xm,ym,sxx,sxy,syy,b,a,res,sse,sst:syy,r2:1-sse/syy}}
+function gj(A,B){const p=A.length;const M=A.map((r,i)=>Array.from(r).concat(B?[B[i]]:[]));for(let c=0;c<p;c++){let m=c;for(let r=c+1;r<p;r++)if(Math.abs(M[r][c])>Math.abs(M[m][c]))m=r;[M[c],M[m]]=[M[m],M[c]];const d=M[c][c]||1e-12;for(let k=c;k<M[c].length;k++)M[c][k]/=d;for(let r=0;r<p;r++)if(r!==c){const f=M[r][c];if(f!==0)for(let k=c;k<M[c].length;k++)M[r][k]-=f*M[c][k]}}return M}
+function olsMulti(cols,y,needInv){const n=y.length,k=cols.length,p=k+1,A=[],B=new Float64Array(p);for(let i=0;i<p;i++)A.push(new Float64Array(p));
+ for(let r=0;r<n;r++){const row=[1];for(let j=0;j<k;j++)row.push(cols[j][r]);for(let i=0;i<p;i++){B[i]+=row[i]*y[r];for(let j=i;j<p;j++)A[i][j]+=row[i]*row[j]}}
+ for(let i=0;i<p;i++){for(let j=0;j<i;j++)A[i][j]=A[j][i];if(i>0)A[i][i]+=1e-9}
+ let beta,inv=null;if(needInv){const I=[];for(let i=0;i<p;i++){const e=new Float64Array(p);e[i]=1;I.push(e)}const M=gj(A,null);const aug=A.map((r,i)=>Array.from(r).concat(Array.from(I[i])));
+  const m=aug;for(let c=0;c<p;c++){let q=c;for(let r=c+1;r<p;r++)if(Math.abs(m[r][c])>Math.abs(m[q][c]))q=r;[m[c],m[q]]=[m[q],m[c]];const d=m[c][c]||1e-12;for(let kk=0;kk<2*p;kk++)m[c][kk]/=d;for(let r=0;r<p;r++)if(r!==c){const f=m[r][c];if(f!==0)for(let kk=0;kk<2*p;kk++)m[r][kk]-=f*m[c][kk]}}
+  inv=m.map(r=>r.slice(p));beta=inv.map(r=>{let s=0;for(let j=0;j<p;j++)s+=r[j]*B[j];return s})}
+ else{const M=gj(A,B);beta=M.map(r=>r[p])}
+ const res=new Float64Array(n);let sse=0;for(let r=0;r<n;r++){let f=beta[0];for(let j=0;j<k;j++)f+=beta[j+1]*cols[j][r];res[r]=y[r]-f;sse+=res[r]*res[r]}
+ const out={beta,res,sse,n,p,inv};if(inv){const s2=sse/(n-p);out.s2=s2;out.se=inv.map((r,i)=>Math.sqrt(s2*r[i]))}return out}
+function scatterAxes(cv,xs,ys,xlo,xhi,ylo,yhi,L){return mk(cv,xlo,xhi,yhi,{y0:ylo,L:L||44})}
+function range(a,pad){let lo=1e99,hi=-1e99;for(const v of a){if(v<lo)lo=v;if(v>hi)hi=v}const w=(hi-lo)||1;return[lo-(pad||.05)*w,hi+(pad||.05)*w]}
+
+
+function bars(P,groups,cols,yt){/* groups: array of arrays of values (0..1) */const g=P.g,G=groups.length,B=groups[0].length,W=(P.w-P.L-P.R)/G;groups.forEach((vals,gi)=>vals.forEach((v,bi)=>{const bw=W*.78/B,x=P.L+W*gi+W*.11+bw*bi;g.fillStyle=cols[bi];g.fillRect(x,P.Y(v),bw-2,P.Y(0)-P.Y(v));g.fillStyle=C.fg;g.textAlign='center';g.font='10px system-ui';g.fillText(Math.round(v*100)+'%',x+bw/2-1,P.Y(v)-3)}));g.font='11px system-ui'}
+function gridG(P,yt,labels){customGrid(P,[],yt);const G=labels.length,W=(P.w-P.L-P.R)/G;P.g.fillStyle=C.mu;P.g.textAlign='center';labels.forEach((l,i)=>P.g.fillText(l,P.L+W*(i+.5),P.h-P.B+15))}
+function legend(P,items,y){let x=P.L+8;items.forEach(([s,c])=>{P.text('■ '+s,x,y,c);x+=P.g.measureText('■ '+s).width+16})}
+
+/* ---------- GLM machinery ---------- */
+const LK={logit:{mu:e=>1/(1+Math.exp(-e)),d:e=>{const m=1/(1+Math.exp(-e));return m*(1-m)}},
+ probit:{mu:e=>normCdf(e),d:e=>npdf(e)},
+ cll:{mu:e=>1-Math.exp(-Math.exp(e)),d:e=>Math.exp(e-Math.exp(e))},
+ log:{mu:e=>Math.exp(e),d:e=>Math.exp(e)}};
+function minv(A){const p=A.length,m=A.map((r,i)=>{const row=Array.from(r);for(let j=0;j<p;j++)row.push(i===j?1:0);return row});
+ for(let c=0;c<p;c++){let q=c;for(let r=c+1;r<p;r++)if(Math.abs(m[r][c])>Math.abs(m[q][c]))q=r;[m[c],m[q]]=[m[q],m[c]];const d=m[c][c]||1e-12;for(let k=0;k<2*p;k++)m[c][k]/=d;for(let r=0;r<p;r++)if(r!==c){const f=m[r][c];if(f!==0)for(let k=0;k<2*p;k++)m[r][k]-=f*m[c][k]}}
+ return m.map(r=>r.slice(p))}
+function glm(cols,y,o){o=o||{};const n=y.length,k=cols.length,p=k+1,fam=o.fam||'binom',L=LK[o.link||(fam==='pois'?'log':'logit')],off=o.off,X=[new Float64Array(n).fill(1)].concat(cols),V=m=>fam==='pois'?m:m*(1-m);
+ let b=new Float64Array(p);if(o.init)b=Float64Array.from(o.init);else if(fam==='pois'){let m=0;for(const v of y)m+=v;b[0]=Math.log(Math.max(m/n,1e-3))-(off?mean(off):0)}
+ function ev(b){const eta=new Float64Array(n),mu=new Float64Array(n);let ll=0;for(let i=0;i<n;i++){let e=off?off[i]:0;for(let j=0;j<p;j++)e+=b[j]*X[j][i];e=Math.max(-30,Math.min(30,e));eta[i]=e;let m=L.mu(e);m=fam==='binom'?Math.min(1-1e-12,Math.max(1e-12,m)):Math.max(m,1e-12);mu[i]=m;ll+=fam==='pois'?y[i]*Math.log(m)-m-lgamma(y[i]+1):y[i]*Math.log(m)+(1-y[i])*Math.log(1-m)}return{eta,mu,ll}}
+ function info(c){const A=[];for(let i=0;i<p;i++)A.push(new Float64Array(p));const w=new Float64Array(n);for(let r=0;r<n;r++){const d=L.d(c.eta[r]),wi=d*d/V(c.mu[r]);w[r]=wi;for(let i=0;i<p;i++){const xi=X[i][r]*wi;for(let j=i;j<p;j++)A[i][j]+=xi*X[j][r]}}for(let i=0;i<p;i++)for(let j=0;j<i;j++)A[i][j]=A[j][i];return{A,w}}
+ let cur=ev(b),it=0,conv=false,maxit=o.maxit==null?40:o.maxit;
+ for(;it<maxit;it++){const{A,w}=info(cur),Ai=minv(A),g=new Float64Array(p);
+  for(let r=0;r<n;r++){const d=L.d(cur.eta[r]),v=V(cur.mu[r]);let s=(y[r]-cur.mu[r])*d/v;if(o.firth){let h=0;for(let i=0;i<p;i++)for(let j=0;j<p;j++)h+=X[i][r]*Ai[i][j]*X[j][r];h*=w[r];s+=h*(.5-cur.mu[r])}for(let i=0;i<p;i++)g[i]+=X[i][r]*s}
+  const st=new Float64Array(p);let mx=0;for(let i=0;i<p;i++){let s=0;for(let j=0;j<p;j++)s+=Ai[i][j]*g[j];st[i]=s}
+  if(o.firth){for(let i=0;i<p;i++){st[i]=Math.max(-1,Math.min(1,st[i]));mx=Math.max(mx,Math.abs(st[i]))}b=b.map((v,i)=>v+st[i]);cur=ev(b);if(mx<1e-8){conv=true;it++;break}}
+  else{let a=1,nb,nc;for(let h=0;h<25;h++){nb=b.map((v,i)=>v+a*st[i]);nc=ev(nb);if(nc.ll>=cur.ll-1e-10)break;a/=2}for(let i=0;i<p;i++)mx=Math.max(mx,Math.abs(a*st[i]));const dl=Math.abs(nc.ll-cur.ll);b=nb;cur=nc;if(mx<1e-8||dl<1e-11){conv=true;it++;break}}}
+ const{A,w}=info(cur),Ai=minv(A),se=Ai.map((r,i)=>Math.sqrt(Math.max(r[i],0)));let dev;
+ if(fam==='binom')dev=-2*cur.ll;else{dev=0;for(let i=0;i<n;i++){const yy=y[i],m=cur.mu[i];dev+=2*((yy>0?yy*Math.log(yy/m):0)-(yy-m))}}
+ return{beta:b,mu:cur.mu,eta:cur.eta,ll:cur.ll,dev,inv:Ai,se,iter:it,conv,X,w,p,n,A}}
+function auc(sc,y){const n=y.length,idx=Array.from({length:n},(_,i)=>i).sort((a,b)=>sc[a]-sc[b]);let rk=0,np=0,i=0;while(i<n){let j=i;while(j+1<n&&sc[idx[j+1]]===sc[idx[i]])j++;const r=(i+j)/2+1;for(let t=i;t<=j;t++)if(y[idx[t]]===1){rk+=r;np++}i=j+1}const nn=n-np;return np&&nn?(rk-np*(np+1)/2)/(np*nn):.5}
+function sepTest(x,y){let a1=1e99,b1=-1e99,a0=1e99,b0=-1e99,n1=0,n0=0;for(let i=0;i<x.length;i++){if(y[i]===1){n1++;a1=Math.min(a1,x[i]);b1=Math.max(b1,x[i])}else{n0++;a0=Math.min(a0,x[i]);b0=Math.max(b0,x[i])}}return n1>0&&n0>0&&(a1>b0||a0>b1)}
+const sig=e=>1/(1+Math.exp(-e));
+function lgt(p){return Math.log(p/(1-p))}
+function binaryData(n,a,b,sd){const x=new Float64Array(n),y=new Float64Array(n);for(let i=0;i<n;i++){x[i]=(sd||1)*randn();y[i]=Math.random()<sig(a+b*x[i])?1:0}return{x,y}}
+function heat(P,gx,gy,vals,x0,x1,y0,y1){const g=P.g,nx=gx,ny=gy;let mn=1e99,mx=-1e99;vals.forEach(v=>{if(isFinite(v)){mn=Math.min(mn,v);mx=Math.max(mx,v)}});mn=Math.max(mn,mx-30);for(let i=0;i<nx;i++)for(let j=0;j<ny;j++){const v=vals[i*ny+j],t=isFinite(v)?Math.max(0,Math.min(1,(v-mn)/(mx-mn))):0,tt=Math.pow(t,1.6),c=Math.round(40+190*tt);g.fillStyle=`rgb(${Math.round(20+60*tt)},${Math.round(30+100*tt)},${c})`;const xa=P.X(x0+(x1-x0)*i/nx),xb=P.X(x0+(x1-x0)*(i+1)/nx),ya=P.Y(y0+(y1-y0)*j/ny),yb=P.Y(y0+(y1-y0)*(j+1)/ny);g.fillRect(xa,Math.min(ya,yb),xb-xa+1,Math.abs(ya-yb)+1)}}
+
+/* ---------- regularisation machinery ---------- */
+function eigSym(A){const p=A.length,a=A.map(r=>Float64Array.from(r)),V=[];for(let i=0;i<p;i++){const r=new Float64Array(p);r[i]=1;V.push(r)}
+ for(let sw=0;sw<60;sw++){let off=0;for(let i=0;i<p;i++)for(let j=i+1;j<p;j++)off+=a[i][j]*a[i][j];if(off<1e-22)break;
+  for(let pp=0;pp<p-1;pp++)for(let q=pp+1;q<p;q++){if(Math.abs(a[pp][q])<1e-15)continue;const th=(a[q][q]-a[pp][pp])/(2*a[pp][q]),t=(th>=0?1:-1)/(Math.abs(th)+Math.sqrt(th*th+1)),c=1/Math.sqrt(t*t+1),s=t*c;
+   for(let k=0;k<p;k++){const x=a[k][pp],y=a[k][q];a[k][pp]=c*x-s*y;a[k][q]=s*x+c*y}
+   for(let k=0;k<p;k++){const x=a[pp][k],y=a[q][k];a[pp][k]=c*x-s*y;a[q][k]=s*x+c*y}
+   for(let k=0;k<p;k++){const x=V[k][pp],y=V[k][q];V[k][pp]=c*x-s*y;V[k][q]=s*x+c*y}}}
+ return{d:a.map((r,i)=>r[i]),V}}
+function stdz(cols,y){const n=y.length,p=cols.length,mu=[],sd=[],Z=[];for(let j=0;j<p;j++){let m=0;for(let i=0;i<n;i++)m+=cols[j][i];m/=n;let v=0;for(let i=0;i<n;i++){const d=cols[j][i]-m;v+=d*d}const s=Math.sqrt(v/n)||1;mu.push(m);sd.push(s);const z=new Float64Array(n);for(let i=0;i<n;i++)z[i]=(cols[j][i]-m)/s;Z.push(z)}let ym=0;for(const v of y)ym+=v;ym/=n;return{Z,mu,sd,ym,yc:Float64Array.from(y,v=>v-ym),n,p}}
+function gramOf(Z,yc,idx){const p=Z.length,n=idx?idx.length:yc.length,G=[],c=new Float64Array(p);for(let i=0;i<p;i++)G.push(new Float64Array(p));
+ for(let r=0;r<n;r++){const i=idx?idx[r]:r;for(let a=0;a<p;a++){const za=Z[a][i];c[a]+=za*yc[i];for(let b=a;b<p;b++)G[a][b]+=za*Z[b][i]}}
+ for(let a=0;a<p;a++){c[a]/=n;for(let b=a;b<p;b++){G[a][b]/=n;G[b][a]=G[a][b]}}return{G,c,n}}
+function gramMinus(F,Z,yc,val){const p=F.c.length,nv=val.length,nt=F.n-nv,G=[],c=new Float64Array(p);for(let i=0;i<p;i++){G.push(new Float64Array(p));c[i]=F.c[i]*F.n}for(let a=0;a<p;a++)for(let b=0;b<p;b++)G[a][b]=F.G[a][b]*F.n;
+ for(const i of val)for(let a=0;a<p;a++){const za=Z[a][i];c[a]-=za*yc[i];for(let b=0;b<p;b++)G[a][b]-=za*Z[b][i]}
+ for(let a=0;a<p;a++){c[a]/=nt;for(let b=0;b<p;b++)G[a][b]/=nt}return{G,c,n:nt}}
+function cd(G,c,lam,al,b0,maxit){const p=c.length,b=b0?Float64Array.from(b0):new Float64Array(p),l1=lam*al,l2=lam*(1-al);for(let it=0;it<(maxit||300);it++){let mx=0;for(let j=0;j<p;j++){let r=c[j];const Gj=G[j];for(let k=0;k<p;k++)if(k!==j&&b[k]!==0)r-=Gj[k]*b[k];const den=Gj[j]+l2,nb=Math.abs(r)>l1?(r>0?1:-1)*(Math.abs(r)-l1)/den:0;mx=Math.max(mx,Math.abs(nb-b[j])*Math.sqrt(Gj[j]));b[j]=nb}if(mx<1e-8)break}return b}
+function lamGrid(c,al,K,ratio){let mx=0;for(const v of c)mx=Math.max(mx,Math.abs(v));mx/=Math.max(al,.01);const r=[];for(let k=0;k<K;k++)r.push(mx*Math.pow(ratio||1e-3,k/(K-1)));return r}
+function ridgeEig(G){const e=eigSym(G);return e}
+function ridgeFromEig(e,c,lam){const p=c.length,vc=new Float64Array(p);for(let k=0;k<p;k++){let s=0;for(let j=0;j<p;j++)s+=e.V[j][k]*c[j];vc[k]=s/(e.d[k]+lam)}const b=new Float64Array(p);for(let j=0;j<p;j++){let s=0;for(let k=0;k<p;k++)s+=e.V[j][k]*vc[k];b[j]=s}return b}
+function dfRidge(e,lam){let s=0;for(const d of e.d)s+=Math.max(d,0)/(Math.max(d,0)+lam);return s}
+function foldsOf(n,K){const f=Int32Array.from({length:n},(_,i)=>i%K);for(let i=n-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[f[i],f[j]]=[f[j],f[i]]}return f}
+/* K-fold CV for enet (al>0) or ridge (al==='ridge'); returns {cv,se,lams,iMin,i1se} */
+function cvEnet(S,al,lams,K){const n=S.n,{Z,yc}=S,F=gramOf(Z,yc),fold=foldsOf(n,K),L=lams.length,err=[];for(let l=0;l<L;l++)err.push(new Float64Array(K));
+ for(let f=0;f<K;f++){const val=[];for(let i=0;i<n;i++)if(fold[i]===f)val.push(i);const T=gramMinus(F,Z,yc,val);let b=null,eg=null;if(al==='ridge')eg=eigSym(T.G);
+  for(let l=0;l<L;l++){b=al==='ridge'?ridgeFromEig(eg,T.c,lams[l]):cd(T.G,T.c,lams[l],al,b);let s=0;for(const i of val){let e=yc[i];for(let j=0;j<Z.length;j++)e-=b[j]*Z[j][i];s+=e*e}err[l][f]=s/val.length}}
+ const cv=[],se=[];for(let l=0;l<L;l++){cv.push(mean(err[l]));se.push(sdOf(err[l])/Math.sqrt(K))}let iMin=0;cv.forEach((v,i)=>{if(v<cv[iMin])iMin=i});let i1=iMin;for(let l=0;l<L;l++)if(cv[l]<=cv[iMin]+se[iMin]){i1=l;break}
+ return{cv,se,lams,iMin,i1se:i1,F}}
+function pathOf(F,al,lams){const out=[];let b=null;for(const l of lams){b=cd(F.G,F.c,l,al,b);out.push(b)}return out}
+function genReg(n,p,beta,rho,sg){const z0=new Float64Array(n).map(()=>randn()),cols=[],y=new Float64Array(n),s=Math.sqrt(rho),t=Math.sqrt(1-rho);for(let j=0;j<p;j++){const c=new Float64Array(n);for(let i=0;i<n;i++)c[i]=s*z0[i]+t*randn();cols.push(c)}for(let i=0;i<n;i++){let m=0;for(let j=0;j<beta.length&&j<p;j++)m+=beta[j]*cols[j][i];y[i]=m+sg*randn()}return{cols,y}}
+/* excess prediction error of standardised coefficients b under equicorrelated truth */
+function excessErr(S,b,beta,rho,p){let s=0;const bo=new Float64Array(p);for(let j=0;j<p;j++)bo[j]=b[j]/S.sd[j]-(beta[j]||0);let sum=0,sq=0;for(let j=0;j<p;j++){sum+=bo[j];sq+=bo[j]*bo[j]}return(1-rho)*sq+rho*sum*sum}
+function pctOf(a,q){const b=Float64Array.from(a).sort();return b[Math.min(b.length-1,Math.max(0,Math.floor(q*b.length)))]}
+function ridgeLogit(Z,y,lam,maxit){const n=y.length,p=Z.length,b=new Float64Array(p+1);for(let it=0;it<(maxit||25);it++){const A=[],g=new Float64Array(p+1);for(let i=0;i<=p;i++)A.push(new Float64Array(p+1));let mx=0;
+  for(let r=0;r<n;r++){let e=b[0];for(let j=0;j<p;j++)e+=b[j+1]*Z[j][r];e=Math.max(-25,Math.min(25,e));const m=1/(1+Math.exp(-e)),w=Math.max(m*(1-m),1e-9),x=[1];for(let j=0;j<p;j++)x.push(Z[j][r]);for(let i=0;i<=p;i++){g[i]+=x[i]*(y[r]-m);for(let j=i;j<=p;j++)A[i][j]+=w*x[i]*x[j]}}
+  for(let i=0;i<=p;i++)for(let j=0;j<i;j++)A[i][j]=A[j][i];for(let i=1;i<=p;i++){A[i][i]+=lam;g[i]-=lam*b[i]}A[0][0]+=1e-8;
+  const Ai=minv(A),st=Ai.map(r=>{let s=0;for(let j=0;j<=p;j++)s+=r[j]*g[j];return s});for(let i=0;i<=p;i++){const s=Math.max(-4,Math.min(4,st[i]));b[i]+=s;mx=Math.max(mx,Math.abs(s))}if(mx<1e-7)break}return b}
+
+/* ---------- Ch1 OLS vs ridge as p grows ---------- */
+(function(){scl('c1n',v=>v);scl('c1s',v=>v+'%');
+ function predMSE(S,b,te){let s=0;const p=S.p;for(let i=0;i<te.y.length;i++){let f=S.ym;for(let j=0;j<p;j++)f+=b[j]*(te.cols[j][i]-S.mu[j])/S.sd[j];s+=(te.y[i]-f)*(te.y[i]-f)}return s/te.y.length}
+ function run(){const n=val('c1n'),r2=val('c1s')/100,bt=Math.sqrt(r2/(1-r2)/10),beta=new Array(10).fill(bt),PG=[2,5,10,20,30,40,50,60].filter(p=>p<=n-6),R=12,res=PG.map(()=>[0,0,0]),lg=[];for(let k=0;k<20;k++)lg.push(Math.pow(10,-3.5+4.5*k/19));
+  PG.forEach((p,gi)=>{for(let r=0;r<R;r++){const tr=genReg(n,p,beta,0,1),te=genReg(400,p,beta,0,1),S=stdz(tr.cols,tr.y),F=gramOf(S.Z,S.yc),e=eigSym(F.G);
+   res[gi][0]+=predMSE(S,ridgeFromEig(e,F.c,1e-7),te)/R;let best=1e99,bb=null;for(const l of lg){const b=ridgeFromEig(e,F.c,l);let rss=0;for(let i=0;i<n;i++){let f=0;for(let j=0;j<p;j++)f+=b[j]*S.Z[j][i];rss+=(S.yc[i]-f)*(S.yc[i]-f)}const g=rss/n/Math.pow(1-dfRidge(e,l)/n,2);if(g<best){best=g;bb=b}}
+   res[gi][1]+=predMSE(S,bb,te)/R;res[gi][2]+=predMSE(S,new Float64Array(p),te)/R}});
+  const mxn=Math.max(...res.map(q=>q[2])),ymax=Math.min(Math.max(...res.flat())*1.08,mxn*3),P=mk($('c1cv'),0,PG[PG.length-1]+2,ymax,{y0:0});P.hline(1,C.fg,'noise floor 1');clip(P,()=>{[[0,C.r],[1,C.g],[2,C.mu]].forEach(([j,c])=>{poly(P,PG.map((p,i)=>[p,res[i][j]]),c,2.6);dots(P,PG.map((p,i)=>[p,res[i][j]]),c,3.5)})});legend(P,[['OLS',C.r],['ridge (GCV λ)',C.g],['mean only',C.mu]],P.T+26);P.text('number of predictors p (10 are real)',P.w/2,P.h-2,C.mu,'center');
+  const L=res.length-1,i10=PG.indexOf(10);
+  $('c1st').innerHTML=stat('largest p',PG[L],'')+stat('OLS test MSE at that p',fmt(res[L][0]),res[L][0]>res[L][2]?'hot':'warn')+stat('ridge test MSE at that p',fmt(res[L][1]),'ok')+stat('mean-only MSE',fmt(res[L][2]),'')+stat('OLS at p = 10',i10>=0?fmt(res[i10][0]):'—','')+stat('ridge at p = 10',i10>=0?fmt(res[i10][1]):'—','');
+  $('c1rd').innerHTML=`With only the 10 real predictors the two fits are close (OLS ${i10>=0?fmt(res[i10][0]):'—'}, ridge ${i10>=0?fmt(res[i10][1]):'—'}). As noise predictors are added OLS pays σ²·p/n in extra variance: at p = ${PG[L]} its test MSE is ${fmt(res[L][0])}${res[L][0]>res[L][2]?', worse than predicting the mean':''}. Ridge, shrinking the useless directions, stays at ${fmt(res[L][1])}. The advantage is greatest when p/n is large and the true signal is weak; with a strong signal and plenty of data penalising gains little.`}
+ $('c1n').addEventListener('change',run);$('c1s').addEventListener('change',run);$('c1go').onclick=run;run();})();
+
+/* ---------- Ch2 ridge paths ---------- */
+(function(){scl('c2r',v=>fmt(v/100));scl('c2l',v=>fmt(v/10));let S=null;const BT=[3,-2,0,0,1.5,0,0,0];
+ function gen(){const d=genReg(100,8,BT,val('c2r')/100,3),s=stdz(d.cols,d.y),F=gramOf(s.Z,s.yc),e=eigSym(F.G),lg=[];for(let k=0;k<=60;k++)lg.push(-3+4.5*k/60);S={s,F,e,lg,paths:lg.map(l=>ridgeFromEig(e,F.c,Math.pow(10,l)))};draw()}
+ function draw(){if(!S)return;const{e,F,lg,paths}=S,L=val('c2l')/10,lam=Math.pow(10,L),b=ridgeFromEig(e,F.c,lam);let mn=0,mx=0;paths.forEach(q=>q.forEach(v=>{mn=Math.min(mn,v);mx=Math.max(mx,v)}));const P=mk($('c2cv'),-3,1.5,mx*1.08,{y0:mn*1.08});P.hline(0,C.mu);
+  for(let j=0;j<8;j++)poly(P,lg.map((l,i)=>[l,paths[i][j]]),PAL[j],BT[j]?2.8:1.6);P.vline(L,'#ffffff','',true);dots(P,Array.from(b,(v,j)=>[L,v]),'#ffffff',3.5);P.text('standardised coefficients against log₁₀ λ · thick lines: true signals',P.L+8,P.T+14,C.mu);
+  const df=dfRidge(e,lam),b0=ridgeFromEig(e,F.c,1e-9),n1=Math.sqrt(b.reduce((s,v)=>s+v*v,0)),n0=Math.sqrt(b0.reduce((s,v)=>s+v*v,0));
+  $('c2st').innerHTML=stat('log₁₀ λ',fmt(L),'')+stat('effective df (of 8)',fmt(df),'in')+stat('‖β̂(λ)‖ ÷ ‖β̂_OLS‖',fmt(n1/n0),'ok')+stat('β̂₁ (true 3) now',fmt(b[0]),'')+stat('β̂₂ (true −2) now',fmt(b[1]),'')+stat('largest noise coefficient',fmt(Math.max(...[2,3,5,6,7].map(j=>Math.abs(b[j])))),'warn');
+  $('c2rd').innerHTML=`At λ = ${f3(lam)} the model uses ${fmt(df)} effective degrees of freedom out of 8 and the coefficient vector is ${fmt(n1/n0)} of its OLS length. Every path shrinks smoothly toward zero without hitting it, and correlated predictors move together (try correlation 90%: coefficients of the noise variables swing before settling). At the left (λ → 0) the coefficients are the noisy OLS values; at the right everything is shrunk to nothing. The best λ lies in between (Lab 5 chooses it by cross-validation).`}
+ on('c2r',gen);$('c2l').addEventListener('input',draw);$('c2go').onclick=gen;gen();resizers.push(draw);})();
+
+/* ---------- Ch3 bias-variance of a ridge coefficient ---------- */
+(function(){scl('c3r',v=>fmt(v/100));scl('c3l',v=>fmt(v/10));scl('c3n',v=>v);
+ function solve2(g11,g12,g22,c1,c2,l){const a=g11+l,d=g22+l,det=a*d-g12*g12;return[(d*c1-g12*c2)/det,(a*c2-g12*c1)/det]}
+ function run(){const n=val('c3n'),rho=val('c3r')/100,lam=Math.pow(10,val('c3l')/10),R=2000,o1=new Float64Array(R),r1=new Float64Array(R),os=new Float64Array(R),rs=new Float64Array(R),c=Math.sqrt(1-rho*rho),x1=new Float64Array(n),x2=new Float64Array(n),y=new Float64Array(n);
+  for(let r=0;r<R;r++){let m1=0,m2=0,my=0;for(let i=0;i<n;i++){x1[i]=randn();x2[i]=rho*x1[i]+c*randn();y[i]=x1[i]+x2[i]+2*randn();m1+=x1[i];m2+=x2[i];my+=y[i]}m1/=n;m2/=n;my/=n;let s11=0,s22=0,s12=0,s1y=0,s2y=0;for(let i=0;i<n;i++){const a=x1[i]-m1,b=x2[i]-m2,yy=y[i]-my;s11+=a*a;s22+=b*b;s12+=a*b;s1y+=a*yy;s2y+=b*yy}const sd1=Math.sqrt(s11/n),sd2=Math.sqrt(s22/n),g12=s12/n/(sd1*sd2),c1=s1y/n/sd1,c2=s2y/n/sd2,ol=solve2(1,g12,1,c1,c2,1e-10),rd=solve2(1,g12,1,c1,c2,lam);o1[r]=ol[0];r1[r]=rd[0];os[r]=ol[0]+ol[1];rs[r]=rd[0]+rd[1]}
+  const M=(a,t)=>{const m=mean(a);return{m,sd:sdOf(a),b:m-t,rmse:Math.sqrt(mean(Array.from(a,v=>(v-t)*(v-t))))}},A=M(o1,1),B=M(r1,1),As=M(os,2),Bs=M(rs,2),w=4*Math.max(A.sd,B.sd);
+  histLines($('c3cv'),[o1,r1],[C.r,C.a],1-w,1+w,60,[[1,C.fg,'truth 1',true]]).text('— OLS    — ridge',70,28,C.mu);
+  $('c3st').innerHTML=stat('OLS: mean · SD · RMSE',fmt(A.m)+' · '+fmt(A.sd)+' · '+fmt(A.rmse),'')+stat('ridge: mean · SD · RMSE',fmt(B.m)+' · '+fmt(B.sd)+' · '+fmt(B.rmse),B.rmse<A.rmse?'ok':'warn')+stat('ridge bias of β₁',fmt(B.b),'warn')+stat('RMSE of β₁+β₂: OLS',fmt(As.rmse),'')+stat('RMSE of β₁+β₂: ridge',fmt(Bs.rmse),Bs.rmse<As.rmse?'ok':'')+stat('SD reduction',pc(1-B.sd/A.sd),'ok');
+  $('c3rd').innerHTML=(B.rmse<A.rmse?`Ridge at λ = ${f3(lam)} trades a bias of ${fmt(B.b)} for a cut in the standard deviation from ${fmt(A.sd)} to ${fmt(B.sd)}, lowering the root-mean-square error of the coefficient from ${fmt(A.rmse)} to ${fmt(B.rmse)}.`:`At this λ ridge is not better than OLS for this coefficient (RMSE ${fmt(B.rmse)} vs ${fmt(A.rmse)}): ${lam<.01?'λ is too small to matter':'the bias now outweighs the variance saved'}. Try a correlation near 95% or a smaller n.`)+` Pushing λ far up shrinks everything to zero (bias dominates). The sum β₁ + β₂ is well estimated by both, because the data identify the combined effect.`}
+ on('c3r c3l c3n',()=>{});['c3r','c3l','c3n'].forEach(i=>$(i).addEventListener('change',run));$('c3go').onclick=run;run();})();
+
+/* ---------- Ch4 geometry ---------- */
+(function(){scl('c4a',v=>fmt(v/10));scl('c4b',v=>fmt(v/10));scl('c4r',v=>fmt(v/100));scl('c4l',v=>fmt(v/100));
+ const soft=(z,l)=>Math.abs(z)>l?Math.sign(z)*(Math.abs(z)-l):0;
+ function draw(){const a=val('c4a')/10,b=val('c4b')/10,r=val('c4r')/100,l=val('c4l')/100,G=[[1,r],[r,1]],c=[a+r*b,r*a+b],ls=cd(G,c,l,1,[a,b],800),rd=ridgeFromEig(eigSym(G),c,l),P=mk($('c4cv'),-4,4,4,{y0:-4}),g=P.g;
+  P.hline(0,C.mu);P.vline(0,C.mu);const ell=(sol,col)=>{const d1=sol[0]-a,d2=sol[1]-b,r2=d1*d1+d2*d2+2*r*d1*d2,rr=Math.sqrt(Math.max(r2,1e-12)),pts=[];for(let k=0;k<=100;k++){const th=2*Math.PI*k/100,u=rr*Math.cos(th)/Math.sqrt(1+r),v=rr*Math.sin(th)/Math.sqrt(1-r);pts.push([a+(u+v)/Math.SQRT2,b+(u-v)/Math.SQRT2])}clip(P,()=>poly(P,pts,col,1.6))};
+  ell(ls,'rgba(255,107,129,.7)');ell(rd,'rgba(74,222,128,.7)');const n1=Math.abs(ls[0])+Math.abs(ls[1]),n2=Math.hypot(rd[0],rd[1]);clip(P,()=>{poly(P,[[n1,0],[0,n1],[-n1,0],[0,-n1],[n1,0]],C.r,2.4);const pc2=[];for(let k=0;k<=100;k++){const th=2*Math.PI*k/100;pc2.push([n2*Math.cos(th),n2*Math.sin(th)])}poly(P,pc2,C.g,2.4)});
+  dots(P,[[a,b]],C.y,5);dots(P,[ls],C.r,6);dots(P,[rd],C.g,6);P.text('yellow: OLS · red: lasso (diamond) · green: ridge (circle)',P.L+8,P.T+14,C.mu);
+  const Q=mk($('c4cv2'),-4,4,4,{y0:-4});Q.line(t=>t,C.mu,1.4,-4,4,2,true);Q.line(t=>t/(1+l),C.g,2.6,-4,4,2);Q.line(t=>soft(t,l),C.r,2.6,-4,4,200);Q.hline(0,C.mu);Q.vline(0,C.mu);dots(Q,[[a,a/(1+l)],[a,soft(a,l)]],'#fff',3.5);Q.text('estimate (y) against OLS estimate (x), one standardised coefficient',Q.L+8,Q.T+14,C.mu);
+  $('c4st').innerHTML=stat('OLS (β̂₁, β̂₂)',fmt(a)+', '+fmt(b),'in')+stat('lasso solution',fmt(ls[0])+', '+fmt(ls[1]),(ls[0]===0||ls[1]===0)?'ok':'')+stat('ridge solution',fmt(rd[0])+', '+fmt(rd[1]),'')+stat('lasso has an exact zero?',(ls[0]===0||ls[1]===0)?'yes':'no',(ls[0]===0||ls[1]===0)?'ok':'warn')+stat('ridge exact zero?','never','');
+  $('c4rd').innerHTML=`${ls[0]===0||ls[1]===0?`The lasso contour touches the diamond at a corner: ${ls[0]===0?'β₁':'β₂'} is exactly zero. `:'At this λ the lasso keeps both coefficients (increase λ to hit a corner). '}Ridge lands at (${fmt(rd[0])}, ${fmt(rd[1])}): both shrunk, neither zero. In the right-hand plot, for λ = ${fmt(l)} the lasso subtracts a constant ${fmt(l)} from every large estimate and zeroes anything below it, while ridge divides by ${fmt(1+l)}. With correlated predictors the contours tilt and the solutions move off the simple formulas, but the corner behaviour is unchanged.`}
+ on('c4a c4b c4r c4l',draw);draw();resizers.push(draw);})();
+
+/* ---------- Ch5 lasso path and CV ---------- */
+(function(){scl('c5n',v=>v);scl('c5p',v=>v);scl('c5s',v=>fmt(v/10));let S=null;const BT=[3,-2,1.5,1,-1];
+ function gen(){const n=val('c5n'),p=val('c5p'),d=genReg(n,p,BT,.2,val('c5s')/10),s=stdz(d.cols,d.y),F=gramOf(s.Z,s.yc),lams=lamGrid(F.c,1,60,1e-3),cv=cvEnet(s,1,lams,10);S={p,s,F,lams,cv,paths:pathOf(F,1,lams)};draw()}
+ function draw(){if(!S)return;const{p,lams,cv,paths}=S,lg=lams.map(Math.log10),x0=lg[lg.length-1],x1=lg[0];let mn=0,mx=0;paths.forEach(q=>q.forEach(v=>{mn=Math.min(mn,v);mx=Math.max(mx,v)}));const P=mk($('c5cv'),x0,x1,mx*1.08,{y0:mn*1.08});P.hline(0,C.mu);
+  for(let j=p-1;j>=0;j--)poly(P,lg.map((l,i)=>[l,paths[i][j]]),j<5?PAL[j]:'rgba(138,147,171,.5)',j<5?2.6:1.2);P.vline(lg[cv.iMin],'#fff','λ min',false);P.vline(lg[cv.i1se],'#fff','1-SE',true);P.text('coefficient paths · coloured: true signals · grey: noise',P.L+8,P.T+14,C.mu);
+  const cm=cv.cv,lo=Math.min(...cm.map((v,i)=>v-cv.se[i])),hi=Math.max(...cm.map((v,i)=>v+cv.se[i])),Q=mk($('c5cv2'),x0,x1,hi,{y0:Math.max(0,lo*.95)});clip(Q,()=>{cm.forEach((v,i)=>{Q.g.strokeStyle='rgba(110,168,255,.4)';Q.g.beginPath();Q.g.moveTo(Q.X(lg[i]),Q.Y(v-cv.se[i]));Q.g.lineTo(Q.X(lg[i]),Q.Y(v+cv.se[i]));Q.g.stroke()});poly(Q,cm.map((v,i)=>[lg[i],v]),C.a,2.4)});Q.vline(lg[cv.iMin],'#fff','',false);Q.vline(lg[cv.i1se],'#fff','',true);Q.text('10-fold CV error ± 1 SE',Q.L+8,Q.T+14,C.mu);
+  const sel=i=>paths[i].map((v,j)=>v!==0?j:-1).filter(j=>j>=0),a=sel(cv.iMin),b=sel(cv.i1se),tp=s=>s.filter(j=>j<5).length;
+  $('c5st').innerHTML=stat('selected at λ min',a.length,'')+stat('… true / false positives',tp(a)+' / '+(a.length-tp(a)),a.length-tp(a)>3?'warn':'ok')+stat('selected at 1-SE',b.length,'in')+stat('… true / false positives',tp(b)+' / '+(b.length-tp(b)),'ok')+stat('λ min · λ 1-SE',f3(lams[cv.iMin])+' · '+f3(lams[cv.i1se]),'')+stat('CV error at min',fmt(cm[cv.iMin]),'');
+  $('c5rd').innerHTML=`The paths grow from zero as λ falls; the five true predictors enter first. Cross-validation picks λ = ${f3(lams[cv.iMin])}, keeping ${a.length} variables (${tp(a)} of the 5 true and ${a.length-tp(a)} false); the one-SE rule picks the larger λ = ${f3(lams[cv.i1se])} with ${b.length} variables (${tp(b)} true, ${b.length-tp(b)} false). The CV curve is flat near its minimum, which is why the simpler 1-SE model costs almost nothing in accuracy. Raise the noise or reduce n and true signals start to be missed; the lasso usually errs by including a few false ones.`}
+ on('c5n c5p c5s',gen);$('c5go').onclick=gen;gen();resizers.push(draw);})();
+
+/* ---------- Ch6 elastic net grouping ---------- */
+(function(){scl('c6a',v=>fmt(v/100));
+ function dat(){const n=100,za=randn(),zb=randn();const za_=new Float64Array(n).map(()=>randn()),zb_=new Float64Array(n).map(()=>randn()),cols=[],y=new Float64Array(n),s=Math.sqrt(.9),t=Math.sqrt(.1);for(let j=0;j<6;j++){const z=j<3?za_:zb_,c=new Float64Array(n);for(let i=0;i<n;i++)c[i]=s*z[i]+t*randn();cols.push(c)}for(let i=0;i<n;i++)y[i]=cols[0][i]+cols[1][i]+cols[2][i]+2*randn();return{cols,y}}
+ function run(){const al=val('c6a')/100,R=250,freq=[new Float64Array(6),new Float64Array(6)],err=[0,0],g1=[0,0];
+  for(let r=0;r<R;r++){const d=dat(),S=stdz(d.cols,d.y),F=gramOf(S.Z,S.yc);[1,al].forEach((a,k)=>{const lams=lamGrid(F.c,a,30,1e-3),cv=cvEnet(S,a,lams,5),b=cd(F.G,F.c,lams[cv.i1se],a);let e=0;for(let j=0;j<6;j++){if(b[j]!==0){freq[k][j]++;if(j<3)g1[k]++}const bo=b[j]/S.sd[j],tr=j<3?1:0;e+=(bo-tr)*(bo-tr)}err[k]+=e})}
+  const P=mk($('c6cv'),0,1,1.22,{y0:0,noGrid:true,L:46});gridG(P,[0,.25,.5,.75,1].map(v=>[v,Math.round(v*100)+'%']),['x₁ (true)','x₂ (true)','x₃ (true)','x₄ (noise)','x₅ (noise)','x₆ (noise)']);bars(P,[0,1,2,3,4,5].map(j=>[freq[0][j]/R,freq[1][j]/R]),[C.r,C.a]);legend(P,[['lasso (α = 1)',C.r],['elastic net α = '+fmt(al),C.a]],P.T+12);
+  $('c6st').innerHTML=stat('true predictors selected: lasso',fmt(g1[0]/R)+' of 3',g1[0]/R<2.2?'warn':'ok')+stat('true predictors selected: elastic net',fmt(g1[1]/R)+' of 3','ok')+stat('squared coefficient error: lasso',fmt(err[0]/R),'')+stat('squared coefficient error: elastic net',fmt(err[1]/R),err[1]<err[0]?'ok':'warn');
+  $('c6rd').innerHTML=`With λ chosen by the one-SE rule, the lasso keeps on average ${fmt(g1[0]/R)} of the three interchangeable predictors (correlation 0.9) and which ones it keeps varies from sample to sample; the weight lands on whichever looked best, so its total squared coefficient error is ${fmt(err[0]/R)}. The elastic net with α = ${fmt(al)} keeps ${fmt(g1[1]/R)}, selecting them together and sharing the effect, with error ${fmt(err[1]/R)}. At α = 1 the two are the same method. Noise variables are chosen occasionally by both; the elastic net admits slightly more of them, the price of grouping.`}
+ $('c6a').addEventListener('change',run);$('c6go').onclick=run;run();})();
+
+/* ---------- Ch7 variability of CV-chosen lambda ---------- */
+(function(){scl('c7n',v=>v);const BT=[1.5,-1.2,1,-.8,.6],RHO=.2,P_=30;
+ function run(){const n=val('c7n'),meth=$('c7m').value,R=60,lm=[],l1=[],e={min:[],se:[],orc:[]};
+  for(let r=0;r<R;r++){const d=genReg(n,P_,BT,RHO,1),S=stdz(d.cols,d.y),F=gramOf(S.Z,S.yc);let lams,paths;
+   if(meth==='lasso'){lams=lamGrid(F.c,1,50,1e-3);paths=pathOf(F,1,lams)}else{lams=[];for(let k=0;k<50;k++)lams.push(3*Math.pow(1e-3/3*1,k/49));const eg=eigSym(F.G);paths=lams.map(l=>ridgeFromEig(eg,F.c,l))}
+   const cv=cvEnet(S,meth==='lasso'?1:'ridge',lams,10),ex=paths.map(b=>excessErr(S,b,BT,RHO,P_));lm.push(Math.log10(lams[cv.iMin]));l1.push(Math.log10(lams[cv.i1se]));e.min.push(ex[cv.iMin]);e.se.push(ex[cv.i1se]);e.orc.push(Math.min(...ex))}
+  const lo=Math.min(...lm,...l1)-.1,hi=Math.max(...lm,...l1)+.1;histLines($('c7cv'),[lm,l1],[C.r,C.a],lo,hi,24,[]).text('log₁₀ λ chosen: red = minimum rule · blue = one-SE rule',70,28,C.mu);
+  const m=a=>mean(a);
+  $('c7st').innerHTML=stat('excess error, λ min',fmt(m(e.min)),'')+stat('excess error, 1-SE',fmt(m(e.se)),m(e.se)<m(e.min)*1.2?'ok':'warn')+stat('best λ in hindsight',fmt(m(e.orc)),'in')+stat('SD of chosen log₁₀ λ (min rule)',fmt(sdOf(lm)),'')+stat('λ min ÷ oracle error',fmt(m(e.min)/m(e.orc)),'');
+  $('c7rd').innerHTML=`Across 60 data sets the minimum rule chooses log₁₀ λ = ${fmt(m(lm))} ± ${fmt(sdOf(lm))}, the one-SE rule ${fmt(m(l1))} ± ${fmt(sdOf(l1))}. In prediction terms, λ chosen by CV has an average excess error of ${fmt(m(e.min))} against ${fmt(m(e.orc))} for the (unknowable) best λ, and the one-SE rule ${fmt(m(e.se))}. The choice jumps around yet the error barely moves: the CV curve is flat, so being roughly right is enough. ${meth==='lasso'?'The one-SE rule gives a sparser fit at a small accuracy cost.':'For ridge, the two rules differ little because shrinkage does not select variables.'}`}
+ $('c7n').addEventListener('change',run);$('c7m').addEventListener('change',run);$('c7go').onclick=run;run();})();
+
+/* ---------- Ch8 winner's curse after lasso ---------- */
+(function(){scl('c8s',v=>fmt(v/100));scl('c8n',v=>v);
+ function run(){const n=val('c8n'),bt=val('c8s')/100,R=500,P_=20,las=[],ref=[];let sel1=0,cov=0,nulls=0,nullSig=0,anySig=0;
+  for(let r=0;r<R;r++){const d=genReg(n,P_,[bt],0,1),S=stdz(d.cols,d.y),F=gramOf(S.Z,S.yc),lams=lamGrid(F.c,1,40,1e-3),cv=cvEnet(S,1,lams,5),b=cd(F.G,F.c,lams[cv.iMin],1),idx=[];b.forEach((v,j)=>{if(v!==0)idx.push(j)});if(!idx.length)continue;
+   const o=olsMulti(idx.map(j=>d.cols[j]),d.y,true);let sig_=false;idx.forEach((j,k)=>{const t=o.beta[k+1]/o.se[k+1];if(j===0){sel1++;las.push(b[0]/S.sd[0]);ref.push(o.beta[1]);if(Math.abs(o.beta[1]-bt)<=1.96*o.se[1])cov++}else{nulls++;if(Math.abs(t)>1.96){nullSig++;sig_=true}}});if(sig_)anySig++}
+  const w=Math.max(.8,bt*1.6);if(las.length>5)histLines($('c8cv'),[las,ref],[C.r,C.a],bt-w,bt+w,40,[[bt,C.fg,'truth '+fmt(bt),true]]).text('red: lasso estimate · blue: OLS refit on selected (x₁ selected only)',70,28,C.mu);else{const P=mk($('c8cv'),0,1,1);P.text('x₁ was rarely selected: too weak to see',P.w/2,P.h/2,C.mu,'center')}
+  const mr=mean(ref),ml=mean(las);
+  $('c8tb').innerHTML='<table><tr><th>quantity</th><th>value</th><th>what it shows</th></tr>'+[
+   ['how often x₁ is selected',pc(sel1/R),'selection of a real effect'],
+   ['mean lasso estimate of x₁ (true '+fmt(bt)+', when selected)',las.length?fmt(ml):'—','shrunk toward zero (bias by design)'],
+   ['mean OLS refit of x₁ when selected',ref.length?fmt(mr):'—','inflated: selected because it looked big'],
+   ['naive 95% CI coverage for x₁ after refit',ref.length?pc(cov/Math.max(sel1,1)):'—','nominal 95%'],
+   ['noise variables selected per data set',fmt(nulls/R),'false positives from the lasso'],
+   ['…of those, “significant” in the refit',nulls?pc(nullSig/nulls):'—','nominal 5%'],
+   ['data sets with at least one false “significant” variable',pc(anySig/R),'what a naive report would show']].map(q=>`<tr><td>${q[0]}</td><td>${q[1]}</td><td>${q[2]}</td></tr>`).join('')+'</table>';
+  $('c8rd').innerHTML=bt===0?`With no true effect the lasso still selects ${fmt(nulls/R)} noise variables per data set, and a naive refit calls ${pc(nullSig/Math.max(nulls,1))} of them significant at 5%: ${pc(anySig/R)} of the analyses would report a “discovery”.`:`When x₁ (true ${fmt(bt)}) is selected the lasso estimate averages ${ref.length?fmt(ml):'—'} (shrunk) while the post-selection OLS refit averages ${ref.length?fmt(mr):'—'}, ${ref.length&&mr>bt?'over-stating the effect: the winner’s curse':'close to the truth only when the effect is strong'}. The naive interval covers ${ref.length?pc(cov/Math.max(sel1,1)):'—'} instead of 95%, and ${pc(nullSig/Math.max(nulls,1))} of the selected noise variables look significant. Use the lasso for prediction and screening, then estimate effects on fresh data or with selective-inference methods.`}
+ $('c8s').addEventListener('change',run);$('c8n').addEventListener('change',run);$('c8go').onclick=run;run();})();
+
+/* ---------- Ch9 ridge logistic ---------- */
+(function(){scl('c9n',v=>v);scl('c9s',v=>fmt(v/10));
+ function dat(n,b){const Z=[];for(let j=0;j<6;j++)Z.push(Float64Array.from({length:n},randn));const y=new Float64Array(n);for(let i=0;i<n;i++)y[i]=Math.random()<sig(-.5+b*Z[0][i]+b*Z[1][i])?1:0;return{Z,y,cols:Z}}
+ function loss(S,beta,te){let s=0;const n=te.y.length;for(let i=0;i<n;i++){let e=beta[0];for(let j=0;j<6;j++)e+=beta[j+1]*(te.Z[j][i]-S.mu[j])/S.sd[j];e=Math.max(-30,Math.min(30,e));const m=Math.min(1-1e-9,Math.max(1e-9,sig(e)));s-=te.y[i]*Math.log(m)+(1-te.y[i])*Math.log(1-m)}return s/n}
+ function run(){const n=val('c9n'),b=val('c9s')/10,R=25,lg=[];for(let k=0;k<25;k++)lg.push(-2+4*k/24);const acc=new Float64Array(25);let mle=0,nul=0,sepc=0,nb=0,done=0,nrm=new Float64Array(25);
+  for(let r=0;r<R;r++){const d=dat(n,b);let pos=0;for(const v of d.y)pos+=v;if(pos<2||pos>n-2)continue;done++;const S=stdz(d.Z,d.y),te=dat(2000,b),fm=ridgeLogit(S.Z,d.y,1e-6,30);if(Math.max(...Array.from(fm).slice(1).map(Math.abs))>8)sepc++;mle+=loss(S,fm,te);const pr=pos/n,b0=[Math.log(pr/(1-pr)),0,0,0,0,0,0];nul+=loss(S,b0,te);
+   lg.forEach((l,k)=>{const f=ridgeLogit(S.Z,d.y,Math.pow(10,l));acc[k]+=loss(S,f,te);nrm[k]+=Math.hypot(...Array.from(f).slice(1))})}
+  const al=Array.from(acc,v=>v/done),ml=mle/done,nl=nul/done,bi=al.indexOf(Math.min(...al)),ymax=Math.min(Math.max(ml,nl)*1.05,Math.max(nl*1.6,Math.max(...al)*1.1)),y0=Math.min(...al)*.95,P=mk($('c9cv'),-2,2,ymax,{y0});
+  P.hline(Math.min(ml,ymax*.99),C.r,'MLE '+fmt(ml));P.hline(nl,C.mu,'intercept only '+fmt(nl));poly(P,lg.map((l,k)=>[l,al[k]]),C.g,2.8);P.vline(lg[bi],C.y,'best',true);P.text('test log-loss against log₁₀ λ (ridge penalty)',P.L+8,P.T+14,C.mu);
+  $('c9st').innerHTML=stat('best log₁₀ λ',fmt(lg[bi]),'ok')+stat('test log-loss at best λ',fmt(al[bi]),'ok')+stat('test log-loss, MLE',fmt(ml),ml>al[bi]*1.1?'hot':'')+stat('intercept-only log-loss',fmt(nl),'')+stat('data sets with separation (|β̂|>8)',pc(sepc/done),sepc/done>.05?'warn':'')+stat('‖β̂‖ at best λ',fmt(nrm[bi]/done),'');
+  $('c9rd').innerHTML=`With ${n} cases and 6 predictors the unpenalised fit scores a test log-loss of ${fmt(ml)}${ml>nl?', worse than ignoring the predictors altogether':''}, because its coefficients are over-fitted${sepc?` (and ${pc(sepc/done)} of the samples were separated, with divergent coefficients)`:''}. Ridge at log₁₀ λ = ${fmt(lg[bi])} brings it down to ${fmt(al[bi])}. The U-shape is the familiar one: too little penalty overfits, too much throws away the two real signals and tends back to ${fmt(nl)}. With more data (n ≈ 300) the gap closes.`}
+ $('c9n').addEventListener('change',run);$('c9s').addEventListener('change',run);$('c9go').onclick=run;run();})();
+
+/* ---------- Ch10 adaptive lasso ---------- */
+(function(){scl('c10g',v=>fmt(v/10));const NS=[50,100,200,500,1000],BT=[1.5,-1.2,1,-.8],P_=20;
+ function sel(S,al){const F=gramOf(S.Z,S.yc),lams=lamGrid(F.c,1,40,1e-3),cv=cvEnet(S,1,lams,5),b=cd(F.G,F.c,lams[cv.iMin],1);return b.map(v=>v!==0)}
+ function run(){const g=val('c10g')/10,R=100,res=NS.map(n=>{const m=[[0,0,0],[0,0,0]];for(let r=0;r<R;r++){const d=genReg(n,P_,BT,.3,1),S=stdz(d.cols,d.y),F=gramOf(S.Z,S.yc),G2=F.G.map((r_,i)=>Array.from(r_).map((v,j)=>v+(i===j?1e-8:0))),ols=gj(G2,Array.from(F.c)).map(r_=>r_[P_]),w=ols.map(v=>Math.pow(Math.abs(v)+1e-6,g)),Z2=S.Z.map((c,j)=>Float64Array.from(c,v=>v*w[j])),S2={Z:Z2,yc:S.yc,n:S.n,p:P_};
+   [sel(S,1),sel(S2,1)].forEach((s,k)=>{let tp=0,fp=0;s.forEach((v,j)=>{if(v){j<4?tp++:fp++}});m[k][0]+=tp/R;m[k][1]+=fp/R;if(tp===4&&fp===0)m[k][2]+=1/R})}return m});
+  const P=mk($('c10cv'),-.3,NS.length-1+.3,1.05,{y0:0,noGrid:true,L:46});customGrid(P,NS.map((n,i)=>[i,'n = '+n]),[0,.25,.5,.75,1].map(v=>[v,Math.round(v*100)+'%']));[[0,C.r],[1,C.g]].forEach(([k,c])=>{poly(P,res.map((m,i)=>[i,m[k][2]]),c,2.8);dots(P,res.map((m,i)=>[i,m[k][2]]),c,4)});legend(P,[['lasso',C.r],['adaptive lasso γ = '+fmt(g),C.g]],P.T+26);P.text('probability of recovering exactly the true set',P.L+8,P.T+12,C.mu);
+  $('c10tb').innerHTML='<table><tr><th>n</th><th>lasso: true / false positives</th><th>lasso exact</th><th>adaptive: true / false positives</th><th>adaptive exact</th></tr>'+res.map((m,i)=>`<tr><td>${NS[i]}</td><td>${fmt(m[0][0])} of 4 / ${fmt(m[0][1])} of 16</td><td>${pc(m[0][2])}</td><td>${fmt(m[1][0])} of 4 / ${fmt(m[1][1])} of 16</td><td>${pc(m[1][2])}</td></tr>`).join('')+'</table>';
+  const L=res.length-1;
+  $('c10rd').innerHTML=`At n = ${NS[L]} the CV-tuned lasso still includes ${fmt(res[L][0][1])} noise variables on average and recovers the exact model only ${pc(res[L][0][2])} of the time: it must shrink the strong coefficients to a degree that lets noise through. The adaptive lasso, which penalises weak candidates harder and strong ones less, has ${fmt(res[L][1][1])} false positives and recovers the exact set ${pc(res[L][1][2])} of the time, and the gap widens with n (selection consistency). With small n the weights come from noisy OLS estimates, so the advantage is small, and with p near n the OLS weights are unusable (use ridge weights).`}
+ $('c10g').addEventListener('change',run);$('c10go').onclick=run;run();})();
+
+/* ---------- Ch11 stability selection ---------- */
+(function(){scl('c11n',v=>v);scl('c11p',v=>v);const BT=[1.5,-1.2,1,-.8];let S=null;
+ function run(){const n=val('c11n'),p=val('c11p'),d=genReg(n,p,BT,.4,1.5),s=stdz(d.cols,d.y),F=gramOf(s.Z,s.yc),lams=lamGrid(F.c,1,50,1e-3),cv=cvEnet(s,1,lams,10),l1=lams[cv.i1se],bmin=cd(F.G,F.c,lams[cv.iMin],1),B=100,freq=new Float64Array(p),half=Math.floor(n/2),idxAll=Array.from({length:n},(_,i)=>i);
+  for(let b=0;b<B;b++){for(let i=n-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[idxAll[i],idxAll[j]]=[idxAll[j],idxAll[i]]}const Fs=gramOf(s.Z,s.yc,idxAll.slice(0,half)),bb=cd(Fs.G,Fs.c,l1,1);bb.forEach((v,j)=>{if(v!==0)freq[j]++})}
+  S={p,freq:Array.from(freq,v=>v/B),single:Array.from(bmin,v=>v!==0),l1};draw()}
+ function draw(){if(!S)return;const{p,freq,single}=S,P=mk($('c11cv'),0,p,1.1,{y0:0,noGrid:true,L:46});customGrid(P,Array.from({length:p},(_,j)=>[j+.5,(p<=24||j%2===0)?'x'+(j+1):'']),[0,.25,.5,.75,1].map(v=>[v,Math.round(v*100)+'%']));P.hline(.6,C.y,'60% threshold');const W=(P.w-P.L-P.R)/p;
+  freq.forEach((v,j)=>{P.g.fillStyle=j<4?C.a:'rgba(138,147,171,.7)';P.g.fillRect(P.L+W*j+1,P.Y(v),W-2,P.Y(0)-P.Y(v));if(single[j]){P.g.fillStyle=C.r;P.g.beginPath();P.g.arc(P.L+W*(j+.5),P.Y(0)-6,3,0,7);P.g.fill()}});P.text('red dots: variables a single lasso at λ min would select',P.L+8,P.T+12,C.r);
+  const st=freq.map((v,j)=>v>=.6?j:-1).filter(j=>j>=0),tp=st.filter(j=>j<4).length,sg=single.map((v,j)=>v?j:-1).filter(j=>j>=0),tpS=sg.filter(j=>j<4).length;
+  $('c11st').innerHTML=stat('stable set (≥ 60%)',st.length+' variables','in')+stat('… true / false',tp+' / '+(st.length-tp),st.length-tp===0?'ok':'warn')+stat('single lasso at λ min',sg.length+' variables','')+stat('… true / false',tpS+' / '+(sg.length-tpS),sg.length-tpS>2?'hot':'warn')+stat('weakest true signal frequency',pc(Math.min(...freq.slice(0,4))),'')+stat('strongest noise frequency',pc(Math.max(...freq.slice(4))),'');
+  $('c11rd').innerHTML=`The four real predictors are selected in ${pc(mean(freq.slice(0,4)))} of the half-samples on average (weakest: ${pc(Math.min(...freq.slice(0,4)))}); the noise variables in only ${pc(mean(freq.slice(4)))} (worst: ${pc(Math.max(...freq.slice(4)))}). The stable set at 60% has ${st.length} variables (${tp} true, ${st.length-tp} false), while one lasso run at λ min picks ${sg.length} (${sg.length-tpS} false). Lower n or raise the noise and the real signals’ bars shorten; the stability bar shows how much to trust each variable, which a single fit cannot.`}
+ on('c11n c11p',()=>{});['c11n','c11p'].forEach(i=>$(i).addEventListener('change',run));$('c11go').onclick=run;run();resizers.push(draw);})();
+const QZ=[
+{l:'Beginner',q:'What is the main reason to use ridge or lasso instead of ordinary least squares?',o:['To make the model unbiased','To reduce variance (overfitting) by accepting some bias, which lowers prediction error','To get smaller p-values','To avoid standardising the data'],a:1,e:'Penalising coefficient size trades a little bias for a larger reduction in variance, especially with many predictors or collinearity.'},
+{l:'Beginner',q:'Which statement about ridge regression is correct?',o:['It sets some coefficients exactly to zero','It shrinks coefficients toward zero but does not set them exactly to zero','It cannot handle correlated predictors','It requires p < n'],a:1,e:'The L2 penalty shrinks smoothly; only the L1 penalty (lasso) produces exact zeros. Ridge works for p > n.'},
+{l:'Intermediate',q:'Before fitting a penalised regression you should…',o:['Leave predictors in their original units','Standardise the predictors (and not penalise the intercept)','Remove the intercept','Log-transform every variable'],a:1,e:'The penalty depends on the scale of each predictor, so predictors need a common scale; the intercept stays unpenalised.'},
+{l:'Intermediate',q:'When predictors are exactly collinear or p > n, XᵀX is singular. Ridge regression…',o:['Also fails','Still has a unique solution, because XᵀX + λI is invertible for any λ > 0','Returns all coefficients equal to zero','Requires deleting predictors first'],a:1,e:'Adding λ to the diagonal makes the matrix positive definite, which is one reason ridge is the standard cure for ill-conditioned problems.'},
+{l:'Intermediate',q:'With λ → 0 the ridge estimate approaches…',o:['Zero','The OLS estimate (when it exists)','The mean of y only','The lasso estimate'],a:1,e:'λ = 0 removes the penalty. As λ → ∞ all slopes go to zero (intercept-only model).'},
+{l:'Intermediate',q:'In ridge regression the effective degrees of freedom df(λ) = Σ d²/(d² + λ)…',o:['Equals p for every λ','Falls smoothly from p (λ = 0) toward 0 (large λ)','Is always 1','Increases with λ'],a:1,e:'Large-variance directions keep near-full degrees of freedom; low-variance directions are shrunk heavily as λ grows.'},
+{l:'Intermediate',q:'For one standardised predictor with OLS estimate z, the lasso estimate (orthonormal case) is…',o:['z/(1 + λ)','sign(z)(|z| − λ)₊, the soft-threshold','z − λ² ','Always zero'],a:1,e:'The lasso subtracts λ from |z| and truncates at zero; ridge divides by (1 + λ).'},
+{l:'Advanced',q:'Why does the lasso produce sparse solutions while ridge does not?',o:['L1 is smoother than L2','The L1 constraint region (a diamond) has corners on the axes, where the loss contours typically touch it','Ridge ignores the data','Lasso uses more data'],a:1,e:'Corners of the L1 ball lie on coordinate axes, so solutions often have exact zeros; the L2 ball is round with no corners.'},
+{l:'Advanced',q:'Among a group of highly correlated predictors with similar true effects, the lasso tends to…',o:['Select all of them with equal coefficients','Pick one (arbitrarily, varying between samples) and drop the others','Never select any','Shrink them all to exactly the same value'],a:1,e:'The lasso lacks the grouping effect; the elastic net’s ridge component makes correlated predictors enter and leave together.'},
+{l:'Advanced',q:'How is the lasso path computed efficiently?',o:['By solving a new linear program from scratch for each λ','By coordinate descent with warm starts along a decreasing λ sequence from λ_max','By inverting XᵀX + λI each time','By random search'],a:1,e:'Soft-thresholded coordinate updates are cheap, and each solution starts the next; λ_max = max|xⱼᵀy|/n is where all coefficients are zero.'},
+{l:'Advanced',q:'The “one-standard-error rule” for choosing λ selects…',o:['The λ with the smallest CV error','The largest λ (simplest model) whose CV error is within one SE of the minimum','The smallest λ on the grid','The λ at which all coefficients are zero'],a:1,e:'Because the CV curve is flat and noisy, the rule prefers a sparser, more regularised model that is statistically as good as the best.'},
+{l:'Advanced',q:'Standardisation for cross-validated lasso should be done…',o:['Once on the full data before splitting into folds','Inside each training fold, using only that fold’s training data','On the response only','Never'],a:1,e:'Standardising with statistics from the whole data leaks information from the validation fold into training.'},
+{l:'Advanced',q:'Elastic net with mixing parameter α = 0 is…',o:['The lasso','Ridge regression','OLS','A tree model'],a:1,e:'Elastic net penalty λ[α‖β‖₁ + (1 − α)½‖β‖²]: α = 1 is the lasso, α = 0 is ridge.'},
+{l:'Expert',q:'After the lasso selects variables you refit OLS on them and report the usual 95% confidence intervals. The main problem is…',o:['Intervals are too wide','They undercover because the variables were selected for looking strong in this sample (winner’s curse); naive inference after selection is invalid','OLS cannot be fitted on a subset','The intercept is lost'],a:1,e:'Selection and estimation on the same data make refitted coefficients biased upward and the p-values optimistic. Use sample splitting or selective inference.'},
+{l:'Expert',q:'Ridge logistic regression is helpful when the unpenalised logistic MLE…',o:['Converges quickly','Diverges because of perfect separation or overfits with few events per predictor','Has exactly zero coefficients','Is unbiased and efficient'],a:1,e:'The penalty keeps coefficients finite and reduces overfitting; λ is chosen by cross-validated log-loss or deviance.'},
+{l:'Expert',q:'In Bayesian terms, ridge regression corresponds to the posterior mode under…',o:['A uniform prior','Independent Gaussian priors on the coefficients','Independent Laplace (double-exponential) priors','A Cauchy prior'],a:1,e:'Gaussian prior → L2 penalty (ridge); Laplace prior → L1 penalty (lasso). λ relates to the ratio of noise to prior variance.'},
+{l:'Expert',q:'The adaptive lasso, with weights 1/|β̂_OLS|^γ, improves on the lasso because…',o:['It uses more data','It penalises strong predictors less and weak ones more, giving consistent selection (oracle property) with enough data','It has no tuning parameter','It avoids standardisation'],a:1,e:'The plain lasso over-shrinks large coefficients and lets noise in; weighted penalties fix both under mild conditions.'},
+{l:'Expert',q:'Stability selection reports a variable as important when…',o:['It is selected by a single lasso at λ_min','It is selected in a large fraction (e.g. ≥ 60–80%) of lasso fits on random subsamples','Its OLS p-value is below 0.05','Its coefficient is the largest'],a:1,e:'Selection frequency across subsamples is a robust measure; noise variables rarely reach the threshold, and the method gives a bound on the expected number of false selections.'}
+];
+(function(){const st=store.get('rg_quiz',{});
+ function render(){const box=$('quiz');box.innerHTML='';
+  QZ.forEach((q,i)=>{const d=document.createElement('div');d.className='q'+(st[i]!=null?' done':'');d.innerHTML=`<div class="qh">Q${i+1} · ${q.l}</div><div style="margin:4px 0 6px"><b>${q.q}</b></div>`;
+   q.o.forEach((o,j)=>{const b=document.createElement('button');b.className='opt';b.textContent=o;if(st[i]!=null){if(j===q.a)b.classList.add('good');else if(j===st[i])b.classList.add('bad')}b.onclick=()=>{if(st[i]!=null)return;st[i]=j;store.set('rg_quiz',st);render();meter()};d.appendChild(b)});
+   const e=document.createElement('div');e.className='ex';e.innerHTML=(st[i]===q.a?'✅ ':'❌ ')+q.e;d.appendChild(e);box.appendChild(d)});
+  const ans=Object.keys(st).length,ok=QZ.filter((q,i)=>st[i]===q.a).length;
+  $('qscore').innerHTML=stat('answered',ans+' / '+QZ.length,'in')+stat('correct',ok,'ok')+stat('score',ans?Math.round(100*ok/ans)+'%':'—',ok/Math.max(ans,1)>=.8?'ok':'warn')+stat('verdict',ans<QZ.length?'keep going':ok>=16?'regularisation master':ok>=13?'strong':'review ch. 1–8','')}
+ $('qreset').onclick=()=>{Object.keys(st).forEach(k=>delete st[k]);store.set('rg_quiz',st);render();meter()};
+ window.__qst=st;render();})();
+const CHK=['Explain the bias–variance reason that penalised estimators can beat OLS.','Write the ridge solution and explain shrinkage along principal directions and effective df.','Explain when ridge helps most (collinearity, p near n, weak signal).','Derive/recall soft-thresholding and contrast it with ridge shrinkage.','Explain the diamond-versus-circle geometry of sparsity.','Describe coordinate descent, warm starts and λ_max.','Choose λ by K-fold CV with the min and one-SE rules and standardise inside folds.','Explain the elastic net and the grouping effect.','State why post-selection inference is invalid and the alternatives.','Fit and tune penalised logistic regression and explain its effect on separation.','Describe the adaptive lasso and oracle property.','Use stability selection to report reliable drivers.','Give the Bayesian interpretation (Gaussian and Laplace priors).','Choose between ridge, lasso and elastic net for a given problem.'];
+(function(){const st=store.get('rg_chk',{}),box=$('chk');CHK.forEach((t,i)=>{const l=document.createElement('label'),c=document.createElement('input');c.type='checkbox';c.checked=!!st[i];c.onchange=()=>{st[i]=c.checked;store.set('rg_chk',st);meter()};l.appendChild(c);const s=document.createElement('span');s.textContent=t;l.appendChild(s);box.appendChild(l)});window.__cst=st;})();
+function meter(){const q=window.__qst||{},c=window.__cst||{};const ok=QZ.filter((x,i)=>q[i]===x.a).length,ck=Object.values(c).filter(Boolean).length;const p=Math.round(100*(.6*ok/QZ.length+.4*ck/CHK.length));$('mtxt').textContent='Mastery: '+p+'%  (exam + checklist)';$('mbar').style.width=p+'%';store.set('mastery_rg',p)}
+meter();
+
+/* ---------- Navigation ---------- */
+(function(){const nav=$('nav');let html='';
+ document.querySelectorAll('main .part, main section.ch').forEach(el=>{if(el.classList.contains('part'))html+=`<div class="pt">${el.textContent}</div>`;else{const h=el.querySelector('h2'),num=h.querySelector('.num').textContent,t=Array.from(h.childNodes).filter(n=>n.nodeType===3).map(n=>n.textContent).join('').trim();html+=`<a href="#${el.id}" data-id="${el.id}">${num}. ${t}</a>`}});
+ nav.innerHTML=html;const links=nav.querySelectorAll('a'),io=new IntersectionObserver(es=>{es.forEach(e=>{if(e.isIntersecting)links.forEach(a=>a.classList.toggle('on',a.dataset.id===e.target.id))})},{rootMargin:'-20% 0px -70% 0px'});
+ document.querySelectorAll('section.ch').forEach(s=>io.observe(s));
+ $('menu').onclick=()=>$('side').classList.toggle('open');nav.addEventListener('click',e=>{if(e.target.tagName==='A')$('side').classList.remove('open')});
+ window.addEventListener('scroll',()=>{const h=document.documentElement;$('prog').style.width=(100*h.scrollTop/(h.scrollHeight-h.clientHeight))+'%'},{passive:true});})();
+</script>
+</body>
+</html>

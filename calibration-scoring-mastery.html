@@ -1,0 +1,642 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Calibration and Scoring Mastery</title>
+<style>
+:root{--bg:#0b0e17;--panel:#121726;--panel2:#171d30;--line:#232a3d;--fg:#e8ebf5;--mu:#8a93ab;--a:#6ea8ff;--r:#ff6b81;--y:#ffd166;--g:#4ade80;--p:#c084fc;--t:#5eead4}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;background:var(--bg);color:var(--fg);font:16px/1.7 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+a{color:var(--a)}
+#prog{position:fixed;top:0;left:0;height:3px;background:linear-gradient(90deg,var(--a),var(--p),var(--r));width:0;z-index:50}
+.side{position:fixed;left:0;top:0;bottom:0;width:290px;background:#0e1220;border-right:1px solid var(--line);overflow:auto;padding:18px 14px 90px;z-index:40;transition:transform .25s}
+.side h1{font-size:15px;margin:0 0 2px}
+.side small{color:var(--mu)}
+.side .pt{margin:16px 0 4px;font-size:11px;text-transform:uppercase;letter-spacing:1.3px;color:var(--p)}
+.side a{display:block;color:var(--mu);text-decoration:none;padding:5px 9px;border-radius:7px;font-size:13.5px;line-height:1.35}
+.side a:hover{background:var(--panel);color:var(--fg)}
+.side a.on{background:var(--panel2);color:var(--fg);box-shadow:inset 3px 0 var(--a)}
+.side a.back{color:var(--t);padding-left:0;margin-bottom:6px}
+.meter{position:fixed;left:0;bottom:0;width:290px;background:#0e1220;border-top:1px solid var(--line);padding:10px 16px;z-index:41;font-size:12px;color:var(--mu)}
+.meter .bar{height:7px;background:var(--line);border-radius:6px;margin-top:5px;overflow:hidden}
+.meter .bar i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--g),var(--t));transition:width .4s}
+#menu{display:none;position:fixed;top:10px;left:10px;z-index:60;background:var(--panel2);color:var(--fg);border:1px solid var(--line);border-radius:9px;padding:7px 12px;font-size:14px;cursor:pointer}
+main{margin-left:290px;padding:0 34px 120px;max-width:1090px}
+.hero{padding:70px 0 30px}
+.hero h1{font-size:clamp(32px,5vw,56px);line-height:1.08;margin:0 0 14px;background:linear-gradient(100deg,#fff,var(--y) 40%,var(--r));-webkit-background-clip:text;background-clip:text;color:transparent}
+.hero p{font-size:19px;color:#c3c9dc;max-width:780px}
+.chips{display:flex;flex-wrap:wrap;gap:8px;margin:18px 0}
+.chip{border:1px solid var(--line);background:var(--panel);padding:5px 12px;border-radius:99px;font-size:13px;color:var(--mu)}
+.chip b{color:var(--fg)}
+.part{margin:90px 0 0;padding-top:22px;border-top:1px solid var(--line);font-size:12px;letter-spacing:2px;text-transform:uppercase;color:var(--p)}
+section.ch{padding-top:30px}
+h2{font-size:30px;line-height:1.2;margin:10px 0 8px;display:flex;gap:12px;align-items:center;flex-wrap:wrap}
+h2 .num{display:inline-grid;place-items:center;width:40px;height:40px;border-radius:12px;background:var(--panel2);border:1px solid var(--line);font-size:18px;color:var(--a)}
+.lvl{font-size:11px;font-weight:600;letter-spacing:.8px;text-transform:uppercase;padding:3px 9px;border-radius:99px;border:1px solid}
+.lvl.b{color:var(--g);border-color:#1f5c3a}.lvl.i{color:var(--a);border-color:#244a85}.lvl.a{color:var(--y);border-color:#6b5420}.lvl.e{color:var(--r);border-color:#7a2c3a}
+h3{font-size:19px;margin:30px 0 6px;color:#fff}
+p{margin:10px 0}li{margin:5px 0}
+code,.f{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace}
+code{background:var(--panel2);padding:1px 6px;border-radius:5px;font-size:.9em}
+.f{display:block;white-space:pre-wrap;background:#0e1322;border:1px solid var(--line);border-left:3px solid var(--a);padding:12px 16px;border-radius:9px;margin:14px 0;overflow-x:auto;font-size:15px;color:#dbe4ff;line-height:1.8}
+.co{border-radius:12px;padding:13px 17px;margin:16px 0;border:1px solid var(--line);background:var(--panel)}
+.co>b:first-child{display:block;margin-bottom:2px;font-size:12px;letter-spacing:1px;text-transform:uppercase}
+.co.def{border-left:4px solid var(--a)}.co.def>b:first-child{color:var(--a)}
+.co.warn{border-left:4px solid var(--r)}.co.warn>b:first-child{color:var(--r)}
+.co.tip{border-left:4px solid var(--g)}.co.tip>b:first-child{color:var(--g)}
+.co.key{border-left:4px solid var(--y);background:#171608}.co.key>b:first-child{color:var(--y)}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:18px 20px;margin:22px 0;box-shadow:0 8px 30px rgba(0,0,0,.25)}
+.card>h4{margin:0 0 3px;font-size:13px;letter-spacing:1.2px;text-transform:uppercase;color:var(--t)}
+.card>p.sub{margin:0 0 12px;color:var(--mu);font-size:14.5px}
+.ctl{display:flex;flex-wrap:wrap;gap:10px 22px;align-items:center;margin:8px 0 10px}
+.ctl label{display:flex;gap:8px;align-items:center;font-size:14px;color:#c3c9dc}
+.ctl output{min-width:38px;font-family:ui-monospace,monospace;color:var(--y);font-size:13px}
+input[type=range]{accent-color:var(--a);width:150px}
+input[type=checkbox]{accent-color:var(--a)}
+select,input[type=number],input[type=text]{background:#0e1322;color:var(--fg);border:1px solid var(--line);border-radius:8px;padding:6px 9px;font:inherit;font-size:14px}
+button{background:linear-gradient(180deg,#2c4a80,#233b68);color:#fff;border:1px solid #3a5a98;border-radius:9px;padding:7px 14px;font:inherit;font-size:14px;cursor:pointer}
+button:hover{filter:brightness(1.15)}
+button.alt{background:var(--panel2);border-color:var(--line);color:var(--fg)}
+canvas{width:100%;height:270px;display:block;background:#0e1322;border:1px solid var(--line);border-radius:10px;margin-top:6px}
+canvas.sm{height:210px}canvas.tl{height:330px}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(125px,1fr));gap:9px;margin:12px 0}
+.stat{background:#0e1322;border:1px solid var(--line);border-radius:10px;padding:8px 11px}
+.stat b{display:block;font-size:17px;font-family:ui-monospace,monospace}
+.stat span{font-size:11.5px;color:var(--mu);text-transform:uppercase;letter-spacing:.7px}
+.stat.hot b{color:var(--r)}.stat.ok b{color:var(--g)}.stat.warn b{color:var(--y)}.stat.in b{color:var(--a)}
+.read{margin:8px 0 0;padding:10px 14px;background:#0e1322;border:1px dashed #33406a;border-radius:10px;font-size:14.5px;color:#d3dbf3}
+table{border-collapse:collapse;width:100%;margin:12px 0;font-size:14px}
+th,td{border:1px solid var(--line);padding:7px 10px;text-align:left;vertical-align:top}
+th{background:var(--panel2);font-size:12px;text-transform:uppercase;letter-spacing:.6px;color:var(--mu)}
+td.n{font-family:ui-monospace,monospace;text-align:right}
+.tw{overflow-x:auto}
+.pill{display:inline-block;padding:1px 9px;border-radius:99px;font-size:12px;font-weight:600}
+.pill.r{background:#3a1520;color:var(--r)}.pill.g{background:#10321f;color:var(--g)}.pill.y{background:#3a2f0e;color:var(--y)}.pill.m{background:#202637;color:var(--mu)}
+details{background:var(--panel);border:1px solid var(--line);border-radius:11px;padding:9px 15px;margin:9px 0}
+details summary{cursor:pointer;font-weight:600}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.q{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:14px 18px;margin:14px 0}
+.q .qh{font-size:12px;letter-spacing:1px;text-transform:uppercase;color:var(--mu)}
+.q .opt{display:block;width:100%;text-align:left;margin:6px 0;background:#0e1322;border:1px solid var(--line);color:var(--fg);border-radius:9px;padding:9px 12px}
+.q .opt.good{border-color:var(--g);background:#0e2418}.q .opt.bad{border-color:var(--r);background:#2a1119}
+.q .ex{display:none;margin-top:8px;font-size:14.5px;color:#c3c9dc}
+.q.done .ex{display:block}
+.chk label{display:flex;gap:10px;align-items:flex-start;padding:6px 0;cursor:pointer}
+.chk input{margin-top:6px;accent-color:var(--g);width:17px;height:17px}
+.sigrow{display:grid;grid-template-columns:minmax(170px,2fr) 1fr 1fr auto;gap:8px 14px;align-items:center;padding:6px 0;border-top:1px dashed #1b2236}
+.sigrow:first-of-type{border-top:0}
+.sigrow label{display:flex;gap:6px;align-items:center;font-size:13.5px;color:#c3c9dc}
+@media(max-width:900px){
+ .side{transform:translateX(-100%)}.side.open{transform:none}.meter{display:none}
+ #menu{display:block}main{margin-left:0;padding:0 16px 100px}.two{grid-template-columns:1fr}.hero{padding-top:60px}
+ .sigrow{grid-template-columns:1fr 1fr}
+}
+</style>
+</head>
+<body>
+<div id="prog"></div>
+<button id="menu">☰ Contents</button>
+<nav class="side" id="side"><a class="back" href="index.html">← All courses</a><h1>Calibration &amp; Scoring</h1><small>12 chapters · 11 labs · exam</small><div id="nav"></div></nav>
+<div class="meter"><div id="mtxt">Mastery: 0%</div><div class="bar"><i id="mbar"></i></div></div>
+
+<main>
+<header class="hero">
+ <h1>Calibration and proper scoring rules: are your probabilities honest?</h1>
+ <p>A model that says “8% default risk” should be right about 8 of 100 such cases. Ranking well is not enough: pricing, provisioning, capital and any threshold rule use the probability itself. This page teaches what calibration means, how to measure it (reliability diagrams, Brier decomposition, calibration slope and intercept, ECE), why models miscalibrate, how to repair it (Platt, isotonic, base-rate adjustment), why proper scoring rules are the right way to compare probability forecasts, and how to test and monitor calibration without fooling yourself. Every lab simulates forecasts from a known truth so you can see exactly what the diagnostics show.</p>
+ <div class="chips"><span class="chip"><b>Part I</b> Forecasts and scores</span><span class="chip"><b>Part II</b> Why it breaks, how to fix it</span><span class="chip"><b>Part III</b> Choosing, segmenting, deciding, testing</span></div>
+ <div class="co tip"><b>How to use this</b>Move the sliders and watch the diagnostics respond; heavy labs update when you release a slider or press the button. Prerequisites: the GLM and Model Selection pages (logistic regression, log-loss, AUC).</div>
+</header>
+
+<div class="part">Part I · Forecasts and scores</div>
+
+<section class="ch" id="c1">
+<h2><span class="num">1</span>What calibration means <span class="lvl b">Beginner</span></h2>
+<p>A probability forecast q for a binary outcome Y is <b>calibrated</b> if, among all cases that receive forecast q, the fraction with Y = 1 is q:</p>
+<div class="f">P(Y = 1 | q) = q   for every value q the model issues</div>
+<p>Calibration is separate from <b>discrimination</b> (does the model rank positives above negatives, measured by AUC). A forecast can have a perfect ranking and terrible probabilities: multiply every probability by three and the AUC does not move. The standard picture is the <b>reliability diagram</b>: group cases by forecast, plot the average forecast against the observed frequency in each group, and compare with the 45° line. Points <em>below</em> the line mean the model over-predicts (forecasts too high); points above, under-predicts. A curve that is flatter than the diagonal at the ends (high forecasts too high, low forecasts too low) is <b>over-confident</b>; steeper, <b>under-confident</b>.</p>
+<p>Levels of calibration, from weakest to strongest: <em>in the large</em> (average forecast equals the event rate), <em>weak</em> (calibration intercept 0 and slope 1), <em>moderate</em> (the whole curve follows the diagonal) and <em>strong</em> (calibrated within every subgroup, see chapter 9).</p>
+<div class="card"><h4>Lab 1 · Reliability diagrams</h4>
+ <p class="sub">The true probability of each case comes from a logistic model (spread of the true logit = “signal”). The model’s forecast is the true logit multiplied by the slope you choose, so slope 1 is perfect, above 1 over-confident, below 1 under-confident. Dots: ten equal-width forecast bins, dot size ∝ number of cases, bars: 95% Wilson intervals for the observed rate.</p>
+ <div class="ctl"><label>cases <input type="range" id="c1n" min="500" max="20000" step="500" value="5000"><output id="c1nv"></output></label><label>slope of forecast logit <input type="range" id="c1a" min="40" max="220" step="5" value="150"><output id="c1av"></output></label><label>signal (SD of true logit) <input type="range" id="c1s" min="50" max="400" step="10" value="200"><output id="c1sv"></output></label><button id="c1go">Re-simulate</button></div>
+ <canvas class="tl" id="c1cv"></canvas><div class="stats" id="c1st"></div><div class="read" id="c1rd"></div></div>
+</section>
+
+<section class="ch" id="c2">
+<h2><span class="num">2</span>Proper scoring rules <span class="lvl i">Intermediate</span></h2>
+<p>A <b>scoring rule</b> S(q, y) assigns a loss to forecast q when the outcome is y. It is <b>proper</b> if, when the true probability is p, the expected loss is smallest when you report q = p; <b>strictly proper</b> if that is the only minimiser. Proper rules reward honesty, so minimising them (or choosing a model by them) pushes forecasts toward the truth. The common rules are:</p>
+<div class="f">Brier: (q − y)²        Log-loss: −y log q − (1 − y) log(1 − q)        Spherical: −[y q + (1−y)(1−q)] / √(q² + (1−q)²)</div>
+<p>When the true probability is p, the expected Brier score of forecast q is p(1 − p) + (q − p)²: noise plus squared miscalibration. The expected log-loss is H(p) + KL(p ‖ q): entropy plus a Kullback–Leibler distance. Both are minimised at q = p. In contrast, <b>accuracy</b> (loss 1 if the thresholded forecast is wrong) and the <b>absolute error</b> |q − y| are <em>improper</em>: their expected loss is minimised by reporting 0 or 1 whenever p ≠ ½, so they cannot be used to tune probabilities. Optimising an improper rule tells the model to exaggerate.</p>
+<div class="card"><h4>Lab 2 · Expected loss versus the reported probability</h4>
+ <p class="sub">The true probability is p (slider). Each curve is the expected loss of reporting q; the dot marks its minimum. Proper rules put the dot at q = p; the improper ones put it at 0 or 1 (or give no incentive to be honest).</p>
+ <div class="ctl"><label>true probability p % <input type="range" id="c2p" min="1" max="99" step="1" value="30"><output id="c2pv"></output></label></div>
+ <canvas class="tl" id="c2cv"></canvas><div class="stats" id="c2st"></div><div class="read" id="c2rd"></div></div>
+</section>
+
+<section class="ch" id="c3">
+<h2><span class="num">3</span>Brier score decomposition <span class="lvl a">Advanced</span></h2>
+<p>If forecasts take K distinct values (or are grouped into K bins and replaced by the bin average), the Brier score splits exactly (Murphy, 1973):</p>
+<div class="f">BS = REL − RES + UNC<br>REL = Σₖ (nₖ/n)(fₖ − oₖ)²   (reliability: miscalibration, lower is better)<br>RES = Σₖ (nₖ/n)(oₖ − ō)²   (resolution: how far the bin outcomes spread from the base rate, higher is better)<br>UNC = ō(1 − ō)   (uncertainty of the outcome: fixed by the data)</div>
+<p>Calibration is REL; discrimination-like information is RES; UNC is the score of always forecasting the base rate ō. The <b>Brier skill score</b> BSS = 1 − BS/UNC measures improvement over that climatology. A model can reduce BS either by being better calibrated or by having more resolution; the decomposition tells you which. A perfectly calibrated forecast has REL = 0 and BS = UNC − RES.</p>
+<div class="card"><h4>Lab 3 · Decomposing the Brier score</h4>
+ <p class="sub">Forecasts are binned into 10 equal-width groups and replaced by the bin mean forecast (so the identity is exact). Bars show REL, RES, UNC and the resulting BS, with the check BS − (REL − RES + UNC).</p>
+ <div class="ctl"><label>cases <input type="range" id="c3n" min="1000" max="30000" step="1000" value="10000"><output id="c3nv"></output></label><label>slope of forecast logit <input type="range" id="c3a" min="40" max="220" step="5" value="100"><output id="c3av"></output></label><label>signal (SD of true logit) <input type="range" id="c3s" min="50" max="400" step="10" value="150"><output id="c3sv"></output></label><button id="c3go">Re-simulate</button></div>
+ <canvas class="tl" id="c3cv"></canvas><div class="stats" id="c3st"></div><div class="read" id="c3rd"></div></div>
+</section>
+
+<section class="ch" id="c4">
+<h2><span class="num">4</span>Measuring miscalibration: ECE, slope and intercept <span class="lvl a">Advanced</span></h2>
+<p>Two summaries dominate practice. The <b>expected calibration error</b> is the bin-weighted average gap, ECE = Σₖ (nₖ/n)|fₖ − oₖ|. It is easy to explain but depends on the binning, and it is biased upward in small samples: even a perfectly calibrated model shows a positive ECE, because observed rates in small bins are noisy. The <b>calibration slope and intercept</b> come from the recalibration model logit P(Y = 1) = α + β·logit(q). Perfect weak calibration is α = 0, β = 1. A slope β &lt; 1 means the forecasts are too extreme (typical of overfitting, chapter 5); β &gt; 1 means too timid. The intercept (read with the slope fixed at 1) shows the average over- or under-prediction. Both come with standard errors, so you can say whether a departure is more than noise.</p>
+<p>A smooth, flexible calibration curve (for example a spline or LOESS fit of y on q) is usually better than fixed bins, and should be shown with a confidence band. Report the slope, the intercept, the E/O ratio (expected over observed events), and a curve; use ECE only as a rough summary.</p>
+<div class="card"><h4>Lab 4 · What ECE and the slope show for a perfectly calibrated model</h4>
+ <p class="sub">The forecasts are exactly calibrated, yet the ECE is not zero, and it depends on the number of bins and the sample size. Curves: average ECE (equal-width bins) against n for 5, 10, 20 and 50 bins, over 60 data sets per point. The statistics at the selected n show the typical slope and intercept error, which is what a real validation would see.</p>
+ <div class="ctl"><label>cases (for the statistics) <input type="range" id="c4n" min="0" max="6" step="1" value="3"><output id="c4nv"></output></label><label>signal (SD of true logit) <input type="range" id="c4s" min="50" max="400" step="10" value="200"><output id="c4sv"></output></label><button id="c4go">Re-simulate</button></div>
+ <canvas class="tl" id="c4cv"></canvas><div class="stats" id="c4st"></div><div class="read" id="c4rd"></div></div>
+</section>
+
+<div class="part">Part II · Why it breaks, how to fix it</div>
+
+<section class="ch" id="c5">
+<h2><span class="num">5</span>Why models become miscalibrated <span class="lvl a">Advanced</span></h2>
+<p>Common causes: <b>Overfitting</b> (including too many predictors for the sample): the fitted logit is too extreme, so out-of-sample forecasts are over-confident and the calibration slope is below 1. <b>Heavy regularisation</b>: shrinkage pulls probabilities toward the base rate, so the model becomes under-confident (slope above 1). <b>Class weights, over- or under-sampling</b>: shift the intercept so that the average forecast no longer matches the real event rate (chapter 7). <b>Model family</b>: naive Bayes and some boosted or deep models are over-confident; random forests and SVMs tend to be under-confident near 0 and 1; tree ensembles pull forecasts toward the middle. <b>Dataset shift</b>: the base rate or relationships change after development. A model that optimises log-loss with a sufficiently flexible link is typically well calibrated on the training data and loses calibration on new data, so calibration must be assessed on data not used for fitting.</p>
+<div class="card"><h4>Lab 5 · Calibration slope and log-loss against ridge strength</h4>
+ <p class="sub">A logistic model with k predictors (5 real, effect 0.8, the rest noise) is fitted with a ridge penalty. Left: calibration slope on 3,000 fresh cases, averaged over repeated data sets (1 = calibrated, below 1 over-confident). Right: test log-loss. The dashed line marks the penalty with the smallest log-loss.</p>
+ <div class="ctl"><label>cases <input type="range" id="c5n" min="100" max="1000" step="50" value="300"><output id="c5nv"></output></label><label>candidate predictors <input type="range" id="c5k" min="5" max="30" step="1" value="20"><output id="c5kv"></output></label><button id="c5go">Re-simulate</button></div>
+ <div class="two"><canvas class="sm" id="c5cv"></canvas><canvas class="sm" id="c5cv2"></canvas></div><div class="stats" id="c5st"></div><div class="read" id="c5rd"></div></div>
+</section>
+
+<section class="ch" id="c6">
+<h2><span class="num">6</span>Recalibration: Platt, temperature and isotonic <span class="lvl e">Expert</span></h2>
+<p>Recalibration learns a monotone map from the raw score to a probability, using data not used to fit the model. <b>Platt scaling</b> fits a logistic regression of y on the score’s logit (two parameters: intercept and slope; fixing the intercept at 0 gives <b>temperature scaling</b>, popular for neural nets). <b>Isotonic regression</b> fits a monotone step function (pool-adjacent-violators); it can correct any monotone distortion but needs enough data (hundreds of events) and produces a step function with ties, which slightly reduces AUC. <b>Beta calibration</b> is a flexible three-parameter parametric alternative. Use a separate calibration set or cross-fitting; re-using the training data repeats the overfitting you are trying to repair. Monotone maps leave the ranking (AUC) unchanged except for ties.</p>
+<div class="card"><h4>Lab 6 · Raw versus Platt versus isotonic</h4>
+ <p class="sub">The raw forecast distorts the true probability in the way you choose. Each method is fitted on a calibration set of the size shown on the horizontal axis and judged on 4,000 fresh cases. Left: reliability of the three methods for one 1,000-case calibration set. Right: test log-loss in excess of the best possible (the true probabilities), over 40 repetitions.</p>
+ <div class="ctl"><label>distortion <select id="c6d"><option value="over">over-confident (slope 1.8)</option><option value="under">under-confident (slope 0.6)</option><option value="shift">intercept shift (+1)</option><option value="skew">non-logistic distortion</option></select></label><button id="c6go">Re-simulate</button></div>
+ <div class="two"><canvas class="sm" id="c6cv"></canvas><canvas class="sm" id="c6cv2"></canvas></div><div class="stats" id="c6st"></div><div class="read" id="c6rd"></div></div>
+</section>
+
+<section class="ch" id="c7">
+<h2><span class="num">7</span>Base-rate shift and calibration in the large <span class="lvl e">Expert</span></h2>
+<p>A model trained when the event rate was π and deployed when it is π′ is miscalibrated in the large even if nothing else changed. When only the base rate moves (<b>label or prior shift</b>: P(x | y) unchanged), the correct update is a shift of the log-odds:</p>
+<div class="f">logit q′ = logit q + log[ (π′/(1 − π′)) / (π/(1 − π)) ]</div>
+<p>This is the same correction as for training on a resampled (for example under-sampled) data set: the model learned the training odds, so you add back the difference between the true and the training log-odds. The shift fixes the intercept and leaves the ranking unchanged. If the relationship P(y | x) itself changed (covariate or concept drift) a simple shift is not enough and the model has to be re-fitted or recalibrated on recent data. In credit risk this is the distinction between point-in-time forecasts, through-the-cycle averages and the long-run default rate.</p>
+<div class="card"><h4>Lab 7 · Deployment with a different event rate</h4>
+ <p class="sub">The feature x is Normal with mean ±separation/2 depending on the class, so P(y | x) is logistic. The model learned the training rate; at deployment the rate differs. The reliability diagram (40,000 cases) shows the uncorrected forecasts and the log-odds-shifted ones.</p>
+ <div class="ctl"><label>training event rate % <input type="range" id="c7t" min="1" max="50" step="1" value="10"><output id="c7tv"></output></label><label>deployment event rate % <input type="range" id="c7d" min="1" max="50" step="1" value="3"><output id="c7dv"></output></label><label>class separation <input type="range" id="c7s" min="5" max="30" step="1" value="15"><output id="c7sv"></output></label><button id="c7go">Re-simulate</button></div>
+ <canvas class="tl" id="c7cv"></canvas><div class="stats" id="c7st"></div><div class="read" id="c7rd"></div></div>
+</section>
+
+<div class="part">Part III · Choosing, segmenting, deciding, testing</div>
+
+<section class="ch" id="c8">
+<h2><span class="num">8</span>Choosing a rule: Brier, log-loss, AUC and accuracy <span class="lvl a">Advanced</span></h2>
+<p>All strictly proper rules are minimised by the true probability, but they weigh errors differently. <b>Brier</b> is bounded (a confident wrong forecast costs at most 1) and treats errors of the same size alike. <b>Log-loss</b> is unbounded: a forecast of 0.001 for an event that happens costs about 6.9, so it punishes confident mistakes severely, is the likelihood (the basis of AIC and of fitting), and is the more sensitive rule for rare events and tails. <b>AUC, Gini, KS and accuracy</b> depend only on ranking or on a threshold, so they are blind to monotone distortions: two forecasts that differ by an over-confident transformation have <em>identical</em> AUC. Use a proper rule for anything where the probability is used, and compare with the skill relative to a baseline (BSS, or the log-score improvement over the base rate).</p>
+<div class="card"><h4>Lab 8 · Two forecasters, one under-confident, one over-confident</h4>
+ <p class="sub">Forecaster A uses 0.8 × the true logit (timid), forecaster B uses k × the true logit (bold; k from the slider). Curves: B’s score minus A’s score against the signal strength (SD of the true logit); below zero means B is better. Both rules are proper, but they can disagree; the AUC of A and B is identical by construction.</p>
+ <div class="ctl"><label>B’s multiplier k <input type="range" id="c8k" min="110" max="250" step="5" value="125"><output id="c8kv"></output></label><button id="c8go">Re-simulate</button></div>
+ <canvas class="tl" id="c8cv"></canvas><div class="stats" id="c8st"></div><div class="read" id="c8rd"></div></div>
+</section>
+
+<section class="ch" id="c9">
+<h2><span class="num">9</span>Calibration within subgroups <span class="lvl e">Expert</span></h2>
+<p>A model can be calibrated overall and badly calibrated in every segment: the errors of opposite sign cancel in the average. If a segment (product, region, vintage, protected group) has a different base rate than the model assumes, the pooled intercept is too low for one group and too high for the other. This matters for pricing fairness, for regulatory scrutiny of rating grades, and for portfolio provisioning by segment. Check calibration-in-the-large and the slope by segment, show reliability curves by segment, and either add the segment (or a feature that captures it) to the model or recalibrate separately. The more segments you slice, the noisier each estimate is, so use intervals and avoid reading noise.</p>
+<div class="card"><h4>Lab 9 · Calibrated on average, wrong in each segment</h4>
+ <p class="sub">The true log-odds equal the score z plus a gap for segment 1. The model uses a pooled logistic fit on z alone. The reliability diagram shows the pooled population (white) and the two segments (blue, red) on 30,000 cases.</p>
+ <div class="ctl"><label>segment gap (log-odds) <input type="range" id="c9g" min="0" max="30" step="1" value="15"><output id="c9gv"></output></label><label>share in segment 1 % <input type="range" id="c9s" min="10" max="50" step="5" value="30"><output id="c9sv"></output></label><button id="c9go">Re-simulate</button></div>
+ <canvas class="tl" id="c9cv"></canvas><div class="stats" id="c9st"></div><div class="read" id="c9rd"></div></div>
+</section>
+
+<section class="ch" id="c10">
+<h2><span class="num">10</span>Decisions: thresholds, expected cost and net benefit <span class="lvl e">Expert</span></h2>
+<p>If a false positive costs c_FP and a false negative c_FN, the cost-minimising rule acts when the probability exceeds t* = c_FP/(c_FP + c_FN) — but only if the probabilities are calibrated. The <b>net benefit</b> of acting on all cases with q ≥ t is NB(t) = TP/n − (FP/n)·t/(1 − t), which values a false positive at the odds of the threshold; plotted against t it gives a <b>decision curve</b> (compared with “act on everyone” and “act on no one”). With miscalibrated forecasts, the cases that clear the threshold are not the cases with the right risk, and the curve falls below that of the recalibrated model. When only the ranking is used (investigate the top 5% by capacity), calibration is irrelevant; when amounts are used (expected loss = PD × LGD × EAD for provisioning, pricing, capital, insurance premiums) calibration is essential.</p>
+<div class="card"><h4>Lab 10 · Net benefit of raw versus recalibrated forecasts</h4>
+ <p class="sub">Forecasts are the true logit times a slope plus a shift. Platt scaling (fitted on a separate half) gives the recalibrated model. The decision curve shows net benefit against the threshold; the vertical marker is the threshold you choose.</p>
+ <div class="ctl"><label>slope of forecast logit <input type="range" id="c10a" min="50" max="250" step="5" value="150"><output id="c10av"></output></label><label>intercept shift <input type="range" id="c10b" min="-20" max="20" step="1" value="10"><output id="c10bv"></output></label><label>threshold t % <input type="range" id="c10t" min="3" max="50" step="1" value="15"><output id="c10tv"></output></label><button id="c10go">Re-simulate</button></div>
+ <canvas class="tl" id="c10cv"></canvas><div class="stats" id="c10st"></div><div class="read" id="c10rd"></div></div>
+</section>
+
+<section class="ch" id="c11">
+<h2><span class="num">11</span>Testing calibration and monitoring it <span class="lvl e">Expert</span></h2>
+<p>Formal tests help only when read correctly. The <b>Hosmer–Lemeshow test</b> groups cases into g bands (usually deciles of the forecast) and compares observed and expected events: X² = Σ (Oₖ − Eₖ)² / [nₖ π̄ₖ(1 − π̄ₖ)], with about g − 2 degrees of freedom for a model fitted on the same data (g for external forecasts). <b>Spiegelhalter’s test</b> standardises the Brier score: Z = (BS − E[BS]) / SD[BS] with E[BS] = mean of q(1 − q) and Var = (1/n²) Σ q(1 − q)(1 − 2q)² under calibration. For rating grades, regulators typically look at a binomial test of the observed default rate against the grade’s PD (with adjustments for default correlation), and traffic-light rules. All of them share the same problem: with large n they reject trivial miscalibration, with small n they cannot detect serious miscalibration. Report the calibration slope and intercept with intervals and a curve, and treat tests as alarms, not as proof. For monitoring, track the E/O ratio, slope and Brier or log-loss over time with control limits.</p>
+<div class="card"><h4>Lab 11 · The distribution of p-values and the power of calibration tests</h4>
+ <p class="sub">Forecasts are the true logit times the slope you choose (1 = calibrated). For each of 300 data sets we run the Hosmer–Lemeshow test (deciles, df = 10) and Spiegelhalter’s test. Under calibration the p-values are uniform; the rejection rate at 5% is the size at slope 1 and the power otherwise.</p>
+ <div class="ctl"><label>cases <input type="range" id="c11n" min="0" max="5" step="1" value="3"><output id="c11nv"></output></label><label>slope of forecast logit <input type="range" id="c11a" min="60" max="160" step="2" value="100"><output id="c11av"></output></label><button id="c11go">Re-simulate</button></div>
+ <div class="two"><canvas class="sm" id="c11cv"></canvas><canvas class="sm" id="c11cv2"></canvas></div><div class="stats" id="c11st"></div><div class="read" id="c11rd"></div></div>
+</section>
+
+<section class="ch" id="c12">
+<h2><span class="num">12</span>Final exam, mastery checklist, cheat sheet <span class="lvl e">Expert</span></h2>
+<h3>Exam (18 questions — click an answer)</h3>
+<div id="quiz"></div>
+<div class="card"><h4>Score</h4><div class="stats" id="qscore"></div><button class="alt" id="qreset">Reset exam</button></div>
+<h3>Mastery checklist — tick when you can do it without notes</h3>
+<div class="card chk" id="chk"></div>
+<h3>Cheat sheet</h3>
+<div class="tw"><table>
+<tr><th>Idea</th><th>One line</th></tr>
+<tr><td>Calibration</td><td>P(Y = 1 | forecast q) = q; separate from discrimination (AUC)</td></tr>
+<tr><td>Reliability diagram</td><td>Binned mean forecast vs observed rate; below the diagonal = over-prediction; flat curve = over-confident</td></tr>
+<tr><td>Proper rule</td><td>Expected loss minimised by reporting the true p; Brier, log-loss, spherical are strictly proper; accuracy and |q − y| are not</td></tr>
+<tr><td>Brier decomposition</td><td>BS = REL − RES + UNC; BSS = 1 − BS/UNC</td></tr>
+<tr><td>Calibration slope / intercept</td><td>logit P(Y) = α + β logit q; ideal 0 and 1; β &lt; 1 over-fit, β &gt; 1 under-confident</td></tr>
+<tr><td>ECE</td><td>Bin-weighted |f − o|; depends on bins and is upward-biased in small samples</td></tr>
+<tr><td>Causes</td><td>Overfitting (slope &lt; 1), shrinkage (slope &gt; 1), resampling or class weights (intercept), model family, dataset shift</td></tr>
+<tr><td>Recalibration</td><td>Platt / temperature (logistic), isotonic (monotone steps, needs data), fit on separate data</td></tr>
+<tr><td>Base-rate shift</td><td>Add log[(π′/(1 − π′))/(π/(1 − π))] to the logit when only the prior moved</td></tr>
+<tr><td>Log-loss vs Brier</td><td>Log-loss punishes confident errors without limit; Brier is bounded; AUC cannot see calibration</td></tr>
+<tr><td>Segments</td><td>Average calibration can hide opposite errors; check by segment</td></tr>
+<tr><td>Decisions</td><td>t* = c_FP/(c_FP + c_FN) needs calibrated q; NB(t) = TP/n − FP/n · t/(1 − t)</td></tr>
+<tr><td>Tests</td><td>HL, Spiegelhalter, binomial by grade: reject too often at large n, too rarely at small n; report slope with CI</td></tr>
+</table></div>
+<div class="co tip"><b>Next on the roadmap</b>Item 17 continues Stage 4: imbalanced data and rare events.</div>
+</section>
+</main>
+<script>
+/*MATH*/
+function lgamma(x){const c=[76.18009172947146,-86.50532032941677,24.01409824083091,-1.231739572450155,0.1208650973866179e-2,-0.5395239384953e-5];let y=x,t=x+5.5;t-=(x+.5)*Math.log(t);let s=1.000000000190015;for(let j=0;j<6;j++)s+=c[j]/++y;return -t+Math.log(2.5066282746310005*s/x);}
+function gser(a,x){let ap=a,sum=1/a,del=sum;for(let n=0;n<1000;n++){ap++;del*=x/ap;sum+=del;if(Math.abs(del)<Math.abs(sum)*1e-15)break;}return sum*Math.exp(-x+a*Math.log(x)-lgamma(a));}
+function gcf(a,x){let b=x+1-a,c=1/1e-300,d=1/b,h=d;for(let i=1;i<1000;i++){const an=-i*(i-a);b+=2;d=an*d+b;if(Math.abs(d)<1e-300)d=1e-300;c=b+an/c;if(Math.abs(c)<1e-300)c=1e-300;d=1/d;const del=d*c;h*=del;if(Math.abs(del-1)<1e-15)break;}return Math.exp(-x+a*Math.log(x)-lgamma(a))*h;}
+function gammaQ(a,x){if(x<=0)return 1;return x<a+1?1-gser(a,x):gcf(a,x);}
+function betacf(a,b,x){const qab=a+b,qap=a+1,qam=a-1;let c=1,d=1-qab*x/qap;if(Math.abs(d)<1e-300)d=1e-300;d=1/d;let h=d;for(let m=1;m<=1000;m++){const m2=2*m;let aa=m*(b-m)*x/((qam+m2)*(a+m2));d=1+aa*d;if(Math.abs(d)<1e-300)d=1e-300;c=1+aa/c;if(Math.abs(c)<1e-300)c=1e-300;d=1/d;h*=d*c;aa=-(a+m)*(qab+m)*x/((a+m2)*(qap+m2));d=1+aa*d;if(Math.abs(d)<1e-300)d=1e-300;c=1+aa/c;if(Math.abs(c)<1e-300)c=1e-300;d=1/d;const del=d*c;h*=del;if(Math.abs(del-1)<1e-15)break;}return h;}
+function betai(a,b,x){if(x<=0)return 0;if(x>=1)return 1;const bt=Math.exp(lgamma(a+b)-lgamma(a)-lgamma(b)+a*Math.log(x)+b*Math.log(1-x));return x<(a+1)/(a+b+2)?bt*betacf(a,b,x)/a:1-bt*betacf(b,a,1-x)/b;}
+function normSf(z){const q=0.5*gammaQ(.5,z*z/2);return z>=0?q:1-q;}
+function normCdf(z){return normSf(-z);}
+function npdf(x){return Math.exp(-x*x/2)/2.5066282746310002;}
+function lbin(n,k){return lgamma(n+1)-lgamma(k+1)-lgamma(n-k+1);}
+function binom(n,k,p){return Math.exp(lbin(n,k)+k*Math.log(p)+(n-k)*Math.log(1-p));}
+function betapdf(x,a,b){return x<=0||x>=1?0:Math.exp(lgamma(a+b)-lgamma(a)-lgamma(b)+(a-1)*Math.log(x)+(b-1)*Math.log(1-x));}
+function betacdf(x,a,b){return betai(a,b,x);}
+function gampdf(x,a,r){return x<=0?0:Math.exp(a*Math.log(r)+(a-1)*Math.log(x)-r*x-lgamma(a));}
+function gamcdf(x,a,r){return x<=0?0:1-gammaQ(a,r*x);}
+function randn(){let u=0;while(!u)u=Math.random();return Math.sqrt(-2*Math.log(u))*Math.cos(2*Math.PI*Math.random());}
+function gammaS(a){if(a<1)return gammaS(a+1)*Math.pow(Math.random(),1/a);const d=a-1/3,c=1/Math.sqrt(9*d);for(;;){let x,v;do{x=randn();v=1+c*x}while(v<=0);v=v*v*v;const u=Math.random();if(Math.log(u)<.5*x*x+d-d*v+d*Math.log(v))return d*v;}}
+function betaS(a,b){const x=gammaS(a),y=gammaS(b);return x/(x+y);}
+function binS(n,p){let k=0;for(let i=0;i<n;i++)if(Math.random()<p)k++;return k;}
+function mean(a){let s=0;for(const v of a)s+=v;return s/a.length;}
+function qc(cdf,lo,hi,p,it){for(let i=0;i<(it||100);i++){const m=(lo+hi)/2;if(cdf(m)<p)lo=m;else hi=m}return(lo+hi)/2;}
+function qb(a,b,p){return qc(x=>betai(a,b,x),0,1,p,50);}
+function tcdf(x,v){const t=.5*betai(v/2,.5,v/(v+x*x));return x>0?1-t:t}
+function qn(p){return qc(normCdf,-9,9,p,70)}
+function pois(k,l){return Math.exp(-l+k*Math.log(l)-lgamma(k+1))}
+function binF(n,p){let k=0;for(;;){if(n<=0||p<=0)return k;if(p>=1)return k+n;if(n<=40){for(let i=0;i<n;i++)if(Math.random()<p)k++;return k}const a=1+(n>>1),bb=1+n-a,x=betaS(a,bb);if(x>=p){n=a-1;p=p/x}else{k+=a;n=bb-1;p=(p-x)/(1-x)}}}
+/*ENDMATH*/
+
+const $=id=>document.getElementById(id), val=id=>+$(id).value;
+const C={fg:'#e8ebf5',mu:'#8a93ab',gr:'#232a3d',a:'#6ea8ff',r:'#ff6b81',y:'#ffd166',g:'#4ade80',p:'#c084fc',t:'#5eead4'};
+const store={get(k,d){try{const v=JSON.parse(localStorage.getItem(k));return v==null?d:v}catch(e){return d}},set(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}};
+function stat(l,v,c){return `<div class="stat ${c||''}"><b>${v}</b><span>${l}</span></div>`}
+function f3(x){if(!isFinite(x))return String(x);const a=Math.abs(x);if(a!==0&&(a<1e-3||a>=1e6))return x.toExponential(2);return String(+x.toFixed(a<1?4:a<100?3:a<1000?2:0))}
+function pc(x){return f3(100*x)+'%'}
+const resizers=[];
+function reg(fn){fn();resizers.push(fn)}
+function on(ids,fn){ids.split(' ').forEach(i=>{const e=$(i);e.addEventListener('input',fn);e.addEventListener('change',fn)})}
+let rt;window.addEventListener('resize',()=>{clearTimeout(rt);rt=setTimeout(()=>resizers.forEach(f=>f()),150)});
+document.querySelectorAll('input[type=range]').forEach(i=>{const o=$(i.id+'v');if(!o)return;const f=()=>{o.textContent=i.value};i.addEventListener('input',f);f()});
+
+function nice(x){const e=Math.pow(10,Math.floor(Math.log10(x))),f=x/e;return (f<1.5?1:f<3?2:f<7?5:10)*e}
+function mk(cv,x0,x1,ymax,o){o=o||{};const y0=o.y0||0,dpr=window.devicePixelRatio||1,r=cv.getBoundingClientRect(),w=r.width||600,h=r.height||270;
+ cv.width=w*dpr;cv.height=h*dpr;const g=cv.getContext('2d');g.setTransform(dpr,0,0,dpr,0,0);g.clearRect(0,0,w,h);
+ const L=o.L||42,R=12,T=14,B=28,X=x=>L+(x-x0)/(x1-x0)*(w-L-R),Y=y=>h-B-(y-y0)/(ymax-y0)*(h-T-B);
+ g.font='11px system-ui';g.lineWidth=1;g.strokeStyle=C.gr;g.fillStyle=C.mu;
+ if(!o.noGrid){const sx=nice((x1-x0)/7);for(let x=Math.ceil(x0/sx-1e-9)*sx;!o.noX&&x<=x1+1e-9;x+=sx){g.beginPath();g.moveTo(X(x),T);g.lineTo(X(x),h-B);g.stroke();g.textAlign='center';g.fillText(String(+x.toFixed(6)),X(x),h-B+15)}
+ const sy=nice((ymax-y0)/4);for(let y=Math.ceil(y0/sy-1e-9)*sy;y<=ymax+1e-9;y+=sy){g.beginPath();g.moveTo(L,Y(y));g.lineTo(w-R,Y(y));g.stroke();g.textAlign='right';g.fillText(String(+y.toFixed(4)),L-5,Y(y)+3)}}
+ return{g,w,h,X,Y,L,R,T,B,
+  line(f,col,lw,a,b,n,dash){a=a==null?x0:a;b=b==null?x1:b;n=n||260;g.save();if(dash)g.setLineDash([5,4]);g.beginPath();g.strokeStyle=col;g.lineWidth=lw||2;let st=false;for(let i=0;i<=n;i++){const x=a+(b-a)*i/n,y=f(x);if(!isFinite(y)){st=false;continue}st?g.lineTo(X(x),Y(y)):g.moveTo(X(x),Y(y));st=true}g.stroke();g.restore()},
+  area(f,a,b,col,n){a=Math.max(a,x0);b=Math.min(b,x1);if(b<=a)return;n=n||200;g.beginPath();g.moveTo(X(a),Y(0));for(let i=0;i<=n;i++){const x=a+(b-a)*i/n;g.lineTo(X(x),Y(f(x)))}g.lineTo(X(b),Y(0));g.closePath();g.fillStyle=col;g.fill()},
+  vline(x,col,lab,dash){g.save();g.strokeStyle=col;g.lineWidth=1.6;if(dash)g.setLineDash([5,4]);g.beginPath();g.moveTo(X(x),T);g.lineTo(X(x),h-B);g.stroke();g.restore();if(lab){g.fillStyle=col;g.textAlign='center';g.fillText(lab,Math.min(Math.max(X(x),34),w-34),T+10)}},
+  hline(y,col,lab){g.save();g.strokeStyle=col;g.lineWidth=1.4;g.setLineDash([5,4]);g.beginPath();g.moveTo(L,Y(y));g.lineTo(w-R,Y(y));g.stroke();g.restore();if(lab){g.fillStyle=col;g.textAlign='right';g.fillText(lab,w-R-3,Y(y)-4)}},
+  text(s,x,y,col,al){g.fillStyle=col||C.fg;g.textAlign=al||'left';g.fillText(s,x,y)}};}
+
+/* ---------- shared helpers for this page ---------- */
+const D={
+ norm:{n:'Normal(0,1)',s:()=>randn(),mu:0,sd:1,sk:0},
+ unif:{n:'Uniform(0,1)',s:()=>Math.random(),mu:.5,sd:Math.sqrt(1/12),sk:0},
+ expo:{n:'Exponential(1)',s:()=>-Math.log(1-Math.random()),mu:1,sd:1,sk:2},
+ logn:{n:'Lognormal(0,1)',s:()=>Math.exp(randn()),mu:Math.exp(.5),sd:Math.sqrt((Math.E-1)*Math.E),sk:(Math.E+2)*Math.sqrt(Math.E-1),disc:0},
+ b05:{n:'Bernoulli(0.5)',s:()=>Math.random()<.5?1:0,mu:.5,sd:.5,sk:0,disc:1},
+ b05s:{n:'Bernoulli(0.05)',s:()=>Math.random()<.05?1:0,mu:.05,sd:Math.sqrt(.0475),sk:.9/Math.sqrt(.0475),disc:1},
+ bimo:{n:'Two humps',s:()=>(Math.random()<.5?-2:2)+.5*randn(),mu:0,sd:Math.sqrt(4.25),sk:0},
+ par5:{n:'Pareto(α=5)',s:()=>Math.pow(1-Math.random(),-.2),mu:1.25,sd:Math.sqrt(5/48),sk:6*Math.sqrt(.6)},
+ cauchy:{n:'Cauchy (no mean)',s:()=>Math.tan(Math.PI*(Math.random()-.5)),mu:NaN,sd:Infinity,sk:NaN}
+};
+function fillSel(id,keys,def){const e=$(id);e.innerHTML=keys.map(k=>`<option value="${k}">${D[k].n}</option>`).join('');e.value=def}
+const PAL=[C.a,C.r,C.y,C.g,C.p,C.t,'#ff9f43','#9aa4bf'];
+function tgrid(N,M){const T=[];let prev=0;for(let i=0;i<M;i++){let n=Math.round(Math.pow(10,Math.log10(N)*i/(M-1)));if(i===M-1)n=N;n=Math.max(prev+1,n);if(n>N)break;T.push(n);prev=n}if(T[T.length-1]!==N)T[T.length-1]=N;return T}
+function nlab(n){return n>=1e6?(n/1e6)+'M':n>=1000?(n/1000)+'k':String(n)}
+function customGrid(P,xt,yt){const g=P.g;g.save();g.strokeStyle=C.gr;g.fillStyle=C.mu;g.font='11px system-ui';g.lineWidth=1;
+ xt.forEach(([v,l])=>{g.beginPath();g.moveTo(P.X(v),P.T);g.lineTo(P.X(v),P.h-P.B);g.stroke();g.textAlign='center';g.fillText(l,P.X(v),P.h-P.B+15)});
+ yt.forEach(([v,l])=>{g.beginPath();g.moveTo(P.L,P.Y(v));g.lineTo(P.w-P.R,P.Y(v));g.stroke();g.textAlign='right';g.fillText(l,P.L-5,P.Y(v)+3)});g.restore()}
+function clip(P,fn){const g=P.g;g.save();g.beginPath();g.rect(P.L,P.T,P.w-P.L-P.R,P.h-P.T-P.B);g.clip();fn();g.restore()}
+function poly(P,pts,col,lw,dash){const g=P.g;g.save();if(dash)g.setLineDash([5,4]);g.strokeStyle=col;g.lineWidth=lw||2;g.beginPath();pts.forEach(([x,y],i)=>i?g.lineTo(P.X(x),P.Y(y)):g.moveTo(P.X(x),P.Y(y)));g.stroke();g.restore()}
+function dots(P,pts,col,r){const g=P.g;g.fillStyle=col;pts.forEach(([x,y])=>{g.beginPath();g.arc(P.X(x),P.Y(y),r||3,0,7);g.fill()})}
+function niceTicks(lo,hi,k){const st=nice((hi-lo)/(k||5)),a=[];for(let v=Math.ceil(lo/st-1e-9)*st;v<=hi+1e-9;v+=st)a.push([v,String(+v.toFixed(6))]);return a}
+function logTicks(lo,hi){const a=[];for(let e=Math.ceil(lo-1e-9);e<=hi+1e-9;e++)a.push([e,nlab(Math.pow(10,e))]);return a}
+function mom(a){const n=a.length;let m=0;for(const v of a)m+=v;m/=n;let v2=0,v3=0,v4=0;for(const v of a){const d=v-m;v2+=d*d;v3+=d*d*d;v4+=d*d*d*d}v2/=n;v3/=n;v4/=n;const sd=Math.sqrt(v2);return{n,m,sd,sk:sd>0?v3/(sd*sd*sd):0,ku:v2>0?v4/(v2*v2)-3:0}}
+function ksN(z){const a=Array.from(z).sort((x,y)=>x-y),n=a.length;let d=0;for(let i=0;i<n;i++){const F=normCdf(a[i]);d=Math.max(d,Math.abs((i+1)/n-F),Math.abs(i/n-F))}return d}
+/* histogram of data as density with optional overlay curves [{f,col,lw,dash}] */
+function hist(cv,data,lo,hi,bins,ov,col){const cnt=new Float64Array(bins),bw=(hi-lo)/bins;let n=0;for(const v of data){if(v<lo||v>=hi)continue;cnt[Math.floor((v-lo)/bw)]++;n++}
+ const N=data.length;let ym=0;for(let i=0;i<bins;i++){cnt[i]/=N*bw;ym=Math.max(ym,cnt[i])}
+ (ov||[]).forEach(o=>{for(let i=0;i<=80;i++)ym=Math.max(ym,o.f(lo+(hi-lo)*i/80)||0)});
+ const P=mk(cv,lo,hi,ym*1.12);
+ P.g.fillStyle=col||'rgba(110,168,255,.5)';for(let i=0;i<bins;i++){if(cnt[i]<=0)continue;const a=P.X(lo+i*bw),b=P.X(lo+(i+1)*bw);P.g.fillRect(a,P.Y(cnt[i]),Math.max(1,b-a-1),P.Y(0)-P.Y(cnt[i]))}
+ (ov||[]).forEach(o=>P.line(o.f,o.col,o.lw||2.4,lo,hi,200,o.dash));return P}
+const fmt=x=>f3(x);
+
+/* ---------- shared for this page ---------- */
+const POPS=['norm','unif','expo','logn','bimo','par5'];
+D.norm.med=0;D.norm.q90=1.2815516;D.unif.med=.5;D.unif.q90=.9;D.expo.med=Math.LN2;D.expo.q90=Math.log(10);D.logn.med=1;D.logn.q90=Math.exp(1.2815516);
+D.bimo.med=0;D.bimo.q90=qc(x=>.5*normCdf((x+2)/.5)+.5*normCdf((x-2)/.5),-10,10,.9,80);D.par5.med=Math.pow(2,.2);D.par5.q90=Math.pow(10,.2);
+const SF={mean:a=>mean(a),median:a=>{const b=Float64Array.from(a).sort(),n=b.length;return n%2?b[(n-1)/2]:(b[n/2-1]+b[n/2])/2},sd:a=>{const n=a.length,m=mean(a);let s=0;for(const v of a)s+=(v-m)*(v-m);return Math.sqrt(s/(n-1))},q90:a=>{const b=Float64Array.from(a).sort();return b[Math.round(.9*(b.length-1))]}};
+function truth(key,st){const d=D[key];return st==='mean'?d.mu:st==='median'?d.med:st==='sd'?d.sd:d.q90}
+const SNAME={mean:'sample mean',median:'sample median',sd:'sample SD',q90:'90th percentile'};
+const N10=[2,3,5,10,20,50,100,200,500,1000];
+function pct(a,p){const b=Float64Array.from(a).sort();return b[Math.min(b.length-1,Math.max(0,Math.floor(p*b.length)))]}
+function histLines(cv,arrs,cols,lo,hi,bins,vl){const bw=(hi-lo)/bins,dens=arrs.map(a=>{const c=new Float64Array(bins);for(const v of a){if(v<lo||v>=hi)continue;c[Math.floor((v-lo)/bw)]++}for(let i=0;i<bins;i++)c[i]/=a.length*bw;return c});let ym=0;dens.forEach(c=>c.forEach(v=>ym=Math.max(ym,v)));const P=mk(cv,lo,hi,ym*1.15||1);
+ dens.forEach((c,k)=>{const pts=[];for(let i=0;i<bins;i++){pts.push([lo+i*bw,c[i]]);pts.push([lo+(i+1)*bw,c[i]])}clip(P,()=>poly(P,pts,cols[k],2.2))});(vl||[]).forEach(v=>P.vline(v[0],v[1],v[2],v[3]));return P}
+function sdOf(a){return mom(a).sd}
+
+/* ---------- ML helpers ---------- */
+function digamma(x){let r=0;while(x<6){r-=1/x;x++}const f=1/(x*x);return r+Math.log(x)-.5/x-f*(1/12-f*(1/120-f/252))}
+function trigamma(x){let r=0;while(x<6){r+=1/(x*x);x++}const f=1/(x*x);return r+1/x+.5*f+f/x*(1/6-f*(1/30-f/42))}
+function poisS(l){if(l<=0)return 0;if(l<30){const L=Math.exp(-l);let k=0,p=1;do{k++;p*=Math.random()}while(p>L);return k-1}const m=Math.floor(.875*l),g=gammaS(m);return g<l?m+poisS(l-g):binF(m-1,l/g)}
+function llb(k,n,p){return(k?k*Math.log(p):0)+(n-k?(n-k)*Math.log(1-p):0)}
+function lrInt(k,n,cut){const ph=k/n,l0=llb(k,n,ph),g=p=>2*(l0-llb(k,n,p))-cut;let lo=0,hi=1;
+ if(k>0){let a=1e-12,b=ph;for(let i=0;i<70;i++){const m=(a+b)/2;if(g(m)>0)a=m;else b=m}lo=(a+b)/2}
+ if(k<n){let a=ph,b=1-1e-12;for(let i=0;i<70;i++){const m=(a+b)/2;if(g(m)>0)b=m;else a=m}hi=(a+b)/2}return[lo,hi]}
+function solveAlpha(s){if(!(s>1e-9))return 1e6;let a=(3-s+Math.sqrt((3-s)*(3-s)+24*s))/(12*s);for(let i=0;i<8;i++){const f=Math.log(a)-digamma(a)-s,fp=1/a-trigamma(a);let n=a-f/fp;if(!(n>0))n=a/2;a=n}return a}
+function normPdfAt(x,m,s){return Math.exp(-(x-m)*(x-m)/(2*s*s))/(s*2.5066282746)}
+/* ---------- Regression helpers ---------- */
+function idx(id,arr,ff){const e=$(id),o=$(id+'v'),f=()=>{o.textContent=ff?ff(arr[+e.value]):arr[+e.value]};e.addEventListener('input',f);f()}
+function scl(id,ff){const e=$(id),o=$(id+'v'),f=()=>{o.textContent=ff(+e.value)};e.addEventListener('input',f);f()}
+function pctTicks(a,b,st){const r=[];for(let v=a;v<=b+1e-9;v+=st)r.push([v,Math.round(v*100)+'%']);return r}
+const _tq={};function tq(v,p){const k=v+'_'+p;return _tq[k]||(_tq[k]=qc(x=>tcdf(x,v),0,500,p,80))}
+function simple(x,y){const n=x.length;let xm=0,ym=0;for(let i=0;i<n;i++){xm+=x[i];ym+=y[i]}xm/=n;ym/=n;let sxx=0,sxy=0,syy=0;for(let i=0;i<n;i++){const dx=x[i]-xm,dy=y[i]-ym;sxx+=dx*dx;sxy+=dx*dy;syy+=dy*dy}const b=sxy/sxx,a=ym-b*xm,res=new Float64Array(n);let sse=0;for(let i=0;i<n;i++){res[i]=y[i]-a-b*x[i];sse+=res[i]*res[i]}return{n,xm,ym,sxx,sxy,syy,b,a,res,sse,sst:syy,r2:1-sse/syy}}
+function gj(A,B){const p=A.length;const M=A.map((r,i)=>Array.from(r).concat(B?[B[i]]:[]));for(let c=0;c<p;c++){let m=c;for(let r=c+1;r<p;r++)if(Math.abs(M[r][c])>Math.abs(M[m][c]))m=r;[M[c],M[m]]=[M[m],M[c]];const d=M[c][c]||1e-12;for(let k=c;k<M[c].length;k++)M[c][k]/=d;for(let r=0;r<p;r++)if(r!==c){const f=M[r][c];if(f!==0)for(let k=c;k<M[c].length;k++)M[r][k]-=f*M[c][k]}}return M}
+function olsMulti(cols,y,needInv){const n=y.length,k=cols.length,p=k+1,A=[],B=new Float64Array(p);for(let i=0;i<p;i++)A.push(new Float64Array(p));
+ for(let r=0;r<n;r++){const row=[1];for(let j=0;j<k;j++)row.push(cols[j][r]);for(let i=0;i<p;i++){B[i]+=row[i]*y[r];for(let j=i;j<p;j++)A[i][j]+=row[i]*row[j]}}
+ for(let i=0;i<p;i++){for(let j=0;j<i;j++)A[i][j]=A[j][i];if(i>0)A[i][i]+=1e-9}
+ let beta,inv=null;if(needInv){const I=[];for(let i=0;i<p;i++){const e=new Float64Array(p);e[i]=1;I.push(e)}const M=gj(A,null);const aug=A.map((r,i)=>Array.from(r).concat(Array.from(I[i])));
+  const m=aug;for(let c=0;c<p;c++){let q=c;for(let r=c+1;r<p;r++)if(Math.abs(m[r][c])>Math.abs(m[q][c]))q=r;[m[c],m[q]]=[m[q],m[c]];const d=m[c][c]||1e-12;for(let kk=0;kk<2*p;kk++)m[c][kk]/=d;for(let r=0;r<p;r++)if(r!==c){const f=m[r][c];if(f!==0)for(let kk=0;kk<2*p;kk++)m[r][kk]-=f*m[c][kk]}}
+  inv=m.map(r=>r.slice(p));beta=inv.map(r=>{let s=0;for(let j=0;j<p;j++)s+=r[j]*B[j];return s})}
+ else{const M=gj(A,B);beta=M.map(r=>r[p])}
+ const res=new Float64Array(n);let sse=0;for(let r=0;r<n;r++){let f=beta[0];for(let j=0;j<k;j++)f+=beta[j+1]*cols[j][r];res[r]=y[r]-f;sse+=res[r]*res[r]}
+ const out={beta,res,sse,n,p,inv};if(inv){const s2=sse/(n-p);out.s2=s2;out.se=inv.map((r,i)=>Math.sqrt(s2*r[i]))}return out}
+function scatterAxes(cv,xs,ys,xlo,xhi,ylo,yhi,L){return mk(cv,xlo,xhi,yhi,{y0:ylo,L:L||44})}
+function range(a,pad){let lo=1e99,hi=-1e99;for(const v of a){if(v<lo)lo=v;if(v>hi)hi=v}const w=(hi-lo)||1;return[lo-(pad||.05)*w,hi+(pad||.05)*w]}
+
+
+function bars(P,groups,cols,yt){/* groups: array of arrays of values (0..1) */const g=P.g,G=groups.length,B=groups[0].length,W=(P.w-P.L-P.R)/G;groups.forEach((vals,gi)=>vals.forEach((v,bi)=>{const bw=W*.78/B,x=P.L+W*gi+W*.11+bw*bi;g.fillStyle=cols[bi];g.fillRect(x,P.Y(v),bw-2,P.Y(0)-P.Y(v));g.fillStyle=C.fg;g.textAlign='center';g.font='10px system-ui';g.fillText(Math.round(v*100)+'%',x+bw/2-1,P.Y(v)-3)}));g.font='11px system-ui'}
+function gridG(P,yt,labels){customGrid(P,[],yt);const G=labels.length,W=(P.w-P.L-P.R)/G;P.g.fillStyle=C.mu;P.g.textAlign='center';labels.forEach((l,i)=>P.g.fillText(l,P.L+W*(i+.5),P.h-P.B+15))}
+function legend(P,items,y){let x=P.L+8;items.forEach(([s,c])=>{P.text('■ '+s,x,y,c);x+=P.g.measureText('■ '+s).width+16})}
+
+/* ---------- GLM machinery ---------- */
+const LK={logit:{mu:e=>1/(1+Math.exp(-e)),d:e=>{const m=1/(1+Math.exp(-e));return m*(1-m)}},
+ probit:{mu:e=>normCdf(e),d:e=>npdf(e)},
+ cll:{mu:e=>1-Math.exp(-Math.exp(e)),d:e=>Math.exp(e-Math.exp(e))},
+ log:{mu:e=>Math.exp(e),d:e=>Math.exp(e)}};
+function minv(A){const p=A.length,m=A.map((r,i)=>{const row=Array.from(r);for(let j=0;j<p;j++)row.push(i===j?1:0);return row});
+ for(let c=0;c<p;c++){let q=c;for(let r=c+1;r<p;r++)if(Math.abs(m[r][c])>Math.abs(m[q][c]))q=r;[m[c],m[q]]=[m[q],m[c]];const d=m[c][c]||1e-12;for(let k=0;k<2*p;k++)m[c][k]/=d;for(let r=0;r<p;r++)if(r!==c){const f=m[r][c];if(f!==0)for(let k=0;k<2*p;k++)m[r][k]-=f*m[c][k]}}
+ return m.map(r=>r.slice(p))}
+function glm(cols,y,o){o=o||{};const n=y.length,k=cols.length,p=k+1,fam=o.fam||'binom',L=LK[o.link||(fam==='pois'?'log':'logit')],off=o.off,X=[new Float64Array(n).fill(1)].concat(cols),V=m=>fam==='pois'?m:m*(1-m);
+ let b=new Float64Array(p);if(o.init)b=Float64Array.from(o.init);else if(fam==='pois'){let m=0;for(const v of y)m+=v;b[0]=Math.log(Math.max(m/n,1e-3))-(off?mean(off):0)}
+ function ev(b){const eta=new Float64Array(n),mu=new Float64Array(n);let ll=0;for(let i=0;i<n;i++){let e=off?off[i]:0;for(let j=0;j<p;j++)e+=b[j]*X[j][i];e=Math.max(-30,Math.min(30,e));eta[i]=e;let m=L.mu(e);m=fam==='binom'?Math.min(1-1e-12,Math.max(1e-12,m)):Math.max(m,1e-12);mu[i]=m;ll+=fam==='pois'?y[i]*Math.log(m)-m-lgamma(y[i]+1):y[i]*Math.log(m)+(1-y[i])*Math.log(1-m)}return{eta,mu,ll}}
+ function info(c){const A=[];for(let i=0;i<p;i++)A.push(new Float64Array(p));const w=new Float64Array(n);for(let r=0;r<n;r++){const d=L.d(c.eta[r]),wi=d*d/V(c.mu[r]);w[r]=wi;for(let i=0;i<p;i++){const xi=X[i][r]*wi;for(let j=i;j<p;j++)A[i][j]+=xi*X[j][r]}}for(let i=0;i<p;i++)for(let j=0;j<i;j++)A[i][j]=A[j][i];return{A,w}}
+ let cur=ev(b),it=0,conv=false,maxit=o.maxit==null?40:o.maxit;
+ for(;it<maxit;it++){const{A,w}=info(cur),Ai=minv(A),g=new Float64Array(p);
+  for(let r=0;r<n;r++){const d=L.d(cur.eta[r]),v=V(cur.mu[r]);let s=(y[r]-cur.mu[r])*d/v;if(o.firth){let h=0;for(let i=0;i<p;i++)for(let j=0;j<p;j++)h+=X[i][r]*Ai[i][j]*X[j][r];h*=w[r];s+=h*(.5-cur.mu[r])}for(let i=0;i<p;i++)g[i]+=X[i][r]*s}
+  const st=new Float64Array(p);let mx=0;for(let i=0;i<p;i++){let s=0;for(let j=0;j<p;j++)s+=Ai[i][j]*g[j];st[i]=s}
+  if(o.firth){for(let i=0;i<p;i++){st[i]=Math.max(-1,Math.min(1,st[i]));mx=Math.max(mx,Math.abs(st[i]))}b=b.map((v,i)=>v+st[i]);cur=ev(b);if(mx<1e-8){conv=true;it++;break}}
+  else{let a=1,nb,nc;for(let h=0;h<25;h++){nb=b.map((v,i)=>v+a*st[i]);nc=ev(nb);if(nc.ll>=cur.ll-1e-10)break;a/=2}for(let i=0;i<p;i++)mx=Math.max(mx,Math.abs(a*st[i]));const dl=Math.abs(nc.ll-cur.ll);b=nb;cur=nc;if(mx<1e-8||dl<1e-11){conv=true;it++;break}}}
+ const{A,w}=info(cur),Ai=minv(A),se=Ai.map((r,i)=>Math.sqrt(Math.max(r[i],0)));let dev;
+ if(fam==='binom')dev=-2*cur.ll;else{dev=0;for(let i=0;i<n;i++){const yy=y[i],m=cur.mu[i];dev+=2*((yy>0?yy*Math.log(yy/m):0)-(yy-m))}}
+ return{beta:b,mu:cur.mu,eta:cur.eta,ll:cur.ll,dev,inv:Ai,se,iter:it,conv,X,w,p,n,A}}
+function auc(sc,y){const n=y.length,idx=Array.from({length:n},(_,i)=>i).sort((a,b)=>sc[a]-sc[b]);let rk=0,np=0,i=0;while(i<n){let j=i;while(j+1<n&&sc[idx[j+1]]===sc[idx[i]])j++;const r=(i+j)/2+1;for(let t=i;t<=j;t++)if(y[idx[t]]===1){rk+=r;np++}i=j+1}const nn=n-np;return np&&nn?(rk-np*(np+1)/2)/(np*nn):.5}
+function sepTest(x,y){let a1=1e99,b1=-1e99,a0=1e99,b0=-1e99,n1=0,n0=0;for(let i=0;i<x.length;i++){if(y[i]===1){n1++;a1=Math.min(a1,x[i]);b1=Math.max(b1,x[i])}else{n0++;a0=Math.min(a0,x[i]);b0=Math.max(b0,x[i])}}return n1>0&&n0>0&&(a1>b0||a0>b1)}
+const sig=e=>1/(1+Math.exp(-e));
+function lgt(p){return Math.log(p/(1-p))}
+function binaryData(n,a,b,sd){const x=new Float64Array(n),y=new Float64Array(n);for(let i=0;i<n;i++){x[i]=(sd||1)*randn();y[i]=Math.random()<sig(a+b*x[i])?1:0}return{x,y}}
+function heat(P,gx,gy,vals,x0,x1,y0,y1){const g=P.g,nx=gx,ny=gy;let mn=1e99,mx=-1e99;vals.forEach(v=>{if(isFinite(v)){mn=Math.min(mn,v);mx=Math.max(mx,v)}});mn=Math.max(mn,mx-30);for(let i=0;i<nx;i++)for(let j=0;j<ny;j++){const v=vals[i*ny+j],t=isFinite(v)?Math.max(0,Math.min(1,(v-mn)/(mx-mn))):0,tt=Math.pow(t,1.6),c=Math.round(40+190*tt);g.fillStyle=`rgb(${Math.round(20+60*tt)},${Math.round(30+100*tt)},${c})`;const xa=P.X(x0+(x1-x0)*i/nx),xb=P.X(x0+(x1-x0)*(i+1)/nx),ya=P.Y(y0+(y1-y0)*j/ny),yb=P.Y(y0+(y1-y0)*(j+1)/ny);g.fillRect(xa,Math.min(ya,yb),xb-xa+1,Math.abs(ya-yb)+1)}}
+
+/* ---------- regularisation machinery ---------- */
+function eigSym(A){const p=A.length,a=A.map(r=>Float64Array.from(r)),V=[];for(let i=0;i<p;i++){const r=new Float64Array(p);r[i]=1;V.push(r)}
+ for(let sw=0;sw<60;sw++){let off=0;for(let i=0;i<p;i++)for(let j=i+1;j<p;j++)off+=a[i][j]*a[i][j];if(off<1e-22)break;
+  for(let pp=0;pp<p-1;pp++)for(let q=pp+1;q<p;q++){if(Math.abs(a[pp][q])<1e-15)continue;const th=(a[q][q]-a[pp][pp])/(2*a[pp][q]),t=(th>=0?1:-1)/(Math.abs(th)+Math.sqrt(th*th+1)),c=1/Math.sqrt(t*t+1),s=t*c;
+   for(let k=0;k<p;k++){const x=a[k][pp],y=a[k][q];a[k][pp]=c*x-s*y;a[k][q]=s*x+c*y}
+   for(let k=0;k<p;k++){const x=a[pp][k],y=a[q][k];a[pp][k]=c*x-s*y;a[q][k]=s*x+c*y}
+   for(let k=0;k<p;k++){const x=V[k][pp],y=V[k][q];V[k][pp]=c*x-s*y;V[k][q]=s*x+c*y}}}
+ return{d:a.map((r,i)=>r[i]),V}}
+function stdz(cols,y){const n=y.length,p=cols.length,mu=[],sd=[],Z=[];for(let j=0;j<p;j++){let m=0;for(let i=0;i<n;i++)m+=cols[j][i];m/=n;let v=0;for(let i=0;i<n;i++){const d=cols[j][i]-m;v+=d*d}const s=Math.sqrt(v/n)||1;mu.push(m);sd.push(s);const z=new Float64Array(n);for(let i=0;i<n;i++)z[i]=(cols[j][i]-m)/s;Z.push(z)}let ym=0;for(const v of y)ym+=v;ym/=n;return{Z,mu,sd,ym,yc:Float64Array.from(y,v=>v-ym),n,p}}
+function gramOf(Z,yc,idx){const p=Z.length,n=idx?idx.length:yc.length,G=[],c=new Float64Array(p);for(let i=0;i<p;i++)G.push(new Float64Array(p));
+ for(let r=0;r<n;r++){const i=idx?idx[r]:r;for(let a=0;a<p;a++){const za=Z[a][i];c[a]+=za*yc[i];for(let b=a;b<p;b++)G[a][b]+=za*Z[b][i]}}
+ for(let a=0;a<p;a++){c[a]/=n;for(let b=a;b<p;b++){G[a][b]/=n;G[b][a]=G[a][b]}}return{G,c,n}}
+function gramMinus(F,Z,yc,val){const p=F.c.length,nv=val.length,nt=F.n-nv,G=[],c=new Float64Array(p);for(let i=0;i<p;i++){G.push(new Float64Array(p));c[i]=F.c[i]*F.n}for(let a=0;a<p;a++)for(let b=0;b<p;b++)G[a][b]=F.G[a][b]*F.n;
+ for(const i of val)for(let a=0;a<p;a++){const za=Z[a][i];c[a]-=za*yc[i];for(let b=0;b<p;b++)G[a][b]-=za*Z[b][i]}
+ for(let a=0;a<p;a++){c[a]/=nt;for(let b=0;b<p;b++)G[a][b]/=nt}return{G,c,n:nt}}
+function cd(G,c,lam,al,b0,maxit){const p=c.length,b=b0?Float64Array.from(b0):new Float64Array(p),l1=lam*al,l2=lam*(1-al);for(let it=0;it<(maxit||300);it++){let mx=0;for(let j=0;j<p;j++){let r=c[j];const Gj=G[j];for(let k=0;k<p;k++)if(k!==j&&b[k]!==0)r-=Gj[k]*b[k];const den=Gj[j]+l2,nb=Math.abs(r)>l1?(r>0?1:-1)*(Math.abs(r)-l1)/den:0;mx=Math.max(mx,Math.abs(nb-b[j])*Math.sqrt(Gj[j]));b[j]=nb}if(mx<1e-8)break}return b}
+function lamGrid(c,al,K,ratio){let mx=0;for(const v of c)mx=Math.max(mx,Math.abs(v));mx/=Math.max(al,.01);const r=[];for(let k=0;k<K;k++)r.push(mx*Math.pow(ratio||1e-3,k/(K-1)));return r}
+function ridgeEig(G){const e=eigSym(G);return e}
+function ridgeFromEig(e,c,lam){const p=c.length,vc=new Float64Array(p);for(let k=0;k<p;k++){let s=0;for(let j=0;j<p;j++)s+=e.V[j][k]*c[j];vc[k]=s/(e.d[k]+lam)}const b=new Float64Array(p);for(let j=0;j<p;j++){let s=0;for(let k=0;k<p;k++)s+=e.V[j][k]*vc[k];b[j]=s}return b}
+function dfRidge(e,lam){let s=0;for(const d of e.d)s+=Math.max(d,0)/(Math.max(d,0)+lam);return s}
+function foldsOf(n,K){const f=Int32Array.from({length:n},(_,i)=>i%K);for(let i=n-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[f[i],f[j]]=[f[j],f[i]]}return f}
+/* K-fold CV for enet (al>0) or ridge (al==='ridge'); returns {cv,se,lams,iMin,i1se} */
+function cvEnet(S,al,lams,K){const n=S.n,{Z,yc}=S,F=gramOf(Z,yc),fold=foldsOf(n,K),L=lams.length,err=[];for(let l=0;l<L;l++)err.push(new Float64Array(K));
+ for(let f=0;f<K;f++){const val=[];for(let i=0;i<n;i++)if(fold[i]===f)val.push(i);const T=gramMinus(F,Z,yc,val);let b=null,eg=null;if(al==='ridge')eg=eigSym(T.G);
+  for(let l=0;l<L;l++){b=al==='ridge'?ridgeFromEig(eg,T.c,lams[l]):cd(T.G,T.c,lams[l],al,b);let s=0;for(const i of val){let e=yc[i];for(let j=0;j<Z.length;j++)e-=b[j]*Z[j][i];s+=e*e}err[l][f]=s/val.length}}
+ const cv=[],se=[];for(let l=0;l<L;l++){cv.push(mean(err[l]));se.push(sdOf(err[l])/Math.sqrt(K))}let iMin=0;cv.forEach((v,i)=>{if(v<cv[iMin])iMin=i});let i1=iMin;for(let l=0;l<L;l++)if(cv[l]<=cv[iMin]+se[iMin]){i1=l;break}
+ return{cv,se,lams,iMin,i1se:i1,F}}
+function pathOf(F,al,lams){const out=[];let b=null;for(const l of lams){b=cd(F.G,F.c,l,al,b);out.push(b)}return out}
+function genReg(n,p,beta,rho,sg){const z0=new Float64Array(n).map(()=>randn()),cols=[],y=new Float64Array(n),s=Math.sqrt(rho),t=Math.sqrt(1-rho);for(let j=0;j<p;j++){const c=new Float64Array(n);for(let i=0;i<n;i++)c[i]=s*z0[i]+t*randn();cols.push(c)}for(let i=0;i<n;i++){let m=0;for(let j=0;j<beta.length&&j<p;j++)m+=beta[j]*cols[j][i];y[i]=m+sg*randn()}return{cols,y}}
+/* excess prediction error of standardised coefficients b under equicorrelated truth */
+function excessErr(S,b,beta,rho,p){let s=0;const bo=new Float64Array(p);for(let j=0;j<p;j++)bo[j]=b[j]/S.sd[j]-(beta[j]||0);let sum=0,sq=0;for(let j=0;j<p;j++){sum+=bo[j];sq+=bo[j]*bo[j]}return(1-rho)*sq+rho*sum*sum}
+function pctOf(a,q){const b=Float64Array.from(a).sort();return b[Math.min(b.length-1,Math.max(0,Math.floor(q*b.length)))]}
+function ridgeLogit(Z,y,lam,maxit){const n=y.length,p=Z.length,b=new Float64Array(p+1);for(let it=0;it<(maxit||25);it++){const A=[],g=new Float64Array(p+1);for(let i=0;i<=p;i++)A.push(new Float64Array(p+1));let mx=0;
+  for(let r=0;r<n;r++){let e=b[0];for(let j=0;j<p;j++)e+=b[j+1]*Z[j][r];e=Math.max(-25,Math.min(25,e));const m=1/(1+Math.exp(-e)),w=Math.max(m*(1-m),1e-9),x=[1];for(let j=0;j<p;j++)x.push(Z[j][r]);for(let i=0;i<=p;i++){g[i]+=x[i]*(y[r]-m);for(let j=i;j<=p;j++)A[i][j]+=w*x[i]*x[j]}}
+  for(let i=0;i<=p;i++)for(let j=0;j<i;j++)A[i][j]=A[j][i];for(let i=1;i<=p;i++){A[i][i]+=lam;g[i]-=lam*b[i]}A[0][0]+=1e-8;
+  const Ai=minv(A),st=Ai.map(r=>{let s=0;for(let j=0;j<=p;j++)s+=r[j]*g[j];return s});for(let i=0;i<=p;i++){const s=Math.max(-4,Math.min(4,st[i]));b[i]+=s;mx=Math.max(mx,Math.abs(s))}if(mx<1e-7)break}return b}
+
+/* ---------- helpers for calibration page ---------- */
+const CL=q=>Math.min(1-1e-12,Math.max(1e-12,q));
+const simZ=(n,sd,m)=>Float64Array.from({length:n},()=>(m||0)+sd*randn());
+const drawY=z=>Float64Array.from(z,v=>Math.random()<sig(v)?1:0);
+const mapA=(a,f)=>Float64Array.from(a,f);
+function brierOf(q,y){let s=0;for(let i=0;i<y.length;i++){const d=q[i]-y[i];s+=d*d}return s/y.length}
+function llOf(q,y){let s=0;for(let i=0;i<y.length;i++){const m=Math.min(1-1e-9,Math.max(1e-9,q[i]));s-=y[i]*Math.log(m)+(1-y[i])*Math.log(1-m)}return s/y.length}
+function relW(q,y,B){const n=new Float64Array(B),sq=new Float64Array(B),sy=new Float64Array(B);for(let i=0;i<y.length;i++){const k=Math.min(B-1,Math.floor(q[i]*B));n[k]++;sq[k]+=q[i];sy[k]+=y[i]}const f=[],o=[],c=[];for(let k=0;k<B;k++)if(n[k]>0){f.push(sq[k]/n[k]);o.push(sy[k]/n[k]);c.push(n[k])}return{f,o,n:c}}
+function relQ(q,y,g){const n=y.length,ix=Array.from({length:n},(_,i)=>i).sort((a,b)=>q[a]-q[b]),f=[],o=[],c=[];for(let k=0;k<g;k++){const a=Math.floor(k*n/g),b=Math.floor((k+1)*n/g);let sq=0,sy=0;for(let i=a;i<b;i++){sq+=q[ix[i]];sy+=y[ix[i]]}if(b>a){f.push(sq/(b-a));o.push(sy/(b-a));c.push(b-a)}}return{f,o,n:c}}
+function eceR(r){let N=0,s=0;r.n.forEach(v=>N+=v);for(let k=0;k<r.n.length;k++)s+=r.n[k]/N*Math.abs(r.f[k]-r.o[k]);return s}
+function wilson(k,n){const z=1.96,p=k/n,d=1+z*z/n,c=(p+z*z/(2*n))/d,h=z*Math.sqrt(p*(1-p)/n+z*z/(4*n*n))/d;return[Math.max(0,c-h),Math.min(1,c+h)]}
+function relDraw(P,r,col,ci){const g=P.g,mx=Math.max(...r.n),pts=r.f.map((f,k)=>[f,r.o[k],r.n[k]]);poly(P,pts.map(p=>[p[0],p[1]]),col,1.6);
+ pts.forEach(([f,o,n])=>{if(ci){const[l,h]=wilson(Math.round(o*n),n);g.strokeStyle=col;g.lineWidth=1.4;g.beginPath();g.moveTo(P.X(f),P.Y(l));g.lineTo(P.X(f),P.Y(h));g.stroke()}g.fillStyle=col;g.beginPath();g.arc(P.X(f),P.Y(o),2.5+5*Math.sqrt(n/mx),0,7);g.fill()})}
+function relAxes(cv,x1){const P=mk(cv,0,x1,x1,{y0:0,L:46});P.line(x=>x,C.mu,1.5,0,x1,2,true);P.text('observed rate ↑',P.L+6,P.T+12,C.mu);P.text('mean forecast →',P.w-P.R-110,P.h-P.B-6,C.mu);return P}
+function calFit(q,y){return ridgeLogit([mapA(q,v=>lgt(CL(v)))],y,1e-6,30)}
+function calInt(q,y){let a=0;const o=mapA(q,v=>lgt(CL(v)));for(let it=0;it<30;it++){let g=0,h=0;for(let i=0;i<y.length;i++){const m=sig(a+o[i]);g+=y[i]-m;h+=m*(1-m)}const s=g/Math.max(h,1e-9);a+=s;if(Math.abs(s)<1e-8)break}return a}
+function sdv(a){const m=mean(a);let s=0;for(const v of a)s+=(v-m)*(v-m);return Math.sqrt(s/Math.max(a.length-1,1))}
+function barV(cv,vals,cols,labs,ymax,ff){const P=mk(cv,0,vals.length,ymax,{y0:0,noGrid:true,L:50});customGrid(P,[],niceTicks(0,ymax,5));const W=(P.w-P.L-P.R)/vals.length,g=P.g;vals.forEach((v,i)=>{const w=W*.5,x=P.L+W*i+W*.25;g.fillStyle=cols[i];g.fillRect(x,P.Y(v),w,P.Y(0)-P.Y(v));g.fillStyle=C.fg;g.textAlign='center';g.fillText((ff||fmt)(v),x+w/2,P.Y(v)-4);g.fillStyle=C.mu;g.fillText(labs[i],x+w/2,P.h-P.B+15)});return P}
+function pav(r,y){const n=r.length,ix=Array.from({length:n},(_,i)=>i).sort((a,b)=>r[a]-r[b]),B=[];for(const i of ix){B.push({lo:r[i],hi:r[i],s:y[i],w:1});while(B.length>1&&B[B.length-2].s/B[B.length-2].w>B[B.length-1].s/B[B.length-1].w){const b=B.pop(),a=B.pop();B.push({lo:a.lo,hi:b.hi,s:a.s+b.s,w:a.w+b.w})}}return B}
+function isoPred(B,r,eps){return mapA(r,v=>{let lo=0,hi=B.length-1;while(lo<hi){const m=(lo+hi+1)>>1;if(B[m].lo<=v)lo=m;else hi=m-1}return Math.min(1-eps,Math.max(eps,B[lo].s/B[lo].w))})}
+
+/* ---------- Ch1 reliability diagram ---------- */
+(function(){scl('c1n',v=>v);scl('c1a',v=>fmt(v/100));scl('c1s',v=>fmt(v/100));
+ function run(){const n=val('c1n'),a=val('c1a')/100,s=val('c1s')/100,z=simZ(n,s),y=drawY(z),q=mapA(z,v=>sig(a*v)),r=relW(q,y,10),P=relAxes($('c1cv'),1);relDraw(P,r,C.a,true);
+  const b=calFit(q,y),al=calInt(q,y),tp=mapA(z,sig);
+  $('c1st').innerHTML=stat('Brier score',fmt(brierOf(q,y)),'')+stat('log-loss',fmt(llOf(q,y)),'')+stat('AUC',fmt(auc(q,y)),'in')+stat('ECE (10 bins)',fmt(eceR(r)),'warn')+stat('calibration slope (fitted)',fmt(b[1]),Math.abs(b[1]-1)>.15?'hot':'ok')+stat('mean forecast vs event rate',fmt(mean(q))+' vs '+fmt(mean(y)),'')+stat('best possible Brier (true p)',fmt(brierOf(tp,y)),'');
+  $('c1rd').innerHTML=a>1.05?`Slope ${fmt(a)} makes the forecasts over-confident: the high bins sit below the diagonal and the low bins above it, the curve is flatter than 45°, and the fitted calibration slope is ${fmt(b[1])} (about 1/${fmt(a)}). The AUC (${fmt(auc(q,y))}) is exactly what it would be for the perfect forecast, because multiplying the logit does not change the ranking, yet the Brier score is ${fmt(brierOf(q,y))} against ${fmt(brierOf(tp,y))} for the true probabilities.`:a<.95?`Slope ${fmt(a)} makes the forecasts under-confident: the curve is steeper than the diagonal (fitted slope ${fmt(b[1])}). The ranking and AUC (${fmt(auc(q,y))}) are unaffected; the Brier score pays ${fmt(brierOf(q,y)-brierOf(tp,y))} extra for the timidity.`:`With slope near 1 the dots follow the diagonal within the 95% intervals (some bins will still miss by chance: with ten bins, about one in ten intervals is expected to exclude the line even for a perfect model). Try slopes 0.6 and 1.8, or reduce the number of cases to see how noisy the diagram becomes.`}
+ on('c1a c1s c1n',()=>{});['c1a','c1s','c1n'].forEach(i=>$(i).addEventListener('change',run));$('c1go').onclick=run;run();})();
+
+/* ---------- Ch2 proper scoring rules (analytic) ---------- */
+(function(){scl('c2p',v=>v+'%');
+ const S={brier:(q,p)=>p*(1-q)*(1-q)+(1-p)*q*q,log:(q,p)=>-p*Math.log(q)-(1-p)*Math.log(1-q),sph:(q,p)=>-(p*q+(1-p)*(1-q))/Math.sqrt(q*q+(1-q)*(1-q)),abs:(q,p)=>p*(1-q)+(1-p)*q,acc:(q,p)=>q>.5?1-p:(q<.5?p:.5)};
+ const NM={brier:'Brier',log:'log-loss',sph:'spherical',abs:'absolute error',acc:'accuracy (0/1)'},CO={brier:C.a,log:C.g,sph:C.p,abs:C.r,acc:C.y};
+ function run(){const p=val('c2p')/100,P=mk($('c2cv'),0,1,1.08,{y0:-.02,L:46}),qs=Array.from({length:199},(_,i)=>.005*(i+1)),arg={};P.vline(p,C.mu,'true p',true);
+  Object.keys(S).forEach(k=>{const v=qs.map(q=>S[k](q,p)),mn=Math.min(...v),mx=Math.max(...v),nv=v.map(t=>(t-mn)/(mx-mn||1));poly(P,qs.map((q,i)=>[q,nv[i]]),CO[k],2.4);let bi=0;nv.forEach((t,i)=>{if(t<nv[bi]-1e-12)bi=i});arg[k]=qs[bi];dots(P,[[qs[bi],0]],CO[k],5)});
+  P.text('expected loss, each rule rescaled to 0–1 →',P.L+6,P.T+12,C.mu);P.text('reported probability q →',P.w-P.R-140,P.h-P.B-6,C.mu);legend(P,Object.keys(S).map(k=>[NM[k],CO[k]]),P.T+28);
+  $('c2st').innerHTML=Object.keys(S).map(k=>stat(NM[k]+' is minimised at q =',k==='acc'?(p===.5?'any':(p>.5?'any q > ½':'any q < ½')):fmt(arg[k]),k==='brier'||k==='log'||k==='sph'?'ok':'hot')).join('');
+  $('c2rd').innerHTML=`The true probability is ${pc(p)}. The three proper rules (Brier, log-loss, spherical) have their minimum at q = ${fmt(p)}: honesty is optimal. The absolute error is linear in q and is minimised by reporting ${p>.5?'1':'0'}, and the 0/1 accuracy has no preference between a forecast of ${pc(p>.5?.51:.49)} and ${pc(p>.5?.99:.01)} (it only cares which side of ½ you are on). A model trained or tuned on an improper rule gets no reward for correct probabilities.`}
+ $('c2p').addEventListener('input',run);run();})();
+
+/* ---------- Ch3 Brier decomposition ---------- */
+(function(){scl('c3n',v=>v);scl('c3a',v=>fmt(v/100));scl('c3s',v=>fmt(v/100));
+ function run(){const n=val('c3n'),a=val('c3a')/100,s=val('c3s')/100,z=simZ(n,s),y=drawY(z),q0=mapA(z,v=>sig(a*v)),B=10,cn=new Float64Array(B),cf=new Float64Array(B),co=new Float64Array(B);
+  for(let i=0;i<n;i++){const k=Math.min(B-1,Math.floor(q0[i]*B));cn[k]++;cf[k]+=q0[i];co[k]+=y[i]}const ob=mean(y);let rel=0,res=0;const q=new Float64Array(n);const fk=[...cf].map((v,k)=>cn[k]?v/cn[k]:0);
+  for(let k=0;k<B;k++)if(cn[k]){const f=cf[k]/cn[k],o=co[k]/cn[k];rel+=cn[k]/n*(f-o)*(f-o);res+=cn[k]/n*(o-ob)*(o-ob)}
+  for(let i=0;i<n;i++)q[i]=fk[Math.min(B-1,Math.floor(q0[i]*B))];const bs=brierOf(q,y),unc=ob*(1-ob),chk=bs-(rel-res+unc);
+  const ym=Math.max(unc,bs)*1.2;barV($('c3cv'),[rel,res,unc,bs],[C.r,C.g,C.mu,C.a],['REL (miscalibration)','RES (resolution)','UNC (uncertainty)','BS = REL − RES + UNC'],ym);
+  $('c3st').innerHTML=stat('REL',fmt(rel),rel>.01?'hot':'ok')+stat('RES',fmt(res),'in')+stat('UNC = ō(1−ō)',fmt(unc),'')+stat('Brier score',fmt(bs),'')+stat('Brier skill score',fmt(1-bs/unc),'ok')+stat('identity check BS − (REL − RES + UNC)',chk.toExponential(1),'');
+  $('c3rd').innerHTML=`The base rate is ${pc(ob)}, so always forecasting it scores UNC = ${fmt(unc)}. The forecasts earn a resolution of ${fmt(res)} (how well they separate high-risk from low-risk groups) and lose ${fmt(rel)} to miscalibration, giving BS = ${fmt(bs)} and a skill score of ${fmt(1-bs/unc)}. ${Math.abs(a-1)<.1?'With slope 1 the reliability term is only sampling noise (and binning).':'Move the slope away from 1 and REL grows while RES stays almost the same: bad calibration costs score, but it does not change the ranking information.'} Increase the signal and RES grows (more separation) without touching REL.`}
+ ['c3a','c3s','c3n'].forEach(i=>$(i).addEventListener('change',run));$('c3go').onclick=run;run();})();
+
+/* ---------- Ch4 ECE and slope for a calibrated model ---------- */
+(function(){const NN=[50,100,200,500,1000,2000,5000],BB=[5,10,20,50],COL=[C.a,C.g,C.y,C.r];idx('c4n',NN);scl('c4s',v=>fmt(v/100));
+ function run(){const s=val('c4s')/100,sel=NN[val('c4n')],R=60,E=BB.map(()=>NN.map(()=>0));
+  NN.forEach((n,ni)=>{for(let r=0;r<R;r++){const z=simZ(n,s),y=drawY(z),q=mapA(z,sig);BB.forEach((B,bi)=>{E[bi][ni]+=eceR(relW(q,y,B))/R})}});
+  const ymax=Math.max(...E.map(a=>a[0]))*1.1,P=mk($('c4cv'),0,NN.length-1,ymax,{y0:0,noGrid:true,L:50});customGrid(P,NN.map((n,i)=>[i,String(n)]),niceTicks(0,ymax,5));BB.forEach((B,bi)=>{poly(P,E[bi].map((v,i)=>[i,v]),COL[bi],2.4);dots(P,E[bi].map((v,i)=>[i,v]),COL[bi],3)});legend(P,BB.map((B,i)=>[B+' bins',COL[i]]),P.T+12);P.text('average ECE of a perfectly calibrated model ↑',P.L+6,P.T+28,C.mu);P.text('cases n →',P.w-P.R-70,P.h-P.B-6,C.mu);
+  const sl=[],ic=[],ec=[];for(let r=0;r<R;r++){const z=simZ(sel,s),y=drawY(z),q=mapA(z,sig);sl.push(calFit(q,y)[1]);ic.push(calInt(q,y));ec.push(eceR(relW(q,y,10)))}
+  const out=sl.filter(v=>Math.abs(v-1)>.2).length/R;
+  $('c4st').innerHTML=stat('ECE at n = '+sel+' (10 bins)',fmt(mean(ec)),'warn')+stat('SD of calibration slope',fmt(sdv(sl)),'')+stat('SD of calibration intercept',fmt(sdv(ic)),'')+stat('data sets with slope outside 0.8–1.2',pc(out),out>.2?'hot':'ok')+stat('ECE (10 bins) at n = 50 vs 5000',fmt(E[1][0])+' vs '+fmt(E[1][6]),'');
+  $('c4rd').innerHTML=`Even though the forecasts are exactly calibrated, a validation with n = ${sel} shows an ECE of ${fmt(mean(ec))} (10 bins), and the ECE depends on the binning: with 50 bins and n = 50 it is ${fmt(E[3][0])}, and it only shrinks as n grows. The fitted calibration slope has a standard deviation of ${fmt(sdv(sl))}, so ${pc(out)} of the validations would report a slope more than 0.2 away from 1 for a perfect model. Do not interpret small ECE differences between models, or between months, unless n is large; report intervals.`}
+ ['c4n','c4s'].forEach(i=>$(i).addEventListener('change',run));$('c4go').onclick=run;run();})();
+
+/* ---------- Ch5 overfitting and ridge: slope vs lambda ---------- */
+(function(){scl('c5n',v=>v);scl('c5k',v=>v);const LAM=[.01,.1,.3,1,3,10,30,100,300,1000],TST=3000;
+ function run(){const n=val('c5n'),k=val('c5k'),R=Math.max(4,Math.min(12,Math.floor(4e6/(n*k*k)))),sl=LAM.map(()=>0),ll=LAM.map(()=>0);
+  for(let r=0;r<R;r++){const Z=[],T=[];for(let j=0;j<k;j++){Z.push(Float64Array.from({length:n},randn));T.push(Float64Array.from({length:TST},randn))}const lin=(M,i)=>-.5+.5*(M[0][i]+M[1][i]+M[2][i]+M[3][i]+M[4][i]),y=Float64Array.from({length:n},(_,i)=>Math.random()<sig(lin(Z,i))?1:0),yt=Float64Array.from({length:TST},(_,i)=>Math.random()<sig(lin(T,i))?1:0);
+   LAM.forEach((lam,li)=>{const b=ridgeLogit(Z,y,lam,25),e=new Float64Array(TST);for(let i=0;i<TST;i++){let t=b[0];for(let j=0;j<k;j++)t+=b[j+1]*T[j][i];e[i]=Math.max(-30,Math.min(30,t))}const q=mapA(e,sig);ll[li]+=llOf(q,yt)/R;sl[li]+=Math.max(-1,Math.min(3,ridgeLogit([e],yt,1e-6,30)[1]))/R})}
+  let bl=0;ll.forEach((v,i)=>{if(v<ll[bl])bl=i});const xt=LAM.map((l,i)=>[i,String(l)]),P1=mk($('c5cv'),-.3,LAM.length-.7,Math.max(1.3,...sl)*1.05,{y0:Math.min(.4,...sl)*.95,noGrid:true,L:44}),P2=mk($('c5cv2'),-.3,LAM.length-.7,Math.max(...ll)*1.03,{y0:Math.min(...ll)*.97,noGrid:true,L:48});
+  [[P1,sl,C.a,'calibration slope on new data'],[P2,ll,C.r,'test log-loss']].forEach(([P,v,col,t])=>{const lo=P===P1?Math.min(.4,...sl)*.95:Math.min(...ll)*.97,hi=P===P1?Math.max(1.3,...sl)*1.05:Math.max(...ll)*1.03;customGrid(P,xt,niceTicks(lo,hi,5));poly(P,v.map((y,i)=>[i,y]),col,2.6);dots(P,v.map((y,i)=>[i,y]),col,3.2);P.vline(bl,C.y,'min log-loss',true);P.text(t,P.L+6,P.T+12,C.mu);P.text('ridge penalty λ →',P.w-P.R-100,P.h-P.B-6,C.mu)});P1.hline(1,C.g,'calibrated');
+  const crossing=sl.findIndex(v=>v>=1);
+  $('c5st').innerHTML=stat('slope with almost no penalty (λ = 0.01)',fmt(sl[0]),sl[0]<.85?'hot':'ok')+stat('slope at the best-log-loss λ',fmt(sl[bl]),'in')+stat('slope at λ = 1000',fmt(sl[9]),sl[9]>1.3?'warn':'')+stat('best λ for log-loss',LAM[bl],'ok')+stat('log-loss: no penalty vs best',fmt(ll[0])+' vs '+fmt(ll[bl]),'')+stat('repetitions',R,'');
+  $('c5rd').innerHTML=`With ${n} cases and ${k} candidate predictors (5 real), the unpenalised model has a calibration slope of ${fmt(sl[0])} on new data: its forecasts are too extreme (the effects were estimated on the same data and noise coefficients add spread). Increasing the ridge penalty pulls the slope up through 1${crossing>0?` near λ ≈ ${LAM[crossing]}`:''} and beyond: at λ = 1000 the model is under-confident (slope ${fmt(sl[9])}${sl[9]>=2.95?' or more':''}) and log-loss is back near the no-skill level. The best log-loss occurs where the slope is ${fmt(sl[bl])}, close to 1: tuning a penalty by log-loss and demanding calibration are largely the same thing.`}
+ ['c5n','c5k'].forEach(i=>$(i).addEventListener('change',run));$('c5go').onclick=run;run();})();
+
+/* ---------- Ch6 Platt vs isotonic ---------- */
+(function(){const MS=[100,200,500,1000,2000,5000],TST=4000;
+ const DIST={over:z=>1.8*z,under:z=>.6*z,shift:z=>z+1,skew:z=>z>0?.5*z:1.8*z};
+ function simSet(m,dist){const z=simZ(m,1.5,-.5),y=drawY(z);return{z,y,r:mapA(z,dist)}}
+ function fitAll(cal){const b=ridgeLogit([cal.r],cal.y,1e-6,30),B=pav(cal.r,cal.y);return{b,B}}
+ function applyAll(f,te){return{raw:mapA(te.r,sig),platt:mapA(te.r,v=>sig(f.b[0]+f.b[1]*v)),iso:isoPred(f.B,te.r,.002)}}
+ function run(){const dist=DIST[$('c6d').value],R=40,ex={raw:MS.map(()=>0),platt:MS.map(()=>0),iso:MS.map(()=>0)};let showR=null;
+  for(let r=0;r<R;r++){const te=simSet(TST,dist),pt=mapA(te.z,sig),base=llOf(pt,te.y);MS.forEach((m,mi)=>{const cal=simSet(m,dist),f=fitAll(cal),o=applyAll(f,te);ex.raw[mi]+=(llOf(o.raw,te.y)-base)/R;ex.platt[mi]+=(llOf(o.platt,te.y)-base)/R;ex.iso[mi]+=(llOf(o.iso,te.y)-base)/R;if(r===0&&m===1000)showR={o,te}})}
+  const P1=relAxes($('c6cv'),1),cols={raw:C.r,platt:C.a,iso:C.g};['raw','platt','iso'].forEach(k=>relDraw(P1,relQ(showR.o[k],showR.te.y,10),cols[k],false));legend(P1,[['raw',C.r],['Platt',C.a],['isotonic',C.g]],P1.T+28);
+  const ymax=Math.max(...ex.raw,...ex.platt,...ex.iso)*1.1,P2=mk($('c6cv2'),0,MS.length-1,ymax,{y0:0,noGrid:true,L:50});customGrid(P2,MS.map((m,i)=>[i,String(m)]),niceTicks(0,ymax,5));['raw','platt','iso'].forEach(k=>{poly(P2,ex[k].map((v,i)=>[i,v]),cols[k],2.6);dots(P2,ex[k].map((v,i)=>[i,v]),cols[k],3)});legend(P2,[['raw',C.r],['Platt',C.a],['isotonic',C.g]],P2.T+12);P2.text('excess test log-loss ↓',P2.L+6,P2.T+28,C.mu);P2.text('calibration set size →',P2.w-P2.R-120,P2.h-P2.B-6,C.mu);
+  const i1=3;$('c6st').innerHTML=stat('raw excess log-loss',fmt(ex.raw[i1]),'hot')+stat('Platt, m = 1000',fmt(ex.platt[i1]),ex.platt[i1]<ex.iso[i1]?'ok':'')+stat('isotonic, m = 1000',fmt(ex.iso[i1]),ex.iso[i1]<ex.platt[i1]?'ok':'')+stat('Platt, m = 100',fmt(ex.platt[0]),'')+stat('isotonic, m = 100',fmt(ex.iso[0]),'warn')+stat('AUC raw (any monotone map)',fmt(auc(showR.o.raw,showR.te.y)),'in');
+  const dk=$('c6d').value;$('c6rd').innerHTML=`Excess log-loss is the loss in excess of what the true probabilities would score; all three share the same ranking, so the differences are calibration. With ${dk==='skew'?'a distortion that is not a straight line on the logit scale':'a distortion that is a straight line on the logit scale'}, ${dk==='skew'?`Platt (two parameters) cannot fully repair it (${fmt(ex.platt[5])} left at m = 5000), while isotonic keeps improving with data (${fmt(ex.iso[5])})`:`Platt corrects it almost perfectly from a small sample (${fmt(ex.platt[0])} at m = 100) and isotonic needs more data to match it (${fmt(ex.iso[0])} at m = 100, ${fmt(ex.iso[5])} at m = 5000)`}. The raw forecasts score ${fmt(ex.raw[1])} in excess. Rule of thumb: Platt or temperature scaling when the distortion is smooth and data are scarce, isotonic when you have thousands of cases, hundreds of events, and a non-parametric shape.`}
+ $('c6d').addEventListener('change',run);$('c6go').onclick=run;run();})();
+
+/* ---------- Ch7 base-rate shift ---------- */
+(function(){scl('c7t',v=>v+'%');scl('c7d',v=>v+'%');scl('c7s',v=>fmt(v/10));
+ function run(){const pt=val('c7t')/100,pd=val('c7d')/100,mu=val('c7s')/10,N=40000,lt=Math.log(pt/(1-pt)),ld=Math.log(pd/(1-pd)),y=new Float64Array(N),x=new Float64Array(N);
+  for(let i=0;i<N;i++){y[i]=Math.random()<pd?1:0;x[i]=y[i]*mu+randn()}
+  const llr=mapA(x,v=>mu*v-mu*mu/2),q0=mapA(llr,v=>sig(lt+v)),q1=mapA(llr,v=>sig(ld+v)),r0=relQ(q0,y,10),r1=relQ(q1,y,10),x1=Math.min(1,nice(Math.max(...r0.f,...r0.o,...r1.f,...r1.o)*1.15)),P=relAxes($('c7cv'),x1);
+  relDraw(P,r0,C.r,false);relDraw(P,r1,C.g,false);legend(P,[['uncorrected (trained at '+pc(pt)+')',C.r],['log-odds shifted',C.g]],P.T+28);
+  const eo0=mean(q0)/mean(y),eo1=mean(q1)/mean(y);
+  $('c7st').innerHTML=stat('mean forecast, uncorrected',pc(mean(q0)),'hot')+stat('observed event rate',pc(mean(y)),'')+stat('E/O uncorrected',fmt(eo0),Math.abs(eo0-1)>.15?'hot':'ok')+stat('E/O after shift',fmt(eo1),'ok')+stat('Brier uncorrected → shifted',fmt(brierOf(q0,y))+' → '+fmt(brierOf(q1,y)),'')+stat('log-loss uncorrected → shifted',fmt(llOf(q0,y))+' → '+fmt(llOf(q1,y)),'')+stat('AUC (both)',fmt(auc(q0,y)),'in');
+  $('c7rd').innerHTML=`Trained at ${pc(pt)} but deployed at ${pc(pd)}, the model forecasts an average ${pc(mean(q0))} against a real ${pc(mean(y))} (E/O = ${fmt(eo0)}): ${eo0>1?'it over-predicts everywhere':eo0<1?'it under-predicts everywhere':'no shift'}, and the whole red curve is displaced from the diagonal. Adding the log-odds difference ${fmt(ld-lt)} to each forecast’s logit restores calibration (E/O = ${fmt(eo1)}); the AUC ${fmt(auc(q0,y))} is untouched because the ranking did not change. This works because only the prior moved; if x was no longer related to y in the same way, recalibration on recent labelled data would be required.`}
+ ['c7t','c7d','c7s'].forEach(i=>$(i).addEventListener('change',run));$('c7go').onclick=run;run();})();
+
+/* ---------- Ch8 Brier vs log-loss, A vs B ---------- */
+(function(){scl('c8k',v=>fmt(v/100));const SD=[.5,1,1.5,2,2.5,3,4];
+ function run(){const k=val('c8k')/100,dB=[],dL=[];let aucA=0,aucB=0;
+  const GN=1201;SD.forEach(s=>{let b=0,l=0;for(let i=0;i<GN;i++){const z=-7*s+14*s*i/(GN-1),w=normPdfAt(z,0,s)*14*s/(GN-1),p=sig(z),qa=sig(.8*z),qb=sig(k*z);b+=w*(p*(1-qb)*(1-qb)+(1-p)*qb*qb-p*(1-qa)*(1-qa)-(1-p)*qa*qa);const sp=x=>Math.max(x,0)+Math.log1p(Math.exp(-Math.abs(x)));l+=w*(p*sp(-k*z)+(1-p)*sp(k*z)-p*sp(-.8*z)-(1-p)*sp(.8*z))}dB.push(b);dL.push(l);if(s===2){const z=simZ(6000,2),y=drawY(z);aucA=auc(mapA(z,v=>sig(.8*v)),y);aucB=auc(mapA(z,v=>sig(k*v)),y)}});
+  const lo=Math.min(0,...dB,...dL),hi=Math.max(0,...dB,...dL),pad=(hi-lo)*.12||.01,P=mk($('c8cv'),0,SD.length-1,hi+pad,{y0:lo-pad,noGrid:true,L:56});customGrid(P,SD.map((s,i)=>[i,String(s)]),niceTicks(lo-pad,hi+pad,5));P.hline(0,C.mu,'B and A tie');
+  poly(P,dB.map((v,i)=>[i,v]),C.a,2.6);dots(P,dB.map((v,i)=>[i,v]),C.a,3.4);poly(P,dL.map((v,i)=>[i,v]),C.r,2.6);dots(P,dL.map((v,i)=>[i,v]),C.r,3.4);legend(P,[['Brier(B) − Brier(A)',C.a],['log-loss(B) − log-loss(A)',C.r]],P.T+12);P.text('below 0: the bold forecaster B is better',P.L+6,P.T+28,C.mu);P.text('signal strength (SD of the true logit) →',P.w-P.R-210,P.h-P.B-6,C.mu);
+  const dis=SD.map((s,i)=>(dB[i]<0)!==(dL[i]<0)?s:null).filter(v=>v!==null);
+  $('c8st').innerHTML=stat('Brier prefers B at signal',SD.filter((x,i)=>dB[i]<0).join(', ')||'none','in')+stat('log-loss prefers B at signal',SD.filter((x,i)=>dL[i]<0).join(', ')||'none','warn')+stat('disagreement at signal',dis.length?dis.join(', '):'none','hot')+stat('AUC of A and B (signal 2)',fmt(aucA)+' and '+fmt(aucB),'ok')+stat('log-loss gap at signal 4',fmt(dL[6]),'')+stat('Brier gap at signal 4',fmt(dB[6]),'');
+  $('c8rd').innerHTML=`A is 20% too timid and B is ${pc(k-1)} too bold. Their AUC is identical (${fmt(aucA)}): ranking-based metrics cannot tell them apart, nor can the accuracy at a fixed threshold. Proper rules can, and they weigh the errors differently: ${dis.length?`they disagree at signal ${dis.join(' and ')} (log-loss penalises the over-confident forecaster much more as the signal, and so the number of extreme forecasts, grows)`:'here both rules point the same way at every signal strength'}. At signal 4 the log-loss difference is ${fmt(dL[6])} while the Brier difference is ${fmt(dB[6])}. Choose log-loss when large errors in the tails matter (rare events, pricing of extremes) and keep Brier for a bounded, more forgiving summary.`}
+ $('c8k').addEventListener('change',run);$('c8go').onclick=run;run();})();
+
+/* ---------- Ch9 subgroup calibration ---------- */
+(function(){scl('c9g',v=>fmt(v/10));scl('c9s',v=>v+'%');
+ function run(){const gp=val('c9g')/10,sh=val('c9s')/100,N=30000,seg=new Float64Array(N),z=simZ(N,1.2),y=new Float64Array(N);
+  for(let i=0;i<N;i++){seg[i]=Math.random()<sh?1:0;y[i]=Math.random()<sig(-2+z[i]+gp*seg[i])?1:0}
+  const b=ridgeLogit([z],y,1e-6,30),q=mapA(z,v=>sig(b[0]+b[1]*v)),sub=g=>{const ix=[];for(let i=0;i<N;i++)if(seg[i]===g)ix.push(i);return{q:Float64Array.from(ix,i=>q[i]),y:Float64Array.from(ix,i=>y[i])}},s0=sub(0),s1=sub(1),rA=relQ(q,y,10),r0=relQ(s0.q,s0.y,8),r1=relQ(s1.q,s1.y,8),x1=Math.min(1,nice(Math.max(...rA.f,...rA.o,...r0.f,...r0.o,...r1.f,...r1.o)*1.15)),P=relAxes($('c9cv'),x1);
+  relDraw(P,rA,C.fg,false);relDraw(P,r0,C.a,false);relDraw(P,r1,C.r,false);legend(P,[['all cases',C.fg],['segment 0',C.a],['segment 1',C.r]],P.T+28);
+  const eo=(s)=>mean(s.q)/mean(s.y);
+  $('c9st').innerHTML=stat('E/O all cases',fmt(mean(q)/mean(y)),'ok')+stat('E/O segment 0',fmt(eo(s0)),Math.abs(eo(s0)-1)>.12?'hot':'ok')+stat('E/O segment 1',fmt(eo(s1)),Math.abs(eo(s1)-1)>.12?'hot':'ok')+stat('event rate seg 0 · seg 1',pc(mean(s0.y))+' · '+pc(mean(s1.y)),'')+stat('ECE all · seg 0 · seg 1',fmt(eceR(rA))+' · '+fmt(eceR(r0))+' · '+fmt(eceR(r1)),'warn')+stat('AUC overall',fmt(auc(q,y)),'in');
+  $('c9rd').innerHTML=`Overall the model looks calibrated (E/O ${fmt(mean(q)/mean(y))}, the white curve hugs the diagonal), but segment 0 has an E/O of ${fmt(eo(s0))} and segment 1 of ${fmt(eo(s1))}: ${gp>.3?`the model over-predicts for the first and under-predicts for the second, because the real log-odds of segment 1 are ${fmt(gp)} higher than the pooled intercept assumes`:'with no real gap the segments agree with the pooled forecasts'}. Fixes: include the segment as a feature, recalibrate within segments (checking each has enough data), or at least monitor and report by segment. Any decision that treats the two segments differently (pricing, limits, provisioning) will be biased if you only look at the pooled curve.`}
+ ['c9g','c9s'].forEach(i=>$(i).addEventListener('change',run));$('c9go').onclick=run;run();})();
+
+/* ---------- Ch10 decision curve ---------- */
+(function(){scl('c10a',v=>fmt(v/100));scl('c10b',v=>fmt(v/10));scl('c10t',v=>v+'%');
+ function nb(q,y,t){let tp=0,fp=0;for(let i=0;i<y.length;i++)if(q[i]>=t){if(y[i])tp++;else fp++}return tp/y.length-fp/y.length*t/(1-t)}
+ function run(){const a=val('c10a')/100,b=val('c10b')/10,t0=val('c10t')/100,N=30000,z=simZ(2*N,1.5,-1.5),y=drawY(z),zt=z.slice(0,N),yt=y.slice(0,N),zc=z.slice(N),yc=y.slice(N),f=v=>a*v+b,qr=mapA(zt,v=>sig(f(v))),qcal=mapA(zc,v=>sig(f(v))),pl=ridgeLogit([mapA(qcal,v=>lgt(CL(v)))],yc,1e-6,30),qp=mapA(qr,v=>sig(pl[0]+pl[1]*lgt(CL(v)))),qt=mapA(zt,sig),pi=mean(yt),TG=Array.from({length:58},(_,i)=>.02+.01*i);
+  const cur={raw:TG.map(t=>nb(qr,yt,t)),pl:TG.map(t=>nb(qp,yt,t)),tr:TG.map(t=>nb(qt,yt,t)),all:TG.map(t=>pi-(1-pi)*t/(1-t))},hi=Math.max(...cur.tr)*1.1,lo=-.04,P=mk($('c10cv'),.02,.59,hi,{y0:lo,L:50});
+  clip(P,()=>{poly(P,TG.map((t,i)=>[t,cur.all[i]]),C.mu,2,true);poly(P,TG.map((t,i)=>[t,cur.tr[i]]),C.g,2.2,true);poly(P,TG.map((t,i)=>[t,cur.raw[i]]),C.r,2.6);poly(P,TG.map((t,i)=>[t,cur.pl[i]]),C.a,2.6)});P.hline(0,C.gr,'');P.vline(t0,C.y,'t',true);legend(P,[['raw forecasts',C.r],['recalibrated (Platt)',C.a],['true probabilities',C.g],['treat everyone',C.mu]],P.T+12);P.text('net benefit ↑',P.L+6,P.T+28,C.mu);P.text('threshold t →',P.w-P.R-80,P.h-P.B-6,C.mu);
+  const n0=nb(qr,yt,t0),n1=nb(qp,yt,t0),n2=nb(qt,yt,t0),n3=pi-(1-pi)*t0/(1-t0),act=qr.filter(v=>v>=t0).length/N,actT=qt.filter(v=>v>=t0).length/N;
+  $('c10st').innerHTML=stat('net benefit at t, raw',fmt(n0),n0<n1-.002?'hot':'')+stat('recalibrated',fmt(n1),'ok')+stat('true probabilities (ceiling)',fmt(n2),'in')+stat('treat everyone',fmt(n3),'')+stat('share acted on: raw · true',pc(act)+' · '+pc(actT),'warn')+stat('mean forecast vs event rate',pc(mean(qr))+' vs '+pc(pi),'');
+  $('c10rd').innerHTML=`At the threshold ${pc(t0)} the raw forecasts act on ${pc(act)} of cases (the true probabilities would act on ${pc(actT)}) and yield a net benefit of ${fmt(n0)}; after Platt recalibration it is ${fmt(n1)}, against ${fmt(n2)} for the ideal. ${Math.abs(a-1)<.1&&Math.abs(b)<.15?'With a nearly calibrated model the three curves coincide.':'Because the ranking is the same, all three curves agree wherever the choice depends only on ranking; the gap appears at thresholds where the miscalibration changes the number acted on. At very low thresholds acting on everyone is hard to beat.'} A threshold derived from costs (t* = c_FP/(c_FP + c_FN)) is only meaningful for calibrated probabilities; if you cannot recalibrate, choose the threshold on the observed outcome on validation data.`}
+ ['c10a','c10b','c10t'].forEach(i=>$(i).addEventListener('change',run));$('c10go').onclick=run;run();})();
+
+/* ---------- Ch11 HL and Spiegelhalter ---------- */
+(function(){const NN=[200,500,1000,2000,5000,10000];idx('c11n',NN);scl('c11a',v=>fmt(v/100));
+ function run(){const n=NN[val('c11n')],a=val('c11a')/100,R=300,ph=[],ps=[];
+  for(let r=0;r<R;r++){const z=simZ(n,1.5,-1),y=drawY(z),q=mapA(z,v=>sig(a*v)),ix=Array.from({length:n},(_,i)=>i).sort((u,w)=>q[u]-q[w]);let X=0;for(let k=0;k<10;k++){const lo=Math.floor(k*n/10),hi=Math.floor((k+1)*n/10),m=hi-lo;let O=0,E=0;for(let i=lo;i<hi;i++){O+=y[ix[i]];E+=q[ix[i]]}const pb=E/m;X+=(O-E)*(O-E)/Math.max(m*pb*(1-pb),1e-9)}ph.push(gammaQ(5,X/2));
+   let bs=0,eb=0,vb=0;for(let i=0;i<n;i++){const d=q[i]-y[i];bs+=d*d;eb+=q[i]*(1-q[i]);vb+=q[i]*(1-q[i])*(1-2*q[i])*(1-2*q[i])}const Z=(bs-eb)/Math.sqrt(Math.max(vb,1e-12));ps.push(2*normSf(Math.abs(Z)))}
+  const P1=hist($('c11cv'),ph,0,1,10,[{f:()=>1,col:C.a}]),P2=hist($('c11cv2'),ps,0,1,10,[{f:()=>1,col:C.a}]);P1.text('Hosmer–Lemeshow p-values',P1.L+8,P1.T+12,C.mu);P2.text('Spiegelhalter p-values',P2.L+8,P2.T+12,C.mu);
+  const rh=ph.filter(v=>v<.05).length/R,rs=ps.filter(v=>v<.05).length/R;
+  $('c11st').innerHTML=stat('HL rejects at 5%',pc(rh),rh>.15?'hot':'in')+stat('Spiegelhalter rejects at 5%',pc(rs),rs>.15?'hot':'in')+stat('true slope of forecast logit',fmt(a),'')+stat('cases',n,'')+stat('median p-value: HL · Spiegelhalter',fmt(pct(ph,.5))+' · '+fmt(pct(ps,.5)),'');
+  $('c11rd').innerHTML=a===1?`The forecasts are exactly calibrated: both tests reject about 5% of the time by design (${pc(rh)} and ${pc(rs)} here) and their p-values are roughly uniform, the flat histogram. Now move the slope to 0.8 or 1.2 and change n: at n = ${n} the rejection rate is the <em>power</em> of each test for that departure.`:`With slope ${fmt(a)} (the forecasts are ${a>1?'over':'under'}-confident by ${pc(Math.abs(a-1))}) the Hosmer–Lemeshow test rejects in ${pc(rh)} of data sets and Spiegelhalter’s in ${pc(rs)} at n = ${n}. ${Math.max(rh,rs)<.5?'Most validations would conclude “no evidence of miscalibration” even though the miscalibration is real: absence of rejection is not evidence of calibration, so look at the slope and its interval.':'Power is high here; at n = 200 the same miscalibration would often go unnoticed, and with a very large n even a harmless slope of 0.98 would be rejected.'} The two tests are sensitive to different shapes: HL looks at the groups across the range, Spiegelhalter at the overall Brier score.`}
+ ['c11n','c11a'].forEach(i=>$(i).addEventListener('change',run));$('c11go').onclick=run;run();})();
+const QZ=[
+{l:'Beginner',q:'A forecast is perfectly calibrated if…',o:['It has the highest possible AUC','Among all cases given forecast q, a fraction q actually have the event','Its average equals 0.5','It never exceeds 0.5'],a:1,e:'Calibration means P(Y = 1 | q) = q for each forecast value; it says nothing about ranking.'},
+{l:'Beginner',q:'On a reliability diagram, a point below the 45° line means…',o:['The model under-predicts in that bin','The model over-predicts in that bin: the observed rate is lower than the forecast','The bin has no data','The model is perfectly calibrated there'],a:1,e:'The horizontal axis is the forecast and the vertical axis the observed rate; below the line means observed &lt; forecast.'},
+{l:'Intermediate',q:'You multiply every predicted log-odds by 2. The AUC…',o:['Doubles','Is unchanged, but the probabilities become more extreme and generally worse calibrated','Falls to 0.5','Is unchanged and so is the calibration'],a:1,e:'A monotone transformation preserves ranking (AUC) but changes the probabilities, so calibration and the proper scores change.'},
+{l:'Intermediate',q:'Which of these is a strictly proper scoring rule?',o:['Accuracy at the 0.5 threshold','Absolute error |q − y|','Brier score and log-loss','The proportion of correct rankings'],a:2,e:'Brier and log-loss are strictly proper: their expected value is minimised only by the true probability. Accuracy and absolute error reward exaggeration.'},
+{l:'Intermediate',q:'If the true probability is p, the expected Brier score of reporting q equals…',o:['p(1 − p) + (q − p)²','(q − p)','p log q','q(1 − q)'],a:0,e:'Noise p(1 − p) plus the squared difference between the forecast and the truth.'},
+{l:'Intermediate',q:'In the Murphy decomposition BS = REL − RES + UNC, which term measures miscalibration?',o:['RES','UNC','REL (reliability)','None: Brier ignores calibration'],a:2,e:'REL = Σ(nₖ/n)(fₖ − oₖ)²; RES is resolution (information), UNC = ō(1 − ō) the base-rate uncertainty.'},
+{l:'Advanced',q:'A validation reports calibration slope 0.7 for a logistic model. This suggests…',o:['Under-confident forecasts','Over-confident (too extreme) forecasts, typical of overfitting','The base rate shifted','Nothing; the slope can be any value'],a:1,e:'β &lt; 1 means the model’s log-odds should be shrunk: new-data risks are less extreme than the predictions.'},
+{l:'Advanced',q:'Why is a nonzero ECE for a perfectly calibrated model in a small validation sample expected?',o:['ECE is always positive by definition, plus noise in bin averages makes the observed rates deviate','Perfect calibration is impossible','ECE measures discrimination','Bins with few cases are ignored'],a:0,e:'|f − o| is positive in any noisy bin, so ECE is biased upward and depends on the number of bins and n.'},
+{l:'Advanced',q:'A heavily regularised model (very large ridge penalty) is most likely to be…',o:['Over-confident','Under-confident: forecasts are shrunk toward the base rate and the slope exceeds 1','Perfectly calibrated','Impossible to calibrate'],a:1,e:'Shrinkage compresses the predicted logits; the calibration slope on new data then exceeds 1.'},
+{l:'Advanced',q:'When should isotonic regression be preferred to Platt scaling?',o:['With very small calibration sets','When there is a lot of calibration data and the distortion is not a simple logistic shape','Never; Platt is always better','When the ranking must change'],a:1,e:'Isotonic is flexible but data-hungry and creates ties; Platt is stable with small samples if the distortion is logistic-shaped.'},
+{l:'Advanced',q:'A model trained on a data set with a 10% event rate is deployed where the rate is 3% (nothing else changed). The correction is…',o:['Retrain the model with new variables','Add log[(0.03/0.97)/(0.10/0.90)] to every forecast logit','Divide all probabilities by 3','Multiply by the AUC'],a:1,e:'For pure prior shift the posterior log-odds change by the difference in prior log-odds; the ranking is unchanged.'},
+{l:'Advanced',q:'Which statement about log-loss versus Brier is correct?',o:['Both are bounded by 1','Log-loss is unbounded and penalises confident wrong forecasts severely; Brier is bounded','Brier is improper','Log-loss ignores calibration'],a:1,e:'A forecast of 0.001 for an event that happens costs about 6.9 in log-loss but at most 1 in Brier.'},
+{l:'Expert',q:'Overall calibration (E/O = 1) is good, but one region’s E/O is 0.7 and another’s is 1.3. The right response is…',o:['Nothing; the overall figure is what matters','Add the region (or a proxy) to the model or recalibrate by region, and monitor by segment','Report the AUC only','Drop the regions'],a:1,e:'Opposite errors cancel in the average. Strong calibration requires calibration in relevant subgroups.'},
+{l:'Expert',q:'A threshold t* = c_FP/(c_FP + c_FN) is the cost-optimal rule only if…',o:['The AUC is above 0.8','The probabilities are calibrated','The base rate is 50%','Accuracy is maximised'],a:1,e:'The derivation assumes q is the true probability; miscalibrated q breaks the rule, so recalibrate or tune t on validation outcomes.'},
+{l:'Expert',q:'The net benefit of acting on cases with q ≥ t is…',o:['TP/n − (FP/n) · t/(1 − t)','TP/n + FP/n','(TP − FP)/n × t','1 − Brier'],a:0,e:'False positives are weighed at the odds of the threshold; this is the basis of the decision curve.'},
+{l:'Expert',q:'A calibration test (Hosmer–Lemeshow) on a 300-case validation set is not significant. You should conclude…',o:['The model is calibrated','Only that there is insufficient evidence of miscalibration; the power is low, so inspect the slope with its interval and the curve','The model is miscalibrated','The AUC is high'],a:1,e:'Non-significance is not proof of calibration; tests have low power at small n and reject trivial deviations at very large n.'},
+{l:'Expert',q:'Two models have the same AUC, but model A has log-loss 0.35 and B has 0.45. The most likely difference is…',o:['B ranks worse','A’s probabilities are better calibrated (or sharper in a calibrated way) while B is miscalibrated','They have different base rates','A used more data'],a:1,e:'AUC ignores the scale of the forecasts. A difference in a proper score at equal AUC points to calibration.'},
+{l:'Expert',q:'For credit provisioning, expected loss is PD × LGD × EAD. Why does calibration matter more here than for a collection-priority list?',o:['The list needs higher AUC','Provisioning multiplies the probability by amounts, so a biased PD biases the total; a priority list only needs the order','Lists never use probabilities','There is no difference'],a:1,e:'When the number itself is used (capital, pricing, provisions), calibration errors flow straight into the result; rankings only need the order.'}
+];
+(function(){const st=store.get('cs_quiz',{});
+ function render(){const box=$('quiz');box.innerHTML='';
+  QZ.forEach((q,i)=>{const d=document.createElement('div');d.className='q'+(st[i]!=null?' done':'');d.innerHTML=`<div class="qh">Q${i+1} · ${q.l}</div><div style="margin:4px 0 6px"><b>${q.q}</b></div>`;
+   q.o.forEach((o,j)=>{const b=document.createElement('button');b.className='opt';b.textContent=o;if(st[i]!=null){if(j===q.a)b.classList.add('good');else if(j===st[i])b.classList.add('bad')}b.onclick=()=>{if(st[i]!=null)return;st[i]=j;store.set('cs_quiz',st);render();meter()};d.appendChild(b)});
+   const e=document.createElement('div');e.className='ex';e.innerHTML=(st[i]===q.a?'✅ ':'❌ ')+q.e;d.appendChild(e);box.appendChild(d)});
+  const ans=Object.keys(st).length,ok=QZ.filter((q,i)=>st[i]===q.a).length;
+  $('qscore').innerHTML=stat('answered',ans+' / '+QZ.length,'in')+stat('correct',ok,'ok')+stat('score',ans?Math.round(100*ok/ans)+'%':'—',ok/Math.max(ans,1)>=.8?'ok':'warn')+stat('verdict',ans<QZ.length?'keep going':ok>=16?'calibration master':ok>=13?'strong':'review ch. 1–7','')}
+ $('qreset').onclick=()=>{Object.keys(st).forEach(k=>delete st[k]);store.set('cs_quiz',st);render();meter()};
+ window.__qst=st;render();})();
+const CHK=['Define calibration and distinguish it from discrimination.','Draw and read a reliability diagram (over- vs under-confidence).','State what makes a scoring rule proper and give proper and improper examples.','Write the Brier decomposition and the Brier skill score.','Fit and interpret calibration slope and intercept.','Explain why ECE is binning- and sample-size-dependent.','List the common causes of miscalibration (overfit, shrinkage, resampling, shift).','Recalibrate with Platt/temperature scaling and isotonic regression on separate data.','Apply the log-odds correction for a base-rate change.','Compare Brier, log-loss and AUC and choose among them.','Check calibration by segment and know the fixes.','Choose a decision threshold from costs and read a decision curve.','Interpret HL and Spiegelhalter tests and their power.','Write a calibration section for a model-validation report.'];
+(function(){const st=store.get('cs_chk',{}),box=$('chk');CHK.forEach((t,i)=>{const l=document.createElement('label'),c=document.createElement('input');c.type='checkbox';c.checked=!!st[i];c.onchange=()=>{st[i]=c.checked;store.set('cs_chk',st);meter()};l.appendChild(c);const s=document.createElement('span');s.textContent=t;l.appendChild(s);box.appendChild(l)});window.__cst=st;})();
+function meter(){const q=window.__qst||{},c=window.__cst||{};const ok=QZ.filter((x,i)=>q[i]===x.a).length,ck=Object.values(c).filter(Boolean).length;const p=Math.round(100*(.6*ok/QZ.length+.4*ck/CHK.length));$('mtxt').textContent='Mastery: '+p+'%  (exam + checklist)';$('mbar').style.width=p+'%';store.set('mastery_cs',p)}
+meter();
+
+/* ---------- Navigation ---------- */
+(function(){const nav=$('nav');let html='';
+ document.querySelectorAll('main .part, main section.ch').forEach(el=>{if(el.classList.contains('part'))html+=`<div class="pt">${el.textContent}</div>`;else{const h=el.querySelector('h2'),num=h.querySelector('.num').textContent,t=Array.from(h.childNodes).filter(n=>n.nodeType===3).map(n=>n.textContent).join('').trim();html+=`<a href="#${el.id}" data-id="${el.id}">${num}. ${t}</a>`}});
+ nav.innerHTML=html;const links=nav.querySelectorAll('a'),io=new IntersectionObserver(es=>{es.forEach(e=>{if(e.isIntersecting)links.forEach(a=>a.classList.toggle('on',a.dataset.id===e.target.id))})},{rootMargin:'-20% 0px -70% 0px'});
+ document.querySelectorAll('section.ch').forEach(s=>io.observe(s));
+ $('menu').onclick=()=>$('side').classList.toggle('open');nav.addEventListener('click',e=>{if(e.target.tagName==='A')$('side').classList.remove('open')});
+ window.addEventListener('scroll',()=>{const h=document.documentElement;$('prog').style.width=(100*h.scrollTop/(h.scrollHeight-h.clientHeight))+'%'},{passive:true});})();
+</script>
+</body>
+</html>
