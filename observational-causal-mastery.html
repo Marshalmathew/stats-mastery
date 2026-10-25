@@ -1,0 +1,643 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Observational Causal Methods Mastery</title>
+<style>
+:root{--bg:#0b0e17;--panel:#121726;--panel2:#171d30;--line:#232a3d;--fg:#e8ebf5;--mu:#8a93ab;--a:#6ea8ff;--r:#ff6b81;--y:#ffd166;--g:#4ade80;--p:#c084fc;--t:#5eead4}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;background:var(--bg);color:var(--fg);font:16px/1.7 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+a{color:var(--a)}
+#prog{position:fixed;top:0;left:0;height:3px;background:linear-gradient(90deg,var(--a),var(--p),var(--r));width:0;z-index:50}
+.side{position:fixed;left:0;top:0;bottom:0;width:290px;background:#0e1220;border-right:1px solid var(--line);overflow:auto;padding:18px 14px 90px;z-index:40;transition:transform .25s}
+.side h1{font-size:15px;margin:0 0 2px}
+.side small{color:var(--mu)}
+.side .pt{margin:16px 0 4px;font-size:11px;text-transform:uppercase;letter-spacing:1.3px;color:var(--p)}
+.side a{display:block;color:var(--mu);text-decoration:none;padding:5px 9px;border-radius:7px;font-size:13.5px;line-height:1.35}
+.side a:hover{background:var(--panel);color:var(--fg)}
+.side a.on{background:var(--panel2);color:var(--fg);box-shadow:inset 3px 0 var(--a)}
+.side a.back{color:var(--t);padding-left:0;margin-bottom:6px}
+.meter{position:fixed;left:0;bottom:0;width:290px;background:#0e1220;border-top:1px solid var(--line);padding:10px 16px;z-index:41;font-size:12px;color:var(--mu)}
+.meter .bar{height:7px;background:var(--line);border-radius:6px;margin-top:5px;overflow:hidden}
+.meter .bar i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--g),var(--t));transition:width .4s}
+#menu{display:none;position:fixed;top:10px;left:10px;z-index:60;background:var(--panel2);color:var(--fg);border:1px solid var(--line);border-radius:9px;padding:7px 12px;font-size:14px;cursor:pointer}
+main{margin-left:290px;padding:0 34px 120px;max-width:1090px}
+.hero{padding:70px 0 30px}
+.hero h1{font-size:clamp(32px,5vw,56px);line-height:1.08;margin:0 0 14px;background:linear-gradient(100deg,#fff,var(--y) 40%,var(--r));-webkit-background-clip:text;background-clip:text;color:transparent}
+.hero p{font-size:19px;color:#c3c9dc;max-width:780px}
+.chips{display:flex;flex-wrap:wrap;gap:8px;margin:18px 0}
+.chip{border:1px solid var(--line);background:var(--panel);padding:5px 12px;border-radius:99px;font-size:13px;color:var(--mu)}
+.chip b{color:var(--fg)}
+.part{margin:90px 0 0;padding-top:22px;border-top:1px solid var(--line);font-size:12px;letter-spacing:2px;text-transform:uppercase;color:var(--p)}
+section.ch{padding-top:30px}
+h2{font-size:30px;line-height:1.2;margin:10px 0 8px;display:flex;gap:12px;align-items:center;flex-wrap:wrap}
+h2 .num{display:inline-grid;place-items:center;width:40px;height:40px;border-radius:12px;background:var(--panel2);border:1px solid var(--line);font-size:18px;color:var(--a)}
+.lvl{font-size:11px;font-weight:600;letter-spacing:.8px;text-transform:uppercase;padding:3px 9px;border-radius:99px;border:1px solid}
+.lvl.b{color:var(--g);border-color:#1f5c3a}.lvl.i{color:var(--a);border-color:#244a85}.lvl.a{color:var(--y);border-color:#6b5420}.lvl.e{color:var(--r);border-color:#7a2c3a}
+h3{font-size:19px;margin:30px 0 6px;color:#fff}
+p{margin:10px 0}li{margin:5px 0}
+code,.f{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace}
+code{background:var(--panel2);padding:1px 6px;border-radius:5px;font-size:.9em}
+.f{display:block;white-space:pre-wrap;background:#0e1322;border:1px solid var(--line);border-left:3px solid var(--a);padding:12px 16px;border-radius:9px;margin:14px 0;overflow-x:auto;font-size:15px;color:#dbe4ff;line-height:1.8}
+.co{border-radius:12px;padding:13px 17px;margin:16px 0;border:1px solid var(--line);background:var(--panel)}
+.co>b:first-child{display:block;margin-bottom:2px;font-size:12px;letter-spacing:1px;text-transform:uppercase}
+.co.def{border-left:4px solid var(--a)}.co.def>b:first-child{color:var(--a)}
+.co.warn{border-left:4px solid var(--r)}.co.warn>b:first-child{color:var(--r)}
+.co.tip{border-left:4px solid var(--g)}.co.tip>b:first-child{color:var(--g)}
+.co.key{border-left:4px solid var(--y);background:#171608}.co.key>b:first-child{color:var(--y)}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:18px 20px;margin:22px 0;box-shadow:0 8px 30px rgba(0,0,0,.25)}
+.card>h4{margin:0 0 3px;font-size:13px;letter-spacing:1.2px;text-transform:uppercase;color:var(--t)}
+.card>p.sub{margin:0 0 12px;color:var(--mu);font-size:14.5px}
+.ctl{display:flex;flex-wrap:wrap;gap:10px 22px;align-items:center;margin:8px 0 10px}
+.ctl label{display:flex;gap:8px;align-items:center;font-size:14px;color:#c3c9dc}
+.ctl output{min-width:38px;font-family:ui-monospace,monospace;color:var(--y);font-size:13px}
+input[type=range]{accent-color:var(--a);width:150px}
+input[type=checkbox]{accent-color:var(--a)}
+select,input[type=number],input[type=text]{background:#0e1322;color:var(--fg);border:1px solid var(--line);border-radius:8px;padding:6px 9px;font:inherit;font-size:14px}
+button{background:linear-gradient(180deg,#2c4a80,#233b68);color:#fff;border:1px solid #3a5a98;border-radius:9px;padding:7px 14px;font:inherit;font-size:14px;cursor:pointer}
+button:hover{filter:brightness(1.15)}
+button.alt{background:var(--panel2);border-color:var(--line);color:var(--fg)}
+canvas{width:100%;height:270px;display:block;background:#0e1322;border:1px solid var(--line);border-radius:10px;margin-top:6px}
+canvas.sm{height:210px}canvas.tl{height:330px}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(125px,1fr));gap:9px;margin:12px 0}
+.stat{background:#0e1322;border:1px solid var(--line);border-radius:10px;padding:8px 11px}
+.stat b{display:block;font-size:17px;font-family:ui-monospace,monospace}
+.stat span{font-size:11.5px;color:var(--mu);text-transform:uppercase;letter-spacing:.7px}
+.stat.hot b{color:var(--r)}.stat.ok b{color:var(--g)}.stat.warn b{color:var(--y)}.stat.in b{color:var(--a)}
+.read{margin:8px 0 0;padding:10px 14px;background:#0e1322;border:1px dashed #33406a;border-radius:10px;font-size:14.5px;color:#d3dbf3}
+table{border-collapse:collapse;width:100%;margin:12px 0;font-size:14px}
+th,td{border:1px solid var(--line);padding:7px 10px;text-align:left;vertical-align:top}
+th{background:var(--panel2);font-size:12px;text-transform:uppercase;letter-spacing:.6px;color:var(--mu)}
+td.n{font-family:ui-monospace,monospace;text-align:right}
+.tw{overflow-x:auto}
+.pill{display:inline-block;padding:1px 9px;border-radius:99px;font-size:12px;font-weight:600}
+.pill.r{background:#3a1520;color:var(--r)}.pill.g{background:#10321f;color:var(--g)}.pill.y{background:#3a2f0e;color:var(--y)}.pill.m{background:#202637;color:var(--mu)}
+details{background:var(--panel);border:1px solid var(--line);border-radius:11px;padding:9px 15px;margin:9px 0}
+details summary{cursor:pointer;font-weight:600}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.q{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:14px 18px;margin:14px 0}
+.q .qh{font-size:12px;letter-spacing:1px;text-transform:uppercase;color:var(--mu)}
+.q .opt{display:block;width:100%;text-align:left;margin:6px 0;background:#0e1322;border:1px solid var(--line);color:var(--fg);border-radius:9px;padding:9px 12px}
+.q .opt.good{border-color:var(--g);background:#0e2418}.q .opt.bad{border-color:var(--r);background:#2a1119}
+.q .ex{display:none;margin-top:8px;font-size:14.5px;color:#c3c9dc}
+.q.done .ex{display:block}
+.chk label{display:flex;gap:10px;align-items:flex-start;padding:6px 0;cursor:pointer}
+.chk input{margin-top:6px;accent-color:var(--g);width:17px;height:17px}
+.sigrow{display:grid;grid-template-columns:minmax(170px,2fr) 1fr 1fr auto;gap:8px 14px;align-items:center;padding:6px 0;border-top:1px dashed #1b2236}
+.sigrow:first-of-type{border-top:0}
+.sigrow label{display:flex;gap:6px;align-items:center;font-size:13.5px;color:#c3c9dc}
+@media(max-width:900px){
+ .side{transform:translateX(-100%)}.side.open{transform:none}.meter{display:none}
+ #menu{display:block}main{margin-left:0;padding:0 16px 100px}.two{grid-template-columns:1fr}.hero{padding-top:60px}
+ .sigrow{grid-template-columns:1fr 1fr}
+}
+</style>
+</head>
+<body>
+<div id="prog"></div>
+<button id="menu">☰ Contents</button>
+<nav class="side" id="side"><a class="back" href="index.html">← All courses</a><h1>Observational Causal Methods</h1><small>12 chapters · 11 labs · exam</small><div id="nav"></div></nav>
+<div class="meter"><div id="mtxt">Mastery: 0%</div><div class="bar"><i id="mbar"></i></div></div>
+
+<main>
+<header class="hero">
+ <h1>Observational causal methods: matching, weighting, difference-in-differences, instruments, regression discontinuity and synthetic control.</h1>
+ <p>Often no experiment is possible: a bank cannot randomise who gets a loan, a rule change applies to every branch, a score cut-off was set years ago. The previous page showed what randomisation buys; this page shows what can be recovered without it and what each method has to assume. Methods that rely on <em>observed</em> confounders (matching, propensity-score weighting, doubly robust estimators) need ignorability and overlap. Designs that exploit <em>structure</em> (before-and-after with a comparison group, an instrument, a threshold, a weighted set of donors) trade that assumption for another, such as parallel trends, exclusion or continuity. Every lab simulates data with a known true effect, so the bias of each estimator, and what breaks it, can be measured.</p>
+ <div class="chips"><span class="chip"><b>Part I</b> Selection on observables</span><span class="chip"><b>Part II</b> Panels and instruments</span><span class="chip"><b>Part III</b> Thresholds, synthetic control, practice</span></div>
+ <div class="co tip"><b>How to use this</b>Sliders change the setting; heavy labs update when you release a slider or press the button. Prerequisites: the confounding and experiments pages, and the regression page. Throughout, the true effect is known; the question in each lab is whether a method recovers it and how it fails.</div>
+</header>
+
+<div class="part">Part I · Selection on observables</div>
+
+<section class="ch" id="c1">
+<h2><span class="num">1</span>Ignorability, overlap and the propensity score <span class="lvl b">Beginner</span></h2>
+<p>If every common cause of treatment T and outcome Y is measured in X, and each customer type has some chance of either treatment, comparing like with like identifies the effect. Formally: <b>ignorability</b> (unconfoundedness) (Y(0), Y(1)) ⟂ T | X, and <b>overlap</b> (positivity) 0 &lt; e(x) &lt; 1 where e(x) = P(T = 1 | X = x) is the <b>propensity score</b>. Rosenbaum and Rubin showed that conditioning on the scalar e(X) is as good as conditioning on all of X, so a high-dimensional adjustment becomes a one-dimensional model of treatment assignment. The propensity score is a <em>balancing</em> score: within strata of e(X) the covariates have the same distribution in both groups, which can be checked directly (a diagnostic that outcome regression does not offer).</p>
+<p>Check balance with <b>standardised mean differences</b> SMD = (x̄₁ − x̄₀)/√((s₁² + s₀²)/2) before and after adjustment (below 0.1 is a common standard), and look at the overlap of the propensity-score distributions. Neither check can reveal an unmeasured confounder: ignorability is an assumption about what is not in the data.</p>
+<div class="card"><h4>Lab 1 · Propensity score, overlap and balance</h4>
+ <p class="sub">Two confounders X₁, X₂ raise both the chance of treatment (strength a) and the outcome; the true effect is 1. Left: the fitted propensity score in treated and control customers. Right: the standardised mean differences of X₁ and X₂ unweighted and after inverse-probability weighting.</p>
+ <div class="ctl"><label>confounding strength a <input type="range" id="c1a" min="0" max="30" step="1" value="12"><output id="c1av"></output></label><button id="c1go">Re-simulate</button></div>
+ <div class="two"><canvas class="sm" id="c1cv"></canvas><canvas class="sm" id="c1cv2"></canvas></div><div class="stats" id="c1st"></div><div class="read" id="c1rd"></div></div>
+</section>
+
+<section class="ch" id="c2">
+<h2><span class="num">2</span>Matching <span class="lvl i">Intermediate</span></h2>
+<p><b>Matching</b> pairs each treated customer with one or more controls who look alike, then compares outcomes within pairs; the estimand is usually the ATT. Matching can be done on covariates (Mahalanobis distance), on the propensity score (usually its logit), or both. Choices that matter: with or without replacement (replacement reduces bias, increases variance), number of neighbours, <b>caliper</b> (maximum allowed distance; treated customers with no close control are dropped, which changes the population the estimate refers to), and exact matching on key variables. Outcomes are not used in matching, so the design can be fixed before the effect is estimated. Matching is not magic: it removes bias only from <em>observed</em> covariates, bias-corrected versions adjust for residual imbalance, and the usual standard error is invalid because the matches are estimated (use the Abadie–Imbens or bootstrap-with-care approaches).</p>
+<div class="card"><h4>Lab 2 · Matching on the propensity score</h4>
+ <p class="sub">One-to-one nearest-neighbour matching with replacement on the logit propensity score, with a caliper (in units of its standard deviation). Left: the naive and matched ATT estimates over 200 samples (n = 1000), true ATT = 1. Right: the standardised mean differences before and after matching in one sample.</p>
+ <div class="ctl"><label>confounding strength a <input type="range" id="c2a" min="0" max="30" step="1" value="12"><output id="c2av"></output></label><label>caliper (sd of logit ps) <input type="range" id="c2k" min="5" max="100" step="5" value="20"><output id="c2kv"></output></label><button id="c2go">Re-simulate</button></div>
+ <div class="two"><canvas class="sm" id="c2cv"></canvas><canvas class="sm" id="c2cv2"></canvas></div><div class="stats" id="c2st"></div><div class="read" id="c2rd"></div></div>
+</section>
+
+<section class="ch" id="c3">
+<h2><span class="num">3</span>Inverse-probability weighting and doubly robust estimation <span class="lvl i">Intermediate</span></h2>
+<p><b>Inverse-probability weighting</b> (IPW) re-weights customers so that treated and control groups each resemble the whole population: a treated customer with e(x) = 0.2 stands in for five like her. The normalised (Hájek) estimator is τ̂ = Σ wᵢ Yᵢ T / Σ wᵢ T − Σ wᵢ Yᵢ (1 − T) / Σ wᵢ (1 − T) with weights 1/e(Xᵢ) and 1/(1 − e(Xᵢ)). It needs a correct propensity model; the <b>outcome regression</b> (g-computation) estimator needs a correct outcome model. The <b>augmented IPW</b> (AIPW, doubly robust) estimator combines both:</p>
+<div class="f">τ̂_AIPW = mean[ μ̂₁(X) − μ̂₀(X) + T(Y − μ̂₁(X))/ê(X) − (1 − T)(Y − μ̂₀(X))/(1 − ê(X)) ]</div>
+<p>It is consistent if <em>either</em> model is right, and with flexible machine-learning nuisance models plus cross-fitting (double/debiased machine learning) it attains the efficient rate under weaker conditions. Doubly robust does not mean doubly safe: if both are wrong, the bias remains, and nothing here cures an unmeasured confounder.</p>
+<div class="card"><h4>Lab 3 · Which model has to be right?</h4>
+ <p class="sub">The true propensity and outcome depend nonlinearly on X₁ (squared term). “Correct” models include the square; “wrong” models are linear. Over 300 samples (n = 1500; true ATE = 1): the distributions of the IPW, outcome-regression and AIPW estimators, and their average bias.</p>
+ <div class="ctl"><label>confounding strength a <input type="range" id="c3a" min="5" max="30" step="1" value="15"><output id="c3av"></output></label><label>propensity model <select id="c3p"><option value="0">correct</option><option value="1">wrong (linear)</option></select></label><label>outcome model <select id="c3o"><option value="0">correct</option><option value="1">wrong (linear)</option></select></label><button id="c3go">Re-simulate</button></div>
+ <div class="two"><canvas class="sm" id="c3cv"></canvas><canvas class="sm" id="c3cv2"></canvas></div><div class="stats" id="c3st"></div><div class="read" id="c3rd"></div></div>
+</section>
+
+<section class="ch" id="c4">
+<h2><span class="num">4</span>Overlap, extreme weights and trimming <span class="lvl a">Advanced</span></h2>
+<p>When some customer types almost never receive one of the treatments (e(x) near 0 or 1), the data contain little or no information about the counterfactual for them; weights 1/e explode, one or two observations dominate the estimate, and the variance becomes huge. The <b>effective sample size</b> (Σw)²/Σw² shows how many equally weighted customers the weighted sample is worth. Responses: (1) check the overlap plot and report it; (2) <b>trim</b> units with ê outside [α, 1 − α], which stabilises the estimate but changes the estimand to the effect in the overlap region (the answer to a different question, and with heterogeneous effects a different number); (3) use <b>overlap weights</b> (weight e(1 − e), which target the population with most overlap); (4) accept that the effect cannot be learned for non-overlapping customers rather than extrapolating from a model. In credit this is the old problem that the approved population does not span the applicants.</p>
+<div class="card"><h4>Lab 4 · Weights, variance and the cost of trimming</h4>
+ <p class="sub">The effect varies with X₁ (τ(x) = 1 + 0.8·X₁, true ATE = 1). Stronger confounding means poorer overlap. Left: the distribution of the IPW weights in one sample (n = 1500). Right: bias and standard deviation of IPW over 300 samples, without trimming and with trimming at ê &lt; α or &gt; 1 − α.</p>
+ <div class="ctl"><label>confounding strength a <input type="range" id="c4a" min="5" max="40" step="1" value="25"><output id="c4av"></output></label><label>trim at α <input type="range" id="c4t" min="1" max="20" step="1" value="5"><output id="c4tv"></output></label><button id="c4go">Re-simulate</button></div>
+ <div class="two"><canvas class="sm" id="c4cv"></canvas><canvas class="sm" id="c4cv2"></canvas></div><div class="stats" id="c4st"></div><div class="read" id="c4rd"></div></div>
+</section>
+
+<div class="part">Part II · Panels and instruments</div>
+
+<section class="ch" id="c5">
+<h2><span class="num">5</span>Difference-in-differences <span class="lvl a">Advanced</span></h2>
+<p>When a policy applies to one group (branches in one region, customers on one product) from a known date, compare the <em>change</em> over time in the treated group with the change in an untreated group. Unit-level, time-invariant differences (fixed effects) drop out of the change, and common shocks drop out of the difference of changes:</p>
+<div class="f">τ̂_DiD = (Ȳ_treated,post − Ȳ_treated,pre) − (Ȳ_control,post − Ȳ_control,pre)</div>
+<p>The identifying assumption is <b>parallel trends</b>: without the policy, the treated group would have moved like the control group. It concerns an unobservable counterfactual; the pre-period can be inspected (an <b>event-study</b> plot of group differences in each pre-period should be flat) but passing a pre-trend test does not prove it, and low power can make a failing trend look flat. Other requirements: no anticipation, no spillover to controls, stable composition of the groups. A level difference between groups is harmless; a difference in trends is fatal and no covariate adjustment cures it unless the trend difference is explained by those covariates.</p>
+<div class="card"><h4>Lab 5 · Difference-in-differences and parallel trends</h4>
+ <p class="sub">Outcome by month for the treated and control groups (n = 2000 each); the policy starts after month 6. The treated group may have a different underlying trend (parallel-trends violation) and there is a common shock at the policy date. Left: the group means with the treated counterfactual (dashed). Right: the effect estimated by three comparisons against the truth.</p>
+ <div class="ctl"><label>true effect τ <input type="range" id="c5t" min="-10" max="20" step="1" value="10"><output id="c5tv"></output></label><label>trend difference per month <input type="range" id="c5d" min="0" max="30" step="1" value="10"><output id="c5dv"></output></label><label>common shock <input type="range" id="c5s" min="0" max="30" step="1" value="10"><output id="c5sv"></output></label><label>baseline gap <input type="range" id="c5b" min="0" max="30" step="1" value="10"><output id="c5bv"></output></label><button id="c5go">Re-simulate</button></div>
+ <div class="two"><canvas class="sm" id="c5cv"></canvas><canvas class="sm" id="c5cv2"></canvas></div><div class="stats" id="c5st"></div><div class="read" id="c5rd"></div></div>
+</section>
+
+<section class="ch" id="c6">
+<h2><span class="num">6</span>Staggered adoption and the two-way fixed effects problem <span class="lvl e">Expert</span></h2>
+<p>With units adopting a policy at different dates, the habitual regression Y_it = α_i + λ_t + β D_it + ε_it (<b>two-way fixed effects</b>, TWFE) is no longer a clean comparison. TWFE is a weighted average of many 2×2 DiD comparisons, including ones that use <em>already-treated</em> units as controls for later-treated units. If effects change over time since treatment (build up, fade), those comparisons subtract part of the earlier cohort’s effect: some weights on cohort-time effects become negative and the estimate can be too small, or even of the wrong sign, although every individual effect is positive.</p>
+<p>The remedy is to estimate cohort-and-period specific effects ATT(g, t) from <b>clean comparisons</b> (each cohort against never-treated or not-yet-treated units, relative to the period before adoption; Callaway–Sant’Anna, Sun–Abraham, stacked designs, imputation estimators) and then aggregate them as you choose: by event time, by cohort, or overall. Plot the event study with these estimators, not with TWFE. With a constant effect that appears at once and parallel trends, TWFE is fine; the problem is heterogeneity in time and across cohorts.</p>
+<div class="card"><h4>Lab 6 · A positive effect, a smaller TWFE estimate</h4>
+ <p class="sub">Three groups over 10 periods: cohort A adopts in period 4, cohort B in period 7, a third group never adopts. The effect is a jump j plus a build-up e per period of exposure. Left: the group means. Right: the TWFE estimate and the clean cohort-by-period estimate over 200 samples against the true average effect on treated observations.</p>
+ <div class="ctl"><label>build-up per period e <input type="range" id="c6e" min="0" max="10" step="1" value="5"><output id="c6ev"></output></label><label>initial jump j <input type="range" id="c6j" min="0" max="20" step="1" value="10"><output id="c6jv"></output></label><button id="c6go">Re-simulate</button></div>
+ <div class="two"><canvas class="sm" id="c6cv"></canvas><canvas class="sm" id="c6cv2"></canvas></div><div class="stats" id="c6st"></div><div class="read" id="c6rd"></div></div>
+</section>
+
+<section class="ch" id="c7">
+<h2><span class="num">7</span>Instrumental variables <span class="lvl a">Advanced</span></h2>
+<p>If unmeasured confounding drives both treatment X and outcome Y, regression is biased. An <b>instrument</b> Z shifts X but affects Y only through X. Three conditions: <b>relevance</b> (Z moves X), <b>independence</b> (Z is as good as randomly assigned relative to the unmeasured confounders) and <b>exclusion</b> (no direct path Z → Y). The IV (Wald) estimate is the reduced form divided by the first stage:</p>
+<div class="f">β̂_IV = Cov(Z, Y) / Cov(Z, X) = (effect of Z on Y) / (effect of Z on X)       two-stage least squares: regress X on Z, then Y on the fitted X̂</div>
+<p>With heterogeneous effects, IV estimates the <b>local average treatment effect</b> (LATE) for the “compliers” whose treatment is moved by the instrument, under monotonicity. It is not the ATE and it changes with the instrument. Banking instruments in the literature: random assignment of loan officers or reviewers with different strictness (judge-style designs), quasi-random timing of marketing waves, distance to a branch (usually questionable), policy-induced eligibility. The first-stage strength is a number to report: the F-statistic.</p>
+<div class="card"><h4>Lab 7 · OLS is biased, IV is not</h4>
+ <p class="sub">An unmeasured U raises both the treatment X and the outcome Y (endogeneity strength e); instrument Z moves X with strength π. True effect β = 1. Left: the OLS and IV estimates over 500 samples. Right: the averages and the first-stage F.</p>
+ <div class="ctl"><label>instrument strength π <input type="range" id="c7p" min="0" max="15" step="1" value="6"><output id="c7pv"></output></label><label>endogeneity e <input type="range" id="c7e" min="0" max="20" step="1" value="10"><output id="c7ev"></output></label><label>customers n <input type="range" id="c7n" min="500" max="5000" step="500" value="2000"><output id="c7nv"></output></label><button id="c7go">Re-simulate</button></div>
+ <div class="two"><canvas class="sm" id="c7cv"></canvas><canvas class="sm" id="c7cv2"></canvas></div><div class="stats" id="c7st"></div><div class="read" id="c7rd"></div></div>
+</section>
+
+<section class="ch" id="c8">
+<h2><span class="num">8</span>Weak instruments and exclusion violations <span class="lvl e">Expert</span></h2>
+<p>An IV estimate is a ratio, and a ratio with a noisy denominator misbehaves. When the first stage is weak (F below about 10), the IV estimator is biased towards OLS, has heavy tails and an unreliable confidence interval; the conventional t-interval undercovers badly. Use the weak-instrument-robust Anderson–Rubin interval, report the first-stage F (effective F for robust standard errors), and prefer fewer strong instruments to many weak ones. Even a strong instrument fails if <b>exclusion</b> does not hold: a small direct effect ζ of Z on Y adds ζ/π to the IV estimate, and a weaker first stage π inflates the same violation. The exclusion restriction cannot be tested with one instrument; with several, over-identification tests only check whether they agree with each other, not that all are valid. Sensitivity analyses ask how large ζ must be to overturn the result.</p>
+<div class="card"><h4>Lab 8 · The ratio explodes when the first stage is weak</h4>
+ <p class="sub">True effect β = 1, endogeneity 1.0, n = 500, plus a direct effect ζ of the instrument on the outcome. Left: the IV estimates over 1000 samples at your first-stage strength π (clipped to the range shown). Right: the median IV estimate and the OLS estimate as the first stage gets stronger.</p>
+ <div class="ctl"><label>first-stage strength π <input type="range" id="c8p" min="2" max="100" step="2" value="20"><output id="c8pv"></output></label><label>direct effect ζ of Z on Y <input type="range" id="c8z" min="-50" max="50" step="5" value="0"><output id="c8zv"></output></label><button id="c8go">Re-simulate</button></div>
+ <div class="two"><canvas class="sm" id="c8cv"></canvas><canvas class="sm" id="c8cv2"></canvas></div><div class="stats" id="c8st"></div><div class="read" id="c8rd"></div></div>
+</section>
+
+<div class="part">Part III · Thresholds, synthetic control and practice</div>
+
+<section class="ch" id="c9">
+<h2><span class="num">9</span>Regression discontinuity <span class="lvl a">Advanced</span></h2>
+<p>If treatment switches on at a threshold of a running variable (a score of 650 for approval, an income limit for an offer, age 65), customers just either side of the cut-off are nearly identical, so the jump in the outcome at the threshold is a causal effect <em>at the threshold</em>. In the sharp design the estimate is the difference between two regression intercepts at the cut-off, from local linear fits within a <b>bandwidth</b> h:</p>
+<div class="f">τ̂_RD = lim_{x↓c} E[Y | X = x] − lim_{x↑c} E[Y | X = x]       (local linear, separate slopes on each side, kernel-weighted)</div>
+<p>The assumption is continuity of the potential-outcome regressions at c (nothing else jumps there). The bias-variance trade-off is set by the bandwidth: a narrow window has little bias but few observations; a wide one has precise but biased estimates when the outcome curve is not straight. Use data-driven bandwidths (Imbens–Kalyanaraman, Calonico–Cattaneo–Titiunik with bias-corrected robust intervals), local linear rather than high-order global polynomials, and show the binned scatter. The effect applies at the cut-off only; extrapolating to customers far from it needs more assumptions. Credit-score cut-offs are textbook cases, provided the score is not manipulated (next chapter).</p>
+<div class="card"><h4>Lab 9 · Bandwidth: bias against variance</h4>
+ <p class="sub">Running variable x ∈ (−1, 1), cut-off at 0, a curved outcome function and a jump τ at the cut-off (n = 3000). Left: one sample with local linear fits within the bandwidth. Right: the bias and the standard deviation of the estimate against the bandwidth (60 samples per point); the dots mark your bandwidth.</p>
+ <div class="ctl"><label>bandwidth h <input type="range" id="c9h" min="5" max="100" step="5" value="50"><output id="c9hv"></output></label><label>curvature q <input type="range" id="c9q" min="0" max="30" step="1" value="20"><output id="c9qv"></output></label><label>true jump τ <input type="range" id="c9t" min="0" max="20" step="1" value="10"><output id="c9tv"></output></label><button id="c9go">Re-simulate</button></div>
+ <div class="two"><canvas class="sm" id="c9cv"></canvas><canvas class="sm" id="c9cv2"></canvas></div><div class="stats" id="c9st"></div><div class="read" id="c9rd"></div></div>
+</section>
+
+<section class="ch" id="c10">
+<h2><span class="num">10</span>Fuzzy designs and manipulation of the running variable <span class="lvl e">Expert</span></h2>
+<p>In a <b>fuzzy</b> design crossing the threshold changes the <em>probability</em> of treatment rather than switching it on for sure (an offer is made above the score but not everyone accepts; some below get exceptions). The estimate is the Wald ratio of the jump in the outcome to the jump in treatment at the cut-off, which is an IV estimate with “above the cut-off” as the instrument, and gives the effect for compliers at the threshold. The central threat is <b>manipulation</b>: if customers, branch staff or applicants can push the running variable just over the line, those just above are no longer comparable with those just below. Diagnose with a density test (McCrary; Cattaneo–Jansson–Ma): bunching just above the cut-off is a warning. Also check that pre-treatment covariates do not jump at the cut-off, vary the bandwidth, try placebo cut-offs, and exclude a donut hole around the threshold.</p>
+<div class="card"><h4>Lab 10 · Bunching at the cut-off breaks the comparison</h4>
+ <p class="sub">A share m of customers just below the cut-off push themselves just above it; these customers have better unmeasured quality (outcome +0.5). Treatment take-up above the cut-off is c. Left: the density of the running variable in one sample. Right: averages over 150 samples (n = 4000) of the jump in the outcome (ITT), the fuzzy estimate and the truth (τ = 1 for compliers).</p>
+ <div class="ctl"><label>share manipulating m <input type="range" id="c10m" min="0" max="60" step="5" value="30"><output id="c10mv"></output></label><label>take-up above cut-off c <input type="range" id="c10k" min="20" max="100" step="10" value="60"><output id="c10kv"></output></label><button id="c10go">Re-simulate</button></div>
+ <div class="two"><canvas class="sm" id="c10cv"></canvas><canvas class="sm" id="c10cv2"></canvas></div><div class="stats" id="c10st"></div><div class="read" id="c10rd"></div></div>
+</section>
+
+<section class="ch" id="c11">
+<h2><span class="num">11</span>Synthetic control and choosing a method <span class="lvl e">Expert</span></h2>
+<p>When one unit (a region, a branch network, a product) is treated and many untreated donors exist, the <b>synthetic control</b> method builds a weighted average of donors, with non-negative weights summing to one, that tracks the treated unit’s outcome path before the intervention; the post-period gap is the effect estimate. Weights are chosen to minimise the pre-period fit error, so the synthetic unit matches both levels and the dynamics of unobserved factors. Inference is by <b>placebo permutation</b>: apply the method to each donor as if it were treated and compare the treated unit’s post/pre error ratio with theirs. It fails when the treated unit lies outside the donors’ convex hull (no weighted average can match it), when the pre-period fit is poor, or when donors are themselves affected.</p>
+<p><b>Choosing among methods:</b> randomise if you can; use matching, weighting or doubly robust estimation if you believe you measured the confounders and overlap is good; use DiD when you have a comparison group with parallel trends and a before-and-after; synthetic control for few treated units and rich pre-period data; IV when a credible instrument exists (and report the LATE); RD when a sharp rule assigns treatment. In every case document the assumption, its diagnostics and a sensitivity analysis, and where possible compare two methods that rely on different assumptions: agreement is weak evidence, disagreement is informative.</p>
+<div class="card"><h4>Lab 11 · Synthetic control with placebo inference</h4>
+ <p class="sub">25 donor units and one treated unit over 24 pre- and 12 post-intervention periods; outcomes follow common factors with unit loadings. Left: the treated unit and its synthetic control. Right: the post-period gap of the treated unit (bold) and the placebo gaps of the donors (thin). Raise the extremeness to put the treated unit outside the donors’ hull.</p>
+ <div class="ctl"><label>true effect τ <input type="range" id="c11t" min="0" max="30" step="1" value="15"><output id="c11tv"></output></label><label>noise sd <input type="range" id="c11s" min="1" max="10" step="1" value="3"><output id="c11sv"></output></label><label>extremeness of treated unit <input type="range" id="c11x" min="0" max="30" step="1" value="0"><output id="c11xv"></output></label><button id="c11go">Re-simulate</button></div>
+ <div class="two"><canvas class="sm" id="c11cv"></canvas><canvas class="sm" id="c11cv2"></canvas></div><div class="stats" id="c11st"></div><div class="read" id="c11rd"></div></div>
+</section>
+
+<section class="ch" id="c12">
+<h2><span class="num">12</span>Final exam, mastery checklist, cheat sheet <span class="lvl e">Expert</span></h2>
+<h3>Exam (18 questions — click an answer)</h3>
+<div id="quiz"></div>
+<div class="card"><h4>Score</h4><div class="stats" id="qscore"></div><button class="alt" id="qreset">Reset exam</button></div>
+<h3>Mastery checklist — tick when you can do it without notes</h3>
+<div class="card chk" id="chk"></div>
+<h3>Cheat sheet</h3>
+<div class="tw"><table>
+<tr><th>Idea</th><th>One line</th></tr>
+<tr><td>Ignorability + overlap</td><td>(Y(0),Y(1)) ⟂ T | X and 0 &lt; e(x) &lt; 1; the propensity score e(X) is a balancing score; check SMDs and the overlap plot</td></tr>
+<tr><td>Matching</td><td>Pair like with like (usually on the logit ps); caliper trades bias for a changed population; only observed confounders are handled</td></tr>
+<tr><td>IPW, AIPW</td><td>Weights 1/e, 1/(1 − e); AIPW is consistent if either the propensity or the outcome model is right; add cross-fitting with ML</td></tr>
+<tr><td>Overlap and trimming</td><td>Extreme weights ⇒ huge variance; trimming changes the estimand; effective sample size (Σw)²/Σw²</td></tr>
+<tr><td>Difference-in-differences</td><td>Change in treated − change in control; needs parallel trends, no anticipation, no spillover; pre-trends are a check, not a proof</td></tr>
+<tr><td>Staggered adoption</td><td>TWFE uses already-treated units as controls; with dynamic effects it can be biased or wrongly signed; use clean cohort-time estimators</td></tr>
+<tr><td>Instrumental variables</td><td>β = Cov(Z,Y)/Cov(Z,X); relevance, independence, exclusion; estimates the LATE for compliers</td></tr>
+<tr><td>Weak instruments</td><td>F &lt; ~10 ⇒ bias towards OLS and heavy tails; exclusion violation adds ζ/π; use Anderson–Rubin intervals</td></tr>
+<tr><td>Regression discontinuity</td><td>Jump of local linear fits at the cut-off; continuity assumption; bandwidth = bias–variance; effect holds at the threshold</td></tr>
+<tr><td>Fuzzy RD, manipulation</td><td>Wald ratio of the jumps for compliers; check density, covariates, donut, placebo cut-offs</td></tr>
+<tr><td>Synthetic control</td><td>Convex-combination of donors matching the pre-path; placebo permutation inference; fails outside the hull</td></tr>
+<tr><td>Method choice</td><td>Pick by what you can defend: randomisation &gt; RD/IV/DiD with diagnostics &gt; adjustment on observables; triangulate and report the assumption</td></tr>
+</table></div>
+<div class="co tip"><b>Next on the roadmap</b>Item 25 continues Stage 5 and completes it: uplift modelling and heterogeneous treatment effects (meta-learners, causal trees and forests, targeting policies).</div>
+</section>
+</main>
+<script>
+/*MATH*/
+function lgamma(x){const c=[76.18009172947146,-86.50532032941677,24.01409824083091,-1.231739572450155,0.1208650973866179e-2,-0.5395239384953e-5];let y=x,t=x+5.5;t-=(x+.5)*Math.log(t);let s=1.000000000190015;for(let j=0;j<6;j++)s+=c[j]/++y;return -t+Math.log(2.5066282746310005*s/x);}
+function gser(a,x){let ap=a,sum=1/a,del=sum;for(let n=0;n<1000;n++){ap++;del*=x/ap;sum+=del;if(Math.abs(del)<Math.abs(sum)*1e-15)break;}return sum*Math.exp(-x+a*Math.log(x)-lgamma(a));}
+function gcf(a,x){let b=x+1-a,c=1/1e-300,d=1/b,h=d;for(let i=1;i<1000;i++){const an=-i*(i-a);b+=2;d=an*d+b;if(Math.abs(d)<1e-300)d=1e-300;c=b+an/c;if(Math.abs(c)<1e-300)c=1e-300;d=1/d;const del=d*c;h*=del;if(Math.abs(del-1)<1e-15)break;}return Math.exp(-x+a*Math.log(x)-lgamma(a))*h;}
+function gammaQ(a,x){if(x<=0)return 1;return x<a+1?1-gser(a,x):gcf(a,x);}
+function betacf(a,b,x){const qab=a+b,qap=a+1,qam=a-1;let c=1,d=1-qab*x/qap;if(Math.abs(d)<1e-300)d=1e-300;d=1/d;let h=d;for(let m=1;m<=1000;m++){const m2=2*m;let aa=m*(b-m)*x/((qam+m2)*(a+m2));d=1+aa*d;if(Math.abs(d)<1e-300)d=1e-300;c=1+aa/c;if(Math.abs(c)<1e-300)c=1e-300;d=1/d;h*=d*c;aa=-(a+m)*(qab+m)*x/((a+m2)*(qap+m2));d=1+aa*d;if(Math.abs(d)<1e-300)d=1e-300;c=1+aa/c;if(Math.abs(c)<1e-300)c=1e-300;d=1/d;const del=d*c;h*=del;if(Math.abs(del-1)<1e-15)break;}return h;}
+function betai(a,b,x){if(x<=0)return 0;if(x>=1)return 1;const bt=Math.exp(lgamma(a+b)-lgamma(a)-lgamma(b)+a*Math.log(x)+b*Math.log(1-x));return x<(a+1)/(a+b+2)?bt*betacf(a,b,x)/a:1-bt*betacf(b,a,1-x)/b;}
+function normSf(z){const q=0.5*gammaQ(.5,z*z/2);return z>=0?q:1-q;}
+function normCdf(z){return normSf(-z);}
+function npdf(x){return Math.exp(-x*x/2)/2.5066282746310002;}
+function lbin(n,k){return lgamma(n+1)-lgamma(k+1)-lgamma(n-k+1);}
+function binom(n,k,p){return Math.exp(lbin(n,k)+k*Math.log(p)+(n-k)*Math.log(1-p));}
+function betapdf(x,a,b){return x<=0||x>=1?0:Math.exp(lgamma(a+b)-lgamma(a)-lgamma(b)+(a-1)*Math.log(x)+(b-1)*Math.log(1-x));}
+function betacdf(x,a,b){return betai(a,b,x);}
+function gampdf(x,a,r){return x<=0?0:Math.exp(a*Math.log(r)+(a-1)*Math.log(x)-r*x-lgamma(a));}
+function gamcdf(x,a,r){return x<=0?0:1-gammaQ(a,r*x);}
+function randn(){let u=0;while(!u)u=Math.random();return Math.sqrt(-2*Math.log(u))*Math.cos(2*Math.PI*Math.random());}
+function gammaS(a){if(a<1)return gammaS(a+1)*Math.pow(Math.random(),1/a);const d=a-1/3,c=1/Math.sqrt(9*d);for(;;){let x,v;do{x=randn();v=1+c*x}while(v<=0);v=v*v*v;const u=Math.random();if(Math.log(u)<.5*x*x+d-d*v+d*Math.log(v))return d*v;}}
+function betaS(a,b){const x=gammaS(a),y=gammaS(b);return x/(x+y);}
+function binS(n,p){let k=0;for(let i=0;i<n;i++)if(Math.random()<p)k++;return k;}
+function mean(a){let s=0;for(const v of a)s+=v;return s/a.length;}
+function qc(cdf,lo,hi,p,it){for(let i=0;i<(it||100);i++){const m=(lo+hi)/2;if(cdf(m)<p)lo=m;else hi=m}return(lo+hi)/2;}
+function qb(a,b,p){return qc(x=>betai(a,b,x),0,1,p,50);}
+function tcdf(x,v){const t=.5*betai(v/2,.5,v/(v+x*x));return x>0?1-t:t}
+function qn(p){return qc(normCdf,-9,9,p,70)}
+function pois(k,l){return Math.exp(-l+k*Math.log(l)-lgamma(k+1))}
+function binF(n,p){let k=0;for(;;){if(n<=0||p<=0)return k;if(p>=1)return k+n;if(n<=40){for(let i=0;i<n;i++)if(Math.random()<p)k++;return k}const a=1+(n>>1),bb=1+n-a,x=betaS(a,bb);if(x>=p){n=a-1;p=p/x}else{k+=a;n=bb-1;p=(p-x)/(1-x)}}}
+/*ENDMATH*/
+
+const $=id=>document.getElementById(id), val=id=>+$(id).value;
+const C={fg:'#e8ebf5',mu:'#8a93ab',gr:'#232a3d',a:'#6ea8ff',r:'#ff6b81',y:'#ffd166',g:'#4ade80',p:'#c084fc',t:'#5eead4'};
+const store={get(k,d){try{const v=JSON.parse(localStorage.getItem(k));return v==null?d:v}catch(e){return d}},set(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}};
+function stat(l,v,c){return `<div class="stat ${c||''}"><b>${v}</b><span>${l}</span></div>`}
+function f3(x){if(!isFinite(x))return String(x);const a=Math.abs(x);if(a!==0&&(a<1e-3||a>=1e6))return x.toExponential(2);return String(+x.toFixed(a<1?4:a<100?3:a<1000?2:0))}
+function pc(x){return f3(100*x)+'%'}
+const resizers=[];
+function reg(fn){fn();resizers.push(fn)}
+function on(ids,fn){ids.split(' ').forEach(i=>{const e=$(i);e.addEventListener('input',fn);e.addEventListener('change',fn)})}
+let rt;window.addEventListener('resize',()=>{clearTimeout(rt);rt=setTimeout(()=>resizers.forEach(f=>f()),150)});
+document.querySelectorAll('input[type=range]').forEach(i=>{const o=$(i.id+'v');if(!o)return;const f=()=>{o.textContent=i.value};i.addEventListener('input',f);f()});
+
+function nice(x){const e=Math.pow(10,Math.floor(Math.log10(x))),f=x/e;return (f<1.5?1:f<3?2:f<7?5:10)*e}
+function mk(cv,x0,x1,ymax,o){o=o||{};const y0=o.y0||0,dpr=window.devicePixelRatio||1,r=cv.getBoundingClientRect(),w=r.width||600,h=r.height||270;
+ cv.width=w*dpr;cv.height=h*dpr;const g=cv.getContext('2d');g.setTransform(dpr,0,0,dpr,0,0);g.clearRect(0,0,w,h);
+ const L=o.L||42,R=12,T=14,B=28,X=x=>L+(x-x0)/(x1-x0)*(w-L-R),Y=y=>h-B-(y-y0)/(ymax-y0)*(h-T-B);
+ g.font='11px system-ui';g.lineWidth=1;g.strokeStyle=C.gr;g.fillStyle=C.mu;
+ if(!o.noGrid){const sx=nice((x1-x0)/7);for(let x=Math.ceil(x0/sx-1e-9)*sx;!o.noX&&x<=x1+1e-9;x+=sx){g.beginPath();g.moveTo(X(x),T);g.lineTo(X(x),h-B);g.stroke();g.textAlign='center';g.fillText(String(+x.toFixed(6)),X(x),h-B+15)}
+ const sy=nice((ymax-y0)/4);for(let y=Math.ceil(y0/sy-1e-9)*sy;y<=ymax+1e-9;y+=sy){g.beginPath();g.moveTo(L,Y(y));g.lineTo(w-R,Y(y));g.stroke();g.textAlign='right';g.fillText(String(+y.toFixed(4)),L-5,Y(y)+3)}}
+ return{g,w,h,X,Y,L,R,T,B,
+  line(f,col,lw,a,b,n,dash){a=a==null?x0:a;b=b==null?x1:b;n=n||260;g.save();if(dash)g.setLineDash([5,4]);g.beginPath();g.strokeStyle=col;g.lineWidth=lw||2;let st=false;for(let i=0;i<=n;i++){const x=a+(b-a)*i/n,y=f(x);if(!isFinite(y)){st=false;continue}st?g.lineTo(X(x),Y(y)):g.moveTo(X(x),Y(y));st=true}g.stroke();g.restore()},
+  area(f,a,b,col,n){a=Math.max(a,x0);b=Math.min(b,x1);if(b<=a)return;n=n||200;g.beginPath();g.moveTo(X(a),Y(0));for(let i=0;i<=n;i++){const x=a+(b-a)*i/n;g.lineTo(X(x),Y(f(x)))}g.lineTo(X(b),Y(0));g.closePath();g.fillStyle=col;g.fill()},
+  vline(x,col,lab,dash){g.save();g.strokeStyle=col;g.lineWidth=1.6;if(dash)g.setLineDash([5,4]);g.beginPath();g.moveTo(X(x),T);g.lineTo(X(x),h-B);g.stroke();g.restore();if(lab){g.fillStyle=col;g.textAlign='center';g.fillText(lab,Math.min(Math.max(X(x),34),w-34),T+10)}},
+  hline(y,col,lab){g.save();g.strokeStyle=col;g.lineWidth=1.4;g.setLineDash([5,4]);g.beginPath();g.moveTo(L,Y(y));g.lineTo(w-R,Y(y));g.stroke();g.restore();if(lab){g.fillStyle=col;g.textAlign='right';g.fillText(lab,w-R-3,Y(y)-4)}},
+  text(s,x,y,col,al){g.fillStyle=col||C.fg;g.textAlign=al||'left';g.fillText(s,x,y)}};}
+
+/* ---------- shared helpers for this page ---------- */
+const D={
+ norm:{n:'Normal(0,1)',s:()=>randn(),mu:0,sd:1,sk:0},
+ unif:{n:'Uniform(0,1)',s:()=>Math.random(),mu:.5,sd:Math.sqrt(1/12),sk:0},
+ expo:{n:'Exponential(1)',s:()=>-Math.log(1-Math.random()),mu:1,sd:1,sk:2},
+ logn:{n:'Lognormal(0,1)',s:()=>Math.exp(randn()),mu:Math.exp(.5),sd:Math.sqrt((Math.E-1)*Math.E),sk:(Math.E+2)*Math.sqrt(Math.E-1),disc:0},
+ b05:{n:'Bernoulli(0.5)',s:()=>Math.random()<.5?1:0,mu:.5,sd:.5,sk:0,disc:1},
+ b05s:{n:'Bernoulli(0.05)',s:()=>Math.random()<.05?1:0,mu:.05,sd:Math.sqrt(.0475),sk:.9/Math.sqrt(.0475),disc:1},
+ bimo:{n:'Two humps',s:()=>(Math.random()<.5?-2:2)+.5*randn(),mu:0,sd:Math.sqrt(4.25),sk:0},
+ par5:{n:'Pareto(α=5)',s:()=>Math.pow(1-Math.random(),-.2),mu:1.25,sd:Math.sqrt(5/48),sk:6*Math.sqrt(.6)},
+ cauchy:{n:'Cauchy (no mean)',s:()=>Math.tan(Math.PI*(Math.random()-.5)),mu:NaN,sd:Infinity,sk:NaN}
+};
+function fillSel(id,keys,def){const e=$(id);e.innerHTML=keys.map(k=>`<option value="${k}">${D[k].n}</option>`).join('');e.value=def}
+const PAL=[C.a,C.r,C.y,C.g,C.p,C.t,'#ff9f43','#9aa4bf'];
+function tgrid(N,M){const T=[];let prev=0;for(let i=0;i<M;i++){let n=Math.round(Math.pow(10,Math.log10(N)*i/(M-1)));if(i===M-1)n=N;n=Math.max(prev+1,n);if(n>N)break;T.push(n);prev=n}if(T[T.length-1]!==N)T[T.length-1]=N;return T}
+function nlab(n){return n>=1e6?(n/1e6)+'M':n>=1000?(n/1000)+'k':String(n)}
+function customGrid(P,xt,yt){const g=P.g;g.save();g.strokeStyle=C.gr;g.fillStyle=C.mu;g.font='11px system-ui';g.lineWidth=1;
+ xt.forEach(([v,l])=>{g.beginPath();g.moveTo(P.X(v),P.T);g.lineTo(P.X(v),P.h-P.B);g.stroke();g.textAlign='center';g.fillText(l,P.X(v),P.h-P.B+15)});
+ yt.forEach(([v,l])=>{g.beginPath();g.moveTo(P.L,P.Y(v));g.lineTo(P.w-P.R,P.Y(v));g.stroke();g.textAlign='right';g.fillText(l,P.L-5,P.Y(v)+3)});g.restore()}
+function clip(P,fn){const g=P.g;g.save();g.beginPath();g.rect(P.L,P.T,P.w-P.L-P.R,P.h-P.T-P.B);g.clip();fn();g.restore()}
+function poly(P,pts,col,lw,dash){const g=P.g;g.save();if(dash)g.setLineDash([5,4]);g.strokeStyle=col;g.lineWidth=lw||2;g.beginPath();pts.forEach(([x,y],i)=>i?g.lineTo(P.X(x),P.Y(y)):g.moveTo(P.X(x),P.Y(y)));g.stroke();g.restore()}
+function dots(P,pts,col,r){const g=P.g;g.fillStyle=col;pts.forEach(([x,y])=>{g.beginPath();g.arc(P.X(x),P.Y(y),r||3,0,7);g.fill()})}
+function niceTicks(lo,hi,k){const st=nice((hi-lo)/(k||5)),a=[];for(let v=Math.ceil(lo/st-1e-9)*st;v<=hi+1e-9;v+=st)a.push([v,String(+v.toFixed(6))]);return a}
+function logTicks(lo,hi){const a=[];for(let e=Math.ceil(lo-1e-9);e<=hi+1e-9;e++)a.push([e,nlab(Math.pow(10,e))]);return a}
+function mom(a){const n=a.length;let m=0;for(const v of a)m+=v;m/=n;let v2=0,v3=0,v4=0;for(const v of a){const d=v-m;v2+=d*d;v3+=d*d*d;v4+=d*d*d*d}v2/=n;v3/=n;v4/=n;const sd=Math.sqrt(v2);return{n,m,sd,sk:sd>0?v3/(sd*sd*sd):0,ku:v2>0?v4/(v2*v2)-3:0}}
+function ksN(z){const a=Array.from(z).sort((x,y)=>x-y),n=a.length;let d=0;for(let i=0;i<n;i++){const F=normCdf(a[i]);d=Math.max(d,Math.abs((i+1)/n-F),Math.abs(i/n-F))}return d}
+/* histogram of data as density with optional overlay curves [{f,col,lw,dash}] */
+function hist(cv,data,lo,hi,bins,ov,col){const cnt=new Float64Array(bins),bw=(hi-lo)/bins;let n=0;for(const v of data){if(v<lo||v>=hi)continue;cnt[Math.floor((v-lo)/bw)]++;n++}
+ const N=data.length;let ym=0;for(let i=0;i<bins;i++){cnt[i]/=N*bw;ym=Math.max(ym,cnt[i])}
+ (ov||[]).forEach(o=>{for(let i=0;i<=80;i++)ym=Math.max(ym,o.f(lo+(hi-lo)*i/80)||0)});
+ const P=mk(cv,lo,hi,ym*1.12);
+ P.g.fillStyle=col||'rgba(110,168,255,.5)';for(let i=0;i<bins;i++){if(cnt[i]<=0)continue;const a=P.X(lo+i*bw),b=P.X(lo+(i+1)*bw);P.g.fillRect(a,P.Y(cnt[i]),Math.max(1,b-a-1),P.Y(0)-P.Y(cnt[i]))}
+ (ov||[]).forEach(o=>P.line(o.f,o.col,o.lw||2.4,lo,hi,200,o.dash));return P}
+const fmt=x=>f3(x);
+
+/* ---------- shared for this page ---------- */
+const POPS=['norm','unif','expo','logn','bimo','par5'];
+D.norm.med=0;D.norm.q90=1.2815516;D.unif.med=.5;D.unif.q90=.9;D.expo.med=Math.LN2;D.expo.q90=Math.log(10);D.logn.med=1;D.logn.q90=Math.exp(1.2815516);
+D.bimo.med=0;D.bimo.q90=qc(x=>.5*normCdf((x+2)/.5)+.5*normCdf((x-2)/.5),-10,10,.9,80);D.par5.med=Math.pow(2,.2);D.par5.q90=Math.pow(10,.2);
+const SF={mean:a=>mean(a),median:a=>{const b=Float64Array.from(a).sort(),n=b.length;return n%2?b[(n-1)/2]:(b[n/2-1]+b[n/2])/2},sd:a=>{const n=a.length,m=mean(a);let s=0;for(const v of a)s+=(v-m)*(v-m);return Math.sqrt(s/(n-1))},q90:a=>{const b=Float64Array.from(a).sort();return b[Math.round(.9*(b.length-1))]}};
+function truth(key,st){const d=D[key];return st==='mean'?d.mu:st==='median'?d.med:st==='sd'?d.sd:d.q90}
+const SNAME={mean:'sample mean',median:'sample median',sd:'sample SD',q90:'90th percentile'};
+const N10=[2,3,5,10,20,50,100,200,500,1000];
+function pct(a,p){const b=Float64Array.from(a).sort();return b[Math.min(b.length-1,Math.max(0,Math.floor(p*b.length)))]}
+function histLines(cv,arrs,cols,lo,hi,bins,vl){const bw=(hi-lo)/bins,dens=arrs.map(a=>{const c=new Float64Array(bins);for(const v of a){if(v<lo||v>=hi)continue;c[Math.floor((v-lo)/bw)]++}for(let i=0;i<bins;i++)c[i]/=a.length*bw;return c});let ym=0;dens.forEach(c=>c.forEach(v=>ym=Math.max(ym,v)));const P=mk(cv,lo,hi,ym*1.15||1);
+ dens.forEach((c,k)=>{const pts=[];for(let i=0;i<bins;i++){pts.push([lo+i*bw,c[i]]);pts.push([lo+(i+1)*bw,c[i]])}clip(P,()=>poly(P,pts,cols[k],2.2))});(vl||[]).forEach(v=>P.vline(v[0],v[1],v[2],v[3]));return P}
+function sdOf(a){return mom(a).sd}
+
+/* ---------- ML helpers ---------- */
+function digamma(x){let r=0;while(x<6){r-=1/x;x++}const f=1/(x*x);return r+Math.log(x)-.5/x-f*(1/12-f*(1/120-f/252))}
+function trigamma(x){let r=0;while(x<6){r+=1/(x*x);x++}const f=1/(x*x);return r+1/x+.5*f+f/x*(1/6-f*(1/30-f/42))}
+function poisS(l){if(l<=0)return 0;if(l<30){const L=Math.exp(-l);let k=0,p=1;do{k++;p*=Math.random()}while(p>L);return k-1}const m=Math.floor(.875*l),g=gammaS(m);return g<l?m+poisS(l-g):binF(m-1,l/g)}
+function llb(k,n,p){return(k?k*Math.log(p):0)+(n-k?(n-k)*Math.log(1-p):0)}
+function lrInt(k,n,cut){const ph=k/n,l0=llb(k,n,ph),g=p=>2*(l0-llb(k,n,p))-cut;let lo=0,hi=1;
+ if(k>0){let a=1e-12,b=ph;for(let i=0;i<70;i++){const m=(a+b)/2;if(g(m)>0)a=m;else b=m}lo=(a+b)/2}
+ if(k<n){let a=ph,b=1-1e-12;for(let i=0;i<70;i++){const m=(a+b)/2;if(g(m)>0)b=m;else a=m}hi=(a+b)/2}return[lo,hi]}
+function solveAlpha(s){if(!(s>1e-9))return 1e6;let a=(3-s+Math.sqrt((3-s)*(3-s)+24*s))/(12*s);for(let i=0;i<8;i++){const f=Math.log(a)-digamma(a)-s,fp=1/a-trigamma(a);let n=a-f/fp;if(!(n>0))n=a/2;a=n}return a}
+function normPdfAt(x,m,s){return Math.exp(-(x-m)*(x-m)/(2*s*s))/(s*2.5066282746)}
+/* ---------- Regression helpers ---------- */
+function idx(id,arr,ff){const e=$(id),o=$(id+'v'),f=()=>{o.textContent=ff?ff(arr[+e.value]):arr[+e.value]};e.addEventListener('input',f);f()}
+function scl(id,ff){const e=$(id),o=$(id+'v'),f=()=>{o.textContent=ff(+e.value)};e.addEventListener('input',f);f()}
+function pctTicks(a,b,st){const r=[];for(let v=a;v<=b+1e-9;v+=st)r.push([v,Math.round(v*100)+'%']);return r}
+const _tq={};function tq(v,p){const k=v+'_'+p;return _tq[k]||(_tq[k]=qc(x=>tcdf(x,v),0,500,p,80))}
+function simple(x,y){const n=x.length;let xm=0,ym=0;for(let i=0;i<n;i++){xm+=x[i];ym+=y[i]}xm/=n;ym/=n;let sxx=0,sxy=0,syy=0;for(let i=0;i<n;i++){const dx=x[i]-xm,dy=y[i]-ym;sxx+=dx*dx;sxy+=dx*dy;syy+=dy*dy}const b=sxy/sxx,a=ym-b*xm,res=new Float64Array(n);let sse=0;for(let i=0;i<n;i++){res[i]=y[i]-a-b*x[i];sse+=res[i]*res[i]}return{n,xm,ym,sxx,sxy,syy,b,a,res,sse,sst:syy,r2:1-sse/syy}}
+function gj(A,B){const p=A.length;const M=A.map((r,i)=>Array.from(r).concat(B?[B[i]]:[]));for(let c=0;c<p;c++){let m=c;for(let r=c+1;r<p;r++)if(Math.abs(M[r][c])>Math.abs(M[m][c]))m=r;[M[c],M[m]]=[M[m],M[c]];const d=M[c][c]||1e-12;for(let k=c;k<M[c].length;k++)M[c][k]/=d;for(let r=0;r<p;r++)if(r!==c){const f=M[r][c];if(f!==0)for(let k=c;k<M[c].length;k++)M[r][k]-=f*M[c][k]}}return M}
+function olsMulti(cols,y,needInv){const n=y.length,k=cols.length,p=k+1,A=[],B=new Float64Array(p);for(let i=0;i<p;i++)A.push(new Float64Array(p));
+ for(let r=0;r<n;r++){const row=[1];for(let j=0;j<k;j++)row.push(cols[j][r]);for(let i=0;i<p;i++){B[i]+=row[i]*y[r];for(let j=i;j<p;j++)A[i][j]+=row[i]*row[j]}}
+ for(let i=0;i<p;i++){for(let j=0;j<i;j++)A[i][j]=A[j][i];if(i>0)A[i][i]+=1e-9}
+ let beta,inv=null;if(needInv){const I=[];for(let i=0;i<p;i++){const e=new Float64Array(p);e[i]=1;I.push(e)}const M=gj(A,null);const aug=A.map((r,i)=>Array.from(r).concat(Array.from(I[i])));
+  const m=aug;for(let c=0;c<p;c++){let q=c;for(let r=c+1;r<p;r++)if(Math.abs(m[r][c])>Math.abs(m[q][c]))q=r;[m[c],m[q]]=[m[q],m[c]];const d=m[c][c]||1e-12;for(let kk=0;kk<2*p;kk++)m[c][kk]/=d;for(let r=0;r<p;r++)if(r!==c){const f=m[r][c];if(f!==0)for(let kk=0;kk<2*p;kk++)m[r][kk]-=f*m[c][kk]}}
+  inv=m.map(r=>r.slice(p));beta=inv.map(r=>{let s=0;for(let j=0;j<p;j++)s+=r[j]*B[j];return s})}
+ else{const M=gj(A,B);beta=M.map(r=>r[p])}
+ const res=new Float64Array(n);let sse=0;for(let r=0;r<n;r++){let f=beta[0];for(let j=0;j<k;j++)f+=beta[j+1]*cols[j][r];res[r]=y[r]-f;sse+=res[r]*res[r]}
+ const out={beta,res,sse,n,p,inv};if(inv){const s2=sse/(n-p);out.s2=s2;out.se=inv.map((r,i)=>Math.sqrt(s2*r[i]))}return out}
+function scatterAxes(cv,xs,ys,xlo,xhi,ylo,yhi,L){return mk(cv,xlo,xhi,yhi,{y0:ylo,L:L||44})}
+function range(a,pad){let lo=1e99,hi=-1e99;for(const v of a){if(v<lo)lo=v;if(v>hi)hi=v}const w=(hi-lo)||1;return[lo-(pad||.05)*w,hi+(pad||.05)*w]}
+
+
+function bars(P,groups,cols,yt){/* groups: array of arrays of values (0..1) */const g=P.g,G=groups.length,B=groups[0].length,W=(P.w-P.L-P.R)/G;groups.forEach((vals,gi)=>vals.forEach((v,bi)=>{const bw=W*.78/B,x=P.L+W*gi+W*.11+bw*bi;g.fillStyle=cols[bi];g.fillRect(x,P.Y(v),bw-2,P.Y(0)-P.Y(v));g.fillStyle=C.fg;g.textAlign='center';g.font='10px system-ui';g.fillText(Math.round(v*100)+'%',x+bw/2-1,P.Y(v)-3)}));g.font='11px system-ui'}
+function gridG(P,yt,labels){customGrid(P,[],yt);const G=labels.length,W=(P.w-P.L-P.R)/G;P.g.fillStyle=C.mu;P.g.textAlign='center';labels.forEach((l,i)=>P.g.fillText(l,P.L+W*(i+.5),P.h-P.B+15))}
+function legend(P,items,y){let x=P.L+8;items.forEach(([s,c])=>{P.text('■ '+s,x,y,c);x+=P.g.measureText('■ '+s).width+16})}
+
+/* ---------- GLM machinery ---------- */
+const LK={logit:{mu:e=>1/(1+Math.exp(-e)),d:e=>{const m=1/(1+Math.exp(-e));return m*(1-m)}},
+ probit:{mu:e=>normCdf(e),d:e=>npdf(e)},
+ cll:{mu:e=>1-Math.exp(-Math.exp(e)),d:e=>Math.exp(e-Math.exp(e))},
+ log:{mu:e=>Math.exp(e),d:e=>Math.exp(e)}};
+function minv(A){const p=A.length,m=A.map((r,i)=>{const row=Array.from(r);for(let j=0;j<p;j++)row.push(i===j?1:0);return row});
+ for(let c=0;c<p;c++){let q=c;for(let r=c+1;r<p;r++)if(Math.abs(m[r][c])>Math.abs(m[q][c]))q=r;[m[c],m[q]]=[m[q],m[c]];const d=m[c][c]||1e-12;for(let k=0;k<2*p;k++)m[c][k]/=d;for(let r=0;r<p;r++)if(r!==c){const f=m[r][c];if(f!==0)for(let k=0;k<2*p;k++)m[r][k]-=f*m[c][k]}}
+ return m.map(r=>r.slice(p))}
+function glm(cols,y,o){o=o||{};const n=y.length,k=cols.length,p=k+1,fam=o.fam||'binom',L=LK[o.link||(fam==='pois'?'log':'logit')],off=o.off,X=[new Float64Array(n).fill(1)].concat(cols),V=m=>fam==='pois'?m:m*(1-m);
+ let b=new Float64Array(p);if(o.init)b=Float64Array.from(o.init);else if(fam==='pois'){let m=0;for(const v of y)m+=v;b[0]=Math.log(Math.max(m/n,1e-3))-(off?mean(off):0)}
+ function ev(b){const eta=new Float64Array(n),mu=new Float64Array(n);let ll=0;for(let i=0;i<n;i++){let e=off?off[i]:0;for(let j=0;j<p;j++)e+=b[j]*X[j][i];e=Math.max(-30,Math.min(30,e));eta[i]=e;let m=L.mu(e);m=fam==='binom'?Math.min(1-1e-12,Math.max(1e-12,m)):Math.max(m,1e-12);mu[i]=m;ll+=fam==='pois'?y[i]*Math.log(m)-m-lgamma(y[i]+1):y[i]*Math.log(m)+(1-y[i])*Math.log(1-m)}return{eta,mu,ll}}
+ function info(c){const A=[];for(let i=0;i<p;i++)A.push(new Float64Array(p));const w=new Float64Array(n);for(let r=0;r<n;r++){const d=L.d(c.eta[r]),wi=d*d/V(c.mu[r]);w[r]=wi;for(let i=0;i<p;i++){const xi=X[i][r]*wi;for(let j=i;j<p;j++)A[i][j]+=xi*X[j][r]}}for(let i=0;i<p;i++)for(let j=0;j<i;j++)A[i][j]=A[j][i];return{A,w}}
+ let cur=ev(b),it=0,conv=false,maxit=o.maxit==null?40:o.maxit;
+ for(;it<maxit;it++){const{A,w}=info(cur),Ai=minv(A),g=new Float64Array(p);
+  for(let r=0;r<n;r++){const d=L.d(cur.eta[r]),v=V(cur.mu[r]);let s=(y[r]-cur.mu[r])*d/v;if(o.firth){let h=0;for(let i=0;i<p;i++)for(let j=0;j<p;j++)h+=X[i][r]*Ai[i][j]*X[j][r];h*=w[r];s+=h*(.5-cur.mu[r])}for(let i=0;i<p;i++)g[i]+=X[i][r]*s}
+  const st=new Float64Array(p);let mx=0;for(let i=0;i<p;i++){let s=0;for(let j=0;j<p;j++)s+=Ai[i][j]*g[j];st[i]=s}
+  if(o.firth){for(let i=0;i<p;i++){st[i]=Math.max(-1,Math.min(1,st[i]));mx=Math.max(mx,Math.abs(st[i]))}b=b.map((v,i)=>v+st[i]);cur=ev(b);if(mx<1e-8){conv=true;it++;break}}
+  else{let a=1,nb,nc;for(let h=0;h<25;h++){nb=b.map((v,i)=>v+a*st[i]);nc=ev(nb);if(nc.ll>=cur.ll-1e-10)break;a/=2}for(let i=0;i<p;i++)mx=Math.max(mx,Math.abs(a*st[i]));const dl=Math.abs(nc.ll-cur.ll);b=nb;cur=nc;if(mx<1e-8||dl<1e-11){conv=true;it++;break}}}
+ const{A,w}=info(cur),Ai=minv(A),se=Ai.map((r,i)=>Math.sqrt(Math.max(r[i],0)));let dev;
+ if(fam==='binom')dev=-2*cur.ll;else{dev=0;for(let i=0;i<n;i++){const yy=y[i],m=cur.mu[i];dev+=2*((yy>0?yy*Math.log(yy/m):0)-(yy-m))}}
+ return{beta:b,mu:cur.mu,eta:cur.eta,ll:cur.ll,dev,inv:Ai,se,iter:it,conv,X,w,p,n,A}}
+function auc(sc,y){const n=y.length,idx=Array.from({length:n},(_,i)=>i).sort((a,b)=>sc[a]-sc[b]);let rk=0,np=0,i=0;while(i<n){let j=i;while(j+1<n&&sc[idx[j+1]]===sc[idx[i]])j++;const r=(i+j)/2+1;for(let t=i;t<=j;t++)if(y[idx[t]]===1){rk+=r;np++}i=j+1}const nn=n-np;return np&&nn?(rk-np*(np+1)/2)/(np*nn):.5}
+function sepTest(x,y){let a1=1e99,b1=-1e99,a0=1e99,b0=-1e99,n1=0,n0=0;for(let i=0;i<x.length;i++){if(y[i]===1){n1++;a1=Math.min(a1,x[i]);b1=Math.max(b1,x[i])}else{n0++;a0=Math.min(a0,x[i]);b0=Math.max(b0,x[i])}}return n1>0&&n0>0&&(a1>b0||a0>b1)}
+const sig=e=>1/(1+Math.exp(-e));
+function lgt(p){return Math.log(p/(1-p))}
+function binaryData(n,a,b,sd){const x=new Float64Array(n),y=new Float64Array(n);for(let i=0;i<n;i++){x[i]=(sd||1)*randn();y[i]=Math.random()<sig(a+b*x[i])?1:0}return{x,y}}
+function heat(P,gx,gy,vals,x0,x1,y0,y1){const g=P.g,nx=gx,ny=gy;let mn=1e99,mx=-1e99;vals.forEach(v=>{if(isFinite(v)){mn=Math.min(mn,v);mx=Math.max(mx,v)}});mn=Math.max(mn,mx-30);for(let i=0;i<nx;i++)for(let j=0;j<ny;j++){const v=vals[i*ny+j],t=isFinite(v)?Math.max(0,Math.min(1,(v-mn)/(mx-mn))):0,tt=Math.pow(t,1.6),c=Math.round(40+190*tt);g.fillStyle=`rgb(${Math.round(20+60*tt)},${Math.round(30+100*tt)},${c})`;const xa=P.X(x0+(x1-x0)*i/nx),xb=P.X(x0+(x1-x0)*(i+1)/nx),ya=P.Y(y0+(y1-y0)*j/ny),yb=P.Y(y0+(y1-y0)*(j+1)/ny);g.fillRect(xa,Math.min(ya,yb),xb-xa+1,Math.abs(ya-yb)+1)}}
+/* ---------- confounding helpers ---------- */
+const U01=()=>1-Math.random();
+function sdv(a){const m=mean(a);let s=0;for(const v of a)s+=(v-m)*(v-m);return Math.sqrt(s/Math.max(a.length-1,1))}
+function barV(cv,vals,cols,labs,ymax,ff){const P=mk(cv,0,vals.length,ymax,{y0:0,noGrid:true,L:50});customGrid(P,[],niceTicks(0,ymax,5));const W=(P.w-P.L-P.R)/vals.length,g=P.g;vals.forEach((v,i)=>{const w=W*.5,x=P.L+W*i+W*.25;g.fillStyle=cols[i];g.fillRect(x,P.Y(v),w,P.Y(0)-P.Y(v));g.fillStyle=C.fg;g.textAlign='center';g.fillText((ff||fmt)(v),x+w/2,P.Y(v)-4);g.fillStyle=C.mu;g.fillText(labs[i],x+w/2,P.h-P.B+15)});return P}
+function barL(cv,vals,cols,labs,lo,hi,ff){const P=mk(cv,0,vals.length,hi,{y0:lo,noGrid:true,L:50});customGrid(P,[],niceTicks(lo,hi,5));const W=(P.w-P.L-P.R)/vals.length,g=P.g;vals.forEach((v,i)=>{const w=W*.5,x=P.L+W*i+W*.25;g.fillStyle=cols[i];g.fillRect(x,P.Y(v),w,P.Y(lo)-P.Y(v));g.fillStyle=C.fg;g.textAlign='center';g.fillText((ff||fmt)(v),x+w/2,P.Y(v)-4);g.fillStyle=C.mu;g.fillText(labs[i],x+w/2,P.h-P.B+15)});return P}
+const avg=a=>{let s=0;for(const v of a)s+=v;return s/a.length};
+function corr(a,b){const n=a.length;let ma=0,mb=0;for(let i=0;i<n;i++){ma+=a[i];mb+=b[i]}ma/=n;mb/=n;let sa=0,sb=0,sab=0;for(let i=0;i<n;i++){const x=a[i]-ma,y=b[i]-mb;sa+=x*x;sb+=y*y;sab+=x*y}return sab/Math.sqrt(sa*sb||1e-12)}
+const pcor=(x,y,z)=>corr(simple(z,x).res,simple(z,y).res);
+const lin=(n,f)=>{const a=new Float64Array(n);for(let i=0;i<n;i++)a[i]=f(i);return a};
+const rn=(n,s)=>lin(n,()=>(s||1)*randn());
+/* signed bars from zero */
+function barZ(cv,vals,cols,labs,lo,hi,ff){const P=mk(cv,0,vals.length,hi,{y0:lo,noGrid:true,L:50});customGrid(P,[],niceTicks(lo,hi,5));const W=(P.w-P.L-P.R)/vals.length,g=P.g;vals.forEach((v,i)=>{const w=W*.5,x=P.L+W*i+W*.25,y0=P.Y(0),y1=P.Y(v);g.fillStyle=cols[i];g.fillRect(x,Math.min(y0,y1),w,Math.abs(y0-y1));g.fillStyle=C.fg;g.textAlign='center';g.fillText((ff||fmt)(v),x+w/2,v>=0?y1-4:y1+13);g.fillStyle=C.mu;g.fillText(labs[i],x+w/2,P.h-P.B+15)});P.hline(0,C.mu,'');return P}
+/* grouped signed bars: groups[g][b] */
+function barG(cv,groups,cols,glabs,lo,hi,ff){const P=mk(cv,0,groups.length,hi,{y0:lo,noGrid:true,L:50});customGrid(P,[],niceTicks(lo,hi,5));const G=groups.length,B=groups[0].length,W=(P.w-P.L-P.R)/G,g=P.g;groups.forEach((vs,gi)=>vs.forEach((v,bi)=>{const bw=W*.7/B,x=P.L+W*gi+W*.15+bw*bi,y0=P.Y(0),y1=P.Y(v);g.fillStyle=cols[bi];g.fillRect(x,Math.min(y0,y1),bw-3,Math.abs(y0-y1));g.fillStyle=C.fg;g.textAlign='center';g.font='10px system-ui';g.fillText((ff||fmt)(v),x+bw/2-1,v>=0?y1-3:y1+11)}));g.font='11px system-ui';g.fillStyle=C.mu;g.textAlign='center';glabs.forEach((l,i)=>g.fillText(l,P.L+W*(i+.5),P.h-P.B+15));P.hline(0,C.mu,'');return P}
+/* scatter with optional per-point colours; draws at most nmax points */
+function scat(P,xs,ys,col,nmax,r,colf){const n=xs.length,st=Math.max(1,Math.floor(n/(nmax||500))),pts=[];clip(P,()=>{for(let i=0;i<n;i+=st){P.g.fillStyle=colf?colf(i):col;P.g.beginPath();P.g.arc(P.X(xs[i]),P.Y(ys[i]),r||2.2,0,7);P.g.fill()}})}
+function fitLine(P,s,col,lw,dash,x0,x1){clip(P,()=>P.line(x=>s.a+s.b*x,col,lw||2,x0,x1,2,dash))}
+const ordIdx=p=>Array.from({length:p.length},(_,i)=>i).sort((a,b)=>p[a]-p[b]);
+/* ---------- experiment helpers ---------- */
+const sgn=v=>(v>=0?'+':'−')+Math.abs(v).toFixed(3);
+const rng2=(a,b,pad)=>range(Array.from(a).concat(Array.from(b)),pad||.05);
+const pct0=x=>Math.round(x*100)+'%';
+const lgs=x=>1/(1+Math.exp(-x));
+function rgam(a){if(a<1)return rgam(a+1)*Math.pow(U01(),1/a);const d=a-1/3,c=1/Math.sqrt(9*d);for(;;){let x,v;do{x=randn();v=1+c*x}while(v<=0);v=v*v*v;const u=U01();if(u<1-.0331*x*x*x*x||Math.log(u)<.5*x*x+d*(1-v+Math.log(v)))return d*v}}
+const rbeta=(a,b)=>{const x=rgam(a),y=rgam(b);return x/(x+y)};
+function rbin(n,p){if(n<=30){let k=0;for(let i=0;i<n;i++)if(Math.random()<p)k++;return k}const m=n*p,s=Math.sqrt(n*p*(1-p)),k=Math.round(m+s*randn());return Math.max(0,Math.min(n,k))}
+function welch(a,b){const na=a.length,nb=b.length,ma=avg(a),mb=avg(b);let va=0,vb=0;for(const v of a)va+=(v-ma)*(v-ma);for(const v of b)vb+=(v-mb)*(v-mb);va/=na-1;vb/=nb-1;const se2=va/na+vb/nb,se=Math.sqrt(se2),t=(ma-mb)/se,df=se2*se2/((va/na)*(va/na)/(na-1)+(vb/nb)*(vb/nb)/(nb-1));return{d:ma-mb,se,t,df,p:2*(1-tcdf(Math.abs(t),df))}}
+const diffMeans=(Y,T)=>{let s1=0,s0=0,n1=0,n0=0;for(let i=0;i<Y.length;i++){if(T[i]){s1+=Y[i];n1++}else{s0+=Y[i];n0++}}return s1/n1-s0/n0};
+/* ---------- observational-causal helpers ---------- */
+function logitFit(cols,y){const n=y.length,k=cols.length,p=k+1,b=new Float64Array(p),lin_=i=>{let s=b[0];for(let j=0;j<k;j++)s+=b[j+1]*cols[j][i];return s};
+ for(let it=0;it<30;it++){const A=[];for(let i=0;i<p;i++)A.push(new Float64Array(p));const g=new Float64Array(p);
+  for(let i=0;i<n;i++){const m=lgs(lin_(i)),w=Math.max(m*(1-m),1e-8),r=y[i]-m,row=[1];for(let j=0;j<k;j++)row.push(cols[j][i]);for(let a=0;a<p;a++){g[a]+=row[a]*r;for(let c=a;c<p;c++)A[a][c]+=w*row[a]*row[c]}}
+  for(let a=0;a<p;a++){for(let c=0;c<a;c++)A[a][c]=A[c][a];A[a][a]+=1e-8}
+  const M=gj(A,Array.from(g)),d=M.map(r=>r[p]);let mx=0;for(let a=0;a<p;a++){b[a]+=d[a];mx=Math.max(mx,Math.abs(d[a]))}if(mx<1e-6)break}
+ const pr=new Float64Array(n),lo=new Float64Array(n);for(let i=0;i<n;i++){pr[i]=Math.min(.9999,Math.max(.0001,lgs(lin_(i))));lo[i]=Math.log(pr[i]/(1-pr[i]))}return{beta:b,pr,lo}}
+/* Hajek IPW estimate of the ATE; keep(i)=false drops a unit */
+function ipwATE(Y,T,e,keep){let a1=0,b1=0,a0=0,b0=0;for(let i=0;i<Y.length;i++){if(keep&&!keep(i))continue;if(T[i]){const w=1/e[i];a1+=w*Y[i];b1+=w}else{const w=1/(1-e[i]);a0+=w*Y[i];b0+=w}}return a1/b1-a0/b0}
+function smd(x,T,w){let m1=0,m0=0,w1=0,w0=0,n1=0,n0=0;for(let i=0;i<x.length;i++){const ww=w?w[i]:1;if(T[i]){m1+=ww*x[i];w1+=ww;n1++}else{m0+=ww*x[i];w0+=ww;n0++}}m1/=w1;m0/=w0;let v1=0,v0=0,a1=0,a0=0;for(let i=0;i<x.length;i++){if(T[i]){a1+=x[i]}else a0+=x[i]}a1/=n1;a0/=n0;for(let i=0;i<x.length;i++){if(T[i])v1+=(x[i]-a1)*(x[i]-a1);else v0+=(x[i]-a0)*(x[i]-a0)}v1/=n1-1;v0/=n0-1;return(m1-m0)/Math.sqrt((v1+v0)/2)}
+/* confounded data: X1,X2; treatment strength a; effect tau (function of x1 optional) */
+function confData(n,a,tauF,nl){const X1=rn(n),X2=rn(n),e=lin(n,i=>lgs(a*(.8*X1[i]+.5*X2[i]+(nl?.4*(X1[i]*X1[i]-1):0))/1.5)),T=new Uint8Array(n),Y=new Float64Array(n);
+ for(let i=0;i<n;i++){T[i]=Math.random()<e[i]?1:0;Y[i]=(T[i]?(tauF?tauF(X1[i]):1):0)+X1[i]+.8*X2[i]+(nl?.6*X1[i]*X1[i]:0)+randn()}return{X1,X2,T,Y,e}}
+/* one-to-one nearest-neighbour matching with replacement on a score; returns ATT and the matched control index per treated unit (-1 if dropped) */
+function matchATT(sc,T,Y,cal){const ctr=[];for(let i=0;i<T.length;i++)if(!T[i])ctr.push(i);ctr.sort((a,b)=>sc[a]-sc[b]);const cs=ctr.map(i=>sc[i]),m=new Int32Array(T.length).fill(-1);let sum=0,k=0;
+ for(let i=0;i<T.length;i++){if(!T[i])continue;let lo=0,hi=cs.length-1;while(lo<hi){const mid=(lo+hi)>>1;if(cs[mid]<sc[i])lo=mid+1;else hi=mid}let b=lo;if(lo>0&&Math.abs(cs[lo-1]-sc[i])<Math.abs(cs[lo]-sc[i]))b=lo-1;if(Math.abs(cs[b]-sc[i])>cal)continue;m[i]=ctr[b];sum+=Y[i]-Y[ctr[b]];k++}return{att:sum/k,m,kept:k}}
+const quant=(a,p)=>{const b=Float64Array.from(a).sort();return b[Math.min(b.length-1,Math.floor(p*b.length))]};
+/* ---------- Ch1 propensity score and balance ---------- */
+(function(){scl('c1a',v=>fmt(v/10));
+ function run(){const a=val('c1a')/10,n=4000,d=confData(n,a,null,false),f=logitFit([d.X1,d.X2],d.T),e=f.pr,w=lin(n,i=>d.T[i]?1/e[i]:1/(1-e[i])),
+  e1=[],e0=[];for(let i=0;i<n;i++)(d.T[i]?e1:e0).push(e[i]);
+  const P=histLines($('c1cv'),[e1,e0],[C.y,C.a],0,1,40,[]);legend(P,[['treated',C.y],['control',C.a]],P.T+12);P.text('fitted propensity score →',P.w-P.R-140,P.h-P.B-6,C.mu);
+  const s0=[smd(d.X1,d.T),smd(d.X2,d.T)],s1=[smd(d.X1,d.T,w),smd(d.X2,d.T,w)],vals=[[s0[0],s1[0]],[s0[1],s1[1]]],lo=Math.min(0,...s0,...s1)-.15,hi=Math.max(0,...s0,...s1)+.15;
+  const P2=barG($('c1cv2'),vals,[C.r,C.g],['X₁','X₂'],lo,hi,x=>x.toFixed(2));legend(P2,[['unweighted',C.r],['IPW',C.g]],P2.T+12);
+  const naive=diffMeans(d.Y,d.T),ols=olsMulti([d.T,d.X1,d.X2],d.Y).beta[1],ip=ipwATE(d.Y,d.T,e),ess=Math.pow(w.reduce((s,v)=>s+v,0),2)/w.reduce((s,v)=>s+v*v,0);
+  $('c1st').innerHTML=stat('true effect',fmt(1),'in')+stat('naive · regression · IPW',fmt(naive)+' · '+fmt(ols)+' · '+fmt(ip),'')+stat('max |SMD|: before · after IPW',fmt(Math.max(...s0.map(Math.abs)))+' · '+fmt(Math.max(...s1.map(Math.abs))),Math.max(...s1.map(Math.abs))<.1?'ok':'warn')+stat('effective sample size',Math.round(ess).toLocaleString('en-US')+' of '+n.toLocaleString('en-US'),ess<n*.5?'warn':'');
+  $('c1rd').innerHTML=a<.05?`With a = 0 assignment is random: the propensity scores of the two groups coincide and the covariates are balanced (SMD ${fmt(s0[0])}, ${fmt(s0[1])}).`:`Stronger confounding pulls the propensity scores of the two groups apart (treated high, control low) and the covariates become imbalanced (SMD up to ${fmt(Math.max(...s0.map(Math.abs)))}). The naive estimate is ${fmt(naive)} against a truth of 1; weighting by the inverse propensity restores balance (max |SMD| ${fmt(Math.max(...s1.map(Math.abs)))}) and gives ${fmt(ip)}, at the price of an effective sample size of ${Math.round(ess).toLocaleString('en-US')}. This works here only because both confounders are measured.`}
+ $('c1a').addEventListener('change',run);$('c1go').onclick=run;run();})();
+
+/* ---------- Ch2 matching ---------- */
+(function(){scl('c2a',v=>fmt(v/10));scl('c2k',v=>fmt(v/100));
+ function run(){const a=val('c2a')/10,k=val('c2k')/100,R=200,NV=[],MT=[];let dropped=0;
+  for(let r=0;r<R;r++){const d=confData(1000,a,null,false),f=logitFit([d.X1,d.X2],d.T),sd=sdv(f.lo),mm=matchATT(f.lo,d.T,d.Y,k*sd);NV.push(diffMeans(d.Y,d.T));
+   let nt=0;for(const t of d.T)nt+=t;dropped+=(1-mm.kept/nt)/R;MT.push(mm.att)}
+  const [l,h]=rng2(NV,MT,.1),P=histLines($('c2cv'),[NV,MT.filter(v=>isFinite(v))],[C.r,C.g],Math.min(l,.9),Math.max(h,1.1),40,[[1,C.fg,'true ATT',true]]);legend(P,[['naive',C.r],['matched',C.g]],P.T+12);P.text('estimated effect →',P.w-P.R-105,P.h-P.B-6,C.mu);
+  const d=confData(3000,a,null,false),f=logitFit([d.X1,d.X2],d.T),sd=sdv(f.lo),mm=matchATT(f.lo,d.T,d.Y,k*sd),w=new Float64Array(3000);for(let i=0;i<3000;i++){if(d.T[i])w[i]=mm.m[i]>=0?1:0}for(let i=0;i<3000;i++)if(d.T[i]&&mm.m[i]>=0)w[mm.m[i]]+=1;
+  const s0=[smd(d.X1,d.T),smd(d.X2,d.T)],s1=[smd(d.X1,d.T,w),smd(d.X2,d.T,w)],lo=Math.min(0,...s0,...s1)-.15,hi=Math.max(0,...s0,...s1)+.15;
+  const P2=barG($('c2cv2'),[[s0[0],s1[0]],[s0[1],s1[1]]],[C.r,C.g],['X₁','X₂'],lo,hi,x=>x.toFixed(2));legend(P2,[['before matching',C.r],['after matching',C.g]],P2.T+12);
+  const mN=avg(NV),mM=avg(MT);
+  $('c2st').innerHTML=stat('true ATT',fmt(1),'in')+stat('naive · matched mean',fmt(mN)+' · '+fmt(mM),Math.abs(mM-1)>.08?'warn':'ok')+stat('matched sd',fmt(sdv(MT)),'')+stat('treated dropped by caliper',pc(dropped),dropped>.15?'warn':'');
+  $('c2rd').innerHTML=`The naive comparison averages ${fmt(mN)}; one-to-one matching on the propensity score brings it to ${fmt(mM)} (truth 1) and removes most of the covariate imbalance (SMD ${fmt(Math.max(...s0.map(Math.abs)))} → ${fmt(Math.max(...s1.map(Math.abs)))}). The caliper of ${fmt(k)} sd drops ${pc(dropped)} of the treated customers: ${dropped>.05?'the estimate now describes the matched subpopulation only. ':'little is lost here. '}Matching with replacement is noisier (sd ${fmt(sdv(MT))}) than the regression or weighting estimators because each treated customer uses a single control.`}
+ ['c2a','c2k'].forEach(i=>$(i).addEventListener('change',run));$('c2go').onclick=run;run();})();
+
+/* ---------- Ch3 doubly robust ---------- */
+(function(){scl('c3a',v=>fmt(v/10));
+ function run(){const a=val('c3a')/10,pw=+$('c3p').value,ow=+$('c3o').value,R=300,n=1500,IP=[],OR=[],AI=[];
+  for(let r=0;r<R;r++){const d=confData(n,a,null,true),sq=d.X1.map(v=>v*v),pc_=pw?[d.X1,d.X2]:[d.X1,d.X2,sq],oc=ow?[d.X1,d.X2]:[d.X1,d.X2,sq],e=logitFit(pc_,d.T).pr;
+   const i1=[],i0=[];for(let i=0;i<n;i++)(d.T[i]?i1:i0).push(i);const sub=(cols,ix)=>cols.map(c=>ix.map(i=>c[i]));
+   const m1=olsMulti(sub(oc,i1),i1.map(i=>d.Y[i])).beta,m0=olsMulti(sub(oc,i0),i0.map(i=>d.Y[i])).beta,pr=(b,i)=>{let s=b[0];for(let j=0;j<oc.length;j++)s+=b[j+1]*oc[j][i];return s};
+   let s=0,sa=0;for(let i=0;i<n;i++){const u1=pr(m1,i),u0=pr(m0,i);s+=u1-u0;sa+=u1-u0+(d.T[i]?(d.Y[i]-u1)/e[i]:0)-(!d.T[i]?(d.Y[i]-u0)/(1-e[i]):0)}
+   IP.push(ipwATE(d.Y,d.T,e));OR.push(s/n);AI.push(sa/n)}
+  const [l,h]=rng2(IP,AI,.1),P=histLines($('c3cv'),[IP,OR,AI].map(x=>x.filter(v=>Math.abs(v-1)<4)),[C.y,C.r,C.g],Math.min(l,.7),Math.max(h,1.3),40,[[1,C.fg,'true ATE',true]]);legend(P,[['IPW',C.y],['outcome regression',C.r],['AIPW',C.g]],P.T+12);P.text('estimated effect →',P.w-P.R-105,P.h-P.B-6,C.mu);
+  const b=[IP,OR,AI].map(x=>avg(x)-1),lo=Math.min(0,...b)-.12,hi=Math.max(0,...b)+.12;barZ($('c3cv2'),b,[C.y,C.r,C.g],['IPW','outcome reg.','AIPW'],lo,hi,x=>x.toFixed(3));
+  const bad=b.map(v=>Math.abs(v)>.06);
+  $('c3st').innerHTML=stat('bias: IPW · OR · AIPW',b.map(v=>sgn(v)).join(' · '),'')+stat('sd: IPW · OR · AIPW',[IP,OR,AI].map(x=>fmt(sdv(x))).join(' · '),'in')+stat('propensity model',pw?'wrong':'correct',pw?'warn':'ok')+stat('outcome model',ow?'wrong':'correct',ow?'warn':'ok');
+  $('c3rd').innerHTML=pw&&ow?`Both models are wrong and so is every estimator: biases ${b.map(sgn).join(', ')}. Double robustness protects against one error, not two.`:!pw&&!ow?'Both models are right, so all three estimators are unbiased; AIPW and the outcome regression are the most precise.':pw?`The propensity model is wrong (linear): IPW is biased (${sgn(b[0])}), but the outcome regression and AIPW stay close to 1 because the outcome model is correct.`:`The outcome model is wrong (linear): the outcome regression is biased (${sgn(b[1])}), but IPW and AIPW remain accurate because the propensity model is correct.`}
+ ['c3a','c3p','c3o'].forEach(i=>$(i).addEventListener('change',run));$('c3go').onclick=run;run();})();
+
+/* ---------- Ch4 overlap and trimming ---------- */
+(function(){scl('c4a',v=>fmt(v/10));scl('c4t',v=>v+'%');
+ function run(){const a=val('c4a')/10,al=val('c4t')/100,R=300,n=1500,U=[],Tm=[],tau=x=>1+.8*x;
+  for(let r=0;r<R;r++){const d=confData(n,a,tau,false),e=logitFit([d.X1,d.X2],d.T).pr;U.push(ipwATE(d.Y,d.T,e));Tm.push(ipwATE(d.Y,d.T,e,i=>e[i]>=al&&e[i]<=1-al))}
+  const d=confData(n,a,tau,false),e=logitFit([d.X1,d.X2],d.T).pr,w=Array.from(e,(v,i)=>d.T[i]?1/v:1/(1-v)),sw=w.reduce((s,v)=>s+v,0),ess=sw*sw/w.reduce((s,v)=>s+v*v,0),wmax=Math.max(...w);
+  const P=histLines($('c4cv'),[w.map(v=>Math.min(v,30))],[C.a],1,30,40,[]);P.text('inverse-probability weight (capped at 30) →',P.w-P.R-225,P.h-P.B-6,C.mu);
+  const bu=avg(U)-1,bt=avg(Tm)-1,su=sdv(U),st=sdv(Tm),hi=Math.max(Math.abs(bu),Math.abs(bt),su,st)*1.2+.05,lo=Math.min(0,bu,bt)-.05;
+  const P2=barG($('c4cv2'),[[bu,bt],[su,st]],[C.r,C.g],['bias','sd'],lo,hi,x=>x.toFixed(2));legend(P2,[['untrimmed',C.r],['trimmed',C.g]],P2.T+12);
+  $('c4st').innerHTML=stat('largest weight · ESS',Math.round(wmax)+' · '+Math.round(ess).toLocaleString('en-US')+' of '+n.toLocaleString('en-US'),wmax>25?'hot':'ok')+stat('untrimmed: bias · sd',sgn(bu)+' · '+fmt(su),'')+stat('trimmed: bias · sd',sgn(bt)+' · '+fmt(st),'')+stat('sd reduction',pc(1-st/su),'in');
+  $('c4rd').innerHTML=`With confounding strength ${fmt(a)} the largest weight in this sample is ${Math.round(wmax)} and the weighted sample is worth ${Math.round(ess).toLocaleString('en-US')} customers. Untrimmed IPW has an sd of ${fmt(su)}; trimming at ${pc(al)} lowers it to ${fmt(st)} but shifts the average to ${sgn(bt)} from the population effect, because the effect varies with X₁ and the trimmed sample no longer represents everybody. Poor overlap cannot be fixed by weighting; the data hold little information about the counterfactual for the extreme customers.`}
+ ['c4a','c4t'].forEach(i=>$(i).addEventListener('change',run));$('c4go').onclick=run;run();})();
+const medn=a=>{const b=Float64Array.from(a).sort(),n=b.length;return n%2?b[(n-1)/2]:(b[n/2-1]+b[n/2])/2};
+const clampR=(a,lo,hi)=>a.filter(v=>v>lo&&v<hi);
+/* ---------- Ch5 difference-in-differences ---------- */
+(function(){['c5t','c5s','c5b'].forEach(i=>scl(i,v=>fmt(v/10)));scl('c5d',v=>fmt(v/100));
+ function run(){const tau=val('c5t')/10,dt=val('c5d')/100,sh=val('c5s')/10,gap=val('c5b')/10,n=2000,TT=10,post=t=>t>=7,gT=new Float64Array(TT+1),gC=new Float64Array(TT+1);
+  for(let u=0;u<2*n;u++){const G=u<n?1:0,al=randn();for(let t=1;t<=TT;t++){const y=al+gap*G+.1*t+dt*t*G+(post(t)?sh+tau*G:0)+.5*randn();if(G)gT[t]+=y/n;else gC[t]+=y/n}}
+  const pts=a=>{const o=[];for(let t=1;t<=TT;t++)o.push([t,a[t]]);return o},cf=[];for(let t=6;t<=TT;t++)cf.push([t,gT[t]-(post(t)?tau:0)]);
+  const all=[...gT.slice(1),...gC.slice(1)],lo=Math.min(...all)-.3,hi=Math.max(...all)+.3,P=mk($('c5cv'),1,TT,hi,{y0:lo,L:44});poly(P,pts(gC),C.a,2.6);poly(P,pts(gT),C.y,2.6);poly(P,cf,C.fg,2,true);dots(P,pts(gC),C.a,3);dots(P,pts(gT),C.y,3);P.vline(6.5,C.mu,'policy',true);legend(P,[['treated',C.y],['control',C.a],['treated counterfactual',C.fg]],P.T+12);P.text('month →',P.w-P.R-50,P.h-P.B-6,C.mu);
+  const m=(a,s,e)=>{let x=0;for(let t=s;t<=e;t++)x+=a[t];return x/(e-s+1)},dT=m(gT,7,10)-m(gT,1,6),dC=m(gC,7,10)-m(gC,1,6),did=dT-dC,postd=m(gT,7,10)-m(gC,7,10);
+  const vals=[tau,postd,dT,did],lo2=Math.min(0,...vals)-.4,hi2=Math.max(0,...vals)+.4;barZ($('c5cv2'),vals,[C.fg,C.r,C.y,C.g],['truth','post-period gap','before–after','DiD'],lo2,hi2);
+  const dd=[];for(let t=1;t<=6;t++)dd.push(gT[t]-gC[t]);const sl=simple(Array.from({length:6},(_,i)=>i+1),dd).b;
+  $('c5st').innerHTML=stat('true effect',fmt(tau),'in')+stat('DiD · bias',fmt(did)+' · '+sgn(did-tau),Math.abs(did-tau)>.12?'hot':'ok')+stat('pre-period trend in the gap',sgn(sl)+' per month',Math.abs(sl)>.05?'warn':'ok')+stat('predicted DiD bias (5 × trend gap)',sgn(5*dt),'');
+  $('c5rd').innerHTML=`The post-period gap (${fmt(postd)}) mixes the effect with the baseline gap of ${fmt(gap)}; the before–after change of the treated (${fmt(dT)}) mixes it with the trend and the common shock of ${fmt(sh)}. The difference-in-differences ${fmt(did)} removes both${dt<.005?', and recovers the truth because the groups share a trend':`, but the treated group drifts ${fmt(dt)} per month faster than the control group, which adds about ${sgn(5*dt)} to the estimate (the pre-period gap visibly trends: ${sgn(sl)} per month)`}.`}
+ ['c5t','c5d','c5s','c5b'].forEach(i=>$(i).addEventListener('change',run));$('c5go').onclick=run;run();})();
+
+/* ---------- Ch6 staggered adoption ---------- */
+(function(){scl('c6e',v=>fmt(v/10));scl('c6j',v=>fmt(v/10));
+ const TT=10,GR=[{g:4,n:80},{g:7,n:80},{g:99,n:140}];
+ function sample(e,j){const N=300,Y=[],cohort=[];let u=0;GR.forEach((G,gi)=>{for(let k=0;k<G.n;k++,u++){const al=randn(),row=new Float64Array(TT+1);for(let t=1;t<=TT;t++)row[t]=al+.3*t+(t>=G.g?j+e*(t-G.g):0)+.5*randn();Y.push(row);cohort.push(gi)}});return{Y,cohort,N}}
+ function twfe(S){const N=S.N,D=S.Y.map((_,i)=>{const r=new Float64Array(TT+1);for(let t=1;t<=TT;t++)r[t]=S.cohort[i]<2&&t>=GR[S.cohort[i]].g?1:0;return r});
+  const dm=M=>{const ri=M.map(r=>{let s=0;for(let t=1;t<=TT;t++)s+=r[t];return s/TT}),ct=new Float64Array(TT+1);for(let t=1;t<=TT;t++){for(let i=0;i<N;i++)ct[t]+=M[i][t]/N}let g=0;for(let i=0;i<N;i++)g+=ri[i]/N;return M.map((r,i)=>{const o=new Float64Array(TT+1);for(let t=1;t<=TT;t++)o[t]=r[t]-ri[i]-ct[t]+g;return o})},Dd=dm(D),Yd=dm(S.Y);let a=0,b=0;for(let i=0;i<N;i++)for(let t=1;t<=TT;t++){a+=Dd[i][t]*Yd[i][t];b+=Dd[i][t]*Dd[i][t]}return a/b}
+ function clean(S){const mean=(gi,t)=>{let s=0,c=0;for(let i=0;i<S.N;i++)if(S.cohort[i]===gi){s+=S.Y[i][t];c++}return s/c};let tot=0,w=0;for(let gi=0;gi<2;gi++){const g=GR[gi].g;for(let t=g;t<=TT;t++){tot+=GR[gi].n*((mean(gi,t)-mean(gi,g-1))-(mean(2,t)-mean(2,g-1)));w+=GR[gi].n}}return tot/w}
+ function run(){const e=val('c6e')/10,j=val('c6j')/10,R=200,TW=[],CL=[],truth=j+e*(80*(0+1+2+3+4+5+6)+80*(0+1+2+3))/(80*11);
+  for(let r=0;r<R;r++){const S=sample(e,j);TW.push(twfe(S));CL.push(clean(S))}
+  const S=sample(e,j),pa=[],cols=[C.y,C.p,C.a],P0=[],ym=[];const gm=gi=>{const o=[];for(let t=1;t<=TT;t++){let s=0,c=0;for(let i=0;i<S.N;i++)if(S.cohort[i]===gi){s+=S.Y[i][t];c++}o.push([t,s/c])}return o};
+  const lines=[gm(0),gm(1),gm(2)],all=lines.flat().map(p=>p[1]),P=mk($('c6cv'),1,TT,Math.max(...all)+.3,{y0:Math.min(...all)-.3,L:44});lines.forEach((l,i)=>poly(P,l,cols[i],2.4));P.vline(3.5,C.y,'',true);P.vline(6.5,C.p,'',true);legend(P,[['adopts in 4',C.y],['adopts in 7',C.p],['never',C.a]],P.T+12);P.text('period →',P.w-P.R-55,P.h-P.B-6,C.mu);
+  const [l,h]=rng2(TW,CL,.1),P2=histLines($('c6cv2'),[TW,CL],[C.r,C.g],Math.min(l,truth-.1),Math.max(h,truth+.1),40,[[truth,C.fg,'true average effect',true]]);legend(P2,[['TWFE',C.r],['clean cohort–period',C.g]],P2.T+12);P2.text('estimated effect →',P2.w-P2.R-105,P2.h-P2.B-6,C.mu);
+  const mT=avg(TW),mC=avg(CL);
+  $('c6st').innerHTML=stat('true average effect on treated cells',fmt(truth),'in')+stat('TWFE mean · bias',fmt(mT)+' · '+sgn(mT-truth),Math.abs(mT-truth)>.15?'hot':'ok')+stat('clean estimator mean · bias',fmt(mC)+' · '+sgn(mC-truth),Math.abs(mC-truth)>.1?'warn':'ok')+stat('sd: TWFE · clean',fmt(sdv(TW))+' · '+fmt(sdv(CL)),'');
+  $('c6rd').innerHTML=e<.05?`The effect is a constant jump of ${fmt(j)}, so TWFE (${fmt(mT)}) and the clean estimator (${fmt(mC)}) agree with the truth ${fmt(truth)}.`:`Effects here grow by ${fmt(e)} per period of exposure, so the average effect on treated observations is ${fmt(truth)}. TWFE returns ${fmt(mT)} (${sgn(mT-truth)}) because it uses the earlier-adopting cohort, whose effect is still growing, as a control for the later one. The clean cohort-by-period estimator, which only compares with never-treated units, gives ${fmt(mC)}, at a somewhat larger variance.`}
+ ['c6e','c6j'].forEach(i=>$(i).addEventListener('change',run));$('c6go').onclick=run;run();})();
+
+/* ---------- IV helpers ---------- */
+function ivSim(n,pi_,en,zeta){const U=rn(n),Z=rn(n),X=lin(n,i=>pi_*Z[i]+en*U[i]+randn()),Y=lin(n,i=>X[i]+en*U[i]+(zeta||0)*Z[i]+randn()),f=simple(Z,X),g=simple(Z,Y);return{iv:g.b/f.b,ols:simple(X,Y).b,F:f.b*f.b*f.sxx/(f.sse/(n-2))}}
+
+/* ---------- Ch7 IV ---------- */
+(function(){scl('c7p',v=>fmt(v/10));scl('c7e',v=>fmt(v/10));scl('c7n',v=>v.toLocaleString('en-US'));
+ function run(){const p=val('c7p')/10,en=val('c7e')/10,n=val('c7n'),R=500,O=[],I=[],F=[];for(let r=0;r<R;r++){const s=ivSim(n,p,en,0);O.push(s.ols);I.push(s.iv);F.push(s.F)}
+  const If=clampR(I,-3,5),[l,h]=rng2(O,If,.1),P=histLines($('c7cv'),[O,If],[C.r,C.g],Math.min(l,.5),Math.max(h,1.5),44,[[1,C.fg,'true β',true]]);legend(P,[['OLS',C.r],['IV',C.g]],P.T+12);P.text('estimate →',P.w-P.R-60,P.h-P.B-6,C.mu);
+  const mO=avg(O),mI=medn(I),th=en*en/(p*p+en*en+1),vals=[1,mO,mI],lo=Math.min(0,...vals)-.2,hi=Math.max(...vals)+.3;barZ($('c7cv2'),vals,[C.fg,C.r,C.g],['truth','OLS mean','IV median'],lo,hi);
+  const Fm=medn(F);
+  $('c7st').innerHTML=stat('OLS mean · predicted bias',fmt(mO)+' · '+sgn(th),Math.abs(mO-1)>.1?'hot':'ok')+stat('IV median · sd (central 90%)',fmt(mI)+' · '+fmt(sdv(clampR(I,quant(I,.05),quant(I,.95)))),Math.abs(mI-1)>.15?'warn':'ok')+stat('median first-stage F',fmt(Fm),Fm<10?'hot':'ok')+stat('instrument strength π',fmt(p),'in');
+  $('c7rd').innerHTML=en<.05?'With no endogeneity OLS is unbiased and more precise than IV; instruments cost variance.':`Unmeasured U inflates OLS to ${fmt(mO)} against a truth of 1 (predicted bias ${sgn(th)}), however large n. The instrument ${Fm<10?`is weak (F ${fmt(Fm)}): the IV estimates are scattered and their median ${fmt(mI)} is pulled towards OLS`:`is strong (median F ${fmt(Fm)}) and the IV estimates are centred on ${fmt(mI)}`}. IV removes the bias but is far less precise than OLS; the price is the variance, paid for the assumption that Z affects Y only through X.`}
+ ['c7p','c7e','c7n'].forEach(i=>$(i).addEventListener('change',run));$('c7go').onclick=run;run();})();
+
+/* ---------- Ch8 weak instruments ---------- */
+(function(){scl('c8p',v=>fmt(v/100));scl('c8z',v=>fmt(v/100));
+ function run(){const p=val('c8p')/100,z=val('c8z')/100,R=1000,n=500,I=[],F=[],O=[];for(let r=0;r<R;r++){const s=ivSim(n,p,1,z);I.push(s.iv);F.push(s.F);O.push(s.ols)}
+  const out=I.filter(v=>v<=-3||v>=5).length,If=clampR(I,-3,5),P=histLines($('c8cv'),[If],[C.g],-3,5,48,[[1,C.fg,'true β',true],[avg(O),C.r,'OLS',true]]);P.text('IV estimate (clipped to −3…5) →',P.w-P.R-165,P.h-P.B-6,C.mu);
+  const grid=[.02,.05,.1,.2,.3,.5,.75,1],med=grid.map(g=>{const a=[];for(let r=0;r<200;r++)a.push(ivSim(n,g,1,z).iv);return medn(a)}),hi=Math.min(4,Math.max(...med,1.6)+.2),lo=Math.max(-1,Math.min(...med,0)-.2);
+  const P2=mk($('c8cv2'),0,1,hi,{y0:lo,L:44});P2.hline(1,C.fg,'truth');P2.hline(avg(O),C.r,'OLS');poly(P2,grid.map((g,i)=>[g,Math.max(lo,Math.min(hi,med[i]))]),C.g,2.6);dots(P2,grid.map((g,i)=>[g,Math.max(lo,Math.min(hi,med[i]))]),C.g,3);P2.vline(p,C.mu,'',true);P2.text('first-stage strength π →',P2.w-P2.R-130,P2.h-P2.B-6,C.mu);P2.text('median IV estimate',P2.L+8,P2.T+28,C.mu);
+  const Fm=medn(F),mI=medn(I);
+  $('c8st').innerHTML=stat('median first-stage F',fmt(Fm),Fm<10?'hot':'ok')+stat('IV median · true β',fmt(mI)+' · 1','')+stat('estimates outside −3…5',pc(out/R),out/R>.05?'warn':'ok')+stat('exclusion bias ζ/π (predicted)',sgn(z/p),Math.abs(z/p)>.2?'hot':'ok');
+  $('c8rd').innerHTML=`At π = ${fmt(p)} the median first-stage F is ${fmt(Fm)}${Fm<10?' (below the rule-of-thumb 10)':''}: the IV estimates spread over a wide range (${pc(out/R)} fall outside −3…5) and their median is ${fmt(mI)}, drifting towards OLS (${fmt(avg(O))}) as the instrument weakens. ${Math.abs(z)>.04?`A direct effect ζ = ${fmt(z)} of the instrument on the outcome adds ζ/π = ${sgn(z/p)} to the estimate, an error that grows as the first stage weakens.`:'Add a small direct effect ζ to see how an exclusion violation is amplified by a weak first stage.'}`}
+ ['c8p','c8z'].forEach(i=>$(i).addEventListener('change',run));$('c8go').onclick=run;run();})();
+
+/* ---------- Ch9 regression discontinuity ---------- */
+(function(){scl('c9h',v=>fmt(v/100));scl('c9q',v=>fmt(v/10));scl('c9t',v=>fmt(v/10));
+ function gen(n,q,t){const x=lin(n,()=>2*Math.random()-1),y=lin(n,i=>.8*x[i]+q*x[i]*x[i]*(x[i]>0?1.6:1)+(x[i]>=0?t:0)+.5*randn());return{x,y}}
+ const trueF=(x,q,t)=>.8*x+q*x*x*(x>0?1.6:1)+(x>=0?t:0);
+ function est(d,h){const L=[],R=[];for(let i=0;i<d.x.length;i++){if(d.x[i]<0&&d.x[i]>=-h)L.push(i);else if(d.x[i]>=0&&d.x[i]<=h)R.push(i)}if(L.length<5||R.length<5)return{tau:NaN,se:NaN,nL:L.length,nR:R.length};const f=ix=>simple(ix.map(i=>d.x[i]),ix.map(i=>d.y[i])),a=f(R),b=f(L),se=s=>Math.sqrt(s.sse/(s.n-2)*(1/s.n+s.xm*s.xm/s.sxx));return{tau:a.a-b.a,se:Math.hypot(se(a),se(b)),a,b,nL:L.length,nR:R.length}}
+ function run(){const h=val('c9h')/100,q=val('c9q')/10,t=val('c9t')/10,n=3000,d=gen(n,q,t),e=est(d,h);
+  const [yl,yh]=range(d.y,.03),P=mk($('c9cv'),-1,1,yh,{y0:yl,L:44});scat(P,d.x,d.y,C.mu,500,2);
+  const bins=[];for(let b=-1;b<1-1e-9;b+=.1){const s=[],ys=[];for(let i=0;i<n;i++)if(d.x[i]>=b&&d.x[i]<b+.1){s.push(d.x[i]);ys.push(d.y[i])}if(s.length)bins.push([avg(s),avg(ys)])}dots(P,bins,C.y,4.5);
+  P.line(x=>trueF(x,q,t),C.fg,2,-1,-1e-6,100,true);P.line(x=>trueF(x,q,t),C.fg,2,0,1,100,true);P.vline(0,C.mu,'cut-off',true);P.vline(-h,C.a,'',true);P.vline(h,C.a,'',true);
+  if(e.a){fitLine(P,e.b,C.r,3,false,-h,0);fitLine(P,e.a,C.g,3,false,0,h)}legend(P,[['customers',C.mu],['bin means',C.y],['true curve',C.fg],['local linear fits',C.g]],P.T+12);P.text('running variable (score) →',P.w-P.R-140,P.h-P.B-6,C.mu);
+  const grid=[.05,.1,.15,.2,.3,.4,.5,.7,1],bs=[],sds=[];grid.forEach(g=>{const a=[];for(let r=0;r<60;r++){const dd=gen(n,q,t),ee=est(dd,g);if(isFinite(ee.tau))a.push(ee.tau)}bs.push(avg(a)-t);sds.push(sdv(a))});
+  const lo=Math.min(0,...bs)-.03,hi=Math.max(...sds,...bs,.1)*1.15,P2=mk($('c9cv2'),0,1,hi,{y0:lo,L:44});P2.hline(0,C.mu,'');poly(P2,grid.map((g,i)=>[g,bs[i]]),C.r,2.6);poly(P2,grid.map((g,i)=>[g,sds[i]]),C.a,2.6);legend(P2,[['bias',C.r],['sd',C.a]],P2.T+12);
+  const ci=grid.reduce((bi,g,i)=>Math.abs(g-h)<Math.abs(grid[bi]-h)?i:bi,0);dots(P2,[[grid[ci],bs[ci]],[grid[ci],sds[ci]]],C.y,5);P2.text('bandwidth →',P2.w-P2.R-70,P2.h-P2.B-6,C.mu);
+  $('c9st').innerHTML=stat('true jump · estimate',fmt(t)+' · '+(isFinite(e.tau)?fmt(e.tau):'—'),'in')+stat('standard error · 95% CI',isFinite(e.se)?fmt(e.se)+' · ['+fmt(e.tau-1.96*e.se)+', '+fmt(e.tau+1.96*e.se)+']':'—','')+stat('customers within the window',(e.nL+e.nR).toLocaleString('en-US'),'')+stat('bias at nearest grid bandwidth',sgn(bs[ci]),Math.abs(bs[ci])>.1?'hot':'ok');
+  $('c9rd').innerHTML=`Within ±${fmt(h)} of the cut-off there are ${(e.nL+e.nR).toLocaleString('en-US')} customers and the estimated jump is ${isFinite(e.tau)?fmt(e.tau):'—'} (truth ${fmt(t)}). ${q<.05?'With a straight outcome curve the bias is negligible at any bandwidth, so the widest window is the most precise.':`With curvature q = ${fmt(q)} a wide window forces a straight line through a curved function: the bias in the right panel grows with h (${sgn(bs[ci])} at h ≈ ${fmt(grid[ci])}), while a narrow window is nearly unbiased but noisy (sd ${fmt(sds[ci])}).`} The estimate holds at the cut-off only.`}
+ ['c9h','c9q','c9t'].forEach(i=>$(i).addEventListener('change',run));$('c9go').onclick=run;run();})();
+
+/* ---------- Ch10 fuzzy RD and manipulation ---------- */
+(function(){scl('c10m',v=>v+'%');scl('c10k',v=>v+'%');
+ function gen(n,m,c){const x=new Float64Array(n),D=new Float64Array(n),Y=new Float64Array(n);for(let i=0;i<n;i++){let xi=.5*randn(),mp=0;if(xi<0&&xi>=-.1&&Math.random()<m){xi=Math.random()*.1;mp=1}x[i]=xi;D[i]=xi>=0&&Math.random()<c?1:0;Y[i]=.8*xi+D[i]+.5*mp+.5*randn()}return{x,D,Y}}
+ function jump(x,v,h){const L=[],R=[];for(let i=0;i<x.length;i++){if(x[i]<0&&x[i]>=-h)L.push(i);else if(x[i]>=0&&x[i]<=h)R.push(i)}const f=ix=>simple(ix.map(i=>x[i]),ix.map(i=>v[i]));return f(R).a-f(L).a}
+ function run(){const m=val('c10m')/100,c=val('c10k')/100,R=150,IT=[],FZ=[],JD=[];
+  for(let r=0;r<R;r++){const d=gen(4000,m,c),jy=jump(d.x,d.Y,.3),jd=jump(d.x,d.D,.3);IT.push(jy);JD.push(jd);FZ.push(jy/jd)}
+  const d=gen(6000,m,c),P=histLines($('c10cv'),[Array.from(d.x)],[C.a],-.6,.6,24,[[0,C.fg,'cut-off',true]]);P.text('running variable →',P.w-P.R-95,P.h-P.B-6,C.mu);
+  let cb=0,ca=0;for(const v of d.x){if(v>=-.1&&v<0)cb++;else if(v>=0&&v<.1)ca++}
+  const vals=[1,avg(IT),avg(FZ),avg(JD)],lo=Math.min(0,...vals)-.2,hi=Math.max(...vals)+.3;barZ($('c10cv2'),vals,[C.fg,C.y,C.r,C.a],['true τ','jump in Y (ITT)','fuzzy RD','jump in take-up'],lo,hi);
+  $('c10st').innerHTML=stat('density just above / below cut-off',fmt(ca/Math.max(cb,1))+' ('+ca+' vs '+cb+')',ca/Math.max(cb,1)>1.3?'hot':'ok')+stat('fuzzy RD · bias',fmt(avg(FZ))+' · '+sgn(avg(FZ)-1),Math.abs(avg(FZ)-1)>.08?'hot':'ok')+stat('jump in take-up (true '+fmt(c)+')',fmt(avg(JD)),'')+stat('sd of fuzzy estimate',fmt(sdv(FZ)),'in');
+  $('c10rd').innerHTML=m<.01?`With no manipulation the density is smooth across the cut-off (ratio ${fmt(ca/Math.max(cb,1))}) and the fuzzy estimate ${fmt(avg(FZ))} recovers the complier effect 1: the jump in the outcome (${fmt(avg(IT))}) is the take-up jump (${fmt(c)}) times the effect.`:`With ${pc(m)} of customers just below the cut-off pushing themselves over it, there is bunching just above (density ratio ${fmt(ca/Math.max(cb,1))}) and a hole just below. The movers have higher unmeasured quality, so the customers just above are no longer comparable with those just below: the fuzzy estimate is ${fmt(avg(FZ))} instead of 1. The density test flags the problem; the treatment effect cannot be repaired by adjustment.`}
+ ['c10m','c10k'].forEach(i=>$(i).addEventListener('change',run));$('c10go').onclick=run;run();})();
+
+/* ---------- Ch11 synthetic control ---------- */
+(function(){scl('c11t',v=>fmt(v/10));scl('c11s',v=>fmt(v/10));scl('c11x',v=>fmt(v/10));
+ const J=25,T0=24,T1=12,TT=T0+T1;
+ function fw(D,y,T0n){const J_=D.length;let w=new Float64Array(J_).fill(1/J_),Yw=new Float64Array(T0n);for(let j=0;j<J_;j++)for(let t=0;t<T0n;t++)Yw[t]+=w[j]*D[j][t];const r=new Float64Array(T0n);for(let t=0;t<T0n;t++)r[t]=y[t]-Yw[t];
+  for(let it=0;it<250;it++){let bj=0,bv=-1e99;for(let j=0;j<J_;j++){let s=0;for(let t=0;t<T0n;t++)s+=D[j][t]*r[t];if(s>bv){bv=s;bj=j}}let rd=0,dd=0;const dv=new Float64Array(T0n);for(let t=0;t<T0n;t++){dv[t]=D[bj][t]-Yw[t];rd+=r[t]*dv[t];dd+=dv[t]*dv[t]}const st=Math.max(0,Math.min(1,dd>0?rd/dd:0));if(st<1e-7)break;for(let j=0;j<J_;j++)w[j]*=1-st;w[bj]+=st;for(let t=0;t<T0n;t++){Yw[t]+=st*dv[t];r[t]-=st*dv[t]}}return w}
+ function gaps(D,y){const w=fw(D.map(r=>r.slice(0,T0)),y.slice(0,T0),T0),g=new Float64Array(TT),syn=new Float64Array(TT);for(let t=0;t<TT;t++){let s=0;for(let j=0;j<D.length;j++)s+=w[j]*D[j][t];syn[t]=s;g[t]=y[t]-s}return{g,syn}}
+ const rm=(g,a,b)=>{let s=0;for(let t=a;t<b;t++)s+=g[t]*g[t];return Math.sqrt(s/(b-a))};
+ function run(){const tau=val('c11t')/10,sg=val('c11s')/10,ex=val('c11x')/10,f1=new Float64Array(TT),f2=new Float64Array(TT);let c=0;for(let t=0;t<TT;t++){c+=.35*randn();f1[t]=c;f2[t]=2*Math.sin(t/3)}
+  const mu=Array.from({length:J},()=>[randn(),randn()]),mk_=(m)=>{const r=new Float64Array(TT);for(let t=0;t<TT;t++)r[t]=.1*t+f1[t]*m[0]+f2[t]*m[1]+sg*randn();return r},D=mu.map(mk_);
+  const pick=[0,1,2].map(()=>Math.floor(Math.random()*J)),m0=[avg(pick.map(i=>mu[i][0]))+ex*.8,avg(pick.map(i=>mu[i][1]))+ex*.6],y=mk_(m0);for(let t=T0;t<TT;t++)y[t]+=tau;
+  const A=gaps(D,y),ratios=[],pl=[];for(let j=0;j<J;j++){const Dj=D.filter((_,i)=>i!==j),G=gaps(Dj,D[j]);pl.push(G.g);ratios.push(rm(G.g,T0,TT)/Math.max(rm(G.g,0,T0),1e-6))}
+  const rT=rm(A.g,T0,TT)/Math.max(rm(A.g,0,T0),1e-6),pv=(ratios.filter(v=>v>=rT).length+1)/(J+1),pre=rm(A.g,0,T0),post=avg(Array.from(A.g).slice(T0));
+  const all=[...y,...A.syn],P=mk($('c11cv'),1,TT,Math.max(...all)+.5,{y0:Math.min(...all)-.5,L:44});poly(P,Array.from(y,(v,t)=>[t+1,v]),C.y,2.8);poly(P,Array.from(A.syn,(v,t)=>[t+1,v]),C.g,2.8,true);P.vline(T0+.5,C.mu,'intervention',true);legend(P,[['treated unit',C.y],['synthetic control',C.g]],P.T+12);P.text('period →',P.w-P.R-55,P.h-P.B-6,C.mu);
+  const yr=Math.max(...Array.from(A.g,Math.abs))*1.4+1,P2=mk($('c11cv2'),1,TT,yr,{y0:-yr,L:44});clip(P2,()=>{pl.forEach(g=>poly(P2,Array.from(g,(v,t)=>[t+1,v]),'rgba(150,160,180,.35)',1));});poly(P2,Array.from(A.g,(v,t)=>[t+1,v]),C.y,3);P2.hline(0,C.mu,'');P2.vline(T0+.5,C.mu,'',true);legend(P2,[['treated gap',C.y],['placebo gaps (donors)',C.mu]],P2.T+12);
+  $('c11st').innerHTML=stat('true effect · estimated (mean post gap)',fmt(tau)+' · '+fmt(post),Math.abs(post-tau)>Math.max(.5,tau*.25)?'warn':'ok')+stat('pre-period RMSPE',fmt(pre),pre>sg*2?'hot':'ok')+stat('post/pre RMSPE ratio',fmt(rT),'in')+stat('placebo p-value',fmt(pv)+' (rank '+(Math.round(pv*(J+1)))+' of '+(J+1)+')',pv<.1?'ok':'');
+  $('c11rd').innerHTML=ex<.05?`The synthetic control tracks the treated unit before the intervention (RMSPE ${fmt(pre)}, about the noise level ${fmt(sg)}), and the post-period gap of ${fmt(post)} estimates the effect ${fmt(tau)}. Among the ${J} placebo donors ${pv<.1?'none or almost none shows a ratio as large as the treated unit':'several show comparable ratios'}, giving a permutation p-value of ${fmt(pv)}.`:`With the treated unit placed ${fmt(ex)} outside the donors’ range, no weighted average of donors can match it (pre-period RMSPE ${fmt(pre)} against noise ${fmt(sg)}), so the post-period gap ${fmt(post)} mixes the effect with the fit error. A poor pre-period fit invalidates the method; do not interpret the gap.`}
+ ['c11t','c11s','c11x'].forEach(i=>$(i).addEventListener('change',run));$('c11go').onclick=run;run();})();
+const QZ=[{"l": "Beginner", "q": "Ignorability (unconfoundedness) means…", "o": ["The propensity score equals 0.5", "Treatment is randomised", "Given the measured covariates, treatment is independent of the potential outcomes", "The covariates are independent of the outcome"], "a": 2, "e": "(Y(0), Y(1)) ⟂ T | X: all common causes of T and Y are in X."}, {"l": "Beginner", "q": "The propensity score is…", "o": ["A measure of model fit", "The effect of treatment", "The probability of the outcome", "The probability of receiving treatment given the covariates"], "a": 3, "e": "e(x) = P(T = 1 | X = x); conditioning on it balances the covariates."}, {"l": "Intermediate", "q": "A caliper in propensity-score matching…", "o": ["Drops treated units with no close control, which changes the population the estimate describes", "Removes all bias from unmeasured confounders", "Is needed only for randomised data", "Guarantees exact balance"], "a": 0, "e": "It trades bias for generality: unmatched treated customers are excluded."}, {"l": "Intermediate", "q": "The AIPW estimator is “doubly robust” because it is consistent if…", "o": ["There is no confounding", "Either the propensity model or the outcome model is correctly specified", "Both models are wrong", "The sample is large"], "a": 1, "e": "The augmentation term corrects the error of one model using the other."}, {"l": "Intermediate", "q": "Several customers have estimated propensity scores of 0.002 in the treated group. The consequence for IPW is…", "o": ["Lower bias", "No effect", "Enormous weights, high variance and a small effective sample size", "More power"], "a": 2, "e": "Weights 1/e = 500 let a few observations dominate; overlap is poor."}, {"l": "Intermediate", "q": "Difference-in-differences identifies the effect on the treated if…", "o": ["There is no common shock", "The control group is larger", "The groups have identical levels before the policy", "The treated group would have followed the same trend as the control group without the policy"], "a": 3, "e": "Parallel trends is about changes, not levels; common shocks cancel."}, {"l": "Advanced", "q": "With staggered adoption and effects that grow over time, two-way fixed effects regression can be biased because…", "o": ["It uses already-treated units as controls for later-treated ones", "It has too many parameters", "It omits unit effects", "It ignores the control group"], "a": 0, "e": "Those comparisons subtract the earlier cohort’s growing effect; some implicit weights are negative."}, {"l": "Advanced", "q": "A valid instrument must satisfy…", "o": ["Being a cause of the confounder", "Relevance, independence from unmeasured confounders and exclusion (no direct effect on Y)", "Correlation with Y", "Relevance only"], "a": 1, "e": "The three core assumptions; with heterogeneous effects add monotonicity for the LATE interpretation."}, {"l": "Advanced", "q": "The IV (Wald) estimand with heterogeneous effects is…", "o": ["The ATT", "The effect for never-takers", "The local average treatment effect for compliers", "The ATE"], "a": 2, "e": "Under monotonicity IV identifies the effect for customers whose treatment is moved by the instrument."}, {"l": "Advanced", "q": "A first-stage F-statistic of 3 indicates…", "o": ["A strong instrument", "No endogeneity", "A valid exclusion restriction", "A weak instrument: IV is biased towards OLS and the usual intervals are unreliable"], "a": 3, "e": "F below about 10 signals weak-instrument problems; use Anderson–Rubin intervals."}, {"l": "Advanced", "q": "In a regression discontinuity, widening the bandwidth typically…", "o": ["Reduces variance but raises bias when the outcome curve is not straight", "Does not matter", "Raises variance and lowers bias", "Reduces both bias and variance"], "a": 0, "e": "The bandwidth controls the bias–variance trade-off of the local linear fit."}, {"l": "Expert", "q": "A McCrary-type density test at the cut-off checks for…", "o": ["Parallel trends", "Manipulation (sorting) of the running variable around the threshold", "Weak instruments", "Heteroskedasticity"], "a": 1, "e": "Bunching just above the cut-off suggests customers or staff push scores over the line."}, {"l": "Expert", "q": "A fuzzy regression discontinuity estimate is…", "o": ["The ratio of bandwidths", "The jump in the outcome", "The jump in the outcome divided by the jump in treatment take-up at the cut-off", "The jump in take-up"], "a": 2, "e": "It is an IV estimate with the threshold as instrument: the complier effect at the cut-off."}, {"l": "Expert", "q": "A pre-trend test shows no significant difference in the trends of treated and control groups. Parallel trends is then…", "o": ["Irrelevant", "Violated", "Proven", "Plausible but not proven; the test may have low power and does not cover the post-period"], "a": 3, "e": "Parallel trends concerns the unobserved post-period counterfactual."}, {"l": "Expert", "q": "The synthetic control method is unreliable when…", "o": ["The pre-intervention fit is poor, for example when the treated unit lies outside the donors’ range", "The outcome is continuous", "There are many donors", "The effect is large"], "a": 0, "e": "No convex combination of donors can reproduce a unit outside their hull."}, {"l": "Expert", "q": "Matching on the propensity score has balanced all measured covariates. The estimate can still be biased because…", "o": ["The sample is too large", "Unmeasured confounders are untouched by matching", "The caliper is too small", "Balance is not checkable"], "a": 1, "e": "Balance on X says nothing about unobserved common causes."}, {"l": "Expert", "q": "Two different methods with different assumptions (for example DiD and an instrument) give the same effect. This is…", "o": ["Irrelevant", "Proof of causality", "Weak but useful corroboration; disagreement would be more informative about which assumption fails", "Evidence that both assumptions are exactly true"], "a": 2, "e": "Triangulation raises confidence without proving any single assumption."}, {"l": "Expert", "q": "A bank wants the effect of approval on repayment using the score cut-off, but loan officers sometimes override the score near the line in favour of customers they know. This most threatens…", "o": ["Parallel trends", "Overlap", "Relevance of an instrument", "The continuity (no-manipulation) assumption of the discontinuity design"], "a": 3, "e": "Selective overrides near the threshold break the comparability of customers on either side."}];
+(function(){const st=store.get('ob_quiz',{});
+ function render(){const box=$('quiz');box.innerHTML='';
+  QZ.forEach((q,i)=>{const d=document.createElement('div');d.className='q'+(st[i]!=null?' done':'');d.innerHTML=`<div class="qh">Q${i+1} · ${q.l}</div><div style="margin:4px 0 6px"><b>${q.q}</b></div>`;
+   q.o.forEach((o,j)=>{const b=document.createElement('button');b.className='opt';b.textContent=o;if(st[i]!=null){if(j===q.a)b.classList.add('good');else if(j===st[i])b.classList.add('bad')}b.onclick=()=>{if(st[i]!=null)return;st[i]=j;store.set('ob_quiz',st);render();meter()};d.appendChild(b)});
+   const e=document.createElement('div');e.className='ex';e.innerHTML=(st[i]===q.a?'✅ ':'❌ ')+q.e;d.appendChild(e);box.appendChild(d)});
+  const ans=Object.keys(st).length,ok=QZ.filter((q,i)=>st[i]===q.a).length;
+  $('qscore').innerHTML=stat('answered',ans+' / '+QZ.length,'in')+stat('correct',ok,'ok')+stat('score',ans?Math.round(100*ok/ans)+'%':'—',ok/Math.max(ans,1)>=.8?'ok':'warn')+stat('verdict',ans<QZ.length?'keep going':ok>=16?'observational-causal master':ok>=13?'strong':'review ch. 1–11','')}
+ $('qreset').onclick=()=>{Object.keys(st).forEach(k=>delete st[k]);store.set('ob_quiz',st);render();meter()};
+ window.__qst=st;render();})();
+const CHK=["State ignorability and overlap and explain what the propensity score does.", "Check covariate balance with standardised mean differences and read an overlap plot.", "Run and critique propensity-score matching (replacement, caliper, population change).", "Compute and explain IPW and AIPW (doubly robust) estimators and when each is consistent.", "Diagnose poor overlap, extreme weights and effective sample size; explain what trimming changes.", "Compute a difference-in-differences estimate and state parallel trends, no anticipation and no spillover.", "Explain why TWFE fails with staggered adoption and heterogeneous effects, and name the clean alternatives.", "State the three IV assumptions and interpret the LATE.", "Diagnose a weak instrument (first-stage F) and an exclusion violation (ζ/π).", "Estimate a sharp RD with local linear regression and choose the bandwidth.", "Explain fuzzy RD as an IV estimate and test for manipulation of the running variable.", "Explain synthetic control, its pre-fit requirement and placebo inference.", "Choose among randomisation, adjustment, DiD, IV, RD and synthetic control for a given bank question.", "Write the identification section of an observational causal analysis: assumptions, diagnostics and sensitivity."];
+(function(){const st=store.get('ob_chk',{}),box=$('chk');CHK.forEach((t,i)=>{const l=document.createElement('label'),c=document.createElement('input');c.type='checkbox';c.checked=!!st[i];c.onchange=()=>{st[i]=c.checked;store.set('ob_chk',st);meter()};l.appendChild(c);const s=document.createElement('span');s.textContent=t;l.appendChild(s);box.appendChild(l)});window.__cst=st;})();
+function meter(){const q=window.__qst||{},c=window.__cst||{};const ok=QZ.filter((x,i)=>q[i]===x.a).length,ck=Object.values(c).filter(Boolean).length;const p=Math.round(100*(.6*ok/QZ.length+.4*ck/CHK.length));$('mtxt').textContent='Mastery: '+p+'%  (exam + checklist)';$('mbar').style.width=p+'%';store.set('mastery_ob',p)}
+meter();
+
+/* ---------- Navigation ---------- */
+(function(){const nav=$('nav');let html='';
+ document.querySelectorAll('main .part, main section.ch').forEach(el=>{if(el.classList.contains('part'))html+=`<div class="pt">${el.textContent}</div>`;else{const h=el.querySelector('h2'),num=h.querySelector('.num').textContent,t=Array.from(h.childNodes).filter(n=>n.nodeType===3).map(n=>n.textContent).join('').trim();html+=`<a href="#${el.id}" data-id="${el.id}">${num}. ${t}</a>`}});
+ nav.innerHTML=html;const links=nav.querySelectorAll('a'),io=new IntersectionObserver(es=>{es.forEach(e=>{if(e.isIntersecting)links.forEach(a=>a.classList.toggle('on',a.dataset.id===e.target.id))})},{rootMargin:'-20% 0px -70% 0px'});
+ document.querySelectorAll('section.ch').forEach(s=>io.observe(s));
+ $('menu').onclick=()=>$('side').classList.toggle('open');nav.addEventListener('click',e=>{if(e.target.tagName==='A')$('side').classList.remove('open')});
+ window.addEventListener('scroll',()=>{const h=document.documentElement;$('prog').style.width=(100*h.scrollTop/(h.scrollHeight-h.clientHeight))+'%'},{passive:true});})();
+</script>
+</body>
+</html>
