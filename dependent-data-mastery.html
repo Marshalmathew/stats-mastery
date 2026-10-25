@@ -1,0 +1,631 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Dependent Data Mastery</title>
+<style>
+:root{--bg:#0b0e17;--panel:#121726;--panel2:#171d30;--line:#232a3d;--fg:#e8ebf5;--mu:#8a93ab;--a:#6ea8ff;--r:#ff6b81;--y:#ffd166;--g:#4ade80;--p:#c084fc;--t:#5eead4}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;background:var(--bg);color:var(--fg);font:16px/1.7 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+a{color:var(--a)}
+#prog{position:fixed;top:0;left:0;height:3px;background:linear-gradient(90deg,var(--a),var(--p),var(--r));width:0;z-index:50}
+.side{position:fixed;left:0;top:0;bottom:0;width:290px;background:#0e1220;border-right:1px solid var(--line);overflow:auto;padding:18px 14px 90px;z-index:40;transition:transform .25s}
+.side h1{font-size:15px;margin:0 0 2px}
+.side small{color:var(--mu)}
+.side .pt{margin:16px 0 4px;font-size:11px;text-transform:uppercase;letter-spacing:1.3px;color:var(--p)}
+.side a{display:block;color:var(--mu);text-decoration:none;padding:5px 9px;border-radius:7px;font-size:13.5px;line-height:1.35}
+.side a:hover{background:var(--panel);color:var(--fg)}
+.side a.on{background:var(--panel2);color:var(--fg);box-shadow:inset 3px 0 var(--a)}
+.side a.back{color:var(--t);padding-left:0;margin-bottom:6px}
+.meter{position:fixed;left:0;bottom:0;width:290px;background:#0e1220;border-top:1px solid var(--line);padding:10px 16px;z-index:41;font-size:12px;color:var(--mu)}
+.meter .bar{height:7px;background:var(--line);border-radius:6px;margin-top:5px;overflow:hidden}
+.meter .bar i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--g),var(--t));transition:width .4s}
+#menu{display:none;position:fixed;top:10px;left:10px;z-index:60;background:var(--panel2);color:var(--fg);border:1px solid var(--line);border-radius:9px;padding:7px 12px;font-size:14px;cursor:pointer}
+main{margin-left:290px;padding:0 34px 120px;max-width:1090px}
+.hero{padding:70px 0 30px}
+.hero h1{font-size:clamp(32px,5vw,56px);line-height:1.08;margin:0 0 14px;background:linear-gradient(100deg,#fff,var(--y) 40%,var(--r));-webkit-background-clip:text;background-clip:text;color:transparent}
+.hero p{font-size:19px;color:#c3c9dc;max-width:780px}
+.chips{display:flex;flex-wrap:wrap;gap:8px;margin:18px 0}
+.chip{border:1px solid var(--line);background:var(--panel);padding:5px 12px;border-radius:99px;font-size:13px;color:var(--mu)}
+.chip b{color:var(--fg)}
+.part{margin:90px 0 0;padding-top:22px;border-top:1px solid var(--line);font-size:12px;letter-spacing:2px;text-transform:uppercase;color:var(--p)}
+section.ch{padding-top:30px}
+h2{font-size:30px;line-height:1.2;margin:10px 0 8px;display:flex;gap:12px;align-items:center;flex-wrap:wrap}
+h2 .num{display:inline-grid;place-items:center;width:40px;height:40px;border-radius:12px;background:var(--panel2);border:1px solid var(--line);font-size:18px;color:var(--a)}
+.lvl{font-size:11px;font-weight:600;letter-spacing:.8px;text-transform:uppercase;padding:3px 9px;border-radius:99px;border:1px solid}
+.lvl.b{color:var(--g);border-color:#1f5c3a}.lvl.i{color:var(--a);border-color:#244a85}.lvl.a{color:var(--y);border-color:#6b5420}.lvl.e{color:var(--r);border-color:#7a2c3a}
+h3{font-size:19px;margin:30px 0 6px;color:#fff}
+p{margin:10px 0}li{margin:5px 0}
+code,.f{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace}
+code{background:var(--panel2);padding:1px 6px;border-radius:5px;font-size:.9em}
+.f{display:block;white-space:pre-wrap;background:#0e1322;border:1px solid var(--line);border-left:3px solid var(--a);padding:12px 16px;border-radius:9px;margin:14px 0;overflow-x:auto;font-size:15px;color:#dbe4ff;line-height:1.8}
+.co{border-radius:12px;padding:13px 17px;margin:16px 0;border:1px solid var(--line);background:var(--panel)}
+.co>b:first-child{display:block;margin-bottom:2px;font-size:12px;letter-spacing:1px;text-transform:uppercase}
+.co.def{border-left:4px solid var(--a)}.co.def>b:first-child{color:var(--a)}
+.co.warn{border-left:4px solid var(--r)}.co.warn>b:first-child{color:var(--r)}
+.co.tip{border-left:4px solid var(--g)}.co.tip>b:first-child{color:var(--g)}
+.co.key{border-left:4px solid var(--y);background:#171608}.co.key>b:first-child{color:var(--y)}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:18px 20px;margin:22px 0;box-shadow:0 8px 30px rgba(0,0,0,.25)}
+.card>h4{margin:0 0 3px;font-size:13px;letter-spacing:1.2px;text-transform:uppercase;color:var(--t)}
+.card>p.sub{margin:0 0 12px;color:var(--mu);font-size:14.5px}
+.ctl{display:flex;flex-wrap:wrap;gap:10px 22px;align-items:center;margin:8px 0 10px}
+.ctl label{display:flex;gap:8px;align-items:center;font-size:14px;color:#c3c9dc}
+.ctl output{min-width:38px;font-family:ui-monospace,monospace;color:var(--y);font-size:13px}
+input[type=range]{accent-color:var(--a);width:150px}
+input[type=checkbox]{accent-color:var(--a)}
+select,input[type=number],input[type=text]{background:#0e1322;color:var(--fg);border:1px solid var(--line);border-radius:8px;padding:6px 9px;font:inherit;font-size:14px}
+button{background:linear-gradient(180deg,#2c4a80,#233b68);color:#fff;border:1px solid #3a5a98;border-radius:9px;padding:7px 14px;font:inherit;font-size:14px;cursor:pointer}
+button:hover{filter:brightness(1.15)}
+button.alt{background:var(--panel2);border-color:var(--line);color:var(--fg)}
+canvas{width:100%;height:270px;display:block;background:#0e1322;border:1px solid var(--line);border-radius:10px;margin-top:6px}
+canvas.sm{height:210px}canvas.tl{height:330px}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(125px,1fr));gap:9px;margin:12px 0}
+.stat{background:#0e1322;border:1px solid var(--line);border-radius:10px;padding:8px 11px}
+.stat b{display:block;font-size:17px;font-family:ui-monospace,monospace}
+.stat span{font-size:11.5px;color:var(--mu);text-transform:uppercase;letter-spacing:.7px}
+.stat.hot b{color:var(--r)}.stat.ok b{color:var(--g)}.stat.warn b{color:var(--y)}.stat.in b{color:var(--a)}
+.read{margin:8px 0 0;padding:10px 14px;background:#0e1322;border:1px dashed #33406a;border-radius:10px;font-size:14.5px;color:#d3dbf3}
+table{border-collapse:collapse;width:100%;margin:12px 0;font-size:14px}
+th,td{border:1px solid var(--line);padding:7px 10px;text-align:left;vertical-align:top}
+th{background:var(--panel2);font-size:12px;text-transform:uppercase;letter-spacing:.6px;color:var(--mu)}
+td.n{font-family:ui-monospace,monospace;text-align:right}
+.tw{overflow-x:auto}
+.pill{display:inline-block;padding:1px 9px;border-radius:99px;font-size:12px;font-weight:600}
+.pill.r{background:#3a1520;color:var(--r)}.pill.g{background:#10321f;color:var(--g)}.pill.y{background:#3a2f0e;color:var(--y)}.pill.m{background:#202637;color:var(--mu)}
+details{background:var(--panel);border:1px solid var(--line);border-radius:11px;padding:9px 15px;margin:9px 0}
+details summary{cursor:pointer;font-weight:600}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.q{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:14px 18px;margin:14px 0}
+.q .qh{font-size:12px;letter-spacing:1px;text-transform:uppercase;color:var(--mu)}
+.q .opt{display:block;width:100%;text-align:left;margin:6px 0;background:#0e1322;border:1px solid var(--line);color:var(--fg);border-radius:9px;padding:9px 12px}
+.q .opt.good{border-color:var(--g);background:#0e2418}.q .opt.bad{border-color:var(--r);background:#2a1119}
+.q .ex{display:none;margin-top:8px;font-size:14.5px;color:#c3c9dc}
+.q.done .ex{display:block}
+.chk label{display:flex;gap:10px;align-items:flex-start;padding:6px 0;cursor:pointer}
+.chk input{margin-top:6px;accent-color:var(--g);width:17px;height:17px}
+.sigrow{display:grid;grid-template-columns:minmax(170px,2fr) 1fr 1fr auto;gap:8px 14px;align-items:center;padding:6px 0;border-top:1px dashed #1b2236}
+.sigrow:first-of-type{border-top:0}
+.sigrow label{display:flex;gap:6px;align-items:center;font-size:13.5px;color:#c3c9dc}
+@media(max-width:900px){
+ .side{transform:translateX(-100%)}.side.open{transform:none}.meter{display:none}
+ #menu{display:block}main{margin-left:0;padding:0 16px 100px}.two{grid-template-columns:1fr}.hero{padding-top:60px}
+ .sigrow{grid-template-columns:1fr 1fr}
+}
+</style>
+</head>
+<body>
+<div id="prog"></div>
+<button id="menu">☰ Contents</button>
+<nav class="side" id="side"><a class="back" href="index.html">← All courses</a><h1>Dependent Data</h1><small>12 chapters · 11 labs · exam</small><div id="nav"></div></nav>
+<div class="meter"><div id="mtxt">Mastery: 0%</div><div class="bar"><i id="mbar"></i></div></div>
+
+<main>
+<header class="hero">
+ <h1>Dependent data: time series, panels, clusters and mixed models.</h1>
+ <p>Most of the methods so far assumed independent observations. Monthly loss rates, daily returns, several loans per customer, branches with their own habits, the same account observed every quarter: none of these are independent, and treating them as such gives standard errors that are too small, p-values that are too good and models that fail out of sample. This page covers the two sources of dependence, <em>time</em> and <em>grouping</em>: autocorrelation, ARMA models, robust inference, spurious regression and cointegration, forecast evaluation, clustered errors, fixed and random effects, mixed models and shrinkage, clustered binary outcomes, volatility clustering and structural breaks.</p>
+ <div class="chips"><span class="chip"><b>Part I</b> Time series</span><span class="chip"><b>Part II</b> Clusters, panels and mixed models</span><span class="chip"><b>Part III</b> Volatility and breaks</span></div>
+ <div class="co tip"><b>How to use this</b>Sliders change the setting; heavy labs update when you release a slider or press the button. Prerequisites: the Linear Regression, GLM and Confidence Intervals pages. Every lab simulates data with a known truth, so you can see which standard error or estimator is right.</div>
+</header>
+
+<div class="part">Part I · Time series</div>
+
+<section class="ch" id="c1">
+<h2><span class="num">1</span>Why dependence breaks the usual formulas <span class="lvl b">Beginner</span></h2>
+<p>The standard error of a mean, s/√n, assumes the n observations carry n independent pieces of information. If neighbouring observations are positively correlated, each new one repeats part of what you already know. For a stationary series with autocorrelation ρₖ at lag k, the variance of the mean is σ²/n × (1 + 2Σ(1 − k/n)ρₖ). For an AR(1) series with ρ the factor is about (1 + ρ)/(1 − ρ), so the <b>effective sample size</b> is n_eff ≈ n(1 − ρ)/(1 + ρ): with ρ = 0.7, 200 observations are worth about 35 independent ones.</p>
+<div class="f">Var(ȳ) ≈ (σ²/n) · (1 + ρ)/(1 − ρ)       n_eff = n · (1 − ρ)/(1 + ρ)</div>
+<p>The same happens for grouped data (chapter 6). The consequences: confidence intervals too narrow, tests that reject too often, and apparent significance of trends that are only slow-moving noise. Negative autocorrelation does the opposite (effective n above n), which is rare in practice but occurs in over-differenced series.</p>
+<div class="card"><h4>Lab 1 · Effective sample size</h4>
+ <p class="sub">Data: AR(1) series y_t = ρ y_{t−1} + e_t, with true mean 0 and unit marginal variance scaled so the SD of y is 1/√(1 − ρ²). Left: the last simulated series. Right: coverage of the “95%” interval for the mean over 400 series, using the usual s/√n, the AR(1)-corrected standard error with ρ estimated from the data, and the same correction with the true ρ.</p>
+ <div class="ctl"><label>length n <input type="range" id="c1n" min="50" max="1000" step="50" value="200"><output id="c1nv"></output></label><label>autocorrelation ρ <input type="range" id="c1r" min="0" max="95" step="5" value="70"><output id="c1rv"></output></label><button id="c1go">Re-simulate</button></div>
+ <div class="two"><canvas class="sm" id="c1cv"></canvas><canvas class="sm" id="c1cv2"></canvas></div><div class="stats" id="c1st"></div><div class="read" id="c1rd"></div></div>
+</section>
+
+<section class="ch" id="c2">
+<h2><span class="num">2</span>Stationarity, ACF, PACF and ARMA models <span class="lvl i">Intermediate</span></h2>
+<p>A series is (weakly) <b>stationary</b> if its mean and variance are constant and the covariance between y_t and y_{t+k} depends only on the lag k. Dependence is summarised by the <b>autocorrelation function</b> ACF(k) = Corr(y_t, y_{t+k}) and the <b>partial autocorrelation function</b> PACF(k), the correlation at lag k after removing the effect of the lags in between. An <b>AR(p)</b> model, y_t = φ₁y_{t−1} + … + φ_p y_{t−p} + e_t, has an ACF that decays and a PACF that cuts off after lag p. An <b>MA(q)</b> model, y_t = e_t + θ₁e_{t−1} + … + θ_q e_{t−q}, has an ACF that cuts off after lag q and a PACF that decays. <b>ARMA</b> combines both and both functions decay. Stationarity of an AR model needs the roots of 1 − φ₁z − … − φ_p z^p to lie outside the unit circle; for AR(1), |φ| &lt; 1.</p>
+<p>A <b>random walk</b> y_t = y_{t−1} + e_t is not stationary: its variance grows with t and its sample ACF decays very slowly, which is the usual sign that the series needs differencing. In samples the bars of the ACF have a standard error of about 1/√n, so values within ±1.96/√n are not distinguishable from zero. Identification by eye is a starting point; compare candidate models by AIC/BIC and check that the residuals show no autocorrelation (Ljung–Box).</p>
+<div class="card"><h4>Lab 2 · Reading the ACF and the PACF</h4>
+ <p class="sub">A series is simulated from the chosen model. Bars: sample ACF and PACF (lags 1–20); yellow dots: the theoretical ACF of the model (the PACF theory has the same pattern); dashed lines: ±1.96/√n. The AR(2) uses φ₂ = −0.5; the ARMA(1,1) uses both sliders.</p>
+ <div class="ctl"><label>model <select id="c2m"><option value="ar1" selected>AR(1)</option><option value="ar2">AR(2)</option><option value="ma1">MA(1)</option><option value="arma">ARMA(1,1)</option><option value="rw">random walk</option></select></label><label>φ <input type="range" id="c2p" min="-90" max="95" step="5" value="70"><output id="c2pv"></output></label><label>θ <input type="range" id="c2t" min="-90" max="90" step="5" value="50"><output id="c2tv"></output></label><label>length n <input type="range" id="c2n" min="100" max="2000" step="100" value="500"><output id="c2nv"></output></label><button id="c2go">Re-simulate</button></div>
+ <div class="two"><canvas class="sm" id="c2cv"></canvas><canvas class="sm" id="c2cv2"></canvas></div><div class="stats" id="c2st"></div><div class="read" id="c2rd"></div></div>
+</section>
+
+<section class="ch" id="c3">
+<h2><span class="num">3</span>Regression with autocorrelated errors: HAC standard errors <span class="lvl i">Intermediate</span></h2>
+<p>In y_t = α + βx_t + u_t with autocorrelated errors, OLS still estimates β without bias (if x is exogenous), but the usual standard error is wrong when <em>both</em> the regressor and the error are autocorrelated: the variance of Σx̃_t u_t includes the cross-products x̃_t u_t x̃_{t−k} u_{t−k}. The <b>Newey–West (HAC)</b> estimator adds them with Bartlett weights:</p>
+<div class="f">Ŝ = Σ x̃ₜ² eₜ² + 2 Σ_{l=1..L} (1 − l/(L+1)) Σₜ x̃ₜ eₜ x̃ₜ₋ₗ eₜ₋ₗ       SE(β̂) = √Ŝ / Σ x̃ₜ²</div>
+<p>The lag truncation L must grow with n (a common rule is L = ⌊4(n/100)^{2/9}⌋); too small and the standard error stays too small, too large and it becomes noisy. HAC repairs the standard errors but not the efficiency; modelling the errors (ARMA errors, adding lagged y, or feasible GLS) can give a more precise estimate. If x is only correlated with past values of y (lagged dependent variable models with autocorrelated errors), OLS itself is biased, a different problem. Also remember that if the errors are autocorrelated because a variable is missing or the dynamics are wrong, fixing the standard error does not fix the model.</p>
+<div class="card"><h4>Lab 3 · Naive versus Newey–West standard errors</h4>
+ <p class="sub">y_t = 0.5x_t + u_t, with x and u independent AR(1) series (parameters ρx and ρu), unit variances. Over 400 data sets: the true SD of the slope estimate, the average standard errors, and the coverage of the nominal 95% interval for the usual formula, Newey–West with your lag L, and Newey–West with the automatic lag.</p>
+ <div class="ctl"><label>length n <input type="range" id="c3n" min="50" max="500" step="25" value="100"><output id="c3nv"></output></label><label>ρx <input type="range" id="c3x" min="0" max="95" step="5" value="80"><output id="c3xv"></output></label><label>ρu <input type="range" id="c3u" min="0" max="95" step="5" value="80"><output id="c3uv"></output></label><label>lag L <input type="range" id="c3l" min="0" max="20" step="1" value="4"><output id="c3lv"></output></label><button id="c3go">Re-simulate</button></div>
+ <div class="two"><canvas class="sm" id="c3cv"></canvas><canvas class="sm" id="c3cv2"></canvas></div><div class="stats" id="c3st"></div><div class="read" id="c3rd"></div></div>
+</section>
+
+<section class="ch" id="c4">
+<h2><span class="num">4</span>Spurious regression, unit roots and cointegration <span class="lvl a">Advanced</span></h2>
+<p>Regressing one random walk on another, completely unrelated one gives a “significant” slope most of the time, a high R² and residuals with a Durbin–Watson statistic near zero: the <b>spurious regression</b> of Granger and Newbold. The t-statistic does not follow its usual distribution because both series have stochastic trends; its spread grows with n, so more data makes the false positives worse. The same happens with any strongly persistent series (AR with ρ near 1), and with two series that merely trend. Rules of thumb: R² larger than the Durbin–Watson statistic is a warning, and a regression of levels needs a stationarity argument.</p>
+<p>Remedies: test for a <b>unit root</b> (Dickey–Fuller: regress Δy_t on y_{t−1} and compare the t-statistic with non-standard critical values, about −2.86 with a constant at 5%); if the series is integrated of order one, <b>difference</b> it (returns instead of prices, changes instead of levels). There is one important exception: if two integrated series share a stochastic trend so that a linear combination y − βx is stationary, they are <b>cointegrated</b>. Then the level regression is not spurious (it is super-consistent), the residual is stationary (Engle–Granger test, with critical values about −3.3 for two variables), and the right model is an error-correction model that combines short-run changes with the correction of the gap. Differencing a cointegrated pair throws the long-run relation away.</p>
+<div class="card"><h4>Lab 4 · Spurious and genuine relations between persistent series</h4>
+ <p class="sub">Choose the pair. Independent random walks and independent AR(1) series with ρ = 0.9 have no relation (true slope 0); in the cointegrated case x is a random walk and y = x + stationary AR(1) noise (true slope 1). Over 400 pairs: the t-statistic of the slope in the level regression and in the regression of differences. Left: one example pair.</p>
+ <div class="ctl"><label>pair <select id="c4s"><option value="rw" selected>independent random walks</option><option value="ar">independent AR(1), ρ = 0.9</option><option value="co">cointegrated</option></select></label><label>length n <input type="range" id="c4n" min="50" max="500" step="25" value="100"><output id="c4nv"></output></label><button id="c4go">Re-simulate</button></div>
+ <div class="two"><canvas class="sm" id="c4cv"></canvas><canvas class="sm" id="c4cv2"></canvas></div><div class="stats" id="c4st"></div><div class="read" id="c4rd"></div></div>
+</section>
+
+<section class="ch" id="c5">
+<h2><span class="num">5</span>Forecasting and how to evaluate it <span class="lvl a">Advanced</span></h2>
+<p>A forecast is judged on <em>future</em> data, so validation must respect time: train on the past, test on what comes after (a <b>walk-forward</b> or <b>rolling-origin</b> evaluation: move the forecast origin forward and repeat). Random k-fold cross-validation mixes the future into the training set, lets the model interpolate between neighbours, and gives optimistic errors when the data are autocorrelated. Always compare with <b>benchmarks</b>: the naive forecast (last value), the seasonal naive (the value one season ago) and the historical mean. A sophisticated model that cannot beat them is not adding value; the mean absolute scaled error (MASE) divides by the in-sample naive error so that series can be compared.</p>
+<p>The error grows with the <b>horizon</b>. For a stationary series the forecast tends to the mean and the error to the unconditional SD; for a random walk the error grows without bound like √h. Which benchmark wins depends on the process: persistence favours the naive forecast at short horizons, mean reversion favours the mean at long horizons, seasonality favours the seasonal naive. Give prediction intervals, not just point forecasts, and evaluate them (coverage). In credit and finance, add leakage checks: features must be known at the forecast origin (macro series are often revised).</p>
+<div class="card"><h4>Lab 5 · Which forecast wins at which horizon?</h4>
+ <p class="sub">The series (history of n observations) comes from the chosen process; we forecast h = 1, …, H steps ahead with the naive forecast, the historical mean, the seasonal naive (period 12) and a fitted AR(1) (on the demeaned series). Root mean squared error over 300 simulated series per horizon. Processes: AR(1) with ρ = 0.8; a random walk; a seasonal pattern (amplitude 2, period 12) plus AR(1) noise with ρ = 0.5.</p>
+ <div class="ctl"><label>process <select id="c5p"><option value="ar" selected>AR(1), ρ = 0.8</option><option value="rw">random walk</option><option value="seas">seasonal + AR(1) noise</option></select></label><label>history n <input type="range" id="c5n" min="48" max="400" step="4" value="120"><output id="c5nv"></output></label><label>horizon H <input type="range" id="c5h" min="6" max="36" step="1" value="24"><output id="c5hv"></output></label><button id="c5go">Re-simulate</button></div>
+ <canvas class="tl" id="c5cv"></canvas><div class="stats" id="c5st"></div><div class="read" id="c5rd"></div></div>
+</section>
+
+<div class="part">Part II · Clusters, panels and mixed models</div>
+
+<section class="ch" id="c6">
+<h2><span class="num">6</span>Clustered data: intra-class correlation and the design effect <span class="lvl a">Advanced</span></h2>
+<p>Observations nested in groups (loans within customers, customers within branches, repeated measures within accounts) share group characteristics. The <b>intra-class correlation</b> ICC = σ²_between / (σ²_between + σ²_within) measures the share of variance that sits between groups. With clusters of size m the variance of a mean inflates by the <b>design effect</b> 1 + (m − 1)·ICC, so a sample of 1000 loans from 100 customers with ICC 0.5 is worth about 1000/5.5 ≈ 180 independent loans. For a regression slope the inflation depends on how the regressor varies: if x is constant within clusters (a branch-level policy), the whole design effect applies; if x varies only within clusters and the cluster effect is absorbed in the error, the usual standard error can even be too large.</p>
+<p><b>Cluster-robust (sandwich) standard errors</b> sum the score x̃ᵢeᵢ within each cluster before squaring, so arbitrary correlation inside clusters is allowed: V = (Σx̃²)⁻² Σ_g (Σ_{i∈g} x̃ᵢeᵢ)². They need many clusters (a rule of thumb is 30–50; with few clusters use t with G − 1 degrees of freedom, wild-cluster bootstrap or a mixed model), and they cluster at the level where the dependence or the treatment assignment lives.</p>
+<div class="card"><h4>Lab 6 · Naive and cluster-robust standard errors</h4>
+ <p class="sub">y_ig = 0.5x_ig + a_g + e_ig with the cluster effect a_g (variance = ICC) and noise (variance 1 − ICC). x varies between clusters only (e.g. a branch policy), within clusters only, or both. 400 data sets: the true SD of the slope against the naive and cluster-robust standard errors, and the coverage of 95% intervals (t with G − 1 df for the robust one).</p>
+ <div class="ctl"><label>x varies <select id="c6s"><option value="between" selected>between clusters only</option><option value="within">within clusters only</option><option value="mixed">both</option></select></label><label>clusters G <input type="range" id="c6g" min="10" max="200" step="5" value="40"><output id="c6gv"></output></label><label>cluster size m <input type="range" id="c6m" min="2" max="50" step="1" value="10"><output id="c6mv"></output></label><label>ICC <input type="range" id="c6i" min="0" max="90" step="5" value="50"><output id="c6iv"></output></label><button id="c6go">Re-simulate</button></div>
+ <div class="two"><canvas class="sm" id="c6cv"></canvas><canvas class="sm" id="c6cv2"></canvas></div><div class="stats" id="c6st"></div><div class="read" id="c6rd"></div></div>
+</section>
+
+<section class="ch" id="c7">
+<h2><span class="num">7</span>Panels: pooled, fixed effects and random effects <span class="lvl a">Advanced</span></h2>
+<p>In a panel (N units observed T times) the model y_it = βx_it + α_i + e_it has a unit effect α_i. <b>Pooled OLS</b> ignores it and is biased if α_i is correlated with x. The <b>fixed-effects (within)</b> estimator removes α_i by demeaning each unit (or adding unit dummies): it is consistent whatever the correlation with x, but it cannot estimate the effect of variables that do not change within a unit and uses only within-unit variation. The <b>random-effects</b> estimator treats α_i as a random draw uncorrelated with x and applies quasi-demeaning with weight θ = 1 − √(σ²_e / (σ²_e + Tσ²_α)): it uses both within and between variation, so it is more efficient, but it is biased if α_i is correlated with x. θ = 1 gives fixed effects, θ = 0 pooled OLS.</p>
+<p>The choice is a trade-off between bias and variance, informed by the <b>Hausman test</b> (FE and RE differ significantly: use FE) and, more importantly, by the question of whether unobserved unit characteristics plausibly correlate with the regressors (usually yes for observational data: customer quality correlates with product use). The between estimator, the correlated random-effects (Mundlak) model that adds unit means of x, and clustering of the standard errors by unit complete the toolbox.</p>
+<div class="card"><h4>Lab 7 · The bias–variance trade-off of fixed and random effects</h4>
+ <p class="sub">y_it = 1·x_it + α_i + e_it with α_i ~ N(0,1), e ~ N(0,1), and x_it = λ·α_i + √(1 − λ²)·z_it so that λ is the correlation between x and the unit effect. 300 panels; distributions of the pooled, random-effects (variance components estimated) and fixed-effects slopes; truth 1.</p>
+ <div class="ctl"><label>units N <input type="range" id="c7n" min="20" max="300" step="10" value="100"><output id="c7nv"></output></label><label>periods T <input type="range" id="c7t" min="2" max="20" step="1" value="5"><output id="c7tv"></output></label><label>correlation λ <input type="range" id="c7l" min="0" max="95" step="5" value="60"><output id="c7lv"></output></label><button id="c7go">Re-simulate</button></div>
+ <canvas class="tl" id="c7cv"></canvas><div class="stats" id="c7st"></div><div class="read" id="c7rd"></div></div>
+</section>
+
+<section class="ch" id="c8">
+<h2><span class="num">8</span>Linear mixed models and shrinkage <span class="lvl e">Expert</span></h2>
+<p>A <b>linear mixed model</b> y_ij = x_ij′β + u_j + e_ij, with u_j ~ N(0, σ²_u) and e_ij ~ N(0, σ²_e), combines population-level (fixed) effects β with group-level random effects. Random slopes (u_j multiplying a covariate) let each group have its own relation. Estimation is by maximum likelihood or REML, which corrects the small-sample downward bias of the variance components. The group effects are predicted by the <b>BLUP</b> (best linear unbiased predictor), which for a random intercept is a shrunken group mean:</p>
+<div class="f">û_j = λ_j (ȳ_j − μ̂),       λ_j = σ²_u / (σ²_u + σ²_e / n_j)</div>
+<p>Groups with few observations or large noise are pulled strongly towards the overall mean (λ small); large groups keep their own mean. This <b>partial pooling</b> sits between <em>no pooling</em> (each group on its own: unbiased but noisy for small groups) and <em>complete pooling</em> (ignore groups: stable but ignores real differences), and beats both in mean squared error when groups are of different sizes. It is the same logic as empirical Bayes and credibility theory, and the reason hierarchical models are used for branch, product and segment effects with thin data. Random-effect variances can be estimated even with few groups, but their uncertainty is large; with fewer than about 5 groups treat the group as fixed.</p>
+<div class="card"><h4>Lab 8 · Partial pooling of group effects</h4>
+ <p class="sub">y_ij = u_j + e_ij (overall mean 0), u_j variance = ICC, e variance = 1 − ICC; group sizes vary between 0.3× and 1.7× the average. Estimators of the group effects: no pooling (group mean minus overall mean), complete pooling (zero) and partial pooling (BLUP with method-of-moments variance components). Left: one data set, raw group mean against BLUP (red: smaller groups). Right: mean squared error over 200 data sets.</p>
+ <div class="ctl"><label>groups G <input type="range" id="c8g" min="10" max="100" step="5" value="30"><output id="c8gv"></output></label><label>average size <input type="range" id="c8m" min="2" max="30" step="1" value="6"><output id="c8mv"></output></label><label>ICC <input type="range" id="c8i" min="5" max="90" step="5" value="30"><output id="c8iv"></output></label><button id="c8go">Re-simulate</button></div>
+ <div class="two"><canvas class="sm" id="c8cv"></canvas><canvas class="sm" id="c8cv2"></canvas></div><div class="stats" id="c8st"></div><div class="read" id="c8rd"></div></div>
+</section>
+
+<section class="ch" id="c9">
+<h2><span class="num">9</span>Clustered binary outcomes: conditional versus marginal effects <span class="lvl e">Expert</span></h2>
+<p>For a binary outcome (default, churn) with a random intercept, logit P(y_ij = 1) = α + βx_ij + u_j, there are two different questions. The <b>conditional</b> (cluster-specific) effect β compares two customers in the <em>same</em> cluster. The <b>marginal</b> (population-averaged) effect, what a logistic regression that ignores the clusters estimates, averages over the clusters and is attenuated towards zero because the logistic curve is flattened by averaging over u: β_marginal ≈ β / √(1 + 0.346 σ²_u). Neither is wrong; they answer different questions. A scorecard that ranks customers uses the marginal association; a model of a customer’s own risk change uses the conditional one. The two are equal only for linear models.</p>
+<p>The two modelling routes are the <b>generalised linear mixed model</b> (GLMM, conditional, estimated by Laplace or quadrature) and <b>generalised estimating equations</b> (GEE, marginal, with a working correlation and sandwich standard errors). With pooled logistic regression the point estimate remains consistent for the marginal effect, but the usual standard errors can be too small (notably when covariates are constant within clusters) and should be <b>cluster-robust</b>. Also note that the usual coefficient interpretation (odds ratios) must say which one is reported.</p>
+<div class="card"><h4>Lab 9 · Pooled logistic regression on clustered data</h4>
+ <p class="sub">logit P(y = 1) = −1 + β·x + u_g with x ~ N(0,1) and u_g ~ N(0, σ²). A large sample (60,000 rows) gives the marginal slope β*. Over 150 data sets we fit pooled logistic regression and compare with the conditional β (green), the marginal β* (yellow) and the formula β/√(1 + 0.346σ²) (red). Coverage is of β* with naive and cluster-robust standard errors.</p>
+ <div class="ctl"><label>clusters G <input type="range" id="c9g" min="50" max="400" step="10" value="200"><output id="c9gv"></output></label><label>cluster size m <input type="range" id="c9m" min="2" max="20" step="1" value="8"><output id="c9mv"></output></label><label>σ of cluster effect <input type="range" id="c9s" min="0" max="30" step="1" value="15"><output id="c9sv"></output></label><label>conditional β <input type="range" id="c9b" min="5" max="20" step="1" value="10"><output id="c9bv"></output></label><button id="c9go">Re-simulate</button></div>
+ <canvas class="tl" id="c9cv"></canvas><div class="stats" id="c9st"></div><div class="read" id="c9rd"></div></div>
+</section>
+
+<div class="part">Part III · Volatility and breaks</div>
+
+<section class="ch" id="c10">
+<h2><span class="num">10</span>Volatility clustering, GARCH and Value-at-Risk <span class="lvl e">Expert</span></h2>
+<p>Financial returns are close to uncorrelated but their <em>squares</em> are not: calm and turbulent periods cluster. <b>ARCH/GARCH</b> models describe it: r_t = σ_t z_t with z_t ~ N(0,1) and σ²_t = ω + α r²_{t−1} + β σ²_{t−1}. The ARCH term α reacts to the latest shock, the GARCH term β carries past volatility, α + β measures persistence (the half-life of a shock is log 0.5 / log(α + β)), and the unconditional variance is ω/(1 − α − β). The unconditional distribution has heavy tails even if the conditional one is normal. <b>EWMA</b> (RiskMetrics) is the special case ω = 0 with λ = β = 0.94 and α = 1 − λ.</p>
+<p>For risk, the question is whether the <b>Value-at-Risk</b> (a quantile of the loss) is exceeded at the stated rate (backtesting: 1% exceedances for 99% VaR, Kupiec test) <em>and</em> whether exceedances are independent (Christoffersen test). A constant-volatility VaR will be too low in turbulent periods and too high in calm ones: the average exceedance rate may look acceptable while exceedances come in bursts, which is when losses are most dangerous. Similar dynamics (clustered delinquency, regime-dependent PD) appear in credit portfolios.</p>
+<div class="card"><h4>Lab 10 · Backtesting 99% VaR under GARCH volatility</h4>
+ <p class="sub">Returns follow a GARCH(1,1) with unit unconditional variance (ω = 1 − α − β). VaR forecasts for day t use information up to t − 1: constant (SD of the previous 250 returns), EWMA (λ = 0.94) and the true conditional σ_t (oracle). Left: the last 300 returns with the three VaR lines. Right: the average exceedance rate over 30 series (target 1%) and the share of exceedances that follow an exceedance the day before (independence implies about 1%).</p>
+ <div class="ctl"><label>α (shock) <input type="range" id="c10a" min="5" max="30" step="1" value="12"><output id="c10av"></output></label><label>β (persistence) <input type="range" id="c10b" min="50" max="94" step="1" value="85"><output id="c10bv"></output></label><label>length n <input type="range" id="c10n" min="500" max="3000" step="250" value="1500"><output id="c10nv"></output></label><button id="c10go">Re-simulate</button></div>
+ <div class="two"><canvas class="sm" id="c10cv"></canvas><canvas class="sm" id="c10cv2"></canvas></div><div class="stats" id="c10st"></div><div class="read" id="c10rd"></div></div>
+</section>
+
+<section class="ch" id="c11">
+<h2><span class="num">11</span>Structural breaks, regime changes and false persistence <span class="lvl e">Expert</span></h2>
+<p>Relationships change: a regulation, a pandemic, a new product, a change in the definition of default. A <b>structural break</b> (a shift in the mean, a slope or the variance) invalidates models estimated across it. Ignoring a level shift makes a stationary series look like a <b>unit root</b>: the estimated AR coefficient is pulled towards 1 and the Dickey–Fuller test fails to reject, so the analyst differences a series that did not need it. Tests for breaks: the <b>Chow test</b> when the date is known (a dummy variable for the later period, with robust standard errors), the <b>sup-F / Andrews</b> and <b>CUSUM</b> tests when it is unknown (with larger critical values because the maximum over dates is taken), and recursive or rolling estimates for monitoring. Remedies: model the break (dummy, regime-switching, time-varying parameters), estimate on the post-break window, or re-train and monitor with population stability and back-testing in production (see the calibration and rare-events pages).</p>
+<div class="card"><h4>Lab 11 · A level shift disguised as persistence</h4>
+ <p class="sub">y_t = δ·1(t &gt; n/2) + AR(1) noise with coefficient ρ₀. 300 series. Left: one example with the two level lines. Right: the AR(1) coefficient estimated ignoring the break and with a dummy for the second half (truth ρ₀). Stats: the share of series in which the Dickey–Fuller test (5%, critical value −2.88) rejects a unit root when the break is ignored, and the detection rate of a t-test on the known-date level dummy with Newey–West standard errors.</p>
+ <div class="ctl"><label>length n <input type="range" id="c11n" min="100" max="500" step="50" value="200"><output id="c11nv"></output></label><label>shift δ <input type="range" id="c11d" min="0" max="80" step="1" value="40"><output id="c11dv"></output></label><label>noise ρ₀ <input type="range" id="c11r" min="0" max="80" step="5" value="30"><output id="c11rv"></output></label><button id="c11go">Re-simulate</button></div>
+ <div class="two"><canvas class="sm" id="c11cv"></canvas><canvas class="sm" id="c11cv2"></canvas></div><div class="stats" id="c11st"></div><div class="read" id="c11rd"></div></div>
+</section>
+
+<section class="ch" id="c12">
+<h2><span class="num">12</span>Final exam, mastery checklist, cheat sheet <span class="lvl e">Expert</span></h2>
+<h3>Exam (18 questions — click an answer)</h3>
+<div id="quiz"></div>
+<div class="card"><h4>Score</h4><div class="stats" id="qscore"></div><button class="alt" id="qreset">Reset exam</button></div>
+<h3>Mastery checklist — tick when you can do it without notes</h3>
+<div class="card chk" id="chk"></div>
+<h3>Cheat sheet</h3>
+<div class="tw"><table>
+<tr><th>Idea</th><th>One line</th></tr>
+<tr><td>Effective sample size</td><td>Positive dependence repeats information: AR(1) n_eff ≈ n(1 − ρ)/(1 + ρ); clusters: n/(1 + (m − 1)ICC)</td></tr>
+<tr><td>ACF / PACF</td><td>AR(p): ACF decays, PACF cuts off at p. MA(q): ACF cuts off at q, PACF decays. Bars within ±1.96/√n are noise</td></tr>
+<tr><td>Stationarity</td><td>Constant mean, variance, lag-covariance; AR roots outside the unit circle; random walk is not stationary</td></tr>
+<tr><td>HAC</td><td>Newey–West with Bartlett weights and L growing with n; repairs the SE, not the efficiency or the model</td></tr>
+<tr><td>Spurious regression</td><td>Independent random walks look related; R² &gt; Durbin–Watson is a warning; difference or test for cointegration</td></tr>
+<tr><td>Cointegration</td><td>Integrated series with a stationary combination: use level relation plus error-correction; differencing loses it</td></tr>
+<tr><td>Forecast evaluation</td><td>Walk-forward, never random k-fold; benchmarks (naive, seasonal naive, mean); error vs horizon; interval coverage</td></tr>
+<tr><td>Clustered data</td><td>Design effect 1 + (m − 1)ICC; cluster-robust SEs need many clusters; cluster where treatment or dependence lives</td></tr>
+<tr><td>FE vs RE</td><td>FE: consistent, within variation only. RE: efficient but needs α_i uncorrelated with x. Hausman and Mundlak help choose</td></tr>
+<tr><td>Mixed models</td><td>REML variance components; BLUP shrinks by λ = σ²_u/(σ²_u + σ²_e/n_j): partial pooling beats no and complete pooling</td></tr>
+<tr><td>Binary clusters</td><td>Conditional (GLMM) ≠ marginal (GEE, pooled logit with robust SE); marginal ≈ β/√(1 + 0.346σ²_u)</td></tr>
+<tr><td>GARCH / VaR</td><td>σ²_t = ω + αr²_{t−1} + βσ²_{t−1}; backtest rate and independence; constant-σ VaR clusters its exceedances</td></tr>
+<tr><td>Breaks</td><td>Ignored level shifts mimic unit roots; Chow (known date), sup-F/CUSUM (unknown), model or window the break</td></tr>
+</table></div>
+<div class="co tip"><b>Next on the roadmap</b>Item 20 completes Stage 4. Stage 5 (causal thinking) starts with multiple testing and selective inference.</div>
+</section>
+</main>
+<script>
+/*MATH*/
+function lgamma(x){const c=[76.18009172947146,-86.50532032941677,24.01409824083091,-1.231739572450155,0.1208650973866179e-2,-0.5395239384953e-5];let y=x,t=x+5.5;t-=(x+.5)*Math.log(t);let s=1.000000000190015;for(let j=0;j<6;j++)s+=c[j]/++y;return -t+Math.log(2.5066282746310005*s/x);}
+function gser(a,x){let ap=a,sum=1/a,del=sum;for(let n=0;n<1000;n++){ap++;del*=x/ap;sum+=del;if(Math.abs(del)<Math.abs(sum)*1e-15)break;}return sum*Math.exp(-x+a*Math.log(x)-lgamma(a));}
+function gcf(a,x){let b=x+1-a,c=1/1e-300,d=1/b,h=d;for(let i=1;i<1000;i++){const an=-i*(i-a);b+=2;d=an*d+b;if(Math.abs(d)<1e-300)d=1e-300;c=b+an/c;if(Math.abs(c)<1e-300)c=1e-300;d=1/d;const del=d*c;h*=del;if(Math.abs(del-1)<1e-15)break;}return Math.exp(-x+a*Math.log(x)-lgamma(a))*h;}
+function gammaQ(a,x){if(x<=0)return 1;return x<a+1?1-gser(a,x):gcf(a,x);}
+function betacf(a,b,x){const qab=a+b,qap=a+1,qam=a-1;let c=1,d=1-qab*x/qap;if(Math.abs(d)<1e-300)d=1e-300;d=1/d;let h=d;for(let m=1;m<=1000;m++){const m2=2*m;let aa=m*(b-m)*x/((qam+m2)*(a+m2));d=1+aa*d;if(Math.abs(d)<1e-300)d=1e-300;c=1+aa/c;if(Math.abs(c)<1e-300)c=1e-300;d=1/d;h*=d*c;aa=-(a+m)*(qab+m)*x/((a+m2)*(qap+m2));d=1+aa*d;if(Math.abs(d)<1e-300)d=1e-300;c=1+aa/c;if(Math.abs(c)<1e-300)c=1e-300;d=1/d;const del=d*c;h*=del;if(Math.abs(del-1)<1e-15)break;}return h;}
+function betai(a,b,x){if(x<=0)return 0;if(x>=1)return 1;const bt=Math.exp(lgamma(a+b)-lgamma(a)-lgamma(b)+a*Math.log(x)+b*Math.log(1-x));return x<(a+1)/(a+b+2)?bt*betacf(a,b,x)/a:1-bt*betacf(b,a,1-x)/b;}
+function normSf(z){const q=0.5*gammaQ(.5,z*z/2);return z>=0?q:1-q;}
+function normCdf(z){return normSf(-z);}
+function npdf(x){return Math.exp(-x*x/2)/2.5066282746310002;}
+function lbin(n,k){return lgamma(n+1)-lgamma(k+1)-lgamma(n-k+1);}
+function binom(n,k,p){return Math.exp(lbin(n,k)+k*Math.log(p)+(n-k)*Math.log(1-p));}
+function betapdf(x,a,b){return x<=0||x>=1?0:Math.exp(lgamma(a+b)-lgamma(a)-lgamma(b)+(a-1)*Math.log(x)+(b-1)*Math.log(1-x));}
+function betacdf(x,a,b){return betai(a,b,x);}
+function gampdf(x,a,r){return x<=0?0:Math.exp(a*Math.log(r)+(a-1)*Math.log(x)-r*x-lgamma(a));}
+function gamcdf(x,a,r){return x<=0?0:1-gammaQ(a,r*x);}
+function randn(){let u=0;while(!u)u=Math.random();return Math.sqrt(-2*Math.log(u))*Math.cos(2*Math.PI*Math.random());}
+function gammaS(a){if(a<1)return gammaS(a+1)*Math.pow(Math.random(),1/a);const d=a-1/3,c=1/Math.sqrt(9*d);for(;;){let x,v;do{x=randn();v=1+c*x}while(v<=0);v=v*v*v;const u=Math.random();if(Math.log(u)<.5*x*x+d-d*v+d*Math.log(v))return d*v;}}
+function betaS(a,b){const x=gammaS(a),y=gammaS(b);return x/(x+y);}
+function binS(n,p){let k=0;for(let i=0;i<n;i++)if(Math.random()<p)k++;return k;}
+function mean(a){let s=0;for(const v of a)s+=v;return s/a.length;}
+function qc(cdf,lo,hi,p,it){for(let i=0;i<(it||100);i++){const m=(lo+hi)/2;if(cdf(m)<p)lo=m;else hi=m}return(lo+hi)/2;}
+function qb(a,b,p){return qc(x=>betai(a,b,x),0,1,p,50);}
+function tcdf(x,v){const t=.5*betai(v/2,.5,v/(v+x*x));return x>0?1-t:t}
+function qn(p){return qc(normCdf,-9,9,p,70)}
+function pois(k,l){return Math.exp(-l+k*Math.log(l)-lgamma(k+1))}
+function binF(n,p){let k=0;for(;;){if(n<=0||p<=0)return k;if(p>=1)return k+n;if(n<=40){for(let i=0;i<n;i++)if(Math.random()<p)k++;return k}const a=1+(n>>1),bb=1+n-a,x=betaS(a,bb);if(x>=p){n=a-1;p=p/x}else{k+=a;n=bb-1;p=(p-x)/(1-x)}}}
+/*ENDMATH*/
+
+const $=id=>document.getElementById(id), val=id=>+$(id).value;
+const C={fg:'#e8ebf5',mu:'#8a93ab',gr:'#232a3d',a:'#6ea8ff',r:'#ff6b81',y:'#ffd166',g:'#4ade80',p:'#c084fc',t:'#5eead4'};
+const store={get(k,d){try{const v=JSON.parse(localStorage.getItem(k));return v==null?d:v}catch(e){return d}},set(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}};
+function stat(l,v,c){return `<div class="stat ${c||''}"><b>${v}</b><span>${l}</span></div>`}
+function f3(x){if(!isFinite(x))return String(x);const a=Math.abs(x);if(a!==0&&(a<1e-3||a>=1e6))return x.toExponential(2);return String(+x.toFixed(a<1?4:a<100?3:a<1000?2:0))}
+function pc(x){return f3(100*x)+'%'}
+const resizers=[];
+function reg(fn){fn();resizers.push(fn)}
+function on(ids,fn){ids.split(' ').forEach(i=>{const e=$(i);e.addEventListener('input',fn);e.addEventListener('change',fn)})}
+let rt;window.addEventListener('resize',()=>{clearTimeout(rt);rt=setTimeout(()=>resizers.forEach(f=>f()),150)});
+document.querySelectorAll('input[type=range]').forEach(i=>{const o=$(i.id+'v');if(!o)return;const f=()=>{o.textContent=i.value};i.addEventListener('input',f);f()});
+
+function nice(x){const e=Math.pow(10,Math.floor(Math.log10(x))),f=x/e;return (f<1.5?1:f<3?2:f<7?5:10)*e}
+function mk(cv,x0,x1,ymax,o){o=o||{};const y0=o.y0||0,dpr=window.devicePixelRatio||1,r=cv.getBoundingClientRect(),w=r.width||600,h=r.height||270;
+ cv.width=w*dpr;cv.height=h*dpr;const g=cv.getContext('2d');g.setTransform(dpr,0,0,dpr,0,0);g.clearRect(0,0,w,h);
+ const L=o.L||42,R=12,T=14,B=28,X=x=>L+(x-x0)/(x1-x0)*(w-L-R),Y=y=>h-B-(y-y0)/(ymax-y0)*(h-T-B);
+ g.font='11px system-ui';g.lineWidth=1;g.strokeStyle=C.gr;g.fillStyle=C.mu;
+ if(!o.noGrid){const sx=nice((x1-x0)/7);for(let x=Math.ceil(x0/sx-1e-9)*sx;!o.noX&&x<=x1+1e-9;x+=sx){g.beginPath();g.moveTo(X(x),T);g.lineTo(X(x),h-B);g.stroke();g.textAlign='center';g.fillText(String(+x.toFixed(6)),X(x),h-B+15)}
+ const sy=nice((ymax-y0)/4);for(let y=Math.ceil(y0/sy-1e-9)*sy;y<=ymax+1e-9;y+=sy){g.beginPath();g.moveTo(L,Y(y));g.lineTo(w-R,Y(y));g.stroke();g.textAlign='right';g.fillText(String(+y.toFixed(4)),L-5,Y(y)+3)}}
+ return{g,w,h,X,Y,L,R,T,B,
+  line(f,col,lw,a,b,n,dash){a=a==null?x0:a;b=b==null?x1:b;n=n||260;g.save();if(dash)g.setLineDash([5,4]);g.beginPath();g.strokeStyle=col;g.lineWidth=lw||2;let st=false;for(let i=0;i<=n;i++){const x=a+(b-a)*i/n,y=f(x);if(!isFinite(y)){st=false;continue}st?g.lineTo(X(x),Y(y)):g.moveTo(X(x),Y(y));st=true}g.stroke();g.restore()},
+  area(f,a,b,col,n){a=Math.max(a,x0);b=Math.min(b,x1);if(b<=a)return;n=n||200;g.beginPath();g.moveTo(X(a),Y(0));for(let i=0;i<=n;i++){const x=a+(b-a)*i/n;g.lineTo(X(x),Y(f(x)))}g.lineTo(X(b),Y(0));g.closePath();g.fillStyle=col;g.fill()},
+  vline(x,col,lab,dash){g.save();g.strokeStyle=col;g.lineWidth=1.6;if(dash)g.setLineDash([5,4]);g.beginPath();g.moveTo(X(x),T);g.lineTo(X(x),h-B);g.stroke();g.restore();if(lab){g.fillStyle=col;g.textAlign='center';g.fillText(lab,Math.min(Math.max(X(x),34),w-34),T+10)}},
+  hline(y,col,lab){g.save();g.strokeStyle=col;g.lineWidth=1.4;g.setLineDash([5,4]);g.beginPath();g.moveTo(L,Y(y));g.lineTo(w-R,Y(y));g.stroke();g.restore();if(lab){g.fillStyle=col;g.textAlign='right';g.fillText(lab,w-R-3,Y(y)-4)}},
+  text(s,x,y,col,al){g.fillStyle=col||C.fg;g.textAlign=al||'left';g.fillText(s,x,y)}};}
+
+/* ---------- shared helpers for this page ---------- */
+const D={
+ norm:{n:'Normal(0,1)',s:()=>randn(),mu:0,sd:1,sk:0},
+ unif:{n:'Uniform(0,1)',s:()=>Math.random(),mu:.5,sd:Math.sqrt(1/12),sk:0},
+ expo:{n:'Exponential(1)',s:()=>-Math.log(1-Math.random()),mu:1,sd:1,sk:2},
+ logn:{n:'Lognormal(0,1)',s:()=>Math.exp(randn()),mu:Math.exp(.5),sd:Math.sqrt((Math.E-1)*Math.E),sk:(Math.E+2)*Math.sqrt(Math.E-1),disc:0},
+ b05:{n:'Bernoulli(0.5)',s:()=>Math.random()<.5?1:0,mu:.5,sd:.5,sk:0,disc:1},
+ b05s:{n:'Bernoulli(0.05)',s:()=>Math.random()<.05?1:0,mu:.05,sd:Math.sqrt(.0475),sk:.9/Math.sqrt(.0475),disc:1},
+ bimo:{n:'Two humps',s:()=>(Math.random()<.5?-2:2)+.5*randn(),mu:0,sd:Math.sqrt(4.25),sk:0},
+ par5:{n:'Pareto(α=5)',s:()=>Math.pow(1-Math.random(),-.2),mu:1.25,sd:Math.sqrt(5/48),sk:6*Math.sqrt(.6)},
+ cauchy:{n:'Cauchy (no mean)',s:()=>Math.tan(Math.PI*(Math.random()-.5)),mu:NaN,sd:Infinity,sk:NaN}
+};
+function fillSel(id,keys,def){const e=$(id);e.innerHTML=keys.map(k=>`<option value="${k}">${D[k].n}</option>`).join('');e.value=def}
+const PAL=[C.a,C.r,C.y,C.g,C.p,C.t,'#ff9f43','#9aa4bf'];
+function tgrid(N,M){const T=[];let prev=0;for(let i=0;i<M;i++){let n=Math.round(Math.pow(10,Math.log10(N)*i/(M-1)));if(i===M-1)n=N;n=Math.max(prev+1,n);if(n>N)break;T.push(n);prev=n}if(T[T.length-1]!==N)T[T.length-1]=N;return T}
+function nlab(n){return n>=1e6?(n/1e6)+'M':n>=1000?(n/1000)+'k':String(n)}
+function customGrid(P,xt,yt){const g=P.g;g.save();g.strokeStyle=C.gr;g.fillStyle=C.mu;g.font='11px system-ui';g.lineWidth=1;
+ xt.forEach(([v,l])=>{g.beginPath();g.moveTo(P.X(v),P.T);g.lineTo(P.X(v),P.h-P.B);g.stroke();g.textAlign='center';g.fillText(l,P.X(v),P.h-P.B+15)});
+ yt.forEach(([v,l])=>{g.beginPath();g.moveTo(P.L,P.Y(v));g.lineTo(P.w-P.R,P.Y(v));g.stroke();g.textAlign='right';g.fillText(l,P.L-5,P.Y(v)+3)});g.restore()}
+function clip(P,fn){const g=P.g;g.save();g.beginPath();g.rect(P.L,P.T,P.w-P.L-P.R,P.h-P.T-P.B);g.clip();fn();g.restore()}
+function poly(P,pts,col,lw,dash){const g=P.g;g.save();if(dash)g.setLineDash([5,4]);g.strokeStyle=col;g.lineWidth=lw||2;g.beginPath();pts.forEach(([x,y],i)=>i?g.lineTo(P.X(x),P.Y(y)):g.moveTo(P.X(x),P.Y(y)));g.stroke();g.restore()}
+function dots(P,pts,col,r){const g=P.g;g.fillStyle=col;pts.forEach(([x,y])=>{g.beginPath();g.arc(P.X(x),P.Y(y),r||3,0,7);g.fill()})}
+function niceTicks(lo,hi,k){const st=nice((hi-lo)/(k||5)),a=[];for(let v=Math.ceil(lo/st-1e-9)*st;v<=hi+1e-9;v+=st)a.push([v,String(+v.toFixed(6))]);return a}
+function logTicks(lo,hi){const a=[];for(let e=Math.ceil(lo-1e-9);e<=hi+1e-9;e++)a.push([e,nlab(Math.pow(10,e))]);return a}
+function mom(a){const n=a.length;let m=0;for(const v of a)m+=v;m/=n;let v2=0,v3=0,v4=0;for(const v of a){const d=v-m;v2+=d*d;v3+=d*d*d;v4+=d*d*d*d}v2/=n;v3/=n;v4/=n;const sd=Math.sqrt(v2);return{n,m,sd,sk:sd>0?v3/(sd*sd*sd):0,ku:v2>0?v4/(v2*v2)-3:0}}
+function ksN(z){const a=Array.from(z).sort((x,y)=>x-y),n=a.length;let d=0;for(let i=0;i<n;i++){const F=normCdf(a[i]);d=Math.max(d,Math.abs((i+1)/n-F),Math.abs(i/n-F))}return d}
+/* histogram of data as density with optional overlay curves [{f,col,lw,dash}] */
+function hist(cv,data,lo,hi,bins,ov,col){const cnt=new Float64Array(bins),bw=(hi-lo)/bins;let n=0;for(const v of data){if(v<lo||v>=hi)continue;cnt[Math.floor((v-lo)/bw)]++;n++}
+ const N=data.length;let ym=0;for(let i=0;i<bins;i++){cnt[i]/=N*bw;ym=Math.max(ym,cnt[i])}
+ (ov||[]).forEach(o=>{for(let i=0;i<=80;i++)ym=Math.max(ym,o.f(lo+(hi-lo)*i/80)||0)});
+ const P=mk(cv,lo,hi,ym*1.12);
+ P.g.fillStyle=col||'rgba(110,168,255,.5)';for(let i=0;i<bins;i++){if(cnt[i]<=0)continue;const a=P.X(lo+i*bw),b=P.X(lo+(i+1)*bw);P.g.fillRect(a,P.Y(cnt[i]),Math.max(1,b-a-1),P.Y(0)-P.Y(cnt[i]))}
+ (ov||[]).forEach(o=>P.line(o.f,o.col,o.lw||2.4,lo,hi,200,o.dash));return P}
+const fmt=x=>f3(x);
+
+/* ---------- shared for this page ---------- */
+const POPS=['norm','unif','expo','logn','bimo','par5'];
+D.norm.med=0;D.norm.q90=1.2815516;D.unif.med=.5;D.unif.q90=.9;D.expo.med=Math.LN2;D.expo.q90=Math.log(10);D.logn.med=1;D.logn.q90=Math.exp(1.2815516);
+D.bimo.med=0;D.bimo.q90=qc(x=>.5*normCdf((x+2)/.5)+.5*normCdf((x-2)/.5),-10,10,.9,80);D.par5.med=Math.pow(2,.2);D.par5.q90=Math.pow(10,.2);
+const SF={mean:a=>mean(a),median:a=>{const b=Float64Array.from(a).sort(),n=b.length;return n%2?b[(n-1)/2]:(b[n/2-1]+b[n/2])/2},sd:a=>{const n=a.length,m=mean(a);let s=0;for(const v of a)s+=(v-m)*(v-m);return Math.sqrt(s/(n-1))},q90:a=>{const b=Float64Array.from(a).sort();return b[Math.round(.9*(b.length-1))]}};
+function truth(key,st){const d=D[key];return st==='mean'?d.mu:st==='median'?d.med:st==='sd'?d.sd:d.q90}
+const SNAME={mean:'sample mean',median:'sample median',sd:'sample SD',q90:'90th percentile'};
+const N10=[2,3,5,10,20,50,100,200,500,1000];
+function pct(a,p){const b=Float64Array.from(a).sort();return b[Math.min(b.length-1,Math.max(0,Math.floor(p*b.length)))]}
+function histLines(cv,arrs,cols,lo,hi,bins,vl){const bw=(hi-lo)/bins,dens=arrs.map(a=>{const c=new Float64Array(bins);for(const v of a){if(v<lo||v>=hi)continue;c[Math.floor((v-lo)/bw)]++}for(let i=0;i<bins;i++)c[i]/=a.length*bw;return c});let ym=0;dens.forEach(c=>c.forEach(v=>ym=Math.max(ym,v)));const P=mk(cv,lo,hi,ym*1.15||1);
+ dens.forEach((c,k)=>{const pts=[];for(let i=0;i<bins;i++){pts.push([lo+i*bw,c[i]]);pts.push([lo+(i+1)*bw,c[i]])}clip(P,()=>poly(P,pts,cols[k],2.2))});(vl||[]).forEach(v=>P.vline(v[0],v[1],v[2],v[3]));return P}
+function sdOf(a){return mom(a).sd}
+
+/* ---------- ML helpers ---------- */
+function digamma(x){let r=0;while(x<6){r-=1/x;x++}const f=1/(x*x);return r+Math.log(x)-.5/x-f*(1/12-f*(1/120-f/252))}
+function trigamma(x){let r=0;while(x<6){r+=1/(x*x);x++}const f=1/(x*x);return r+1/x+.5*f+f/x*(1/6-f*(1/30-f/42))}
+function poisS(l){if(l<=0)return 0;if(l<30){const L=Math.exp(-l);let k=0,p=1;do{k++;p*=Math.random()}while(p>L);return k-1}const m=Math.floor(.875*l),g=gammaS(m);return g<l?m+poisS(l-g):binF(m-1,l/g)}
+function llb(k,n,p){return(k?k*Math.log(p):0)+(n-k?(n-k)*Math.log(1-p):0)}
+function lrInt(k,n,cut){const ph=k/n,l0=llb(k,n,ph),g=p=>2*(l0-llb(k,n,p))-cut;let lo=0,hi=1;
+ if(k>0){let a=1e-12,b=ph;for(let i=0;i<70;i++){const m=(a+b)/2;if(g(m)>0)a=m;else b=m}lo=(a+b)/2}
+ if(k<n){let a=ph,b=1-1e-12;for(let i=0;i<70;i++){const m=(a+b)/2;if(g(m)>0)b=m;else a=m}hi=(a+b)/2}return[lo,hi]}
+function solveAlpha(s){if(!(s>1e-9))return 1e6;let a=(3-s+Math.sqrt((3-s)*(3-s)+24*s))/(12*s);for(let i=0;i<8;i++){const f=Math.log(a)-digamma(a)-s,fp=1/a-trigamma(a);let n=a-f/fp;if(!(n>0))n=a/2;a=n}return a}
+function normPdfAt(x,m,s){return Math.exp(-(x-m)*(x-m)/(2*s*s))/(s*2.5066282746)}
+/* ---------- Regression helpers ---------- */
+function idx(id,arr,ff){const e=$(id),o=$(id+'v'),f=()=>{o.textContent=ff?ff(arr[+e.value]):arr[+e.value]};e.addEventListener('input',f);f()}
+function scl(id,ff){const e=$(id),o=$(id+'v'),f=()=>{o.textContent=ff(+e.value)};e.addEventListener('input',f);f()}
+function pctTicks(a,b,st){const r=[];for(let v=a;v<=b+1e-9;v+=st)r.push([v,Math.round(v*100)+'%']);return r}
+const _tq={};function tq(v,p){const k=v+'_'+p;return _tq[k]||(_tq[k]=qc(x=>tcdf(x,v),0,500,p,80))}
+function simple(x,y){const n=x.length;let xm=0,ym=0;for(let i=0;i<n;i++){xm+=x[i];ym+=y[i]}xm/=n;ym/=n;let sxx=0,sxy=0,syy=0;for(let i=0;i<n;i++){const dx=x[i]-xm,dy=y[i]-ym;sxx+=dx*dx;sxy+=dx*dy;syy+=dy*dy}const b=sxy/sxx,a=ym-b*xm,res=new Float64Array(n);let sse=0;for(let i=0;i<n;i++){res[i]=y[i]-a-b*x[i];sse+=res[i]*res[i]}return{n,xm,ym,sxx,sxy,syy,b,a,res,sse,sst:syy,r2:1-sse/syy}}
+function gj(A,B){const p=A.length;const M=A.map((r,i)=>Array.from(r).concat(B?[B[i]]:[]));for(let c=0;c<p;c++){let m=c;for(let r=c+1;r<p;r++)if(Math.abs(M[r][c])>Math.abs(M[m][c]))m=r;[M[c],M[m]]=[M[m],M[c]];const d=M[c][c]||1e-12;for(let k=c;k<M[c].length;k++)M[c][k]/=d;for(let r=0;r<p;r++)if(r!==c){const f=M[r][c];if(f!==0)for(let k=c;k<M[c].length;k++)M[r][k]-=f*M[c][k]}}return M}
+function olsMulti(cols,y,needInv){const n=y.length,k=cols.length,p=k+1,A=[],B=new Float64Array(p);for(let i=0;i<p;i++)A.push(new Float64Array(p));
+ for(let r=0;r<n;r++){const row=[1];for(let j=0;j<k;j++)row.push(cols[j][r]);for(let i=0;i<p;i++){B[i]+=row[i]*y[r];for(let j=i;j<p;j++)A[i][j]+=row[i]*row[j]}}
+ for(let i=0;i<p;i++){for(let j=0;j<i;j++)A[i][j]=A[j][i];if(i>0)A[i][i]+=1e-9}
+ let beta,inv=null;if(needInv){const I=[];for(let i=0;i<p;i++){const e=new Float64Array(p);e[i]=1;I.push(e)}const M=gj(A,null);const aug=A.map((r,i)=>Array.from(r).concat(Array.from(I[i])));
+  const m=aug;for(let c=0;c<p;c++){let q=c;for(let r=c+1;r<p;r++)if(Math.abs(m[r][c])>Math.abs(m[q][c]))q=r;[m[c],m[q]]=[m[q],m[c]];const d=m[c][c]||1e-12;for(let kk=0;kk<2*p;kk++)m[c][kk]/=d;for(let r=0;r<p;r++)if(r!==c){const f=m[r][c];if(f!==0)for(let kk=0;kk<2*p;kk++)m[r][kk]-=f*m[c][kk]}}
+  inv=m.map(r=>r.slice(p));beta=inv.map(r=>{let s=0;for(let j=0;j<p;j++)s+=r[j]*B[j];return s})}
+ else{const M=gj(A,B);beta=M.map(r=>r[p])}
+ const res=new Float64Array(n);let sse=0;for(let r=0;r<n;r++){let f=beta[0];for(let j=0;j<k;j++)f+=beta[j+1]*cols[j][r];res[r]=y[r]-f;sse+=res[r]*res[r]}
+ const out={beta,res,sse,n,p,inv};if(inv){const s2=sse/(n-p);out.s2=s2;out.se=inv.map((r,i)=>Math.sqrt(s2*r[i]))}return out}
+function scatterAxes(cv,xs,ys,xlo,xhi,ylo,yhi,L){return mk(cv,xlo,xhi,yhi,{y0:ylo,L:L||44})}
+function range(a,pad){let lo=1e99,hi=-1e99;for(const v of a){if(v<lo)lo=v;if(v>hi)hi=v}const w=(hi-lo)||1;return[lo-(pad||.05)*w,hi+(pad||.05)*w]}
+
+
+function bars(P,groups,cols,yt){/* groups: array of arrays of values (0..1) */const g=P.g,G=groups.length,B=groups[0].length,W=(P.w-P.L-P.R)/G;groups.forEach((vals,gi)=>vals.forEach((v,bi)=>{const bw=W*.78/B,x=P.L+W*gi+W*.11+bw*bi;g.fillStyle=cols[bi];g.fillRect(x,P.Y(v),bw-2,P.Y(0)-P.Y(v));g.fillStyle=C.fg;g.textAlign='center';g.font='10px system-ui';g.fillText(Math.round(v*100)+'%',x+bw/2-1,P.Y(v)-3)}));g.font='11px system-ui'}
+function gridG(P,yt,labels){customGrid(P,[],yt);const G=labels.length,W=(P.w-P.L-P.R)/G;P.g.fillStyle=C.mu;P.g.textAlign='center';labels.forEach((l,i)=>P.g.fillText(l,P.L+W*(i+.5),P.h-P.B+15))}
+function legend(P,items,y){let x=P.L+8;items.forEach(([s,c])=>{P.text('■ '+s,x,y,c);x+=P.g.measureText('■ '+s).width+16})}
+
+/* ---------- GLM machinery ---------- */
+const LK={logit:{mu:e=>1/(1+Math.exp(-e)),d:e=>{const m=1/(1+Math.exp(-e));return m*(1-m)}},
+ probit:{mu:e=>normCdf(e),d:e=>npdf(e)},
+ cll:{mu:e=>1-Math.exp(-Math.exp(e)),d:e=>Math.exp(e-Math.exp(e))},
+ log:{mu:e=>Math.exp(e),d:e=>Math.exp(e)}};
+function minv(A){const p=A.length,m=A.map((r,i)=>{const row=Array.from(r);for(let j=0;j<p;j++)row.push(i===j?1:0);return row});
+ for(let c=0;c<p;c++){let q=c;for(let r=c+1;r<p;r++)if(Math.abs(m[r][c])>Math.abs(m[q][c]))q=r;[m[c],m[q]]=[m[q],m[c]];const d=m[c][c]||1e-12;for(let k=0;k<2*p;k++)m[c][k]/=d;for(let r=0;r<p;r++)if(r!==c){const f=m[r][c];if(f!==0)for(let k=0;k<2*p;k++)m[r][k]-=f*m[c][k]}}
+ return m.map(r=>r.slice(p))}
+function glm(cols,y,o){o=o||{};const n=y.length,k=cols.length,p=k+1,fam=o.fam||'binom',L=LK[o.link||(fam==='pois'?'log':'logit')],off=o.off,X=[new Float64Array(n).fill(1)].concat(cols),V=m=>fam==='pois'?m:m*(1-m);
+ let b=new Float64Array(p);if(o.init)b=Float64Array.from(o.init);else if(fam==='pois'){let m=0;for(const v of y)m+=v;b[0]=Math.log(Math.max(m/n,1e-3))-(off?mean(off):0)}
+ function ev(b){const eta=new Float64Array(n),mu=new Float64Array(n);let ll=0;for(let i=0;i<n;i++){let e=off?off[i]:0;for(let j=0;j<p;j++)e+=b[j]*X[j][i];e=Math.max(-30,Math.min(30,e));eta[i]=e;let m=L.mu(e);m=fam==='binom'?Math.min(1-1e-12,Math.max(1e-12,m)):Math.max(m,1e-12);mu[i]=m;ll+=fam==='pois'?y[i]*Math.log(m)-m-lgamma(y[i]+1):y[i]*Math.log(m)+(1-y[i])*Math.log(1-m)}return{eta,mu,ll}}
+ function info(c){const A=[];for(let i=0;i<p;i++)A.push(new Float64Array(p));const w=new Float64Array(n);for(let r=0;r<n;r++){const d=L.d(c.eta[r]),wi=d*d/V(c.mu[r]);w[r]=wi;for(let i=0;i<p;i++){const xi=X[i][r]*wi;for(let j=i;j<p;j++)A[i][j]+=xi*X[j][r]}}for(let i=0;i<p;i++)for(let j=0;j<i;j++)A[i][j]=A[j][i];return{A,w}}
+ let cur=ev(b),it=0,conv=false,maxit=o.maxit==null?40:o.maxit;
+ for(;it<maxit;it++){const{A,w}=info(cur),Ai=minv(A),g=new Float64Array(p);
+  for(let r=0;r<n;r++){const d=L.d(cur.eta[r]),v=V(cur.mu[r]);let s=(y[r]-cur.mu[r])*d/v;if(o.firth){let h=0;for(let i=0;i<p;i++)for(let j=0;j<p;j++)h+=X[i][r]*Ai[i][j]*X[j][r];h*=w[r];s+=h*(.5-cur.mu[r])}for(let i=0;i<p;i++)g[i]+=X[i][r]*s}
+  const st=new Float64Array(p);let mx=0;for(let i=0;i<p;i++){let s=0;for(let j=0;j<p;j++)s+=Ai[i][j]*g[j];st[i]=s}
+  if(o.firth){for(let i=0;i<p;i++){st[i]=Math.max(-1,Math.min(1,st[i]));mx=Math.max(mx,Math.abs(st[i]))}b=b.map((v,i)=>v+st[i]);cur=ev(b);if(mx<1e-8){conv=true;it++;break}}
+  else{let a=1,nb,nc;for(let h=0;h<25;h++){nb=b.map((v,i)=>v+a*st[i]);nc=ev(nb);if(nc.ll>=cur.ll-1e-10)break;a/=2}for(let i=0;i<p;i++)mx=Math.max(mx,Math.abs(a*st[i]));const dl=Math.abs(nc.ll-cur.ll);b=nb;cur=nc;if(mx<1e-8||dl<1e-11){conv=true;it++;break}}}
+ const{A,w}=info(cur),Ai=minv(A),se=Ai.map((r,i)=>Math.sqrt(Math.max(r[i],0)));let dev;
+ if(fam==='binom')dev=-2*cur.ll;else{dev=0;for(let i=0;i<n;i++){const yy=y[i],m=cur.mu[i];dev+=2*((yy>0?yy*Math.log(yy/m):0)-(yy-m))}}
+ return{beta:b,mu:cur.mu,eta:cur.eta,ll:cur.ll,dev,inv:Ai,se,iter:it,conv,X,w,p,n,A}}
+function auc(sc,y){const n=y.length,idx=Array.from({length:n},(_,i)=>i).sort((a,b)=>sc[a]-sc[b]);let rk=0,np=0,i=0;while(i<n){let j=i;while(j+1<n&&sc[idx[j+1]]===sc[idx[i]])j++;const r=(i+j)/2+1;for(let t=i;t<=j;t++)if(y[idx[t]]===1){rk+=r;np++}i=j+1}const nn=n-np;return np&&nn?(rk-np*(np+1)/2)/(np*nn):.5}
+function sepTest(x,y){let a1=1e99,b1=-1e99,a0=1e99,b0=-1e99,n1=0,n0=0;for(let i=0;i<x.length;i++){if(y[i]===1){n1++;a1=Math.min(a1,x[i]);b1=Math.max(b1,x[i])}else{n0++;a0=Math.min(a0,x[i]);b0=Math.max(b0,x[i])}}return n1>0&&n0>0&&(a1>b0||a0>b1)}
+const sig=e=>1/(1+Math.exp(-e));
+function lgt(p){return Math.log(p/(1-p))}
+function binaryData(n,a,b,sd){const x=new Float64Array(n),y=new Float64Array(n);for(let i=0;i<n;i++){x[i]=(sd||1)*randn();y[i]=Math.random()<sig(a+b*x[i])?1:0}return{x,y}}
+function heat(P,gx,gy,vals,x0,x1,y0,y1){const g=P.g,nx=gx,ny=gy;let mn=1e99,mx=-1e99;vals.forEach(v=>{if(isFinite(v)){mn=Math.min(mn,v);mx=Math.max(mx,v)}});mn=Math.max(mn,mx-30);for(let i=0;i<nx;i++)for(let j=0;j<ny;j++){const v=vals[i*ny+j],t=isFinite(v)?Math.max(0,Math.min(1,(v-mn)/(mx-mn))):0,tt=Math.pow(t,1.6),c=Math.round(40+190*tt);g.fillStyle=`rgb(${Math.round(20+60*tt)},${Math.round(30+100*tt)},${c})`;const xa=P.X(x0+(x1-x0)*i/nx),xb=P.X(x0+(x1-x0)*(i+1)/nx),ya=P.Y(y0+(y1-y0)*j/ny),yb=P.Y(y0+(y1-y0)*(j+1)/ny);g.fillRect(xa,Math.min(ya,yb),xb-xa+1,Math.abs(ya-yb)+1)}}
+/* ---------- dependent-data helpers ---------- */
+const U01=()=>1-Math.random();
+const mapA=(a,f)=>Float64Array.from(a,f);
+function sdv(a){const m=mean(a);let s=0;for(const v of a)s+=(v-m)*(v-m);return Math.sqrt(s/Math.max(a.length-1,1))}
+function barV(cv,vals,cols,labs,ymax,ff){const P=mk(cv,0,vals.length,ymax,{y0:0,noGrid:true,L:50});customGrid(P,[],niceTicks(0,ymax,5));const W=(P.w-P.L-P.R)/vals.length,g=P.g;vals.forEach((v,i)=>{const w=W*.5,x=P.L+W*i+W*.25;g.fillStyle=cols[i];g.fillRect(x,P.Y(v),w,P.Y(0)-P.Y(v));g.fillStyle=C.fg;g.textAlign='center';g.fillText((ff||fmt)(v),x+w/2,P.Y(v)-4);g.fillStyle=C.mu;g.fillText(labs[i],x+w/2,P.h-P.B+15)});return P}
+function barL(cv,vals,cols,labs,lo,hi,ff){const P=mk(cv,0,vals.length,hi,{y0:lo,noGrid:true,L:50});customGrid(P,[],niceTicks(lo,hi,5));const W=(P.w-P.L-P.R)/vals.length,g=P.g;vals.forEach((v,i)=>{const w=W*.5,x=P.L+W*i+W*.25;g.fillStyle=cols[i];g.fillRect(x,P.Y(v),w,P.Y(lo)-P.Y(v));g.fillStyle=C.fg;g.textAlign='center';g.fillText((ff||fmt)(v),x+w/2,P.Y(v)-4);g.fillStyle=C.mu;g.fillText(labs[i],x+w/2,P.h-P.B+15)});return P}
+const tcr=df=>{df=Math.max(1,Math.round(df));return df>200?1.96:tq(df,.975)};
+function arma(n,phi,theta,sd){phi=phi||[];theta=theta||[];sd=sd||1;const B=200,N=n+B,e=new Float64Array(N),y=new Float64Array(N);for(let t=0;t<N;t++)e[t]=sd*randn();for(let t=0;t<N;t++){let v=e[t];for(let j=0;j<phi.length;j++)if(t-j-1>=0)v+=phi[j]*y[t-j-1];for(let j=0;j<theta.length;j++)if(t-j-1>=0)v+=theta[j]*e[t-j-1];y[t]=v}return y.slice(B)}
+const ar1=(n,rho,sd)=>arma(n,[rho],[],sd);
+function acfS(y,K){const n=y.length,m=mean(y);let c0=0;for(const v of y)c0+=(v-m)*(v-m);const r=[1];for(let h=1;h<=K;h++){let s=0;for(let t=h;t<n;t++)s+=(y[t]-m)*(y[t-h]-m);r.push(s/c0)}return r}
+function pacfS(r,K){const out=[1];let phi=[];for(let k=1;k<=K;k++){let num=r[k],den=1;for(let j=0;j<k-1;j++){num-=phi[j]*r[k-1-j];den-=phi[j]*r[j+1]}const a=num/den,nw=[];for(let j=0;j<k-1;j++)nw.push(phi[j]-a*phi[k-2-j]);nw.push(a);phi=nw;out.push(a)}return out}
+function acfT(phi,theta,K){const J=400,psi=new Float64Array(J);psi[0]=1;for(let j=1;j<J;j++){let v=j<=theta.length?theta[j-1]:0;for(let k=1;k<=phi.length&&k<=j;k++)v+=phi[k-1]*psi[j-k];psi[j]=v}const g=h=>{let s=0;for(let j=0;j+h<J;j++)s+=psi[j]*psi[j+h];return s},g0=g(0);return Array.from({length:K+1},(_,h)=>g(h)/g0)}
+/* Newey–West standard error of a simple-regression slope */
+function nwSE(x,e,L){const n=x.length,xm=mean(x),xt=mapA(x,v=>v-xm);let sxx=0,S=0;for(let t=0;t<n;t++){sxx+=xt[t]*xt[t];S+=xt[t]*xt[t]*e[t]*e[t]}
+ for(let l=1;l<=L;l++){let G=0;for(let t=l;t<n;t++)G+=xt[t]*e[t]*xt[t-l]*e[t-l];S+=2*(1-l/(L+1))*G}return Math.sqrt(Math.max(S,0))/sxx}
+/* simple regression with residuals */
+function reg1(x,y){const s=simple(x,y),n=x.length,e=new Float64Array(n);for(let i=0;i<n;i++)e[i]=y[i]-s.a-s.b*x[i];return{b:s.b,a:s.a,e,se:Math.sqrt(s.sse/(n-2)/s.sxx),r2:s.r2,sxx:s.sxx,n}}
+/* cluster-robust (CR1) standard error of a simple-regression slope; g = cluster index per row */
+function crSE(x,e,g,G){const n=x.length,xm=mean(x),acc=new Float64Array(G);let sxx=0;for(let i=0;i<n;i++){const xt=x[i]-xm;sxx+=xt*xt;acc[g[i]]+=xt*e[i]}let S=0;for(let j=0;j<G;j++)S+=acc[j]*acc[j];return Math.sqrt(S*G/Math.max(G-1,1))/sxx}
+const uvar=r=>Math.sqrt(1-r*r);
+/* ---------- Ch1 effective sample size ---------- */
+(function(){scl('c1n',v=>v);scl('c1r',v=>fmt(v/100));
+ function run(){const n=val('c1n'),rho=val('c1r')/100,R=400,cv=[0,0,0],ms=[],nse=[];let last=null;
+  for(let r=0;r<R;r++){const y=ar1(n,rho,1),m=mean(y),s=sdv(y),se0=s/Math.sqrt(n),rh=Math.min(acfS(y,1)[1],.99),se1=s*Math.sqrt((1+rh)/(1-rh)/n),se2=s*Math.sqrt((1+rho)/(1-rho)/n);
+   ms.push(m);nse.push(se0);[se0,se1,se2].forEach((se,j)=>{if(Math.abs(m)<=1.96*se)cv[j]++});if(r===R-1)last=y}
+  const rg=range(last,.1),P=mk($('c1cv'),0,n,rg[1],{y0:rg[0],L:44});poly(P,Array.from(last,(v,i)=>[i,v]),C.a,1.6);P.hline(0,C.g,'true mean 0');P.hline(mean(last),C.r,'sample mean '+fmt(mean(last)));P.text('time →',P.w-P.R-40,P.h-P.B-6,C.mu);
+  const P2=barV($('c1cv2'),cv.map(v=>v/R),[C.r,C.y,C.g],['usual s/√n','AR(1), ρ̂','AR(1), true ρ'],1.12,x=>Math.round(x*100)+'%');P2.hline(.95,C.fg,'95%');P2.text('coverage of the mean',P2.L+6,P2.T+12,C.mu);
+  const neff=n*(1-rho)/(1+rho),sdm=sdv(ms),nv=mean(nse);
+  $('c1st').innerHTML=stat('effective sample size n(1−ρ)/(1+ρ)',fmt(neff),'in')+stat('true SD of the mean · average usual SE',fmt(sdm)+' · '+fmt(nv),'')+stat('variance inflation (SD/SE)²',fmt(sdm*sdm/(nv*nv)),rho>.3?'hot':'')+stat('coverage: usual · ρ̂ · true ρ',cv.map(v=>pc(v/R)).join(' · '),'ok');
+  $('c1rd').innerHTML=`With ρ = ${fmt(rho)} the ${n} observations carry about ${fmt(neff)} independent observations' worth of information. The usual standard error (${fmt(nv)}) is ${fmt(sdm/nv)} times too small compared with the true SD of the mean (${fmt(sdm)}), so its “95%” intervals cover only ${pc(cv[0]/R)}. Correcting with ρ̂ estimated from the same data recovers ${pc(cv[1]/R)} (still a little short in small samples because ρ̂ is biased downwards), and with the true ρ ${pc(cv[2]/R)}.`}
+ ['c1n','c1r'].forEach(i=>$(i).addEventListener('change',run));$('c1go').onclick=run;run();})();
+
+/* ---------- Ch2 ACF / PACF ---------- */
+(function(){scl('c2p',v=>fmt(v/100));scl('c2t',v=>fmt(v/100));scl('c2n',v=>v);
+ function bars2(cv,vals,theo,n,title){const K=vals.length-1,P=mk(cv,0,K+1,1.05,{y0:-1.05,L:44}),g=P.g,b=1.96/Math.sqrt(n);P.hline(0,C.mu,'');P.hline(b,C.mu,'');P.hline(-b,C.mu,'');
+  for(let h=1;h<=K;h++){g.fillStyle=C.a;g.fillRect(P.X(h)-4,Math.min(P.Y(0),P.Y(vals[h])),8,Math.abs(P.Y(vals[h])-P.Y(0)))}
+  if(theo)dots(P,theo.slice(1).map((v,i)=>[i+1,v]),C.y,3.5);P.text(title,P.L+6,P.T+12,C.mu);P.text('lag →',P.w-P.R-30,P.h-P.B-6,C.mu);return P}
+ function run(){const m=$('c2m').value,p=val('c2p')/100,t=val('c2t')/100,n=val('c2n'),K=20,sp={ar1:[[p],[]],ar2:[[p,-.5],[]],ma1:[[],[t]],arma:[[p],[t]],rw:[[1],[]]}[m],y=arma(n,sp[0],sp[1],1),r=acfS(y,K),pr=pacfS(r,K);
+  let th=null,thp=null;if(m!=='rw'){th=acfT(sp[0],sp[1],K);thp=pacfS(th,K)}
+  bars2($('c2cv'),r,th,n,'ACF (bars: sample, dots: theory)');bars2($('c2cv2'),pr,thp,n,'PACF (bars: sample, dots: theory)');
+  const pat={ar1:'ACF decays geometrically while the PACF has one spike at lag 1 and then cuts off: an AR(1).',ar2:'The ACF decays (with a sign pattern) and the PACF cuts off after lag 2: an AR(2).',ma1:'The ACF has a single spike at lag 1 and cuts off, while the PACF decays: an MA(1).',arma:'Both functions decay without a clean cut-off: a mixed ARMA, to be chosen with AIC/BIC and residual checks.',rw:'The ACF stays close to 1 and decays very slowly: the signature of a unit root. Difference the series and look again; no stationary model describes it.'}[m];
+  $('c2st').innerHTML=stat('sample ACF at lags 1 · 2 · 3',[1,2,3].map(h=>fmt(r[h])).join(' · '),'')+stat('sample PACF at lags 1 · 2 · 3',[1,2,3].map(h=>fmt(pr[h])).join(' · '),'')+stat('noise band ±1.96/√n',fmt(1.96/Math.sqrt(n)),'in')+stat('model',m==='rw'?'non-stationary':'stationary',m==='rw'?'hot':'ok');
+  $('c2rd').innerHTML=pat+` With n = ${n} the sample bars follow the theory (dots) only roughly: bars inside the dashed band are indistinguishable from zero, and even in a true AR(1) a few high lags will cross the band by chance.`}
+ ['c2m','c2p','c2t','c2n'].forEach(i=>$(i).addEventListener('change',run));$('c2go').onclick=run;run();})();
+
+/* ---------- Ch3 HAC ---------- */
+(function(){scl('c3n',v=>v);scl('c3x',v=>fmt(v/100));scl('c3u',v=>fmt(v/100));scl('c3l',v=>v);
+ function run(){const n=val('c3n'),rx=val('c3x')/100,ru=val('c3u')/100,L=val('c3l'),La=Math.floor(4*Math.pow(n/100,2/9)),R=400,bs=[],se=[[],[],[]],cov=[0,0,0];
+  for(let r=0;r<R;r++){const x=ar1(n,rx,uvar(rx)),u=ar1(n,ru,uvar(ru)),y=mapA(x,(v,i)=>.5*v+u[i]),f=reg1(x,y);bs.push(f.b);
+   [f.se,nwSE(x,f.e,L),nwSE(x,f.e,La)].forEach((s,j)=>{se[j].push(s);if(Math.abs(f.b-.5)<=tcr(n-2)*s)cov[j]++})}
+  const sd=sdv(bs),ms=se.map(mean),P=barV($('c3cv'),[sd,...ms],[C.fg,C.r,C.y,C.g],['true SD','usual','NW (L)','NW (auto)'],Math.max(sd,...ms)*1.3,x=>fmt(x));P.text('standard error of the slope',P.L+6,P.T+12,C.mu);
+  const P2=barV($('c3cv2'),cov.map(v=>v/R),[C.r,C.y,C.g],['usual','NW (L = '+L+')','NW (auto, L = '+La+')'],1.12,x=>Math.round(x*100)+'%');P2.hline(.95,C.fg,'95%');P2.text('coverage of 95% intervals',P2.L+6,P2.T+12,C.mu);
+  $('c3st').innerHTML=stat('true SD of β̂',fmt(sd),'')+stat('average SE: usual · NW(L) · NW(auto)',ms.map(fmt).join(' · '),'in')+stat('coverage: usual · NW(L) · NW(auto)',cov.map(v=>pc(v/R)).join(' · '),'ok')+stat('mean β̂ (truth 0.5)',fmt(mean(bs)),'');
+  $('c3rd').innerHTML=(rx===0||ru===0?'When x or u has no autocorrelation the cross-products average to zero and the usual formula is fine (try ρx = 0). ':'')+`With ρx = ${fmt(rx)} and ρu = ${fmt(ru)} the true SD of the slope is ${fmt(sd)}, but the usual formula reports ${fmt(ms[0])} and covers ${pc(cov[0]/R)}. Newey–West with L = ${L} reports ${fmt(ms[1])} (coverage ${pc(cov[1]/R)}) and with the automatic L = ${La} ${fmt(ms[2])} (${pc(cov[2]/R)}): the correction helps but is not perfect in short samples, and L = 0 is the same as the heteroskedasticity-robust formula, which ignores the autocorrelation. The point estimate is unbiased (mean ${fmt(mean(bs))}) either way.`}
+ ['c3n','c3x','c3u','c3l'].forEach(i=>$(i).addEventListener('change',run));$('c3go').onclick=run;run();})();
+
+/* ---------- Ch4 spurious regression ---------- */
+(function(){scl('c4n',v=>v);
+ const walk=n=>{const a=new Float64Array(n);let s=0;for(let i=0;i<n;i++){s+=randn();a[i]=s}return a};
+ function run(){const sc=$('c4s').value,n=val('c4n'),R=400,TL=[],TD=[],R2=[];let rej=0,rejD=0,eg=0,dw=0,bL=0,bD=0,demo=null;
+  for(let r=0;r<R;r++){let x,y;if(sc==='rw'){x=walk(n);y=walk(n)}else if(sc==='ar'){x=ar1(n,.9,uvar(.9));y=ar1(n,.9,uvar(.9))}else{x=walk(n);const u=ar1(n,.5,1);y=mapA(x,(v,i)=>v+u[i])}
+   const f=reg1(x,y),t=f.b/f.se;TL.push(t);if(Math.abs(t)>1.96)rej++;R2.push(f.r2);bL+=f.b/R;
+   let num=0,den=0,sxy=0,sxx=0;for(let i=1;i<n;i++){const d=f.e[i]-f.e[i-1];num+=d*d;sxy+=d*f.e[i-1];sxx+=f.e[i-1]*f.e[i-1]}for(let i=0;i<n;i++)den+=f.e[i]*f.e[i];dw+=num/den/R;
+   const g=sxy/sxx;let sse=0;for(let i=1;i<n;i++){const z=f.e[i]-f.e[i-1]-g*f.e[i-1];sse+=z*z}if(g/Math.sqrt(sse/(n-2)/sxx)<-3.34)eg++;
+   const dx=Float64Array.from({length:n-1},(_,i)=>x[i+1]-x[i]),dy=Float64Array.from({length:n-1},(_,i)=>y[i+1]-y[i]),fd=reg1(dx,dy),td=fd.b/fd.se;TD.push(td);if(Math.abs(td)>1.96)rejD++;bD+=fd.b/R;if(r===R-1)demo={x,y}}
+  const all=Array.from(demo.x).concat(Array.from(demo.y)),rg=range(all,.08),Q=mk($('c4cv'),0,n,rg[1],{y0:rg[0],L:44});poly(Q,Array.from(demo.x,(v,i)=>[i,v]),C.a,1.8);poly(Q,Array.from(demo.y,(v,i)=>[i,v]),C.r,1.8);legend(Q,[['x',C.a],['y',C.r]],Q.T+12);Q.text('time →',Q.w-Q.R-40,Q.h-Q.B-6,C.mu);
+  const cl=a=>a.map(v=>Math.max(-15,Math.min(15-1e-9,v))),H=histLines($('c4cv2'),[cl(TL),cl(TD)],[C.r,C.g],-15,15,45,[[-1.96,C.mu,'',true],[1.96,C.mu,'',true]]);legend(H,[['levels',C.r],['differences',C.g]],H.T+12);H.text('t-statistic of the slope (clipped at ±15) →',H.w-H.R-210,H.h-H.B-6,C.mu);
+  const truth0=sc!=='co';
+  $('c4st').innerHTML=stat(truth0?'false positives, levels (|t| > 1.96)':'|t| > 1.96, levels',pc(rej/R),truth0?'hot':'')+stat(truth0?'false positives, differences':'|t| > 1.96, differences',pc(rejD/R),truth0?'ok':'')+stat('mean R² · Durbin–Watson (levels)',fmt(mean(R2))+' · '+fmt(dw),'')+stat('Engle–Granger rejects unit root in residual',pc(eg/R),sc==='co'?'ok':'')+stat('mean slope: levels · differences',fmt(bL)+' · '+fmt(bD),'in');
+  $('c4rd').innerHTML=sc==='co'?`The two series share one stochastic trend, so the level regression is genuine: the slope is estimated at ${fmt(bL)} (truth 1) with a stationary residual that the Engle–Granger test recognises in ${pc(eg/R)} of the cases. The regression of differences also estimates about ${fmt(bD)} but throws away the long-run link and the information it carries; the right model is an error-correction model.`:`The series are unrelated (true slope 0), yet the level regression finds a “significant” slope in ${pc(rej/R)} of the cases (nominal 5%), with an average R² of ${fmt(mean(R2))} and a Durbin–Watson statistic of ${fmt(dw)}, well below R². The regression on differences has ${pc(rejD/R)} false positives. The Engle–Granger test correctly rarely finds cointegration (${pc(eg/R)}). Increase n and watch the level false positives get worse for random walks.`}
+ ['c4s','c4n'].forEach(i=>$(i).addEventListener('change',run));$('c4go').onclick=run;run();})();
+
+/* ---------- Ch5 forecasting ---------- */
+(function(){scl('c5n',v=>v);scl('c5h',v=>v);
+ function gen(p,N){if(p==='ar')return ar1(N,.8,1);if(p==='rw'){const a=new Float64Array(N);let s=0;for(let i=0;i<N;i++){s+=randn();a[i]=s}return a}const nz=ar1(N,.5,1);return mapA(nz,(v,i)=>2*Math.sin(2*Math.PI*i/12)+v)}
+ function run(){const p=$('c5p').value,n=val('c5n'),H=val('c5h'),R=300,M=['naive','mean','seasonal naive','AR(1)'],CL=[C.r,C.y,C.p,C.g],se=M.map(()=>new Float64Array(H));
+  for(let r=0;r<R;r++){const y=gen(p,n+H),hist=y.slice(0,n),mu=mean(hist),d=mapA(hist,v=>v-mu);let a=0,b=0;for(let t=1;t<n;t++){a+=d[t]*d[t-1];b+=d[t-1]*d[t-1]}const phi=Math.max(-.99,Math.min(.999,a/b));
+   for(let h=1;h<=H;h++){const act=y[n+h-1],fc=[hist[n-1],mu,hist[n-1+h-12*Math.ceil(h/12)],mu+Math.pow(phi,h)*d[n-1]];fc.forEach((f,j)=>{se[j][h-1]+=(act-f)*(act-f)/R})}}
+  const rm=se.map(a=>Array.from(a,Math.sqrt)),ymax=Math.max(...rm.map(a=>Math.max(...a)))*1.1,P=mk($('c5cv'),1,H,ymax,{y0:0,L:44});
+  rm.forEach((a,j)=>poly(P,a.map((v,h)=>[h+1,v]),CL[j],2.4));legend(P,M.map((s,j)=>[s,CL[j]]),P.T+12);P.text('horizon h →',P.w-P.R-70,P.h-P.B-6,C.mu);P.text('RMSE',P.L+6,P.T+26,C.mu);
+  const best=h=>M[rm.map(a=>a[h]).indexOf(Math.min(...rm.map(a=>a[h])))];
+  $('c5st').innerHTML=M.map((s,j)=>stat('RMSE '+s+': h = 1 · '+Math.min(H,12)+' · '+H,[0,Math.min(H,12)-1,H-1].map(h=>fmt(rm[j][h])).join(' · '),j===rm.map(a=>a[H-1]).indexOf(Math.min(...rm.map(a=>a[H-1])))?'ok':'')).join('')+stat('best at h = 1 · h = '+H,best(0)+' · '+best(H-1),'in');
+  $('c5rd').innerHTML={ar:`For a mean-reverting AR(1) the naive forecast is competitive only at the shortest horizons; the fitted AR(1) and the mean converge to the unconditional SD (${fmt(Math.sqrt(1/(1-.64)))}) as h grows, while the naive error stays inflated because it keeps the last value.`,rw:`For a random walk the naive forecast is optimal at every horizon, and its error grows like √h (${fmt(Math.sqrt(H))} at h = ${H}); the mean and the AR(1) forecasts (which pull back to the historical mean) are worse the further ahead, because the series does not come back.`,seas:`With a seasonal pattern the seasonal naive wins at long horizons, since the others cannot reproduce the cycle; the naive and AR(1) forecasts follow the last value or the mean and miss the seasonality entirely (RMSE of the mean at h = ${H}: ${fmt(rm[1][H-1])}).`}[p]+` Best at h = 1: ${best(0)}; best at h = ${H}: ${best(H-1)}. The ranking depends on the process and on the horizon, which is why benchmarks and walk-forward evaluation matter.`}
+ ['c5p','c5n','c5h'].forEach(i=>$(i).addEventListener('change',run));$('c5go').onclick=run;run();})();
+/* ---------- Ch6 clustered data ---------- */
+(function(){scl('c6g',v=>v);scl('c6m',v=>v);scl('c6i',v=>fmt(v/100));
+ function run(){const sc=$('c6s').value,G=val('c6g'),m=val('c6m'),icc=val('c6i')/100,R=400,n=G*m,bs=[],se=[[],[]],cov=[0,0],g=new Int32Array(n);for(let i=0;i<n;i++)g[i]=Math.floor(i/m);
+  for(let r=0;r<R;r++){const a=Float64Array.from({length:G},()=>Math.sqrt(icc)*randn()),w=Float64Array.from({length:G},randn),x=new Float64Array(n),y=new Float64Array(n);
+   for(let i=0;i<n;i++){const j=g[i];x[i]=sc==='between'?w[j]:sc==='within'?randn():.7*w[j]+.714*randn();y[i]=.5*x[i]+a[j]+Math.sqrt(1-icc)*randn()}
+   const f=reg1(x,y),s1=crSE(x,f.e,g,G);bs.push(f.b);se[0].push(f.se);se[1].push(s1);if(Math.abs(f.b-.5)<=tcr(n-2)*f.se)cov[0]++;if(Math.abs(f.b-.5)<=tcr(G-1)*s1)cov[1]++}
+  const sd=sdv(bs),ms=se.map(mean),P=barV($('c6cv'),[sd,...ms],[C.fg,C.r,C.g],['true SD','naive','cluster-robust'],Math.max(sd,...ms)*1.3,x=>fmt(x));P.text('standard error of the slope',P.L+6,P.T+12,C.mu);
+  const P2=barV($('c6cv2'),cov.map(v=>v/R),[C.r,C.g],['naive','cluster-robust'],1.12,x=>Math.round(x*100)+'%');P2.hline(.95,C.fg,'95%');P2.text('coverage of 95% intervals',P2.L+6,P2.T+12,C.mu);
+  const de=1+(m-1)*icc;
+  $('c6st').innerHTML=stat('design effect of a mean 1 + (m−1)ICC',fmt(de),'in')+stat('effective sample size of a mean',fmt(n/de),'')+stat('observed (true SD / naive SE)² for the slope',fmt(sd*sd/(ms[0]*ms[0])),sd/ms[0]>1.2?'hot':'ok')+stat('coverage: naive · robust',cov.map(v=>pc(v/R)).join(' · '),'ok');
+  $('c6rd').innerHTML=(sc==='within'?`Here x varies only within clusters and is independent across rows, so the cluster effect behaves like extra noise and the slope’s variance is not inflated: the naive standard error (${fmt(ms[0])}) is about right (true SD ${fmt(sd)}), whatever the ICC. The design effect applies to means and to between-cluster regressors, not to this one. `:sc==='between'?`Here x is constant within clusters, so the ${n} rows are really ${G} independent pieces of information for this regressor: the true SD of the slope is ${fmt(sd)} against a naive ${fmt(ms[0])}, a variance inflation of ${fmt(sd*sd/(ms[0]*ms[0]))} (the design effect is ${fmt(de)}), and the naive intervals cover ${pc(cov[0]/R)}. `:`With half of the variation of x between clusters the inflation is in between (${fmt(sd*sd/(ms[0]*ms[0]))}) and the naive intervals cover ${pc(cov[0]/R)}. `)+`Cluster-robust standard errors give ${fmt(ms[1])} on average and cover ${pc(cov[1]/R)}${G<30?'; with so few clusters they are noisy and a little too small, which is why small G needs the t distribution, a wild bootstrap or a mixed model':''}.`}
+ ['c6s','c6g','c6m','c6i'].forEach(i=>$(i).addEventListener('change',run));$('c6go').onclick=run;run();})();
+
+/* ---------- Ch7 FE vs RE ---------- */
+(function(){scl('c7n',v=>v);scl('c7t',v=>v);scl('c7l',v=>fmt(v/100));
+ function run(){const N=val('c7n'),T=val('c7t'),lam=val('c7l')/100,R=300,E=[[],[],[]],s2=Math.sqrt(1-lam*lam);let th=0,dif=0;
+  for(let r=0;r<R;r++){const n=N*T,x=new Float64Array(n),y=new Float64Array(n),xb=new Float64Array(N),yb=new Float64Array(N);
+   for(let i=0;i<N;i++){const a=randn();for(let t=0;t<T;t++){const k=i*T+t;x[k]=lam*a+s2*randn();y[k]=x[k]+a+randn();xb[i]+=x[k]/T;yb[i]+=y[k]/T}}
+   const bp=reg1(x,y).b;let sxy=0,sxx=0;for(let i=0;i<N;i++)for(let t=0;t<T;t++){const k=i*T+t,xd=x[k]-xb[i],yd=y[k]-yb[i];sxy+=xd*yd;sxx+=xd*xd}const bf=sxy/sxx;let sw=0;for(let i=0;i<N;i++)for(let t=0;t<T;t++){const k=i*T+t,z=(y[k]-yb[i])-bf*(x[k]-xb[i]);sw+=z*z}
+   const se2=sw/(N*T-N-1),bt=reg1(xb,yb),s2B=bt.e.reduce((a,v)=>a+v*v,0)/(N-2),sa2=Math.max(0,s2B-se2/T),theta=1-Math.sqrt(se2/(se2+T*sa2)),xq=new Float64Array(n),yq=new Float64Array(n);
+   for(let i=0;i<N;i++)for(let t=0;t<T;t++){const k=i*T+t;xq[k]=x[k]-theta*xb[i];yq[k]=y[k]-theta*yb[i]}
+   const br=reg1(xq,yq).b;E[0].push(bp);E[1].push(br);E[2].push(bf);th+=theta/R;dif+=(bf-br)/R}
+  const cl=a=>a.map(v=>Math.max(.4,Math.min(2.6-1e-9,v))),NM=['pooled OLS','random effects','fixed effects'],CL=[C.r,C.y,C.g],P=histLines($('c7cv'),E.map(cl),CL,.4,2.6,55,[[1,C.fg,'truth',true]]);legend(P,NM.map((s,i)=>[s,CL[i]]),P.T+12);P.text('estimated slope →',P.w-P.R-100,P.h-P.B-6,C.mu);
+  $('c7st').innerHTML=NM.map((s,i)=>stat(s+': mean · SD',fmt(mean(E[i]))+' · '+fmt(sdv(E[i])),i===2?'ok':'')).join('')+stat('average RE weight θ',fmt(th),'in')+stat('FE − RE (Hausman gap)',fmt(dif),Math.abs(dif)>.05?'warn':'');
+  $('c7rd').innerHTML=lam<.05?`With the unit effect uncorrelated with x all three estimators are centred on 1, but random effects is the most precise (SD ${fmt(sdv(E[1]))} against ${fmt(sdv(E[2]))} for fixed effects): it uses the between-unit variation as well. Pooled OLS is also unbiased but wastes the structure (SD ${fmt(sdv(E[0]))}).`:`With a correlation of ${fmt(lam)} between x and the unit effect, pooled OLS is biased (mean ${fmt(mean(E[0]))}, truth 1), and so is random effects (${fmt(mean(E[1]))}, pulled towards pooled by θ = ${fmt(th)}). Fixed effects stays on the truth (${fmt(mean(E[2]))}) at the price of a larger spread (SD ${fmt(sdv(E[2]))}). The gap FE − RE (${fmt(dif)}) is the quantity behind the Hausman test: when it is large relative to its noise, random effects is rejected. More periods T push θ towards 1 and RE towards FE.`}
+ ['c7n','c7t','c7l'].forEach(i=>$(i).addEventListener('change',run));$('c7go').onclick=run;run();})();
+
+/* ---------- Ch8 shrinkage ---------- */
+(function(){scl('c8g',v=>v);scl('c8m',v=>v);scl('c8i',v=>fmt(v/100));
+ function dataset(G,mAvg,icc){const nj=[],u=[],yb=[],ys=[];for(let j=0;j<G;j++){const n=Math.max(1,Math.round(mAvg*(.3+1.4*Math.random()))),uj=Math.sqrt(icc)*randn(),v=[];let s=0;for(let i=0;i<n;i++){const z=uj+Math.sqrt(1-icc)*randn();v.push(z);s+=z}nj.push(n);u.push(uj);yb.push(s/n);ys.push(v)}return{nj,u,yb,ys}}
+ function est(d){const G=d.nj.length;let N=0,tot=0,ssw=0;for(let j=0;j<G;j++){N+=d.nj[j];tot+=d.nj[j]*d.yb[j];for(const v of d.ys[j])ssw+=(v-d.yb[j])*(v-d.yb[j])}
+  const gm=tot/N,se2=N>G?ssw/(N-G):1,vb=Math.pow(sdv(d.yb),2),su2=Math.max(1e-6,vb-mean(d.nj.map(n=>se2/n))),lam=d.nj.map(n=>su2/(su2+se2/n));return{gm,se2,su2,lam,np:d.yb.map(v=>v-gm),bl:d.yb.map((v,j)=>lam[j]*(v-gm))}}
+ function run(){const G=val('c8g'),m=val('c8m'),icc=val('c8i')/100,R=200,ms=[0,0,0];let demo=null,iccH=0;
+  for(let r=0;r<R;r++){const d=dataset(G,m,icc),e=est(d);let a=0,b=0,c=0;for(let j=0;j<G;j++){a+=Math.pow(e.np[j]-d.u[j],2);b+=d.u[j]*d.u[j];c+=Math.pow(e.bl[j]-d.u[j],2)}ms[0]+=a/G/R;ms[1]+=b/G/R;ms[2]+=c/G/R;iccH+=e.su2/(e.su2+e.se2)/R;if(r===R-1)demo={d,e}}
+  const rg=range(demo.e.np,.1),lim=Math.max(Math.abs(rg[0]),Math.abs(rg[1])),P=mk($('c8cv'),-lim,lim,lim,{y0:-lim,L:44}),med=medianOf(demo.d.nj),sm=[],bg=[];demo.e.np.forEach((v,j)=>(demo.d.nj[j]<med?sm:bg).push([v,demo.e.bl[j]]));
+  P.line(x=>x,C.mu,1.2,-lim,lim,2,true);dots(P,bg,C.a,3.2);dots(P,sm,C.r,3.2);legend(P,[['larger groups',C.a],['smaller groups',C.r]],P.T+12);P.text('raw group effect →',P.w-P.R-100,P.h-P.B-6,C.mu);P.text('BLUP ↑',P.L+6,P.T+26,C.mu);
+  const P2=barV($('c8cv2'),ms,[C.r,C.y,C.g],['no pooling','complete pooling','partial pooling'],Math.max(...ms)*1.3,x=>fmt(x));P2.text('mean squared error of group effects',P2.L+6,P2.T+12,C.mu);
+  const lamS=mean(demo.e.lam.filter((v,j)=>demo.d.nj[j]<med)),lamB=mean(demo.e.lam.filter((v,j)=>demo.d.nj[j]>=med));
+  $('c8st').innerHTML=stat('MSE: none · complete · partial',ms.map(fmt).join(' · '),'')+stat('partial vs none',pc(1-ms[2]/ms[0])+' lower','ok')+stat('estimated ICC (truth '+fmt(icc)+')',fmt(iccH),'in')+stat('shrinkage λ: smaller · larger groups',fmt(lamS)+' · '+fmt(lamB),'');
+  $('c8rd').innerHTML=`Partial pooling has the lowest error (${fmt(ms[2])}), ${pc(1-ms[2]/ms[0])} below treating each group on its own (${fmt(ms[0])}) and ${ms[1]>ms[2]?pc(1-ms[2]/ms[1])+' below':'close to'} ignoring the groups (${fmt(ms[1])}). On the left the red points (small groups) lie closer to zero than the diagonal: they keep only ${pc(lamS)} of their raw deviation, against ${pc(lamB)} for larger groups. When the ICC is tiny, the data say the groups are alike and the BLUP collapses to complete pooling; when groups are large or the ICC high, it approaches no pooling.`}
+ ['c8g','c8m','c8i'].forEach(i=>$(i).addEventListener('change',run));$('c8go').onclick=run;run();})();
+function medianOf(a){const b=Array.from(a).sort((x,y)=>x-y);return b[b.length>>1]}
+
+/* ---------- Ch9 clustered logistic ---------- */
+(function(){scl('c9g',v=>v);scl('c9m',v=>v);scl('c9s',v=>fmt(v/10));scl('c9b',v=>fmt(v/10));
+ function sim(G,m,sg,b){const n=G*m,x=new Float64Array(n),y=new Float64Array(n),g=new Int32Array(n);for(let j=0;j<G;j++){const u=sg*randn();for(let i=0;i<m;i++){const k=j*m+i;g[k]=j;x[k]=randn();y[k]=Math.random()<sig(-1+b*x[k]+u)?1:0}}return{x,y,g,n}}
+ function robust(f,d,G){const S=Array.from({length:G},()=>[0,0]);for(let i=0;i<d.n;i++){const r=d.y[i]-f.mu[i];S[d.g[i]][0]+=r;S[d.g[i]][1]+=r*d.x[i]}const M=[[0,0],[0,0]];S.forEach(s=>{M[0][0]+=s[0]*s[0];M[0][1]+=s[0]*s[1];M[1][0]+=s[1]*s[0];M[1][1]+=s[1]*s[1]});let v=0;for(let a=0;a<2;a++)for(let b=0;b<2;b++)v+=f.inv[1][a]*M[a][b]*f.inv[b][1];return Math.sqrt(v*G/(G-1))}
+ function run(){const G=val('c9g'),m=val('c9m'),sg=val('c9s')/10,b=val('c9b')/10,R=150,big=sim(1500,40,sg,b),bstar=glm([big.x],big.y).beta[1],ap=b/Math.sqrt(1+.346*sg*sg),B=[],S=[[],[]],cov=[0,0];
+  for(let r=0;r<R;r++){const d=sim(G,m,sg,b),f=glm([d.x],d.y),s1=robust(f,d,G);B.push(f.beta[1]);S[0].push(f.se[1]);S[1].push(s1);if(Math.abs(f.beta[1]-bstar)<=1.96*f.se[1])cov[0]++;if(Math.abs(f.beta[1]-bstar)<=1.96*s1)cov[1]++}
+  const lo=Math.max(0,ap*.5-.2),hi=b*1.5+.3,P=histLines($('c9cv'),[B.map(v=>Math.max(lo,Math.min(hi-1e-9,v)))],[C.a],lo,hi,45,[[b,C.g,'conditional β',true],[bstar,C.y,'marginal β*',true],[ap,C.r,'formula',true]]);P.text('pooled logistic slope →',P.w-P.R-120,P.h-P.B-6,C.mu);
+  $('c9st').innerHTML=stat('conditional β · marginal β* (large sample) · formula',fmt(b)+' · '+fmt(bstar)+' · '+fmt(ap),'in')+stat('pooled logit: mean β̂ · SD',fmt(mean(B))+' · '+fmt(sdv(B)),'')+stat('average SE: naive · cluster-robust',fmt(mean(S[0]))+' · '+fmt(mean(S[1])),'')+stat('coverage of β*: naive · robust',cov.map(v=>pc(v/R)).join(' · '),'ok');
+  $('c9rd').innerHTML=(sg===0?'With σ = 0 there is no cluster effect and the conditional and marginal slopes coincide. ':`Averaging over the cluster effects flattens the logistic curve: the pooled estimate centres on ${fmt(mean(B))}, close to the marginal slope ${fmt(bstar)} and to the formula (${fmt(ap)}), not on the conditional ${fmt(b)}. `)+`The true SD of β̂ is ${fmt(sdv(B))}; the naive standard error says ${fmt(mean(S[0]))} and its intervals cover the marginal slope ${pc(cov[0]/R)} of the time, the cluster-robust one says ${fmt(mean(S[1]))} and covers ${pc(cov[1]/R)}. A GLMM would estimate the conditional β; both are legitimate but answer different questions.`}
+ ['c9g','c9m','c9s','c9b'].forEach(i=>$(i).addEventListener('change',run));$('c9go').onclick=run;run();})();
+
+/* ---------- Ch10 GARCH VaR ---------- */
+(function(){scl('c10a',v=>fmt(v/100));scl('c10b',v=>fmt(v/100));scl('c10n',v=>v);
+ function run(){let al=val('c10a')/100,be=val('c10b')/100,clamped=false;if(al+be>.995){be=.995-al;clamped=true}const n=val('c10n'),om=1-al-be,W=250,z=2.326,R=30,ex=[0,0,0],prevN=[0,0,0],both=[0,0,0];let demo=null,a1=0,a2=0;
+  for(let r=0;r<R;r++){const ret=new Float64Array(n),sg=new Float64Array(n);let s2=1;for(let t=0;t<n;t++){sg[t]=Math.sqrt(s2);ret[t]=sg[t]*randn();s2=om+al*ret[t]*ret[t]+be*s2}
+   const pre=new Float64Array(n+1),pre2=new Float64Array(n+1);for(let t=0;t<n;t++){pre[t+1]=pre[t]+ret[t];pre2[t+1]=pre2[t]+ret[t]*ret[t]}
+   let se2=1;const flag=[new Uint8Array(n),new Uint8Array(n),new Uint8Array(n)],vc=new Float64Array(n),ve=new Float64Array(n);
+   for(let t=1;t<n;t++){se2=.94*se2+.06*ret[t-1]*ret[t-1];if(t>=W){const m=(pre[t]-pre[t-W])/W,v=(pre2[t]-pre2[t-W])/W-m*m;vc[t]=Math.sqrt(v);ve[t]=Math.sqrt(se2);[vc[t],ve[t],sg[t]].forEach((s,j)=>{flag[j][t]=ret[t]<-z*s?1:0})}}
+   for(let j=0;j<3;j++)for(let t=W;t<n;t++){ex[j]+=flag[j][t]/((n-W)*R);if(t>W&&flag[j][t-1]){prevN[j]++;if(flag[j][t])both[j]++}}
+   a1+=acfS(ret,1)[1]/R;a2+=acfS(Float64Array.from(ret,v=>v*v),1)[1]/R;if(r===R-1)demo={ret,sg,vc,ve}}
+  const k0=n-300,seg=a=>Array.from(a.slice(k0),(v,i)=>[i,v]),all=Array.from(demo.ret.slice(k0)).concat(Array.from(demo.sg.slice(k0),v=>-z*v)),rg=range(all,.08),P=mk($('c10cv'),0,300,rg[1],{y0:rg[0],L:44});
+  poly(P,seg(demo.ret),C.a,1.2);poly(P,seg(demo.vc).map(([i,v])=>[i,-z*v]),C.r,2);poly(P,seg(demo.ve).map(([i,v])=>[i,-z*v]),C.y,2);poly(P,seg(demo.sg).map(([i,v])=>[i,-z*v]),C.g,2);legend(P,[['returns',C.a],['constant σ',C.r],['EWMA',C.y],['true σ',C.g]],P.T+12);P.text('last 300 days →',P.w-P.R-90,P.h-P.B-6,C.mu);
+  const P2=barV($('c10cv2'),ex,[C.r,C.y,C.g],['constant σ','EWMA','true σ_t'],Math.max(.02,...ex)*1.35,x=>(x*100).toFixed(2)+'%');P2.hline(.01,C.fg,'target 1%');P2.text('exceedance rate of 99% VaR',P2.L+6,P2.T+12,C.mu);
+  const cond=j=>prevN[j]?both[j]/prevN[j]:NaN;
+  $('c10st').innerHTML=stat('exceedances: constant · EWMA · true',ex.map(v=>(v*100).toFixed(2)+'%').join(' · '),'')+stat('P(exceed | exceeded yesterday)',[0,1,2].map(j=>pc(cond(j))).join(' · '),cond(0)>.03?'hot':'ok')+stat('lag-1 ACF of returns · of squared returns',fmt(a1)+' · '+fmt(a2),'in')+stat('persistence α+β · half-life (days)',fmt(al+be)+' · '+fmt(Math.log(.5)/Math.log(al+be)),'');
+  $('c10rd').innerHTML=(clamped?`(β was lowered to ${fmt(be)} so that α + β stays below 1.) `:'')+`Returns are almost uncorrelated (ACF ${fmt(a1)}) but their squares are not (${fmt(a2)}): volatility clusters. The oracle VaR with the true σ_t is exceeded ${(ex[2]*100).toFixed(2)}% of the time and its exceedances are independent. The constant-σ VaR is exceeded ${(ex[0]*100).toFixed(2)}% overall, but after an exceedance the probability of another is ${pc(cond(0))}: the losses come in bursts exactly when the VaR is too low. EWMA adapts (${(ex[1]*100).toFixed(2)}%, ${pc(cond(1))} after an exceedance) with no model fitting.`}
+ ['c10a','c10b','c10n'].forEach(i=>$(i).addEventListener('change',run));$('c10go').onclick=run;run();})();
+
+/* ---------- Ch11 breaks ---------- */
+(function(){scl('c11n',v=>v);scl('c11d',v=>fmt(v/10));scl('c11r',v=>fmt(v/100));
+ function run(){const n=val('c11n'),dl=val('c11d')/10,r0=val('c11r')/100,R=300,h=n>>1,PI=[],PB=[],L=Math.floor(Math.pow(n,1/3));let dfr=0,det=0,demo=null;
+  for(let r=0;r<R;r++){const nz=ar1(n,r0,1),y=mapA(nz,(v,i)=>(i>=h?dl:0)+v),D=mapA(y,(v,i)=>i>=h?1:0),yl=y.slice(0,n-1),yc=y.slice(1),f1=reg1(yl,yc),fd=reg1(yl,mapA(yc,(v,i)=>v-yl[i]));
+   PI.push(f1.b);if(fd.b/fd.se<-2.88)dfr++;const Dc=D.slice(1),Dl=D.slice(0,n-1),f2=olsMulti([yl,Dc,Dl],yc,false);PB.push(f2.beta[1]);
+   const fb=reg1(D,y),tb=fb.b/nwSE(D,fb.e,L);if(Math.abs(tb)>1.96)det++;if(r===R-1)demo=y}
+  const rg=range(demo,.1),P=mk($('c11cv'),0,n,rg[1],{y0:rg[0],L:44});poly(P,Array.from(demo,(v,i)=>[i,v]),C.a,1.5);poly(P,[[0,0],[h,0]],C.g,2.4,true);poly(P,[[h,dl],[n,dl]],C.g,2.4,true);P.vline(h,C.mu,'break',true);P.text('time →',P.w-P.R-40,P.h-P.B-6,C.mu);
+  const lo=-.2,hi=1.1,cl=a=>a.map(v=>Math.max(lo,Math.min(hi-1e-9,v))),H=histLines($('c11cv2'),[cl(PI),cl(PB)],[C.r,C.g],lo,hi,45,[[r0,C.fg,'truth ρ₀',true]]);legend(H,[['ignoring the break',C.r],['with level dummies',C.g]],H.T+12);H.text('estimated AR(1) coefficient →',H.w-H.R-170,H.h-H.B-6,C.mu);
+  $('c11st').innerHTML=stat('AR(1) coefficient: ignoring · with dummies (truth '+fmt(r0)+')',fmt(mean(PI))+' · '+fmt(mean(PB)),mean(PI)>r0+.15?'hot':'ok')+stat('unit root rejected by DF (break ignored)',pc(dfr/R),dfr/R<.6?'hot':'ok')+stat('break detected (t-test, NW SE)',pc(det/R),dl>0?'in':'')+stat('shift size in SD of the noise',fmt(dl/Math.sqrt(1/(1-r0*r0))),'');
+  $('c11rd').innerHTML=dl===0?`With no shift the AR(1) coefficient is estimated near ${fmt(mean(PI))} (truth ${fmt(r0)}), the unit root is rejected in ${pc(dfr/R)} of the series and the break test fires ${pc(det/R)} of the time (its size, near 5%). Raise δ.`:`The series is stationary around two levels, with true persistence ${fmt(r0)}. Ignoring the shift, the estimated coefficient is ${fmt(mean(PI))} and the Dickey–Fuller test rejects a unit root in ${pc(dfr/R)} of the series (about 100% when there is no break): ${dfr/R<.7?'the break masquerades as persistence, and an analyst would difference a series that did not need it':'with this small a shift the test still sees through it, so raise δ to see the power collapse'}. With level dummies the coefficient is back at ${fmt(mean(PB))}. The known-date test finds the break in ${pc(det/R)} of the series; with an unknown date a sup-type test with larger critical values is needed.`}
+ ['c11n','c11d','c11r'].forEach(i=>$(i).addEventListener('change',run));$('c11go').onclick=run;run();})();
+const QZ=[
+{l:'Beginner',q:'An AR(1) series with autocorrelation 0.8 has 500 observations. Its effective sample size for estimating the mean is about…',o:['About 900','500','400','About 55 (500·(1−0.8)/(1+0.8))'],a:3,e:'Positive autocorrelation repeats information: n_eff ≈ n(1−ρ)/(1+ρ), here about 56.'},
+{l:'Beginner',q:'What is the main consequence of ignoring positive autocorrelation or clustering when computing a standard error?',o:['The standard error is too small, so intervals are too narrow and tests reject too often','The estimate becomes biased','Nothing, if n is large','The standard error is too large'],a:0,e:'Dependent observations carry less information than independent ones, but the usual formula counts them as independent.'},
+{l:'Intermediate',q:'An AR(2) process has…',o:['A PACF that decays and an ACF that cuts off','Both functions cutting off at lag 2','A PACF that cuts off after lag 2 and an ACF that decays','An ACF that cuts off after lag 2'],a:2,e:'AR(p): PACF cuts off after p, ACF decays. MA(q) is the mirror image.'},
+{l:'Intermediate',q:'The sample ACF of a series stays near 1 for many lags and decays very slowly. The best next step is to…',o:['Suspect a unit root and examine the differenced series (and test)','Remove outliers','Use more lags in the regression','Fit an MA(1) model'],a:0,e:'A slowly decaying ACF is the signature of non-stationarity such as a random walk.'},
+{l:'Intermediate',q:'Newey–West standard errors in a time-series regression…',o:['Remove the bias of the OLS estimator','Are valid only for panel data','Correct the standard error for autocorrelation and heteroskedasticity, with a lag truncation that should grow with n','Make the errors white noise'],a:2,e:'HAC repairs the standard errors, not the efficiency or the model.'},
+{l:'Intermediate',q:'You regress one random walk on another, independent random walk. You will typically find…',o:['A “significant” slope in most samples, a high R² and a very low Durbin–Watson statistic','Exactly 5% false positives','A slope near zero with a small t-statistic','No relation because the series are independent'],a:0,e:'Spurious regression: the t-statistic does not have its usual distribution when the series have stochastic trends.'},
+{l:'Advanced',q:'Two integrated series have a stationary linear combination. They are…',o:['Correlated in differences only','Cointegrated: the level relation is genuine and an error-correction model is appropriate','Independent','Spurious'],a:1,e:'Cointegration means a shared stochastic trend; differencing would discard the long-run relation.'},
+{l:'Advanced',q:'Why is random k-fold cross-validation inappropriate for forecasting an autocorrelated series?',o:['It is too slow','It uses too little data','It puts future observations in the training set, so neighbouring observations leak information and errors look optimistic','It cannot handle seasonality'],a:2,e:'Evaluation must mimic use: train on the past, test on the future (walk-forward).'},
+{l:'Advanced',q:'For a random walk, which forecast is best at every horizon and how does its error grow?',o:['A fitted AR(1); like h','The historical mean; constant','The last value (naive); like √h','A seasonal average; like log h'],a:2,e:'The conditional mean of a random walk is its last value, and the variance grows linearly in h.'},
+{l:'Advanced',q:'Loans are clustered within customers with ICC 0.5 and 10 loans per customer. A covariate that is constant within customers has a design effect on its regression slope of about…',o:['10 only if ICC is 1','1','0.5','5.5'],a:3,e:'1 + (m−1)·ICC = 1 + 9·0.5 = 5.5: the 10 loans of a customer are worth only about 1.8 independent ones for this regressor.'},
+{l:'Advanced',q:'Cluster-robust standard errors are unreliable when…',o:['There are very few clusters (e.g. fewer than about 30)','The ICC is high','The outcome is binary','The clusters have different sizes'],a:0,e:'The sandwich estimator relies on many independent clusters; with few, use t(G−1), a wild-cluster bootstrap or a mixed model.'},
+{l:'Expert',q:'In a panel, the unit effect is correlated with the regressor. Which estimator is consistent?',o:['Fixed effects (within)','Random effects','None of them','Pooled OLS'],a:0,e:'The within transformation removes α_i whatever its correlation with x; pooled and random effects are biased.'},
+{l:'Expert',q:'Random effects is preferred to fixed effects when…',o:['The unit effects are plausibly uncorrelated with the regressors and you want efficiency or need time-invariant regressors','There is only one unit','The unit effects are strongly correlated with x','T is large'],a:0,e:'RE is more efficient and can estimate time-invariant effects, but is biased if α_i is correlated with x (Hausman, Mundlak).'},
+{l:'Expert',q:'In a random-intercept model the BLUP of a group effect is the group mean deviation multiplied by λ = σ²_u/(σ²_u + σ²_e/n_j). A group with few observations has…',o:['λ undefined','λ close to 1 (little shrinkage)','λ above 1','λ close to 0 (strong shrinkage towards the overall mean)'],a:3,e:'Small groups carry little information, so their estimates are pulled strongly towards the population mean.'},
+{l:'Expert',q:'A random-intercept logistic model has conditional slope 1.0 and σ_u = 1.5. The slope of a pooled logistic regression that ignores clusters will be about…',o:['Larger (about 1.4)','Zero','Smaller (about 0.75): the marginal effect is attenuated','The same, 1.0'],a:2,e:'β/√(1 + 0.346σ²) = 1/√1.78 ≈ 0.75: averaging over cluster effects flattens the curve.'},
+{l:'Expert',q:'A 99% VaR with constant volatility has the right overall exceedance rate under GARCH returns but is a poor risk measure because…',o:['It needs normality','It is too conservative','It ignores the mean','Exceedances come in clusters: it is too low exactly in turbulent periods when losses are largest'],a:3,e:'Conditional coverage matters: independence of the exceedances (Christoffersen) is tested as well as the rate (Kupiec).'},
+{l:'Expert',q:'A stationary series with a level shift in the middle is analysed ignoring the shift. The AR(1) coefficient and the unit-root test will tend to show…',o:['No change','Spuriously high persistence and weak rejection of a unit root','A negative coefficient','Lower persistence and strong rejection of a unit root'],a:1,e:'The level shift is absorbed as persistence: estimates move towards 1 and the Dickey–Fuller test loses power.'},
+{l:'Expert',q:'For a time series in credit risk (monthly default rate), which validation design is most defensible?',o:['Test on the first years, train on the last years','Walk-forward evaluation with benchmarks, features known at the forecast origin and a break/stability check','Random 5-fold cross-validation','Fit on the whole sample and report in-sample R²'],a:1,e:'Respect time order, compare with naive benchmarks, avoid look-ahead (revised macro data) and check for regime changes.'}
+];
+(function(){const st=store.get('dd_quiz',{});
+ function render(){const box=$('quiz');box.innerHTML='';
+  QZ.forEach((q,i)=>{const d=document.createElement('div');d.className='q'+(st[i]!=null?' done':'');d.innerHTML=`<div class="qh">Q${i+1} · ${q.l}</div><div style="margin:4px 0 6px"><b>${q.q}</b></div>`;
+   q.o.forEach((o,j)=>{const b=document.createElement('button');b.className='opt';b.textContent=o;if(st[i]!=null){if(j===q.a)b.classList.add('good');else if(j===st[i])b.classList.add('bad')}b.onclick=()=>{if(st[i]!=null)return;st[i]=j;store.set('dd_quiz',st);render();meter()};d.appendChild(b)});
+   const e=document.createElement('div');e.className='ex';e.innerHTML=(st[i]===q.a?'✅ ':'❌ ')+q.e;d.appendChild(e);box.appendChild(d)});
+  const ans=Object.keys(st).length,ok=QZ.filter((q,i)=>st[i]===q.a).length;
+  $('qscore').innerHTML=stat('answered',ans+' / '+QZ.length,'in')+stat('correct',ok,'ok')+stat('score',ans?Math.round(100*ok/ans)+'%':'—',ok/Math.max(ans,1)>=.8?'ok':'warn')+stat('verdict',ans<QZ.length?'keep going':ok>=16?'dependence master':ok>=13?'strong':'review ch. 1–11','')}
+ $('qreset').onclick=()=>{Object.keys(st).forEach(k=>delete st[k]);store.set('dd_quiz',st);render();meter()};
+ window.__qst=st;render();})();
+const CHK=['Explain effective sample size for autocorrelated and clustered data.','Read ACF and PACF plots and identify AR, MA and ARMA patterns.','Check stationarity and know when to difference.','Use HAC and cluster-robust standard errors and know their limits.','Recognise spurious regression and distinguish it from cointegration.','Evaluate forecasts with walk-forward validation against naive and seasonal benchmarks.','Compute the ICC and the design effect and choose the clustering level.','Choose between pooled, fixed and random effects and justify it.','Write a random-intercept and a random-slope model and explain shrinkage (BLUP).','Distinguish conditional (GLMM) from marginal (GEE) effects for binary outcomes.','Write the GARCH(1,1) recursion and backtest VaR for rate and independence.','Detect and handle structural breaks without confusing them with unit roots.','Design the validation of a time-dependent or clustered credit model.','Write the dependence section of a model-validation report.'];
+(function(){const st=store.get('dd_chk',{}),box=$('chk');CHK.forEach((t,i)=>{const l=document.createElement('label'),c=document.createElement('input');c.type='checkbox';c.checked=!!st[i];c.onchange=()=>{st[i]=c.checked;store.set('dd_chk',st);meter()};l.appendChild(c);const s=document.createElement('span');s.textContent=t;l.appendChild(s);box.appendChild(l)});window.__cst=st;})();
+function meter(){const q=window.__qst||{},c=window.__cst||{};const ok=QZ.filter((x,i)=>q[i]===x.a).length,ck=Object.values(c).filter(Boolean).length;const p=Math.round(100*(.6*ok/QZ.length+.4*ck/CHK.length));$('mtxt').textContent='Mastery: '+p+'%  (exam + checklist)';$('mbar').style.width=p+'%';store.set('mastery_dd',p)}
+meter();
+
+/* ---------- Navigation ---------- */
+(function(){const nav=$('nav');let html='';
+ document.querySelectorAll('main .part, main section.ch').forEach(el=>{if(el.classList.contains('part'))html+=`<div class="pt">${el.textContent}</div>`;else{const h=el.querySelector('h2'),num=h.querySelector('.num').textContent,t=Array.from(h.childNodes).filter(n=>n.nodeType===3).map(n=>n.textContent).join('').trim();html+=`<a href="#${el.id}" data-id="${el.id}">${num}. ${t}</a>`}});
+ nav.innerHTML=html;const links=nav.querySelectorAll('a'),io=new IntersectionObserver(es=>{es.forEach(e=>{if(e.isIntersecting)links.forEach(a=>a.classList.toggle('on',a.dataset.id===e.target.id))})},{rootMargin:'-20% 0px -70% 0px'});
+ document.querySelectorAll('section.ch').forEach(s=>io.observe(s));
+ $('menu').onclick=()=>$('side').classList.toggle('open');nav.addEventListener('click',e=>{if(e.target.tagName==='A')$('side').classList.remove('open')});
+ window.addEventListener('scroll',()=>{const h=document.documentElement;$('prog').style.width=(100*h.scrollTop/(h.scrollHeight-h.clientHeight))+'%'},{passive:true});})();
+</script>
+</body>
+</html>
