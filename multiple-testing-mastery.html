@@ -1,0 +1,610 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Multiple Testing Mastery</title>
+<style>
+:root{--bg:#0b0e17;--panel:#121726;--panel2:#171d30;--line:#232a3d;--fg:#e8ebf5;--mu:#8a93ab;--a:#6ea8ff;--r:#ff6b81;--y:#ffd166;--g:#4ade80;--p:#c084fc;--t:#5eead4}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;background:var(--bg);color:var(--fg);font:16px/1.7 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+a{color:var(--a)}
+#prog{position:fixed;top:0;left:0;height:3px;background:linear-gradient(90deg,var(--a),var(--p),var(--r));width:0;z-index:50}
+.side{position:fixed;left:0;top:0;bottom:0;width:290px;background:#0e1220;border-right:1px solid var(--line);overflow:auto;padding:18px 14px 90px;z-index:40;transition:transform .25s}
+.side h1{font-size:15px;margin:0 0 2px}
+.side small{color:var(--mu)}
+.side .pt{margin:16px 0 4px;font-size:11px;text-transform:uppercase;letter-spacing:1.3px;color:var(--p)}
+.side a{display:block;color:var(--mu);text-decoration:none;padding:5px 9px;border-radius:7px;font-size:13.5px;line-height:1.35}
+.side a:hover{background:var(--panel);color:var(--fg)}
+.side a.on{background:var(--panel2);color:var(--fg);box-shadow:inset 3px 0 var(--a)}
+.side a.back{color:var(--t);padding-left:0;margin-bottom:6px}
+.meter{position:fixed;left:0;bottom:0;width:290px;background:#0e1220;border-top:1px solid var(--line);padding:10px 16px;z-index:41;font-size:12px;color:var(--mu)}
+.meter .bar{height:7px;background:var(--line);border-radius:6px;margin-top:5px;overflow:hidden}
+.meter .bar i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--g),var(--t));transition:width .4s}
+#menu{display:none;position:fixed;top:10px;left:10px;z-index:60;background:var(--panel2);color:var(--fg);border:1px solid var(--line);border-radius:9px;padding:7px 12px;font-size:14px;cursor:pointer}
+main{margin-left:290px;padding:0 34px 120px;max-width:1090px}
+.hero{padding:70px 0 30px}
+.hero h1{font-size:clamp(32px,5vw,56px);line-height:1.08;margin:0 0 14px;background:linear-gradient(100deg,#fff,var(--y) 40%,var(--r));-webkit-background-clip:text;background-clip:text;color:transparent}
+.hero p{font-size:19px;color:#c3c9dc;max-width:780px}
+.chips{display:flex;flex-wrap:wrap;gap:8px;margin:18px 0}
+.chip{border:1px solid var(--line);background:var(--panel);padding:5px 12px;border-radius:99px;font-size:13px;color:var(--mu)}
+.chip b{color:var(--fg)}
+.part{margin:90px 0 0;padding-top:22px;border-top:1px solid var(--line);font-size:12px;letter-spacing:2px;text-transform:uppercase;color:var(--p)}
+section.ch{padding-top:30px}
+h2{font-size:30px;line-height:1.2;margin:10px 0 8px;display:flex;gap:12px;align-items:center;flex-wrap:wrap}
+h2 .num{display:inline-grid;place-items:center;width:40px;height:40px;border-radius:12px;background:var(--panel2);border:1px solid var(--line);font-size:18px;color:var(--a)}
+.lvl{font-size:11px;font-weight:600;letter-spacing:.8px;text-transform:uppercase;padding:3px 9px;border-radius:99px;border:1px solid}
+.lvl.b{color:var(--g);border-color:#1f5c3a}.lvl.i{color:var(--a);border-color:#244a85}.lvl.a{color:var(--y);border-color:#6b5420}.lvl.e{color:var(--r);border-color:#7a2c3a}
+h3{font-size:19px;margin:30px 0 6px;color:#fff}
+p{margin:10px 0}li{margin:5px 0}
+code,.f{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace}
+code{background:var(--panel2);padding:1px 6px;border-radius:5px;font-size:.9em}
+.f{display:block;white-space:pre-wrap;background:#0e1322;border:1px solid var(--line);border-left:3px solid var(--a);padding:12px 16px;border-radius:9px;margin:14px 0;overflow-x:auto;font-size:15px;color:#dbe4ff;line-height:1.8}
+.co{border-radius:12px;padding:13px 17px;margin:16px 0;border:1px solid var(--line);background:var(--panel)}
+.co>b:first-child{display:block;margin-bottom:2px;font-size:12px;letter-spacing:1px;text-transform:uppercase}
+.co.def{border-left:4px solid var(--a)}.co.def>b:first-child{color:var(--a)}
+.co.warn{border-left:4px solid var(--r)}.co.warn>b:first-child{color:var(--r)}
+.co.tip{border-left:4px solid var(--g)}.co.tip>b:first-child{color:var(--g)}
+.co.key{border-left:4px solid var(--y);background:#171608}.co.key>b:first-child{color:var(--y)}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:18px 20px;margin:22px 0;box-shadow:0 8px 30px rgba(0,0,0,.25)}
+.card>h4{margin:0 0 3px;font-size:13px;letter-spacing:1.2px;text-transform:uppercase;color:var(--t)}
+.card>p.sub{margin:0 0 12px;color:var(--mu);font-size:14.5px}
+.ctl{display:flex;flex-wrap:wrap;gap:10px 22px;align-items:center;margin:8px 0 10px}
+.ctl label{display:flex;gap:8px;align-items:center;font-size:14px;color:#c3c9dc}
+.ctl output{min-width:38px;font-family:ui-monospace,monospace;color:var(--y);font-size:13px}
+input[type=range]{accent-color:var(--a);width:150px}
+input[type=checkbox]{accent-color:var(--a)}
+select,input[type=number],input[type=text]{background:#0e1322;color:var(--fg);border:1px solid var(--line);border-radius:8px;padding:6px 9px;font:inherit;font-size:14px}
+button{background:linear-gradient(180deg,#2c4a80,#233b68);color:#fff;border:1px solid #3a5a98;border-radius:9px;padding:7px 14px;font:inherit;font-size:14px;cursor:pointer}
+button:hover{filter:brightness(1.15)}
+button.alt{background:var(--panel2);border-color:var(--line);color:var(--fg)}
+canvas{width:100%;height:270px;display:block;background:#0e1322;border:1px solid var(--line);border-radius:10px;margin-top:6px}
+canvas.sm{height:210px}canvas.tl{height:330px}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(125px,1fr));gap:9px;margin:12px 0}
+.stat{background:#0e1322;border:1px solid var(--line);border-radius:10px;padding:8px 11px}
+.stat b{display:block;font-size:17px;font-family:ui-monospace,monospace}
+.stat span{font-size:11.5px;color:var(--mu);text-transform:uppercase;letter-spacing:.7px}
+.stat.hot b{color:var(--r)}.stat.ok b{color:var(--g)}.stat.warn b{color:var(--y)}.stat.in b{color:var(--a)}
+.read{margin:8px 0 0;padding:10px 14px;background:#0e1322;border:1px dashed #33406a;border-radius:10px;font-size:14.5px;color:#d3dbf3}
+table{border-collapse:collapse;width:100%;margin:12px 0;font-size:14px}
+th,td{border:1px solid var(--line);padding:7px 10px;text-align:left;vertical-align:top}
+th{background:var(--panel2);font-size:12px;text-transform:uppercase;letter-spacing:.6px;color:var(--mu)}
+td.n{font-family:ui-monospace,monospace;text-align:right}
+.tw{overflow-x:auto}
+.pill{display:inline-block;padding:1px 9px;border-radius:99px;font-size:12px;font-weight:600}
+.pill.r{background:#3a1520;color:var(--r)}.pill.g{background:#10321f;color:var(--g)}.pill.y{background:#3a2f0e;color:var(--y)}.pill.m{background:#202637;color:var(--mu)}
+details{background:var(--panel);border:1px solid var(--line);border-radius:11px;padding:9px 15px;margin:9px 0}
+details summary{cursor:pointer;font-weight:600}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.q{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:14px 18px;margin:14px 0}
+.q .qh{font-size:12px;letter-spacing:1px;text-transform:uppercase;color:var(--mu)}
+.q .opt{display:block;width:100%;text-align:left;margin:6px 0;background:#0e1322;border:1px solid var(--line);color:var(--fg);border-radius:9px;padding:9px 12px}
+.q .opt.good{border-color:var(--g);background:#0e2418}.q .opt.bad{border-color:var(--r);background:#2a1119}
+.q .ex{display:none;margin-top:8px;font-size:14.5px;color:#c3c9dc}
+.q.done .ex{display:block}
+.chk label{display:flex;gap:10px;align-items:flex-start;padding:6px 0;cursor:pointer}
+.chk input{margin-top:6px;accent-color:var(--g);width:17px;height:17px}
+.sigrow{display:grid;grid-template-columns:minmax(170px,2fr) 1fr 1fr auto;gap:8px 14px;align-items:center;padding:6px 0;border-top:1px dashed #1b2236}
+.sigrow:first-of-type{border-top:0}
+.sigrow label{display:flex;gap:6px;align-items:center;font-size:13.5px;color:#c3c9dc}
+@media(max-width:900px){
+ .side{transform:translateX(-100%)}.side.open{transform:none}.meter{display:none}
+ #menu{display:block}main{margin-left:0;padding:0 16px 100px}.two{grid-template-columns:1fr}.hero{padding-top:60px}
+ .sigrow{grid-template-columns:1fr 1fr}
+}
+</style>
+</head>
+<body>
+<div id="prog"></div>
+<button id="menu">☰ Contents</button>
+<nav class="side" id="side"><a class="back" href="index.html">← All courses</a><h1>Multiple Testing</h1><small>12 chapters · 11 labs · exam</small><div id="nav"></div></nav>
+<div class="meter"><div id="mtxt">Mastery: 0%</div><div class="bar"><i id="mbar"></i></div></div>
+
+<main>
+<header class="hero">
+ <h1>Multiple testing and selective inference: FWER, FDR, the winner’s curse and honest confidence intervals.</h1>
+ <p>Test enough hypotheses and something will be significant. A bank screens thousands of customer segments, hundreds of candidate features, dozens of rules in a monitoring system, and an A/B test reports twenty metrics. The risk is not only a false positive; it is also that the <em>selected</em> winners look better than they are (the winner’s curse) and that confidence intervals computed after selection are too narrow. This page builds the error rates (FWER, FDR), the procedures (Bonferroni, Holm, Benjamini–Hochberg, adaptive and empirical-null versions), the problems of selection (winner’s curse, subgroups, post-selection intervals, backtest overfitting) and the sequential version of the same problem (peeking), ending with false-discovery risk and governance.</p>
+ <div class="chips"><span class="chip"><b>Part I</b> Error rates and corrections</span><span class="chip"><b>Part II</b> Selection and its biases</span><span class="chip"><b>Part III</b> Large scale and practice</span></div>
+ <div class="co tip"><b>How to use this</b>Sliders change the setting; heavy labs update when you release a slider or press the button. Prerequisites: the p-value, Hypothesis Testing and Power, and Confidence Interval pages. Every lab simulates data where the truth is known, so false discoveries can be counted exactly.</div>
+</header>
+
+<div class="part">Part I · Error rates and corrections</div>
+
+<section class="ch" id="c1">
+<h2><span class="num">1</span>The multiplicity problem <span class="lvl b">Beginner</span></h2>
+<p>A single test at level α = 0.05 has a 5% chance of a false positive when the null is true. With m independent true nulls the chance that <em>at least one</em> is significant is 1 − (1 − α)^m: 64% for m = 20, 99.4% for m = 100. The expected number of false positives is mα, whatever the correlation. The “family” can be explicit (20 metrics in an experiment) or hidden: choices of outcome, subgroup, cut-off, transformation, model and sample, sometimes called the garden of forking paths or researcher degrees of freedom. If the analysis path was chosen after seeing the data, the effective number of tests is larger than the number reported.</p>
+<div class="f">P(at least one false positive) = 1 − (1 − α)^m  ≈  mα for small mα       E[false positives] = m₀ α</div>
+<p>Two error rates are used to control this. The <b>family-wise error rate</b> (FWER) is P(V ≥ 1), where V is the number of false rejections: appropriate when a single false claim is costly (confirmatory claims, regulatory submissions). The <b>false discovery rate</b> (FDR) is E[V/R] with R the number of rejections (taken as 0 when R = 0): appropriate for screening where some false leads are acceptable but their share should be controlled. Controlling the per-test error at α controls neither.</p>
+<div class="card"><h4>Lab 1 · How fast false positives accumulate</h4>
+ <p class="sub">All m null hypotheses are true; each p-value is uniform. Left: the probability of at least one false positive against the number of tests for the chosen α (red: no correction; green: Bonferroni, which tests each at α/m); the yellow dot is the simulation at your m (3000 repetitions). Right: the distribution of the number of false positives for that m with no correction.</p>
+ <div class="ctl"><label>tests m <input type="range" id="c1m" min="1" max="200" step="1" value="20"><output id="c1mv"></output></label><label>level α <input type="range" id="c1a" min="1" max="10" step="1" value="5"><output id="c1av"></output></label><button id="c1go">Re-simulate</button></div>
+ <div class="two"><canvas class="sm" id="c1cv"></canvas><canvas class="sm" id="c1cv2"></canvas></div><div class="stats" id="c1st"></div><div class="read" id="c1rd"></div></div>
+</section>
+
+<section class="ch" id="c2">
+<h2><span class="num">2</span>Controlling the family-wise error rate <span class="lvl i">Intermediate</span></h2>
+<p><b>Bonferroni</b> rejects H_i if p_i ≤ α/m: it controls the FWER at α under any dependence, using only the union bound. It is simple and very conservative when m is large, and loses power exactly when many effects are real. <b>Šidák</b> uses 1 − (1 − α)^{1/m}, slightly less conservative for independent tests. <b>Holm</b> (step-down) orders the p-values p₍₁₎ ≤ … ≤ p₍ₘ₎ and rejects while p₍ₖ₎ ≤ α/(m − k + 1), stopping at the first failure: it controls the FWER under any dependence and is uniformly more powerful than Bonferroni, so there is no reason to use plain Bonferroni when Holm is available. <b>Hochberg</b> (step-up) finds the largest k with p₍ₖ₎ ≤ α/(m − k + 1) and rejects all hypotheses up to it: slightly more powerful, valid under independence or positive dependence. Closed testing and gatekeeping extend these to structured families (primary then secondary endpoints in a pre-specified order).</p>
+<div class="card"><h4>Lab 2 · Power cost of controlling the FWER</h4>
+ <p class="sub">m z-tests; a share of them has a true effect of size δ (in standard errors), the others are exactly null. Over 400 repetitions: the FWER (probability of at least one false rejection) and the power (average share of the true effects found) for uncorrected testing, Bonferroni, Holm and Hochberg at α = 0.05.</p>
+ <div class="ctl"><label>tests m <input type="range" id="c2m" min="10" max="200" step="10" value="50"><output id="c2mv"></output></label><label>true effects share <input type="range" id="c2f" min="0" max="50" step="5" value="20"><output id="c2fv"></output></label><label>effect δ <input type="range" id="c2d" min="10" max="60" step="1" value="35"><output id="c2dv"></output></label><button id="c2go">Re-simulate</button></div>
+ <div class="two"><canvas class="sm" id="c2cv"></canvas><canvas class="sm" id="c2cv2"></canvas></div><div class="stats" id="c2st"></div><div class="read" id="c2rd"></div></div>
+</section>
+
+<section class="ch" id="c3">
+<h2><span class="num">3</span>The false discovery rate and Benjamini–Hochberg <span class="lvl i">Intermediate</span></h2>
+<p>In screening, demanding zero false positives wastes discoveries. The <b>Benjamini–Hochberg (BH)</b> procedure controls the FDR at q: order the p-values, find the largest k with p₍ₖ₎ ≤ k q / m and reject the k smallest. Graphically, draw the line of slope q/m through the origin on the plot of ordered p-values against rank, and reject everything up to the last point under the line. Under independence (and positive dependence, PRDS) the FDR equals π₀ q, where π₀ = m₀/m is the share of true nulls, so BH is conservative when many effects are real. The threshold adapts: with many strong signals, the largest p-value rejected can be far above α/m.</p>
+<p>The FDR is a statement about the <em>average</em> false discovery proportion (FDP = V/R) over repetitions, not about the one list in front of you, whose FDP can be higher or lower. The adjusted p-value (BH q-value) of a hypothesis is the smallest q at which it would be rejected; reporting “significant at FDR 10%” is clearer than reporting adjusted p-values as if they were ordinary ones.</p>
+<div class="card"><h4>Lab 3 · The BH line against Bonferroni and no correction</h4>
+ <p class="sub">Left: one data set, ordered p-values by rank (green: true effects, red: nulls; zoomed to the first ranks) with the BH line i·q/m, the Bonferroni threshold α/m and the uncorrected α. Right: realised FDR and power over 300 repetitions for each rule (α = 0.05; BH at the chosen q).</p>
+ <div class="ctl"><label>tests m <input type="range" id="c3m" min="50" max="1000" step="50" value="200"><output id="c3mv"></output></label><label>true effects share <input type="range" id="c3f" min="5" max="50" step="5" value="20"><output id="c3fv"></output></label><label>effect δ <input type="range" id="c3d" min="10" max="60" step="1" value="30"><output id="c3dv"></output></label><label>target FDR q <input type="range" id="c3q" min="1" max="20" step="1" value="10"><output id="c3qv"></output></label><button id="c3go">Re-simulate</button></div>
+ <div class="two"><canvas class="sm" id="c3cv"></canvas><canvas class="sm" id="c3cv2"></canvas></div><div class="stats" id="c3st"></div><div class="read" id="c3rd"></div></div>
+</section>
+
+<section class="ch" id="c4">
+<h2><span class="num">4</span>Dependence, adaptive FDR and q-values <span class="lvl a">Advanced</span></h2>
+<p>BH is proven under independence and <b>positive regression dependence</b> (PRDS); for arbitrary dependence the <b>Benjamini–Yekutieli</b> version divides q by Σ1/i (about ln m + 0.58), a large loss of power. In practice BH is robust to moderate correlation in the mean FDR, but the <em>variability</em> of the false discovery proportion grows with correlation: with strongly correlated tests the list is all right in most data sets and badly wrong in a few, because a common factor moves all the statistics together (a market-wide move, a batch effect, a shared confounder).</p>
+<p><b>Storey’s adaptive procedures</b> estimate the share of nulls, π̂₀ = #{p &gt; λ} / ((1 − λ)m) with λ = 0.5, and run BH at level q/π̂₀ (equivalently define the <b>q-value</b>, the FDR analogue of the p-value). This gains power when π₀ is well below 1, and is valid for independent or weakly dependent p-values but can be anti-conservative under strong dependence. For correlated tests, permutation-based FDR estimates and factor-adjusted statistics are alternatives.</p>
+<div class="card"><h4>Lab 4 · FDR under correlated tests</h4>
+ <p class="sub">z-statistics with a common factor (correlation ρ between all pairs); a share of them has a true effect δ. Over 500 repetitions: the distribution of the false discovery proportion of BH at q = 0.10 when the tests are independent (green) and when correlated with the chosen ρ (red). Stats include BH, Benjamini–Yekutieli and Storey’s adaptive BH.</p>
+ <div class="ctl"><label>tests m <input type="range" id="c4m" min="200" max="1000" step="100" value="400"><output id="c4mv"></output></label><label>true effects share <input type="range" id="c4f" min="5" max="60" step="5" value="30"><output id="c4fv"></output></label><label>effect δ <input type="range" id="c4d" min="10" max="50" step="1" value="25"><output id="c4dv"></output></label><label>correlation ρ <input type="range" id="c4r" min="0" max="90" step="5" value="50"><output id="c4rv"></output></label><button id="c4go">Re-simulate</button></div>
+ <canvas class="tl" id="c4cv"></canvas><div class="stats" id="c4st"></div><div class="read" id="c4rd"></div></div>
+</section>
+
+<div class="part">Part II · Selection and its biases</div>
+
+<section class="ch" id="c5">
+<h2><span class="num">5</span>The winner’s curse and regression to the mean <span class="lvl a">Advanced</span></h2>
+<p>When many noisy estimates are ranked and the top ones are chosen, the chosen estimates are biased upwards: part of their apparent size is luck that got them selected. This is the <b>winner’s curse</b> (or selection bias, or regression to the mean): the best-performing branch, the strongest feature, the most profitable strategy, the segment with the highest uplift will do worse next time on average. The bias grows with the number of candidates, with the noise in each estimate and with the share of candidates with nearly equal true effects.</p>
+<p>Remedies: (1) <b>independent confirmation</b>: re-estimate the selected items on new data (split the sample, use a later period, a holdout); (2) <b>shrinkage / empirical Bayes</b>: estimate each effect by θ̂ᵢ = ȳ + B(yᵢ − ȳ) with B = 1 − s²/Var(y), which pulls extreme estimates towards the mean in proportion to their noise; (3) <b>hierarchical models</b> (the same partial pooling as in mixed models); (4) correct inference for selection (chapter 7). The expected true effect of a selected item is the shrunken estimate, not the raw one.</p>
+<div class="card"><h4>Lab 5 · How much of the best performance is luck?</h4>
+ <p class="sub">m candidates with true effects θᵢ ~ N(0, τ²) are each measured with noise s: yᵢ = θᵢ + noise. We select the top k by y. Left: one data set (red: selected; dashed: y = θ). Right: over 300 repetitions, the average estimate of the selected (naive), their average true effect, the empirical Bayes shrunken estimate and the estimate from an independent second measurement.</p>
+ <div class="ctl"><label>candidates m <input type="range" id="c5m" min="10" max="500" step="10" value="100"><output id="c5mv"></output></label><label>selected k <input type="range" id="c5k" min="1" max="20" step="1" value="5"><output id="c5kv"></output></label><label>noise s <input type="range" id="c5s" min="5" max="30" step="1" value="10"><output id="c5sv"></output></label><label>true spread τ <input type="range" id="c5t" min="0" max="20" step="1" value="5"><output id="c5tv"></output></label><button id="c5go">Re-simulate</button></div>
+ <div class="two"><canvas class="sm" id="c5cv"></canvas><canvas class="sm" id="c5cv2"></canvas></div><div class="stats" id="c5st"></div><div class="read" id="c5rd"></div></div>
+</section>
+
+<section class="ch" id="c6">
+<h2><span class="num">6</span>Subgroup analyses and interaction tests <span class="lvl a">Advanced</span></h2>
+<p>Subgroup analyses are multiple testing in disguise: S subgroups give S tests. Two classic errors follow. (1) A treatment with <em>no</em> effect has a 1 − 0.95^S chance of looking significant in some subgroup. (2) A treatment with the <em>same</em> true effect everywhere will often be significant in some subgroups and not in others, which is read as “works in A, not in B”. The fact that one result is significant and another is not does not mean they differ: the difference between “significant” and “not significant” is not itself statistically significant. The valid question, whether the effect differs across subgroups, is answered by a single <b>interaction (heterogeneity) test</b>, with the right size whatever the number of subgroups, and by estimates with intervals for each subgroup rather than verdicts.</p>
+<p>Good practice: pre-specify a small number of subgroups with a rationale, test the interaction, adjust the subgroup tests (Holm), treat the overall effect as the default estimate for each subgroup and label the rest exploratory. In credit and marketing the same logic applies to “uplift” in segments and to model performance across portfolios.</p>
+<div class="card"><h4>Lab 6 · The subgroup mirage</h4>
+ <p class="sub">An experiment with S equally sized subgroups and a common true effect (in SD units; 0 = no effect at all); each subgroup has n per arm. Over 2000 repetitions: how often some subgroup is significant (uncorrected), significant after Holm, how often the pooled test is significant and the heterogeneity test fires; and how often “some subgroups significant, others not” appears although the true effect is identical.</p>
+ <div class="ctl"><label>subgroups S <input type="range" id="c6s" min="2" max="20" step="1" value="8"><output id="c6sv"></output></label><label>n per arm per subgroup <input type="range" id="c6n" min="50" max="1000" step="50" value="200"><output id="c6nv"></output></label><label>true effect (SD) <input type="range" id="c6e" min="0" max="30" step="1" value="10"><output id="c6ev"></output></label><button id="c6go">Re-simulate</button></div>
+ <div class="two"><canvas class="sm" id="c6cv"></canvas><canvas class="sm" id="c6cv2"></canvas></div><div class="stats" id="c6st"></div><div class="read" id="c6rd"></div></div>
+</section>
+
+<section class="ch" id="c7">
+<h2><span class="num">7</span>Selective inference: confidence intervals after selection <span class="lvl e">Expert</span></h2>
+<p>If you select the parameters that look interesting and then report the usual 95% intervals for them, the intervals do not have 95% coverage <em>for the selected parameters</em>. Selecting an estimate because |y| &gt; 1.96 and then reporting y ± 1.96 is the extreme case: the interval never contains 0, whatever the truth. The same happens with coefficients kept by stepwise regression or lasso, with the top-ranked strategies, and with significant subgroups. Valid options: (1) <b>simultaneous intervals</b> over the whole family (Bonferroni, or Scheffé-type), valid for any selection but wide; (2) <b>sample splitting or an independent replication</b>: select on one part, estimate on the other (cost: power, and the answer depends on the split); (3) <b>conditional (selective) inference</b>: intervals with the right coverage given the selection event, computed from the truncated distribution of the estimate (exact for a normal estimate selected by a threshold); they can be very wide near the threshold, which is honest; (4) data-fission and related randomisation methods; (5) Bayesian shrinkage with a hierarchical prior.</p>
+<div class="card"><h4>Lab 7 · Coverage of 95% intervals for the selected parameters</h4>
+ <p class="sub">m parameters, a share non-null with value δ, the rest 0; each is estimated by yᵢ ~ N(θᵢ, 1). Parameters with |yᵢ| &gt; 1.96 are selected. For the selected ones we form four 95% intervals: naive (y ± 1.96), Bonferroni (y ± z at α/2m), conditional on selection (truncated normal), and an independent replication (a second measurement of the selected parameters). Coverage and median width over 100 data sets.</p>
+ <div class="ctl"><label>parameters m <input type="range" id="c7m" min="50" max="500" step="50" value="200"><output id="c7mv"></output></label><label>non-null share <input type="range" id="c7f" min="5" max="50" step="5" value="10"><output id="c7fv"></output></label><label>non-null size δ <input type="range" id="c7d" min="10" max="50" step="1" value="25"><output id="c7dv"></output></label><button id="c7go">Re-simulate</button></div>
+ <div class="two"><canvas class="sm" id="c7cv"></canvas><canvas class="sm" id="c7cv2"></canvas></div><div class="stats" id="c7st"></div><div class="read" id="c7rd"></div></div>
+</section>
+
+<section class="ch" id="c8">
+<h2><span class="num">8</span>Backtest overfitting and the multiplicity of model search <span class="lvl e">Expert</span></h2>
+<p>Trying K strategies, feature sets or hyperparameters and keeping the best is a multiple-testing procedure whose statistic is the maximum. The maximum of K independent noise estimates grows with K: for standard normals it is about √(2 ln K), so with 1000 strategies of zero true edge the best in-sample (annualised) Sharpe ratio, whose standard error is √(252/T) for T days, is roughly 3.2 standard errors. Its out-of-sample Sharpe is zero on average. The same structure underlies feature selection on many candidates, tuning many hyperparameters on one validation set, and picking the best of many rules in transaction monitoring. The corrections are the ones in this page: account for the number of trials (<b>deflated Sharpe ratio</b>, whose benchmark is the expected maximum under the null), hold out data not touched by the search (and touch it once), use cross-validation over the whole search procedure, report all the trials and the dispersion of their results, and compare the final choice with simple benchmarks.</p>
+<div class="card"><h4>Lab 8 · The best of K strategies with no edge</h4>
+ <p class="sub">K strategies; a share has a genuine annual Sharpe of 0.8, the others 0. For each we observe T days in sample, choose the best sample Sharpe, and then observe a fresh period of the same length. Left: distribution over 400 repetitions of the best in-sample Sharpe (red) and the out-of-sample Sharpe of that same strategy (green); dashed: the expected maximum under pure noise. Right: that expected maximum against K for the chosen T.</p>
+ <div class="ctl"><label>strategies K <input type="range" id="c8k" min="0" max="6" step="1" value="4"><output id="c8kv"></output></label><label>days T <input type="range" id="c8t" min="0" max="4" step="1" value="2"><output id="c8tv"></output></label><label>genuine share <input type="range" id="c8g" min="0" max="20" step="1" value="0"><output id="c8gv"></output></label><button id="c8go">Re-simulate</button></div>
+ <div class="two"><canvas class="sm" id="c8cv"></canvas><canvas class="sm" id="c8cv2"></canvas></div><div class="stats" id="c8st"></div><div class="read" id="c8rd"></div></div>
+</section>
+
+<div class="part">Part III · Large scale and practice</div>
+
+<section class="ch" id="c9">
+<h2><span class="num">9</span>Large-scale inference: local fdr and the empirical null <span class="lvl e">Expert</span></h2>
+<p>With thousands of tests the data themselves tell you about the null. In the <b>two-groups model</b> each z-score comes from the null density f₀ with probability π₀ and from an alternative f₁ otherwise, so the mixture density is f = π₀f₀ + π₁f₁. The <b>local false discovery rate</b> is fdr(z) = π₀ f₀(z) / f(z): the posterior probability that a case with score z is null. Reject where fdr(z) is small (say below 0.2); the tail-area FDR is the average of fdr over the rejected region. The theoretical null f₀ = N(0,1) is correct only if the analysis is clean. Unmeasured confounding, batch effects, correlated noise and model misspecification typically make the bulk of the z-scores wider (N(μ₀, σ₀²) with σ₀ &gt; 1); applying BH with the theoretical null then produces many false discoveries. Efron’s <b>empirical null</b> estimates (μ₀, σ₀) from the central part of the histogram (here by the median and MAD), which is where the nulls dominate.</p>
+<div class="card"><h4>Lab 9 · When the null is wider than N(0,1)</h4>
+ <p class="sub">Two-groups data: nulls ~ N(0, σ₀²), a small share of alternatives ~ N(δ, σ₀²). Left: histogram of the z-scores of one data set with the theoretical null (red) and the empirical null (green), both scaled by π̂₀. Right: average false discovery proportion over 30 data sets for BH at q = 0.10 using the theoretical null, BH using the empirical null, and the local fdr &lt; 0.2 rule with the empirical null.</p>
+ <div class="ctl"><label>tests m <input type="range" id="c9m" min="1000" max="5000" step="500" value="2000"><output id="c9mv"></output></label><label>non-null share <input type="range" id="c9f" min="2" max="20" step="1" value="10"><output id="c9fv"></output></label><label>alternative δ <input type="range" id="c9d" min="25" max="50" step="1" value="35"><output id="c9dv"></output></label><label>null SD σ₀ <input type="range" id="c9s" min="100" max="160" step="5" value="120"><output id="c9sv"></output></label><button id="c9go">Re-simulate</button></div>
+ <div class="two"><canvas class="sm" id="c9cv"></canvas><canvas class="sm" id="c9cv2"></canvas></div><div class="stats" id="c9st"></div><div class="read" id="c9rd"></div></div>
+</section>
+
+<section class="ch" id="c10">
+<h2><span class="num">10</span>Peeking: sequential testing and group-sequential boundaries <span class="lvl e">Expert</span></h2>
+<p>Looking at an experiment repeatedly and stopping when p &lt; 0.05 is multiple testing over time, and the looks are strongly correlated (the same accumulating data). With 5 looks the false positive rate of the “stop at the first p &lt; 0.05” rule is about 14%; with 20 looks it is about 25%; with continuous monitoring it approaches 1. The cure is a pre-specified <b>group-sequential design</b>: boundaries on the z-statistic at each look chosen so that the overall error is α. <b>Bonferroni</b> (α/L at each look) is valid but wasteful; <b>Pocock</b> uses a constant boundary (2.41 for 5 looks), spending the error evenly, and makes it easy to stop early; <b>O’Brien–Fleming</b> uses a boundary c√(L/k) that is very strict early (about 4.6 at the first of 5 looks) and close to the usual 1.96 at the end, so it keeps almost full power at the final look. Alpha-spending functions generalise this to unequally spaced looks, and always-valid (mixture-sequential or e-value) methods allow unlimited looks. Estimates after early stopping are biased, another instance of selection.</p>
+<div class="card"><h4>Lab 10 · The price of looking</h4>
+ <p class="sub">A z-test is monitored at L equally spaced looks. Left: the boundaries on |z| at each look for the naive rule (1.96), Bonferroni, Pocock and O’Brien–Fleming (constants calibrated by simulation), with six sample paths of |z|. Right: over 3000 repetitions, the probability of stopping with a rejection at some look: the false positive rate if the true effect is 0, the power otherwise (expected z at the final look set by the slider).</p>
+ <div class="ctl"><label>looks L <input type="range" id="c10l" min="1" max="20" step="1" value="5"><output id="c10lv"></output></label><label>expected z at the end <input type="range" id="c10e" min="0" max="40" step="1" value="0"><output id="c10ev"></output></label><button id="c10go">Re-simulate</button></div>
+ <div class="two"><canvas class="sm" id="c10cv"></canvas><canvas class="sm" id="c10cv2"></canvas></div><div class="stats" id="c10st"></div><div class="read" id="c10rd"></div></div>
+</section>
+
+<section class="ch" id="c11">
+<h2><span class="num">11</span>False discovery risk, replication and governance <span class="lvl e">Expert</span></h2>
+<p>Whether a “significant” finding is true depends on how often true effects are tested, not only on α. The <b>positive predictive value</b> of a significant result is PPV = π·power / (π·power + (1 − π)α), with π the prior probability that a tested hypothesis is real. With π = 0.1, power 0.6 and α = 0.05, PPV = 0.06/(0.06 + 0.045) = 57%: nearly half of the discoveries are false. Analytic flexibility (bias u: the share of analyses that would have been negative but are made positive by choices) raises the effective α and the effective power and lowers the PPV. An honest replication has the same α and power, so it confirms true effects with probability equal to the power and false ones with probability α; the surviving list is much cleaner.</p>
+<p><b>Governance:</b> write the analysis plan before looking (hypotheses, primary and secondary outcomes, subgroups, corrections, stopping rules); log all the tests run, including the ones not reported; use confirmatory data (holdout, later period, new customers) before deployment; report effect sizes with intervals and say which results are exploratory; in a model-validation file, document the number of candidate models and features tried and how the final choice accounts for it.</p>
+<div class="card"><h4>Lab 11 · How many discoveries are true?</h4>
+ <p class="sub">Expected counts per 1000 tested hypotheses. Left: true positives and false positives among the significant results, and among those that replicate in an honest second study with the same α and power. Right: PPV against the prior π for power 20%, 50% and 80% at your α and bias; the dot is your setting.</p>
+ <div class="ctl"><label>prior π (real effects) <input type="range" id="c11p" min="1" max="50" step="1" value="10"><output id="c11pv"></output></label><label>power <input type="range" id="c11w" min="20" max="95" step="5" value="60"><output id="c11wv"></output></label><label>level α <input type="range" id="c11a" min="1" max="10" step="1" value="5"><output id="c11av"></output></label><label>analytic flexibility u <input type="range" id="c11u" min="0" max="50" step="5" value="10"><output id="c11uv"></output></label></div>
+ <div class="two"><canvas class="sm" id="c11cv"></canvas><canvas class="sm" id="c11cv2"></canvas></div><div class="stats" id="c11st"></div><div class="read" id="c11rd"></div></div>
+</section>
+
+<section class="ch" id="c12">
+<h2><span class="num">12</span>Final exam, mastery checklist, cheat sheet <span class="lvl e">Expert</span></h2>
+<h3>Exam (18 questions — click an answer)</h3>
+<div id="quiz"></div>
+<div class="card"><h4>Score</h4><div class="stats" id="qscore"></div><button class="alt" id="qreset">Reset exam</button></div>
+<h3>Mastery checklist — tick when you can do it without notes</h3>
+<div class="card chk" id="chk"></div>
+<h3>Cheat sheet</h3>
+<div class="tw"><table>
+<tr><th>Idea</th><th>One line</th></tr>
+<tr><td>Multiplicity</td><td>P(≥ 1 false positive) = 1 − (1 − α)^m; the family includes hidden choices (subgroups, outcomes, cut-offs, models)</td></tr>
+<tr><td>FWER vs FDR</td><td>FWER = P(V ≥ 1), for confirmatory claims. FDR = E[V/R], for screening; neither is controlled by testing each at α</td></tr>
+<tr><td>Bonferroni / Holm</td><td>α/m; Holm is step-down with α/(m − k + 1) and dominates Bonferroni under any dependence</td></tr>
+<tr><td>Benjamini–Hochberg</td><td>Largest k with p₍ₖ₎ ≤ kq/m; FDR = π₀q under independence or PRDS; BY divides q by Σ1/i for arbitrary dependence</td></tr>
+<tr><td>Storey / q-value</td><td>π̂₀ = #{p &gt; λ}/((1 − λ)m); BH at q/π̂₀; more power when many effects are real</td></tr>
+<tr><td>FDR is an average</td><td>The FDP of one list varies, more so with correlated tests</td></tr>
+<tr><td>Winner’s curse</td><td>Selected estimates are biased up; confirm on new data, shrink (empirical Bayes), use hierarchical models</td></tr>
+<tr><td>Subgroups</td><td>Test the interaction once; “significant here, not there” is not evidence of heterogeneity; pre-specify and adjust</td></tr>
+<tr><td>Selective inference</td><td>Naive intervals fail after selection; use simultaneous, conditional (truncated), split or replication intervals</td></tr>
+<tr><td>Backtest overfitting</td><td>Best of K noise strategies has Sharpe ≈ SE·√(2 ln K) in sample and 0 out of sample; deflate by the number of trials</td></tr>
+<tr><td>Local fdr, empirical null</td><td>fdr(z) = π₀f₀/f; estimate the null from the bulk when the theoretical N(0,1) is too narrow</td></tr>
+<tr><td>Peeking</td><td>Repeated looks inflate α; use Pocock, O’Brien–Fleming or alpha-spending boundaries, fixed in advance</td></tr>
+<tr><td>PPV</td><td>PPV = π·power/(π·power + (1 − π)α); low priors and flexibility make many significant results false; replicate</td></tr>
+</table></div>
+<div class="co tip"><b>Next on the roadmap</b>Item 22 continues Stage 5: confounding, selection bias, colliders and Simpson’s paradox.</div>
+</section>
+</main>
+<script>
+/*MATH*/
+function lgamma(x){const c=[76.18009172947146,-86.50532032941677,24.01409824083091,-1.231739572450155,0.1208650973866179e-2,-0.5395239384953e-5];let y=x,t=x+5.5;t-=(x+.5)*Math.log(t);let s=1.000000000190015;for(let j=0;j<6;j++)s+=c[j]/++y;return -t+Math.log(2.5066282746310005*s/x);}
+function gser(a,x){let ap=a,sum=1/a,del=sum;for(let n=0;n<1000;n++){ap++;del*=x/ap;sum+=del;if(Math.abs(del)<Math.abs(sum)*1e-15)break;}return sum*Math.exp(-x+a*Math.log(x)-lgamma(a));}
+function gcf(a,x){let b=x+1-a,c=1/1e-300,d=1/b,h=d;for(let i=1;i<1000;i++){const an=-i*(i-a);b+=2;d=an*d+b;if(Math.abs(d)<1e-300)d=1e-300;c=b+an/c;if(Math.abs(c)<1e-300)c=1e-300;d=1/d;const del=d*c;h*=del;if(Math.abs(del-1)<1e-15)break;}return Math.exp(-x+a*Math.log(x)-lgamma(a))*h;}
+function gammaQ(a,x){if(x<=0)return 1;return x<a+1?1-gser(a,x):gcf(a,x);}
+function betacf(a,b,x){const qab=a+b,qap=a+1,qam=a-1;let c=1,d=1-qab*x/qap;if(Math.abs(d)<1e-300)d=1e-300;d=1/d;let h=d;for(let m=1;m<=1000;m++){const m2=2*m;let aa=m*(b-m)*x/((qam+m2)*(a+m2));d=1+aa*d;if(Math.abs(d)<1e-300)d=1e-300;c=1+aa/c;if(Math.abs(c)<1e-300)c=1e-300;d=1/d;h*=d*c;aa=-(a+m)*(qab+m)*x/((a+m2)*(qap+m2));d=1+aa*d;if(Math.abs(d)<1e-300)d=1e-300;c=1+aa/c;if(Math.abs(c)<1e-300)c=1e-300;d=1/d;const del=d*c;h*=del;if(Math.abs(del-1)<1e-15)break;}return h;}
+function betai(a,b,x){if(x<=0)return 0;if(x>=1)return 1;const bt=Math.exp(lgamma(a+b)-lgamma(a)-lgamma(b)+a*Math.log(x)+b*Math.log(1-x));return x<(a+1)/(a+b+2)?bt*betacf(a,b,x)/a:1-bt*betacf(b,a,1-x)/b;}
+function normSf(z){const q=0.5*gammaQ(.5,z*z/2);return z>=0?q:1-q;}
+function normCdf(z){return normSf(-z);}
+function npdf(x){return Math.exp(-x*x/2)/2.5066282746310002;}
+function lbin(n,k){return lgamma(n+1)-lgamma(k+1)-lgamma(n-k+1);}
+function binom(n,k,p){return Math.exp(lbin(n,k)+k*Math.log(p)+(n-k)*Math.log(1-p));}
+function betapdf(x,a,b){return x<=0||x>=1?0:Math.exp(lgamma(a+b)-lgamma(a)-lgamma(b)+(a-1)*Math.log(x)+(b-1)*Math.log(1-x));}
+function betacdf(x,a,b){return betai(a,b,x);}
+function gampdf(x,a,r){return x<=0?0:Math.exp(a*Math.log(r)+(a-1)*Math.log(x)-r*x-lgamma(a));}
+function gamcdf(x,a,r){return x<=0?0:1-gammaQ(a,r*x);}
+function randn(){let u=0;while(!u)u=Math.random();return Math.sqrt(-2*Math.log(u))*Math.cos(2*Math.PI*Math.random());}
+function gammaS(a){if(a<1)return gammaS(a+1)*Math.pow(Math.random(),1/a);const d=a-1/3,c=1/Math.sqrt(9*d);for(;;){let x,v;do{x=randn();v=1+c*x}while(v<=0);v=v*v*v;const u=Math.random();if(Math.log(u)<.5*x*x+d-d*v+d*Math.log(v))return d*v;}}
+function betaS(a,b){const x=gammaS(a),y=gammaS(b);return x/(x+y);}
+function binS(n,p){let k=0;for(let i=0;i<n;i++)if(Math.random()<p)k++;return k;}
+function mean(a){let s=0;for(const v of a)s+=v;return s/a.length;}
+function qc(cdf,lo,hi,p,it){for(let i=0;i<(it||100);i++){const m=(lo+hi)/2;if(cdf(m)<p)lo=m;else hi=m}return(lo+hi)/2;}
+function qb(a,b,p){return qc(x=>betai(a,b,x),0,1,p,50);}
+function tcdf(x,v){const t=.5*betai(v/2,.5,v/(v+x*x));return x>0?1-t:t}
+function qn(p){return qc(normCdf,-9,9,p,70)}
+function pois(k,l){return Math.exp(-l+k*Math.log(l)-lgamma(k+1))}
+function binF(n,p){let k=0;for(;;){if(n<=0||p<=0)return k;if(p>=1)return k+n;if(n<=40){for(let i=0;i<n;i++)if(Math.random()<p)k++;return k}const a=1+(n>>1),bb=1+n-a,x=betaS(a,bb);if(x>=p){n=a-1;p=p/x}else{k+=a;n=bb-1;p=(p-x)/(1-x)}}}
+/*ENDMATH*/
+
+const $=id=>document.getElementById(id), val=id=>+$(id).value;
+const C={fg:'#e8ebf5',mu:'#8a93ab',gr:'#232a3d',a:'#6ea8ff',r:'#ff6b81',y:'#ffd166',g:'#4ade80',p:'#c084fc',t:'#5eead4'};
+const store={get(k,d){try{const v=JSON.parse(localStorage.getItem(k));return v==null?d:v}catch(e){return d}},set(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}};
+function stat(l,v,c){return `<div class="stat ${c||''}"><b>${v}</b><span>${l}</span></div>`}
+function f3(x){if(!isFinite(x))return String(x);const a=Math.abs(x);if(a!==0&&(a<1e-3||a>=1e6))return x.toExponential(2);return String(+x.toFixed(a<1?4:a<100?3:a<1000?2:0))}
+function pc(x){return f3(100*x)+'%'}
+const resizers=[];
+function reg(fn){fn();resizers.push(fn)}
+function on(ids,fn){ids.split(' ').forEach(i=>{const e=$(i);e.addEventListener('input',fn);e.addEventListener('change',fn)})}
+let rt;window.addEventListener('resize',()=>{clearTimeout(rt);rt=setTimeout(()=>resizers.forEach(f=>f()),150)});
+document.querySelectorAll('input[type=range]').forEach(i=>{const o=$(i.id+'v');if(!o)return;const f=()=>{o.textContent=i.value};i.addEventListener('input',f);f()});
+
+function nice(x){const e=Math.pow(10,Math.floor(Math.log10(x))),f=x/e;return (f<1.5?1:f<3?2:f<7?5:10)*e}
+function mk(cv,x0,x1,ymax,o){o=o||{};const y0=o.y0||0,dpr=window.devicePixelRatio||1,r=cv.getBoundingClientRect(),w=r.width||600,h=r.height||270;
+ cv.width=w*dpr;cv.height=h*dpr;const g=cv.getContext('2d');g.setTransform(dpr,0,0,dpr,0,0);g.clearRect(0,0,w,h);
+ const L=o.L||42,R=12,T=14,B=28,X=x=>L+(x-x0)/(x1-x0)*(w-L-R),Y=y=>h-B-(y-y0)/(ymax-y0)*(h-T-B);
+ g.font='11px system-ui';g.lineWidth=1;g.strokeStyle=C.gr;g.fillStyle=C.mu;
+ if(!o.noGrid){const sx=nice((x1-x0)/7);for(let x=Math.ceil(x0/sx-1e-9)*sx;!o.noX&&x<=x1+1e-9;x+=sx){g.beginPath();g.moveTo(X(x),T);g.lineTo(X(x),h-B);g.stroke();g.textAlign='center';g.fillText(String(+x.toFixed(6)),X(x),h-B+15)}
+ const sy=nice((ymax-y0)/4);for(let y=Math.ceil(y0/sy-1e-9)*sy;y<=ymax+1e-9;y+=sy){g.beginPath();g.moveTo(L,Y(y));g.lineTo(w-R,Y(y));g.stroke();g.textAlign='right';g.fillText(String(+y.toFixed(4)),L-5,Y(y)+3)}}
+ return{g,w,h,X,Y,L,R,T,B,
+  line(f,col,lw,a,b,n,dash){a=a==null?x0:a;b=b==null?x1:b;n=n||260;g.save();if(dash)g.setLineDash([5,4]);g.beginPath();g.strokeStyle=col;g.lineWidth=lw||2;let st=false;for(let i=0;i<=n;i++){const x=a+(b-a)*i/n,y=f(x);if(!isFinite(y)){st=false;continue}st?g.lineTo(X(x),Y(y)):g.moveTo(X(x),Y(y));st=true}g.stroke();g.restore()},
+  area(f,a,b,col,n){a=Math.max(a,x0);b=Math.min(b,x1);if(b<=a)return;n=n||200;g.beginPath();g.moveTo(X(a),Y(0));for(let i=0;i<=n;i++){const x=a+(b-a)*i/n;g.lineTo(X(x),Y(f(x)))}g.lineTo(X(b),Y(0));g.closePath();g.fillStyle=col;g.fill()},
+  vline(x,col,lab,dash){g.save();g.strokeStyle=col;g.lineWidth=1.6;if(dash)g.setLineDash([5,4]);g.beginPath();g.moveTo(X(x),T);g.lineTo(X(x),h-B);g.stroke();g.restore();if(lab){g.fillStyle=col;g.textAlign='center';g.fillText(lab,Math.min(Math.max(X(x),34),w-34),T+10)}},
+  hline(y,col,lab){g.save();g.strokeStyle=col;g.lineWidth=1.4;g.setLineDash([5,4]);g.beginPath();g.moveTo(L,Y(y));g.lineTo(w-R,Y(y));g.stroke();g.restore();if(lab){g.fillStyle=col;g.textAlign='right';g.fillText(lab,w-R-3,Y(y)-4)}},
+  text(s,x,y,col,al){g.fillStyle=col||C.fg;g.textAlign=al||'left';g.fillText(s,x,y)}};}
+
+/* ---------- shared helpers for this page ---------- */
+const D={
+ norm:{n:'Normal(0,1)',s:()=>randn(),mu:0,sd:1,sk:0},
+ unif:{n:'Uniform(0,1)',s:()=>Math.random(),mu:.5,sd:Math.sqrt(1/12),sk:0},
+ expo:{n:'Exponential(1)',s:()=>-Math.log(1-Math.random()),mu:1,sd:1,sk:2},
+ logn:{n:'Lognormal(0,1)',s:()=>Math.exp(randn()),mu:Math.exp(.5),sd:Math.sqrt((Math.E-1)*Math.E),sk:(Math.E+2)*Math.sqrt(Math.E-1),disc:0},
+ b05:{n:'Bernoulli(0.5)',s:()=>Math.random()<.5?1:0,mu:.5,sd:.5,sk:0,disc:1},
+ b05s:{n:'Bernoulli(0.05)',s:()=>Math.random()<.05?1:0,mu:.05,sd:Math.sqrt(.0475),sk:.9/Math.sqrt(.0475),disc:1},
+ bimo:{n:'Two humps',s:()=>(Math.random()<.5?-2:2)+.5*randn(),mu:0,sd:Math.sqrt(4.25),sk:0},
+ par5:{n:'Pareto(α=5)',s:()=>Math.pow(1-Math.random(),-.2),mu:1.25,sd:Math.sqrt(5/48),sk:6*Math.sqrt(.6)},
+ cauchy:{n:'Cauchy (no mean)',s:()=>Math.tan(Math.PI*(Math.random()-.5)),mu:NaN,sd:Infinity,sk:NaN}
+};
+function fillSel(id,keys,def){const e=$(id);e.innerHTML=keys.map(k=>`<option value="${k}">${D[k].n}</option>`).join('');e.value=def}
+const PAL=[C.a,C.r,C.y,C.g,C.p,C.t,'#ff9f43','#9aa4bf'];
+function tgrid(N,M){const T=[];let prev=0;for(let i=0;i<M;i++){let n=Math.round(Math.pow(10,Math.log10(N)*i/(M-1)));if(i===M-1)n=N;n=Math.max(prev+1,n);if(n>N)break;T.push(n);prev=n}if(T[T.length-1]!==N)T[T.length-1]=N;return T}
+function nlab(n){return n>=1e6?(n/1e6)+'M':n>=1000?(n/1000)+'k':String(n)}
+function customGrid(P,xt,yt){const g=P.g;g.save();g.strokeStyle=C.gr;g.fillStyle=C.mu;g.font='11px system-ui';g.lineWidth=1;
+ xt.forEach(([v,l])=>{g.beginPath();g.moveTo(P.X(v),P.T);g.lineTo(P.X(v),P.h-P.B);g.stroke();g.textAlign='center';g.fillText(l,P.X(v),P.h-P.B+15)});
+ yt.forEach(([v,l])=>{g.beginPath();g.moveTo(P.L,P.Y(v));g.lineTo(P.w-P.R,P.Y(v));g.stroke();g.textAlign='right';g.fillText(l,P.L-5,P.Y(v)+3)});g.restore()}
+function clip(P,fn){const g=P.g;g.save();g.beginPath();g.rect(P.L,P.T,P.w-P.L-P.R,P.h-P.T-P.B);g.clip();fn();g.restore()}
+function poly(P,pts,col,lw,dash){const g=P.g;g.save();if(dash)g.setLineDash([5,4]);g.strokeStyle=col;g.lineWidth=lw||2;g.beginPath();pts.forEach(([x,y],i)=>i?g.lineTo(P.X(x),P.Y(y)):g.moveTo(P.X(x),P.Y(y)));g.stroke();g.restore()}
+function dots(P,pts,col,r){const g=P.g;g.fillStyle=col;pts.forEach(([x,y])=>{g.beginPath();g.arc(P.X(x),P.Y(y),r||3,0,7);g.fill()})}
+function niceTicks(lo,hi,k){const st=nice((hi-lo)/(k||5)),a=[];for(let v=Math.ceil(lo/st-1e-9)*st;v<=hi+1e-9;v+=st)a.push([v,String(+v.toFixed(6))]);return a}
+function logTicks(lo,hi){const a=[];for(let e=Math.ceil(lo-1e-9);e<=hi+1e-9;e++)a.push([e,nlab(Math.pow(10,e))]);return a}
+function mom(a){const n=a.length;let m=0;for(const v of a)m+=v;m/=n;let v2=0,v3=0,v4=0;for(const v of a){const d=v-m;v2+=d*d;v3+=d*d*d;v4+=d*d*d*d}v2/=n;v3/=n;v4/=n;const sd=Math.sqrt(v2);return{n,m,sd,sk:sd>0?v3/(sd*sd*sd):0,ku:v2>0?v4/(v2*v2)-3:0}}
+function ksN(z){const a=Array.from(z).sort((x,y)=>x-y),n=a.length;let d=0;for(let i=0;i<n;i++){const F=normCdf(a[i]);d=Math.max(d,Math.abs((i+1)/n-F),Math.abs(i/n-F))}return d}
+/* histogram of data as density with optional overlay curves [{f,col,lw,dash}] */
+function hist(cv,data,lo,hi,bins,ov,col){const cnt=new Float64Array(bins),bw=(hi-lo)/bins;let n=0;for(const v of data){if(v<lo||v>=hi)continue;cnt[Math.floor((v-lo)/bw)]++;n++}
+ const N=data.length;let ym=0;for(let i=0;i<bins;i++){cnt[i]/=N*bw;ym=Math.max(ym,cnt[i])}
+ (ov||[]).forEach(o=>{for(let i=0;i<=80;i++)ym=Math.max(ym,o.f(lo+(hi-lo)*i/80)||0)});
+ const P=mk(cv,lo,hi,ym*1.12);
+ P.g.fillStyle=col||'rgba(110,168,255,.5)';for(let i=0;i<bins;i++){if(cnt[i]<=0)continue;const a=P.X(lo+i*bw),b=P.X(lo+(i+1)*bw);P.g.fillRect(a,P.Y(cnt[i]),Math.max(1,b-a-1),P.Y(0)-P.Y(cnt[i]))}
+ (ov||[]).forEach(o=>P.line(o.f,o.col,o.lw||2.4,lo,hi,200,o.dash));return P}
+const fmt=x=>f3(x);
+
+/* ---------- shared for this page ---------- */
+const POPS=['norm','unif','expo','logn','bimo','par5'];
+D.norm.med=0;D.norm.q90=1.2815516;D.unif.med=.5;D.unif.q90=.9;D.expo.med=Math.LN2;D.expo.q90=Math.log(10);D.logn.med=1;D.logn.q90=Math.exp(1.2815516);
+D.bimo.med=0;D.bimo.q90=qc(x=>.5*normCdf((x+2)/.5)+.5*normCdf((x-2)/.5),-10,10,.9,80);D.par5.med=Math.pow(2,.2);D.par5.q90=Math.pow(10,.2);
+const SF={mean:a=>mean(a),median:a=>{const b=Float64Array.from(a).sort(),n=b.length;return n%2?b[(n-1)/2]:(b[n/2-1]+b[n/2])/2},sd:a=>{const n=a.length,m=mean(a);let s=0;for(const v of a)s+=(v-m)*(v-m);return Math.sqrt(s/(n-1))},q90:a=>{const b=Float64Array.from(a).sort();return b[Math.round(.9*(b.length-1))]}};
+function truth(key,st){const d=D[key];return st==='mean'?d.mu:st==='median'?d.med:st==='sd'?d.sd:d.q90}
+const SNAME={mean:'sample mean',median:'sample median',sd:'sample SD',q90:'90th percentile'};
+const N10=[2,3,5,10,20,50,100,200,500,1000];
+function pct(a,p){const b=Float64Array.from(a).sort();return b[Math.min(b.length-1,Math.max(0,Math.floor(p*b.length)))]}
+function histLines(cv,arrs,cols,lo,hi,bins,vl){const bw=(hi-lo)/bins,dens=arrs.map(a=>{const c=new Float64Array(bins);for(const v of a){if(v<lo||v>=hi)continue;c[Math.floor((v-lo)/bw)]++}for(let i=0;i<bins;i++)c[i]/=a.length*bw;return c});let ym=0;dens.forEach(c=>c.forEach(v=>ym=Math.max(ym,v)));const P=mk(cv,lo,hi,ym*1.15||1);
+ dens.forEach((c,k)=>{const pts=[];for(let i=0;i<bins;i++){pts.push([lo+i*bw,c[i]]);pts.push([lo+(i+1)*bw,c[i]])}clip(P,()=>poly(P,pts,cols[k],2.2))});(vl||[]).forEach(v=>P.vline(v[0],v[1],v[2],v[3]));return P}
+function sdOf(a){return mom(a).sd}
+
+/* ---------- ML helpers ---------- */
+function digamma(x){let r=0;while(x<6){r-=1/x;x++}const f=1/(x*x);return r+Math.log(x)-.5/x-f*(1/12-f*(1/120-f/252))}
+function trigamma(x){let r=0;while(x<6){r+=1/(x*x);x++}const f=1/(x*x);return r+1/x+.5*f+f/x*(1/6-f*(1/30-f/42))}
+function poisS(l){if(l<=0)return 0;if(l<30){const L=Math.exp(-l);let k=0,p=1;do{k++;p*=Math.random()}while(p>L);return k-1}const m=Math.floor(.875*l),g=gammaS(m);return g<l?m+poisS(l-g):binF(m-1,l/g)}
+function llb(k,n,p){return(k?k*Math.log(p):0)+(n-k?(n-k)*Math.log(1-p):0)}
+function lrInt(k,n,cut){const ph=k/n,l0=llb(k,n,ph),g=p=>2*(l0-llb(k,n,p))-cut;let lo=0,hi=1;
+ if(k>0){let a=1e-12,b=ph;for(let i=0;i<70;i++){const m=(a+b)/2;if(g(m)>0)a=m;else b=m}lo=(a+b)/2}
+ if(k<n){let a=ph,b=1-1e-12;for(let i=0;i<70;i++){const m=(a+b)/2;if(g(m)>0)b=m;else a=m}hi=(a+b)/2}return[lo,hi]}
+function solveAlpha(s){if(!(s>1e-9))return 1e6;let a=(3-s+Math.sqrt((3-s)*(3-s)+24*s))/(12*s);for(let i=0;i<8;i++){const f=Math.log(a)-digamma(a)-s,fp=1/a-trigamma(a);let n=a-f/fp;if(!(n>0))n=a/2;a=n}return a}
+function normPdfAt(x,m,s){return Math.exp(-(x-m)*(x-m)/(2*s*s))/(s*2.5066282746)}
+/* ---------- Regression helpers ---------- */
+function idx(id,arr,ff){const e=$(id),o=$(id+'v'),f=()=>{o.textContent=ff?ff(arr[+e.value]):arr[+e.value]};e.addEventListener('input',f);f()}
+function scl(id,ff){const e=$(id),o=$(id+'v'),f=()=>{o.textContent=ff(+e.value)};e.addEventListener('input',f);f()}
+function pctTicks(a,b,st){const r=[];for(let v=a;v<=b+1e-9;v+=st)r.push([v,Math.round(v*100)+'%']);return r}
+const _tq={};function tq(v,p){const k=v+'_'+p;return _tq[k]||(_tq[k]=qc(x=>tcdf(x,v),0,500,p,80))}
+function simple(x,y){const n=x.length;let xm=0,ym=0;for(let i=0;i<n;i++){xm+=x[i];ym+=y[i]}xm/=n;ym/=n;let sxx=0,sxy=0,syy=0;for(let i=0;i<n;i++){const dx=x[i]-xm,dy=y[i]-ym;sxx+=dx*dx;sxy+=dx*dy;syy+=dy*dy}const b=sxy/sxx,a=ym-b*xm,res=new Float64Array(n);let sse=0;for(let i=0;i<n;i++){res[i]=y[i]-a-b*x[i];sse+=res[i]*res[i]}return{n,xm,ym,sxx,sxy,syy,b,a,res,sse,sst:syy,r2:1-sse/syy}}
+function gj(A,B){const p=A.length;const M=A.map((r,i)=>Array.from(r).concat(B?[B[i]]:[]));for(let c=0;c<p;c++){let m=c;for(let r=c+1;r<p;r++)if(Math.abs(M[r][c])>Math.abs(M[m][c]))m=r;[M[c],M[m]]=[M[m],M[c]];const d=M[c][c]||1e-12;for(let k=c;k<M[c].length;k++)M[c][k]/=d;for(let r=0;r<p;r++)if(r!==c){const f=M[r][c];if(f!==0)for(let k=c;k<M[c].length;k++)M[r][k]-=f*M[c][k]}}return M}
+function olsMulti(cols,y,needInv){const n=y.length,k=cols.length,p=k+1,A=[],B=new Float64Array(p);for(let i=0;i<p;i++)A.push(new Float64Array(p));
+ for(let r=0;r<n;r++){const row=[1];for(let j=0;j<k;j++)row.push(cols[j][r]);for(let i=0;i<p;i++){B[i]+=row[i]*y[r];for(let j=i;j<p;j++)A[i][j]+=row[i]*row[j]}}
+ for(let i=0;i<p;i++){for(let j=0;j<i;j++)A[i][j]=A[j][i];if(i>0)A[i][i]+=1e-9}
+ let beta,inv=null;if(needInv){const I=[];for(let i=0;i<p;i++){const e=new Float64Array(p);e[i]=1;I.push(e)}const M=gj(A,null);const aug=A.map((r,i)=>Array.from(r).concat(Array.from(I[i])));
+  const m=aug;for(let c=0;c<p;c++){let q=c;for(let r=c+1;r<p;r++)if(Math.abs(m[r][c])>Math.abs(m[q][c]))q=r;[m[c],m[q]]=[m[q],m[c]];const d=m[c][c]||1e-12;for(let kk=0;kk<2*p;kk++)m[c][kk]/=d;for(let r=0;r<p;r++)if(r!==c){const f=m[r][c];if(f!==0)for(let kk=0;kk<2*p;kk++)m[r][kk]-=f*m[c][kk]}}
+  inv=m.map(r=>r.slice(p));beta=inv.map(r=>{let s=0;for(let j=0;j<p;j++)s+=r[j]*B[j];return s})}
+ else{const M=gj(A,B);beta=M.map(r=>r[p])}
+ const res=new Float64Array(n);let sse=0;for(let r=0;r<n;r++){let f=beta[0];for(let j=0;j<k;j++)f+=beta[j+1]*cols[j][r];res[r]=y[r]-f;sse+=res[r]*res[r]}
+ const out={beta,res,sse,n,p,inv};if(inv){const s2=sse/(n-p);out.s2=s2;out.se=inv.map((r,i)=>Math.sqrt(s2*r[i]))}return out}
+function scatterAxes(cv,xs,ys,xlo,xhi,ylo,yhi,L){return mk(cv,xlo,xhi,yhi,{y0:ylo,L:L||44})}
+function range(a,pad){let lo=1e99,hi=-1e99;for(const v of a){if(v<lo)lo=v;if(v>hi)hi=v}const w=(hi-lo)||1;return[lo-(pad||.05)*w,hi+(pad||.05)*w]}
+
+
+function bars(P,groups,cols,yt){/* groups: array of arrays of values (0..1) */const g=P.g,G=groups.length,B=groups[0].length,W=(P.w-P.L-P.R)/G;groups.forEach((vals,gi)=>vals.forEach((v,bi)=>{const bw=W*.78/B,x=P.L+W*gi+W*.11+bw*bi;g.fillStyle=cols[bi];g.fillRect(x,P.Y(v),bw-2,P.Y(0)-P.Y(v));g.fillStyle=C.fg;g.textAlign='center';g.font='10px system-ui';g.fillText(Math.round(v*100)+'%',x+bw/2-1,P.Y(v)-3)}));g.font='11px system-ui'}
+function gridG(P,yt,labels){customGrid(P,[],yt);const G=labels.length,W=(P.w-P.L-P.R)/G;P.g.fillStyle=C.mu;P.g.textAlign='center';labels.forEach((l,i)=>P.g.fillText(l,P.L+W*(i+.5),P.h-P.B+15))}
+function legend(P,items,y){let x=P.L+8;items.forEach(([s,c])=>{P.text('■ '+s,x,y,c);x+=P.g.measureText('■ '+s).width+16})}
+
+/* ---------- GLM machinery ---------- */
+const LK={logit:{mu:e=>1/(1+Math.exp(-e)),d:e=>{const m=1/(1+Math.exp(-e));return m*(1-m)}},
+ probit:{mu:e=>normCdf(e),d:e=>npdf(e)},
+ cll:{mu:e=>1-Math.exp(-Math.exp(e)),d:e=>Math.exp(e-Math.exp(e))},
+ log:{mu:e=>Math.exp(e),d:e=>Math.exp(e)}};
+function minv(A){const p=A.length,m=A.map((r,i)=>{const row=Array.from(r);for(let j=0;j<p;j++)row.push(i===j?1:0);return row});
+ for(let c=0;c<p;c++){let q=c;for(let r=c+1;r<p;r++)if(Math.abs(m[r][c])>Math.abs(m[q][c]))q=r;[m[c],m[q]]=[m[q],m[c]];const d=m[c][c]||1e-12;for(let k=0;k<2*p;k++)m[c][k]/=d;for(let r=0;r<p;r++)if(r!==c){const f=m[r][c];if(f!==0)for(let k=0;k<2*p;k++)m[r][k]-=f*m[c][k]}}
+ return m.map(r=>r.slice(p))}
+function glm(cols,y,o){o=o||{};const n=y.length,k=cols.length,p=k+1,fam=o.fam||'binom',L=LK[o.link||(fam==='pois'?'log':'logit')],off=o.off,X=[new Float64Array(n).fill(1)].concat(cols),V=m=>fam==='pois'?m:m*(1-m);
+ let b=new Float64Array(p);if(o.init)b=Float64Array.from(o.init);else if(fam==='pois'){let m=0;for(const v of y)m+=v;b[0]=Math.log(Math.max(m/n,1e-3))-(off?mean(off):0)}
+ function ev(b){const eta=new Float64Array(n),mu=new Float64Array(n);let ll=0;for(let i=0;i<n;i++){let e=off?off[i]:0;for(let j=0;j<p;j++)e+=b[j]*X[j][i];e=Math.max(-30,Math.min(30,e));eta[i]=e;let m=L.mu(e);m=fam==='binom'?Math.min(1-1e-12,Math.max(1e-12,m)):Math.max(m,1e-12);mu[i]=m;ll+=fam==='pois'?y[i]*Math.log(m)-m-lgamma(y[i]+1):y[i]*Math.log(m)+(1-y[i])*Math.log(1-m)}return{eta,mu,ll}}
+ function info(c){const A=[];for(let i=0;i<p;i++)A.push(new Float64Array(p));const w=new Float64Array(n);for(let r=0;r<n;r++){const d=L.d(c.eta[r]),wi=d*d/V(c.mu[r]);w[r]=wi;for(let i=0;i<p;i++){const xi=X[i][r]*wi;for(let j=i;j<p;j++)A[i][j]+=xi*X[j][r]}}for(let i=0;i<p;i++)for(let j=0;j<i;j++)A[i][j]=A[j][i];return{A,w}}
+ let cur=ev(b),it=0,conv=false,maxit=o.maxit==null?40:o.maxit;
+ for(;it<maxit;it++){const{A,w}=info(cur),Ai=minv(A),g=new Float64Array(p);
+  for(let r=0;r<n;r++){const d=L.d(cur.eta[r]),v=V(cur.mu[r]);let s=(y[r]-cur.mu[r])*d/v;if(o.firth){let h=0;for(let i=0;i<p;i++)for(let j=0;j<p;j++)h+=X[i][r]*Ai[i][j]*X[j][r];h*=w[r];s+=h*(.5-cur.mu[r])}for(let i=0;i<p;i++)g[i]+=X[i][r]*s}
+  const st=new Float64Array(p);let mx=0;for(let i=0;i<p;i++){let s=0;for(let j=0;j<p;j++)s+=Ai[i][j]*g[j];st[i]=s}
+  if(o.firth){for(let i=0;i<p;i++){st[i]=Math.max(-1,Math.min(1,st[i]));mx=Math.max(mx,Math.abs(st[i]))}b=b.map((v,i)=>v+st[i]);cur=ev(b);if(mx<1e-8){conv=true;it++;break}}
+  else{let a=1,nb,nc;for(let h=0;h<25;h++){nb=b.map((v,i)=>v+a*st[i]);nc=ev(nb);if(nc.ll>=cur.ll-1e-10)break;a/=2}for(let i=0;i<p;i++)mx=Math.max(mx,Math.abs(a*st[i]));const dl=Math.abs(nc.ll-cur.ll);b=nb;cur=nc;if(mx<1e-8||dl<1e-11){conv=true;it++;break}}}
+ const{A,w}=info(cur),Ai=minv(A),se=Ai.map((r,i)=>Math.sqrt(Math.max(r[i],0)));let dev;
+ if(fam==='binom')dev=-2*cur.ll;else{dev=0;for(let i=0;i<n;i++){const yy=y[i],m=cur.mu[i];dev+=2*((yy>0?yy*Math.log(yy/m):0)-(yy-m))}}
+ return{beta:b,mu:cur.mu,eta:cur.eta,ll:cur.ll,dev,inv:Ai,se,iter:it,conv,X,w,p,n,A}}
+function auc(sc,y){const n=y.length,idx=Array.from({length:n},(_,i)=>i).sort((a,b)=>sc[a]-sc[b]);let rk=0,np=0,i=0;while(i<n){let j=i;while(j+1<n&&sc[idx[j+1]]===sc[idx[i]])j++;const r=(i+j)/2+1;for(let t=i;t<=j;t++)if(y[idx[t]]===1){rk+=r;np++}i=j+1}const nn=n-np;return np&&nn?(rk-np*(np+1)/2)/(np*nn):.5}
+function sepTest(x,y){let a1=1e99,b1=-1e99,a0=1e99,b0=-1e99,n1=0,n0=0;for(let i=0;i<x.length;i++){if(y[i]===1){n1++;a1=Math.min(a1,x[i]);b1=Math.max(b1,x[i])}else{n0++;a0=Math.min(a0,x[i]);b0=Math.max(b0,x[i])}}return n1>0&&n0>0&&(a1>b0||a0>b1)}
+const sig=e=>1/(1+Math.exp(-e));
+function lgt(p){return Math.log(p/(1-p))}
+function binaryData(n,a,b,sd){const x=new Float64Array(n),y=new Float64Array(n);for(let i=0;i<n;i++){x[i]=(sd||1)*randn();y[i]=Math.random()<sig(a+b*x[i])?1:0}return{x,y}}
+function heat(P,gx,gy,vals,x0,x1,y0,y1){const g=P.g,nx=gx,ny=gy;let mn=1e99,mx=-1e99;vals.forEach(v=>{if(isFinite(v)){mn=Math.min(mn,v);mx=Math.max(mx,v)}});mn=Math.max(mn,mx-30);for(let i=0;i<nx;i++)for(let j=0;j<ny;j++){const v=vals[i*ny+j],t=isFinite(v)?Math.max(0,Math.min(1,(v-mn)/(mx-mn))):0,tt=Math.pow(t,1.6),c=Math.round(40+190*tt);g.fillStyle=`rgb(${Math.round(20+60*tt)},${Math.round(30+100*tt)},${c})`;const xa=P.X(x0+(x1-x0)*i/nx),xb=P.X(x0+(x1-x0)*(i+1)/nx),ya=P.Y(y0+(y1-y0)*j/ny),yb=P.Y(y0+(y1-y0)*(j+1)/ny);g.fillRect(xa,Math.min(ya,yb),xb-xa+1,Math.abs(ya-yb)+1)}}
+/* ---------- multiple-testing helpers ---------- */
+const U01=()=>1-Math.random();
+const mapA=(a,f)=>Float64Array.from(a,f);
+function sdv(a){const m=mean(a);let s=0;for(const v of a)s+=(v-m)*(v-m);return Math.sqrt(s/Math.max(a.length-1,1))}
+function barV(cv,vals,cols,labs,ymax,ff){const P=mk(cv,0,vals.length,ymax,{y0:0,noGrid:true,L:50});customGrid(P,[],niceTicks(0,ymax,5));const W=(P.w-P.L-P.R)/vals.length,g=P.g;vals.forEach((v,i)=>{const w=W*.5,x=P.L+W*i+W*.25;g.fillStyle=cols[i];g.fillRect(x,P.Y(v),w,P.Y(0)-P.Y(v));g.fillStyle=C.fg;g.textAlign='center';g.fillText((ff||fmt)(v),x+w/2,P.Y(v)-4);g.fillStyle=C.mu;g.fillText(labs[i],x+w/2,P.h-P.B+15)});return P}
+function barL(cv,vals,cols,labs,lo,hi,ff){const P=mk(cv,0,vals.length,hi,{y0:lo,noGrid:true,L:50});customGrid(P,[],niceTicks(lo,hi,5));const W=(P.w-P.L-P.R)/vals.length,g=P.g;vals.forEach((v,i)=>{const w=W*.5,x=P.L+W*i+W*.25;g.fillStyle=cols[i];g.fillRect(x,P.Y(v),w,P.Y(lo)-P.Y(v));g.fillStyle=C.fg;g.textAlign='center';g.fillText((ff||fmt)(v),x+w/2,P.Y(v)-4);g.fillStyle=C.mu;g.fillText(labs[i],x+w/2,P.h-P.B+15)});return P}
+function rgam(a){if(a<1)return rgam(a+1)*Math.pow(U01(),1/a);const d=a-1/3,c=1/Math.sqrt(9*d);for(;;){let x,v;do{x=randn();v=1+c*x}while(v<=0);v=v*v*v;const u=U01();if(u<1-.0331*x*x*x*x||Math.log(u)<.5*x*x+d*(1-v+Math.log(v)))return d*v}}
+const rchi=df=>2*rgam(df/2);
+const pTwo=z=>2*normSf(Math.abs(z));
+const ordIdx=p=>Array.from({length:p.length},(_,i)=>i).sort((a,b)=>p[a]-p[b]);
+const bonfRej=(p,a)=>Array.from(p,v=>v<=a/p.length);
+function holmRej(p,a){const m=p.length,o=ordIdx(p),r=new Array(m).fill(false);for(let k=0;k<m;k++){if(p[o[k]]<=a/(m-k))r[o[k]]=true;else break}return r}
+function hochRej(p,a){const m=p.length,o=ordIdx(p),r=new Array(m).fill(false);let kmax=-1;for(let k=m-1;k>=0;k--){if(p[o[k]]<=a/(m-k)){kmax=k;break}}for(let k=0;k<=kmax;k++)r[o[k]]=true;return r}
+/* Benjamini–Hochberg at level q; pi0 = adaptive null-proportion (Storey); by = Benjamini–Yekutieli */
+function bhRej(p,q,pi0,by){const m=p.length,o=ordIdx(p),r=new Array(m).fill(false);let qq=q/Math.min(1,pi0||1);if(by){let h=0;for(let i=1;i<=m;i++)h+=1/i;qq/=h}let kmax=-1;for(let k=m-1;k>=0;k--){if(p[o[k]]<=(k+1)*qq/m){kmax=k;break}}for(let k=0;k<=kmax;k++)r[o[k]]=true;return r}
+const unRej=(p,a)=>Array.from(p,v=>v<=a);
+/* z-statistics with m1 true effects (value delta) and equicorrelation rho through a common factor */
+function zsim(m,m1,delta,rho,sd0){const W=randn(),a=Math.sqrt(rho||0),b=Math.sqrt(1-(rho||0)),z=new Float64Array(m),tr=new Uint8Array(m),s=sd0||1;for(let i=0;i<m;i++){tr[i]=i<m1?1:0;z[i]=s*(a*W+b*randn())+(tr[i]?delta:0)}return{z,tr}}
+function evalRej(rej,tr){let V=0,S=0;for(let i=0;i<tr.length;i++)if(rej[i]){if(tr[i])S++;else V++}return{V,S,R:V+S}}
+const medOf=a=>{const b=Float64Array.from(a).sort();const n=b.length;return n%2?b[(n-1)/2]:(b[n/2-1]+b[n/2])/2};
+const quant=(a,p)=>{const b=Float64Array.from(a).sort();return b[Math.min(b.length-1,Math.floor(p*b.length))]};
+const pct0=x=>Math.round(x*100)+'%';
+/* ---------- Ch1 multiplicity ---------- */
+(function(){scl('c1m',v=>v);scl('c1a',v=>v+'%');
+ function run(){const m=val('c1m'),a=val('c1a')/100,R=3000,cnt=new Float64Array(m+1);let any=0;
+  for(let r=0;r<R;r++){let k=0;for(let i=0;i<m;i++)if(Math.random()<a)k++;cnt[k]++;if(k>0)any++}
+  const th=1-Math.pow(1-a,m),P=mk($('c1cv'),1,200,1.02,{y0:0,L:44});P.line(x=>1-Math.pow(1-a,x),C.r,2.6,1,200,120);P.line(x=>1-Math.pow(1-a/x,x),C.g,2.6,1,200,120);dots(P,[[m,any/R]],C.y,5);P.vline(m,C.mu,'',true);legend(P,[['no correction',C.r],['Bonferroni',C.g],['simulation',C.y]],P.T+12);P.text('number of tests →',P.w-P.R-100,P.h-P.B-6,C.mu);
+  const K=Math.min(m,10),vals=[],labs=[];for(let k=0;k<=K;k++){let c=cnt[k];if(k===K){c=0;for(let j=K;j<=m;j++)c+=cnt[j]}vals.push(c/R);labs.push(k===K&&K<m?'≥'+K:String(k))}
+  const P2=barV($('c1cv2'),vals,vals.map(()=>C.r),labs,Math.max(...vals)*1.2,x=>pct0(x));P2.text('number of false positives (no correction)',P2.L+6,P2.T+12,C.mu);
+  $('c1st').innerHTML=stat('P(≥ 1 false positive): simulated · formula',pc(any/R)+' · '+pc(th),th>.2?'hot':'ok')+stat('expected false positives mα',fmt(m*a),'in')+stat('P(none)',pc(cnt[0]/R),'')+stat('Bonferroni threshold α/m',fmt(a/m),'');
+  $('c1rd').innerHTML=`With ${m} true nulls tested at ${pc(a)}, the chance that nothing is significant is only ${pc(cnt[0]/R)} (formula ${pc(1-th)}), and on average ${fmt(m*a)} results are significant by chance alone. Testing each hypothesis at α/m = ${fmt(a/m)} (green) keeps the probability of any false positive near ${pc(a)} whatever m, at the price of a much higher bar for each test.`}
+ ['c1m','c1a'].forEach(i=>$(i).addEventListener('change',run));$('c1go').onclick=run;run();})();
+
+/* ---------- Ch2 FWER ---------- */
+(function(){scl('c2m',v=>v);scl('c2f',v=>v+'%');scl('c2d',v=>fmt(v/10));
+ function run(){const m=val('c2m'),m1=Math.round(m*val('c2f')/100),d=val('c2d')/10,R=400,A=.05,NM=['uncorrected','Bonferroni','Holm','Hochberg'],fw=[0,0,0,0],pw=[0,0,0,0];
+  for(let r=0;r<R;r++){const s=zsim(m,m1,d,0),p=Array.from(s.z,pTwo),rj=[unRej(p,A),bonfRej(p,A),holmRej(p,A),hochRej(p,A)];rj.forEach((x,j)=>{const e=evalRej(x,s.tr);if(e.V>0)fw[j]++;pw[j]+=m1?e.S/m1/R:0})}
+  const CL=[C.r,C.y,C.g,C.p],P=barV($('c2cv'),fw.map(v=>v/R),CL,NM,1.12,x=>pct0(x));P.hline(A,C.fg,'5%');P.text('FWER: P(at least one false rejection)',P.L+6,P.T+12,C.mu);
+  const P2=barV($('c2cv2'),pw,CL,NM,1.12,x=>pct0(x));P2.text('power: share of true effects found',P2.L+6,P2.T+12,C.mu);
+  $('c2st').innerHTML=stat('FWER: uncorr. · Bonf. · Holm · Hoch.',fw.map(v=>pc(v/R)).join(' · '),'')+stat('power: uncorr. · Bonf. · Holm · Hoch.',m1?pw.map(pc).join(' · '):'no true effects','in')+stat('true effects · nulls',m1+' · '+(m-m1),'')+stat('uncorrected FWER, theory',pc(1-Math.pow(.95,m-m1)),'');
+  $('c2rd').innerHTML=`Testing every hypothesis at 5% gives a family-wise error rate of ${pc(fw[0]/R)} (theory ${pc(1-Math.pow(.95,m-m1))}): a false claim is almost certain. Bonferroni brings it to ${pc(fw[1]/R)} and Holm to ${pc(fw[2]/R)}, Hochberg ${pc(fw[3]/R)}${m1?`, at the cost of power: ${pc(pw[0])} uncorrected against ${pc(pw[1])} (Bonferroni) and ${pc(pw[2])} (Holm). Holm never does worse than Bonferroni; the gain is largest when many effects are real.`:' (with no true effects there is nothing to detect).'}`}
+ ['c2m','c2f','c2d'].forEach(i=>$(i).addEventListener('change',run));$('c2go').onclick=run;run();})();
+
+/* ---------- Ch3 BH ---------- */
+(function(){scl('c3m',v=>v);scl('c3f',v=>v+'%');scl('c3d',v=>fmt(v/10));scl('c3q',v=>fmt(v/100));
+ function run(){const m=val('c3m'),m1=Math.round(m*val('c3f')/100),d=val('c3d')/10,q=val('c3q')/100,R=300,A=.05,fd=[0,0,0],pw=[0,0,0];let demo=null;
+  for(let r=0;r<R;r++){const s=zsim(m,m1,d,0),p=Array.from(s.z,pTwo),rj=[unRej(p,A),bonfRej(p,A),bhRej(p,q)];rj.forEach((x,j)=>{const e=evalRej(x,s.tr);fd[j]+=(e.R?e.V/e.R:0)/R;pw[j]+=(m1?e.S/m1:0)/R});if(r===R-1)demo={p,tr:s.tr,bh:rj[2]}}
+  const o=ordIdx(demo.p),K=Math.min(m,3*m1+20),ymax=Math.max(.06,demo.p[o[K-1]])*1.05,P=mk($('c3cv'),0,K+1,ymax,{y0:0,L:50}),tp=[],fp=[];for(let k=0;k<K;k++)(demo.tr[o[k]]?tp:fp).push([k+1,demo.p[o[k]]]);
+  poly(P,[[0,0],[K+1,(K+1)*q/m]],C.y,2.2);P.hline(A/m,C.p,'');P.hline(A,C.r,'');dots(P,fp,C.r,2.8);dots(P,tp,C.g,2.8);legend(P,[['BH line',C.y],['true effect',C.g],['null',C.r]],P.T+12);P.text('rank →',P.w-P.R-40,P.h-P.B-6,C.mu);P.text('p-value ↑ (dotted: 0.05 and 0.05/m)',P.L+6,P.T+26,C.mu);
+  const NM=['uncorr. FDR','uncorr. power','Bonf. FDR','Bonf. power','BH FDR','BH power'],vals=[fd[0],pw[0],fd[1],pw[1],fd[2],pw[2]],P2=barV($('c3cv2'),vals,[C.r,C.g,C.r,C.g,C.r,C.g],NM,1.12,x=>pct0(x));P2.hline(q,C.fg,'q');
+  const e=evalRej(demo.bh,demo.tr),p0=1-m1/m;
+  $('c3st').innerHTML=stat('this data set: BH rejects · false',e.R+' · '+e.V+(e.R?' (FDP '+pc(e.V/e.R)+')':''),'')+stat('FDR: uncorr. · Bonf. · BH',fd.map(pc).join(' · '),'')+stat('power: uncorr. · Bonf. · BH',m1?pw.map(pc).join(' · '):'–','in')+stat('theory: BH FDR = π₀q',pc(p0*q),'ok');
+  $('c3rd').innerHTML=`Uncorrected testing at 5% has an FDR of ${pc(fd[0])}: ${pc(fd[0])} of the “discoveries” are false. Bonferroni keeps the FDR tiny (${pc(fd[1])}) but finds only ${pc(pw[1])} of the true effects. BH at q = ${pc(q)} finds ${pc(pw[2])} with a realised FDR of ${pc(fd[2])}, close to π₀q = ${pc(p0*q)}: it is below q because a share ${pc(m1/m)} of the hypotheses are true effects. The BH line (yellow) sits far above the Bonferroni level: it rejects every ordered p-value up to the last one under it.`}
+ ['c3m','c3f','c3d','c3q'].forEach(i=>$(i).addEventListener('change',run));$('c3go').onclick=run;run();})();
+
+/* ---------- Ch4 dependence ---------- */
+(function(){scl('c4m',v=>v);scl('c4f',v=>v+'%');scl('c4d',v=>fmt(v/10));scl('c4r',v=>fmt(v/100));
+ function run(){const m=val('c4m'),m1=Math.round(m*val('c4f')/100),d=val('c4d')/10,rho=val('c4r')/100,q=.1,R=500,F0=[],F1=[];let by=0,st=0,pi0=0;
+  const fdp=(rj,tr)=>{const e=evalRej(rj,tr);return e.R?e.V/e.R:0};
+  for(let r=0;r<R;r++){const a=zsim(m,m1,d,0),pa=Array.from(a.z,pTwo);F0.push(fdp(bhRej(pa,q),a.tr));
+   const b=zsim(m,m1,d,rho),pb=Array.from(b.z,pTwo);F1.push(fdp(bhRej(pb,q),b.tr));by+=fdp(bhRej(pb,q,1,true),b.tr)/R;let c=0;for(const v of pb)if(v>.5)c++;const p0=Math.min(1,c/(.5*m));pi0+=p0/R;st+=fdp(bhRej(pb,q,p0),b.tr)/R}
+  const cl=a=>a.map(v=>Math.max(0,Math.min(.6-1e-9,v))),P=histLines($('c4cv'),[cl(F0),cl(F1)],[C.g,C.r],0,.6,30,[[q,C.fg,'q = 0.10',true]]);legend(P,[['independent tests',C.g],['correlated ρ = '+fmt(rho),C.r]],P.T+12);P.text('false discovery proportion of BH →',P.w-P.R-190,P.h-P.B-6,C.mu);
+  const gt=a=>a.filter(v=>v>.2).length/R;
+  $('c4st').innerHTML=stat('BH FDR: independent · correlated',pc(mean(F0))+' · '+pc(mean(F1)),'ok')+stat('SD of FDP: independent · correlated',fmt(sdv(F0))+' · '+fmt(sdv(F1)),sdv(F1)>2*sdv(F0)?'hot':'')+stat('P(FDP > 20%): independent · correlated',pc(gt(F0))+' · '+pc(gt(F1)),'')+stat('BY FDR (correlated)',pc(by),'in')+stat('Storey: mean π̂₀ (truth '+fmt(1-m1/m)+') · FDR',fmt(pi0)+' · '+pc(st),'');
+  $('c4rd').innerHTML=`The average false discovery proportion of BH stays near its target when the tests are correlated (${pc(mean(F1))} against ${pc(mean(F0))} for independent tests; π₀q = ${pc((1-m1/m)*q)}), but its spread does not: the SD of the FDP goes from ${fmt(sdv(F0))} to ${fmt(sdv(F1))} and the chance that more than a fifth of the discoveries are false from ${pc(gt(F0))} to ${pc(gt(F1))}. A common factor moves all the z-scores together, so in some data sets many nulls look significant at once. Benjamini–Yekutieli is safe but loses power (FDR ${pc(by)}); Storey’s version estimates π₀ at ${fmt(pi0)} (truth ${fmt(1-m1/m)}) and has FDR ${pc(st)}, ${st>q*1.2?'above':'near'} the target.`}
+ ['c4m','c4f','c4d','c4r'].forEach(i=>$(i).addEventListener('change',run));$('c4go').onclick=run;run();})();
+
+/* ---------- Ch5 winner's curse ---------- */
+(function(){scl('c5m',v=>v);scl('c5k',v=>v);scl('c5s',v=>fmt(v/10));scl('c5t',v=>fmt(v/10));
+ function run(){const m=val('c5m'),k=Math.min(val('c5k'),m),s=val('c5s')/10,tau=val('c5t')/10,R=300,acc=[0,0,0,0];let neg=0,demo=null;
+  for(let r=0;r<R;r++){const th=Float64Array.from({length:m},()=>tau*randn()),y=mapA(th,v=>v+s*randn()),y2=mapA(th,v=>v+s*randn()),mu=mean(y),vy=Math.pow(sdv(y),2),B=Math.max(0,1-s*s/vy),sel=ordIdx(mapA(y,v=>-v)).slice(0,k);
+   acc[0]+=mean(sel.map(i=>y[i]))/R;acc[1]+=mean(sel.map(i=>th[i]))/R;acc[2]+=mean(sel.map(i=>mu+B*(y[i]-mu)))/R;acc[3]+=mean(sel.map(i=>y2[i]))/R;neg+=sel.filter(i=>th[i]<0).length/k/R;if(r===R-1)demo={th,y,sel:new Set(sel)}}
+  const lim=Math.max(.5,...Array.from(demo.th,Math.abs),...Array.from(demo.y,Math.abs))*1.05,P=mk($('c5cv'),-lim,lim,lim,{y0:-lim,L:44}),ns=[],sl=[];demo.th.forEach((v,i)=>(demo.sel.has(i)?sl:ns).push([v,demo.y[i]]));
+  P.line(x=>x,C.mu,1.2,-lim,lim,2,true);dots(P,ns,C.a,2.2);dots(P,sl,C.r,4.5);legend(P,[['candidates',C.a],['selected (top k)',C.r]],P.T+12);P.text('true effect θ →',P.w-P.R-80,P.h-P.B-6,C.mu);P.text('estimate y ↑',P.L+6,P.T+26,C.mu);
+  const P2=barV($('c5cv2'),acc.map(v=>Math.max(v,0)),[C.r,C.fg,C.y,C.g],['naive estimate','true effect','shrunken (EB)','independent re-measurement'],Math.max(...acc,.1)*1.25,x=>fmt(x));P2.text('average over the selected',P2.L+6,P2.T+12,C.mu);
+  $('c5st').innerHTML=stat('naive estimate of the selected',fmt(acc[0]),'hot')+stat('their true average effect',fmt(acc[1]),'')+stat('winner’s curse (bias)',fmt(acc[0]-acc[1]),'warn')+stat('shrunken · re-measured',fmt(acc[2])+' · '+fmt(acc[3]),'ok')+stat('selected with true effect below 0',pc(neg),'');
+  $('c5rd').innerHTML=`The top ${k} of ${m} look like ${fmt(acc[0])} on average but are really worth ${fmt(acc[1])}: the selection process picked them partly for their luck, an overstatement of ${fmt(acc[0]-acc[1])}. A fresh measurement of the same items gives ${fmt(acc[3])}, close to the truth, and the empirical Bayes shrinkage, which uses only the original data, gives ${fmt(acc[2])}. ${pc(neg)} of the selected items have a true effect below zero. The curse grows with more candidates, more noise and a small true spread (try τ = 0: every apparent winner is pure luck).`}
+ ['c5m','c5k','c5s','c5t'].forEach(i=>$(i).addEventListener('change',run));$('c5go').onclick=run;run();})();
+
+/* ---------- Ch6 subgroups ---------- */
+(function(){scl('c6s',v=>v);scl('c6n',v=>v);scl('c6e',v=>fmt(v/100));
+ function run(){const S=val('c6s'),n=val('c6n'),th=val('c6e')/100,R=2000,sh=th*Math.sqrt(n/2),cnt=new Float64Array(S+1);let any=0,anyH=0,pool=0,het=0,mixed=0;
+  for(let r=0;r<R;r++){const z=Float64Array.from({length:S},()=>sh+randn()),p=Array.from(z,pTwo);let sig=0;for(const v of p)if(v<.05)sig++;cnt[sig]++;if(sig>0)any++;if(holmRej(p,.05).some(Boolean))anyH++;if(sig>0&&sig<S)mixed++;
+   if(pTwo(z.reduce((a,b)=>a+b,0)/Math.sqrt(S))<.05)pool++;const zb=mean(z);let Q=0;for(const v of z)Q+=(v-zb)*(v-zb);if(gammaQ((S-1)/2,Q/2)<.05)het++}
+  const P=barV($('c6cv'),[any,anyH,mixed,pool,het].map(v=>v/R),[C.r,C.y,C.p,C.a,C.g],['some subgroup p<.05','…after Holm','some yes, some no','pooled test','heterogeneity test'],1.12,x=>pct0(x));P.hline(.05,C.fg,'5%');
+  const K=Math.min(S,10),vals=[],labs=[];for(let k=0;k<=K;k++){let c=cnt[k];if(k===K){c=0;for(let j=K;j<=S;j++)c+=cnt[j]}vals.push(c/R);labs.push(k===K&&K<S?'≥'+K:String(k))}
+  const P2=barV($('c6cv2'),vals,vals.map(()=>C.a),labs,Math.max(...vals)*1.2,x=>pct0(x));P2.text('number of significant subgroups',P2.L+6,P2.T+12,C.mu);
+  $('c6st').innerHTML=stat('some subgroup significant · after Holm',pc(any/R)+' · '+pc(anyH/R),'')+stat('“works in some, not others”',pc(mixed/R),'hot')+stat('pooled test · heterogeneity test',pc(pool/R)+' · '+pc(het/R),'ok')+stat('theory (no effect): 1 − 0.95^S',pc(1-Math.pow(.95,S)),'in');
+  $('c6rd').innerHTML=th===0?`With no effect anywhere, ${pc(any/R)} of the experiments show at least one significant subgroup (theory ${pc(1-Math.pow(.95,S))}) and each is a false story; Holm cuts that to ${pc(anyH/R)}, the pooled test and the heterogeneity test fire at their nominal 5% (${pc(pool/R)} and ${pc(het/R)}).`:`The true effect is identical in all ${S} subgroups (${fmt(th)} SD), yet in ${pc(mixed/R)} of the experiments some subgroups are significant and others are not: a tempting “works for A, not for B” story that the heterogeneity test, rejecting only ${pc(het/R)} of the time (its nominal 5%), correctly refuses to support. The pooled test finds the shared effect ${pc(pool/R)} of the time, more often than any single subgroup.`}
+ ['c6s','c6n','c6e'].forEach(i=>$(i).addEventListener('change',run));$('c6go').onclick=run;run();})();
+/* ---------- Ch7 selective inference ---------- */
+function condCI(y,c,al){const s=y<0?-1:1,yy=Math.abs(y),U=th=>normSf(yy-th)/(normSf(c-th)+normCdf(-c-th)),solve=p=>{let lo=-10,hi=yy+10;for(let i=0;i<60;i++){const mid=(lo+hi)/2;if(U(mid)<p)lo=mid;else hi=mid}return(lo+hi)/2},L=solve(al/2),Uu=solve(1-al/2);return s>0?[L,Uu]:[-Uu,-L]}
+(function(){scl('c7m',v=>v);scl('c7f',v=>v+'%');scl('c7d',v=>fmt(v/10));
+ function run(){const m=val('c7m'),m1=Math.round(m*val('c7f')/100),d=val('c7d')/10,R=100,c=1.96,zb=qn(1-.05/(2*m)),cov=[0,0,0,0],wd=[[],[],[],[]];let nsel=0,nnull=0,covN=0;
+  for(let r=0;r<R;r++)for(let i=0;i<m;i++){const th=i<m1?d:0,y=th+randn();if(Math.abs(y)<=c)continue;nsel++;const y2=th+randn(),ci=[[y-c,y+c],[y-zb,y+zb],condCI(y,c,.05),[y2-c,y2+c]];
+   ci.forEach((b,j)=>{if(b[0]<=th&&th<=b[1])cov[j]++;wd[j].push(b[1]-b[0])});if(!th){nnull++;if(ci[0][0]<=0&&0<=ci[0][1])covN++}}
+  const NM=['naive','Bonferroni','conditional','replication'],CL=[C.r,C.y,C.g,C.a],P=barV($('c7cv'),cov.map(v=>v/nsel),CL,NM,1.12,x=>pct0(x));P.hline(.95,C.fg,'95%');P.text('coverage for the selected parameters',P.L+6,P.T+12,C.mu);
+  const md=wd.map(medOf),P2=barV($('c7cv2'),md,CL,NM,Math.max(...md)*1.25,x=>fmt(x));P2.text('median interval width',P2.L+6,P2.T+12,C.mu);
+  $('c7st').innerHTML=stat('selected per data set · null among them',fmt(nsel/R)+' · '+pc(nnull/nsel),'')+stat('coverage: naive · Bonf. · cond. · replic.',cov.map(v=>pc(v/nsel)).join(' · '),'')+stat('naive coverage of the selected nulls',nnull?pc(covN/nnull):'–','hot')+stat('median width: naive · Bonf. · cond. · replic.',md.map(fmt).join(' · '),'in');
+  $('c7rd').innerHTML=`Only ${pc(1-nnull/nsel)} of the ${fmt(nsel/R)} parameters selected per data set are truly non-null; the naive 95% intervals cover ${pc(cov[0]/nsel)} of the selected parameters, and for the selected nulls exactly ${nnull?pc(covN/nnull):'–'}: an interval centred on a value beyond 1.96 can never contain 0. Bonferroni covers ${pc(cov[1]/nsel)} with intervals ${fmt(md[1]/md[0])} times as wide. The conditional intervals reach ${pc(cov[2]/nsel)} (median width ${fmt(md[2])}; they are very wide for estimates just beyond the threshold), and an independent replication ${pc(cov[3]/nsel)} at the ordinary width but with a second measurement.`}
+ ['c7m','c7f','c7d'].forEach(i=>$(i).addEventListener('change',run));$('c7go').onclick=run;run();})();
+
+/* ---------- Ch8 backtest overfitting ---------- */
+(function(){const KS=[1,5,10,50,100,500,1000],TS=[63,126,252,504,1008];idx('c8k',KS);idx('c8t',TS);scl('c8g',v=>v+'%');
+ const emax=K=>{if(K<=1)return 0;const g=.5772156649;return(1-g)*qn(1-1/K)+g*qn(1-1/(K*Math.E))};
+ const sharpe=(mu,T)=>{const mb=mu/Math.sqrt(252)+randn()/Math.sqrt(T),s2=rchi(T-1)/(T-1);return mb/Math.sqrt(s2)*Math.sqrt(252)};
+ function run(){const K=KS[+$('c8k').value],T=TS[+$('c8t').value],g=val('c8g')/100,R=400,SR=.8,se=Math.sqrt(252/T),ng=Math.round(K*g),IS=[],OS=[];let gen=0,pass=0;
+  for(let r=0;r<R;r++){let best=-1e9,bi=-1;for(let i=0;i<K;i++){const s=sharpe(i<ng?SR:0,T);if(s>best){best=s;bi=i}}IS.push(best);OS.push(sharpe(bi<ng?SR:0,T));if(bi<ng)gen++;if(best>emax(K)*se)pass++}
+  const em=emax(K)*se,hi=Math.max(5,Math.max(...IS)+.5),P=histLines($('c8cv'),[IS,OS],[C.r,C.g],-3,hi,50,[[em,C.y,'E[max] under noise',true],[0,C.mu,'',false]]);legend(P,[['best in sample',C.r],['same strategy, new period',C.g]],P.T+12);P.text('annualised Sharpe ratio →',P.w-P.R-130,P.h-P.B-6,C.mu);
+  const ym=emax(1000)*se*1.15+.2,Q=mk($('c8cv2'),1,1000,ym,{y0:0,L:44});Q.line(x=>emax(Math.max(1,x))*se,C.y,2.6,1,1000,160);dots(Q,[[K,mean(IS)]],C.r,5);dots(Q,[[K,mean(OS)]],C.g,5);Q.vline(K,C.mu,'',true);legend(Q,[['E[max Sharpe] if no edge',C.y],['simulated best',C.r],['its next period',C.g]],Q.T+12);Q.text('number of strategies K →',Q.w-Q.R-130,Q.h-Q.B-6,C.mu);
+  $('c8st').innerHTML=stat('best in-sample Sharpe: mean',fmt(mean(IS)),'hot')+stat('its out-of-sample Sharpe: mean',fmt(mean(OS)),'ok')+stat('E[max] under no edge (SE '+fmt(se)+')',fmt(em),'in')+stat('best is a genuine strategy',ng?pc(gen/R):'none exist','')+stat('best beats the deflated benchmark',pc(pass/R),'');
+  $('c8rd').innerHTML=`Out of ${K} strategies${ng?` (${ng} with a real Sharpe of ${SR})`:' with no edge at all'}, the winner has an in-sample Sharpe of ${fmt(mean(IS))} on average, close to the expected maximum of ${fmt(em)} for pure noise, but in the next period the same strategy delivers ${fmt(mean(OS))}${ng?`; it is a genuine strategy in ${pc(gen/R)} of the runs`:''}. The in-sample number is a statement about the search, not the strategy. ${pc(pass/R)} of the winners exceed the “deflated” benchmark that accounts for the number of trials; a longer history shrinks the benchmark (the standard error falls as T grows).`}
+ ['c8k','c8t','c8g'].forEach(i=>$(i).addEventListener('change',run));$('c8go').onclick=run;run();})();
+
+/* ---------- Ch9 empirical null ---------- */
+(function(){scl('c9m',v=>v);scl('c9f',v=>v+'%');scl('c9d',v=>fmt(v/10));scl('c9s',v=>fmt(v/100));
+ const grid=Array.from({length:161},(_,i)=>-6+.1*i);
+ function kde(z,h){const out=new Float64Array(grid.length),n=z.length;for(let g=0;g<grid.length;g++){let s=0;const x=grid[g];for(let i=0;i<n;i++){const u=(x-z[i])/h;if(u>-5&&u<5)s+=Math.exp(-.5*u*u)}out[g]=s/(n*h*Math.sqrt(2*Math.PI))}return out}
+ function fAt(f,x){const t=(x+6)/.1,i=Math.max(0,Math.min(f.length-2,Math.floor(t))),w=Math.max(0,Math.min(1,t-i));return f[i]*(1-w)+f[i+1]*w}
+ function run(){const m=val('c9m'),m1=Math.round(m*val('c9f')/100),d=val('c9d')/10,s0=val('c9s')/100,R=30,NM=['BH, theoretical null','BH, empirical null','local fdr < 0.2'],fd=[0,0,0],nd=[0,0,0];let demo=null,mu0s=0,sg0s=0,p0s=0;
+  for(let r=0;r<R;r++){const s=zsim(m,m1,d,0,s0),z=s.z,mu0=medOf(z),sg0=medOf(Array.from(z,v=>Math.abs(v-mu0)))*1.4826;let c=0;for(const v of z)if(Math.abs(v-mu0)<.6745*sg0)c++;const pi0=Math.min(1,c/m/.5),f=kde(z,.3),
+   rj=[bhRej(Array.from(z,pTwo),.1),bhRej(Array.from(z,v=>pTwo((v-mu0)/sg0)),.1),Array.from(z,v=>Math.min(1,pi0*npdf((v-mu0)/sg0)/sg0/Math.max(fAt(f,v),1e-9))<.2)];
+   rj.forEach((x,j)=>{const e=evalRej(x,s.tr);fd[j]+=(e.R?e.V/e.R:0)/R;nd[j]+=e.R/R});mu0s+=mu0/R;sg0s+=sg0/R;p0s+=pi0/R;if(r===R-1)demo={z,pi0,mu0,sg0}}
+  const P=histLines($('c9cv'),[demo.z],[C.a],-6,10,80,[]);P.line(x=>demo.pi0*npdf(x),C.r,2.2,-6,10,200,true);P.line(x=>demo.pi0*npdf((x-demo.mu0)/demo.sg0)/demo.sg0,C.g,2.2,-6,10,200);legend(P,[['z-scores',C.a],['π̂₀ N(0,1)',C.r],['π̂₀ empirical null',C.g]],P.T+12);P.text('z →',P.w-P.R-20,P.h-P.B-6,C.mu);
+  const P2=barV($('c9cv2'),fd,[C.r,C.g,C.y],['BH theoretical','BH empirical','local fdr'],Math.max(.2,...fd)*1.3,x=>pct0(x));P2.hline(.1,C.fg,'q = 0.10');P2.text('false discovery proportion',P2.L+6,P2.T+12,C.mu);
+  $('c9st').innerHTML=stat('discoveries: BH theo. · BH emp. · lfdr',nd.map(fmt).join(' · '),'')+stat('false discovery proportion',fd.map(pc).join(' · '),fd[0]>.2?'hot':'ok')+stat('empirical null: μ̂₀ · σ̂₀ (truth 0 · '+fmt(s0)+')',fmt(mu0s)+' · '+fmt(sg0s),'in')+stat('π̂₀ (truth '+fmt(1-m1/m)+')',fmt(p0s),'');
+  $('c9rd').innerHTML=s0>1.04?`The null cases are spread with SD ${fmt(s0)}, not 1, as happens with unmeasured confounding or correlated noise. BH with the theoretical N(0,1) null calls ${fmt(nd[0])} cases discoveries but ${pc(fd[0])} of them are false (target 10%). The empirical null, estimated from the bulk of the histogram (σ̂₀ = ${fmt(sg0s)}), restores control (${pc(fd[1])}; the estimate is a little above the true ${fmt(s0)} because the alternatives widen the centre, which makes it conservative), and the local fdr rule gives ${pc(fd[2])} with ${fmt(nd[2])} discoveries. Fewer discoveries, but honest ones.`:`With σ₀ = 1 the theoretical null is right, and all three rules behave: false discovery proportions ${pc(fd[0])}, ${pc(fd[1])} and ${pc(fd[2])}. Raise σ₀ to see what happens when the null is wider than assumed.`}
+ ['c9m','c9f','c9d','c9s'].forEach(i=>$(i).addEventListener('change',run));$('c9go').onclick=run;run();})();
+
+/* ---------- Ch10 sequential boundaries ---------- */
+(function(){scl('c10l',v=>v);scl('c10e',v=>fmt(v/10));const cache={};
+ function consts(L){if(cache[L])return cache[L];const N=20000,mP=new Float64Array(N),mO=new Float64Array(N);for(let i=0;i<N;i++){let S=0,a=0,b=0;for(let k=1;k<=L;k++){S+=randn();const z=Math.abs(S)/Math.sqrt(k);if(z>a)a=z;const zo=z*Math.sqrt(k/L);if(zo>b)b=zo}mP[i]=a;mO[i]=b}return cache[L]={pocock:quant(mP,.95),obf:quant(mO,.95)}}
+ function run(){const L=val('c10l'),Zf=val('c10e')/10,th=Zf/Math.sqrt(L),R=3000,cs=consts(L),NM=['naive 1.96','Bonferroni','Pocock','O’Brien–Fleming'],CL=[C.r,C.y,C.p,C.g],bz=qn(1-.05/(2*L)),
+   B=[Array.from({length:L},()=>1.96),Array.from({length:L},()=>bz),Array.from({length:L},()=>cs.pocock),Array.from({length:L},(_,k)=>cs.obf*Math.sqrt(L/(k+1)))],rej=[0,0,0,0],stop=[0,0,0,0],paths=[];
+  for(let r=0;r<R;r++){let S=0;const z=[];for(let k=1;k<=L;k++){S+=randn();z.push(Math.abs(S+th*k)/Math.sqrt(k))}if(r<6)paths.push(z);for(let j=0;j<4;j++){let hit=-1;for(let k=0;k<L;k++)if(z[k]>B[j][k]){hit=k+1;break}if(hit>0){rej[j]++;stop[j]+=hit}}}
+  const ymax=Math.max(4,B[3][0],...paths.map(p=>Math.max(...p)))*1.05,P=mk($('c10cv'),.5,L+.5,ymax,{y0:0,L:40});paths.forEach(p=>poly(P,p.map((v,k)=>[k+1,v]),'rgba(138,147,171,.55)',1.2));
+  B.forEach((b,j)=>poly(P,b.map((v,k)=>[k+1,v]),CL[j],2.4));legend(P,NM.map((s,j)=>[s,CL[j]]),P.T+12);P.text('look →',P.w-P.R-30,P.h-P.B-6,C.mu);P.text('|z| (grey: sample paths)',P.L+6,P.T+26,C.mu);
+  const P2=barV($('c10cv2'),rej.map(v=>v/R),CL,['naive','Bonferroni','Pocock','OBF'],1.12,x=>pct0(x));P2.hline(.05,C.fg,'5%');P2.text(Zf===0?'false positive rate':'probability of rejecting',P2.L+6,P2.T+12,C.mu);
+  $('c10st').innerHTML=stat(Zf===0?'false positive rate: naive · Bonf. · Pocock · OBF':'power: naive · Bonf. · Pocock · OBF',rej.map(v=>pc(v/R)).join(' · '),'')+stat('boundaries: Pocock · OBF at look 1 · OBF at the end',fmt(cs.pocock)+' · '+fmt(B[3][0])+' · '+fmt(B[3][L-1]),'in')+stat('average look at rejection: Pocock · OBF',fmt(rej[2]?stop[2]/rej[2]:NaN)+' · '+fmt(rej[3]?stop[3]/rej[3]:NaN),'')+stat('Bonferroni boundary',fmt(bz),'');
+  $('c10rd').innerHTML=(Zf===0?`With no true effect, stopping at the first |z| &gt; 1.96 among ${L} looks gives a false positive rate of ${pc(rej[0]/R)}; `:`With an expected z of ${fmt(Zf)} at the end, the naive rule rejects ${pc(rej[0]/R)} of the time, but part of that is inflation of the false positive rate (set the expected z to 0 to see it); `)+`Bonferroni (${pc(rej[1]/R)}), Pocock (${pc(rej[2]/R)}) and O’Brien–Fleming (${pc(rej[3]/R)}) are calibrated to a 5% overall level. OBF asks for |z| &gt; ${fmt(B[3][0])} at the first look but only ${fmt(B[3][L-1])} at the end, so it keeps most of the power of a single test; Pocock stops earlier on average (${fmt(rej[2]?stop[2]/rej[2]:NaN)} against ${fmt(rej[3]?stop[3]/rej[3]:NaN)}) but pays at the end (${fmt(cs.pocock)}).`}
+ ['c10l','c10e'].forEach(i=>$(i).addEventListener('change',run));$('c10go').onclick=run;run();})();
+
+/* ---------- Ch11 PPV and replication ---------- */
+(function(){scl('c11p',v=>v+'%');scl('c11w',v=>v+'%');scl('c11a',v=>v+'%');scl('c11u',v=>v+'%');
+ function run(){const pi=val('c11p')/100,pw=val('c11w')/100,a=val('c11a')/100,u=val('c11u')/100,ae=a+(1-a)*u,pe=pw+(1-pw)*u,N=1000,TP=N*pi*pe,FP=N*(1-pi)*ae,TPr=TP*pw,FPr=FP*a,ppv=(p,w)=>{const we=w+(1-w)*u;return p*we/(p*we+(1-p)*ae)};
+  const P=barV($('c11cv'),[TP,FP,TPr,FPr],[C.g,C.r,C.g,C.r],['true (significant)','false (significant)','true (replicated)','false (replicated)'],Math.max(TP,FP,1)*1.25,x=>fmt(x));P.text('expected counts per 1000 hypotheses',P.L+6,P.T+12,C.mu);
+  const Q=mk($('c11cv2'),0,.5,1.02,{y0:0,L:44}),WL=[[.2,C.r],[.5,C.y],[.8,C.g]];WL.forEach(([w,c])=>Q.line(x=>ppv(x,w),c,2.4,.001,.5,120));dots(Q,[[pi,ppv(pi,pw)]],C.fg,5.5);legend(Q,WL.map(([w,c])=>['power '+Math.round(w*100)+'%',c]),Q.T+12);Q.text('prior probability π →',Q.w-Q.R-110,Q.h-Q.B-6,C.mu);Q.text('PPV ↑',Q.L+6,Q.T+26,C.mu);
+  const rr=(TPr+FPr)/(TP+FP);
+  $('c11st').innerHTML=stat('PPV of a significant result',pc(TP/(TP+FP)),TP/(TP+FP)<.5?'hot':'ok')+stat('significant per 1000 · false among them',fmt(TP+FP)+' · '+fmt(FP),'')+stat('replication rate',pc(rr),'in')+stat('PPV after honest replication',pc(TPr/(TPr+FPr)),'ok')+stat('effective α · effective power',pc(ae)+' · '+pc(pe),'');
+  $('c11rd').innerHTML=`Of 1000 hypotheses, ${fmt(N*pi)} are real. With α = ${pc(a)}, power ${pc(pw)} and ${pc(u)} analytic flexibility, ${fmt(TP+FP)} come out significant and ${fmt(FP)} of them are false, so only ${pc(TP/(TP+FP))} of the discoveries are true. An honest replication confirms ${pc(rr)} of the list and lifts the share of true results to ${pc(TPr/(TPr+FPr))}. The same α gives very different reliability depending on the prior and the power: rare real effects (low π) are the problem, and small studies (low power) make it worse.`}
+ ['c11p','c11w','c11a','c11u'].forEach(i=>$(i).addEventListener('input',run));run();})();
+const QZ=[
+{l:'Beginner',q:'You test 20 true null hypotheses independently, each at α = 0.05. The probability that at least one is significant is about…',o:['5%','64%','95%','36%'],a:1,e:'1 − 0.95²⁰ ≈ 64%: false positives accumulate quickly.'},
+{l:'Beginner',q:'What does the false discovery rate (FDR) control?',o:['The probability that a given p-value is below α','The probability of at least one false rejection','The expected proportion of false rejections among all rejections','The power of each test'],a:2,e:'FDR = E[V/R] (0 when R = 0); FWER is the probability of at least one false rejection.'},
+{l:'Intermediate',q:'Which statement about Holm and Bonferroni is correct?',o:['Holm controls the FWER under any dependence and is uniformly at least as powerful as Bonferroni','Bonferroni is more powerful than Holm','Holm needs independent tests','Holm controls the FDR, not the FWER'],a:0,e:'Holm’s step-down thresholds α/(m − k + 1) are never stricter than α/m.'},
+{l:'Intermediate',q:'The Benjamini–Hochberg procedure at level q rejects…',o:['All p-values below q/m','Only the smallest p-value','All p-values below q','All p-values up to the largest k with p₍ₖ₎ ≤ kq/m'],a:3,e:'BH is a step-up rule with the line kq/m.'},
+{l:'Intermediate',q:'Under independence BH controls the FDR at π₀q. When many effects are real (π₀ small), BH is…',o:['Anti-conservative','Conservative: the realised FDR is below q, and adaptive versions regain power','Invalid','Exact at q'],a:1,e:'Estimating π₀ (Storey) and running BH at q/π̂₀ recovers the lost power.'},
+{l:'Intermediate',q:'Controlling the FDR at 10% guarantees that…',o:['On average over repetitions, the false discovery proportion is at most 10%; a single list can be worse','No discovery is false','The FWER is below 10%','Each list of discoveries has at most 10% false ones'],a:0,e:'FDR is an expectation; the FDP of one data set fluctuates, more so when tests are correlated.'},
+{l:'Advanced',q:'The best-performing 5 of 100 noisy candidates are selected. Their estimated performance is, on average…',o:['Exact if the sample is large','Unbiased','Biased downwards','Biased upwards (winner’s curse); an independent re-measurement will regress towards the mean'],a:3,e:'Selection picks partly on noise; the selected estimates overstate their true value.'},
+{l:'Advanced',q:'Empirical Bayes shrinkage of a set of estimates pulls extreme values…',o:['Away from the overall mean','Towards the overall mean in proportion to their noise','To zero exactly','Nowhere: it only changes the variance'],a:1,e:'θ̂ = ȳ + B(y − ȳ), with B = 1 − s²/Var(y).'},
+{l:'Advanced',q:'A treatment has the same true effect in 8 subgroups. Some subgroups are significant and others are not. The right conclusion is…',o:['The treatment works in the significant subgroups only','Nothing about heterogeneity: use an interaction test; differences between significant and non-significant results are not themselves significant','The effect differs across subgroups','The sample is biased'],a:1,e:'Heterogeneity needs a direct test; chance alone produces “mixed” subgroup results.'},
+{l:'Advanced',q:'With correlated tests, Benjamini–Hochberg…',o:['Keeps the average FDP near its target for positively dependent tests but the FDP varies much more between data sets','Never controls the FDR','Becomes more powerful','Must be replaced by Bonferroni'],a:0,e:'PRDS covers many positive dependence structures; the variability of the false discovery proportion rises with correlation.'},
+{l:'Advanced',q:'The Benjamini–Yekutieli procedure is used when…',o:['Dependence is arbitrary; it divides q by Σ1/i at a considerable cost in power','There are only two tests','Tests are independent','The effect sizes are known'],a:0,e:'BY is valid under any dependence but conservative (≈ ln m).'},
+{l:'Expert',q:'You keep only estimates with |y| > 1.96 and report y ± 1.96 for each. For a selected parameter whose true value is exactly 0, the coverage of this interval is…',o:['About 50%','0%: the interval never contains 0','100%','95%'],a:1,e:'Any |y| above 1.96 gives an interval that excludes 0.'},
+{l:'Expert',q:'Which approach gives valid intervals after selection with the right coverage conditional on the selection event?',o:['Wider intervals by a fixed 10%','Intervals from the truncated distribution of the estimate (conditional inference), sample splitting or an independent replication','Naive intervals','Intervals with the same width but a lower α'],a:1,e:'The selected estimate is not normally distributed given selection; condition on it or use fresh data.'},
+{l:'Expert',q:'The best Sharpe ratio among 1000 strategies with zero true edge, estimated from one year of daily data, will typically be…',o:['Negative','About 0','Large and positive (roughly 3 standard errors) and not repeatable out of sample','Equal to the market Sharpe'],a:2,e:'E[max of K normals] ≈ √(2 ln K); the out-of-sample Sharpe of the winner is about 0.'},
+{l:'Expert',q:'In a large screening exercise the histogram of z-scores is clearly wider than N(0,1) in its centre. Applying BH with the theoretical null will likely…',o:['Have no discoveries','Be conservative','Be exact','Produce many false discoveries; an empirical null estimated from the bulk is more appropriate'],a:3,e:'Confounding or correlation inflates the null spread; the theoretical null is too narrow.'},
+{l:'Expert',q:'You monitor an A/B test with 5 looks and stop at the first p < 0.05. The overall false positive rate is about…',o:['14% (and rising with more looks)','2.5%','5%','50%'],a:0,e:'Repeated looks inflate α; use Pocock, O’Brien–Fleming or alpha-spending boundaries.'},
+{l:'Expert',q:'O’Brien–Fleming boundaries differ from Pocock boundaries because they…',o:['Ignore the number of looks','Allow unlimited looks','Are constant across looks','Are very strict at early looks and close to the usual critical value at the end, preserving power at the final analysis'],a:3,e:'OBF boundary c√(L/k) spends little α early.'},
+{l:'Expert',q:'10% of tested hypotheses are real, power is 60% and α = 5%. The probability that a significant result is real (PPV) is about…',o:['10%','57%','90%','95%'],a:1,e:'0.1·0.6 / (0.1·0.6 + 0.9·0.05) = 0.06/0.105 ≈ 57%.'}
+];
+(function(){const st=store.get('mt_quiz',{});
+ function render(){const box=$('quiz');box.innerHTML='';
+  QZ.forEach((q,i)=>{const d=document.createElement('div');d.className='q'+(st[i]!=null?' done':'');d.innerHTML=`<div class="qh">Q${i+1} · ${q.l}</div><div style="margin:4px 0 6px"><b>${q.q}</b></div>`;
+   q.o.forEach((o,j)=>{const b=document.createElement('button');b.className='opt';b.textContent=o;if(st[i]!=null){if(j===q.a)b.classList.add('good');else if(j===st[i])b.classList.add('bad')}b.onclick=()=>{if(st[i]!=null)return;st[i]=j;store.set('mt_quiz',st);render();meter()};d.appendChild(b)});
+   const e=document.createElement('div');e.className='ex';e.innerHTML=(st[i]===q.a?'✅ ':'❌ ')+q.e;d.appendChild(e);box.appendChild(d)});
+  const ans=Object.keys(st).length,ok=QZ.filter((q,i)=>st[i]===q.a).length;
+  $('qscore').innerHTML=stat('answered',ans+' / '+QZ.length,'in')+stat('correct',ok,'ok')+stat('score',ans?Math.round(100*ok/ans)+'%':'—',ok/Math.max(ans,1)>=.8?'ok':'warn')+stat('verdict',ans<QZ.length?'keep going':ok>=16?'multiple-testing master':ok>=13?'strong':'review ch. 1–11','')}
+ $('qreset').onclick=()=>{Object.keys(st).forEach(k=>delete st[k]);store.set('mt_quiz',st);render();meter()};
+ window.__qst=st;render();})();
+const CHK=['Compute the chance of at least one false positive among m tests and explain hidden multiplicity.','Distinguish FWER from FDR and choose between them for a task.','Apply Bonferroni, Holm and Hochberg and know their assumptions.','Apply Benjamini–Hochberg by hand and read the BH line on a p-value plot.','Explain what FDR guarantees (an average) and how dependence affects it.','Use Storey’s π₀ and q-values and know when adaptive FDR is safe.','Explain the winner’s curse and correct it by confirmation or shrinkage.','Analyse subgroups properly: interaction test, pre-specification, adjustment.','Explain why naive intervals fail after selection and name valid alternatives.','Account for the number of trials in a backtest or model search (deflation, holdout).','Use local fdr and an empirical null for large-scale screening.','Design a group-sequential test with Pocock or O’Brien–Fleming boundaries.','Compute PPV and the effect of power, prior and analytic flexibility.','Write the multiplicity and selection section of a model-validation or experiment report.'];
+(function(){const st=store.get('mt_chk',{}),box=$('chk');CHK.forEach((t,i)=>{const l=document.createElement('label'),c=document.createElement('input');c.type='checkbox';c.checked=!!st[i];c.onchange=()=>{st[i]=c.checked;store.set('mt_chk',st);meter()};l.appendChild(c);const s=document.createElement('span');s.textContent=t;l.appendChild(s);box.appendChild(l)});window.__cst=st;})();
+function meter(){const q=window.__qst||{},c=window.__cst||{};const ok=QZ.filter((x,i)=>q[i]===x.a).length,ck=Object.values(c).filter(Boolean).length;const p=Math.round(100*(.6*ok/QZ.length+.4*ck/CHK.length));$('mtxt').textContent='Mastery: '+p+'%  (exam + checklist)';$('mbar').style.width=p+'%';store.set('mastery_mt',p)}
+meter();
+
+/* ---------- Navigation ---------- */
+(function(){const nav=$('nav');let html='';
+ document.querySelectorAll('main .part, main section.ch').forEach(el=>{if(el.classList.contains('part'))html+=`<div class="pt">${el.textContent}</div>`;else{const h=el.querySelector('h2'),num=h.querySelector('.num').textContent,t=Array.from(h.childNodes).filter(n=>n.nodeType===3).map(n=>n.textContent).join('').trim();html+=`<a href="#${el.id}" data-id="${el.id}">${num}. ${t}</a>`}});
+ nav.innerHTML=html;const links=nav.querySelectorAll('a'),io=new IntersectionObserver(es=>{es.forEach(e=>{if(e.isIntersecting)links.forEach(a=>a.classList.toggle('on',a.dataset.id===e.target.id))})},{rootMargin:'-20% 0px -70% 0px'});
+ document.querySelectorAll('section.ch').forEach(s=>io.observe(s));
+ $('menu').onclick=()=>$('side').classList.toggle('open');nav.addEventListener('click',e=>{if(e.target.tagName==='A')$('side').classList.remove('open')});
+ window.addEventListener('scroll',()=>{const h=document.documentElement;$('prog').style.width=(100*h.scrollTop/(h.scrollHeight-h.clientHeight))+'%'},{passive:true});})();
+</script>
+</body>
+</html>

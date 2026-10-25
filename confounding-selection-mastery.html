@@ -1,0 +1,606 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Confounding and Selection Mastery</title>
+<style>
+:root{--bg:#0b0e17;--panel:#121726;--panel2:#171d30;--line:#232a3d;--fg:#e8ebf5;--mu:#8a93ab;--a:#6ea8ff;--r:#ff6b81;--y:#ffd166;--g:#4ade80;--p:#c084fc;--t:#5eead4}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;background:var(--bg);color:var(--fg);font:16px/1.7 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+a{color:var(--a)}
+#prog{position:fixed;top:0;left:0;height:3px;background:linear-gradient(90deg,var(--a),var(--p),var(--r));width:0;z-index:50}
+.side{position:fixed;left:0;top:0;bottom:0;width:290px;background:#0e1220;border-right:1px solid var(--line);overflow:auto;padding:18px 14px 90px;z-index:40;transition:transform .25s}
+.side h1{font-size:15px;margin:0 0 2px}
+.side small{color:var(--mu)}
+.side .pt{margin:16px 0 4px;font-size:11px;text-transform:uppercase;letter-spacing:1.3px;color:var(--p)}
+.side a{display:block;color:var(--mu);text-decoration:none;padding:5px 9px;border-radius:7px;font-size:13.5px;line-height:1.35}
+.side a:hover{background:var(--panel);color:var(--fg)}
+.side a.on{background:var(--panel2);color:var(--fg);box-shadow:inset 3px 0 var(--a)}
+.side a.back{color:var(--t);padding-left:0;margin-bottom:6px}
+.meter{position:fixed;left:0;bottom:0;width:290px;background:#0e1220;border-top:1px solid var(--line);padding:10px 16px;z-index:41;font-size:12px;color:var(--mu)}
+.meter .bar{height:7px;background:var(--line);border-radius:6px;margin-top:5px;overflow:hidden}
+.meter .bar i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--g),var(--t));transition:width .4s}
+#menu{display:none;position:fixed;top:10px;left:10px;z-index:60;background:var(--panel2);color:var(--fg);border:1px solid var(--line);border-radius:9px;padding:7px 12px;font-size:14px;cursor:pointer}
+main{margin-left:290px;padding:0 34px 120px;max-width:1090px}
+.hero{padding:70px 0 30px}
+.hero h1{font-size:clamp(32px,5vw,56px);line-height:1.08;margin:0 0 14px;background:linear-gradient(100deg,#fff,var(--y) 40%,var(--r));-webkit-background-clip:text;background-clip:text;color:transparent}
+.hero p{font-size:19px;color:#c3c9dc;max-width:780px}
+.chips{display:flex;flex-wrap:wrap;gap:8px;margin:18px 0}
+.chip{border:1px solid var(--line);background:var(--panel);padding:5px 12px;border-radius:99px;font-size:13px;color:var(--mu)}
+.chip b{color:var(--fg)}
+.part{margin:90px 0 0;padding-top:22px;border-top:1px solid var(--line);font-size:12px;letter-spacing:2px;text-transform:uppercase;color:var(--p)}
+section.ch{padding-top:30px}
+h2{font-size:30px;line-height:1.2;margin:10px 0 8px;display:flex;gap:12px;align-items:center;flex-wrap:wrap}
+h2 .num{display:inline-grid;place-items:center;width:40px;height:40px;border-radius:12px;background:var(--panel2);border:1px solid var(--line);font-size:18px;color:var(--a)}
+.lvl{font-size:11px;font-weight:600;letter-spacing:.8px;text-transform:uppercase;padding:3px 9px;border-radius:99px;border:1px solid}
+.lvl.b{color:var(--g);border-color:#1f5c3a}.lvl.i{color:var(--a);border-color:#244a85}.lvl.a{color:var(--y);border-color:#6b5420}.lvl.e{color:var(--r);border-color:#7a2c3a}
+h3{font-size:19px;margin:30px 0 6px;color:#fff}
+p{margin:10px 0}li{margin:5px 0}
+code,.f{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace}
+code{background:var(--panel2);padding:1px 6px;border-radius:5px;font-size:.9em}
+.f{display:block;white-space:pre-wrap;background:#0e1322;border:1px solid var(--line);border-left:3px solid var(--a);padding:12px 16px;border-radius:9px;margin:14px 0;overflow-x:auto;font-size:15px;color:#dbe4ff;line-height:1.8}
+.co{border-radius:12px;padding:13px 17px;margin:16px 0;border:1px solid var(--line);background:var(--panel)}
+.co>b:first-child{display:block;margin-bottom:2px;font-size:12px;letter-spacing:1px;text-transform:uppercase}
+.co.def{border-left:4px solid var(--a)}.co.def>b:first-child{color:var(--a)}
+.co.warn{border-left:4px solid var(--r)}.co.warn>b:first-child{color:var(--r)}
+.co.tip{border-left:4px solid var(--g)}.co.tip>b:first-child{color:var(--g)}
+.co.key{border-left:4px solid var(--y);background:#171608}.co.key>b:first-child{color:var(--y)}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:18px 20px;margin:22px 0;box-shadow:0 8px 30px rgba(0,0,0,.25)}
+.card>h4{margin:0 0 3px;font-size:13px;letter-spacing:1.2px;text-transform:uppercase;color:var(--t)}
+.card>p.sub{margin:0 0 12px;color:var(--mu);font-size:14.5px}
+.ctl{display:flex;flex-wrap:wrap;gap:10px 22px;align-items:center;margin:8px 0 10px}
+.ctl label{display:flex;gap:8px;align-items:center;font-size:14px;color:#c3c9dc}
+.ctl output{min-width:38px;font-family:ui-monospace,monospace;color:var(--y);font-size:13px}
+input[type=range]{accent-color:var(--a);width:150px}
+input[type=checkbox]{accent-color:var(--a)}
+select,input[type=number],input[type=text]{background:#0e1322;color:var(--fg);border:1px solid var(--line);border-radius:8px;padding:6px 9px;font:inherit;font-size:14px}
+button{background:linear-gradient(180deg,#2c4a80,#233b68);color:#fff;border:1px solid #3a5a98;border-radius:9px;padding:7px 14px;font:inherit;font-size:14px;cursor:pointer}
+button:hover{filter:brightness(1.15)}
+button.alt{background:var(--panel2);border-color:var(--line);color:var(--fg)}
+canvas{width:100%;height:270px;display:block;background:#0e1322;border:1px solid var(--line);border-radius:10px;margin-top:6px}
+canvas.sm{height:210px}canvas.tl{height:330px}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(125px,1fr));gap:9px;margin:12px 0}
+.stat{background:#0e1322;border:1px solid var(--line);border-radius:10px;padding:8px 11px}
+.stat b{display:block;font-size:17px;font-family:ui-monospace,monospace}
+.stat span{font-size:11.5px;color:var(--mu);text-transform:uppercase;letter-spacing:.7px}
+.stat.hot b{color:var(--r)}.stat.ok b{color:var(--g)}.stat.warn b{color:var(--y)}.stat.in b{color:var(--a)}
+.read{margin:8px 0 0;padding:10px 14px;background:#0e1322;border:1px dashed #33406a;border-radius:10px;font-size:14.5px;color:#d3dbf3}
+table{border-collapse:collapse;width:100%;margin:12px 0;font-size:14px}
+th,td{border:1px solid var(--line);padding:7px 10px;text-align:left;vertical-align:top}
+th{background:var(--panel2);font-size:12px;text-transform:uppercase;letter-spacing:.6px;color:var(--mu)}
+td.n{font-family:ui-monospace,monospace;text-align:right}
+.tw{overflow-x:auto}
+.pill{display:inline-block;padding:1px 9px;border-radius:99px;font-size:12px;font-weight:600}
+.pill.r{background:#3a1520;color:var(--r)}.pill.g{background:#10321f;color:var(--g)}.pill.y{background:#3a2f0e;color:var(--y)}.pill.m{background:#202637;color:var(--mu)}
+details{background:var(--panel);border:1px solid var(--line);border-radius:11px;padding:9px 15px;margin:9px 0}
+details summary{cursor:pointer;font-weight:600}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.q{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:14px 18px;margin:14px 0}
+.q .qh{font-size:12px;letter-spacing:1px;text-transform:uppercase;color:var(--mu)}
+.q .opt{display:block;width:100%;text-align:left;margin:6px 0;background:#0e1322;border:1px solid var(--line);color:var(--fg);border-radius:9px;padding:9px 12px}
+.q .opt.good{border-color:var(--g);background:#0e2418}.q .opt.bad{border-color:var(--r);background:#2a1119}
+.q .ex{display:none;margin-top:8px;font-size:14.5px;color:#c3c9dc}
+.q.done .ex{display:block}
+.chk label{display:flex;gap:10px;align-items:flex-start;padding:6px 0;cursor:pointer}
+.chk input{margin-top:6px;accent-color:var(--g);width:17px;height:17px}
+.sigrow{display:grid;grid-template-columns:minmax(170px,2fr) 1fr 1fr auto;gap:8px 14px;align-items:center;padding:6px 0;border-top:1px dashed #1b2236}
+.sigrow:first-of-type{border-top:0}
+.sigrow label{display:flex;gap:6px;align-items:center;font-size:13.5px;color:#c3c9dc}
+@media(max-width:900px){
+ .side{transform:translateX(-100%)}.side.open{transform:none}.meter{display:none}
+ #menu{display:block}main{margin-left:0;padding:0 16px 100px}.two{grid-template-columns:1fr}.hero{padding-top:60px}
+ .sigrow{grid-template-columns:1fr 1fr}
+}
+</style>
+</head>
+<body>
+<div id="prog"></div>
+<button id="menu">☰ Contents</button>
+<nav class="side" id="side"><a class="back" href="index.html">← All courses</a><h1>Confounding &amp; Selection</h1><small>12 chapters · 11 labs · exam</small><div id="nav"></div></nav>
+<div class="meter"><div id="mtxt">Mastery: 0%</div><div class="bar"><i id="mbar"></i></div></div>
+
+<main>
+<header class="hero">
+ <h1>Confounding, selection bias, colliders and Simpson’s paradox: when an association is not the effect you want.</h1>
+ <p>Most questions a bank asks are causal: does the limit increase raise spend or default, does a retention call reduce churn, does a new collections strategy work? Data collected without randomisation answers a different question, namely how outcomes differ between the people who happened to get each treatment. The gap between the two has a small number of sources: <em>confounding</em> (a common cause), <em>selection</em> (who enters the data, often through a collider), <em>over-adjustment</em> (controlling for something the treatment causes), <em>measurement</em> (an imperfect control) and <em>chance selection</em> (regression to the mean). This page names them with causal diagrams, simulates each with a known truth so the bias can be measured, and ends with sensitivity analysis and negative controls for what cannot be adjusted away.</p>
+ <div class="chips"><span class="chip"><b>Part I</b> Confounding and diagrams</span><span class="chip"><b>Part II</b> Selection and bad controls</span><span class="chip"><b>Part III</b> Sensitivity and practice</span></div>
+ <div class="co tip"><b>How to use this</b>Sliders change the setting; heavy labs update when you release a slider or press the button. Prerequisites: the regression, missing-data and multiple-testing pages help. Every lab simulates data where the true causal effect is known, so the bias of each analysis can be read off directly. The next page (item 23) turns to designs that remove these biases by construction.</div>
+</header>
+
+<div class="part">Part I · Confounding and causal diagrams</div>
+
+<section class="ch" id="c1">
+<h2><span class="num">1</span>From association to effect: confounding <span class="lvl b">Beginner</span></h2>
+<p>Let X be a treatment (a limit increase, a retention offer) and Y an outcome. The causal effect asks what Y would be for the same people if X were changed; the observed association compares different people. A <b>confounder</b> Z is a common cause of X and Y: customers with better finances get larger limits <em>and</em> repay better, so limits look protective even if they do nothing. If Z is measured, comparing like with like (adjusting for Z) removes the bias; if it is not, the bias remains however large the sample.</p>
+<p>In the linear model Y = βX + κZ + ε with X = γZ + e (unit variances), regressing Y on X alone gives not β but</p>
+<div class="f">naive slope = β + κγ / (1 + γ²)        bias = (effect of Z on Y) × (association of Z with X)</div>
+<p>The bias has the sign of κγ and does not shrink with n: more data only makes the wrong answer more precise. Randomisation breaks the arrow Z → X (γ = 0), which is why it is the benchmark. Confounding is a property of the causal structure, not of the data: a variable is a confounder because of how it is generated, and no statistical test of the data alone can establish this.</p>
+<div class="card"><h4>Lab 1 · Naive versus adjusted estimates</h4>
+ <p class="sub">Z → X, Z → Y and X → Y with true effect β. Left: one sample of 400 customers, coloured by whether Z is high; the red line is the naive fit, the green lines are the within-group fits (slope close to β). Right: the naive and the Z-adjusted estimates over 500 repetitions (n = 300).</p>
+ <div class="ctl"><label>Z → X strength γ <input type="range" id="c1g" min="0" max="15" step="1" value="10"><output id="c1gv"></output></label><label>Z → Y strength κ <input type="range" id="c1k" min="-20" max="20" step="1" value="10"><output id="c1kv"></output></label><label>true effect β <input type="range" id="c1b" min="-10" max="20" step="1" value="5"><output id="c1bv"></output></label><button id="c1go">Re-simulate</button></div>
+ <div class="two"><canvas class="sm" id="c1cv"></canvas><canvas class="sm" id="c1cv2"></canvas></div><div class="stats" id="c1st"></div><div class="read" id="c1rd"></div></div>
+</section>
+
+<section class="ch" id="c2">
+<h2><span class="num">2</span>Simpson’s paradox <span class="lvl b">Beginner</span></h2>
+<p>Simpson’s paradox is confounding seen in a table: a trend that appears in every subgroup reverses when the groups are pooled. A classic bank version: approval rates are higher for one channel than the other in <em>each</em> customer segment, yet lower overall, because that channel receives mostly applications from the hard segment. The numbers are all correct; the paradox is only in the temptation to read the pooled figure causally.</p>
+<p>Which table to trust is not a statistical question. If the segment is a <b>confounder</b> (it influences who is in which channel and the outcome), the segment-specific comparison is closer to the effect. If the “segment” is instead a <b>mediator</b> or <b>collider</b> (caused by the treatment, or by both treatment and outcome), the pooled comparison is the right one and stratifying creates bias. The diagram, not the data, decides: that is the lesson of the whole page. In regression form, the pooled slope is a mixture of the within-group slope b and the between-group trend:</p>
+<div class="f">pooled slope ≈ b − h·s·Var(g) / (1 + s²·Var(g))   (groups g = 0,1,2 shifted by s in x and by −h in y)</div>
+<div class="card"><h4>Lab 2 · A reversal you can dial</h4>
+ <p class="sub">Three customer segments. Within each, Y rises with X at slope b. Segment means are shifted along X by s and down in Y by h. Left: the data with within-segment fits (solid) and the pooled fit (dashed white). Right: the pooled slope, the segment-adjusted slope and the truth.</p>
+ <div class="ctl"><label>spread of segment means s <input type="range" id="c2s" min="0" max="30" step="1" value="20"><output id="c2sv"></output></label><label>between-segment drop h <input type="range" id="c2h" min="0" max="30" step="1" value="25"><output id="c2hv"></output></label><label>within slope b <input type="range" id="c2b" min="-10" max="20" step="1" value="5"><output id="c2bv"></output></label><button id="c2go">Re-simulate</button></div>
+ <div class="two"><canvas class="sm" id="c2cv"></canvas><canvas class="sm" id="c2cv2"></canvas></div><div class="stats" id="c2st"></div><div class="read" id="c2rd"></div></div>
+</section>
+
+<section class="ch" id="c3">
+<h2><span class="num">3</span>Causal diagrams: chains, forks and colliders <span class="lvl i">Intermediate</span></h2>
+<p>A causal diagram (DAG) draws an arrow from each variable to the variables it directly causes. Only three local structures matter for association:</p>
+<ul><li><b>Chain</b> X → Z → Y: Z is a mediator. X and Y are associated; conditioning on Z blocks the path.</li><li><b>Fork</b> X ← Z → Y: Z is a common cause (confounder). X and Y are associated through Z; conditioning on Z blocks the path.</li><li><b>Collider</b> X → Z ← Y: Z is a common effect. X and Y are <em>not</em> associated; conditioning on Z (or on anything caused by Z) <b>opens</b> the path and creates an association.</li></ul>
+<p>Association flows along every path that is not blocked; a path is blocked by conditioning on a non-collider on it, or by not conditioning on a collider (and its descendants). Two variables are <b>d-separated</b> by a set S if all paths between them are blocked given S; in a causal model d-separation implies conditional independence. The collider rule is the counter-intuitive one and the source of most selection bias: it says that “adjusting for more” can create a relationship that was not there.</p>
+<div class="card"><h4>Lab 3 · The three structures, with and without conditioning on Z</h4>
+ <p class="sub">All arrows have strength a. Left: the correlation of X and Y marginally and after conditioning on Z (partial correlation), for each structure (n = 4000). Right: the collider case; points are coloured by whether Z is high, and the lines are the fits within each colour.</p>
+ <div class="ctl"><label>arrow strength a <input type="range" id="c3a" min="2" max="15" step="1" value="8"><output id="c3av"></output></label><button id="c3go">Re-simulate</button></div>
+ <div class="two"><canvas class="sm" id="c3cv"></canvas><canvas class="sm" id="c3cv2"></canvas></div><div class="stats" id="c3st"></div><div class="read" id="c3rd"></div></div>
+</section>
+
+<section class="ch" id="c4">
+<h2><span class="num">4</span>The backdoor criterion and adjustment sets <span class="lvl i">Intermediate</span></h2>
+<p>To estimate the <em>total</em> effect of X on Y from observational data, close every non-causal (“backdoor”) path from X to Y, meaning every path that starts with an arrow into X, and leave the causal paths open. A set S satisfies the <b>backdoor criterion</b> if it contains no descendant of X and blocks every backdoor path. Then the effect is identified by adjusting for S: E[Y | do(X = x)] = Σ_s E[Y | X = x, S = s] P(S = s). In practice this is a regression with S as covariates (correct if the model is correct) or matching, weighting or stratification on S.</p>
+<p>Rules of thumb that follow from the diagram: <b>include</b> common causes of X and Y; <b>exclude</b> mediators (for the total effect), colliders and their descendants, and anything caused by the treatment; <b>optional but useful</b>: causes of Y only (they reduce variance); <b>harmful for precision</b>: causes of X only (they inflate variance, and amplify any residual bias). A variable being “correlated with both” is not enough to make it a confounder; being “pre-treatment” is also not enough (chapter 8).</p>
+<div class="card"><h4>Lab 4 · Choose the adjustment set</h4>
+ <p class="sub">Diagram: C → X, C → Y (confounder); X → M → Y and X → Y (mediator, total effect 0.98); X → K ← Y (collider); W → Y (outcome-only cause); I → X (treatment-only cause). Tick the variables to adjust for. Left: the distribution of your estimate over 400 samples (n = 300) against the truth. Right: the average bias of seven standard sets.</p>
+ <div class="ctl"><label><input type="checkbox" id="c4C"> C confounder</label><label><input type="checkbox" id="c4M"> M mediator</label><label><input type="checkbox" id="c4K"> K collider</label><label><input type="checkbox" id="c4W"> W causes Y</label><label><input type="checkbox" id="c4I"> I causes X</label><button id="c4p1" class="alt">{C}</button><button id="c4p2" class="alt">{C, W}</button><button id="c4p3" class="alt">everything</button><button id="c4go">Re-simulate</button></div>
+ <div class="two"><canvas class="sm" id="c4cv"></canvas><canvas class="sm" id="c4cv2"></canvas></div><div class="stats" id="c4st"></div><div class="read" id="c4rd"></div></div>
+</section>
+
+<div class="part">Part II · Selection and bad controls</div>
+
+<section class="ch" id="c5">
+<h2><span class="num">5</span>Collider bias and selection <span class="lvl a">Advanced</span></h2>
+<p>Selection bias arises when the data are restricted by something caused by both the exposure and the outcome (or by their causes). Conditioning on such a collider, whether by explicit filtering, by who responds, by who is approved or by who survives, induces an association between its causes even if there is none in the population. This is <b>Berkson’s paradox</b>: in hospital patients, two unrelated diseases look negatively associated because each independently raises the chance of admission. The banking version: among <em>approved</em> applicants, income and credit history look negatively related, because approval needs a high combination of the two; weak on one means strong on the other.</p>
+<p>Three consequences recur. (1) Relationships estimated on a selected sample can be wrong in sign and not just in size (“higher bureau score, riskier customer”). (2) The distortion depends on how hard the selection is: strongest when the filter is tight and when it is driven by the variables in question. (3) It cannot be diagnosed from the selected data alone; you need to know the selection mechanism or have data on the unselected. The same logic covers volunteer and non-response bias, attrition, survivor bias, and “controlling for” a variable that is a consequence of both the treatment and the outcome.</p>
+<div class="card"><h4>Lab 5 · Selecting on a score creates a correlation</h4>
+ <p class="sub">X and Y (two customer characteristics) have true correlation ρ. Customers are kept if a score S = X + Y + noise is in the top share. Left: all customers (grey) and the kept ones (colour) with a fit for each. Right: the correlation among the kept customers as the kept share changes; the dot is your setting.</p>
+ <div class="ctl"><label>true correlation ρ <input type="range" id="c5r" min="-8" max="8" step="1" value="0"><output id="c5rv"></output></label><label>share kept <input type="range" id="c5s" min="5" max="90" step="5" value="30"><output id="c5sv"></output></label><label>noise in the rule <input type="range" id="c5n" min="0" max="20" step="1" value="5"><output id="c5nv"></output></label><button id="c5go">Re-simulate</button></div>
+ <div class="two"><canvas class="sm" id="c5cv"></canvas><canvas class="sm" id="c5cv2"></canvas></div><div class="stats" id="c5st"></div><div class="read" id="c5rd"></div></div>
+</section>
+
+<section class="ch" id="c6">
+<h2><span class="num">6</span>Mediators, over-adjustment and “bad controls” <span class="lvl a">Advanced</span></h2>
+<p>Suppose a pricing offer X is randomised, and it works partly through the customer’s line utilisation M, which also depends on unobserved appetite for credit U (and U also drives default Y). The <b>total effect</b> of X is the full change in Y, including the path through M; it is estimated by regressing Y on X, with no controls at all (randomisation). The <b>direct effect</b> (the part not through M) is what you would try to get by also controlling for M. It fails whenever U exists: M is a collider on X → M ← U, so conditioning on M links X to U, and U drives Y. A clean randomised comparison becomes biased through an innocent-looking control.</p>
+<p>Hence a practical rule: do not control for post-treatment variables unless the question is explicitly about direct effects and you can defend the absence of unmeasured common causes of mediator and outcome (a much stronger assumption than for the total effect). The same holds for outcomes measured after the treatment, such as “among customers who stayed”. Formal mediation analysis uses natural direct and indirect effects; both need sequential ignorability.</p>
+<div class="card"><h4>Lab 6 · Controlling for a mediator when something unmeasured drives it</h4>
+ <p class="sub">X is randomised. X → M with strength a, M → Y with b, X → Y directly with d, and an unobserved U → M, U → Y of strength u. Left: average estimates over 400 samples (n = 400) of the total and direct effects, by the correct and the controlled regression, next to the truth. Right: the distribution of the “direct effect” estimate from Y ~ X + M.</p>
+ <div class="ctl"><label>X → M a <input type="range" id="c6a" min="0" max="15" step="1" value="8"><output id="c6av"></output></label><label>M → Y b <input type="range" id="c6b" min="0" max="15" step="1" value="6"><output id="c6bv"></output></label><label>direct d <input type="range" id="c6d" min="-10" max="15" step="1" value="5"><output id="c6dv"></output></label><label>unmeasured U strength u <input type="range" id="c6u" min="0" max="15" step="1" value="8"><output id="c6uv"></output></label><button id="c6go">Re-simulate</button></div>
+ <div class="two"><canvas class="sm" id="c6cv"></canvas><canvas class="sm" id="c6cv2"></canvas></div><div class="stats" id="c6st"></div><div class="read" id="c6rd"></div></div>
+</section>
+
+<section class="ch" id="c7">
+<h2><span class="num">7</span>Survivorship, truncation and reject inference <span class="lvl a">Advanced</span></h2>
+<p>A credit model is trained on loans that were booked, so the outcome is observed only for approved applicants: the training data are a <b>selected sample</b>. Whether this matters depends on how selection depended on the data. If approval depends <em>only on the observed features</em> X (selection on observables, “missing at random” given X) and the model is correctly specified, the relation of Y to X in the approved region is unbiased; the danger is <b>extrapolation</b>: the model never saw the rejected region, and if the true relationship is curved it will be wrong there. If approval also used information not in the data (a banker’s override, an unrecorded document, a policy exception: U), then among the approved, X and U are correlated through the selection collider, and the estimated coefficients are biased even within the approved region.</p>
+<p>Remedies: <b>reject inference</b> (parcelling, augmentation, fuzzy or extrapolation methods; each rests on assumptions that the data cannot verify), <b>exploration</b> (a small random-approval band, the only fully assumption-free source of rejected-region outcomes), through-the-door and cut-off-neighbourhood designs (chapter on regression discontinuity in the next page), bounds (worst-case outcomes for the rejected), and conservative treatment of the rejected region in policy. The same structure covers <b>survivorship bias</b> (analysing only the funds, branches or customers that still exist), left truncation (customers observed only after they entered the book) and immortal-time bias (misclassifying the period during which an event could not have happened).</p>
+<div class="card"><h4>Lab 7 · Fitting a risk model on approved applicants only</h4>
+ <p class="sub">Application score s (higher is better), unobserved officer information u, risk Y = −0.8·s + c·u + q·(s² − 1) + noise. Applicants are approved if s + δ·u ranks in the top share. Left: the approved (colour) and rejected (grey, outcome unobserved in practice) with the true curve (dashed) and the fit on the approved. Right: the quantities that matter for the rejected region.</p>
+ <div class="ctl"><label>approval share <input type="range" id="c7s" min="20" max="90" step="5" value="50"><output id="c7sv"></output></label><label>override on u (δ) <input type="range" id="c7d" min="0" max="15" step="1" value="0"><output id="c7dv"></output></label><label>u → risk (c) <input type="range" id="c7u" min="0" max="10" step="1" value="6"><output id="c7uv"></output></label><label>curvature q <input type="range" id="c7q" min="-5" max="5" step="1" value="0"><output id="c7qv"></output></label><button id="c7go">Re-simulate</button></div>
+ <div class="two"><canvas class="sm" id="c7cv"></canvas><canvas class="sm" id="c7cv2"></canvas></div><div class="stats" id="c7st"></div><div class="read" id="c7rd"></div></div>
+</section>
+
+<section class="ch" id="c8">
+<h2><span class="num">8</span>Imperfect adjustment: proxies, residual confounding and M-bias <span class="lvl a">Advanced</span></h2>
+<p><b>Noisy confounders.</b> Adjustment works on the variable actually entered. If the true confounder Z (income, say) is measured with error, or only a proxy (a postcode, a salary-credit band) is available, adjusting for the proxy removes only part of the bias: residual confounding remains, shrinking as reliability rises. With measurement error that is itself related to treatment, the leftover can even be amplified. The consequence is that “we controlled for it” should be read as “to the extent that the control measures it”.</p>
+<p><b>M-bias.</b> A pre-treatment variable that is a collider is a bad control even though it is “before” the treatment: with U₁ → X, U₁ → M, U₂ → M, U₂ → Y and no effect of X on Y, M is associated with both X and Y yet adjusting for it produces a spurious effect (conditioning on the collider M links U₁ to U₂). The M-bias is usually modest compared with omitted-confounder bias, which is why practitioners tend to adjust for pre-treatment variables, but it shows that the rule is “block backdoor paths”, not “adjust for everything measured before treatment”.</p>
+<div class="card"><h4>Lab 8 · A noisy control and a pre-treatment collider</h4>
+ <p class="sub">True effect of X on Y is zero in both panels. Left: the estimated effect after adjusting for a proxy of the confounder against the proxy’s reliability (the share of its variance that is signal); dot = your reliability. Right: the estimated effect after adjusting for the pre-treatment collider M against its strength (without adjusting for M it is zero); dot = your strength. (n = 15 000 per point.)</p>
+ <div class="ctl"><label>confounding strength <input type="range" id="c8g" min="2" max="15" step="1" value="10"><output id="c8gv"></output></label><label>proxy reliability <input type="range" id="c8r" min="10" max="100" step="10" value="70"><output id="c8rv"></output></label><label>M-bias strength <input type="range" id="c8m" min="2" max="12" step="1" value="7"><output id="c8mv"></output></label><button id="c8go">Re-simulate</button></div>
+ <div class="two"><canvas class="sm" id="c8cv"></canvas><canvas class="sm" id="c8cv2"></canvas></div><div class="stats" id="c8st"></div><div class="read" id="c8rd"></div></div>
+</section>
+
+<div class="part">Part III · Chance selection, sensitivity and practice</div>
+
+<section class="ch" id="c9">
+<h2><span class="num">9</span>Regression to the mean as selection <span class="lvl a">Advanced</span></h2>
+<p>If a measurement is partly stable level and partly transient noise, units selected for an extreme value at time 1 are, on average, less extreme at time 2 with no intervention at all. The expected change of the selected group is −(1 − r)·(its mean standardised score at time 1), where r is the correlation between the two measurements. Banks meet it constantly: accounts flagged for the worst delinquency this month, branches with the worst churn last quarter, customers with the highest utilisation spike. A “before and after” comparison of the treated flagged group then shows improvement that is largely selection on noise.</p>
+<p>The fix is a <b>concurrent control group drawn from the same selection rule</b>: among the flagged, randomise who gets the action. Comparing with unflagged units does not work (they have a different mean), nor does a control that was selected on a different measure. Related: <b>Campbell’s law</b>, where selection on a target metric invites gaming, and the <b>winner’s curse</b> (multiple testing page) for selection of the best of many.</p>
+<div class="card"><h4>Lab 9 · Improvement with no treatment effect</h4>
+ <p class="sub">A standardised measure observed twice (persistence r = correlation between periods). The worst share at time 1 is selected; half of them are randomly treated (effect e in sd, 0 by default). Left: time 1 against time 2 with the selected highlighted. Right: the average change from time 1 to time 2 for the treated and for the untreated selected customers, and the randomised estimate.</p>
+ <div class="ctl"><label>persistence r <input type="range" id="c9r" min="10" max="100" step="5" value="50"><output id="c9rv"></output></label><label>share selected <input type="range" id="c9s" min="5" max="50" step="5" value="10"><output id="c9sv"></output></label><label>true effect e <input type="range" id="c9e" min="-10" max="10" step="1" value="0"><output id="c9ev"></output></label><button id="c9go">Re-simulate</button></div>
+ <div class="two"><canvas class="sm" id="c9cv"></canvas><canvas class="sm" id="c9cv2"></canvas></div><div class="stats" id="c9st"></div><div class="read" id="c9rd"></div></div>
+</section>
+
+<section class="ch" id="c10">
+<h2><span class="num">10</span>Sensitivity to unmeasured confounding <span class="lvl e">Expert</span></h2>
+<p>Unmeasured confounding cannot be tested away, but its <em>required strength</em> can be quantified. <b>Omitted variable bias</b>: if the unmeasured U changes the outcome by κ per unit and the treatment by γ per unit (in a linear model with unit-variance noise), the naive estimate is off by κγ/(1 + γ²). Sensitivity analysis asks how large κ and γ must be to explain the observed estimate (to turn it to zero or to reverse it) and then whether such a confounder is plausible given the measured ones (benchmarking against the strongest observed confounder, e.g. “as strong as income”).</p>
+<p>The <b>E-value</b> (VanderWeele and Ding) does this for a risk ratio RR ≥ 1: the minimum strength of association, on the risk-ratio scale, that an unmeasured confounder would need with <em>both</em> treatment and outcome to explain away the estimate,</p>
+<div class="f">E-value = RR + √( RR·(RR − 1) )        (for RR &lt; 1 use 1/RR); apply to the confidence limit closer to 1 as well</div>
+<p>RR = 1.8 gives 3.0: a confounder would need to raise both the odds of treatment and of the outcome threefold. Report sensitivity as part of any observational claim: it states what has been assumed rather than hidden.</p>
+<div class="card"><h4>Lab 10 · How strong a hidden confounder must be</h4>
+ <p class="sub">Left: the naive estimate over 500 samples (n = 300) with unobserved U (strengths γ and κ), the true β and the omitted-variable-bias prediction. Right: the E-value as a function of the observed risk ratio; the dot is your RR.</p>
+ <div class="ctl"><label>U → X γ <input type="range" id="c10g" min="0" max="15" step="1" value="8"><output id="c10gv"></output></label><label>U → Y κ <input type="range" id="c10k" min="0" max="15" step="1" value="8"><output id="c10kv"></output></label><label>true effect β <input type="range" id="c10b" min="-5" max="10" step="1" value="3"><output id="c10bv"></output></label><label>observed RR <input type="range" id="c10rr" min="100" max="400" step="5" value="180"><output id="c10rrv"></output></label><button id="c10go">Re-simulate</button></div>
+ <div class="two"><canvas class="sm" id="c10cv"></canvas><canvas class="sm" id="c10cv2"></canvas></div><div class="stats" id="c10st"></div><div class="read" id="c10rd"></div></div>
+</section>
+
+<section class="ch" id="c11">
+<h2><span class="num">11</span>Negative controls, falsification and practice <span class="lvl e">Expert</span></h2>
+<p>A <b>negative control outcome</b> N is an outcome that the treatment cannot affect but that shares the same confounders as the real outcome (a pre-treatment outcome, an outcome in an unrelated product, a placebo period). If the analysis finds a “treatment effect” on N, the analysis is confounded. A <b>negative control exposure</b> is a treatment that cannot affect Y but is subject to the same confounding. Falsification tests of this sort are cheap and often more persuasive than another adjustment. Under a proportionality assumption (the confounder affects N and Y in a known ratio), the apparent effect on N can even be used to correct the estimate for Y. If the match is poor, the correction is wrong, and this is the limitation to state.</p>
+<p><b>A practical workflow for a bank causal question:</b> draw the diagram with the business owners (who decides the treatment, with what information?), list what is measured and what is not, choose the adjustment set from the diagram, check overlap (every type of customer has some chance of each treatment), estimate with a method chosen in the next pages, run a negative control and a sensitivity analysis, and document assumptions alongside the estimate for validation and regulators. Prefer an experiment, even a small randomised band, wherever it is feasible.</p>
+<div class="card"><h4>Lab 11 · A negative control outcome calibrates the estimate</h4>
+ <p class="sub">U → X (γ), U → Y (κ), X → Y with β; the negative control N has no effect from X but depends on U with strength κ·ratio. The analyst assumes ratio = 1. Left: the naive and the calibrated estimates over 400 samples (n = 400). Right: the average naive estimate, the apparent effect on N, the calibrated estimate and the truth.</p>
+ <div class="ctl"><label>U → X γ <input type="range" id="c11g" min="2" max="15" step="1" value="10"><output id="c11gv"></output></label><label>U → Y κ <input type="range" id="c11k" min="2" max="15" step="1" value="8"><output id="c11kv"></output></label><label>true effect β <input type="range" id="c11b" min="0" max="10" step="1" value="3"><output id="c11bv"></output></label><label>true ratio N:Y <input type="range" id="c11q" min="0" max="15" step="1" value="10"><output id="c11qv"></output></label><button id="c11go">Re-simulate</button></div>
+ <div class="two"><canvas class="sm" id="c11cv"></canvas><canvas class="sm" id="c11cv2"></canvas></div><div class="stats" id="c11st"></div><div class="read" id="c11rd"></div></div>
+</section>
+
+<section class="ch" id="c12">
+<h2><span class="num">12</span>Final exam, mastery checklist, cheat sheet <span class="lvl e">Expert</span></h2>
+<h3>Exam (18 questions — click an answer)</h3>
+<div id="quiz"></div>
+<div class="card"><h4>Score</h4><div class="stats" id="qscore"></div><button class="alt" id="qreset">Reset exam</button></div>
+<h3>Mastery checklist — tick when you can do it without notes</h3>
+<div class="card chk" id="chk"></div>
+<h3>Cheat sheet</h3>
+<div class="tw"><table>
+<tr><th>Idea</th><th>One line</th></tr>
+<tr><td>Confounder</td><td>Common cause of treatment and outcome; naive slope = β + κγ/(1 + γ²) in the linear case; does not shrink with n</td></tr>
+<tr><td>Simpson’s paradox</td><td>A trend reverses on pooling; which table is right depends on the diagram (confounder: stratify; mediator or collider: do not)</td></tr>
+<tr><td>Chain, fork, collider</td><td>Chain and fork: conditioning blocks. Collider: conditioning (or on its descendant) opens the path</td></tr>
+<tr><td>Backdoor criterion</td><td>Adjust for a set with no descendant of X that blocks all backdoor paths; include confounders, exclude mediators and colliders</td></tr>
+<tr><td>Precision variables</td><td>Causes of Y only help variance; causes of X only hurt it</td></tr>
+<tr><td>Collider / selection bias</td><td>Filtering on a common effect makes causes dependent (Berkson); worst when selection is tight and driven by the variables studied</td></tr>
+<tr><td>Over-adjustment</td><td>Do not control for post-treatment variables for the total effect; controlling for a mediator with an unmeasured mediator–outcome cause biases even a randomised effect</td></tr>
+<tr><td>Reject inference</td><td>Selection on observables is harmless if the model is right, but extrapolation fails; selection on unobservables biases; only exploration is assumption-free</td></tr>
+<tr><td>Proxies and M-bias</td><td>A noisy control removes only part of the confounding; adjusting for a pre-treatment collider creates bias</td></tr>
+<tr><td>Regression to the mean</td><td>Expected change of the selected = −(1 − r) × their standardised time-1 mean; use a randomised control from the same selection</td></tr>
+<tr><td>Sensitivity</td><td>OVB = κγ/(1 + γ²); E-value = RR + √(RR(RR − 1)): the strength a hidden confounder needs with both X and Y</td></tr>
+<tr><td>Negative controls</td><td>An outcome the treatment cannot affect should show no effect; a non-zero estimate exposes confounding; calibrate only under a defended proportionality</td></tr>
+</table></div>
+<div class="co tip"><b>Next on the roadmap</b>Item 23 continues Stage 5: potential outcomes, randomised experiments and A/B testing, CUPED variance reduction and sequential testing, the designs that remove these biases by construction.</div>
+</section>
+</main>
+<script>
+/*MATH*/
+function lgamma(x){const c=[76.18009172947146,-86.50532032941677,24.01409824083091,-1.231739572450155,0.1208650973866179e-2,-0.5395239384953e-5];let y=x,t=x+5.5;t-=(x+.5)*Math.log(t);let s=1.000000000190015;for(let j=0;j<6;j++)s+=c[j]/++y;return -t+Math.log(2.5066282746310005*s/x);}
+function gser(a,x){let ap=a,sum=1/a,del=sum;for(let n=0;n<1000;n++){ap++;del*=x/ap;sum+=del;if(Math.abs(del)<Math.abs(sum)*1e-15)break;}return sum*Math.exp(-x+a*Math.log(x)-lgamma(a));}
+function gcf(a,x){let b=x+1-a,c=1/1e-300,d=1/b,h=d;for(let i=1;i<1000;i++){const an=-i*(i-a);b+=2;d=an*d+b;if(Math.abs(d)<1e-300)d=1e-300;c=b+an/c;if(Math.abs(c)<1e-300)c=1e-300;d=1/d;const del=d*c;h*=del;if(Math.abs(del-1)<1e-15)break;}return Math.exp(-x+a*Math.log(x)-lgamma(a))*h;}
+function gammaQ(a,x){if(x<=0)return 1;return x<a+1?1-gser(a,x):gcf(a,x);}
+function betacf(a,b,x){const qab=a+b,qap=a+1,qam=a-1;let c=1,d=1-qab*x/qap;if(Math.abs(d)<1e-300)d=1e-300;d=1/d;let h=d;for(let m=1;m<=1000;m++){const m2=2*m;let aa=m*(b-m)*x/((qam+m2)*(a+m2));d=1+aa*d;if(Math.abs(d)<1e-300)d=1e-300;c=1+aa/c;if(Math.abs(c)<1e-300)c=1e-300;d=1/d;h*=d*c;aa=-(a+m)*(qab+m)*x/((a+m2)*(qap+m2));d=1+aa*d;if(Math.abs(d)<1e-300)d=1e-300;c=1+aa/c;if(Math.abs(c)<1e-300)c=1e-300;d=1/d;const del=d*c;h*=del;if(Math.abs(del-1)<1e-15)break;}return h;}
+function betai(a,b,x){if(x<=0)return 0;if(x>=1)return 1;const bt=Math.exp(lgamma(a+b)-lgamma(a)-lgamma(b)+a*Math.log(x)+b*Math.log(1-x));return x<(a+1)/(a+b+2)?bt*betacf(a,b,x)/a:1-bt*betacf(b,a,1-x)/b;}
+function normSf(z){const q=0.5*gammaQ(.5,z*z/2);return z>=0?q:1-q;}
+function normCdf(z){return normSf(-z);}
+function npdf(x){return Math.exp(-x*x/2)/2.5066282746310002;}
+function lbin(n,k){return lgamma(n+1)-lgamma(k+1)-lgamma(n-k+1);}
+function binom(n,k,p){return Math.exp(lbin(n,k)+k*Math.log(p)+(n-k)*Math.log(1-p));}
+function betapdf(x,a,b){return x<=0||x>=1?0:Math.exp(lgamma(a+b)-lgamma(a)-lgamma(b)+(a-1)*Math.log(x)+(b-1)*Math.log(1-x));}
+function betacdf(x,a,b){return betai(a,b,x);}
+function gampdf(x,a,r){return x<=0?0:Math.exp(a*Math.log(r)+(a-1)*Math.log(x)-r*x-lgamma(a));}
+function gamcdf(x,a,r){return x<=0?0:1-gammaQ(a,r*x);}
+function randn(){let u=0;while(!u)u=Math.random();return Math.sqrt(-2*Math.log(u))*Math.cos(2*Math.PI*Math.random());}
+function gammaS(a){if(a<1)return gammaS(a+1)*Math.pow(Math.random(),1/a);const d=a-1/3,c=1/Math.sqrt(9*d);for(;;){let x,v;do{x=randn();v=1+c*x}while(v<=0);v=v*v*v;const u=Math.random();if(Math.log(u)<.5*x*x+d-d*v+d*Math.log(v))return d*v;}}
+function betaS(a,b){const x=gammaS(a),y=gammaS(b);return x/(x+y);}
+function binS(n,p){let k=0;for(let i=0;i<n;i++)if(Math.random()<p)k++;return k;}
+function mean(a){let s=0;for(const v of a)s+=v;return s/a.length;}
+function qc(cdf,lo,hi,p,it){for(let i=0;i<(it||100);i++){const m=(lo+hi)/2;if(cdf(m)<p)lo=m;else hi=m}return(lo+hi)/2;}
+function qb(a,b,p){return qc(x=>betai(a,b,x),0,1,p,50);}
+function tcdf(x,v){const t=.5*betai(v/2,.5,v/(v+x*x));return x>0?1-t:t}
+function qn(p){return qc(normCdf,-9,9,p,70)}
+function pois(k,l){return Math.exp(-l+k*Math.log(l)-lgamma(k+1))}
+function binF(n,p){let k=0;for(;;){if(n<=0||p<=0)return k;if(p>=1)return k+n;if(n<=40){for(let i=0;i<n;i++)if(Math.random()<p)k++;return k}const a=1+(n>>1),bb=1+n-a,x=betaS(a,bb);if(x>=p){n=a-1;p=p/x}else{k+=a;n=bb-1;p=(p-x)/(1-x)}}}
+/*ENDMATH*/
+
+const $=id=>document.getElementById(id), val=id=>+$(id).value;
+const C={fg:'#e8ebf5',mu:'#8a93ab',gr:'#232a3d',a:'#6ea8ff',r:'#ff6b81',y:'#ffd166',g:'#4ade80',p:'#c084fc',t:'#5eead4'};
+const store={get(k,d){try{const v=JSON.parse(localStorage.getItem(k));return v==null?d:v}catch(e){return d}},set(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}};
+function stat(l,v,c){return `<div class="stat ${c||''}"><b>${v}</b><span>${l}</span></div>`}
+function f3(x){if(!isFinite(x))return String(x);const a=Math.abs(x);if(a!==0&&(a<1e-3||a>=1e6))return x.toExponential(2);return String(+x.toFixed(a<1?4:a<100?3:a<1000?2:0))}
+function pc(x){return f3(100*x)+'%'}
+const resizers=[];
+function reg(fn){fn();resizers.push(fn)}
+function on(ids,fn){ids.split(' ').forEach(i=>{const e=$(i);e.addEventListener('input',fn);e.addEventListener('change',fn)})}
+let rt;window.addEventListener('resize',()=>{clearTimeout(rt);rt=setTimeout(()=>resizers.forEach(f=>f()),150)});
+document.querySelectorAll('input[type=range]').forEach(i=>{const o=$(i.id+'v');if(!o)return;const f=()=>{o.textContent=i.value};i.addEventListener('input',f);f()});
+
+function nice(x){const e=Math.pow(10,Math.floor(Math.log10(x))),f=x/e;return (f<1.5?1:f<3?2:f<7?5:10)*e}
+function mk(cv,x0,x1,ymax,o){o=o||{};const y0=o.y0||0,dpr=window.devicePixelRatio||1,r=cv.getBoundingClientRect(),w=r.width||600,h=r.height||270;
+ cv.width=w*dpr;cv.height=h*dpr;const g=cv.getContext('2d');g.setTransform(dpr,0,0,dpr,0,0);g.clearRect(0,0,w,h);
+ const L=o.L||42,R=12,T=14,B=28,X=x=>L+(x-x0)/(x1-x0)*(w-L-R),Y=y=>h-B-(y-y0)/(ymax-y0)*(h-T-B);
+ g.font='11px system-ui';g.lineWidth=1;g.strokeStyle=C.gr;g.fillStyle=C.mu;
+ if(!o.noGrid){const sx=nice((x1-x0)/7);for(let x=Math.ceil(x0/sx-1e-9)*sx;!o.noX&&x<=x1+1e-9;x+=sx){g.beginPath();g.moveTo(X(x),T);g.lineTo(X(x),h-B);g.stroke();g.textAlign='center';g.fillText(String(+x.toFixed(6)),X(x),h-B+15)}
+ const sy=nice((ymax-y0)/4);for(let y=Math.ceil(y0/sy-1e-9)*sy;y<=ymax+1e-9;y+=sy){g.beginPath();g.moveTo(L,Y(y));g.lineTo(w-R,Y(y));g.stroke();g.textAlign='right';g.fillText(String(+y.toFixed(4)),L-5,Y(y)+3)}}
+ return{g,w,h,X,Y,L,R,T,B,
+  line(f,col,lw,a,b,n,dash){a=a==null?x0:a;b=b==null?x1:b;n=n||260;g.save();if(dash)g.setLineDash([5,4]);g.beginPath();g.strokeStyle=col;g.lineWidth=lw||2;let st=false;for(let i=0;i<=n;i++){const x=a+(b-a)*i/n,y=f(x);if(!isFinite(y)){st=false;continue}st?g.lineTo(X(x),Y(y)):g.moveTo(X(x),Y(y));st=true}g.stroke();g.restore()},
+  area(f,a,b,col,n){a=Math.max(a,x0);b=Math.min(b,x1);if(b<=a)return;n=n||200;g.beginPath();g.moveTo(X(a),Y(0));for(let i=0;i<=n;i++){const x=a+(b-a)*i/n;g.lineTo(X(x),Y(f(x)))}g.lineTo(X(b),Y(0));g.closePath();g.fillStyle=col;g.fill()},
+  vline(x,col,lab,dash){g.save();g.strokeStyle=col;g.lineWidth=1.6;if(dash)g.setLineDash([5,4]);g.beginPath();g.moveTo(X(x),T);g.lineTo(X(x),h-B);g.stroke();g.restore();if(lab){g.fillStyle=col;g.textAlign='center';g.fillText(lab,Math.min(Math.max(X(x),34),w-34),T+10)}},
+  hline(y,col,lab){g.save();g.strokeStyle=col;g.lineWidth=1.4;g.setLineDash([5,4]);g.beginPath();g.moveTo(L,Y(y));g.lineTo(w-R,Y(y));g.stroke();g.restore();if(lab){g.fillStyle=col;g.textAlign='right';g.fillText(lab,w-R-3,Y(y)-4)}},
+  text(s,x,y,col,al){g.fillStyle=col||C.fg;g.textAlign=al||'left';g.fillText(s,x,y)}};}
+
+/* ---------- shared helpers for this page ---------- */
+const D={
+ norm:{n:'Normal(0,1)',s:()=>randn(),mu:0,sd:1,sk:0},
+ unif:{n:'Uniform(0,1)',s:()=>Math.random(),mu:.5,sd:Math.sqrt(1/12),sk:0},
+ expo:{n:'Exponential(1)',s:()=>-Math.log(1-Math.random()),mu:1,sd:1,sk:2},
+ logn:{n:'Lognormal(0,1)',s:()=>Math.exp(randn()),mu:Math.exp(.5),sd:Math.sqrt((Math.E-1)*Math.E),sk:(Math.E+2)*Math.sqrt(Math.E-1),disc:0},
+ b05:{n:'Bernoulli(0.5)',s:()=>Math.random()<.5?1:0,mu:.5,sd:.5,sk:0,disc:1},
+ b05s:{n:'Bernoulli(0.05)',s:()=>Math.random()<.05?1:0,mu:.05,sd:Math.sqrt(.0475),sk:.9/Math.sqrt(.0475),disc:1},
+ bimo:{n:'Two humps',s:()=>(Math.random()<.5?-2:2)+.5*randn(),mu:0,sd:Math.sqrt(4.25),sk:0},
+ par5:{n:'Pareto(α=5)',s:()=>Math.pow(1-Math.random(),-.2),mu:1.25,sd:Math.sqrt(5/48),sk:6*Math.sqrt(.6)},
+ cauchy:{n:'Cauchy (no mean)',s:()=>Math.tan(Math.PI*(Math.random()-.5)),mu:NaN,sd:Infinity,sk:NaN}
+};
+function fillSel(id,keys,def){const e=$(id);e.innerHTML=keys.map(k=>`<option value="${k}">${D[k].n}</option>`).join('');e.value=def}
+const PAL=[C.a,C.r,C.y,C.g,C.p,C.t,'#ff9f43','#9aa4bf'];
+function tgrid(N,M){const T=[];let prev=0;for(let i=0;i<M;i++){let n=Math.round(Math.pow(10,Math.log10(N)*i/(M-1)));if(i===M-1)n=N;n=Math.max(prev+1,n);if(n>N)break;T.push(n);prev=n}if(T[T.length-1]!==N)T[T.length-1]=N;return T}
+function nlab(n){return n>=1e6?(n/1e6)+'M':n>=1000?(n/1000)+'k':String(n)}
+function customGrid(P,xt,yt){const g=P.g;g.save();g.strokeStyle=C.gr;g.fillStyle=C.mu;g.font='11px system-ui';g.lineWidth=1;
+ xt.forEach(([v,l])=>{g.beginPath();g.moveTo(P.X(v),P.T);g.lineTo(P.X(v),P.h-P.B);g.stroke();g.textAlign='center';g.fillText(l,P.X(v),P.h-P.B+15)});
+ yt.forEach(([v,l])=>{g.beginPath();g.moveTo(P.L,P.Y(v));g.lineTo(P.w-P.R,P.Y(v));g.stroke();g.textAlign='right';g.fillText(l,P.L-5,P.Y(v)+3)});g.restore()}
+function clip(P,fn){const g=P.g;g.save();g.beginPath();g.rect(P.L,P.T,P.w-P.L-P.R,P.h-P.T-P.B);g.clip();fn();g.restore()}
+function poly(P,pts,col,lw,dash){const g=P.g;g.save();if(dash)g.setLineDash([5,4]);g.strokeStyle=col;g.lineWidth=lw||2;g.beginPath();pts.forEach(([x,y],i)=>i?g.lineTo(P.X(x),P.Y(y)):g.moveTo(P.X(x),P.Y(y)));g.stroke();g.restore()}
+function dots(P,pts,col,r){const g=P.g;g.fillStyle=col;pts.forEach(([x,y])=>{g.beginPath();g.arc(P.X(x),P.Y(y),r||3,0,7);g.fill()})}
+function niceTicks(lo,hi,k){const st=nice((hi-lo)/(k||5)),a=[];for(let v=Math.ceil(lo/st-1e-9)*st;v<=hi+1e-9;v+=st)a.push([v,String(+v.toFixed(6))]);return a}
+function logTicks(lo,hi){const a=[];for(let e=Math.ceil(lo-1e-9);e<=hi+1e-9;e++)a.push([e,nlab(Math.pow(10,e))]);return a}
+function mom(a){const n=a.length;let m=0;for(const v of a)m+=v;m/=n;let v2=0,v3=0,v4=0;for(const v of a){const d=v-m;v2+=d*d;v3+=d*d*d;v4+=d*d*d*d}v2/=n;v3/=n;v4/=n;const sd=Math.sqrt(v2);return{n,m,sd,sk:sd>0?v3/(sd*sd*sd):0,ku:v2>0?v4/(v2*v2)-3:0}}
+function ksN(z){const a=Array.from(z).sort((x,y)=>x-y),n=a.length;let d=0;for(let i=0;i<n;i++){const F=normCdf(a[i]);d=Math.max(d,Math.abs((i+1)/n-F),Math.abs(i/n-F))}return d}
+/* histogram of data as density with optional overlay curves [{f,col,lw,dash}] */
+function hist(cv,data,lo,hi,bins,ov,col){const cnt=new Float64Array(bins),bw=(hi-lo)/bins;let n=0;for(const v of data){if(v<lo||v>=hi)continue;cnt[Math.floor((v-lo)/bw)]++;n++}
+ const N=data.length;let ym=0;for(let i=0;i<bins;i++){cnt[i]/=N*bw;ym=Math.max(ym,cnt[i])}
+ (ov||[]).forEach(o=>{for(let i=0;i<=80;i++)ym=Math.max(ym,o.f(lo+(hi-lo)*i/80)||0)});
+ const P=mk(cv,lo,hi,ym*1.12);
+ P.g.fillStyle=col||'rgba(110,168,255,.5)';for(let i=0;i<bins;i++){if(cnt[i]<=0)continue;const a=P.X(lo+i*bw),b=P.X(lo+(i+1)*bw);P.g.fillRect(a,P.Y(cnt[i]),Math.max(1,b-a-1),P.Y(0)-P.Y(cnt[i]))}
+ (ov||[]).forEach(o=>P.line(o.f,o.col,o.lw||2.4,lo,hi,200,o.dash));return P}
+const fmt=x=>f3(x);
+
+/* ---------- shared for this page ---------- */
+const POPS=['norm','unif','expo','logn','bimo','par5'];
+D.norm.med=0;D.norm.q90=1.2815516;D.unif.med=.5;D.unif.q90=.9;D.expo.med=Math.LN2;D.expo.q90=Math.log(10);D.logn.med=1;D.logn.q90=Math.exp(1.2815516);
+D.bimo.med=0;D.bimo.q90=qc(x=>.5*normCdf((x+2)/.5)+.5*normCdf((x-2)/.5),-10,10,.9,80);D.par5.med=Math.pow(2,.2);D.par5.q90=Math.pow(10,.2);
+const SF={mean:a=>mean(a),median:a=>{const b=Float64Array.from(a).sort(),n=b.length;return n%2?b[(n-1)/2]:(b[n/2-1]+b[n/2])/2},sd:a=>{const n=a.length,m=mean(a);let s=0;for(const v of a)s+=(v-m)*(v-m);return Math.sqrt(s/(n-1))},q90:a=>{const b=Float64Array.from(a).sort();return b[Math.round(.9*(b.length-1))]}};
+function truth(key,st){const d=D[key];return st==='mean'?d.mu:st==='median'?d.med:st==='sd'?d.sd:d.q90}
+const SNAME={mean:'sample mean',median:'sample median',sd:'sample SD',q90:'90th percentile'};
+const N10=[2,3,5,10,20,50,100,200,500,1000];
+function pct(a,p){const b=Float64Array.from(a).sort();return b[Math.min(b.length-1,Math.max(0,Math.floor(p*b.length)))]}
+function histLines(cv,arrs,cols,lo,hi,bins,vl){const bw=(hi-lo)/bins,dens=arrs.map(a=>{const c=new Float64Array(bins);for(const v of a){if(v<lo||v>=hi)continue;c[Math.floor((v-lo)/bw)]++}for(let i=0;i<bins;i++)c[i]/=a.length*bw;return c});let ym=0;dens.forEach(c=>c.forEach(v=>ym=Math.max(ym,v)));const P=mk(cv,lo,hi,ym*1.15||1);
+ dens.forEach((c,k)=>{const pts=[];for(let i=0;i<bins;i++){pts.push([lo+i*bw,c[i]]);pts.push([lo+(i+1)*bw,c[i]])}clip(P,()=>poly(P,pts,cols[k],2.2))});(vl||[]).forEach(v=>P.vline(v[0],v[1],v[2],v[3]));return P}
+function sdOf(a){return mom(a).sd}
+
+/* ---------- ML helpers ---------- */
+function digamma(x){let r=0;while(x<6){r-=1/x;x++}const f=1/(x*x);return r+Math.log(x)-.5/x-f*(1/12-f*(1/120-f/252))}
+function trigamma(x){let r=0;while(x<6){r+=1/(x*x);x++}const f=1/(x*x);return r+1/x+.5*f+f/x*(1/6-f*(1/30-f/42))}
+function poisS(l){if(l<=0)return 0;if(l<30){const L=Math.exp(-l);let k=0,p=1;do{k++;p*=Math.random()}while(p>L);return k-1}const m=Math.floor(.875*l),g=gammaS(m);return g<l?m+poisS(l-g):binF(m-1,l/g)}
+function llb(k,n,p){return(k?k*Math.log(p):0)+(n-k?(n-k)*Math.log(1-p):0)}
+function lrInt(k,n,cut){const ph=k/n,l0=llb(k,n,ph),g=p=>2*(l0-llb(k,n,p))-cut;let lo=0,hi=1;
+ if(k>0){let a=1e-12,b=ph;for(let i=0;i<70;i++){const m=(a+b)/2;if(g(m)>0)a=m;else b=m}lo=(a+b)/2}
+ if(k<n){let a=ph,b=1-1e-12;for(let i=0;i<70;i++){const m=(a+b)/2;if(g(m)>0)b=m;else a=m}hi=(a+b)/2}return[lo,hi]}
+function solveAlpha(s){if(!(s>1e-9))return 1e6;let a=(3-s+Math.sqrt((3-s)*(3-s)+24*s))/(12*s);for(let i=0;i<8;i++){const f=Math.log(a)-digamma(a)-s,fp=1/a-trigamma(a);let n=a-f/fp;if(!(n>0))n=a/2;a=n}return a}
+function normPdfAt(x,m,s){return Math.exp(-(x-m)*(x-m)/(2*s*s))/(s*2.5066282746)}
+/* ---------- Regression helpers ---------- */
+function idx(id,arr,ff){const e=$(id),o=$(id+'v'),f=()=>{o.textContent=ff?ff(arr[+e.value]):arr[+e.value]};e.addEventListener('input',f);f()}
+function scl(id,ff){const e=$(id),o=$(id+'v'),f=()=>{o.textContent=ff(+e.value)};e.addEventListener('input',f);f()}
+function pctTicks(a,b,st){const r=[];for(let v=a;v<=b+1e-9;v+=st)r.push([v,Math.round(v*100)+'%']);return r}
+const _tq={};function tq(v,p){const k=v+'_'+p;return _tq[k]||(_tq[k]=qc(x=>tcdf(x,v),0,500,p,80))}
+function simple(x,y){const n=x.length;let xm=0,ym=0;for(let i=0;i<n;i++){xm+=x[i];ym+=y[i]}xm/=n;ym/=n;let sxx=0,sxy=0,syy=0;for(let i=0;i<n;i++){const dx=x[i]-xm,dy=y[i]-ym;sxx+=dx*dx;sxy+=dx*dy;syy+=dy*dy}const b=sxy/sxx,a=ym-b*xm,res=new Float64Array(n);let sse=0;for(let i=0;i<n;i++){res[i]=y[i]-a-b*x[i];sse+=res[i]*res[i]}return{n,xm,ym,sxx,sxy,syy,b,a,res,sse,sst:syy,r2:1-sse/syy}}
+function gj(A,B){const p=A.length;const M=A.map((r,i)=>Array.from(r).concat(B?[B[i]]:[]));for(let c=0;c<p;c++){let m=c;for(let r=c+1;r<p;r++)if(Math.abs(M[r][c])>Math.abs(M[m][c]))m=r;[M[c],M[m]]=[M[m],M[c]];const d=M[c][c]||1e-12;for(let k=c;k<M[c].length;k++)M[c][k]/=d;for(let r=0;r<p;r++)if(r!==c){const f=M[r][c];if(f!==0)for(let k=c;k<M[c].length;k++)M[r][k]-=f*M[c][k]}}return M}
+function olsMulti(cols,y,needInv){const n=y.length,k=cols.length,p=k+1,A=[],B=new Float64Array(p);for(let i=0;i<p;i++)A.push(new Float64Array(p));
+ for(let r=0;r<n;r++){const row=[1];for(let j=0;j<k;j++)row.push(cols[j][r]);for(let i=0;i<p;i++){B[i]+=row[i]*y[r];for(let j=i;j<p;j++)A[i][j]+=row[i]*row[j]}}
+ for(let i=0;i<p;i++){for(let j=0;j<i;j++)A[i][j]=A[j][i];if(i>0)A[i][i]+=1e-9}
+ let beta,inv=null;if(needInv){const I=[];for(let i=0;i<p;i++){const e=new Float64Array(p);e[i]=1;I.push(e)}const M=gj(A,null);const aug=A.map((r,i)=>Array.from(r).concat(Array.from(I[i])));
+  const m=aug;for(let c=0;c<p;c++){let q=c;for(let r=c+1;r<p;r++)if(Math.abs(m[r][c])>Math.abs(m[q][c]))q=r;[m[c],m[q]]=[m[q],m[c]];const d=m[c][c]||1e-12;for(let kk=0;kk<2*p;kk++)m[c][kk]/=d;for(let r=0;r<p;r++)if(r!==c){const f=m[r][c];if(f!==0)for(let kk=0;kk<2*p;kk++)m[r][kk]-=f*m[c][kk]}}
+  inv=m.map(r=>r.slice(p));beta=inv.map(r=>{let s=0;for(let j=0;j<p;j++)s+=r[j]*B[j];return s})}
+ else{const M=gj(A,B);beta=M.map(r=>r[p])}
+ const res=new Float64Array(n);let sse=0;for(let r=0;r<n;r++){let f=beta[0];for(let j=0;j<k;j++)f+=beta[j+1]*cols[j][r];res[r]=y[r]-f;sse+=res[r]*res[r]}
+ const out={beta,res,sse,n,p,inv};if(inv){const s2=sse/(n-p);out.s2=s2;out.se=inv.map((r,i)=>Math.sqrt(s2*r[i]))}return out}
+function scatterAxes(cv,xs,ys,xlo,xhi,ylo,yhi,L){return mk(cv,xlo,xhi,yhi,{y0:ylo,L:L||44})}
+function range(a,pad){let lo=1e99,hi=-1e99;for(const v of a){if(v<lo)lo=v;if(v>hi)hi=v}const w=(hi-lo)||1;return[lo-(pad||.05)*w,hi+(pad||.05)*w]}
+
+
+function bars(P,groups,cols,yt){/* groups: array of arrays of values (0..1) */const g=P.g,G=groups.length,B=groups[0].length,W=(P.w-P.L-P.R)/G;groups.forEach((vals,gi)=>vals.forEach((v,bi)=>{const bw=W*.78/B,x=P.L+W*gi+W*.11+bw*bi;g.fillStyle=cols[bi];g.fillRect(x,P.Y(v),bw-2,P.Y(0)-P.Y(v));g.fillStyle=C.fg;g.textAlign='center';g.font='10px system-ui';g.fillText(Math.round(v*100)+'%',x+bw/2-1,P.Y(v)-3)}));g.font='11px system-ui'}
+function gridG(P,yt,labels){customGrid(P,[],yt);const G=labels.length,W=(P.w-P.L-P.R)/G;P.g.fillStyle=C.mu;P.g.textAlign='center';labels.forEach((l,i)=>P.g.fillText(l,P.L+W*(i+.5),P.h-P.B+15))}
+function legend(P,items,y){let x=P.L+8;items.forEach(([s,c])=>{P.text('■ '+s,x,y,c);x+=P.g.measureText('■ '+s).width+16})}
+
+/* ---------- GLM machinery ---------- */
+const LK={logit:{mu:e=>1/(1+Math.exp(-e)),d:e=>{const m=1/(1+Math.exp(-e));return m*(1-m)}},
+ probit:{mu:e=>normCdf(e),d:e=>npdf(e)},
+ cll:{mu:e=>1-Math.exp(-Math.exp(e)),d:e=>Math.exp(e-Math.exp(e))},
+ log:{mu:e=>Math.exp(e),d:e=>Math.exp(e)}};
+function minv(A){const p=A.length,m=A.map((r,i)=>{const row=Array.from(r);for(let j=0;j<p;j++)row.push(i===j?1:0);return row});
+ for(let c=0;c<p;c++){let q=c;for(let r=c+1;r<p;r++)if(Math.abs(m[r][c])>Math.abs(m[q][c]))q=r;[m[c],m[q]]=[m[q],m[c]];const d=m[c][c]||1e-12;for(let k=0;k<2*p;k++)m[c][k]/=d;for(let r=0;r<p;r++)if(r!==c){const f=m[r][c];if(f!==0)for(let k=0;k<2*p;k++)m[r][k]-=f*m[c][k]}}
+ return m.map(r=>r.slice(p))}
+function glm(cols,y,o){o=o||{};const n=y.length,k=cols.length,p=k+1,fam=o.fam||'binom',L=LK[o.link||(fam==='pois'?'log':'logit')],off=o.off,X=[new Float64Array(n).fill(1)].concat(cols),V=m=>fam==='pois'?m:m*(1-m);
+ let b=new Float64Array(p);if(o.init)b=Float64Array.from(o.init);else if(fam==='pois'){let m=0;for(const v of y)m+=v;b[0]=Math.log(Math.max(m/n,1e-3))-(off?mean(off):0)}
+ function ev(b){const eta=new Float64Array(n),mu=new Float64Array(n);let ll=0;for(let i=0;i<n;i++){let e=off?off[i]:0;for(let j=0;j<p;j++)e+=b[j]*X[j][i];e=Math.max(-30,Math.min(30,e));eta[i]=e;let m=L.mu(e);m=fam==='binom'?Math.min(1-1e-12,Math.max(1e-12,m)):Math.max(m,1e-12);mu[i]=m;ll+=fam==='pois'?y[i]*Math.log(m)-m-lgamma(y[i]+1):y[i]*Math.log(m)+(1-y[i])*Math.log(1-m)}return{eta,mu,ll}}
+ function info(c){const A=[];for(let i=0;i<p;i++)A.push(new Float64Array(p));const w=new Float64Array(n);for(let r=0;r<n;r++){const d=L.d(c.eta[r]),wi=d*d/V(c.mu[r]);w[r]=wi;for(let i=0;i<p;i++){const xi=X[i][r]*wi;for(let j=i;j<p;j++)A[i][j]+=xi*X[j][r]}}for(let i=0;i<p;i++)for(let j=0;j<i;j++)A[i][j]=A[j][i];return{A,w}}
+ let cur=ev(b),it=0,conv=false,maxit=o.maxit==null?40:o.maxit;
+ for(;it<maxit;it++){const{A,w}=info(cur),Ai=minv(A),g=new Float64Array(p);
+  for(let r=0;r<n;r++){const d=L.d(cur.eta[r]),v=V(cur.mu[r]);let s=(y[r]-cur.mu[r])*d/v;if(o.firth){let h=0;for(let i=0;i<p;i++)for(let j=0;j<p;j++)h+=X[i][r]*Ai[i][j]*X[j][r];h*=w[r];s+=h*(.5-cur.mu[r])}for(let i=0;i<p;i++)g[i]+=X[i][r]*s}
+  const st=new Float64Array(p);let mx=0;for(let i=0;i<p;i++){let s=0;for(let j=0;j<p;j++)s+=Ai[i][j]*g[j];st[i]=s}
+  if(o.firth){for(let i=0;i<p;i++){st[i]=Math.max(-1,Math.min(1,st[i]));mx=Math.max(mx,Math.abs(st[i]))}b=b.map((v,i)=>v+st[i]);cur=ev(b);if(mx<1e-8){conv=true;it++;break}}
+  else{let a=1,nb,nc;for(let h=0;h<25;h++){nb=b.map((v,i)=>v+a*st[i]);nc=ev(nb);if(nc.ll>=cur.ll-1e-10)break;a/=2}for(let i=0;i<p;i++)mx=Math.max(mx,Math.abs(a*st[i]));const dl=Math.abs(nc.ll-cur.ll);b=nb;cur=nc;if(mx<1e-8||dl<1e-11){conv=true;it++;break}}}
+ const{A,w}=info(cur),Ai=minv(A),se=Ai.map((r,i)=>Math.sqrt(Math.max(r[i],0)));let dev;
+ if(fam==='binom')dev=-2*cur.ll;else{dev=0;for(let i=0;i<n;i++){const yy=y[i],m=cur.mu[i];dev+=2*((yy>0?yy*Math.log(yy/m):0)-(yy-m))}}
+ return{beta:b,mu:cur.mu,eta:cur.eta,ll:cur.ll,dev,inv:Ai,se,iter:it,conv,X,w,p,n,A}}
+function auc(sc,y){const n=y.length,idx=Array.from({length:n},(_,i)=>i).sort((a,b)=>sc[a]-sc[b]);let rk=0,np=0,i=0;while(i<n){let j=i;while(j+1<n&&sc[idx[j+1]]===sc[idx[i]])j++;const r=(i+j)/2+1;for(let t=i;t<=j;t++)if(y[idx[t]]===1){rk+=r;np++}i=j+1}const nn=n-np;return np&&nn?(rk-np*(np+1)/2)/(np*nn):.5}
+function sepTest(x,y){let a1=1e99,b1=-1e99,a0=1e99,b0=-1e99,n1=0,n0=0;for(let i=0;i<x.length;i++){if(y[i]===1){n1++;a1=Math.min(a1,x[i]);b1=Math.max(b1,x[i])}else{n0++;a0=Math.min(a0,x[i]);b0=Math.max(b0,x[i])}}return n1>0&&n0>0&&(a1>b0||a0>b1)}
+const sig=e=>1/(1+Math.exp(-e));
+function lgt(p){return Math.log(p/(1-p))}
+function binaryData(n,a,b,sd){const x=new Float64Array(n),y=new Float64Array(n);for(let i=0;i<n;i++){x[i]=(sd||1)*randn();y[i]=Math.random()<sig(a+b*x[i])?1:0}return{x,y}}
+function heat(P,gx,gy,vals,x0,x1,y0,y1){const g=P.g,nx=gx,ny=gy;let mn=1e99,mx=-1e99;vals.forEach(v=>{if(isFinite(v)){mn=Math.min(mn,v);mx=Math.max(mx,v)}});mn=Math.max(mn,mx-30);for(let i=0;i<nx;i++)for(let j=0;j<ny;j++){const v=vals[i*ny+j],t=isFinite(v)?Math.max(0,Math.min(1,(v-mn)/(mx-mn))):0,tt=Math.pow(t,1.6),c=Math.round(40+190*tt);g.fillStyle=`rgb(${Math.round(20+60*tt)},${Math.round(30+100*tt)},${c})`;const xa=P.X(x0+(x1-x0)*i/nx),xb=P.X(x0+(x1-x0)*(i+1)/nx),ya=P.Y(y0+(y1-y0)*j/ny),yb=P.Y(y0+(y1-y0)*(j+1)/ny);g.fillRect(xa,Math.min(ya,yb),xb-xa+1,Math.abs(ya-yb)+1)}}
+/* ---------- confounding helpers ---------- */
+const U01=()=>1-Math.random();
+function sdv(a){const m=mean(a);let s=0;for(const v of a)s+=(v-m)*(v-m);return Math.sqrt(s/Math.max(a.length-1,1))}
+function barV(cv,vals,cols,labs,ymax,ff){const P=mk(cv,0,vals.length,ymax,{y0:0,noGrid:true,L:50});customGrid(P,[],niceTicks(0,ymax,5));const W=(P.w-P.L-P.R)/vals.length,g=P.g;vals.forEach((v,i)=>{const w=W*.5,x=P.L+W*i+W*.25;g.fillStyle=cols[i];g.fillRect(x,P.Y(v),w,P.Y(0)-P.Y(v));g.fillStyle=C.fg;g.textAlign='center';g.fillText((ff||fmt)(v),x+w/2,P.Y(v)-4);g.fillStyle=C.mu;g.fillText(labs[i],x+w/2,P.h-P.B+15)});return P}
+function barL(cv,vals,cols,labs,lo,hi,ff){const P=mk(cv,0,vals.length,hi,{y0:lo,noGrid:true,L:50});customGrid(P,[],niceTicks(lo,hi,5));const W=(P.w-P.L-P.R)/vals.length,g=P.g;vals.forEach((v,i)=>{const w=W*.5,x=P.L+W*i+W*.25;g.fillStyle=cols[i];g.fillRect(x,P.Y(v),w,P.Y(lo)-P.Y(v));g.fillStyle=C.fg;g.textAlign='center';g.fillText((ff||fmt)(v),x+w/2,P.Y(v)-4);g.fillStyle=C.mu;g.fillText(labs[i],x+w/2,P.h-P.B+15)});return P}
+const avg=a=>{let s=0;for(const v of a)s+=v;return s/a.length};
+function corr(a,b){const n=a.length;let ma=0,mb=0;for(let i=0;i<n;i++){ma+=a[i];mb+=b[i]}ma/=n;mb/=n;let sa=0,sb=0,sab=0;for(let i=0;i<n;i++){const x=a[i]-ma,y=b[i]-mb;sa+=x*x;sb+=y*y;sab+=x*y}return sab/Math.sqrt(sa*sb||1e-12)}
+const pcor=(x,y,z)=>corr(simple(z,x).res,simple(z,y).res);
+const lin=(n,f)=>{const a=new Float64Array(n);for(let i=0;i<n;i++)a[i]=f(i);return a};
+const rn=(n,s)=>lin(n,()=>(s||1)*randn());
+/* signed bars from zero */
+function barZ(cv,vals,cols,labs,lo,hi,ff){const P=mk(cv,0,vals.length,hi,{y0:lo,noGrid:true,L:50});customGrid(P,[],niceTicks(lo,hi,5));const W=(P.w-P.L-P.R)/vals.length,g=P.g;vals.forEach((v,i)=>{const w=W*.5,x=P.L+W*i+W*.25,y0=P.Y(0),y1=P.Y(v);g.fillStyle=cols[i];g.fillRect(x,Math.min(y0,y1),w,Math.abs(y0-y1));g.fillStyle=C.fg;g.textAlign='center';g.fillText((ff||fmt)(v),x+w/2,v>=0?y1-4:y1+13);g.fillStyle=C.mu;g.fillText(labs[i],x+w/2,P.h-P.B+15)});P.hline(0,C.mu,'');return P}
+/* grouped signed bars: groups[g][b] */
+function barG(cv,groups,cols,glabs,lo,hi,ff){const P=mk(cv,0,groups.length,hi,{y0:lo,noGrid:true,L:50});customGrid(P,[],niceTicks(lo,hi,5));const G=groups.length,B=groups[0].length,W=(P.w-P.L-P.R)/G,g=P.g;groups.forEach((vs,gi)=>vs.forEach((v,bi)=>{const bw=W*.7/B,x=P.L+W*gi+W*.15+bw*bi,y0=P.Y(0),y1=P.Y(v);g.fillStyle=cols[bi];g.fillRect(x,Math.min(y0,y1),bw-3,Math.abs(y0-y1));g.fillStyle=C.fg;g.textAlign='center';g.font='10px system-ui';g.fillText((ff||fmt)(v),x+bw/2-1,v>=0?y1-3:y1+11)}));g.font='11px system-ui';g.fillStyle=C.mu;g.textAlign='center';glabs.forEach((l,i)=>g.fillText(l,P.L+W*(i+.5),P.h-P.B+15));P.hline(0,C.mu,'');return P}
+/* scatter with optional per-point colours; draws at most nmax points */
+function scat(P,xs,ys,col,nmax,r,colf){const n=xs.length,st=Math.max(1,Math.floor(n/(nmax||500))),pts=[];clip(P,()=>{for(let i=0;i<n;i+=st){P.g.fillStyle=colf?colf(i):col;P.g.beginPath();P.g.arc(P.X(xs[i]),P.Y(ys[i]),r||2.2,0,7);P.g.fill()}})}
+function fitLine(P,s,col,lw,dash,x0,x1){clip(P,()=>P.line(x=>s.a+s.b*x,col,lw||2,x0,x1,2,dash))}
+const ordIdx=p=>Array.from({length:p.length},(_,i)=>i).sort((a,b)=>p[a]-p[b]);
+const sgn=v=>(v>=0?'+':'−')+fmt(Math.abs(v));
+const rng2=(a,b,pad)=>range(Array.from(a).concat(Array.from(b)),pad||.05);
+/* ---------- Ch1 confounding ---------- */
+(function(){scl('c1g',v=>fmt(v/10));scl('c1k',v=>fmt(v/10));scl('c1b',v=>fmt(v/10));
+ function gen(n,g,k,b){const Z=rn(n),X=lin(n,i=>g*Z[i]+randn()),Y=lin(n,i=>b*X[i]+k*Z[i]+randn());return{Z,X,Y}}
+ function run(){const g=val('c1g')/10,k=val('c1k')/10,b=val('c1b')/10,R=500,N=[],A=[];
+  for(let r=0;r<R;r++){const d=gen(300,g,k,b);N.push(simple(d.X,d.Y).b);A.push(olsMulti([d.X,d.Z],d.Y).beta[1])}
+  const d=gen(400,g,k,b),hi=d.Z.map(z=>z>=0),[xl,xh]=range(d.X,.05),[yl,yh]=range(d.Y,.05),P=mk($('c1cv'),xl,xh,yh,{y0:yl,L:44});
+  scat(P,d.X,d.Y,null,400,2.4,i=>hi[i]?C.y:C.a);
+  const ix1=[],ix0=[];for(let i=0;i<400;i++)(hi[i]?ix1:ix0).push(i);const sub=ix=>simple(ix.map(i=>d.X[i]),ix.map(i=>d.Y[i]));
+  if(ix1.length>5)fitLine(P,sub(ix1),C.g,2.4,false,xl,xh);if(ix0.length>5)fitLine(P,sub(ix0),C.g,2.4,false,xl,xh);fitLine(P,simple(d.X,d.Y),C.r,2.8,false,xl,xh);
+  legend(P,[['Z high',C.y],['Z low',C.a],['naive fit',C.r],['within-Z fits',C.g]],P.T+12);P.text('X (treatment) →',P.w-P.R-95,P.h-P.B-6,C.mu);
+  const [lo,hh]=rng2(N,A,.1),P2=histLines($('c1cv2'),[N,A],[C.r,C.g],Math.min(lo,b-.1),Math.max(hh,b+.1),40,[[b,C.fg,'truth β',true]]);legend(P2,[['naive',C.r],['adjusted for Z',C.g]],P2.T+12);P2.text('estimated effect →',P2.w-P2.R-110,P2.h-P2.B-6,C.mu);
+  const th=k*g/(1+g*g),mN=avg(N),mA=avg(A);
+  $('c1st').innerHTML=stat('true effect β',fmt(b),'in')+stat('naive mean · bias',fmt(mN)+' · '+sgn(mN-b),Math.abs(mN-b)>.1?'hot':'ok')+stat('predicted bias κγ/(1+γ²)',sgn(th),'')+stat('adjusted mean · sd',fmt(mA)+' · '+fmt(sdv(A)),'ok');
+  $('c1rd').innerHTML=Math.abs(th)<.03?`With γ = ${fmt(g)} and κ = ${fmt(k)} there is almost no confounding, so the naive and the adjusted estimates agree on ${fmt(b)}. Raise both sliders and watch the red distribution move away from the truth while the green one stays put.`:`The naive estimate averages ${fmt(mN)} against a true effect of ${fmt(b)}: bias ${sgn(mN-b)}, matching the formula κγ/(1+γ²) = ${sgn(th)}. ${th*b<0&&Math.abs(mN)<Math.abs(b)?'The confounding works against the effect and hides part of it.':b>=0&&mN>b?'The confounding inflates the apparent effect.':mN<b?'The confounding pushes the estimate below the truth.':''} Adjusting for Z recovers ${fmt(mA)}. The bias would be the same with ten times the data: it is a property of the structure.`}
+ ['c1g','c1k','c1b'].forEach(i=>$(i).addEventListener('change',run));$('c1go').onclick=run;run();})();
+
+/* ---------- Ch2 Simpson ---------- */
+(function(){scl('c2s',v=>fmt(v/10));scl('c2h',v=>fmt(v/10));scl('c2b',v=>fmt(v/10));
+ function run(){const s=val('c2s')/10,h=val('c2h')/10,b=val('c2b')/10,n=900,G=lin(n,i=>i%3),X=lin(n,i=>s*G[i]+randn()),Y=lin(n,i=>b*X[i]-h*G[i]+randn());
+  const G1=lin(n,i=>G[i]===1?1:0),G2=lin(n,i=>G[i]===2?1:0),pooled=simple(X,Y),adj=olsMulti([X,G1,G2],Y).beta[1];
+  const [xl,xh]=range(X,.04),[yl,yh]=range(Y,.04),P=mk($('c2cv'),xl,xh,yh,{y0:yl,L:44}),CL=[C.a,C.y,C.p];
+  scat(P,X,Y,null,600,2.2,i=>CL[G[i]]);
+  for(let g=0;g<3;g++){const ix=[];for(let i=0;i<n;i++)if(G[i]===g)ix.push(i);const f=simple(ix.map(i=>X[i]),ix.map(i=>Y[i])),xs=ix.map(i=>X[i]);fitLine(P,f,CL[g],2.6,false,Math.min(...xs),Math.max(...xs))}
+  fitLine(P,pooled,C.fg,2.4,true,xl,xh);legend(P,[['segment 0',C.a],['segment 1',C.y],['segment 2',C.p],['pooled fit (dashed)',C.fg]],P.T+12);P.text('X →',P.w-P.R-24,P.h-P.B-6,C.mu);
+  const vg=2/3,th=b-h*s*vg/(1+s*s*vg),vals=[pooled.b,adj,b],lo=Math.min(0,...vals)-.4,hi=Math.max(0,...vals)+.4;
+  const P2=barZ($('c2cv2'),vals,[C.r,C.g,C.fg],['pooled','segment-adjusted','truth'],lo,hi);
+  $('c2st').innerHTML=stat('within-segment slope b',fmt(b),'in')+stat('pooled slope · theory',fmt(pooled.b)+' · '+fmt(th),Math.sign(pooled.b)!==Math.sign(b)&&Math.abs(b)>.05?'hot':'')+stat('segment-adjusted slope',fmt(adj),'ok')+stat('sign reversed?',Math.sign(pooled.b)!==Math.sign(b)&&Math.abs(b)>.05&&Math.abs(pooled.b)>.02?'yes':'no',Math.sign(pooled.b)!==Math.sign(b)?'hot':'');
+  $('c2rd').innerHTML=Math.sign(pooled.b)!==Math.sign(b)&&Math.abs(b)>.05?`Inside every segment Y ${b>0?'rises':'falls'} with X (slope ${fmt(b)}), but the pooled line slopes the other way (${fmt(pooled.b)}): the segments with higher X are the ones with lower Y. This is Simpson’s paradox. If the segment causes both X and Y, the adjusted slope ${fmt(adj)} is the causal one; if the segment were instead caused by X, the pooled one would be.`:`The pooled slope (${fmt(pooled.b)}) and the within-segment slope (${fmt(b)}) have the same sign, so there is no reversal, yet the pooled slope is still ${Math.abs(pooled.b-b)>.1?'distorted':'close'} (theory ${fmt(th)}). Increase the spread s and the between-segment drop h to produce a reversal.`}
+ ['c2s','c2h','c2b'].forEach(i=>$(i).addEventListener('change',run));$('c2go').onclick=run;run();})();
+
+/* ---------- Ch3 chain, fork, collider ---------- */
+(function(){scl('c3a',v=>fmt(v/10));
+ function sim(a,n){const chain=(()=>{const X=rn(n),Z=lin(n,i=>a*X[i]+randn()),Y=lin(n,i=>a*Z[i]+randn());return{X,Y,Z}})(),fork=(()=>{const Z=rn(n),X=lin(n,i=>a*Z[i]+randn()),Y=lin(n,i=>a*Z[i]+randn());return{X,Y,Z}})(),col=(()=>{const X=rn(n),Y=rn(n),Z=lin(n,i=>a*X[i]+a*Y[i]+randn());return{X,Y,Z}})();return[chain,fork,col]}
+ function run(){const a=val('c3a')/10,S=sim(a,4000),mg=S.map(d=>corr(d.X,d.Y)),cd=S.map(d=>pcor(d.X,d.Y,d.Z));
+  const P=barG($('c3cv'),mg.map((v,i)=>[v,cd[i]]),[C.r,C.g],['chain X→Z→Y','fork X←Z→Y','collider X→Z←Y'],-1,1,x=>x.toFixed(2));legend(P,[['marginal corr(X,Y)',C.r],['given Z',C.g]],P.T+12);
+  const d=sim(a,1500)[2],hi=d.Z.map(z=>z>=0),[xl,xh]=range(d.X,.04),[yl,yh]=range(d.Y,.04),P2=mk($('c3cv2'),xl,xh,yh,{y0:yl,L:44});scat(P2,d.X,d.Y,null,500,2.4,i=>hi[i]?C.y:C.a);
+  [true,false].forEach((flag,j)=>{const ix=[];for(let i=0;i<1500;i++)if(hi[i]===flag)ix.push(i);if(ix.length>5)fitLine(P2,simple(ix.map(i=>d.X[i]),ix.map(i=>d.Y[i])),flag?C.y:C.a,2.6,false,xl,xh)});
+  legend(P2,[['Z high',C.y],['Z low',C.a]],P2.T+12);P2.text('X →   (collider case: X and Y independent)',P2.L+8,P2.h-P2.B-6,C.mu);
+  $('c3st').innerHTML=stat('chain: marginal · given Z',mg[0].toFixed(2)+' · '+cd[0].toFixed(2),'')+stat('fork: marginal · given Z',mg[1].toFixed(2)+' · '+cd[1].toFixed(2),'')+stat('collider: marginal · given Z',mg[2].toFixed(2)+' · '+cd[2].toFixed(2),'hot')+stat('collider fits within Z groups',Math.abs(cd[2])>.05?'negative slope':'flat','in');
+  $('c3rd').innerHTML=`In the chain and the fork X and Y are correlated (${mg[0].toFixed(2)} and ${mg[1].toFixed(2)}) and conditioning on Z removes it (${cd[0].toFixed(2)}, ${cd[1].toFixed(2)}). In the collider X and Y are independent (${mg[2].toFixed(2)}), yet given Z they are correlated at ${cd[2].toFixed(2)}: in the right panel each colour band slopes downwards although the cloud as a whole is flat. Conditioning removes association in the first two structures and creates it in the third.`}
+ $('c3a').addEventListener('change',run);$('c3go').onclick=run;run();})();
+
+/* ---------- Ch4 adjustment sets ---------- */
+(function(){const NM=['C','M','K','W','I'],TR=.98;
+ function gen(n){const C_=rn(n),W=rn(n),I=rn(n),X=lin(n,i=>.9*C_[i]+.9*I[i]+randn()),M=lin(n,i=>.8*X[i]+randn()),Y=lin(n,i=>.5*X[i]+.6*M[i]+.9*C_[i]+.8*W[i]+randn()),K=lin(n,i=>.7*X[i]+.7*Y[i]+randn());return{X,Y,V:{C:C_,M,K,W,I}}}
+ const est=(d,set)=>olsMulti([d.X].concat(set.map(k=>d.V[k])),d.Y).beta[1];
+ const PRE=[[[],'none'],[['C'],'{C}'],[['C','W'],'{C,W}'],[['C','I'],'{C,I}'],[['C','M'],'{C,M}'],[['C','K'],'{C,K}'],[NM,'all']];
+ function setTo(a){NM.forEach(k=>{$('c4'+k).checked=a.includes(k)});run()}
+ function run(){const mine=NM.filter(k=>$('c4'+k).checked),R=300,E=[],B=PRE.map(()=>0);
+  for(let r=0;r<R;r++){const d=gen(300);E.push(est(d,mine));PRE.forEach(([s],j)=>B[j]+=est(d,s)/R)}
+  const m=avg(E),sd=sdv(E),lo=Math.min(Math.min(...E),TR)-.1,hi=Math.max(Math.max(...E),TR)+.1,P=histLines($('c4cv'),[E],[C.a],lo,hi,36,[[TR,C.g,'truth 0.98',true],[m,C.r,'mean',true]]);P.text('estimate of the total effect →',P.w-P.R-165,P.h-P.B-6,C.mu);
+  const bias=B.map(v=>v-TR),bl=Math.min(0,...bias)-.15,bh=Math.max(0,...bias)+.15;barZ($('c4cv2'),bias,bias.map(v=>Math.abs(v)<.06?C.g:C.r),PRE.map(p=>p[1]),bl,bh,x=>x.toFixed(2));
+  const issues=[];if(!mine.includes('C'))issues.push('C is left out, so the backdoor path X ← C → Y stays open (upward bias)');if(mine.includes('M'))issues.push('M is a mediator: controlling it removes the indirect part and estimates only the direct effect 0.50');if(mine.includes('K'))issues.push('K is a collider: controlling it opens X → K ← Y and biases the estimate downward');
+  const goods=[];if(mine.includes('W'))goods.push('W is an outcome-only cause, which reduces the variance');if(mine.includes('I'))goods.push('I is a treatment-only cause, which inflates the variance');
+  $('c4st').innerHTML=stat('set adjusted for',mine.length?'{'+mine.join(', ')+'}':'nothing','in')+stat('mean estimate · truth',fmt(m)+' · 0.98','')+stat('bias',sgn(m-TR),Math.abs(m-TR)>.06?'hot':'ok')+stat('sd · RMSE',fmt(sd)+' · '+fmt(Math.sqrt(sd*sd+(m-TR)*(m-TR))),'');
+  $('c4rd').innerHTML=(issues.length?`<b>Problems:</b> ${issues.join('; ')}. `:`<b>No identification problem:</b> the set blocks the backdoor path and leaves the causal paths open. `)+(goods.length?goods.join('; ')+'. ':'')+`The right panel shows the average bias of seven standard sets: only sets containing C and not M or K are unbiased for the total effect; adding W is free precision, adding I costs precision.`}
+ NM.forEach(k=>$('c4'+k).addEventListener('change',run));$('c4p1').onclick=()=>setTo(['C']);$('c4p2').onclick=()=>setTo(['C','W']);$('c4p3').onclick=()=>setTo(NM);$('c4go').onclick=run;run();})();
+
+/* ---------- Ch5 collider selection ---------- */
+(function(){scl('c5r',v=>fmt(v/10));scl('c5s',v=>v+'%');scl('c5n',v=>fmt(v/10));
+ function run(){const rho=val('c5r')/10,sh=val('c5s')/100,nz=val('c5n')/10,n=5000,X=rn(n),Y=lin(n,i=>rho*X[i]+Math.sqrt(1-rho*rho)*randn()),S=lin(n,i=>X[i]+Y[i]+nz*randn()),o=ordIdx(S.map(v=>-v)),k=Math.round(sh*n),keep=new Uint8Array(n);for(let j=0;j<k;j++)keep[o[j]]=1;
+  const ix=o.slice(0,k),sel=simple(ix.map(i=>X[i]),ix.map(i=>Y[i])),all=simple(X,Y),cs=corr(ix.map(i=>X[i]),ix.map(i=>Y[i])),ca=corr(X,Y);
+  const [xl,xh]=range(X,.03),[yl,yh]=range(Y,.03),P=mk($('c5cv'),xl,xh,yh,{y0:yl,L:44});scat(P,X,Y,null,700,2.2,i=>keep[i]?C.y:C.gr);fitLine(P,all,C.mu,2.4,true,xl,xh);fitLine(P,sel,C.r,2.8,false,xl,xh);
+  legend(P,[['kept',C.y],['not kept',C.mu],['fit, all',C.mu],['fit, kept',C.r]],P.T+12);P.text('X →',P.w-P.R-24,P.h-P.B-6,C.mu);
+  const pts=[];let sx=0,sy=0,sxx=0,syy=0,sxy=0;for(let j=0;j<n;j++){const i=o[j];sx+=X[i];sy+=Y[i];sxx+=X[i]*X[i];syy+=Y[i]*Y[i];sxy+=X[i]*Y[i];const c=j+1;if(c%50===0&&c>=100&&c<=.95*n){const cv=sxy/c-sx/c*sy/c,vx=sxx/c-sx*sx/c/c,vy=syy/c-sy*sy/c/c;pts.push([100*c/n,cv/Math.sqrt(vx*vy)])}}
+  const P2=mk($('c5cv2'),0,100,1,{y0:-1,L:44});P2.hline(rho,C.g,'true ρ');poly(P2,pts,C.r,2.6);dots(P2,[[100*sh,cs]],C.y,5);P2.vline(100*sh,C.mu,'',true);P2.text('share kept (%) →',P2.w-P2.R-105,P2.h-P2.B-6,C.mu);P2.text('corr among kept',P2.L+8,P2.T+12,C.mu);
+  $('c5st').innerHTML=stat('correlation, all customers',fmt(ca),'in')+stat('correlation, kept',fmt(cs),Math.abs(cs-ca)>.15?'hot':'ok')+stat('slope all · kept',fmt(all.b)+' · '+fmt(sel.b),'')+stat('share kept',pc(sh),'');
+  $('c5rd').innerHTML=Math.abs(cs-ca)<.08?`The kept customers show a correlation of ${fmt(cs)} against ${fmt(ca)} in the whole population: with this selection the distortion is small.`:`In the whole population the correlation is ${fmt(ca)}; among the kept ${pc(sh)} it is ${fmt(cs)}${ca>=-.05&&cs<ca?' (it has turned negative)':''}. The selection rule is a collider of X and Y: customers with a low X had to have a high Y to pass. Tightening the rule (move the share left) or reducing the noise in it strengthens the effect, and the pattern cannot be seen from the kept data alone.`}
+ ['c5r','c5s','c5n'].forEach(i=>$(i).addEventListener('change',run));$('c5go').onclick=run;run();})();
+
+/* ---------- Ch6 mediator over-adjustment ---------- */
+(function(){['c6a','c6b','c6d','c6u'].forEach(i=>scl(i,v=>fmt(v/10)));
+ function run(){const a=val('c6a')/10,b=val('c6b')/10,d=val('c6d')/10,u=val('c6u')/10,R=400,T=[],D=[];
+  for(let r=0;r<R;r++){const n=400,X=rn(n),U=rn(n),M=lin(n,i=>a*X[i]+u*U[i]+randn()),Y=lin(n,i=>d*X[i]+b*M[i]+u*U[i]+randn());T.push(simple(X,Y).b);D.push(olsMulti([X,M],Y).beta[1])}
+  const tt=d+a*b,mT=avg(T),mD=avg(D),vals=[tt,mT,d,mD],lo=Math.min(0,...vals)-.3,hi=Math.max(0,...vals)+.3;
+  barZ($('c6cv'),vals,[C.fg,C.g,C.fg,C.r],['true total','Y ~ X','true direct','Y ~ X + M'],lo,hi);
+  const [l,h]=range(D,.1),P=histLines($('c6cv2'),[D],[C.r],Math.min(l,d-.1),Math.max(h,d+.1),36,[[d,C.g,'true direct',true]]);P.text('direct effect from Y ~ X + M →',P.w-P.R-170,P.h-P.B-6,C.mu);
+  $('c6st').innerHTML=stat('true total · direct',fmt(tt)+' · '+fmt(d),'in')+stat('Y ~ X (total) mean',fmt(mT),Math.abs(mT-tt)<.06?'ok':'hot')+stat('Y ~ X + M mean · bias',fmt(mD)+' · '+sgn(mD-d),Math.abs(mD-d)>.06?'hot':'ok')+stat('sd of direct estimate',fmt(sdv(D)),'');
+  $('c6rd').innerHTML=`X is randomised, so Y ~ X recovers the total effect (${fmt(mT)} against ${fmt(tt)}) whatever u is. Controlling for M to isolate the direct effect gives ${fmt(mD)} against a truth of ${fmt(d)}: ${u<.05?'with u = 0 there is no unmeasured common cause of M and Y, so this control is harmless here.':`bias ${sgn(mD-d)}. M is a collider of X and U, so conditioning on it makes X informative about U, and U drives Y.`}`}
+ ['c6a','c6b','c6d','c6u'].forEach(i=>$(i).addEventListener('change',run));$('c6go').onclick=run;run();})();
+/* ---------- Ch7 reject inference ---------- */
+(function(){scl('c7s',v=>v+'%');scl('c7d',v=>fmt(v/10));scl('c7u',v=>fmt(v/10));scl('c7q',v=>fmt(v/10));
+ function run(){const sh=val('c7s')/100,dl=val('c7d')/10,c=val('c7u')/10,q=val('c7q')/10,n=5000,s=rn(n),u=rn(n),f=x=>-.8*x+q*(x*x-1),Y=lin(n,i=>f(s[i])+c*u[i]+.5*randn()),T=lin(n,i=>s[i]+dl*u[i]),o=ordIdx(T.map(v=>-v)),k=Math.round(sh*n),ap=new Uint8Array(n);for(let j=0;j<k;j++)ap[o[j]]=1;
+  const A=[],Rj=[];for(let i=0;i<n;i++)(ap[i]?A:Rj).push(i);const fa=simple(A.map(i=>s[i]),A.map(i=>Y[i])),fall=simple(s,Y),act=avg(Rj.map(i=>Y[i])),pred=avg(Rj.map(i=>fa.a+fa.b*s[i]));
+  const [xl,xh]=range(s,.03),[yl,yh]=range(Y,.03),P=mk($('c7cv'),xl,xh,yh,{y0:yl,L:44});scat(P,s,Y,null,700,2.2,i=>ap[i]?C.y:C.gr);
+  P.line(f,C.fg,2.4,xl,xh,120,true);fitLine(P,fa,C.r,2.8,false,xl,xh);legend(P,[['approved',C.y],['rejected (unobserved)',C.mu],['true E[Y|s]',C.fg],['fit on approved',C.r]],P.T+12);P.text('application score s →',P.w-P.R-120,P.h-P.B-6,C.mu);
+  const vals=[fall.b,fa.b,act,pred],lo=Math.min(0,...vals)-.3,hi=Math.max(0,...vals)+.3;barZ($('c7cv2'),vals,[C.fg,C.y,C.fg,C.r],['slope, all','slope, approved','risk, rejected','predicted'],lo,hi);
+  const gap=pred-act;
+  $('c7st').innerHTML=stat('slope on s: all · approved',fmt(fall.b)+' · '+fmt(fa.b),Math.abs(fall.b-fa.b)>.08?'hot':'ok')+stat('rejected: actual · predicted risk',fmt(act)+' · '+fmt(pred),'')+stat('error in rejected region',sgn(gap),Math.abs(gap)>.15?'hot':'ok')+stat('approved · rejected',A.length+' · '+Rj.length,'in');
+  $('c7rd').innerHTML=(dl<.05&&Math.abs(q)<.05?`Approval depends only on the observed score and the true relation is linear, so the fit on the approved (slope ${fmt(fa.b)}) is as good as the fit on everybody (${fmt(fall.b)}) and the rejected region is predicted well (error ${sgn(gap)}).`:'')+(dl>=.05?` The officers also use u (δ = ${fmt(dl)}), so among the approved, s and u are negatively linked and the slope on s is distorted (${fmt(fa.b)} against ${fmt(fall.b)}). `:'')+(Math.abs(q)>=.05?` The relation is curved (q = ${fmt(q)}); the straight line fitted to the approved region misses the shape in the rejected region (error ${sgn(gap)}). `:'')+` Only a sample of the rejected, such as a small random-approval band, can test this.`}
+ ['c7s','c7d','c7u','c7q'].forEach(i=>$(i).addEventListener('change',run));$('c7go').onclick=run;run();})();
+
+/* ---------- Ch8 proxies and M-bias ---------- */
+(function(){scl('c8g',v=>fmt(v/10));scl('c8r',v=>v+'%');scl('c8m',v=>fmt(v/10));
+ const N=15000;
+ function prox(g,r){const Z=rn(N),X=lin(N,i=>g*Z[i]+randn()),Y=lin(N,i=>Z[i]+randn()),tau=Math.sqrt(Math.max(1/r-1,0)),Pz=lin(N,i=>Z[i]+tau*randn());return r>=.999?olsMulti([X,Z],Y).beta[1]:olsMulti([X,Pz],Y).beta[1]}
+ function mb(s){const U1=rn(N),U2=rn(N),X=lin(N,i=>s*U1[i]+randn()),M=lin(N,i=>s*U1[i]+s*U2[i]+randn()),Y=lin(N,i=>s*U2[i]+randn());return olsMulti([X,M],Y).beta[1]}
+ function run(){const g=val('c8g')/10,r=val('c8r')/100,m=val('c8m')/10,rs=[],es=[];for(let k=1;k<=10;k++){rs.push(k/10);es.push(prox(g,k/10))}
+  const ymax=Math.max(...es)*1.15+.01,P=mk($('c8cv'),0,100,ymax,{y0:0,L:44});poly(P,rs.map((v,i)=>[v*100,es[i]]),C.r,2.6);P.hline(0,C.g,'truth 0');const cur=es[Math.round(r*10)-1];dots(P,[[r*100,cur]],C.y,5);P.vline(r*100,C.mu,'',true);P.text('proxy reliability (%) →',P.w-P.R-120,P.h-P.B-6,C.mu);P.text('estimated effect (truth 0)',P.L+8,P.T+12,C.mu);
+  const ss=[],ms=[];for(let k=0;k<=8;k++){ss.push(k*.15);ms.push(mb(k*.15))}
+  const lo=Math.min(...ms)-.03,P2=mk($('c8cv2'),0,1.2,.05,{y0:Math.min(lo,-.05),L:44});poly(P2,ss.map((v,i)=>[v,ms[i]]),C.r,2.6);P2.hline(0,C.g,'no adjustment: 0');const mm=mb(m);dots(P2,[[m,mm]],C.y,5);P2.vline(m,C.mu,'',true);P2.text('M-bias strength →',P2.w-P2.R-105,P2.h-P2.B-6,C.mu);P2.text('effect after adjusting for M',P2.L+8,P2.T+12,C.mu);
+  $('c8st').innerHTML=stat('residual bias at reliability '+pc(r),sgn(cur),Math.abs(cur)>.05?'hot':'ok')+stat('bias, reliability 10% · 100%',sgn(es[0])+' · '+sgn(es[9]),'in')+stat('M-bias at strength '+fmt(m),sgn(mm),Math.abs(mm)>.04?'hot':'ok')+stat('M-bias at strength 1.2',sgn(ms[8]),'');
+  $('c8rd').innerHTML=`True effect is zero throughout. Adjusting for a proxy that is ${pc(r)} reliable still leaves a spurious effect of ${sgn(cur)}; only a perfectly measured confounder gives ${sgn(es[9])}. The right panel shows that adjusting for a pre-treatment collider M turns a null into ${sgn(mm)} at strength ${fmt(m)}: smaller than a typical omitted-confounder bias, but it shows that “adjust for everything before treatment” is not a rule.`}
+ ['c8g','c8r','c8m'].forEach(i=>$(i).addEventListener('change',run));$('c8go').onclick=run;run();})();
+
+/* ---------- Ch9 regression to the mean ---------- */
+(function(){scl('c9r',v=>v+'%');scl('c9s',v=>v+'%');scl('c9e',v=>fmt(v/10));
+ function run(){const r=val('c9r')/100,sh=val('c9s')/100,e=val('c9e')/10,n=20000,L=rn(n,Math.sqrt(r)),sd=Math.sqrt(1-r),t1=lin(n,i=>L[i]+sd*randn()),t2=lin(n,i=>L[i]+sd*randn()),o=ordIdx(t1.map(v=>-v)),k=Math.round(sh*n),sel=new Uint8Array(n),trt=new Uint8Array(n);
+  for(let j=0;j<k;j++){sel[o[j]]=1;if(Math.random()<.5){trt[o[j]]=1;t2[o[j]]-=e}}
+  let sT=0,sU=0,nT=0,nU=0,m1=0;for(let i=0;i<n;i++)if(sel[i]){m1+=t1[i];if(trt[i]){sT+=t2[i]-t1[i];nT++}else{sU+=t2[i]-t1[i];nU++}}
+  m1/=k;const cT=sT/nT,cU=sU/nU,th=-(1-r)*m1,est=cU-cT;
+  const [xl,xh]=range(t1,.02),[yl,yh]=range(t2,.02),P=mk($('c9cv'),xl,xh,yh,{y0:yl,L:44});scat(P,t1,t2,null,700,2.2,i=>sel[i]?C.y:C.gr);P.line(x=>x,C.fg,2,xl,xh,2,true);fitLine(P,simple(t1,t2),C.r,2.6,false,xl,xh);legend(P,[['selected (worst)',C.y],['others',C.mu],['no change',C.fg],['fit of t2 on t1',C.r]],P.T+12);P.text('measure at time 1 →',P.w-P.R-110,P.h-P.B-6,C.mu);
+  const vals=[cT,cU,th,est,e],lo=Math.min(0,...vals)-.25,hi=Math.max(0,...vals)+.25;barZ($('c9cv2'),vals,[C.y,C.a,C.fg,C.g,C.fg],['treated','untreated','theory','randomised','truth'],lo,hi);
+  $('c9st').innerHTML=stat('selected mean at time 1 (sd)',fmt(m1),'in')+stat('change, untreated selected',fmt(cU),Math.abs(cU)>.1?'hot':'ok')+stat('change, treated · theory (no effect)',fmt(cT)+' · '+fmt(th),'')+stat('randomised effect · truth',fmt(est)+' · '+fmt(e),'ok');
+  $('c9rd').innerHTML=`The ${pc(sh)} worst customers start ${fmt(m1)} sd above average. With persistence ${pc(r)} their measure falls by ${fmt(-cU)} sd by itself (theory ${fmt(-th)}). A before-and-after look at the treated gives a change of ${fmt(cT)} and would suggest an effect of ${fmt(-cT)} sd${Math.abs(e)<.05?' that does not exist':''}. Comparing the treated with the untreated selected customers gives ${fmt(est)}, close to the true ${fmt(e)}.`}
+ ['c9r','c9s','c9e'].forEach(i=>$(i).addEventListener('change',run));$('c9go').onclick=run;run();})();
+
+/* ---------- Ch10 sensitivity ---------- */
+(function(){scl('c10g',v=>fmt(v/10));scl('c10k',v=>fmt(v/10));scl('c10b',v=>fmt(v/10));scl('c10rr',v=>fmt(v/100));
+ const EV=r=>{r=r<1?1/r:r;return r+Math.sqrt(r*(r-1))};
+ function run(){const g=val('c10g')/10,k=val('c10k')/10,b=val('c10b')/10,rr=val('c10rr')/100,R=500,N=[];
+  for(let r=0;r<R;r++){const n=300,U=rn(n),X=lin(n,i=>g*U[i]+randn()),Y=lin(n,i=>b*X[i]+k*U[i]+randn());N.push(simple(X,Y).b)}
+  const bias=k*g/(1+g*g),m=avg(N),[l,h]=range(N,.12),P=histLines($('c10cv'),[N],[C.a],Math.min(l,b-.1),Math.max(h,b+bias+.1),40,[[b,C.g,'truth β',true],[b+bias,C.r,'β + κγ/(1+γ²)',true]]);P.text('naive estimate →',P.w-P.R-90,P.h-P.B-6,C.mu);
+  const P2=mk($('c10cv2'),1,4,8,{y0:1,L:44});P2.line(EV,C.a,2.6,1,4,100);dots(P2,[[rr,EV(rr)]],C.y,5);P2.vline(rr,C.mu,'',true);P2.text('observed risk ratio →',P2.w-P2.R-120,P2.h-P2.B-6,C.mu);P2.text('E-value',P2.L+8,P2.T+12,C.mu);
+  $('c10st').innerHTML=stat('true β · naive mean',fmt(b)+' · '+fmt(m),'in')+stat('bias · formula',sgn(m-b)+' · '+sgn(bias),Math.abs(m-b)>.06?'hot':'ok')+stat('E-value for RR '+fmt(rr),fmt(EV(rr)),'warn')+stat('E-value for RR '+fmt(1/rr)+' (protective)',fmt(EV(1/rr)),'');
+  $('c10rd').innerHTML=`With a hidden U of strength γ = ${fmt(g)}, κ = ${fmt(k)} the naive estimate is ${fmt(m)} against a true effect of ${fmt(b)}; the formula predicts a shift of ${sgn(bias)}. For an observed risk ratio of ${fmt(rr)} the E-value is ${fmt(EV(rr))}: a hidden confounder would need a risk ratio of at least ${fmt(EV(rr))} with <em>both</em> treatment and outcome (beyond the measured covariates) to explain the whole association. Ask whether any known variable (the strongest measured confounder is the benchmark) is anywhere near that.`}
+ ['c10g','c10k','c10b','c10rr'].forEach(i=>$(i).addEventListener('change',run));$('c10go').onclick=run;run();})();
+
+/* ---------- Ch11 negative control ---------- */
+(function(){scl('c11g',v=>fmt(v/10));scl('c11k',v=>fmt(v/10));scl('c11b',v=>fmt(v/10));scl('c11q',v=>fmt(v/10));
+ function run(){const g=val('c11g')/10,k=val('c11k')/10,b=val('c11b')/10,q=val('c11q')/10,R=400,NV=[],NC=[],CA=[];
+  for(let r=0;r<R;r++){const n=400,U=rn(n),X=lin(n,i=>g*U[i]+randn()),Y=lin(n,i=>b*X[i]+k*U[i]+randn()),Nn=lin(n,i=>q*k*U[i]+randn()),nv=simple(X,Y).b,nc=simple(X,Nn).b;NV.push(nv);NC.push(nc);CA.push(nv-nc)}
+  const mN=avg(NV),mC=avg(NC),mA=avg(CA),[l,h]=rng2(NV,CA,.1),P=histLines($('c11cv'),[NV,CA],[C.r,C.g],Math.min(l,b-.1),Math.max(h,b+.1),40,[[b,C.fg,'truth β',true]]);legend(P,[['naive',C.r],['calibrated with N',C.g]],P.T+12);P.text('estimated effect →',P.w-P.R-110,P.h-P.B-6,C.mu);
+  const vals=[b,mN,mC,mA],lo=Math.min(0,...vals)-.2,hi=Math.max(0,...vals)+.2;barZ($('c11cv2'),vals,[C.fg,C.r,C.y,C.g],['truth','naive','“effect” on N','calibrated'],lo,hi);
+  $('c11st').innerHTML=stat('truth · naive mean',fmt(b)+' · '+fmt(mN),'in')+stat('apparent effect on N (should be 0)',fmt(mC),Math.abs(mC)>.06?'hot':'ok')+stat('calibrated mean · bias',fmt(mA)+' · '+sgn(mA-b),Math.abs(mA-b)>.06?'warn':'ok')+stat('true ratio N:Y (assumed 1)',fmt(q),'');
+  $('c11rd').innerHTML=`The negative control outcome should show no effect of X, but it shows ${fmt(mC)}: a clear sign of confounding. Subtracting it (assuming the confounder moves N and Y equally) gives ${fmt(mA)} against a truth of ${fmt(b)}${Math.abs(q-1)<.05?', which is right because the assumption holds':`; the residual error of ${sgn(mA-b)} is the price of the true ratio being ${fmt(q)} rather than 1`}. A negative control is a diagnostic first and a correction only when the match is defended.`}
+ ['c11g','c11k','c11b','c11q'].forEach(i=>$(i).addEventListener('change',run));$('c11go').onclick=run;run();})();
+const QZ=[{"l": "Beginner", "q": "A confounder is best described as…", "o": ["A variable that is a common cause of the treatment and the outcome", "A variable caused by the treatment", "A variable correlated with the outcome only", "Any variable measured before the treatment"], "a": 0, "e": "A confounder opens a backdoor path X ← Z → Y; being pre-treatment or correlated is not sufficient."}, {"l": "Beginner", "q": "In Simpson’s paradox, which comparison should you trust?", "o": ["Always the stratified comparison", "It depends on the causal diagram: stratify if the grouping is a confounder, pool if it is a mediator or collider", "Whichever has the larger sample", "Always the pooled comparison"], "a": 1, "e": "The data alone cannot say; the causal structure decides which table answers the causal question."}, {"l": "Intermediate", "q": "Z is caused by both X and Y, and X and Y are independent. Conditioning on Z will…", "o": ["Make the estimate more precise and unbiased", "Remove any bias", "Induce an association between X and Y", "Leave X and Y independent"], "a": 2, "e": "Z is a collider; conditioning on it (or a descendant) opens the path X → Z ← Y."}, {"l": "Intermediate", "q": "Y = βX + κZ + ε and X = γZ + e with unit variances. Regressing Y on X alone converges to…", "o": ["β(1 + γ²)", "β", "β + κ", "β + κγ/(1 + γ²)"], "a": 3, "e": "The omitted-variable bias is the effect of Z on Y times the regression of Z on X, κγ/(1 + γ²); it does not vanish with n."}, {"l": "Intermediate", "q": "To estimate the total effect of X on Y, which variable should you adjust for?", "o": ["A common cause of X and Y", "A mediator on X → M → Y", "A variable caused by Y", "A common effect of X and Y"], "a": 0, "e": "Backdoor adjustment uses non-descendants of X that block backdoor paths: confounders yes; mediators and colliders no."}, {"l": "Intermediate", "q": "Adding a variable that causes only the treatment (not the outcome) to the adjustment set will typically…", "o": ["Reduce the variance", "Inflate the variance of the estimate without removing bias", "Remove confounding", "Create collider bias"], "a": 1, "e": "Treatment-only causes soak up variation in X that identifies the effect; they hurt precision."}, {"l": "Advanced", "q": "Among approved applicants, income and credit history are negatively correlated although unrelated in the population. This is…", "o": ["Regression to the mean", "Measurement error", "Collider (selection) bias from approving on a combination of the two", "Confounding by age"], "a": 2, "e": "Approval is a common effect of both; restricting to approved applicants conditions on it."}, {"l": "Advanced", "q": "A randomised offer X affects default Y partly through utilisation M; an unobserved appetite U affects M and Y. Y ~ X + M estimates…", "o": ["Zero", "The unbiased total effect", "The unbiased direct effect", "A biased direct effect, because M is a collider of X and U"], "a": 3, "e": "Conditioning on M links X to U, and U drives Y, even though X was randomised; Y ~ X gives the total effect."}, {"l": "Advanced", "q": "A scorecard is fitted on approved loans only, approval having depended on observed features alone and the model being correctly specified. The main remaining risk is…", "o": ["Extrapolation to the rejected region if the true relationship is not captured there", "None at all", "Bias in the coefficients inside the approved region", "Collider bias in the coefficients"], "a": 0, "e": "Selection on observables does not bias a correct model, but nothing in the data validates it in the unseen region."}, {"l": "Advanced", "q": "The 10% worst-performing branches get a new process, and next quarter they improve. The proper conclusion is…", "o": ["The process failed", "Nothing without a control group selected in the same way (regression to the mean explains part)", "The process works", "The branches were mismeasured"], "a": 1, "e": "Selection on an extreme noisy value guarantees partial reversion; a randomised control among the same selected is needed."}, {"l": "Advanced", "q": "Adjusting for a noisy proxy of a confounder…", "o": ["Is equivalent to adjusting for the confounder", "Removes all confounding", "Removes only part of the confounding: residual confounding remains", "Creates collider bias in every case"], "a": 2, "e": "The control removes confounding only to the extent that it measures the confounder."}, {"l": "Expert", "q": "A pre-treatment variable M is caused by U₁ (which causes X) and U₂ (which causes Y), with no effect of X on Y. Adjusting for M…", "o": ["Removes confounding", "Reduces variance only", "Is always safe because M is pre-treatment", "Introduces bias (M-bias): M is a collider"], "a": 3, "e": "Conditioning on the collider M links U₁ and U₂ and hence X and Y."}, {"l": "Expert", "q": "Which statement about the causal diagram and the data is correct?", "o": ["The data cannot, by themselves, tell a confounder from a mediator or collider", "A significant correlation with both X and Y makes a variable a confounder", "A variable measured before treatment is never harmful to adjust for", "Statistical tests identify the right adjustment set"], "a": 0, "e": "Observationally equivalent structures can imply different adjustments; the diagram comes from subject-matter knowledge."}, {"l": "Expert", "q": "The E-value for an observed risk ratio of 1.8 is about…", "o": ["5.4", "3.0", "1.8", "0.9"], "a": 1, "e": "1.8 + √(1.8 × 0.8) = 1.8 + 1.2 = 3.0: an unmeasured confounder would need risk ratios of about 3 with both treatment and outcome."}, {"l": "Expert", "q": "A negative control outcome shows a clear “effect” of the treatment. This suggests…", "o": ["The outcome should be dropped from the model", "The sample is too small", "Residual confounding or bias in the analysis", "The treatment works strongly"], "a": 2, "e": "An outcome the treatment cannot affect should show no association; one that does reveals bias shared with the real outcome."}, {"l": "Expert", "q": "A lender wants unbiased training data for decisions near the approval cut-off. The only fully assumption-free source of outcomes for would-be rejects is…", "o": ["Using bureau scores as labels", "Reject inference by parcelling", "Extrapolating the approved-sample fit", "A small randomised approval (exploration) band"], "a": 3, "e": "Randomisation breaks dependence of approval on unobservables; inference methods rest on untestable assumptions."}, {"l": "Expert", "q": "Why can randomisation of X be trusted to remove confounding, while adjusting for Z cannot?", "o": ["It breaks all arrows into X, including those from unmeasured causes", "It removes measurement error", "It increases the sample size", "It makes the variables normal"], "a": 0, "e": "Randomisation makes X independent of all pre-treatment causes of Y, measured or not; adjustment handles only what is measured and correctly modelled."}, {"l": "Expert", "q": "Customers with a high utilisation spike this month are called by collections; next month their utilisation is lower. With a persistence of 0.5 and these customers 2 sd above average, the expected fall without any effect is about…", "o": ["2 sd", "1 sd (−(1 − r) × 2)", "0 sd", "0.5 sd"], "a": 1, "e": "E[t₂ | t₁] = r·t₁, so the change is −(1 − r)·t₁ = −0.5 × 2 = −1 sd."}];
+(function(){const st=store.get('cf_quiz',{});
+ function render(){const box=$('quiz');box.innerHTML='';
+  QZ.forEach((q,i)=>{const d=document.createElement('div');d.className='q'+(st[i]!=null?' done':'');d.innerHTML=`<div class="qh">Q${i+1} · ${q.l}</div><div style="margin:4px 0 6px"><b>${q.q}</b></div>`;
+   q.o.forEach((o,j)=>{const b=document.createElement('button');b.className='opt';b.textContent=o;if(st[i]!=null){if(j===q.a)b.classList.add('good');else if(j===st[i])b.classList.add('bad')}b.onclick=()=>{if(st[i]!=null)return;st[i]=j;store.set('cf_quiz',st);render();meter()};d.appendChild(b)});
+   const e=document.createElement('div');e.className='ex';e.innerHTML=(st[i]===q.a?'✅ ':'❌ ')+q.e;d.appendChild(e);box.appendChild(d)});
+  const ans=Object.keys(st).length,ok=QZ.filter((q,i)=>st[i]===q.a).length;
+  $('qscore').innerHTML=stat('answered',ans+' / '+QZ.length,'in')+stat('correct',ok,'ok')+stat('score',ans?Math.round(100*ok/ans)+'%':'—',ok/Math.max(ans,1)>=.8?'ok':'warn')+stat('verdict',ans<QZ.length?'keep going':ok>=16?'causal-thinking master':ok>=13?'strong':'review ch. 1–11','')}
+ $('qreset').onclick=()=>{Object.keys(st).forEach(k=>delete st[k]);store.set('cf_quiz',st);render();meter()};
+ window.__qst=st;render();})();
+const CHK=["Distinguish association from causal effect and define a confounder from a diagram.", "Derive the bias of the naive regression with an omitted confounder and say why it does not shrink with n.", "Explain Simpson’s paradox and decide from the diagram which table answers the causal question.", "Classify chains, forks and colliders and say when conditioning blocks or opens a path.", "Apply the backdoor criterion to choose an adjustment set (include confounders; exclude mediators and colliders).", "Explain Berkson’s paradox and how selection on a common effect creates association.", "Explain why controlling for a mediator can bias even a randomised comparison.", "Explain what reject inference can and cannot recover, and why exploration is the clean solution.", "Describe residual confounding from a noisy proxy and M-bias from a pre-treatment collider.", "Recognise regression to the mean and design a proper control for a selected group.", "Compute the omitted-variable bias and the E-value, and interpret them.", "Design a negative control outcome or exposure and say when it can calibrate an estimate.", "Say why randomisation removes confounding that adjustment cannot.", "Write the causal-assumptions section of a model-validation or experiment report (diagram, adjustment set, sensitivity)."];
+(function(){const st=store.get('cf_chk',{}),box=$('chk');CHK.forEach((t,i)=>{const l=document.createElement('label'),c=document.createElement('input');c.type='checkbox';c.checked=!!st[i];c.onchange=()=>{st[i]=c.checked;store.set('cf_chk',st);meter()};l.appendChild(c);const s=document.createElement('span');s.textContent=t;l.appendChild(s);box.appendChild(l)});window.__cst=st;})();
+function meter(){const q=window.__qst||{},c=window.__cst||{};const ok=QZ.filter((x,i)=>q[i]===x.a).length,ck=Object.values(c).filter(Boolean).length;const p=Math.round(100*(.6*ok/QZ.length+.4*ck/CHK.length));$('mtxt').textContent='Mastery: '+p+'%  (exam + checklist)';$('mbar').style.width=p+'%';store.set('mastery_cf',p)}
+meter();
+
+/* ---------- Navigation ---------- */
+(function(){const nav=$('nav');let html='';
+ document.querySelectorAll('main .part, main section.ch').forEach(el=>{if(el.classList.contains('part'))html+=`<div class="pt">${el.textContent}</div>`;else{const h=el.querySelector('h2'),num=h.querySelector('.num').textContent,t=Array.from(h.childNodes).filter(n=>n.nodeType===3).map(n=>n.textContent).join('').trim();html+=`<a href="#${el.id}" data-id="${el.id}">${num}. ${t}</a>`}});
+ nav.innerHTML=html;const links=nav.querySelectorAll('a'),io=new IntersectionObserver(es=>{es.forEach(e=>{if(e.isIntersecting)links.forEach(a=>a.classList.toggle('on',a.dataset.id===e.target.id))})},{rootMargin:'-20% 0px -70% 0px'});
+ document.querySelectorAll('section.ch').forEach(s=>io.observe(s));
+ $('menu').onclick=()=>$('side').classList.toggle('open');nav.addEventListener('click',e=>{if(e.target.tagName==='A')$('side').classList.remove('open')});
+ window.addEventListener('scroll',()=>{const h=document.documentElement;$('prog').style.width=(100*h.scrollTop/(h.scrollHeight-h.clientHeight))+'%'},{passive:true});})();
+</script>
+</body>
+</html>
