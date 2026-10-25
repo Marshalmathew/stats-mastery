@@ -1,0 +1,616 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Experiments and A/B Testing Mastery</title>
+<style>
+:root{--bg:#0b0e17;--panel:#121726;--panel2:#171d30;--line:#232a3d;--fg:#e8ebf5;--mu:#8a93ab;--a:#6ea8ff;--r:#ff6b81;--y:#ffd166;--g:#4ade80;--p:#c084fc;--t:#5eead4}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;background:var(--bg);color:var(--fg);font:16px/1.7 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+a{color:var(--a)}
+#prog{position:fixed;top:0;left:0;height:3px;background:linear-gradient(90deg,var(--a),var(--p),var(--r));width:0;z-index:50}
+.side{position:fixed;left:0;top:0;bottom:0;width:290px;background:#0e1220;border-right:1px solid var(--line);overflow:auto;padding:18px 14px 90px;z-index:40;transition:transform .25s}
+.side h1{font-size:15px;margin:0 0 2px}
+.side small{color:var(--mu)}
+.side .pt{margin:16px 0 4px;font-size:11px;text-transform:uppercase;letter-spacing:1.3px;color:var(--p)}
+.side a{display:block;color:var(--mu);text-decoration:none;padding:5px 9px;border-radius:7px;font-size:13.5px;line-height:1.35}
+.side a:hover{background:var(--panel);color:var(--fg)}
+.side a.on{background:var(--panel2);color:var(--fg);box-shadow:inset 3px 0 var(--a)}
+.side a.back{color:var(--t);padding-left:0;margin-bottom:6px}
+.meter{position:fixed;left:0;bottom:0;width:290px;background:#0e1220;border-top:1px solid var(--line);padding:10px 16px;z-index:41;font-size:12px;color:var(--mu)}
+.meter .bar{height:7px;background:var(--line);border-radius:6px;margin-top:5px;overflow:hidden}
+.meter .bar i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--g),var(--t));transition:width .4s}
+#menu{display:none;position:fixed;top:10px;left:10px;z-index:60;background:var(--panel2);color:var(--fg);border:1px solid var(--line);border-radius:9px;padding:7px 12px;font-size:14px;cursor:pointer}
+main{margin-left:290px;padding:0 34px 120px;max-width:1090px}
+.hero{padding:70px 0 30px}
+.hero h1{font-size:clamp(32px,5vw,56px);line-height:1.08;margin:0 0 14px;background:linear-gradient(100deg,#fff,var(--y) 40%,var(--r));-webkit-background-clip:text;background-clip:text;color:transparent}
+.hero p{font-size:19px;color:#c3c9dc;max-width:780px}
+.chips{display:flex;flex-wrap:wrap;gap:8px;margin:18px 0}
+.chip{border:1px solid var(--line);background:var(--panel);padding:5px 12px;border-radius:99px;font-size:13px;color:var(--mu)}
+.chip b{color:var(--fg)}
+.part{margin:90px 0 0;padding-top:22px;border-top:1px solid var(--line);font-size:12px;letter-spacing:2px;text-transform:uppercase;color:var(--p)}
+section.ch{padding-top:30px}
+h2{font-size:30px;line-height:1.2;margin:10px 0 8px;display:flex;gap:12px;align-items:center;flex-wrap:wrap}
+h2 .num{display:inline-grid;place-items:center;width:40px;height:40px;border-radius:12px;background:var(--panel2);border:1px solid var(--line);font-size:18px;color:var(--a)}
+.lvl{font-size:11px;font-weight:600;letter-spacing:.8px;text-transform:uppercase;padding:3px 9px;border-radius:99px;border:1px solid}
+.lvl.b{color:var(--g);border-color:#1f5c3a}.lvl.i{color:var(--a);border-color:#244a85}.lvl.a{color:var(--y);border-color:#6b5420}.lvl.e{color:var(--r);border-color:#7a2c3a}
+h3{font-size:19px;margin:30px 0 6px;color:#fff}
+p{margin:10px 0}li{margin:5px 0}
+code,.f{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace}
+code{background:var(--panel2);padding:1px 6px;border-radius:5px;font-size:.9em}
+.f{display:block;white-space:pre-wrap;background:#0e1322;border:1px solid var(--line);border-left:3px solid var(--a);padding:12px 16px;border-radius:9px;margin:14px 0;overflow-x:auto;font-size:15px;color:#dbe4ff;line-height:1.8}
+.co{border-radius:12px;padding:13px 17px;margin:16px 0;border:1px solid var(--line);background:var(--panel)}
+.co>b:first-child{display:block;margin-bottom:2px;font-size:12px;letter-spacing:1px;text-transform:uppercase}
+.co.def{border-left:4px solid var(--a)}.co.def>b:first-child{color:var(--a)}
+.co.warn{border-left:4px solid var(--r)}.co.warn>b:first-child{color:var(--r)}
+.co.tip{border-left:4px solid var(--g)}.co.tip>b:first-child{color:var(--g)}
+.co.key{border-left:4px solid var(--y);background:#171608}.co.key>b:first-child{color:var(--y)}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:18px 20px;margin:22px 0;box-shadow:0 8px 30px rgba(0,0,0,.25)}
+.card>h4{margin:0 0 3px;font-size:13px;letter-spacing:1.2px;text-transform:uppercase;color:var(--t)}
+.card>p.sub{margin:0 0 12px;color:var(--mu);font-size:14.5px}
+.ctl{display:flex;flex-wrap:wrap;gap:10px 22px;align-items:center;margin:8px 0 10px}
+.ctl label{display:flex;gap:8px;align-items:center;font-size:14px;color:#c3c9dc}
+.ctl output{min-width:38px;font-family:ui-monospace,monospace;color:var(--y);font-size:13px}
+input[type=range]{accent-color:var(--a);width:150px}
+input[type=checkbox]{accent-color:var(--a)}
+select,input[type=number],input[type=text]{background:#0e1322;color:var(--fg);border:1px solid var(--line);border-radius:8px;padding:6px 9px;font:inherit;font-size:14px}
+button{background:linear-gradient(180deg,#2c4a80,#233b68);color:#fff;border:1px solid #3a5a98;border-radius:9px;padding:7px 14px;font:inherit;font-size:14px;cursor:pointer}
+button:hover{filter:brightness(1.15)}
+button.alt{background:var(--panel2);border-color:var(--line);color:var(--fg)}
+canvas{width:100%;height:270px;display:block;background:#0e1322;border:1px solid var(--line);border-radius:10px;margin-top:6px}
+canvas.sm{height:210px}canvas.tl{height:330px}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(125px,1fr));gap:9px;margin:12px 0}
+.stat{background:#0e1322;border:1px solid var(--line);border-radius:10px;padding:8px 11px}
+.stat b{display:block;font-size:17px;font-family:ui-monospace,monospace}
+.stat span{font-size:11.5px;color:var(--mu);text-transform:uppercase;letter-spacing:.7px}
+.stat.hot b{color:var(--r)}.stat.ok b{color:var(--g)}.stat.warn b{color:var(--y)}.stat.in b{color:var(--a)}
+.read{margin:8px 0 0;padding:10px 14px;background:#0e1322;border:1px dashed #33406a;border-radius:10px;font-size:14.5px;color:#d3dbf3}
+table{border-collapse:collapse;width:100%;margin:12px 0;font-size:14px}
+th,td{border:1px solid var(--line);padding:7px 10px;text-align:left;vertical-align:top}
+th{background:var(--panel2);font-size:12px;text-transform:uppercase;letter-spacing:.6px;color:var(--mu)}
+td.n{font-family:ui-monospace,monospace;text-align:right}
+.tw{overflow-x:auto}
+.pill{display:inline-block;padding:1px 9px;border-radius:99px;font-size:12px;font-weight:600}
+.pill.r{background:#3a1520;color:var(--r)}.pill.g{background:#10321f;color:var(--g)}.pill.y{background:#3a2f0e;color:var(--y)}.pill.m{background:#202637;color:var(--mu)}
+details{background:var(--panel);border:1px solid var(--line);border-radius:11px;padding:9px 15px;margin:9px 0}
+details summary{cursor:pointer;font-weight:600}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.q{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:14px 18px;margin:14px 0}
+.q .qh{font-size:12px;letter-spacing:1px;text-transform:uppercase;color:var(--mu)}
+.q .opt{display:block;width:100%;text-align:left;margin:6px 0;background:#0e1322;border:1px solid var(--line);color:var(--fg);border-radius:9px;padding:9px 12px}
+.q .opt.good{border-color:var(--g);background:#0e2418}.q .opt.bad{border-color:var(--r);background:#2a1119}
+.q .ex{display:none;margin-top:8px;font-size:14.5px;color:#c3c9dc}
+.q.done .ex{display:block}
+.chk label{display:flex;gap:10px;align-items:flex-start;padding:6px 0;cursor:pointer}
+.chk input{margin-top:6px;accent-color:var(--g);width:17px;height:17px}
+.sigrow{display:grid;grid-template-columns:minmax(170px,2fr) 1fr 1fr auto;gap:8px 14px;align-items:center;padding:6px 0;border-top:1px dashed #1b2236}
+.sigrow:first-of-type{border-top:0}
+.sigrow label{display:flex;gap:6px;align-items:center;font-size:13.5px;color:#c3c9dc}
+@media(max-width:900px){
+ .side{transform:translateX(-100%)}.side.open{transform:none}.meter{display:none}
+ #menu{display:block}main{margin-left:0;padding:0 16px 100px}.two{grid-template-columns:1fr}.hero{padding-top:60px}
+ .sigrow{grid-template-columns:1fr 1fr}
+}
+</style>
+</head>
+<body>
+<div id="prog"></div>
+<button id="menu">☰ Contents</button>
+<nav class="side" id="side"><a class="back" href="index.html">← All courses</a><h1>Experiments &amp; A/B Testing</h1><small>12 chapters · 11 labs · exam</small><div id="nav"></div></nav>
+<div class="meter"><div id="mtxt">Mastery: 0%</div><div class="bar"><i id="mbar"></i></div></div>
+
+<main>
+<header class="hero">
+ <h1>Potential outcomes, randomised experiments and A/B testing: CUPED, validity checks and sequential decisions.</h1>
+ <p>The previous page listed the ways observational comparisons go wrong. A randomised experiment removes them by design: it makes treatment independent of every pre-treatment characteristic, measured or not. This page builds the framework (potential outcomes, the average treatment effect, SUTVA), the analysis (difference in means, randomisation inference), the planning (minimum detectable effect, sample size), the threats that survive randomisation (clustering, spillover, sample-ratio mismatch, non-compliance), the tools that sharpen it (stratification, regression adjustment, CUPED) and the ways of deciding as data arrive (always-valid sequential tests, bandits). The examples are the bank’s: offers, limit tests, collections strategies, champion–challenger comparisons.</p>
+ <div class="chips"><span class="chip"><b>Part I</b> Framework and design</span><span class="chip"><b>Part II</b> Threats and variance reduction</span><span class="chip"><b>Part III</b> Compliance, sequential and adaptive</span></div>
+ <div class="co tip"><b>How to use this</b>Sliders change the setting; heavy labs update when you release a slider or press the button. Prerequisites: the power, confidence-interval, multiple-testing and confounding pages. Every lab simulates data with a known true effect, so the bias, coverage and error rate of each method can be counted.</div>
+</header>
+
+<div class="part">Part I · Framework and design</div>
+
+<section class="ch" id="c1">
+<h2><span class="num">1</span>Potential outcomes and the fundamental problem <span class="lvl b">Beginner</span></h2>
+<p>Each unit i has two <b>potential outcomes</b>: Yᵢ(1) if treated and Yᵢ(0) if not. The unit-level effect τᵢ = Yᵢ(1) − Yᵢ(0) is never observed, because only one of the two is realised: this is the <b>fundamental problem of causal inference</b>. What can be estimated are averages: the <b>ATE</b> = E[Y(1) − Y(0)] over the population, the <b>ATT</b> over those who were treated, the <b>CATE</b> within a subgroup. The observed difference in means mixes the effect with selection:</p>
+<div class="f">E[Y | T=1] − E[Y | T=0] = ATT + { E[Y(0) | T=1] − E[Y(0) | T=0] }       (second term = selection bias)</div>
+<p>Two assumptions are built into the notation. <b>SUTVA</b>: one unit’s outcome does not depend on others’ treatments (no interference) and there is a single version of the treatment. <b>Consistency</b>: the observed outcome equals the potential outcome of the treatment actually received. Under <b>randomisation</b> T is independent of (Y(0), Y(1)), so the selection term is zero and the difference in means is unbiased for the ATE. This is the sense in which an experiment needs no model of why customers differ.</p>
+<div class="card"><h4>Lab 1 · Self-selection versus a coin flip</h4>
+ <p class="sub">A population with baseline outcome Y(0) and heterogeneous effects τᵢ = τ + h·zᵢ. Treated customers are chosen (not randomised) with probability depending on their baseline (strength s) and on their own gain (strength g). Left: the true ATE, the ATT, and the average naive and randomised estimates. Right: distribution of the two estimators over 500 samples (n = 400).</p>
+ <div class="ctl"><label>average effect τ <input type="range" id="c1t" min="0" max="10" step="1" value="5"><output id="c1tv"></output></label><label>selection on baseline s <input type="range" id="c1s" min="0" max="30" step="1" value="15"><output id="c1sv"></output></label><label>selection on gain g <input type="range" id="c1g" min="0" max="30" step="1" value="0"><output id="c1gv"></output></label><label>effect heterogeneity h <input type="range" id="c1h" min="0" max="15" step="1" value="8"><output id="c1hv"></output></label><button id="c1go">Re-simulate</button></div>
+ <div class="two"><canvas class="sm" id="c1cv"></canvas><canvas class="sm" id="c1cv2"></canvas></div><div class="stats" id="c1st"></div><div class="read" id="c1rd"></div></div>
+</section>
+
+<section class="ch" id="c2">
+<h2><span class="num">2</span>Analysing a randomised experiment: Neyman and Fisher <span class="lvl b">Beginner</span></h2>
+<p>With n₁ treated and n₀ control customers the estimator is the difference in means τ̂ = Ȳ₁ − Ȳ₀. <b>Neyman’s</b> view treats the potential outcomes as fixed and the randomisation as the only randomness: τ̂ is unbiased for the sample ATE with variance s₁²/n₁ + s₀²/n₀ − s_τ²/n (the last term, unknowable, is dropped, so the usual unpooled standard error is conservative). The Welch t interval is the standard report. <b>Fisher’s</b> view tests the sharp null that τᵢ = 0 for everyone: under it, all outcomes are fixed and any re-assignment of the labels is equally likely, so the exact null distribution of any statistic is obtained by re-randomising and recomputing. This <b>randomisation test</b> needs no normality, is valid in small samples and with skewed outcomes, and extends to any test statistic (medians, quantiles, rank-based statistics).</p>
+<p>For skewed money outcomes (spend, balances) the mean is what the business cares about, but it is noisy; trimmed means, winsorising (decided in advance), log transforms (a different estimand) and larger samples are the usual options. Report the effect with an interval, not just a p-value.</p>
+<div class="card"><h4>Lab 2 · Permutation test against the t test</h4>
+ <p class="sub">Left: one experiment; the histogram is the permutation distribution of the difference in means under the sharp null, the line is the observed value, and both p-values are shown. Right: over 300 experiments each, the rejection rate (5% level) of the Welch t test and the permutation test, with no effect (size) and with the chosen effect (power).</p>
+ <div class="ctl"><label>customers per arm <input type="range" id="c2n" min="10" max="100" step="5" value="20"><output id="c2nv"></output></label><label>effect (sd units) <input type="range" id="c2d" min="0" max="15" step="1" value="8"><output id="c2dv"></output></label><label>outcome <select id="c2k"><option value="0">normal</option><option value="1">skewed (lognormal)</option><option value="2">5% outliers</option></select></label><button id="c2go">Re-simulate</button></div>
+ <div class="two"><canvas class="sm" id="c2cv"></canvas><canvas class="sm" id="c2cv2"></canvas></div><div class="stats" id="c2st"></div><div class="read" id="c2rd"></div></div>
+</section>
+
+<section class="ch" id="c3">
+<h2><span class="num">3</span>Sample size, power and the minimum detectable effect <span class="lvl i">Intermediate</span></h2>
+<p>Plan before running. For a two-sided test at level α with power 1 − β, comparing two arms of n customers each with standard deviation σ (continuous metric), the smallest effect reliably detected is</p>
+<div class="f">MDE = (z₁₋α/₂ + z₁₋β) · σ · √(2/n)            n per arm = 2 (z₁₋α/₂ + z₁₋β)² σ² / δ²</div>
+<p>For a conversion rate p₀ replace σ² by p(1 − p) (about p₀(1 − p₀) for each arm). Halving the detectable effect costs four times the sample; rare events (default, fraud, attrition) therefore need very large arms, which is why such experiments are run on <em>proxies</em> or on longer horizons. Choose the primary metric, the MDE that would change the decision (the smallest worthwhile effect, not the hoped-for one), α and the power before launch, and write down the stopping rule: a test that stops when the result looks good is not a test at level α.</p>
+<div class="card"><h4>Lab 3 · What can this test detect?</h4>
+ <p class="sub">A conversion metric with baseline rate p₀. Left: power against the relative lift for the chosen n per arm (α = 5%); the dot is your target lift and the dashed line is 80%. Right: the n per arm required for 80% power against the relative lift; the dot is your target. The simulation re-estimates the power at your target lift from 2000 experiments (binomial counts drawn with a normal approximation).</p>
+ <div class="ctl"><label>baseline rate p₀ <input type="range" id="c3p" min="1" max="40" step="1" value="5"><output id="c3pv"></output></label><label>customers per arm <input type="range" id="c3n" min="500" max="50000" step="500" value="32000"><output id="c3nv"></output></label><label>target relative lift <input type="range" id="c3l" min="1" max="30" step="1" value="10"><output id="c3lv"></output></label><button id="c3go">Re-simulate</button></div>
+ <div class="two"><canvas class="sm" id="c3cv"></canvas><canvas class="sm" id="c3cv2"></canvas></div><div class="stats" id="c3st"></div><div class="read" id="c3rd"></div></div>
+</section>
+
+<section class="ch" id="c4">
+<h2><span class="num">4</span>Units of randomisation and clustered designs <span class="lvl i">Intermediate</span></h2>
+<p>The unit of randomisation (customer, household, branch, region, day) must match the unit at which treatments are delivered and outcomes interact. When customers in the same branch share an effect (staff behaviour, local conditions) and the treatment is assigned by branch, observations within a cluster are correlated with intra-cluster correlation ρ. Treating the n = K·m customers as independent understates the variance by the <b>design effect</b></p>
+<div class="f">DEFF = 1 + (m − 1)ρ        effective sample size = n / DEFF</div>
+<p>so with m = 100 customers per branch and ρ = 0.05 the variance is almost six times too small and a nominal 5% test rejects far more often. The remedy is to analyse at the cluster level (cluster means, or cluster-robust standard errors with enough clusters) and to plan the sample size with the DEFF: adding customers within clusters helps little, adding clusters helps a lot. With few clusters (under about 30 in total) use cluster-level permutation tests or small-sample corrections.</p>
+<div class="card"><h4>Lab 4 · Randomising branches, analysing customers</h4>
+ <p class="sub">K branches per arm, m customers per branch, no true effect. Left: the share of 800 experiments declared significant at 5% by the naive customer-level test and by a test on cluster means. Right: the design effect against cluster size for ρ = 1%, 5% and 10%; the dot is your setting.</p>
+ <div class="ctl"><label>customers per branch m <input type="range" id="c4m" min="5" max="200" step="5" value="50"><output id="c4mv"></output></label><label>intra-cluster ρ <input type="range" id="c4r" min="0" max="30" step="1" value="5"><output id="c4rv"></output></label><label>branches per arm K <input type="range" id="c4k" min="5" max="50" step="1" value="20"><output id="c4kv"></output></label><button id="c4go">Re-simulate</button></div>
+ <div class="two"><canvas class="sm" id="c4cv"></canvas><canvas class="sm" id="c4cv2"></canvas></div><div class="stats" id="c4st"></div><div class="read" id="c4rd"></div></div>
+</section>
+
+<div class="part">Part II · Threats and variance reduction</div>
+
+<section class="ch" id="c5">
+<h2><span class="num">5</span>Interference and spillovers <span class="lvl a">Advanced</span></h2>
+<p>SUTVA fails when a treated customer’s treatment changes other customers’ outcomes: referral and network offers, shared resources (limited inventory, call-centre capacity, a market with fixed demand), social comparison, price competition. Then each unit has more than two potential outcomes, indexed by the whole assignment vector, and the individually randomised difference in means estimates a <em>direct</em> effect under partial exposure (say 50% of the market treated), not the effect of rolling the treatment out to everybody. If treated and control units share an exposure, spillovers cancel in the difference but the quantity of interest (global treatment versus none) is different. Designs for interference randomise <b>clusters</b> (markets, branches, social-graph communities), vary the treated share across clusters, use switchback designs (alternating time periods for the whole system) or model the exposure explicitly.</p>
+<div class="card"><h4>Lab 5 · The rollout effect is not the A/B effect</h4>
+ <p class="sub">Each customer’s outcome is τ·T + s·(share of treated customers in their market) + noise. The global effect of treating everyone is τ + s (e.g. s &lt; 0: cannibalisation). Left: estimates from 300 individually randomised experiments (treated share p, 40 markets × 50 customers) and from 300 market-randomised experiments (half of the markets treated). Right: the means of the two designs against the global effect.</p>
+ <div class="ctl"><label>direct effect τ <input type="range" id="c5t" min="0" max="20" step="1" value="10"><output id="c5tv"></output></label><label>spillover s <input type="range" id="c5s" min="-15" max="15" step="1" value="-8"><output id="c5sv"></output></label><label>treated share p <input type="range" id="c5p" min="10" max="90" step="10" value="50"><output id="c5pv"></output></label><button id="c5go">Re-simulate</button></div>
+ <div class="two"><canvas class="sm" id="c5cv"></canvas><canvas class="sm" id="c5cv2"></canvas></div><div class="stats" id="c5st"></div><div class="read" id="c5rd"></div></div>
+</section>
+
+<section class="ch" id="c6">
+<h2><span class="num">6</span>Stratification and regression adjustment <span class="lvl a">Advanced</span></h2>
+<p>Randomisation guarantees balance on average, not in the sample you got; pre-treatment covariates that predict the outcome can be used to remove that chance imbalance and to shrink the standard error without any bias. <b>Stratified (blocked) randomisation</b> randomises within strata (segments, branches, risk bands). <b>Regression adjustment</b> fits Y ~ T + X: the coefficient on T stays unbiased under randomisation even if the linear model is wrong (Freedman’s caveat for small samples aside), and Lin’s version with the interaction T·(X − X̄) is never worse asymptotically than the unadjusted estimator. If X explains a share R² of the outcome variance, the variance of the estimate falls by about that share:</p>
+<div class="f">Var(τ̂_adj) ≈ (1 − R²) · Var(τ̂_unadj)      equivalent to a sample (1 − R²)⁻¹ times larger</div>
+<p>The covariates must be fixed <b>before</b> treatment (otherwise they absorb part of the effect) and chosen in advance, not by testing which gives the best p-value.</p>
+<div class="card"><h4>Lab 6 · What a good covariate buys</h4>
+ <p class="sub">A covariate X correlated with the outcome (ρ). Over 600 experiments: the unadjusted difference in means, the regression-adjusted estimate (Y ~ T + X) and Lin’s interaction estimator when the effect varies with X (heterogeneity λ). Left: distribution of the three estimators. Right: their standard deviations; the theory for the adjustment is (1 − ρ²) in variance.</p>
+ <div class="ctl"><label>corr(X, Y) ρ <input type="range" id="c6r" min="0" max="95" step="5" value="60"><output id="c6rv"></output></label><label>customers n <input type="range" id="c6n" min="100" max="2000" step="100" value="400"><output id="c6nv"></output></label><label>effect heterogeneity λ <input type="range" id="c6l" min="0" max="20" step="1" value="10"><output id="c6lv"></output></label><button id="c6go">Re-simulate</button></div>
+ <div class="two"><canvas class="sm" id="c6cv"></canvas><canvas class="sm" id="c6cv2"></canvas></div><div class="stats" id="c6st"></div><div class="read" id="c6rd"></div></div>
+</section>
+
+<section class="ch" id="c7">
+<h2><span class="num">7</span>CUPED: variance reduction from the pre-period <span class="lvl a">Advanced</span></h2>
+<p><b>CUPED</b> (controlled-experiment using pre-experiment data) is regression adjustment with the same metric measured before the experiment. With pre-period metric X and in-experiment metric Y, define Ỹ = Y − θ(X − X̄) with θ = Cov(X, Y)/Var(X) estimated on the pooled data; the treatment effect is estimated as the difference in means of Ỹ. Because X is measured before assignment it is unaffected by treatment and the estimate stays unbiased, while the variance falls by 1 − ρ² where ρ = Corr(X, Y). For user-level metrics with a persistent customer level (spend, balances, activity), ρ can be 0.5 to 0.9, equivalent to halving or better the required sample.</p>
+<p>How to get a high ρ: a longer pre-period (averaging more weeks reduces the noise in X), the same metric definition, and extra pre-period covariates (ML-based versions such as CUPAC predict Y from many features). Pitfalls: a covariate measured <em>during or after</em> treatment can be affected by it and bias the estimate; new customers have no pre-period (impute and flag, or fall back to the unadjusted estimate); changing θ after seeing the data is another researcher degree of freedom.</p>
+<div class="card"><h4>Lab 7 · A longer pre-period gives a stronger covariate</h4>
+ <p class="sub">Weekly metric = persistent level + weekly noise (level share v of the variance). X is the average of W pre-period weeks; Y is the average of 2 in-experiment weeks. Left: the theoretical variance reduction 1 − ρ² against W (curve) and the simulated variance ratio at your W (dot). Right: over 400 experiments (n = 600), the average estimates and standard deviations for the plain estimator, CUPED with a true pre-period X, and CUPED with an X that is partly measured after treatment (contamination c).</p>
+ <div class="ctl"><label>pre-period weeks W <input type="range" id="c7w" min="1" max="12" step="1" value="4"><output id="c7wv"></output></label><label>persistent share v <input type="range" id="c7v" min="10" max="90" step="10" value="50"><output id="c7vv"></output></label><label>contamination c <input type="range" id="c7k" min="0" max="10" step="1" value="0"><output id="c7kv"></output></label><button id="c7go">Re-simulate</button></div>
+ <div class="two"><canvas class="sm" id="c7cv"></canvas><canvas class="sm" id="c7cv2"></canvas></div><div class="stats" id="c7st"></div><div class="read" id="c7rd"></div></div>
+</section>
+
+<section class="ch" id="c8">
+<h2><span class="num">8</span>Validity checks: sample-ratio mismatch and differential attrition <span class="lvl a">Advanced</span></h2>
+<p>A randomised experiment can be broken by its implementation. The first check is the <b>sample ratio mismatch</b> (SRM): if the design assigns 50/50 and the data show 50.8/49.2 among 100 000 customers, a chi-square test on the counts gives p ≈ 10⁻⁶, which cannot be chance. Typical causes: a bug that drops users in one arm (a page that fails to load for slow customers, an eligibility rule evaluated after assignment), bot filtering applied differently, redirects, caching, and logging that loses events. The danger is that the missing customers are not a random subset: removing the poorest outcomes from one arm re-creates selection bias (chapter 5 of the previous page) <em>inside</em> a randomised experiment, and the estimate is wrong with a clean-looking p-value.</p>
+<p>Routine practice: run the SRM test on every experiment (use a strict threshold such as p &lt; 0.001), check covariate balance on pre-period variables, define the analysed population by pre-assignment information only (“intention to treat”), and treat an SRM as a stop sign, not a footnote. The same applies to attrition in longer studies: compare loss rates and characteristics between arms.</p>
+<div class="card"><h4>Lab 8 · Customers lost after assignment</h4>
+ <p class="sub">n customers are split 50/50. In the treatment arm, customers with a low outcome (bottom quartile) are lost with probability q (a logging or eligibility bug). Left: the counts per arm in one experiment against the expected 50%. Right: the effect estimated on the retained customers over 300 experiments, against the truth, with the share of experiments in which the SRM test (p &lt; 0.001) raised the alarm.</p>
+ <div class="ctl"><label>customers n <input type="range" id="c8n" min="2000" max="40000" step="2000" value="30000"><output id="c8nv"></output></label><label>loss rate q <input type="range" id="c8q" min="0" max="30" step="1" value="20"><output id="c8qv"></output></label><label>true effect (sd) <input type="range" id="c8t" min="0" max="50" step="5" value="10"><output id="c8tv"></output></label><button id="c8go">Re-simulate</button></div>
+ <div class="two"><canvas class="sm" id="c8cv"></canvas><canvas class="sm" id="c8cv2"></canvas></div><div class="stats" id="c8st"></div><div class="read" id="c8rd"></div></div>
+</section>
+
+<div class="part">Part III · Compliance, sequential decisions and adaptive allocation</div>
+
+<section class="ch" id="c9">
+<h2><span class="num">9</span>Non-compliance: intention-to-treat and the complier effect <span class="lvl e">Expert</span></h2>
+<p>Often the randomised thing is an <em>offer</em> or an <em>encouragement</em> (a call, an email, an eligibility), and only some customers take it up. Three comparisons are available. <b>Intention-to-treat</b> (ITT): compare by assignment; unbiased for the effect of the offer, diluted by non-take-up, and the right answer for the policy “make the offer”. <b>As-treated</b> or <b>per-protocol</b>: compare those who actually took the treatment with those who did not; these groups differ by self-selection, so it is biased even though the assignment was random. The <b>complier average causal effect</b> (CACE) is the effect for customers who take the treatment only when offered; with random assignment, a monotone take-up and no effect of the offer other than through take-up (exclusion), it is identified by the Wald (instrumental-variable) ratio</p>
+<div class="f">CACE = ITT / (take-up in offered − take-up in not offered) = (Ȳ₁ − Ȳ₀) / (D̄₁ − D̄₀)</div>
+<p>Always report the ITT; use the CACE for a question about the effect of treatment on those it moves, and say that it is a local effect.</p>
+<div class="card"><h4>Lab 9 · Three ways to read an experiment with partial take-up</h4>
+ <p class="sub">Offer randomised 50/50. Compliers (share c) take the treatment only if offered; always-takers (10%) take it regardless and have a higher baseline outcome by b; the rest never take it (lower baseline by b). The treatment effect for those treated is τ. Left: distributions over 400 experiments (n = 4000) of ITT, as-treated and Wald estimates, with the true complier effect and the true ITT marked. Right: their means.</p>
+ <div class="ctl"><label>complier share c <input type="range" id="c9m" min="20" max="90" step="5" value="50"><output id="c9mv"></output></label><label>baseline gap b <input type="range" id="c9b" min="0" max="20" step="1" value="10"><output id="c9bv"></output></label><label>effect τ <input type="range" id="c9t" min="0" max="20" step="1" value="10"><output id="c9tv"></output></label><button id="c9go">Re-simulate</button></div>
+ <div class="two"><canvas class="sm" id="c9cv"></canvas><canvas class="sm" id="c9cv2"></canvas></div><div class="stats" id="c9st"></div><div class="read" id="c9rd"></div></div>
+</section>
+
+<section class="ch" id="c10">
+<h2><span class="num">10</span>Sequential testing and always-valid inference <span class="lvl e">Expert</span></h2>
+<p>The multiple-testing page showed that repeated looks inflate the false positive rate and that group-sequential boundaries fix the number and timing of looks in advance. Modern experimentation platforms need <b>always-valid</b> inference: a result that can be checked at any time, with any stopping rule, at a guaranteed error rate. The mixture sequential probability ratio test (mSPRT) does this: with the effect estimate θ̂ₙ and its variance Vₙ (for two arms, Vₙ ≈ 2σ²/n), and a normal prior N(0, τ²) on the effect, the mixture likelihood ratio is</p>
+<div class="f">Λₙ = √(Vₙ / (Vₙ + τ²)) · exp( θ̂ₙ² τ² / (2 Vₙ (Vₙ + τ²)) );       stop and reject when Λₙ ≥ 1/α</div>
+<p>Under the null Λₙ is a nonnegative martingale with mean 1, so by Ville’s inequality P(Λₙ ≥ 1/α for some n) ≤ α, however often you look. The price is a larger sample than a fixed-horizon test when the effect is as planned; the gain is the freedom to stop early on a large effect and an unbiased guarantee against peeking. The inversion gives a <b>confidence sequence</b>, an interval valid at all times. Choose τ near the plausible effect size; group-sequential designs (O’Brien–Fleming spending) remain more efficient when the looks are few and planned. Point estimates after early stopping are biased upward, as for any selected winner.</p>
+<div class="card"><h4>Lab 10 · Peeking, fixed-horizon and mSPRT</h4>
+ <p class="sub">Two arms with unit variance, up to 2000 customers per arm, 100 looks (every 20 per arm), 800 experiments. Left: the log of Λₙ for eight sample paths with the rejection line log(1/α). Right: the share of experiments that reject (false positive rate if the true effect is 0, power otherwise) for a fixed-horizon test at the end, the naive “stop when |z| &gt; 1.96” rule and the mSPRT.</p>
+ <div class="ctl"><label>true effect δ (sd) <input type="range" id="c10d" min="0" max="30" step="1" value="0"><output id="c10dv"></output></label><label>prior sd τ <input type="range" id="c10t" min="5" max="60" step="5" value="20"><output id="c10tv"></output></label><button id="c10go">Re-simulate</button></div>
+ <div class="two"><canvas class="sm" id="c10cv"></canvas><canvas class="sm" id="c10cv2"></canvas></div><div class="stats" id="c10st"></div><div class="read" id="c10rd"></div></div>
+</section>
+
+<section class="ch" id="c11">
+<h2><span class="num">11</span>Adaptive allocation, bandits and practice <span class="lvl e">Expert</span></h2>
+<p>A fixed 50/50 split sends half of the traffic to the worse arm for the whole test. A <b>multi-armed bandit</b> shifts traffic towards arms that look better as data accrue. <b>Thompson sampling</b> allocates each customer to an arm with the probability that the arm is the best under its posterior (for conversion rates: Beta posteriors). It reduces cumulative <b>regret</b> (the reward lost relative to always playing the best arm) and is natural for short-lived decisions (which of several offers to show this week). Its costs: estimates of the weaker arms are noisier and biased, p-values and confidence intervals need specific methods (inverse-probability-weighted or always-valid estimators), non-stationarity (day-of-week, novelty effects) can mislead the allocation, and it is not a substitute for a clean experiment when a precise, defensible effect estimate is the objective.</p>
+<p><b>Practical checklist for a bank experiment:</b> state the decision and the smallest effect that would change it; pick the unit of randomisation and the analysis population before launch; define the primary metric, guardrail metrics (complaints, default, opt-outs) and the horizon (delayed outcomes such as default need long follow-up or surrogates); pre-register the analysis and the stopping rule; run SRM and balance checks; analyse by intention to treat with covariate adjustment; document consent, fairness and regulatory constraints (offers must not discriminate across protected groups; some tests need approval).</p>
+<div class="card"><h4>Lab 11 · Fixed split versus Thompson sampling</h4>
+ <p class="sub">Three offers with conversion rates p₀, p₀(1 + λ) and p₀(1 + λ/2). Traffic is allocated in batches of 100 over N customers, 60 repetitions. Left: average cumulative regret (conversions lost against always using the best offer) for the equal split and for Thompson sampling. Right: the share of traffic that went to the best offer and the share of repetitions where the best offer was identified at the end.</p>
+ <div class="ctl"><label>baseline rate p₀ <input type="range" id="c11p" min="2" max="30" step="1" value="6"><output id="c11pv"></output></label><label>best offer’s relative lift λ <input type="range" id="c11l" min="5" max="100" step="5" value="20"><output id="c11lv"></output></label><label>customers N <input type="range" id="c11n" min="1000" max="20000" step="1000" value="8000"><output id="c11nv"></output></label><button id="c11go">Re-simulate</button></div>
+ <div class="two"><canvas class="sm" id="c11cv"></canvas><canvas class="sm" id="c11cv2"></canvas></div><div class="stats" id="c11st"></div><div class="read" id="c11rd"></div></div>
+</section>
+
+<section class="ch" id="c12">
+<h2><span class="num">12</span>Final exam, mastery checklist, cheat sheet <span class="lvl e">Expert</span></h2>
+<h3>Exam (18 questions — click an answer)</h3>
+<div id="quiz"></div>
+<div class="card"><h4>Score</h4><div class="stats" id="qscore"></div><button class="alt" id="qreset">Reset exam</button></div>
+<h3>Mastery checklist — tick when you can do it without notes</h3>
+<div class="card chk" id="chk"></div>
+<h3>Cheat sheet</h3>
+<div class="tw"><table>
+<tr><th>Idea</th><th>One line</th></tr>
+<tr><td>Potential outcomes</td><td>τᵢ = Yᵢ(1) − Yᵢ(0) is never observed; naive difference = ATT + selection bias; randomisation sets the selection term to zero</td></tr>
+<tr><td>SUTVA</td><td>No interference between units and a single version of treatment; fails with spillovers, shared capacity, networks</td></tr>
+<tr><td>Analysis</td><td>Difference in means with the unpooled (Neyman) SE; randomisation test for exact, assumption-light inference</td></tr>
+<tr><td>Sample size</td><td>n per arm = 2(z₁₋α/₂ + z₁₋β)²σ²/δ²; halving the MDE costs 4× the sample; set the MDE from the decision</td></tr>
+<tr><td>Clustering</td><td>DEFF = 1 + (m − 1)ρ; analyse at the cluster level; more clusters beat more customers per cluster</td></tr>
+<tr><td>Interference</td><td>Individual randomisation estimates a partial-exposure effect; randomise clusters or use switchbacks for the rollout effect</td></tr>
+<tr><td>Regression adjustment</td><td>Adjust for pre-treatment covariates: unbiased, variance × (1 − R²); never adjust for post-treatment variables</td></tr>
+<tr><td>CUPED</td><td>Ỹ = Y − θ(X − X̄), θ = Cov(X,Y)/Var(X); X from the pre-period; variance × (1 − ρ²); longer pre-periods help</td></tr>
+<tr><td>SRM and attrition</td><td>Chi-square on arm counts at p &lt; 0.001; unequal loss re-introduces selection bias inside an experiment; analyse by assignment</td></tr>
+<tr><td>Non-compliance</td><td>ITT for the offer; as-treated is biased; CACE = ITT / take-up difference is a local (complier) effect</td></tr>
+<tr><td>Sequential testing</td><td>Peeking inflates α; use group-sequential boundaries or always-valid mSPRT with Λₙ ≥ 1/α; early-stopped estimates are biased up</td></tr>
+<tr><td>Bandits</td><td>Thompson sampling lowers regret, sacrifices clean inference on weaker arms; use when the goal is reward, not estimation</td></tr>
+</table></div>
+<div class="co tip"><b>Next on the roadmap</b>Item 24 continues Stage 5: observational causal methods when an experiment is impossible: matching, inverse-probability weighting, difference-in-differences, instrumental variables and regression discontinuity.</div>
+</section>
+</main>
+<script>
+/*MATH*/
+function lgamma(x){const c=[76.18009172947146,-86.50532032941677,24.01409824083091,-1.231739572450155,0.1208650973866179e-2,-0.5395239384953e-5];let y=x,t=x+5.5;t-=(x+.5)*Math.log(t);let s=1.000000000190015;for(let j=0;j<6;j++)s+=c[j]/++y;return -t+Math.log(2.5066282746310005*s/x);}
+function gser(a,x){let ap=a,sum=1/a,del=sum;for(let n=0;n<1000;n++){ap++;del*=x/ap;sum+=del;if(Math.abs(del)<Math.abs(sum)*1e-15)break;}return sum*Math.exp(-x+a*Math.log(x)-lgamma(a));}
+function gcf(a,x){let b=x+1-a,c=1/1e-300,d=1/b,h=d;for(let i=1;i<1000;i++){const an=-i*(i-a);b+=2;d=an*d+b;if(Math.abs(d)<1e-300)d=1e-300;c=b+an/c;if(Math.abs(c)<1e-300)c=1e-300;d=1/d;const del=d*c;h*=del;if(Math.abs(del-1)<1e-15)break;}return Math.exp(-x+a*Math.log(x)-lgamma(a))*h;}
+function gammaQ(a,x){if(x<=0)return 1;return x<a+1?1-gser(a,x):gcf(a,x);}
+function betacf(a,b,x){const qab=a+b,qap=a+1,qam=a-1;let c=1,d=1-qab*x/qap;if(Math.abs(d)<1e-300)d=1e-300;d=1/d;let h=d;for(let m=1;m<=1000;m++){const m2=2*m;let aa=m*(b-m)*x/((qam+m2)*(a+m2));d=1+aa*d;if(Math.abs(d)<1e-300)d=1e-300;c=1+aa/c;if(Math.abs(c)<1e-300)c=1e-300;d=1/d;h*=d*c;aa=-(a+m)*(qab+m)*x/((a+m2)*(qap+m2));d=1+aa*d;if(Math.abs(d)<1e-300)d=1e-300;c=1+aa/c;if(Math.abs(c)<1e-300)c=1e-300;d=1/d;const del=d*c;h*=del;if(Math.abs(del-1)<1e-15)break;}return h;}
+function betai(a,b,x){if(x<=0)return 0;if(x>=1)return 1;const bt=Math.exp(lgamma(a+b)-lgamma(a)-lgamma(b)+a*Math.log(x)+b*Math.log(1-x));return x<(a+1)/(a+b+2)?bt*betacf(a,b,x)/a:1-bt*betacf(b,a,1-x)/b;}
+function normSf(z){const q=0.5*gammaQ(.5,z*z/2);return z>=0?q:1-q;}
+function normCdf(z){return normSf(-z);}
+function npdf(x){return Math.exp(-x*x/2)/2.5066282746310002;}
+function lbin(n,k){return lgamma(n+1)-lgamma(k+1)-lgamma(n-k+1);}
+function binom(n,k,p){return Math.exp(lbin(n,k)+k*Math.log(p)+(n-k)*Math.log(1-p));}
+function betapdf(x,a,b){return x<=0||x>=1?0:Math.exp(lgamma(a+b)-lgamma(a)-lgamma(b)+(a-1)*Math.log(x)+(b-1)*Math.log(1-x));}
+function betacdf(x,a,b){return betai(a,b,x);}
+function gampdf(x,a,r){return x<=0?0:Math.exp(a*Math.log(r)+(a-1)*Math.log(x)-r*x-lgamma(a));}
+function gamcdf(x,a,r){return x<=0?0:1-gammaQ(a,r*x);}
+function randn(){let u=0;while(!u)u=Math.random();return Math.sqrt(-2*Math.log(u))*Math.cos(2*Math.PI*Math.random());}
+function gammaS(a){if(a<1)return gammaS(a+1)*Math.pow(Math.random(),1/a);const d=a-1/3,c=1/Math.sqrt(9*d);for(;;){let x,v;do{x=randn();v=1+c*x}while(v<=0);v=v*v*v;const u=Math.random();if(Math.log(u)<.5*x*x+d-d*v+d*Math.log(v))return d*v;}}
+function betaS(a,b){const x=gammaS(a),y=gammaS(b);return x/(x+y);}
+function binS(n,p){let k=0;for(let i=0;i<n;i++)if(Math.random()<p)k++;return k;}
+function mean(a){let s=0;for(const v of a)s+=v;return s/a.length;}
+function qc(cdf,lo,hi,p,it){for(let i=0;i<(it||100);i++){const m=(lo+hi)/2;if(cdf(m)<p)lo=m;else hi=m}return(lo+hi)/2;}
+function qb(a,b,p){return qc(x=>betai(a,b,x),0,1,p,50);}
+function tcdf(x,v){const t=.5*betai(v/2,.5,v/(v+x*x));return x>0?1-t:t}
+function qn(p){return qc(normCdf,-9,9,p,70)}
+function pois(k,l){return Math.exp(-l+k*Math.log(l)-lgamma(k+1))}
+function binF(n,p){let k=0;for(;;){if(n<=0||p<=0)return k;if(p>=1)return k+n;if(n<=40){for(let i=0;i<n;i++)if(Math.random()<p)k++;return k}const a=1+(n>>1),bb=1+n-a,x=betaS(a,bb);if(x>=p){n=a-1;p=p/x}else{k+=a;n=bb-1;p=(p-x)/(1-x)}}}
+/*ENDMATH*/
+
+const $=id=>document.getElementById(id), val=id=>+$(id).value;
+const C={fg:'#e8ebf5',mu:'#8a93ab',gr:'#232a3d',a:'#6ea8ff',r:'#ff6b81',y:'#ffd166',g:'#4ade80',p:'#c084fc',t:'#5eead4'};
+const store={get(k,d){try{const v=JSON.parse(localStorage.getItem(k));return v==null?d:v}catch(e){return d}},set(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}};
+function stat(l,v,c){return `<div class="stat ${c||''}"><b>${v}</b><span>${l}</span></div>`}
+function f3(x){if(!isFinite(x))return String(x);const a=Math.abs(x);if(a!==0&&(a<1e-3||a>=1e6))return x.toExponential(2);return String(+x.toFixed(a<1?4:a<100?3:a<1000?2:0))}
+function pc(x){return f3(100*x)+'%'}
+const resizers=[];
+function reg(fn){fn();resizers.push(fn)}
+function on(ids,fn){ids.split(' ').forEach(i=>{const e=$(i);e.addEventListener('input',fn);e.addEventListener('change',fn)})}
+let rt;window.addEventListener('resize',()=>{clearTimeout(rt);rt=setTimeout(()=>resizers.forEach(f=>f()),150)});
+document.querySelectorAll('input[type=range]').forEach(i=>{const o=$(i.id+'v');if(!o)return;const f=()=>{o.textContent=i.value};i.addEventListener('input',f);f()});
+
+function nice(x){const e=Math.pow(10,Math.floor(Math.log10(x))),f=x/e;return (f<1.5?1:f<3?2:f<7?5:10)*e}
+function mk(cv,x0,x1,ymax,o){o=o||{};const y0=o.y0||0,dpr=window.devicePixelRatio||1,r=cv.getBoundingClientRect(),w=r.width||600,h=r.height||270;
+ cv.width=w*dpr;cv.height=h*dpr;const g=cv.getContext('2d');g.setTransform(dpr,0,0,dpr,0,0);g.clearRect(0,0,w,h);
+ const L=o.L||42,R=12,T=14,B=28,X=x=>L+(x-x0)/(x1-x0)*(w-L-R),Y=y=>h-B-(y-y0)/(ymax-y0)*(h-T-B);
+ g.font='11px system-ui';g.lineWidth=1;g.strokeStyle=C.gr;g.fillStyle=C.mu;
+ if(!o.noGrid){const sx=nice((x1-x0)/7);for(let x=Math.ceil(x0/sx-1e-9)*sx;!o.noX&&x<=x1+1e-9;x+=sx){g.beginPath();g.moveTo(X(x),T);g.lineTo(X(x),h-B);g.stroke();g.textAlign='center';g.fillText(String(+x.toFixed(6)),X(x),h-B+15)}
+ const sy=nice((ymax-y0)/4);for(let y=Math.ceil(y0/sy-1e-9)*sy;y<=ymax+1e-9;y+=sy){g.beginPath();g.moveTo(L,Y(y));g.lineTo(w-R,Y(y));g.stroke();g.textAlign='right';g.fillText(String(+y.toFixed(4)),L-5,Y(y)+3)}}
+ return{g,w,h,X,Y,L,R,T,B,
+  line(f,col,lw,a,b,n,dash){a=a==null?x0:a;b=b==null?x1:b;n=n||260;g.save();if(dash)g.setLineDash([5,4]);g.beginPath();g.strokeStyle=col;g.lineWidth=lw||2;let st=false;for(let i=0;i<=n;i++){const x=a+(b-a)*i/n,y=f(x);if(!isFinite(y)){st=false;continue}st?g.lineTo(X(x),Y(y)):g.moveTo(X(x),Y(y));st=true}g.stroke();g.restore()},
+  area(f,a,b,col,n){a=Math.max(a,x0);b=Math.min(b,x1);if(b<=a)return;n=n||200;g.beginPath();g.moveTo(X(a),Y(0));for(let i=0;i<=n;i++){const x=a+(b-a)*i/n;g.lineTo(X(x),Y(f(x)))}g.lineTo(X(b),Y(0));g.closePath();g.fillStyle=col;g.fill()},
+  vline(x,col,lab,dash){g.save();g.strokeStyle=col;g.lineWidth=1.6;if(dash)g.setLineDash([5,4]);g.beginPath();g.moveTo(X(x),T);g.lineTo(X(x),h-B);g.stroke();g.restore();if(lab){g.fillStyle=col;g.textAlign='center';g.fillText(lab,Math.min(Math.max(X(x),34),w-34),T+10)}},
+  hline(y,col,lab){g.save();g.strokeStyle=col;g.lineWidth=1.4;g.setLineDash([5,4]);g.beginPath();g.moveTo(L,Y(y));g.lineTo(w-R,Y(y));g.stroke();g.restore();if(lab){g.fillStyle=col;g.textAlign='right';g.fillText(lab,w-R-3,Y(y)-4)}},
+  text(s,x,y,col,al){g.fillStyle=col||C.fg;g.textAlign=al||'left';g.fillText(s,x,y)}};}
+
+/* ---------- shared helpers for this page ---------- */
+const D={
+ norm:{n:'Normal(0,1)',s:()=>randn(),mu:0,sd:1,sk:0},
+ unif:{n:'Uniform(0,1)',s:()=>Math.random(),mu:.5,sd:Math.sqrt(1/12),sk:0},
+ expo:{n:'Exponential(1)',s:()=>-Math.log(1-Math.random()),mu:1,sd:1,sk:2},
+ logn:{n:'Lognormal(0,1)',s:()=>Math.exp(randn()),mu:Math.exp(.5),sd:Math.sqrt((Math.E-1)*Math.E),sk:(Math.E+2)*Math.sqrt(Math.E-1),disc:0},
+ b05:{n:'Bernoulli(0.5)',s:()=>Math.random()<.5?1:0,mu:.5,sd:.5,sk:0,disc:1},
+ b05s:{n:'Bernoulli(0.05)',s:()=>Math.random()<.05?1:0,mu:.05,sd:Math.sqrt(.0475),sk:.9/Math.sqrt(.0475),disc:1},
+ bimo:{n:'Two humps',s:()=>(Math.random()<.5?-2:2)+.5*randn(),mu:0,sd:Math.sqrt(4.25),sk:0},
+ par5:{n:'Pareto(α=5)',s:()=>Math.pow(1-Math.random(),-.2),mu:1.25,sd:Math.sqrt(5/48),sk:6*Math.sqrt(.6)},
+ cauchy:{n:'Cauchy (no mean)',s:()=>Math.tan(Math.PI*(Math.random()-.5)),mu:NaN,sd:Infinity,sk:NaN}
+};
+function fillSel(id,keys,def){const e=$(id);e.innerHTML=keys.map(k=>`<option value="${k}">${D[k].n}</option>`).join('');e.value=def}
+const PAL=[C.a,C.r,C.y,C.g,C.p,C.t,'#ff9f43','#9aa4bf'];
+function tgrid(N,M){const T=[];let prev=0;for(let i=0;i<M;i++){let n=Math.round(Math.pow(10,Math.log10(N)*i/(M-1)));if(i===M-1)n=N;n=Math.max(prev+1,n);if(n>N)break;T.push(n);prev=n}if(T[T.length-1]!==N)T[T.length-1]=N;return T}
+function nlab(n){return n>=1e6?(n/1e6)+'M':n>=1000?(n/1000)+'k':String(n)}
+function customGrid(P,xt,yt){const g=P.g;g.save();g.strokeStyle=C.gr;g.fillStyle=C.mu;g.font='11px system-ui';g.lineWidth=1;
+ xt.forEach(([v,l])=>{g.beginPath();g.moveTo(P.X(v),P.T);g.lineTo(P.X(v),P.h-P.B);g.stroke();g.textAlign='center';g.fillText(l,P.X(v),P.h-P.B+15)});
+ yt.forEach(([v,l])=>{g.beginPath();g.moveTo(P.L,P.Y(v));g.lineTo(P.w-P.R,P.Y(v));g.stroke();g.textAlign='right';g.fillText(l,P.L-5,P.Y(v)+3)});g.restore()}
+function clip(P,fn){const g=P.g;g.save();g.beginPath();g.rect(P.L,P.T,P.w-P.L-P.R,P.h-P.T-P.B);g.clip();fn();g.restore()}
+function poly(P,pts,col,lw,dash){const g=P.g;g.save();if(dash)g.setLineDash([5,4]);g.strokeStyle=col;g.lineWidth=lw||2;g.beginPath();pts.forEach(([x,y],i)=>i?g.lineTo(P.X(x),P.Y(y)):g.moveTo(P.X(x),P.Y(y)));g.stroke();g.restore()}
+function dots(P,pts,col,r){const g=P.g;g.fillStyle=col;pts.forEach(([x,y])=>{g.beginPath();g.arc(P.X(x),P.Y(y),r||3,0,7);g.fill()})}
+function niceTicks(lo,hi,k){const st=nice((hi-lo)/(k||5)),a=[];for(let v=Math.ceil(lo/st-1e-9)*st;v<=hi+1e-9;v+=st)a.push([v,String(+v.toFixed(6))]);return a}
+function logTicks(lo,hi){const a=[];for(let e=Math.ceil(lo-1e-9);e<=hi+1e-9;e++)a.push([e,nlab(Math.pow(10,e))]);return a}
+function mom(a){const n=a.length;let m=0;for(const v of a)m+=v;m/=n;let v2=0,v3=0,v4=0;for(const v of a){const d=v-m;v2+=d*d;v3+=d*d*d;v4+=d*d*d*d}v2/=n;v3/=n;v4/=n;const sd=Math.sqrt(v2);return{n,m,sd,sk:sd>0?v3/(sd*sd*sd):0,ku:v2>0?v4/(v2*v2)-3:0}}
+function ksN(z){const a=Array.from(z).sort((x,y)=>x-y),n=a.length;let d=0;for(let i=0;i<n;i++){const F=normCdf(a[i]);d=Math.max(d,Math.abs((i+1)/n-F),Math.abs(i/n-F))}return d}
+/* histogram of data as density with optional overlay curves [{f,col,lw,dash}] */
+function hist(cv,data,lo,hi,bins,ov,col){const cnt=new Float64Array(bins),bw=(hi-lo)/bins;let n=0;for(const v of data){if(v<lo||v>=hi)continue;cnt[Math.floor((v-lo)/bw)]++;n++}
+ const N=data.length;let ym=0;for(let i=0;i<bins;i++){cnt[i]/=N*bw;ym=Math.max(ym,cnt[i])}
+ (ov||[]).forEach(o=>{for(let i=0;i<=80;i++)ym=Math.max(ym,o.f(lo+(hi-lo)*i/80)||0)});
+ const P=mk(cv,lo,hi,ym*1.12);
+ P.g.fillStyle=col||'rgba(110,168,255,.5)';for(let i=0;i<bins;i++){if(cnt[i]<=0)continue;const a=P.X(lo+i*bw),b=P.X(lo+(i+1)*bw);P.g.fillRect(a,P.Y(cnt[i]),Math.max(1,b-a-1),P.Y(0)-P.Y(cnt[i]))}
+ (ov||[]).forEach(o=>P.line(o.f,o.col,o.lw||2.4,lo,hi,200,o.dash));return P}
+const fmt=x=>f3(x);
+
+/* ---------- shared for this page ---------- */
+const POPS=['norm','unif','expo','logn','bimo','par5'];
+D.norm.med=0;D.norm.q90=1.2815516;D.unif.med=.5;D.unif.q90=.9;D.expo.med=Math.LN2;D.expo.q90=Math.log(10);D.logn.med=1;D.logn.q90=Math.exp(1.2815516);
+D.bimo.med=0;D.bimo.q90=qc(x=>.5*normCdf((x+2)/.5)+.5*normCdf((x-2)/.5),-10,10,.9,80);D.par5.med=Math.pow(2,.2);D.par5.q90=Math.pow(10,.2);
+const SF={mean:a=>mean(a),median:a=>{const b=Float64Array.from(a).sort(),n=b.length;return n%2?b[(n-1)/2]:(b[n/2-1]+b[n/2])/2},sd:a=>{const n=a.length,m=mean(a);let s=0;for(const v of a)s+=(v-m)*(v-m);return Math.sqrt(s/(n-1))},q90:a=>{const b=Float64Array.from(a).sort();return b[Math.round(.9*(b.length-1))]}};
+function truth(key,st){const d=D[key];return st==='mean'?d.mu:st==='median'?d.med:st==='sd'?d.sd:d.q90}
+const SNAME={mean:'sample mean',median:'sample median',sd:'sample SD',q90:'90th percentile'};
+const N10=[2,3,5,10,20,50,100,200,500,1000];
+function pct(a,p){const b=Float64Array.from(a).sort();return b[Math.min(b.length-1,Math.max(0,Math.floor(p*b.length)))]}
+function histLines(cv,arrs,cols,lo,hi,bins,vl){const bw=(hi-lo)/bins,dens=arrs.map(a=>{const c=new Float64Array(bins);for(const v of a){if(v<lo||v>=hi)continue;c[Math.floor((v-lo)/bw)]++}for(let i=0;i<bins;i++)c[i]/=a.length*bw;return c});let ym=0;dens.forEach(c=>c.forEach(v=>ym=Math.max(ym,v)));const P=mk(cv,lo,hi,ym*1.15||1);
+ dens.forEach((c,k)=>{const pts=[];for(let i=0;i<bins;i++){pts.push([lo+i*bw,c[i]]);pts.push([lo+(i+1)*bw,c[i]])}clip(P,()=>poly(P,pts,cols[k],2.2))});(vl||[]).forEach(v=>P.vline(v[0],v[1],v[2],v[3]));return P}
+function sdOf(a){return mom(a).sd}
+
+/* ---------- ML helpers ---------- */
+function digamma(x){let r=0;while(x<6){r-=1/x;x++}const f=1/(x*x);return r+Math.log(x)-.5/x-f*(1/12-f*(1/120-f/252))}
+function trigamma(x){let r=0;while(x<6){r+=1/(x*x);x++}const f=1/(x*x);return r+1/x+.5*f+f/x*(1/6-f*(1/30-f/42))}
+function poisS(l){if(l<=0)return 0;if(l<30){const L=Math.exp(-l);let k=0,p=1;do{k++;p*=Math.random()}while(p>L);return k-1}const m=Math.floor(.875*l),g=gammaS(m);return g<l?m+poisS(l-g):binF(m-1,l/g)}
+function llb(k,n,p){return(k?k*Math.log(p):0)+(n-k?(n-k)*Math.log(1-p):0)}
+function lrInt(k,n,cut){const ph=k/n,l0=llb(k,n,ph),g=p=>2*(l0-llb(k,n,p))-cut;let lo=0,hi=1;
+ if(k>0){let a=1e-12,b=ph;for(let i=0;i<70;i++){const m=(a+b)/2;if(g(m)>0)a=m;else b=m}lo=(a+b)/2}
+ if(k<n){let a=ph,b=1-1e-12;for(let i=0;i<70;i++){const m=(a+b)/2;if(g(m)>0)b=m;else a=m}hi=(a+b)/2}return[lo,hi]}
+function solveAlpha(s){if(!(s>1e-9))return 1e6;let a=(3-s+Math.sqrt((3-s)*(3-s)+24*s))/(12*s);for(let i=0;i<8;i++){const f=Math.log(a)-digamma(a)-s,fp=1/a-trigamma(a);let n=a-f/fp;if(!(n>0))n=a/2;a=n}return a}
+function normPdfAt(x,m,s){return Math.exp(-(x-m)*(x-m)/(2*s*s))/(s*2.5066282746)}
+/* ---------- Regression helpers ---------- */
+function idx(id,arr,ff){const e=$(id),o=$(id+'v'),f=()=>{o.textContent=ff?ff(arr[+e.value]):arr[+e.value]};e.addEventListener('input',f);f()}
+function scl(id,ff){const e=$(id),o=$(id+'v'),f=()=>{o.textContent=ff(+e.value)};e.addEventListener('input',f);f()}
+function pctTicks(a,b,st){const r=[];for(let v=a;v<=b+1e-9;v+=st)r.push([v,Math.round(v*100)+'%']);return r}
+const _tq={};function tq(v,p){const k=v+'_'+p;return _tq[k]||(_tq[k]=qc(x=>tcdf(x,v),0,500,p,80))}
+function simple(x,y){const n=x.length;let xm=0,ym=0;for(let i=0;i<n;i++){xm+=x[i];ym+=y[i]}xm/=n;ym/=n;let sxx=0,sxy=0,syy=0;for(let i=0;i<n;i++){const dx=x[i]-xm,dy=y[i]-ym;sxx+=dx*dx;sxy+=dx*dy;syy+=dy*dy}const b=sxy/sxx,a=ym-b*xm,res=new Float64Array(n);let sse=0;for(let i=0;i<n;i++){res[i]=y[i]-a-b*x[i];sse+=res[i]*res[i]}return{n,xm,ym,sxx,sxy,syy,b,a,res,sse,sst:syy,r2:1-sse/syy}}
+function gj(A,B){const p=A.length;const M=A.map((r,i)=>Array.from(r).concat(B?[B[i]]:[]));for(let c=0;c<p;c++){let m=c;for(let r=c+1;r<p;r++)if(Math.abs(M[r][c])>Math.abs(M[m][c]))m=r;[M[c],M[m]]=[M[m],M[c]];const d=M[c][c]||1e-12;for(let k=c;k<M[c].length;k++)M[c][k]/=d;for(let r=0;r<p;r++)if(r!==c){const f=M[r][c];if(f!==0)for(let k=c;k<M[c].length;k++)M[r][k]-=f*M[c][k]}}return M}
+function olsMulti(cols,y,needInv){const n=y.length,k=cols.length,p=k+1,A=[],B=new Float64Array(p);for(let i=0;i<p;i++)A.push(new Float64Array(p));
+ for(let r=0;r<n;r++){const row=[1];for(let j=0;j<k;j++)row.push(cols[j][r]);for(let i=0;i<p;i++){B[i]+=row[i]*y[r];for(let j=i;j<p;j++)A[i][j]+=row[i]*row[j]}}
+ for(let i=0;i<p;i++){for(let j=0;j<i;j++)A[i][j]=A[j][i];if(i>0)A[i][i]+=1e-9}
+ let beta,inv=null;if(needInv){const I=[];for(let i=0;i<p;i++){const e=new Float64Array(p);e[i]=1;I.push(e)}const M=gj(A,null);const aug=A.map((r,i)=>Array.from(r).concat(Array.from(I[i])));
+  const m=aug;for(let c=0;c<p;c++){let q=c;for(let r=c+1;r<p;r++)if(Math.abs(m[r][c])>Math.abs(m[q][c]))q=r;[m[c],m[q]]=[m[q],m[c]];const d=m[c][c]||1e-12;for(let kk=0;kk<2*p;kk++)m[c][kk]/=d;for(let r=0;r<p;r++)if(r!==c){const f=m[r][c];if(f!==0)for(let kk=0;kk<2*p;kk++)m[r][kk]-=f*m[c][kk]}}
+  inv=m.map(r=>r.slice(p));beta=inv.map(r=>{let s=0;for(let j=0;j<p;j++)s+=r[j]*B[j];return s})}
+ else{const M=gj(A,B);beta=M.map(r=>r[p])}
+ const res=new Float64Array(n);let sse=0;for(let r=0;r<n;r++){let f=beta[0];for(let j=0;j<k;j++)f+=beta[j+1]*cols[j][r];res[r]=y[r]-f;sse+=res[r]*res[r]}
+ const out={beta,res,sse,n,p,inv};if(inv){const s2=sse/(n-p);out.s2=s2;out.se=inv.map((r,i)=>Math.sqrt(s2*r[i]))}return out}
+function scatterAxes(cv,xs,ys,xlo,xhi,ylo,yhi,L){return mk(cv,xlo,xhi,yhi,{y0:ylo,L:L||44})}
+function range(a,pad){let lo=1e99,hi=-1e99;for(const v of a){if(v<lo)lo=v;if(v>hi)hi=v}const w=(hi-lo)||1;return[lo-(pad||.05)*w,hi+(pad||.05)*w]}
+
+
+function bars(P,groups,cols,yt){/* groups: array of arrays of values (0..1) */const g=P.g,G=groups.length,B=groups[0].length,W=(P.w-P.L-P.R)/G;groups.forEach((vals,gi)=>vals.forEach((v,bi)=>{const bw=W*.78/B,x=P.L+W*gi+W*.11+bw*bi;g.fillStyle=cols[bi];g.fillRect(x,P.Y(v),bw-2,P.Y(0)-P.Y(v));g.fillStyle=C.fg;g.textAlign='center';g.font='10px system-ui';g.fillText(Math.round(v*100)+'%',x+bw/2-1,P.Y(v)-3)}));g.font='11px system-ui'}
+function gridG(P,yt,labels){customGrid(P,[],yt);const G=labels.length,W=(P.w-P.L-P.R)/G;P.g.fillStyle=C.mu;P.g.textAlign='center';labels.forEach((l,i)=>P.g.fillText(l,P.L+W*(i+.5),P.h-P.B+15))}
+function legend(P,items,y){let x=P.L+8;items.forEach(([s,c])=>{P.text('■ '+s,x,y,c);x+=P.g.measureText('■ '+s).width+16})}
+
+/* ---------- GLM machinery ---------- */
+const LK={logit:{mu:e=>1/(1+Math.exp(-e)),d:e=>{const m=1/(1+Math.exp(-e));return m*(1-m)}},
+ probit:{mu:e=>normCdf(e),d:e=>npdf(e)},
+ cll:{mu:e=>1-Math.exp(-Math.exp(e)),d:e=>Math.exp(e-Math.exp(e))},
+ log:{mu:e=>Math.exp(e),d:e=>Math.exp(e)}};
+function minv(A){const p=A.length,m=A.map((r,i)=>{const row=Array.from(r);for(let j=0;j<p;j++)row.push(i===j?1:0);return row});
+ for(let c=0;c<p;c++){let q=c;for(let r=c+1;r<p;r++)if(Math.abs(m[r][c])>Math.abs(m[q][c]))q=r;[m[c],m[q]]=[m[q],m[c]];const d=m[c][c]||1e-12;for(let k=0;k<2*p;k++)m[c][k]/=d;for(let r=0;r<p;r++)if(r!==c){const f=m[r][c];if(f!==0)for(let k=0;k<2*p;k++)m[r][k]-=f*m[c][k]}}
+ return m.map(r=>r.slice(p))}
+function glm(cols,y,o){o=o||{};const n=y.length,k=cols.length,p=k+1,fam=o.fam||'binom',L=LK[o.link||(fam==='pois'?'log':'logit')],off=o.off,X=[new Float64Array(n).fill(1)].concat(cols),V=m=>fam==='pois'?m:m*(1-m);
+ let b=new Float64Array(p);if(o.init)b=Float64Array.from(o.init);else if(fam==='pois'){let m=0;for(const v of y)m+=v;b[0]=Math.log(Math.max(m/n,1e-3))-(off?mean(off):0)}
+ function ev(b){const eta=new Float64Array(n),mu=new Float64Array(n);let ll=0;for(let i=0;i<n;i++){let e=off?off[i]:0;for(let j=0;j<p;j++)e+=b[j]*X[j][i];e=Math.max(-30,Math.min(30,e));eta[i]=e;let m=L.mu(e);m=fam==='binom'?Math.min(1-1e-12,Math.max(1e-12,m)):Math.max(m,1e-12);mu[i]=m;ll+=fam==='pois'?y[i]*Math.log(m)-m-lgamma(y[i]+1):y[i]*Math.log(m)+(1-y[i])*Math.log(1-m)}return{eta,mu,ll}}
+ function info(c){const A=[];for(let i=0;i<p;i++)A.push(new Float64Array(p));const w=new Float64Array(n);for(let r=0;r<n;r++){const d=L.d(c.eta[r]),wi=d*d/V(c.mu[r]);w[r]=wi;for(let i=0;i<p;i++){const xi=X[i][r]*wi;for(let j=i;j<p;j++)A[i][j]+=xi*X[j][r]}}for(let i=0;i<p;i++)for(let j=0;j<i;j++)A[i][j]=A[j][i];return{A,w}}
+ let cur=ev(b),it=0,conv=false,maxit=o.maxit==null?40:o.maxit;
+ for(;it<maxit;it++){const{A,w}=info(cur),Ai=minv(A),g=new Float64Array(p);
+  for(let r=0;r<n;r++){const d=L.d(cur.eta[r]),v=V(cur.mu[r]);let s=(y[r]-cur.mu[r])*d/v;if(o.firth){let h=0;for(let i=0;i<p;i++)for(let j=0;j<p;j++)h+=X[i][r]*Ai[i][j]*X[j][r];h*=w[r];s+=h*(.5-cur.mu[r])}for(let i=0;i<p;i++)g[i]+=X[i][r]*s}
+  const st=new Float64Array(p);let mx=0;for(let i=0;i<p;i++){let s=0;for(let j=0;j<p;j++)s+=Ai[i][j]*g[j];st[i]=s}
+  if(o.firth){for(let i=0;i<p;i++){st[i]=Math.max(-1,Math.min(1,st[i]));mx=Math.max(mx,Math.abs(st[i]))}b=b.map((v,i)=>v+st[i]);cur=ev(b);if(mx<1e-8){conv=true;it++;break}}
+  else{let a=1,nb,nc;for(let h=0;h<25;h++){nb=b.map((v,i)=>v+a*st[i]);nc=ev(nb);if(nc.ll>=cur.ll-1e-10)break;a/=2}for(let i=0;i<p;i++)mx=Math.max(mx,Math.abs(a*st[i]));const dl=Math.abs(nc.ll-cur.ll);b=nb;cur=nc;if(mx<1e-8||dl<1e-11){conv=true;it++;break}}}
+ const{A,w}=info(cur),Ai=minv(A),se=Ai.map((r,i)=>Math.sqrt(Math.max(r[i],0)));let dev;
+ if(fam==='binom')dev=-2*cur.ll;else{dev=0;for(let i=0;i<n;i++){const yy=y[i],m=cur.mu[i];dev+=2*((yy>0?yy*Math.log(yy/m):0)-(yy-m))}}
+ return{beta:b,mu:cur.mu,eta:cur.eta,ll:cur.ll,dev,inv:Ai,se,iter:it,conv,X,w,p,n,A}}
+function auc(sc,y){const n=y.length,idx=Array.from({length:n},(_,i)=>i).sort((a,b)=>sc[a]-sc[b]);let rk=0,np=0,i=0;while(i<n){let j=i;while(j+1<n&&sc[idx[j+1]]===sc[idx[i]])j++;const r=(i+j)/2+1;for(let t=i;t<=j;t++)if(y[idx[t]]===1){rk+=r;np++}i=j+1}const nn=n-np;return np&&nn?(rk-np*(np+1)/2)/(np*nn):.5}
+function sepTest(x,y){let a1=1e99,b1=-1e99,a0=1e99,b0=-1e99,n1=0,n0=0;for(let i=0;i<x.length;i++){if(y[i]===1){n1++;a1=Math.min(a1,x[i]);b1=Math.max(b1,x[i])}else{n0++;a0=Math.min(a0,x[i]);b0=Math.max(b0,x[i])}}return n1>0&&n0>0&&(a1>b0||a0>b1)}
+const sig=e=>1/(1+Math.exp(-e));
+function lgt(p){return Math.log(p/(1-p))}
+function binaryData(n,a,b,sd){const x=new Float64Array(n),y=new Float64Array(n);for(let i=0;i<n;i++){x[i]=(sd||1)*randn();y[i]=Math.random()<sig(a+b*x[i])?1:0}return{x,y}}
+function heat(P,gx,gy,vals,x0,x1,y0,y1){const g=P.g,nx=gx,ny=gy;let mn=1e99,mx=-1e99;vals.forEach(v=>{if(isFinite(v)){mn=Math.min(mn,v);mx=Math.max(mx,v)}});mn=Math.max(mn,mx-30);for(let i=0;i<nx;i++)for(let j=0;j<ny;j++){const v=vals[i*ny+j],t=isFinite(v)?Math.max(0,Math.min(1,(v-mn)/(mx-mn))):0,tt=Math.pow(t,1.6),c=Math.round(40+190*tt);g.fillStyle=`rgb(${Math.round(20+60*tt)},${Math.round(30+100*tt)},${c})`;const xa=P.X(x0+(x1-x0)*i/nx),xb=P.X(x0+(x1-x0)*(i+1)/nx),ya=P.Y(y0+(y1-y0)*j/ny),yb=P.Y(y0+(y1-y0)*(j+1)/ny);g.fillRect(xa,Math.min(ya,yb),xb-xa+1,Math.abs(ya-yb)+1)}}
+/* ---------- confounding helpers ---------- */
+const U01=()=>1-Math.random();
+function sdv(a){const m=mean(a);let s=0;for(const v of a)s+=(v-m)*(v-m);return Math.sqrt(s/Math.max(a.length-1,1))}
+function barV(cv,vals,cols,labs,ymax,ff){const P=mk(cv,0,vals.length,ymax,{y0:0,noGrid:true,L:50});customGrid(P,[],niceTicks(0,ymax,5));const W=(P.w-P.L-P.R)/vals.length,g=P.g;vals.forEach((v,i)=>{const w=W*.5,x=P.L+W*i+W*.25;g.fillStyle=cols[i];g.fillRect(x,P.Y(v),w,P.Y(0)-P.Y(v));g.fillStyle=C.fg;g.textAlign='center';g.fillText((ff||fmt)(v),x+w/2,P.Y(v)-4);g.fillStyle=C.mu;g.fillText(labs[i],x+w/2,P.h-P.B+15)});return P}
+function barL(cv,vals,cols,labs,lo,hi,ff){const P=mk(cv,0,vals.length,hi,{y0:lo,noGrid:true,L:50});customGrid(P,[],niceTicks(lo,hi,5));const W=(P.w-P.L-P.R)/vals.length,g=P.g;vals.forEach((v,i)=>{const w=W*.5,x=P.L+W*i+W*.25;g.fillStyle=cols[i];g.fillRect(x,P.Y(v),w,P.Y(lo)-P.Y(v));g.fillStyle=C.fg;g.textAlign='center';g.fillText((ff||fmt)(v),x+w/2,P.Y(v)-4);g.fillStyle=C.mu;g.fillText(labs[i],x+w/2,P.h-P.B+15)});return P}
+const avg=a=>{let s=0;for(const v of a)s+=v;return s/a.length};
+function corr(a,b){const n=a.length;let ma=0,mb=0;for(let i=0;i<n;i++){ma+=a[i];mb+=b[i]}ma/=n;mb/=n;let sa=0,sb=0,sab=0;for(let i=0;i<n;i++){const x=a[i]-ma,y=b[i]-mb;sa+=x*x;sb+=y*y;sab+=x*y}return sab/Math.sqrt(sa*sb||1e-12)}
+const pcor=(x,y,z)=>corr(simple(z,x).res,simple(z,y).res);
+const lin=(n,f)=>{const a=new Float64Array(n);for(let i=0;i<n;i++)a[i]=f(i);return a};
+const rn=(n,s)=>lin(n,()=>(s||1)*randn());
+/* signed bars from zero */
+function barZ(cv,vals,cols,labs,lo,hi,ff){const P=mk(cv,0,vals.length,hi,{y0:lo,noGrid:true,L:50});customGrid(P,[],niceTicks(lo,hi,5));const W=(P.w-P.L-P.R)/vals.length,g=P.g;vals.forEach((v,i)=>{const w=W*.5,x=P.L+W*i+W*.25,y0=P.Y(0),y1=P.Y(v);g.fillStyle=cols[i];g.fillRect(x,Math.min(y0,y1),w,Math.abs(y0-y1));g.fillStyle=C.fg;g.textAlign='center';g.fillText((ff||fmt)(v),x+w/2,v>=0?y1-4:y1+13);g.fillStyle=C.mu;g.fillText(labs[i],x+w/2,P.h-P.B+15)});P.hline(0,C.mu,'');return P}
+/* grouped signed bars: groups[g][b] */
+function barG(cv,groups,cols,glabs,lo,hi,ff){const P=mk(cv,0,groups.length,hi,{y0:lo,noGrid:true,L:50});customGrid(P,[],niceTicks(lo,hi,5));const G=groups.length,B=groups[0].length,W=(P.w-P.L-P.R)/G,g=P.g;groups.forEach((vs,gi)=>vs.forEach((v,bi)=>{const bw=W*.7/B,x=P.L+W*gi+W*.15+bw*bi,y0=P.Y(0),y1=P.Y(v);g.fillStyle=cols[bi];g.fillRect(x,Math.min(y0,y1),bw-3,Math.abs(y0-y1));g.fillStyle=C.fg;g.textAlign='center';g.font='10px system-ui';g.fillText((ff||fmt)(v),x+bw/2-1,v>=0?y1-3:y1+11)}));g.font='11px system-ui';g.fillStyle=C.mu;g.textAlign='center';glabs.forEach((l,i)=>g.fillText(l,P.L+W*(i+.5),P.h-P.B+15));P.hline(0,C.mu,'');return P}
+/* scatter with optional per-point colours; draws at most nmax points */
+function scat(P,xs,ys,col,nmax,r,colf){const n=xs.length,st=Math.max(1,Math.floor(n/(nmax||500))),pts=[];clip(P,()=>{for(let i=0;i<n;i+=st){P.g.fillStyle=colf?colf(i):col;P.g.beginPath();P.g.arc(P.X(xs[i]),P.Y(ys[i]),r||2.2,0,7);P.g.fill()}})}
+function fitLine(P,s,col,lw,dash,x0,x1){clip(P,()=>P.line(x=>s.a+s.b*x,col,lw||2,x0,x1,2,dash))}
+const ordIdx=p=>Array.from({length:p.length},(_,i)=>i).sort((a,b)=>p[a]-p[b]);
+/* ---------- experiment helpers ---------- */
+const sgn=v=>(v>=0?'+':'−')+fmt(Math.abs(v));
+const rng2=(a,b,pad)=>range(Array.from(a).concat(Array.from(b)),pad||.05);
+const pct0=x=>Math.round(x*100)+'%';
+const lgs=x=>1/(1+Math.exp(-x));
+function rgam(a){if(a<1)return rgam(a+1)*Math.pow(U01(),1/a);const d=a-1/3,c=1/Math.sqrt(9*d);for(;;){let x,v;do{x=randn();v=1+c*x}while(v<=0);v=v*v*v;const u=U01();if(u<1-.0331*x*x*x*x||Math.log(u)<.5*x*x+d*(1-v+Math.log(v)))return d*v}}
+const rbeta=(a,b)=>{const x=rgam(a),y=rgam(b);return x/(x+y)};
+function rbin(n,p){if(n<=30){let k=0;for(let i=0;i<n;i++)if(Math.random()<p)k++;return k}const m=n*p,s=Math.sqrt(n*p*(1-p)),k=Math.round(m+s*randn());return Math.max(0,Math.min(n,k))}
+function welch(a,b){const na=a.length,nb=b.length,ma=avg(a),mb=avg(b);let va=0,vb=0;for(const v of a)va+=(v-ma)*(v-ma);for(const v of b)vb+=(v-mb)*(v-mb);va/=na-1;vb/=nb-1;const se2=va/na+vb/nb,se=Math.sqrt(se2),t=(ma-mb)/se,df=se2*se2/((va/na)*(va/na)/(na-1)+(vb/nb)*(vb/nb)/(nb-1));return{d:ma-mb,se,t,df,p:2*(1-tcdf(Math.abs(t),df))}}
+const diffMeans=(Y,T)=>{let s1=0,s0=0,n1=0,n0=0;for(let i=0;i<Y.length;i++){if(T[i]){s1+=Y[i];n1++}else{s0+=Y[i];n0++}}return s1/n1-s0/n0};
+/* ---------- Ch1 potential outcomes ---------- */
+(function(){['c1t','c1s','c1g','c1h'].forEach(i=>scl(i,v=>fmt(v/10)));
+ function run(){const tau=val('c1t')/10,s=val('c1s')/10,g=val('c1g')/10,h=val('c1h')/10,R=500,n=400,NV=[],RD=[];let ate=0,att=0;
+  for(let r=0;r<R;r++){const y0=rn(n),z=rn(n),T=new Uint8Array(n),T2=new Uint8Array(n),Y=new Float64Array(n),Y2=new Float64Array(n);let sa=0,st=0,nt=0;
+   for(let i=0;i<n;i++){const ti=tau+h*z[i];sa+=ti;T[i]=Math.random()<lgs(s*y0[i]+g*z[i])?1:0;T2[i]=Math.random()<.5?1:0;Y[i]=y0[i]+T[i]*ti;Y2[i]=y0[i]+T2[i]*ti;if(T[i]){st+=ti;nt++}}
+   if(nt<5||nt>n-5){r--;continue}ate+=sa/n/R;att+=st/nt/R;NV.push(diffMeans(Y,T));RD.push(diffMeans(Y2,T2))}
+  const mN=avg(NV),mR=avg(RD),vals=[ate,att,mN,mR],lo=Math.min(0,...vals)-.3,hi=Math.max(0,...vals)+.3;
+  barZ($('c1cv'),vals,[C.fg,C.p,C.r,C.g],['true ATE','true ATT','self-selected','randomised'],lo,hi);
+  const [l,hh]=rng2(NV,RD,.1),P=histLines($('c1cv2'),[NV,RD],[C.r,C.g],Math.min(l,ate-.1),Math.max(hh,ate+.1),40,[[ate,C.fg,'ATE',true]]);legend(P,[['self-selected',C.r],['randomised',C.g]],P.T+12);P.text('estimated effect →',P.w-P.R-105,P.h-P.B-6,C.mu);
+  $('c1st').innerHTML=stat('true ATE · ATT',fmt(ate)+' · '+fmt(att),'in')+stat('self-selected mean · bias',fmt(mN)+' · '+sgn(mN-ate),Math.abs(mN-ate)>.08?'hot':'ok')+stat('randomised mean · sd',fmt(mR)+' · '+fmt(sdv(RD)),'ok')+stat('selection term (naive − ATT)',sgn(mN-att),'');
+  $('c1rd').innerHTML=(s<.05&&g<.05?'With no selection the naive comparison is itself a randomised one and agrees with the truth. ':`The self-selected comparison averages ${fmt(mN)} against a true ATE of ${fmt(ate)}: bias ${sgn(mN-ate)}. `)+(g>=.05?`Because customers also choose on their own gain, the treated have a different average effect (ATT ${fmt(att)}) from the population (ATE ${fmt(ate)}). `:'')+`The randomised comparison recovers the ATE (${fmt(mR)}) whatever the heterogeneity h = ${fmt(h)}, which only adds noise (sd ${fmt(sdv(RD))}).`}
+ ['c1t','c1s','c1g','c1h'].forEach(i=>$(i).addEventListener('change',run));$('c1go').onclick=run;run();})();
+
+/* ---------- Ch2 randomisation inference ---------- */
+(function(){scl('c2n',v=>v);scl('c2d',v=>fmt(v/10));
+ const gen=(n,k,d)=>{const a=new Float64Array(n),b=new Float64Array(n);const f=()=>k==0?randn():k==1?(Math.exp(randn())-1.6487)/2.1612:randn()+(Math.random()<.05?8*randn():0);for(let i=0;i<n;i++){a[i]=f();b[i]=f()+d}return{a,b}};
+ function permDist(a,b,B){const all=new Float64Array(a.length+b.length);all.set(a);all.set(b,a.length);const n=a.length,N=all.length;let tot=0;for(let i=0;i<N;i++)tot+=all[i];const obs=avg(b)-avg(a),out=new Float64Array(B);
+  for(let r=0;r<B;r++){for(let i=N-1;i>0;i--){const j=Math.floor(Math.random()*(i+1)),t=all[i];all[i]=all[j];all[j]=t}let s=0;for(let i=0;i<n;i++)s+=all[i];out[r]=(tot-s)/(N-n)-s/n}return{obs,out}}
+ function permP(a,b,B){const d=permDist(a,b,B);let c=0;for(const v of d.out)if(Math.abs(v)>=Math.abs(d.obs)-1e-12)c++;return(c+1)/(B+1)}
+ function run(){const n=val('c2n'),d=val('c2d')/10,k=+$('c2k').value,x=gen(n,k,d),w=welch(x.b,x.a),pd=permDist(x.a,x.b,2000);let c=0;for(const v of pd.out)if(Math.abs(v)>=Math.abs(pd.obs)-1e-12)c++;const pp=(c+1)/2001;
+  const lim=Math.max(Math.abs(pd.obs)*1.2,Math.max(...Array.from(pd.out).map(Math.abs))),P=histLines($('c2cv'),[pd.out],[C.a],-lim,lim,40,[[pd.obs,C.r,'observed',true],[-pd.obs,C.r,'',true]]);P.text('difference in means under the sharp null →',P.w-P.R-235,P.h-P.B-6,C.mu);
+  const R=300,B=200,rt=[0,0],rp=[0,0];for(let r=0;r<R;r++)[0,1].forEach(j=>{const y=gen(n,k,j?d:0);if(welch(y.b,y.a).p<.05)rt[j]++;if(permP(y.a,y.b,B)<.05)rp[j]++});
+  const P2=barG($('c2cv2'),[[rt[0]/R,rp[0]/R],[rt[1]/R,rp[1]/R]],[C.a,C.g],['size (effect 0)','power'],0,1.1,pct0);P2.hline(.05,C.fg,'5%');legend(P2,[['Welch t',C.a],['permutation',C.g]],P2.T+12);
+  $('c2st').innerHTML=stat('observed difference',fmt(pd.obs),'in')+stat('p: permutation · Welch t',fmt(pp)+' · '+fmt(w.p),pp<.05?'ok':'')+stat('size: t · permutation',pc(rt[0]/R)+' · '+pc(rp[0]/R),Math.abs(rt[0]/R-.05)>.025||Math.abs(rp[0]/R-.05)>.025?'warn':'ok')+stat('power: t · permutation',pc(rt[1]/R)+' · '+pc(rp[1]/R),'');
+  $('c2rd').innerHTML=`In this experiment the permutation p-value is ${fmt(pp)} and the Welch p-value ${fmt(w.p)}. Over many experiments with no effect the t test rejects ${pc(rt[0]/R)} of the time and the permutation test ${pc(rp[0]/R)} (nominal 5%; ${R} experiments, so ±2.5 points of noise). ${k>0&&n<30?'With skewed or outlier-prone data and small groups the t test can drift from 5%; the randomisation test keeps its exact level for the sharp null.':'Both tests are close to 5% here; try a small n with the skewed outcome.'}`}
+ ['c2n','c2d','c2k'].forEach(i=>$(i).addEventListener('change',run));$('c2go').onclick=run;run();})();
+
+/* ---------- Ch3 sample size ---------- */
+(function(){scl('c3p',v=>v+'%');scl('c3n',v=>v.toLocaleString('en-US'));scl('c3l',v=>v+'%');
+ const zA=1.959964,zB=.841621,pw=(p0,n,l)=>{const p1=Math.min(.999,p0*(1+l)),se=Math.sqrt(p0*(1-p0)/n+p1*(1-p1)/n);return normCdf(Math.abs(p1-p0)/se-zA)},nreq=(p0,l)=>{const p1=Math.min(.999,p0*(1+l));return(zA+zB)*(zA+zB)*(p0*(1-p0)+p1*(1-p1))/((p1-p0)*(p1-p0))};
+ function mde(p0,n){let lo=0,hi=5;for(let i=0;i<50;i++){const m=(lo+hi)/2;if(pw(p0,n,m)<.8)lo=m;else hi=m}return hi}
+ function run(){const p0=val('c3p')/100,n=val('c3n'),l=val('c3l')/100,pts=[];for(let k=1;k<=30;k++)pts.push([k,pw(p0,n,k/100)]);
+  const P=mk($('c3cv'),0,30,1.02,{y0:0,L:44});poly(P,pts,C.a,2.6);P.hline(.8,C.fg,'80%');dots(P,[[l*100,pw(p0,n,l)]],C.y,5);P.vline(l*100,C.mu,'',true);P.text('relative lift (%) →',P.w-P.R-100,P.h-P.B-6,C.mu);P.text('power',P.L+8,P.T+12,C.mu);
+  const lg=[];for(let k=2;k<=30;k++)lg.push([k,Math.log10(nreq(p0,k/100))]);const ys=lg.map(v=>v[1]),lo=Math.floor(Math.min(...ys)),hi=Math.ceil(Math.max(...ys,Math.log10(nreq(p0,l))));
+  const P2=mk($('c3cv2'),0,30,hi,{y0:lo,noGrid:true,L:50});const tk=[];for(let e=lo;e<=hi;e++)tk.push([e,e<3?String(Math.pow(10,e)):e<6?Math.pow(10,e-3)+'k':Math.pow(10,e-6)+'M']);customGrid(P2,[],tk);poly(P2,lg,C.a,2.6);dots(P2,[[l*100,Math.log10(nreq(p0,l))]],C.y,5);P2.vline(l*100,C.mu,'',true);P2.text('relative lift (%) →',P2.w-P2.R-100,P2.h-P2.B-6,C.mu);P2.text('n per arm for 80% power (log scale)',P2.L+8,P2.T+12,C.mu);
+  const R=2000,p1=p0*(1+l);let rej=0;for(let r=0;r<R;r++){const a=rbin(n,p0),b=rbin(n,p1),pa=a/n,pb=b/n,pp=(a+b)/(2*n),se=Math.sqrt(2*pp*(1-pp)/n);if(se>0&&Math.abs(pb-pa)/se>zA)rej++}
+  $('c3st').innerHTML=stat('power at target lift · simulated',pc(pw(p0,n,l))+' · '+pc(rej/R),pw(p0,n,l)>=.8?'ok':'hot')+stat('n per arm for 80%',Math.round(nreq(p0,l)).toLocaleString('en-US'),'in')+stat('MDE at this n (80% power)',pc(mde(p0,n))+' relative',n<nreq(p0,l)?'warn':'ok')+stat('absolute difference at target',(100*(p1-p0)).toFixed(2)+' points','');
+  $('c3rd').innerHTML=`With a ${pc(p0)} baseline and ${n.toLocaleString('en-US')} customers per arm, a ${pc(l)} relative lift (${(100*(p1-p0)).toFixed(2)} points) is detected with power ${pc(pw(p0,n,l))} (simulation ${pc(rej/R)}). The smallest relative lift this test detects with 80% power is ${pc(mde(p0,n))}; detecting a lift half that size would need about four times the customers. ${pw(p0,n,l)<.8?'This test is underpowered for the target: a non-significant result would say little.':'This design meets the 80% standard for the target lift.'}`}
+ ['c3p','c3n','c3l'].forEach(i=>$(i).addEventListener('change',run));$('c3go').onclick=run;run();})();
+
+/* ---------- Ch4 clustering ---------- */
+(function(){scl('c4m',v=>v);scl('c4r',v=>fmt(v/100));scl('c4k',v=>v);
+ function run(){const m=val('c4m'),rho=val('c4r')/100,K=val('c4k'),R=600;let rn_=0,rc=0;
+  for(let r=0;r<R;r++){const A=[],B=[],ca=[],cb=[];for(let g=0;g<2;g++)for(let k=0;k<K;k++){const u=Math.sqrt(rho)*randn(),sd=Math.sqrt(1-rho);let s=0;for(let i=0;i<m;i++){const y=u+sd*randn();(g?B:A).push(y);s+=y}(g?cb:ca).push(s/m)}
+   if(welch(B,A).p<.05)rn_++;if(welch(cb,ca).p<.05)rc++}
+  const P=barV($('c4cv'),[rn_/R,rc/R],[C.r,C.g],['customer-level test','cluster-means test'],Math.max(.15,rn_/R*1.3),pct0);P.hline(.05,C.fg,'5%');P.text('false positive rate, no true effect',P.L+6,P.T+12,C.mu);
+  const P2=mk($('c4cv2'),1,200,1+199*.1*1.05,{y0:1,L:44});[[.01,C.g],[.05,C.y],[.1,C.r]].forEach(([r,c])=>P2.line(x=>1+(x-1)*r,c,2.4,1,200,2));legend(P2,[['ρ = 1%',C.g],['ρ = 5%',C.y],['ρ = 10%',C.r]],P2.T+12);dots(P2,[[m,1+(m-1)*rho]],C.fg,5);P2.text('customers per cluster m →',P2.w-P2.R-135,P2.h-P2.B-6,C.mu);P2.text('design effect',P2.L+8,P2.T+28,C.mu);
+  const de=1+(m-1)*rho;
+  $('c4st').innerHTML=stat('design effect 1 + (m − 1)ρ',fmt(de),de>2?'hot':'in')+stat('effective sample size',Math.round(2*K*m/de).toLocaleString('en-US')+' of '+(2*K*m).toLocaleString('en-US'),'')+stat('FPR: customer-level · cluster',pc(rn_/R)+' · '+pc(rc/R),rn_/R>.08?'hot':'ok')+stat('clusters in total',2*K,K<10?'warn':'');
+  $('c4rd').innerHTML=`Randomising ${2*K} branches of ${m} customers with ρ = ${fmt(rho)} gives a design effect of ${fmt(de)}: the ${(2*K*m).toLocaleString('en-US')} customers carry the information of about ${Math.round(2*K*m/de).toLocaleString('en-US')}. Analysing them as independent customers declares a null effect significant ${pc(rn_/R)} of the time (nominal 5%); the test on branch means stays near 5% (${pc(rc/R)}). To gain power, add branches, not customers per branch.`}
+ ['c4m','c4r','c4k'].forEach(i=>$(i).addEventListener('change',run));$('c4go').onclick=run;run();})();
+
+/* ---------- Ch5 interference ---------- */
+(function(){['c5t','c5s'].forEach(i=>scl(i,v=>fmt(v/10)));scl('c5p',v=>v+'%');
+ function run(){const tau=val('c5t')/10,s=val('c5s')/10,p=val('c5p')/100,G=40,m=50,R=300,IA=[],CA=[];
+  for(let r=0;r<R;r++){const T=[],Y=[],T2=[],Y2=[],tg=new Uint8Array(G);const ord=ordIdx(lin(G,()=>Math.random()));for(let j=0;j<G/2;j++)tg[ord[j]]=1;
+   for(let g=0;g<G;g++){const u=.5*randn(),t=[],sh=[];let c=0;for(let i=0;i<m;i++){const ti=Math.random()<p?1:0;t.push(ti);c+=ti}const share=c/m;
+    for(let i=0;i<m;i++){T.push(t[i]);Y.push(tau*t[i]+s*share+u+randn());T2.push(tg[g]);Y2.push(tau*tg[g]+s*tg[g]+u+randn())}}
+   IA.push(diffMeans(Y,T));CA.push(diffMeans(Y2,T2))}
+  const glob=tau+s,[l,h]=rng2(IA,CA,.1),P=histLines($('c5cv'),[IA,CA],[C.r,C.g],Math.min(l,glob-.1,tau-.1),Math.max(h,glob+.1,tau+.1),40,[[glob,C.fg,'global τ+s',true],[tau,C.mu,'τ',true]]);legend(P,[['individual randomisation',C.r],['market randomisation',C.g]],P.T+12);P.text('estimated effect →',P.w-P.R-105,P.h-P.B-6,C.mu);
+  const mI=avg(IA),mC=avg(CA),vals=[tau,mI,glob,mC],lo=Math.min(0,...vals)-.3,hi=Math.max(0,...vals)+.3;barZ($('c5cv2'),vals,[C.mu,C.r,C.fg,C.g],['direct τ','individual A/B','global effect','market A/B'],lo,hi);
+  $('c5st').innerHTML=stat('direct effect τ · global τ + s',fmt(tau)+' · '+fmt(glob),'in')+stat('individual A/B mean · sd',fmt(mI)+' · '+fmt(sdv(IA)),Math.abs(mI-glob)>.1?'hot':'ok')+stat('market A/B mean · sd',fmt(mC)+' · '+fmt(sdv(CA)),'ok')+stat('gap, A/B vs rollout',sgn(mI-glob),'');
+  $('c5rd').innerHTML=Math.abs(s)<.05?'With no spillover (s = 0) the individual A/B test estimates the rollout effect, and it is more precise than the market-level design.':`The individually randomised test estimates the direct effect ${fmt(mI)} (≈ τ = ${fmt(tau)}) because treated and control customers share the same market exposure, so the spillover cancels. Treating the whole market changes the exposure by s = ${fmt(s)}, so the rollout effect is ${fmt(glob)}${s<0?': the A/B result overstates what the business will get':': the A/B result understates what the business will get'}. The market-randomised design recovers ${fmt(mC)} at the price of a much larger standard deviation (${fmt(sdv(CA))} against ${fmt(sdv(IA))}).`}
+ ['c5t','c5s','c5p'].forEach(i=>$(i).addEventListener('change',run));$('c5go').onclick=run;run();})();
+
+/* ---------- Ch6 stratification / regression adjustment ---------- */
+(function(){scl('c6r',v=>fmt(v/100));scl('c6n',v=>v);scl('c6l',v=>fmt(v/10));
+ function run(){const rho=val('c6r')/100,n=val('c6n'),lam=val('c6l')/10,R=600,D=[],A=[],L=[],eff=.2,sq=Math.sqrt(1-rho*rho);
+  for(let r=0;r<R;r++){const X=rn(n),T=new Uint8Array(n),o=ordIdx(lin(n,()=>Math.random()));for(let j=0;j<n/2;j++)T[o[j]]=1;const Y=lin(n,i=>rho*X[i]+sq*randn()+T[i]*(eff+.15*lam*X[i])),xm=avg(X),Xc=X.map(v=>v-xm),TX=lin(n,i=>T[i]*Xc[i]);
+   D.push(diffMeans(Y,T));A.push(olsMulti([T,X],Y).beta[1]);L.push(olsMulti([T,Xc,TX],Y).beta[1])}
+  const [l,h]=rng2(D,L,.1),P=histLines($('c6cv'),[D,A,L],[C.r,C.y,C.g],Math.min(l,eff-.05),Math.max(h,eff+.05),44,[[eff,C.fg,'truth',true]]);legend(P,[['unadjusted',C.r],['Y ~ T + X',C.y],['Lin (T·X)',C.g]],P.T+12);P.text('estimated effect →',P.w-P.R-105,P.h-P.B-6,C.mu);
+  const sds=[sdv(D),sdv(A),sdv(L)],P2=barV($('c6cv2'),sds,[C.r,C.y,C.g],['unadjusted','Y ~ T + X','Lin'],Math.max(...sds)*1.25,x=>x.toFixed(3));P2.text('standard deviation of the estimate',P2.L+6,P2.T+12,C.mu);
+  $('c6st').innerHTML=stat('mean: unadj. · adj. · Lin',[D,A,L].map(a=>fmt(avg(a))).join(' · '),'in')+stat('sd: unadj. · adj. · Lin',sds.map(v=>v.toFixed(3)).join(' · '),'ok')+stat('variance ratio Lin / unadjusted',fmt(sds[2]*sds[2]/(sds[0]*sds[0])),'')+stat('theory 1 − ρ²',fmt(1-rho*rho),'');
+  $('c6rd').innerHTML=`All three estimators are unbiased for the effect ${fmt(eff)}; they differ in precision. With ρ = ${fmt(rho)} the covariate explains ${pc(rho*rho)} of the outcome variance and the variance falls to ${fmt(sds[2]*sds[2]/(sds[0]*sds[0]))} of the unadjusted one (theory ${fmt(1-rho*rho)}). ${lam>.05?`With effect heterogeneity λ = ${fmt(lam)} the plain adjustment can keep some variance from the T×X interaction in unbalanced or small samples; Lin’s estimator removes it.`:'Without heterogeneity the plain and Lin adjustments perform alike.'}`}
+ ['c6r','c6n','c6l'].forEach(i=>$(i).addEventListener('change',run));$('c6go').onclick=run;run();})();
+/* ---------- Ch7 CUPED ---------- */
+(function(){scl('c7w',v=>v);scl('c7v',v=>v+'%');scl('c7k',v=>fmt(v/10));
+ const rho2=(v,W)=>v*v/((v+(1-v)/W)*(v+(1-v)/2));
+ function run(){const W=val('c7w'),v=val('c7v')/100,c=val('c7k')/10,n=600,R=400,tau=.15,P0=[],P1=[],P2=[];
+  for(let r=0;r<R;r++){const L=rn(n,Math.sqrt(v)),T=new Uint8Array(n),o=ordIdx(lin(n,()=>Math.random()));for(let j=0;j<n/2;j++)T[o[j]]=1;
+   const X=lin(n,i=>L[i]+Math.sqrt((1-v)/W)*randn()),Y=lin(n,i=>L[i]+Math.sqrt((1-v)/2)*randn()+tau*T[i]),Xc=lin(n,i=>X[i]+c*T[i]);
+   const adj=(Z)=>{const th=simple(Z,Y).b,zm=avg(Z);return diffMeans(lin(n,i=>Y[i]-th*(Z[i]-zm)),T)};
+   P0.push(diffMeans(Y,T));P1.push(adj(X));P2.push(adj(Xc))}
+  const curve=[];for(let w=1;w<=12;w++)curve.push([w,1-rho2(v,w)]);
+  const Pa=mk($('c7cv'),0,12,1.05,{y0:0,L:44});poly(Pa,curve,C.g,2.6);dots(Pa,[[W,sdv(P1)*sdv(P1)/(sdv(P0)*sdv(P0))]],C.y,5);Pa.vline(W,C.mu,'',true);Pa.text('pre-period weeks →',Pa.w-Pa.R-100,Pa.h-Pa.B-6,C.mu);Pa.text('variance relative to unadjusted',Pa.L+8,Pa.T+12,C.mu);
+  const [l,h]=rng2(P0,P2,.1),Pb=histLines($('c7cv2'),[P0,P1,P2],[C.r,C.g,C.p],Math.min(l,tau-.05),Math.max(h,tau+.05),44,[[tau,C.fg,'truth',true]]);legend(Pb,[['plain',C.r],['CUPED',C.g],['CUPED, contaminated X',C.p]],Pb.T+12);Pb.text('estimated effect →',Pb.w-Pb.R-105,Pb.h-Pb.B-6,C.mu);
+  const vr=sdv(P1)*sdv(P1)/(sdv(P0)*sdv(P0));
+  $('c7st').innerHTML=stat('ρ² between X and Y · variance factor',fmt(rho2(v,W))+' · '+fmt(1-rho2(v,W)),'in')+stat('simulated variance ratio',fmt(vr),'ok')+stat('sd: plain · CUPED',sdv(P0).toFixed(3)+' · '+sdv(P1).toFixed(3),'')+stat('mean: CUPED · contaminated',fmt(avg(P1))+' · '+fmt(avg(P2)),Math.abs(avg(P2)-tau)>.04?'hot':'ok');
+  $('c7rd').innerHTML=`With ${W} pre-period week${W>1?'s':''} the covariate correlates with the outcome at ρ² = ${fmt(rho2(v,W))}, so CUPED cuts the variance to ${fmt(1-rho2(v,W))} of the plain estimator (simulated ${fmt(vr)}): the same precision as a sample ${fmt(1/(1-rho2(v,W)))} times larger. More pre-period weeks help most when the weekly metric is noisy (a small persistent share). ${c>.05?`When the covariate is partly measured after treatment (c = ${fmt(c)}) the estimate becomes ${fmt(avg(P2))} instead of ${fmt(tau)}: the covariate absorbs part of the effect.`:'Raise the contamination slider to see what happens when the covariate is not strictly pre-treatment.'}`}
+ ['c7w','c7v','c7k'].forEach(i=>$(i).addEventListener('change',run));$('c7go').onclick=run;run();})();
+
+/* ---------- Ch8 SRM ---------- */
+(function(){scl('c8n',v=>v.toLocaleString('en-US'));scl('c8q',v=>v+'%');scl('c8t',v=>fmt(v/100));
+ const pChi=(a,b)=>{const E=(a+b)/2,x=((a-E)*(a-E)+(b-E)*(b-E))/E;return 2*normSf(Math.sqrt(x))};
+ function exper(n,q,t){let n1=0,n0=0,s1=0,s0=0;for(let i=0;i<n;i++){if(i&1){const z=randn();if(z<-.6745&&Math.random()<q)continue;n1++;s1+=z+t}else{n0++;s0+=randn()}}return{n1,n0,d:s1/n1-s0/n0,p:pChi(n1,n0)}}
+ function run(){const n=val('c8n'),q=val('c8q')/100,t=val('c8t')/100,R=300,E=[];let alarm=0;for(let r=0;r<R;r++){const e=exper(n,q,t);E.push(e.d);if(e.p<.001)alarm++}
+  const one=exper(n,q,t),P=barV($('c8cv'),[one.n0,one.n1],[C.a,C.y],['control','treatment'],Math.max(one.n0,one.n1,n/2)*1.3,x=>Math.round(x).toLocaleString('en-US'));P.hline(n/2,C.fg,'expected '+(n/2).toLocaleString('en-US'));P.text('customers analysed per arm (one experiment)',P.L+6,P.T+12,C.mu);
+  const m=avg(E),[l,h]=range(E,.12),P2=histLines($('c8cv2'),[E],[C.r],Math.min(l,t-.03),Math.max(h,t+.03),36,[[t,C.g,'true effect',true],[m,C.r,'mean',true]]);P2.text('estimate on retained customers →',P2.w-P2.R-175,P2.h-P2.B-6,C.mu);
+  $('c8st').innerHTML=stat('this experiment: arm counts · SRM p',one.n0.toLocaleString('en-US')+' · '+one.n1.toLocaleString('en-US')+' · '+(one.p<.001?'<0.001':fmt(one.p)),one.p<.001?'hot':'ok')+stat('SRM alarm rate (p < 0.001)',pc(alarm/R),q>0&&alarm/R>.5?'warn':'in')+stat('true · estimated effect',fmt(t)+' · '+fmt(m),'')+stat('bias',sgn(m-t),Math.abs(m-t)>.03?'hot':'ok');
+  $('c8rd').innerHTML=q<.005?`With no loss the arm counts are balanced (SRM p = ${fmt(one.p)}) and the estimate is unbiased (${fmt(m)}).`:`Losing ${pc(q)} of the low-outcome customers in the treatment arm shifts the arm counts (SRM p ${one.p<.001?'< 0.001':'= '+fmt(one.p)}; alarm in ${pc(alarm/R)} of experiments) and biases the estimate to ${fmt(m)} against a true ${fmt(t)}: the treatment arm now looks better because its worst customers vanished. The estimate on the retained customers is no longer a randomised comparison; find and fix the loss, do not adjust for it.`}
+ ['c8n','c8q','c8t'].forEach(i=>$(i).addEventListener('change',run));$('c8go').onclick=run;run();})();
+
+/* ---------- Ch9 non-compliance ---------- */
+(function(){scl('c9m',v=>v+'%');scl('c9b',v=>fmt(v/10));scl('c9t',v=>fmt(v/10));
+ function run(){const cs=val('c9m')/100,b=val('c9b')/10,tau=val('c9t')/10,al=.10,R=400,n=4000,I=[],A=[],Wd=[];
+  for(let r=0;r<R;r++){const Z=new Uint8Array(n),D=new Uint8Array(n),Y=new Float64Array(n);for(let i=0;i<n;i++){Z[i]=i&1;const u=Math.random(),ty=u<al?0:u<al+cs?1:2;D[i]=ty===0?1:ty===1?Z[i]:0;Y[i]=(ty===0?b:ty===2?-b:0)+tau*D[i]+randn()}
+   const itt=diffMeans(Y,Z),dd=diffMeans(D,Z);I.push(itt);A.push(diffMeans(Y,D));Wd.push(itt/dd)}
+  const itt0=cs*tau,[l,h]=rng2(I,A,.1),lo=Math.min(l,...Wd,tau-.2,itt0-.2),hi=Math.max(h,tau+.2),P=histLines($('c9cv'),[I,A,Wd.filter(v=>v>lo&&v<hi+3)],[C.y,C.r,C.g],lo,Math.max(hi,Math.max(...Wd.map(v=>Math.min(v,hi+1)))),50,[[tau,C.fg,'complier effect τ',true],[itt0,C.mu,'true ITT',true]]);legend(P,[['ITT',C.y],['as-treated',C.r],['Wald / CACE',C.g]],P.T+12);P.text('estimate →',P.w-P.R-60,P.h-P.B-6,C.mu);
+  const vals=[itt0,avg(I),avg(A),tau,avg(Wd)],lo2=Math.min(0,...vals)-.3,hi2=Math.max(0,...vals)+.3;barZ($('c9cv2'),vals,[C.mu,C.y,C.r,C.fg,C.g],['true ITT','ITT','as-treated','true CACE','Wald'],lo2,hi2);
+  $('c9st').innerHTML=stat('true ITT · CACE',fmt(itt0)+' · '+fmt(tau),'in')+stat('ITT estimate',fmt(avg(I)),Math.abs(avg(I)-itt0)<.05?'ok':'hot')+stat('as-treated · bias',fmt(avg(A))+' · '+sgn(avg(A)-tau),Math.abs(avg(A)-tau)>.1?'hot':'ok')+stat('Wald estimate · sd',fmt(avg(Wd))+' · '+fmt(sdv(Wd)),'ok');
+  $('c9rd').innerHTML=`Only ${pc(cs)} of customers respond to the offer, so the ITT (${fmt(avg(I))}) is diluted to ${pc(cs)} of the effect ${fmt(tau)}: this is the right number for the policy “send the offer”. The as-treated comparison gives ${fmt(avg(A))}${b>.05?`, wrong by ${sgn(avg(A)-tau)} because the customers who take the treatment regardless are different (baseline gap b = ${fmt(b)})`:''}. Dividing the ITT by the take-up difference recovers the complier effect (${fmt(avg(Wd))}), at the cost of a larger spread (sd ${fmt(sdv(Wd))}).`}
+ ['c9m','c9b','c9t'].forEach(i=>$(i).addEventListener('change',run));$('c9go').onclick=run;run();})();
+
+/* ---------- Ch10 sequential ---------- */
+(function(){scl('c10d',v=>fmt(v/100));scl('c10t',v=>fmt(v/100));
+ function run(){const d=val('c10d')/100,tau=val('c10t')/100,K=100,b=20,R=800,L20=Math.log(20),lm=(n,th)=>{const V=2/n;return .5*Math.log(V/(V+tau*tau))+th*th*tau*tau/(2*V*(V+tau*tau))};
+  let fx=0,nv=0,ms=0,stop=0;const paths=[];
+  for(let r=0;r<R;r++){let S=0,naive=false,m=false;const pa=[];for(let k=1;k<=K;k++){S+=d*b+Math.sqrt(2*b)*randn();const n=k*b,th=S/n,z=th/Math.sqrt(2/n),ll=lm(n,th);if(r<8)pa.push([n,ll]);if(Math.abs(z)>1.96)naive=true;if(!m&&ll>=L20){m=true;stop+=n}if(k===K&&Math.abs(z)>1.96)fx++}if(naive)nv++;if(m)ms++;if(r<8)paths.push(pa)}
+  const ys=paths.flat().map(p=>p[1]),lo=Math.min(-4,Math.min(...ys)),hi=Math.max(L20+1,Math.max(...ys)),P=mk($('c10cv'),0,2000,hi,{y0:lo,L:44});paths.forEach((p,i)=>poly(P,p,[C.a,C.y,C.g,C.p,C.r,C.t,C.mu,C.fg][i],1.6));P.hline(L20,C.r,'reject: log(1/α)');P.hline(0,C.mu,'');P.text('customers per arm →',P.w-P.R-110,P.h-P.B-6,C.mu);P.text('log of the mixture likelihood ratio',P.L+8,P.T+12,C.mu);
+  const P2=barV($('c10cv2'),[fx/R,nv/R,ms/R],[C.a,C.r,C.g],['fixed, one look','naive peeking','mSPRT'],1.1,pct0);P2.hline(.05,C.fg,'5%');P2.text(d<.005?'false positive rate':'power (share rejecting)',P2.L+6,P2.T+12,C.mu);
+  $('c10st').innerHTML=stat(d<.005?'FPR: fixed · peeking · mSPRT':'power: fixed · peeking · mSPRT',pc(fx/R)+' · '+pc(nv/R)+' · '+pc(ms/R),d<.005&&nv/R>.1?'hot':'ok')+stat('mSPRT mean stopping n (if rejected)',ms?Math.round(stop/ms).toLocaleString('en-US'):'—','in')+stat('fixed design n','2,000','')+stat('true effect · prior sd',fmt(d)+' · '+fmt(tau),'');
+  $('c10rd').innerHTML=d<.005?`With no true effect, stopping whenever |z| &gt; 1.96 over 100 looks produces a false positive in ${pc(nv/R)} of experiments; the fixed-horizon test keeps ${pc(fx/R)} and the mSPRT ${pc(ms/R)} (never above 5% however often you look, by Ville’s inequality).`:`With a true effect of ${fmt(d)} sd the fixed test (one look at 2000 per arm) has power ${pc(fx/R)}; the mSPRT rejects in ${pc(ms/R)} of experiments and, when it does, stops after ${ms?Math.round(stop/ms).toLocaleString('en-US'):'—'} customers per arm on average. Naive peeking appears to have the highest power only because it also rejects falsely (${pc(nv/R)} at zero effect). Try different prior sd τ: a value near the true effect stops earliest.`}
+ ['c10d','c10t'].forEach(i=>$(i).addEventListener('change',run));$('c10go').onclick=run;run();})();
+
+/* ---------- Ch11 bandits ---------- */
+(function(){scl('c11p',v=>v+'%');scl('c11l',v=>v+'%');scl('c11n',v=>v.toLocaleString('en-US'));
+ function run(){const p0=val('c11p')/100,lam=val('c11l')/100,N=val('c11n'),B=100,nb=Math.round(N/B),p=[p0,p0*(1+lam),p0*(1+lam/2)],best=1,pst=p[best],R=60;
+  const rf=new Float64Array(nb),rt=new Float64Array(nb);let shT=0,idF=0,idT=0;
+  for(let r=0;r<R;r++){const sF=[0,0,0],nF=[0,0,0],sT=[0,0,0],nT=[0,0,0];let cf=0,ct=0,tb=0;
+   for(let k=0;k<nb;k++){
+    const al=[33,33,34];for(let a=0;a<3;a++){sF[a]+=rbin(al[a],p[a]);nF[a]+=al[a];cf+=al[a]*(pst-p[a])}rf[k]+=cf/R;
+    const wins=[0,0,0];for(let d=0;d<40;d++){let bi=0,bv=-1;for(let a=0;a<3;a++){const x=rbeta(1+sT[a],1+nT[a]-sT[a]);if(x>bv){bv=x;bi=a}}wins[bi]++}
+    const al2=wins.map(w=>Math.round(B*w/40));const dif=B-al2.reduce((a,b)=>a+b,0);al2[wins.indexOf(Math.max(...wins))]+=dif;
+    for(let a=0;a<3;a++){const nn=Math.max(0,al2[a]);sT[a]+=rbin(nn,p[a]);nT[a]+=nn;ct+=nn*(pst-p[a])}rt[k]+=ct/R;tb+=Math.max(0,al2[best])}
+   shT+=tb/(nb*B)/R;const rate=(s,n)=>s.map((v,i)=>v/Math.max(n[i],1));const argm=a=>a.indexOf(Math.max(...a));if(argm(rate(sF,nF))===best)idF++;if(argm(sT.map((v,i)=>(1+v)/(2+nT[i])))===best)idT++}
+  const P=mk($('c11cv'),0,nb*B,Math.max(rf[nb-1],rt[nb-1])*1.1+1e-6,{y0:0,L:50});poly(P,Array.from(rf,(v,i)=>[(i+1)*B,v]),C.r,2.6);poly(P,Array.from(rt,(v,i)=>[(i+1)*B,v]),C.g,2.6);legend(P,[['equal split',C.r],['Thompson sampling',C.g]],P.T+12);P.text('customers →',P.w-P.R-70,P.h-P.B-6,C.mu);P.text('cumulative regret (conversions)',P.L+8,P.T+28,C.mu);
+  const P2=barG($('c11cv2'),[[1/3,shT],[idF/R,idT/R]],[C.r,C.g],['traffic to best offer','best offer identified'],0,1.15,pct0);legend(P2,[['equal split',C.r],['Thompson',C.g]],P2.T+12);
+  $('c11st').innerHTML=stat('final regret: split · Thompson',Math.round(rf[nb-1])+' · '+Math.round(rt[nb-1]),'in')+stat('regret saved',pc(1-rt[nb-1]/Math.max(rf[nb-1],1e-9)),'ok')+stat('traffic to best offer: Thompson',pc(shT),'')+stat('identified at the end: split · TS',pc(idF/R)+' · '+pc(idT/R),'');
+  $('c11rd').innerHTML=`Offers convert at ${pc(p[0])}, ${pc(p[1])} (best) and ${pc(p[2])}. Over ${N.toLocaleString('en-US')} customers Thompson sampling sends ${pc(shT)} of the traffic to the best offer (the equal split sends 33%) and loses ${Math.round(rt[nb-1])} conversions to the best possible policy against ${Math.round(rf[nb-1])} for the split. The price is statistical: the other offers get little data, so their estimates are noisier and biased, and a clean confidence interval for the difference needs special methods.`}
+ ['c11p','c11l','c11n'].forEach(i=>$(i).addEventListener('change',run));$('c11go').onclick=run;run();})();
+const QZ=[{"l": "Beginner", "q": "Why is the unit-level effect Yᵢ(1) − Yᵢ(0) never observed?", "o": ["Treatment effects are always zero for individuals", "Only one potential outcome is realised for each unit", "The sample is too small", "The outcomes are measured with error"], "a": 1, "e": "The fundamental problem of causal inference: a customer is either treated or not."}, {"l": "Beginner", "q": "Randomising treatment makes the difference in means unbiased for the ATE because…", "o": ["Treatment is independent of the potential outcomes, so the selection term is zero", "It makes the outcome normally distributed", "It removes all noise from the outcome", "It guarantees the groups are exactly balanced"], "a": 0, "e": "Randomisation gives E[Y(0) | T=1] = E[Y(0) | T=0]; balance holds on average, not exactly."}, {"l": "Intermediate", "q": "You halve the minimum detectable effect you want to detect, keeping α, power and σ. The sample per arm must…", "o": ["Increase by 41%", "Double", "Stay the same", "Quadruple"], "a": 3, "e": "n ∝ 1/δ², so halving δ multiplies n by 4."}, {"l": "Intermediate", "q": "50 branches are randomised to a new process; 100 customers per branch, ρ = 0.05. The design effect is about…", "o": ["100", "50", "5.95", "1.05"], "a": 2, "e": "DEFF = 1 + (m − 1)ρ = 1 + 99 × 0.05 = 5.95."}, {"l": "Intermediate", "q": "The randomisation (permutation) test of a sharp null needs…", "o": ["Large samples only", "No distributional assumption: under the null any re-assignment of labels is equally likely", "Normally distributed outcomes", "Equal variances in the two arms"], "a": 1, "e": "Its validity comes from the randomisation itself."}, {"l": "Intermediate", "q": "Which covariate is valid for regression adjustment or CUPED?", "o": ["The same metric measured before assignment", "Whether the customer opened the offer email", "The metric measured during the experiment", "Any variable that improves the p-value"], "a": 0, "e": "Covariates must be fixed before treatment; post-treatment variables can absorb part of the effect."}, {"l": "Advanced", "q": "CUPED reduces the variance of the effect estimate by a factor of…", "o": ["ρ", "1/ρ", "1 − ρ", "1 − ρ², where ρ = Corr(pre-period metric, outcome)"], "a": 3, "e": "Var(Ỹ) = Var(Y)(1 − ρ²) with θ = Cov(X,Y)/Var(X)."}, {"l": "Advanced", "q": "In a 50/50 test the arms contain 50 800 and 49 200 customers. This is…", "o": ["Evidence that the treatment works", "Within normal random variation", "A sample ratio mismatch (p ≈ 10⁻⁶): investigate before reading the results", "A reason to drop the smaller arm"], "a": 2, "e": "χ² = 25.6 on 1 df, far beyond chance; the loss is probably selective and biases the comparison."}, {"l": "Advanced", "q": "A referral offer is randomised across individual customers. The A/B difference estimates…", "o": ["The effect for compliers only", "A direct effect under partial exposure, which may differ from the effect of treating everyone", "The effect of rolling out to everyone", "Always zero"], "a": 1, "e": "With interference the global effect needs cluster, market or switchback designs."}, {"l": "Advanced", "q": "An offer is randomised but only half of those offered take it. The ITT estimate is…", "o": ["Unbiased for the effect of making the offer, diluted by non-take-up", "Biased because of non-compliance", "The effect of the treatment on those treated", "Equal to the complier effect"], "a": 0, "e": "Compare by assignment: ITT answers “what does the offer policy do”."}, {"l": "Advanced", "q": "The Wald estimator ITT / (difference in take-up) identifies…", "o": ["The average effect for all customers", "The ATT", "The as-treated effect", "The complier average causal effect, given monotonicity and exclusion"], "a": 3, "e": "It is a local effect for those whose take-up is moved by the assignment."}, {"l": "Expert", "q": "You check a running test every day and stop when p < 0.05. The false positive rate is…", "o": ["Below 5%", "Equal to the power", "Well above 5%", "5%"], "a": 2, "e": "Repeated looks are multiple tests; always-valid or group-sequential boundaries are needed."}, {"l": "Expert", "q": "The mixture SPRT rejects when Λₙ ≥ 1/α. Why is its type I error bounded by α at any stopping time?", "o": ["It uses a larger sample", "Under the null Λₙ is a nonnegative martingale with mean 1 (Ville’s inequality)", "Λₙ is always below 1", "It averages over looks"], "a": 1, "e": "P(sup Λₙ ≥ 1/α) ≤ α for a nonnegative martingale started at 1."}, {"l": "Expert", "q": "Thompson sampling versus a fixed split is best described as…", "o": ["Lower regret, but less clean inference on the weaker arms", "Unbiased estimates for every arm", "Equivalent to a fixed split", "Always more powerful for estimating effects"], "a": 0, "e": "Adaptive allocation optimises reward, not estimation; estimates need IPW or always-valid methods."}, {"l": "Expert", "q": "Treated customers in an experiment are lost from the data when they have a bad outcome. The arms still differ only by randomised assignment, so the analysis on retained customers is…", "o": ["Unbiased by randomisation", "Unbiased but less precise", "Unbiased if the p-value is significant", "Biased: selection on the outcome after randomisation re-creates selection bias"], "a": 3, "e": "Randomisation protects only the full assigned population; post-assignment selection on Y breaks it."}, {"l": "Expert", "q": "Regression adjustment in a randomised experiment changes the estimand and introduces bias when…", "o": ["The model is linear", "The covariate is strongly predictive", "The covariate is affected by the treatment", "The sample is large"], "a": 2, "e": "Pre-treatment covariates only improve precision; post-treatment ones block part of the effect."}, {"l": "Expert", "q": "Branch-level randomisation with 6 branches in total and strong ρ gives p = 0.03 from a customer-level t test. The sound reading is…", "o": ["Weak evidence because ρ is high but the test is valid", "The test ignores clustering; with 6 clusters use a cluster-level permutation test and expect low power", "Strong evidence, since n is large", "Significant: apply a Bonferroni correction"], "a": 1, "e": "The effective sample size is close to the number of clusters; customer-level p-values are far too small."}, {"l": "Expert", "q": "A bank wants the effect of a limit-increase offer on churn and also the effect of actually receiving the increase. Which pair of estimands is right?", "o": ["ITT for the offer policy and CACE (Wald) for receiving the increase among those it moves", "As-treated for both", "ATE for both", "ATT for the offer and ITT for the increase"], "a": 0, "e": "Randomise the offer; report ITT for the policy and a complier (IV) effect for take-up, stating that it is local."}];
+(function(){const st=store.get('ab_quiz',{});
+ function render(){const box=$('quiz');box.innerHTML='';
+  QZ.forEach((q,i)=>{const d=document.createElement('div');d.className='q'+(st[i]!=null?' done':'');d.innerHTML=`<div class="qh">Q${i+1} · ${q.l}</div><div style="margin:4px 0 6px"><b>${q.q}</b></div>`;
+   q.o.forEach((o,j)=>{const b=document.createElement('button');b.className='opt';b.textContent=o;if(st[i]!=null){if(j===q.a)b.classList.add('good');else if(j===st[i])b.classList.add('bad')}b.onclick=()=>{if(st[i]!=null)return;st[i]=j;store.set('ab_quiz',st);render();meter()};d.appendChild(b)});
+   const e=document.createElement('div');e.className='ex';e.innerHTML=(st[i]===q.a?'✅ ':'❌ ')+q.e;d.appendChild(e);box.appendChild(d)});
+  const ans=Object.keys(st).length,ok=QZ.filter((q,i)=>st[i]===q.a).length;
+  $('qscore').innerHTML=stat('answered',ans+' / '+QZ.length,'in')+stat('correct',ok,'ok')+stat('score',ans?Math.round(100*ok/ans)+'%':'—',ok/Math.max(ans,1)>=.8?'ok':'warn')+stat('verdict',ans<QZ.length?'keep going':ok>=16?'experimentation master':ok>=13?'strong':'review ch. 1–11','')}
+ $('qreset').onclick=()=>{Object.keys(st).forEach(k=>delete st[k]);store.set('ab_quiz',st);render();meter()};
+ window.__qst=st;render();})();
+const CHK=["Define potential outcomes, ATE, ATT and CATE and explain the fundamental problem.", "Decompose a naive difference into the effect and the selection term and say why randomisation removes it.", "State SUTVA and recognise designs where it fails (spillovers, shared capacity, networks).", "Analyse an experiment with a difference in means, an unpooled SE and a randomisation test.", "Compute the MDE and the sample size per arm and say how they scale with σ, δ, α and power.", "Compute the design effect for clustered randomisation and analyse at the cluster level.", "Choose between individual, market-level and switchback randomisation when interference is likely.", "Use stratification and regression adjustment (including Lin’s) without biasing the estimate.", "Build CUPED, state the variance reduction 1 − ρ² and choose a pre-period length.", "Run and interpret the SRM test and the covariate balance checks, and explain why attrition can bias an experiment.", "Distinguish ITT, as-treated and CACE and compute the Wald estimator.", "Explain peeking and use group-sequential or always-valid (mSPRT) boundaries.", "Explain Thompson sampling, regret and the inference cost of adaptive designs.", "Write an experiment plan: decision, MDE, unit, metrics, guardrails, stopping rule, analysis and governance."];
+(function(){const st=store.get('ab_chk',{}),box=$('chk');CHK.forEach((t,i)=>{const l=document.createElement('label'),c=document.createElement('input');c.type='checkbox';c.checked=!!st[i];c.onchange=()=>{st[i]=c.checked;store.set('ab_chk',st);meter()};l.appendChild(c);const s=document.createElement('span');s.textContent=t;l.appendChild(s);box.appendChild(l)});window.__cst=st;})();
+function meter(){const q=window.__qst||{},c=window.__cst||{};const ok=QZ.filter((x,i)=>q[i]===x.a).length,ck=Object.values(c).filter(Boolean).length;const p=Math.round(100*(.6*ok/QZ.length+.4*ck/CHK.length));$('mtxt').textContent='Mastery: '+p+'%  (exam + checklist)';$('mbar').style.width=p+'%';store.set('mastery_ab',p)}
+meter();
+
+/* ---------- Navigation ---------- */
+(function(){const nav=$('nav');let html='';
+ document.querySelectorAll('main .part, main section.ch').forEach(el=>{if(el.classList.contains('part'))html+=`<div class="pt">${el.textContent}</div>`;else{const h=el.querySelector('h2'),num=h.querySelector('.num').textContent,t=Array.from(h.childNodes).filter(n=>n.nodeType===3).map(n=>n.textContent).join('').trim();html+=`<a href="#${el.id}" data-id="${el.id}">${num}. ${t}</a>`}});
+ nav.innerHTML=html;const links=nav.querySelectorAll('a'),io=new IntersectionObserver(es=>{es.forEach(e=>{if(e.isIntersecting)links.forEach(a=>a.classList.toggle('on',a.dataset.id===e.target.id))})},{rootMargin:'-20% 0px -70% 0px'});
+ document.querySelectorAll('section.ch').forEach(s=>io.observe(s));
+ $('menu').onclick=()=>$('side').classList.toggle('open');nav.addEventListener('click',e=>{if(e.target.tagName==='A')$('side').classList.remove('open')});
+ window.addEventListener('scroll',()=>{const h=document.documentElement;$('prog').style.width=(100*h.scrollTop/(h.scrollHeight-h.clientHeight))+'%'},{passive:true});})();
+</script>
+</body>
+</html>
