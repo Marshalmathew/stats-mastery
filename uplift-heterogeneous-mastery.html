@@ -1,0 +1,644 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Uplift and Heterogeneous Effects Mastery</title>
+<style>
+:root{--bg:#0b0e17;--panel:#121726;--panel2:#171d30;--line:#232a3d;--fg:#e8ebf5;--mu:#8a93ab;--a:#6ea8ff;--r:#ff6b81;--y:#ffd166;--g:#4ade80;--p:#c084fc;--t:#5eead4}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;background:var(--bg);color:var(--fg);font:16px/1.7 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+a{color:var(--a)}
+#prog{position:fixed;top:0;left:0;height:3px;background:linear-gradient(90deg,var(--a),var(--p),var(--r));width:0;z-index:50}
+.side{position:fixed;left:0;top:0;bottom:0;width:290px;background:#0e1220;border-right:1px solid var(--line);overflow:auto;padding:18px 14px 90px;z-index:40;transition:transform .25s}
+.side h1{font-size:15px;margin:0 0 2px}
+.side small{color:var(--mu)}
+.side .pt{margin:16px 0 4px;font-size:11px;text-transform:uppercase;letter-spacing:1.3px;color:var(--p)}
+.side a{display:block;color:var(--mu);text-decoration:none;padding:5px 9px;border-radius:7px;font-size:13.5px;line-height:1.35}
+.side a:hover{background:var(--panel);color:var(--fg)}
+.side a.on{background:var(--panel2);color:var(--fg);box-shadow:inset 3px 0 var(--a)}
+.side a.back{color:var(--t);padding-left:0;margin-bottom:6px}
+.meter{position:fixed;left:0;bottom:0;width:290px;background:#0e1220;border-top:1px solid var(--line);padding:10px 16px;z-index:41;font-size:12px;color:var(--mu)}
+.meter .bar{height:7px;background:var(--line);border-radius:6px;margin-top:5px;overflow:hidden}
+.meter .bar i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--g),var(--t));transition:width .4s}
+#menu{display:none;position:fixed;top:10px;left:10px;z-index:60;background:var(--panel2);color:var(--fg);border:1px solid var(--line);border-radius:9px;padding:7px 12px;font-size:14px;cursor:pointer}
+main{margin-left:290px;padding:0 34px 120px;max-width:1090px}
+.hero{padding:70px 0 30px}
+.hero h1{font-size:clamp(32px,5vw,56px);line-height:1.08;margin:0 0 14px;background:linear-gradient(100deg,#fff,var(--y) 40%,var(--r));-webkit-background-clip:text;background-clip:text;color:transparent}
+.hero p{font-size:19px;color:#c3c9dc;max-width:780px}
+.chips{display:flex;flex-wrap:wrap;gap:8px;margin:18px 0}
+.chip{border:1px solid var(--line);background:var(--panel);padding:5px 12px;border-radius:99px;font-size:13px;color:var(--mu)}
+.chip b{color:var(--fg)}
+.part{margin:90px 0 0;padding-top:22px;border-top:1px solid var(--line);font-size:12px;letter-spacing:2px;text-transform:uppercase;color:var(--p)}
+section.ch{padding-top:30px}
+h2{font-size:30px;line-height:1.2;margin:10px 0 8px;display:flex;gap:12px;align-items:center;flex-wrap:wrap}
+h2 .num{display:inline-grid;place-items:center;width:40px;height:40px;border-radius:12px;background:var(--panel2);border:1px solid var(--line);font-size:18px;color:var(--a)}
+.lvl{font-size:11px;font-weight:600;letter-spacing:.8px;text-transform:uppercase;padding:3px 9px;border-radius:99px;border:1px solid}
+.lvl.b{color:var(--g);border-color:#1f5c3a}.lvl.i{color:var(--a);border-color:#244a85}.lvl.a{color:var(--y);border-color:#6b5420}.lvl.e{color:var(--r);border-color:#7a2c3a}
+h3{font-size:19px;margin:30px 0 6px;color:#fff}
+p{margin:10px 0}li{margin:5px 0}
+code,.f{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace}
+code{background:var(--panel2);padding:1px 6px;border-radius:5px;font-size:.9em}
+.f{display:block;white-space:pre-wrap;background:#0e1322;border:1px solid var(--line);border-left:3px solid var(--a);padding:12px 16px;border-radius:9px;margin:14px 0;overflow-x:auto;font-size:15px;color:#dbe4ff;line-height:1.8}
+.co{border-radius:12px;padding:13px 17px;margin:16px 0;border:1px solid var(--line);background:var(--panel)}
+.co>b:first-child{display:block;margin-bottom:2px;font-size:12px;letter-spacing:1px;text-transform:uppercase}
+.co.def{border-left:4px solid var(--a)}.co.def>b:first-child{color:var(--a)}
+.co.warn{border-left:4px solid var(--r)}.co.warn>b:first-child{color:var(--r)}
+.co.tip{border-left:4px solid var(--g)}.co.tip>b:first-child{color:var(--g)}
+.co.key{border-left:4px solid var(--y);background:#171608}.co.key>b:first-child{color:var(--y)}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:18px 20px;margin:22px 0;box-shadow:0 8px 30px rgba(0,0,0,.25)}
+.card>h4{margin:0 0 3px;font-size:13px;letter-spacing:1.2px;text-transform:uppercase;color:var(--t)}
+.card>p.sub{margin:0 0 12px;color:var(--mu);font-size:14.5px}
+.ctl{display:flex;flex-wrap:wrap;gap:10px 22px;align-items:center;margin:8px 0 10px}
+.ctl label{display:flex;gap:8px;align-items:center;font-size:14px;color:#c3c9dc}
+.ctl output{min-width:38px;font-family:ui-monospace,monospace;color:var(--y);font-size:13px}
+input[type=range]{accent-color:var(--a);width:150px}
+input[type=checkbox]{accent-color:var(--a)}
+select,input[type=number],input[type=text]{background:#0e1322;color:var(--fg);border:1px solid var(--line);border-radius:8px;padding:6px 9px;font:inherit;font-size:14px}
+button{background:linear-gradient(180deg,#2c4a80,#233b68);color:#fff;border:1px solid #3a5a98;border-radius:9px;padding:7px 14px;font:inherit;font-size:14px;cursor:pointer}
+button:hover{filter:brightness(1.15)}
+button.alt{background:var(--panel2);border-color:var(--line);color:var(--fg)}
+canvas{width:100%;height:270px;display:block;background:#0e1322;border:1px solid var(--line);border-radius:10px;margin-top:6px}
+canvas.sm{height:210px}canvas.tl{height:330px}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(125px,1fr));gap:9px;margin:12px 0}
+.stat{background:#0e1322;border:1px solid var(--line);border-radius:10px;padding:8px 11px}
+.stat b{display:block;font-size:17px;font-family:ui-monospace,monospace}
+.stat span{font-size:11.5px;color:var(--mu);text-transform:uppercase;letter-spacing:.7px}
+.stat.hot b{color:var(--r)}.stat.ok b{color:var(--g)}.stat.warn b{color:var(--y)}.stat.in b{color:var(--a)}
+.read{margin:8px 0 0;padding:10px 14px;background:#0e1322;border:1px dashed #33406a;border-radius:10px;font-size:14.5px;color:#d3dbf3}
+table{border-collapse:collapse;width:100%;margin:12px 0;font-size:14px}
+th,td{border:1px solid var(--line);padding:7px 10px;text-align:left;vertical-align:top}
+th{background:var(--panel2);font-size:12px;text-transform:uppercase;letter-spacing:.6px;color:var(--mu)}
+td.n{font-family:ui-monospace,monospace;text-align:right}
+.tw{overflow-x:auto}
+.pill{display:inline-block;padding:1px 9px;border-radius:99px;font-size:12px;font-weight:600}
+.pill.r{background:#3a1520;color:var(--r)}.pill.g{background:#10321f;color:var(--g)}.pill.y{background:#3a2f0e;color:var(--y)}.pill.m{background:#202637;color:var(--mu)}
+details{background:var(--panel);border:1px solid var(--line);border-radius:11px;padding:9px 15px;margin:9px 0}
+details summary{cursor:pointer;font-weight:600}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.q{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:14px 18px;margin:14px 0}
+.q .qh{font-size:12px;letter-spacing:1px;text-transform:uppercase;color:var(--mu)}
+.q .opt{display:block;width:100%;text-align:left;margin:6px 0;background:#0e1322;border:1px solid var(--line);color:var(--fg);border-radius:9px;padding:9px 12px}
+.q .opt.good{border-color:var(--g);background:#0e2418}.q .opt.bad{border-color:var(--r);background:#2a1119}
+.q .ex{display:none;margin-top:8px;font-size:14.5px;color:#c3c9dc}
+.q.done .ex{display:block}
+.chk label{display:flex;gap:10px;align-items:flex-start;padding:6px 0;cursor:pointer}
+.chk input{margin-top:6px;accent-color:var(--g);width:17px;height:17px}
+.sigrow{display:grid;grid-template-columns:minmax(170px,2fr) 1fr 1fr auto;gap:8px 14px;align-items:center;padding:6px 0;border-top:1px dashed #1b2236}
+.sigrow:first-of-type{border-top:0}
+.sigrow label{display:flex;gap:6px;align-items:center;font-size:13.5px;color:#c3c9dc}
+@media(max-width:900px){
+ .side{transform:translateX(-100%)}.side.open{transform:none}.meter{display:none}
+ #menu{display:block}main{margin-left:0;padding:0 16px 100px}.two{grid-template-columns:1fr}.hero{padding-top:60px}
+ .sigrow{grid-template-columns:1fr 1fr}
+}
+</style>
+</head>
+<body>
+<div id="prog"></div>
+<button id="menu">☰ Contents</button>
+<nav class="side" id="side"><a class="back" href="index.html">← All courses</a><h1>Uplift &amp; Heterogeneous Effects</h1><small>12 chapters · 11 labs · exam</small><div id="nav"></div></nav>
+<div class="meter"><div id="mtxt">Mastery: 0%</div><div class="bar"><i id="mbar"></i></div></div>
+
+<main>
+<header class="hero">
+ <h1>Uplift and heterogeneous treatment effects: who should be treated, how to estimate it, and how to know it worked.</h1>
+ <p>An average effect answers “does the campaign work?”. A bank usually needs a different question: <em>for whom</em> does it work, and where does it do harm? A retention call helps customers who would otherwise leave, wastes money on those who would stay anyway, and annoys some into leaving. Predicting who will respond is not the same as predicting who will respond <em>because of</em> the treatment. This page builds the conditional average treatment effect (CATE) and its estimators (subgroups, meta-learners, honest causal trees, doubly robust learners), the evaluation tools that replace accuracy (Qini and uplift curves, calibration of heterogeneity), the decision layer (targeting, budgets, off-policy evaluation) and the practice issues of pilots, selection noise and fairness constraints. As before, every lab simulates data with a known truth.</p>
+ <div class="chips"><span class="chip"><b>Part I</b> Concepts and estimators</span><span class="chip"><b>Part II</b> Evaluation and honesty</span><span class="chip"><b>Part III</b> Decisions and practice</span></div>
+ <div class="co tip"><b>How to use this</b>Sliders change the setting; heavy labs update when you release a slider or press the button. Prerequisites: the experiments and observational-methods pages, and the multiple-testing page for subgroup traps. Most labs assume randomised treatment (a pilot); chapter 7 shows what changes with observational data.</div>
+</header>
+
+<div class="part">Part I · Concepts and estimators</div>
+
+<section class="ch" id="c1">
+<h2><span class="num">1</span>Why the average hides the decision <span class="lvl b">Beginner</span></h2>
+<p>The <b>conditional average treatment effect</b> is τ(x) = E[Y(1) − Y(0) | X = x]; <b>uplift</b> is the same quantity for a binary outcome (the change in conversion probability caused by the treatment). Marketing practice sorts customers into four types by their behaviour with and without the treatment: <b>persuadables</b> (respond only if treated: positive uplift), <b>sure things</b> (convert anyway: zero uplift, treatment is waste), <b>lost causes</b> (never convert: zero uplift) and <b>sleeping dogs</b> (react badly to contact: negative uplift). An average effect near zero can hide a large positive effect in one segment and a negative effect in another; a campaign is worth running only on customers whose uplift exceeds the cost of treating them.</p>
+<p>The central confusion is between <b>response</b> and <b>uplift</b>. A model that predicts who will convert ranks sure things first and will happily target them; a model that predicts the <em>effect</em> ranks persuadables first. The value of a policy is Σ over treated customers of (value × uplift − cost), which depends only on τ(x), not on the baseline.</p>
+<div class="card"><h4>Lab 1 · The four types and what each policy earns</h4>
+ <p class="sub">Persuadables: conversion 5% → 25%. Sure things: 50% → 50%. Lost causes: 5% → 5%. Sleeping dogs: 35% → 15%. A conversion is worth 100; contacting costs c. The remaining customers are split evenly between sure things and lost causes. Bars: net value per 1000 customers of contacting nobody, everybody, the 30% with the highest baseline response (a response model) and only those with positive net uplift (an uplift model).</p>
+ <div class="ctl"><label>persuadables % <input type="range" id="c1p" min="5" max="40" step="1" value="20"><output id="c1pv"></output></label><label>sleeping dogs % <input type="range" id="c1d" min="0" max="30" step="1" value="10"><output id="c1dv"></output></label><label>cost per contact c <input type="range" id="c1k" min="0" max="20" step="1" value="5"><output id="c1kv"></output></label></div>
+ <div class="two"><canvas class="sm" id="c1cv"></canvas><canvas class="sm" id="c1cv2"></canvas></div><div class="stats" id="c1st"></div><div class="read" id="c1rd"></div></div>
+</section>
+
+<section class="ch" id="c2">
+<h2><span class="num">2</span>Estimating the CATE from an experiment: subgroups and interactions <span class="lvl i">Intermediate</span></h2>
+<p>With randomised treatment, the effect in any subgroup defined by pre-treatment X is estimated by the difference in means within it, and a linear model Y = α + βT + γ'X + δ'(T·X) + ε gives a smooth CATE τ̂(x) = β + δ'x. The trade-off is the usual one: fine subgroups have little bias but each has a small sample (standard error ≈ σ√(4/n_g)), so the estimated effects are noisy, and the most extreme estimated subgroups are the most overestimated (the winner’s curse of the multiple-testing page). A constant ATE estimate has no variance from heterogeneity but is biased for every individual; a parametric interaction model borrows strength across x. When true heterogeneity is modest, shrinkage towards a common effect beats unrestricted subgroup estimates in mean-squared error.</p>
+<div class="card"><h4>Lab 2 · Decile effects, a linear interaction and the constant effect</h4>
+ <p class="sub">x is uniform on (0, 1); the true effect is τ(x) = 0.1 + h·x with unit-variance outcome noise and 50/50 randomisation. Left: estimated effect and 95% interval in each decile of x in one sample, with the true line. Right: root-mean-squared error of the effect at the decile centres over 200 samples for the three estimators.</p>
+ <div class="ctl"><label>customers n <input type="range" id="c2n" min="400" max="20000" step="400" value="2000"><output id="c2nv"></output></label><label>heterogeneity h <input type="range" id="c2h" min="0" max="50" step="1" value="20"><output id="c2hv"></output></label><button id="c2go">Re-simulate</button></div>
+ <div class="two"><canvas class="sm" id="c2cv"></canvas><canvas class="sm" id="c2cv2"></canvas></div><div class="stats" id="c2st"></div><div class="read" id="c2rd"></div></div>
+</section>
+
+<section class="ch" id="c3">
+<h2><span class="num">3</span>Meta-learners: S, T and X <span class="lvl i">Intermediate</span></h2>
+<p>A <b>meta-learner</b> turns any regression method into a CATE estimator. The <b>S-learner</b> fits one model μ(x, T) with treatment as a feature and takes τ̂(x) = μ(x, 1) − μ(x, 0); flexible learners may shrink or ignore T, so heterogeneity is under-detected (in the lab, an additive treatment term cannot represent any). The <b>T-learner</b> fits μ₁(x) on treated and μ₀(x) on controls and subtracts them; it captures any heterogeneity but doubles the variance and is poor when one arm is small. The <b>X-learner</b> (Künzel et al.) imputes individual effects, D¹ = Y − μ̂₀(x) for treated and D⁰ = μ̂₁(x) − Y for controls, regresses each on x, and combines them weighted by the propensity: it borrows information from the large arm and is the usual choice with unbalanced treatment. Other options: the <b>R-learner</b> and <b>DR-learner</b> (chapter 7) and causal forests.</p>
+<div class="card"><h4>Lab 3 · Three learners, one unbalanced experiment</h4>
+ <p class="sub">x ∈ (−1, 1), true effect τ(x) = 0.5 + h·sin(3x), nonlinear baseline. Base learner: a degree-5 polynomial. Left: the true effect and the three estimates in one sample. Right: root-mean-squared error of the estimated effect over 100 samples.</p>
+ <div class="ctl"><label>customers n <input type="range" id="c3n" min="500" max="5000" step="500" value="1500"><output id="c3nv"></output></label><label>treated share <input type="range" id="c3p" min="5" max="50" step="5" value="15"><output id="c3pv"></output></label><label>noise sd <input type="range" id="c3s" min="5" max="20" step="1" value="10"><output id="c3sv"></output></label><label>heterogeneity h <input type="range" id="c3h" min="0" max="15" step="1" value="10"><output id="c3hv"></output></label><button id="c3go">Re-simulate</button></div>
+ <div class="two"><canvas class="sm" id="c3cv"></canvas><canvas class="sm" id="c3cv2"></canvas></div><div class="stats" id="c3st"></div><div class="read" id="c3rd"></div></div>
+</section>
+
+<section class="ch" id="c4">
+<h2><span class="num">4</span>Uplift trees, causal forests and honesty <span class="lvl a">Advanced</span></h2>
+<p>A <b>causal (uplift) tree</b> splits the covariate space to maximise the <em>difference in treatment effect</em> between the children, not the difference in outcome. Trained and evaluated on the same data it overfits in a specific way: the split is chosen where the estimated effects happen to differ most, so the effect estimates in the leaves are biased away from the truth (a selection effect). <b>Honest estimation</b> (Athey and Imbens) splits the sample: one part chooses the partition, the other estimates the effect inside the leaves, which makes the leaf estimates unbiased with valid intervals. <b>Causal forests</b> average many honest trees grown on subsamples; they adapt to the data while giving pointwise confidence intervals and variable importance. In all cases the number of candidate splits (features × thresholds) is a multiple-comparisons problem: more noise features means more spurious heterogeneity.</p>
+<div class="card"><h4>Lab 4 · Spurious heterogeneity, adaptive against honest</h4>
+ <p class="sub">A randomised experiment; only feature x₁ can matter (true difference between the two sides of x₁ = 0 is h) and p − 1 features are noise. A one-split tree is grown on half of the data, the best of all features × 9 thresholds. Over 120 samples: the apparent effect difference between the leaves, estimated on the same half (adaptive) and on the other half (honest), in the direction chosen by the split.</p>
+ <div class="ctl"><label>customers n <input type="range" id="c4n" min="200" max="4000" step="200" value="800"><output id="c4nv"></output></label><label>true difference h <input type="range" id="c4h" min="0" max="20" step="1" value="0"><output id="c4hv"></output></label><label>features p <input type="range" id="c4p" min="1" max="20" step="1" value="10"><output id="c4pv"></output></label><button id="c4go">Re-simulate</button></div>
+ <div class="two"><canvas class="sm" id="c4cv"></canvas><canvas class="sm" id="c4cv2"></canvas></div><div class="stats" id="c4st"></div><div class="read" id="c4rd"></div></div>
+</section>
+
+<div class="part">Part II · Evaluation and honesty</div>
+
+<section class="ch" id="c5">
+<h2><span class="num">5</span>Evaluating uplift models: Qini and uplift curves <span class="lvl a">Advanced</span></h2>
+<p>There is no ground truth for an individual’s uplift, so accuracy metrics (AUC, RMSE) do not apply. Evaluation uses a randomised <em>test</em> set and the idea of cumulative gain. Rank customers by predicted uplift, and for each top fraction φ compute the incremental outcome: the treated group’s outcome minus the control group’s outcome rescaled to the treated group’s size. The <b>Qini curve</b> plots this cumulative gain against φ; a random ranking gives a straight line from 0 to the overall effect, a good model bends above it, and the <b>Qini coefficient</b> or <b>AUUC</b> is the area between the curve and the random line. The <b>uplift curve</b> is the same idea in rates. A model ranked by baseline response scores near the random line (or below it) however accurate it is as a response model; this is the test that exposes it.</p>
+<div class="card"><h4>Lab 5 · A better ranking bends the curve</h4>
+ <p class="sub">A randomised test set. True uplift varies across customers (mean 2 points, sd 5 points); baseline conversion is unrelated to it. Left: Qini curves (incremental conversions per 1000 customers against the share of customers contacted) for the oracle ranking, an uplift model of quality ρ (correlation with true uplift), a response model and random targeting. Right: the Qini coefficients.</p>
+ <div class="ctl"><label>model quality ρ <input type="range" id="c5r" min="0" max="95" step="5" value="60"><output id="c5rv"></output></label><label>customers n <input type="range" id="c5n" min="2000" max="50000" step="2000" value="10000"><output id="c5nv"></output></label><button id="c5go">Re-simulate</button></div>
+ <div class="two"><canvas class="sm" id="c5cv"></canvas><canvas class="sm" id="c5cv2"></canvas></div><div class="stats" id="c5st"></div><div class="read" id="c5rd"></div></div>
+</section>
+
+<section class="ch" id="c6">
+<h2><span class="num">6</span>Choosing who to treat: budgets, break-even and the winner’s curse <span class="lvl a">Advanced</span></h2>
+<p>Given predicted uplift û(x), the profit-maximising rule treats a customer if V·û(x) &gt; c (V the value of a conversion, c the cost of contact); with a budget, treat the top k. The profit curve rises while the marginal customer’s uplift exceeds c/V, peaks, and then falls as low- and negative-uplift customers are added. Two cautions. First, û is noisy: ranking by a noisy estimate and then looking at the selected customers’ <em>predicted</em> uplift overstates their true uplift (selection on noise, the same winner’s curse as for subgroups), so the predicted profit curve is too optimistic and the optimal cut-off is too generous. Second, reporting predicted uplift for the selected group needs shrinkage, a held-out randomised check or an honest estimate, not the model’s own output.</p>
+<div class="card"><h4>Lab 6 · Predicted profit against realised profit</h4>
+ <p class="sub">20 000 customers with true uplift ~ N(2%, 5%); a conversion is worth 100. The model’s estimate is the truth plus noise (sd s). Left: profit against the share contacted (best-ranked first) as the model predicts it and as it is realised, with the profit of contacting everyone as a dashed line. Right: predicted and realised average uplift in the top 10%, top 30% and all customers.</p>
+ <div class="ctl"><label>cost per contact c <input type="range" id="c6k" min="0" max="40" step="1" value="15"><output id="c6kv"></output></label><label>estimation noise s <input type="range" id="c6s" min="0" max="8" step="1" value="3"><output id="c6sv"></output></label><button id="c6go">Re-simulate</button></div>
+ <div class="two"><canvas class="sm" id="c6cv"></canvas><canvas class="sm" id="c6cv2"></canvas></div><div class="stats" id="c6st"></div><div class="read" id="c6rd"></div></div>
+</section>
+
+<section class="ch" id="c7">
+<h2><span class="num">7</span>Observational data: doubly robust learners and orthogonality <span class="lvl e">Expert</span></h2>
+<p>When treatment was not randomised (past campaigns targeted by rules), CATE estimation needs the ignorability and overlap assumptions of the previous page, and the meta-learners inherit all their problems: a T-learner with misspecified outcome models carries confounding bias into τ̂(x). The <b>DR-learner</b> builds a pseudo-outcome that is unbiased for the effect if <em>either</em> the outcome models or the propensity model is right,</p>
+<div class="f">ψᵢ = μ̂₁(Xᵢ) − μ̂₀(Xᵢ) + Tᵢ(Yᵢ − μ̂₁(Xᵢ))/ê(Xᵢ) − (1 − Tᵢ)(Yᵢ − μ̂₀(Xᵢ))/(1 − ê(Xᵢ)),       τ̂(x) = regression of ψ on X</div>
+<p>and then regresses ψ on X with any learner. The <b>R-learner</b> (Nie and Wager) instead minimises a loss built from residuals of Y and T on X, and <b>double/debiased machine learning</b> uses cross-fitting so that flexible nuisance models do not contaminate τ̂. The common idea is <b>Neyman orthogonality</b>: the estimating equation is insensitive to small errors in the nuisance functions, so slow-converging ML models for μ and e still allow a fast, well-behaved τ̂. None of this repairs an unmeasured confounder.</p>
+<div class="card"><h4>Lab 7 · T-learner against DR-learner under confounding</h4>
+ <p class="sub">Confounded treatment, nonlinear outcome and nonlinear assignment; the true effect is τ(x₁) = 1 + 0.8·x₁. “Wrong” models are linear. Left: the true effect and the average of each learner’s estimate over 100 samples (n = 4000). Right: RMSE, bias and standard deviation over x₁ ∈ (−2, 2).</p>
+ <div class="ctl"><label>confounding a <input type="range" id="c7a" min="5" max="30" step="1" value="10"><output id="c7av"></output></label><label>outcome models <select id="c7o"><option value="0">correct</option><option value="1" selected>wrong (linear)</option></select></label><label>propensity model <select id="c7p"><option value="0">correct</option><option value="1">wrong (linear)</option></select></label><button id="c7go">Re-simulate</button></div>
+ <div class="two"><canvas class="sm" id="c7cv"></canvas><canvas class="sm" id="c7cv2"></canvas></div><div class="stats" id="c7st"></div><div class="read" id="c7rd"></div></div>
+</section>
+
+<section class="ch" id="c8">
+<h2><span class="num">8</span>Is there heterogeneity at all? Calibration tests and subgroup hunts <span class="lvl e">Expert</span></h2>
+<p>Before acting on a CATE model, test whether it carries real signal. The <b>best linear predictor</b> (BLP) test of Chernozhukov, Demirer, Duflo and Fernández-Val uses a held-out sample: with τ̂ trained on one half, regress the held-out outcome on T, the centred prediction d = τ̂(X) − mean(τ̂) and their product T·d. The coefficient on T·d is 1 if the predictions are well calibrated and 0 if they contain no heterogeneity signal; a t-test on it is a single pre-planned test of heterogeneity. The alternative, searching subgroups until one has a significant interaction, inflates the false positive rate: with eight candidate splits and no true heterogeneity, about one experiment in three “finds” a subgroup. Pre-specify subgroups, use one omnibus test, adjust for multiplicity, and confirm on new data.</p>
+<div class="card"><h4>Lab 8 · One calibrated test against a subgroup hunt</h4>
+ <p class="sub">Eight candidate features x₁…x₈; the true effect depends on x₁ only: τ = 0.3 + h·x₁. Left: the BLP coefficient on T·d over 300 held-out samples at your h (ideal: near 1; none: 0). Right: rejection rates (5% level) of the BLP test and of “any of the 8 subgroup interaction tests significant”, with no true heterogeneity (size) and at your h (power).</p>
+ <div class="ctl"><label>customers n <input type="range" id="c8n" min="400" max="6000" step="400" value="2000"><output id="c8nv"></output></label><label>true heterogeneity h <input type="range" id="c8h" min="0" max="10" step="1" value="5"><output id="c8hv"></output></label><button id="c8go">Re-simulate</button></div>
+ <div class="two"><canvas class="sm" id="c8cv"></canvas><canvas class="sm" id="c8cv2"></canvas></div><div class="stats" id="c8st"></div><div class="read" id="c8rd"></div></div>
+</section>
+
+<div class="part">Part III · Decisions and practice</div>
+
+<section class="ch" id="c9">
+<h2><span class="num">9</span>Evaluating a targeting policy: off-policy evaluation <span class="lvl e">Expert</span></h2>
+<p>A policy π(x) says whom to treat. Its value V(π) = E[Y(π(X))] can be estimated from <em>logged</em> data collected under another (randomised or known) assignment rule, without deploying π. Three estimators: the <b>direct method</b> plugs in outcome models, V̂ = mean[μ̂(X, π(X))], and is biased when they are wrong; <b>inverse-propensity weighting</b> keeps only the customers whose logged treatment agrees with the policy, V̂ = mean[Y·1{T = π(X)} / P(T | X)], and is unbiased but noisy, especially when the logging probability of an action the policy wants is small; the <b>doubly robust</b> estimator adds the IPW correction to the model prediction and is consistent if either is right, with lower variance. Logging with some randomisation over all actions (“exploration”) is what makes this possible.</p>
+<div class="card"><h4>Lab 9 · How well can we value a policy before deploying it?</h4>
+ <p class="sub">Logged data from a random experiment treating a share ℓ at random; the effect τ(x₁) = 0.3 + 0.4·x₁ and a nonlinear baseline. The policy treats the customers with x₁ above a threshold (the chosen share). The direct method uses linear outcome models (wrong). Left: the three estimates of the policy’s value over 200 logs against the truth. Right: bias and standard deviation.</p>
+ <div class="ctl"><label>logging treated share ℓ <input type="range" id="c9l" min="5" max="50" step="5" value="15"><output id="c9lv"></output></label><label>policy treats share <input type="range" id="c9s" min="10" max="90" step="10" value="40"><output id="c9sv"></output></label><label>customers n <input type="range" id="c9n" min="1000" max="10000" step="1000" value="3000"><output id="c9nv"></output></label><button id="c9go">Re-simulate</button></div>
+ <div class="two"><canvas class="sm" id="c9cv"></canvas><canvas class="sm" id="c9cv2"></canvas></div><div class="stats" id="c9st"></div><div class="read" id="c9rd"></div></div>
+</section>
+
+<section class="ch" id="c10">
+<h2><span class="num">10</span>From pilot to deployment: the value of experimenting <span class="lvl e">Expert</span></h2>
+<p>An uplift model needs randomised data, and a pilot has a cost (customers treated or untreated for the wrong reasons) and a size. The question is how large a pilot pays for itself. Too small and the learned policy is noise; too large and the learning cost exceeds the gain. The deployed policy’s profit grows with pilot size towards the oracle and flattens: the useful size depends on the heterogeneity (large, easy-to-find differences need little data), the noise in the outcome, and the margin between benefit and contact cost. Practical designs: a permanent <b>holdout</b> group that is never contacted (so effects can be re-estimated and drift detected), <b>exploration</b> bands (random treatment for a share of customers), and phased roll-outs with sequential or adaptive allocation (chapter 11 of the experiments page).</p>
+<div class="card"><h4>Lab 10 · What the pilot buys</h4>
+ <p class="sub">Revenue per customer Y = base(x) + T·τ(x) + noise (sd 3) with τ(x) = 0.5 + h·x₁ and contact cost c. A randomised pilot of the chosen size trains a T-learner (linear in x₁, x₂); the policy treats customers whose estimated effect exceeds c, and is deployed on 20 000 new customers (60 repetitions). Left: average profit per customer of each strategy at your pilot size. Right: the uplift policy’s profit against the pilot size.</p>
+ <div class="ctl"><label>pilot size <input type="range" id="c10p" min="0" max="6" step="1" value="3"><output id="c10pv"></output></label><label>heterogeneity h <input type="range" id="c10h" min="0" max="10" step="1" value="6"><output id="c10hv"></output></label><label>contact cost c <input type="range" id="c10k" min="0" max="10" step="1" value="5"><output id="c10kv"></output></label><button id="c10go">Re-simulate</button></div>
+ <div class="two"><canvas class="sm" id="c10cv"></canvas><canvas class="sm" id="c10cv2"></canvas></div><div class="stats" id="c10st"></div><div class="read" id="c10rd"></div></div>
+</section>
+
+<section class="ch" id="c11">
+<h2><span class="num">11</span>Constraints, fairness and governance of targeting <span class="lvl e">Expert</span></h2>
+<p>Targeting by uplift allocates offers, reminders or retention effort unevenly, and the uneven allocation can correlate with protected or sensitive characteristics even when they are not used (through proxies). Regulators and customers care about differential treatment, and for credit-related actions, fair-lending and non-discrimination duties apply. A <b>parity constraint</b> (equal treatment rates across groups) is one option; it costs value, and the cost is the <b>price of fairness</b>, which should be measured and reported rather than argued. Other tools: equal-opportunity or calibration-within-group requirements, constraining by need rather than by predicted uplift, and monitoring outcomes by group after deployment. Governance for an uplift model: documented causal assumptions and the experiment behind the effect estimates, a holdout kept for monitoring, drift checks on the effect (not only on the score), human override rules, and model-risk validation of the CATE estimator including its calibration (chapter 8).</p>
+<div class="card"><h4>Lab 11 · The price of equal treatment rates</h4>
+ <p class="sub">20 000 customers; group A (60%) has mean uplift 5 points, group B (40%) 5 points minus the gap, both with sd 4 points; a conversion is worth 100. Left: total net value against the share of customers contacted when ranking by uplift alone and when each group is contacted at the same rate; the dot marks your budget. Right: the treatment rate of each group at your budget under the two policies.</p>
+ <div class="ctl"><label>budget (share contacted) <input type="range" id="c11k" min="5" max="100" step="5" value="30"><output id="c11kv"></output></label><label>uplift gap of group B <input type="range" id="c11g" min="0" max="40" step="1" value="20"><output id="c11gv"></output></label><label>cost per contact c <input type="range" id="c11k2" min="0" max="40" step="1" value="15"><output id="c11k2v"></output></label></div>
+ <div class="two"><canvas class="sm" id="c11cv"></canvas><canvas class="sm" id="c11cv2"></canvas></div><div class="stats" id="c11st"></div><div class="read" id="c11rd"></div></div>
+</section>
+
+<section class="ch" id="c12">
+<h2><span class="num">12</span>Final exam, mastery checklist, cheat sheet <span class="lvl e">Expert</span></h2>
+<h3>Exam (18 questions — click an answer)</h3>
+<div id="quiz"></div>
+<div class="card"><h4>Score</h4><div class="stats" id="qscore"></div><button class="alt" id="qreset">Reset exam</button></div>
+<h3>Mastery checklist — tick when you can do it without notes</h3>
+<div class="card chk" id="chk"></div>
+<h3>Cheat sheet</h3>
+<div class="tw"><table>
+<tr><th>Idea</th><th>One line</th></tr>
+<tr><td>CATE and uplift</td><td>τ(x) = E[Y(1) − Y(0) | X = x]; uplift is the change in conversion probability caused by treatment</td></tr>
+<tr><td>Four types</td><td>Persuadables (+), sure things (0, waste), lost causes (0), sleeping dogs (−); response models rank sure things first</td></tr>
+<tr><td>Policy rule</td><td>Treat if V·τ̂(x) &gt; c; profit curve peaks where the marginal uplift equals c/V</td></tr>
+<tr><td>Subgroups</td><td>Difference in means within pre-specified subgroups; fine subgroups are noisy; shrink towards a common effect</td></tr>
+<tr><td>Meta-learners</td><td>S: one model with T as a feature (under-detects). T: separate models (noisy, doubles variance). X: imputed effects weighted by propensity (good with unbalanced arms)</td></tr>
+<tr><td>Causal trees and forests</td><td>Split on effect differences; adaptive leaf estimates are biased; honest splitting separates structure from estimation; forests give intervals</td></tr>
+<tr><td>Qini / AUUC</td><td>Cumulative incremental gain by targeted share on a randomised test set; area against the random line; a response model scores near random</td></tr>
+<tr><td>Winner’s curse in targeting</td><td>Top-ranked customers’ predicted uplift overstates the truth; validate with held-out randomised data or shrink</td></tr>
+<tr><td>DR-learner / R-learner</td><td>Orthogonal pseudo-outcome ψ regressed on X; needs ignorability and overlap; cross-fit ML nuisances</td></tr>
+<tr><td>Heterogeneity test</td><td>BLP on held-out data: coefficient on T·(τ̂ − mean) is 1 if calibrated, 0 if no signal; avoid hunting subgroups</td></tr>
+<tr><td>Off-policy evaluation</td><td>Direct (model), IPW (unbiased, noisy), doubly robust; needs randomised or known logging with exploration</td></tr>
+<tr><td>Pilot and holdout</td><td>Pilot size pays off with heterogeneity and margin; keep a permanent holdout and an exploration band</td></tr>
+<tr><td>Fairness constraints</td><td>Parity of treatment rates costs value; measure the price of fairness; monitor by group; document the causal basis</td></tr>
+</table></div>
+<div class="co tip"><b>Stage 5 complete</b>Items 21–25 now cover multiple testing, confounding, experiments, observational causal methods and heterogeneous effects. Item 26 begins Stage 6: Bayesian inference, with conjugate updating, priors, credible intervals, posterior predictive checks and shrinkage.</div>
+</section>
+</main>
+<script>
+/*MATH*/
+function lgamma(x){const c=[76.18009172947146,-86.50532032941677,24.01409824083091,-1.231739572450155,0.1208650973866179e-2,-0.5395239384953e-5];let y=x,t=x+5.5;t-=(x+.5)*Math.log(t);let s=1.000000000190015;for(let j=0;j<6;j++)s+=c[j]/++y;return -t+Math.log(2.5066282746310005*s/x);}
+function gser(a,x){let ap=a,sum=1/a,del=sum;for(let n=0;n<1000;n++){ap++;del*=x/ap;sum+=del;if(Math.abs(del)<Math.abs(sum)*1e-15)break;}return sum*Math.exp(-x+a*Math.log(x)-lgamma(a));}
+function gcf(a,x){let b=x+1-a,c=1/1e-300,d=1/b,h=d;for(let i=1;i<1000;i++){const an=-i*(i-a);b+=2;d=an*d+b;if(Math.abs(d)<1e-300)d=1e-300;c=b+an/c;if(Math.abs(c)<1e-300)c=1e-300;d=1/d;const del=d*c;h*=del;if(Math.abs(del-1)<1e-15)break;}return Math.exp(-x+a*Math.log(x)-lgamma(a))*h;}
+function gammaQ(a,x){if(x<=0)return 1;return x<a+1?1-gser(a,x):gcf(a,x);}
+function betacf(a,b,x){const qab=a+b,qap=a+1,qam=a-1;let c=1,d=1-qab*x/qap;if(Math.abs(d)<1e-300)d=1e-300;d=1/d;let h=d;for(let m=1;m<=1000;m++){const m2=2*m;let aa=m*(b-m)*x/((qam+m2)*(a+m2));d=1+aa*d;if(Math.abs(d)<1e-300)d=1e-300;c=1+aa/c;if(Math.abs(c)<1e-300)c=1e-300;d=1/d;h*=d*c;aa=-(a+m)*(qab+m)*x/((a+m2)*(qap+m2));d=1+aa*d;if(Math.abs(d)<1e-300)d=1e-300;c=1+aa/c;if(Math.abs(c)<1e-300)c=1e-300;d=1/d;const del=d*c;h*=del;if(Math.abs(del-1)<1e-15)break;}return h;}
+function betai(a,b,x){if(x<=0)return 0;if(x>=1)return 1;const bt=Math.exp(lgamma(a+b)-lgamma(a)-lgamma(b)+a*Math.log(x)+b*Math.log(1-x));return x<(a+1)/(a+b+2)?bt*betacf(a,b,x)/a:1-bt*betacf(b,a,1-x)/b;}
+function normSf(z){const q=0.5*gammaQ(.5,z*z/2);return z>=0?q:1-q;}
+function normCdf(z){return normSf(-z);}
+function npdf(x){return Math.exp(-x*x/2)/2.5066282746310002;}
+function lbin(n,k){return lgamma(n+1)-lgamma(k+1)-lgamma(n-k+1);}
+function binom(n,k,p){return Math.exp(lbin(n,k)+k*Math.log(p)+(n-k)*Math.log(1-p));}
+function betapdf(x,a,b){return x<=0||x>=1?0:Math.exp(lgamma(a+b)-lgamma(a)-lgamma(b)+(a-1)*Math.log(x)+(b-1)*Math.log(1-x));}
+function betacdf(x,a,b){return betai(a,b,x);}
+function gampdf(x,a,r){return x<=0?0:Math.exp(a*Math.log(r)+(a-1)*Math.log(x)-r*x-lgamma(a));}
+function gamcdf(x,a,r){return x<=0?0:1-gammaQ(a,r*x);}
+function randn(){let u=0;while(!u)u=Math.random();return Math.sqrt(-2*Math.log(u))*Math.cos(2*Math.PI*Math.random());}
+function gammaS(a){if(a<1)return gammaS(a+1)*Math.pow(Math.random(),1/a);const d=a-1/3,c=1/Math.sqrt(9*d);for(;;){let x,v;do{x=randn();v=1+c*x}while(v<=0);v=v*v*v;const u=Math.random();if(Math.log(u)<.5*x*x+d-d*v+d*Math.log(v))return d*v;}}
+function betaS(a,b){const x=gammaS(a),y=gammaS(b);return x/(x+y);}
+function binS(n,p){let k=0;for(let i=0;i<n;i++)if(Math.random()<p)k++;return k;}
+function mean(a){let s=0;for(const v of a)s+=v;return s/a.length;}
+function qc(cdf,lo,hi,p,it){for(let i=0;i<(it||100);i++){const m=(lo+hi)/2;if(cdf(m)<p)lo=m;else hi=m}return(lo+hi)/2;}
+function qb(a,b,p){return qc(x=>betai(a,b,x),0,1,p,50);}
+function tcdf(x,v){const t=.5*betai(v/2,.5,v/(v+x*x));return x>0?1-t:t}
+function qn(p){return qc(normCdf,-9,9,p,70)}
+function pois(k,l){return Math.exp(-l+k*Math.log(l)-lgamma(k+1))}
+function binF(n,p){let k=0;for(;;){if(n<=0||p<=0)return k;if(p>=1)return k+n;if(n<=40){for(let i=0;i<n;i++)if(Math.random()<p)k++;return k}const a=1+(n>>1),bb=1+n-a,x=betaS(a,bb);if(x>=p){n=a-1;p=p/x}else{k+=a;n=bb-1;p=(p-x)/(1-x)}}}
+/*ENDMATH*/
+
+const $=id=>document.getElementById(id), val=id=>+$(id).value;
+const C={fg:'#e8ebf5',mu:'#8a93ab',gr:'#232a3d',a:'#6ea8ff',r:'#ff6b81',y:'#ffd166',g:'#4ade80',p:'#c084fc',t:'#5eead4'};
+const store={get(k,d){try{const v=JSON.parse(localStorage.getItem(k));return v==null?d:v}catch(e){return d}},set(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}};
+function stat(l,v,c){return `<div class="stat ${c||''}"><b>${v}</b><span>${l}</span></div>`}
+function f3(x){if(!isFinite(x))return String(x);const a=Math.abs(x);if(a!==0&&(a<1e-3||a>=1e6))return x.toExponential(2);return String(+x.toFixed(a<1?4:a<100?3:a<1000?2:0))}
+function pc(x){return f3(100*x)+'%'}
+const resizers=[];
+function reg(fn){fn();resizers.push(fn)}
+function on(ids,fn){ids.split(' ').forEach(i=>{const e=$(i);e.addEventListener('input',fn);e.addEventListener('change',fn)})}
+let rt;window.addEventListener('resize',()=>{clearTimeout(rt);rt=setTimeout(()=>resizers.forEach(f=>f()),150)});
+document.querySelectorAll('input[type=range]').forEach(i=>{const o=$(i.id+'v');if(!o)return;const f=()=>{o.textContent=i.value};i.addEventListener('input',f);f()});
+
+function nice(x){const e=Math.pow(10,Math.floor(Math.log10(x))),f=x/e;return (f<1.5?1:f<3?2:f<7?5:10)*e}
+function mk(cv,x0,x1,ymax,o){o=o||{};const y0=o.y0||0,dpr=window.devicePixelRatio||1,r=cv.getBoundingClientRect(),w=r.width||600,h=r.height||270;
+ cv.width=w*dpr;cv.height=h*dpr;const g=cv.getContext('2d');g.setTransform(dpr,0,0,dpr,0,0);g.clearRect(0,0,w,h);
+ const L=o.L||42,R=12,T=14,B=28,X=x=>L+(x-x0)/(x1-x0)*(w-L-R),Y=y=>h-B-(y-y0)/(ymax-y0)*(h-T-B);
+ g.font='11px system-ui';g.lineWidth=1;g.strokeStyle=C.gr;g.fillStyle=C.mu;
+ if(!o.noGrid){const sx=nice((x1-x0)/7);for(let x=Math.ceil(x0/sx-1e-9)*sx;!o.noX&&x<=x1+1e-9;x+=sx){g.beginPath();g.moveTo(X(x),T);g.lineTo(X(x),h-B);g.stroke();g.textAlign='center';g.fillText(String(+x.toFixed(6)),X(x),h-B+15)}
+ const sy=nice((ymax-y0)/4);for(let y=Math.ceil(y0/sy-1e-9)*sy;y<=ymax+1e-9;y+=sy){g.beginPath();g.moveTo(L,Y(y));g.lineTo(w-R,Y(y));g.stroke();g.textAlign='right';g.fillText(String(+y.toFixed(4)),L-5,Y(y)+3)}}
+ return{g,w,h,X,Y,L,R,T,B,
+  line(f,col,lw,a,b,n,dash){a=a==null?x0:a;b=b==null?x1:b;n=n||260;g.save();if(dash)g.setLineDash([5,4]);g.beginPath();g.strokeStyle=col;g.lineWidth=lw||2;let st=false;for(let i=0;i<=n;i++){const x=a+(b-a)*i/n,y=f(x);if(!isFinite(y)){st=false;continue}st?g.lineTo(X(x),Y(y)):g.moveTo(X(x),Y(y));st=true}g.stroke();g.restore()},
+  area(f,a,b,col,n){a=Math.max(a,x0);b=Math.min(b,x1);if(b<=a)return;n=n||200;g.beginPath();g.moveTo(X(a),Y(0));for(let i=0;i<=n;i++){const x=a+(b-a)*i/n;g.lineTo(X(x),Y(f(x)))}g.lineTo(X(b),Y(0));g.closePath();g.fillStyle=col;g.fill()},
+  vline(x,col,lab,dash){g.save();g.strokeStyle=col;g.lineWidth=1.6;if(dash)g.setLineDash([5,4]);g.beginPath();g.moveTo(X(x),T);g.lineTo(X(x),h-B);g.stroke();g.restore();if(lab){g.fillStyle=col;g.textAlign='center';g.fillText(lab,Math.min(Math.max(X(x),34),w-34),T+10)}},
+  hline(y,col,lab){g.save();g.strokeStyle=col;g.lineWidth=1.4;g.setLineDash([5,4]);g.beginPath();g.moveTo(L,Y(y));g.lineTo(w-R,Y(y));g.stroke();g.restore();if(lab){g.fillStyle=col;g.textAlign='right';g.fillText(lab,w-R-3,Y(y)-4)}},
+  text(s,x,y,col,al){g.fillStyle=col||C.fg;g.textAlign=al||'left';g.fillText(s,x,y)}};}
+
+/* ---------- shared helpers for this page ---------- */
+const D={
+ norm:{n:'Normal(0,1)',s:()=>randn(),mu:0,sd:1,sk:0},
+ unif:{n:'Uniform(0,1)',s:()=>Math.random(),mu:.5,sd:Math.sqrt(1/12),sk:0},
+ expo:{n:'Exponential(1)',s:()=>-Math.log(1-Math.random()),mu:1,sd:1,sk:2},
+ logn:{n:'Lognormal(0,1)',s:()=>Math.exp(randn()),mu:Math.exp(.5),sd:Math.sqrt((Math.E-1)*Math.E),sk:(Math.E+2)*Math.sqrt(Math.E-1),disc:0},
+ b05:{n:'Bernoulli(0.5)',s:()=>Math.random()<.5?1:0,mu:.5,sd:.5,sk:0,disc:1},
+ b05s:{n:'Bernoulli(0.05)',s:()=>Math.random()<.05?1:0,mu:.05,sd:Math.sqrt(.0475),sk:.9/Math.sqrt(.0475),disc:1},
+ bimo:{n:'Two humps',s:()=>(Math.random()<.5?-2:2)+.5*randn(),mu:0,sd:Math.sqrt(4.25),sk:0},
+ par5:{n:'Pareto(α=5)',s:()=>Math.pow(1-Math.random(),-.2),mu:1.25,sd:Math.sqrt(5/48),sk:6*Math.sqrt(.6)},
+ cauchy:{n:'Cauchy (no mean)',s:()=>Math.tan(Math.PI*(Math.random()-.5)),mu:NaN,sd:Infinity,sk:NaN}
+};
+function fillSel(id,keys,def){const e=$(id);e.innerHTML=keys.map(k=>`<option value="${k}">${D[k].n}</option>`).join('');e.value=def}
+const PAL=[C.a,C.r,C.y,C.g,C.p,C.t,'#ff9f43','#9aa4bf'];
+function tgrid(N,M){const T=[];let prev=0;for(let i=0;i<M;i++){let n=Math.round(Math.pow(10,Math.log10(N)*i/(M-1)));if(i===M-1)n=N;n=Math.max(prev+1,n);if(n>N)break;T.push(n);prev=n}if(T[T.length-1]!==N)T[T.length-1]=N;return T}
+function nlab(n){return n>=1e6?(n/1e6)+'M':n>=1000?(n/1000)+'k':String(n)}
+function customGrid(P,xt,yt){const g=P.g;g.save();g.strokeStyle=C.gr;g.fillStyle=C.mu;g.font='11px system-ui';g.lineWidth=1;
+ xt.forEach(([v,l])=>{g.beginPath();g.moveTo(P.X(v),P.T);g.lineTo(P.X(v),P.h-P.B);g.stroke();g.textAlign='center';g.fillText(l,P.X(v),P.h-P.B+15)});
+ yt.forEach(([v,l])=>{g.beginPath();g.moveTo(P.L,P.Y(v));g.lineTo(P.w-P.R,P.Y(v));g.stroke();g.textAlign='right';g.fillText(l,P.L-5,P.Y(v)+3)});g.restore()}
+function clip(P,fn){const g=P.g;g.save();g.beginPath();g.rect(P.L,P.T,P.w-P.L-P.R,P.h-P.T-P.B);g.clip();fn();g.restore()}
+function poly(P,pts,col,lw,dash){const g=P.g;g.save();if(dash)g.setLineDash([5,4]);g.strokeStyle=col;g.lineWidth=lw||2;g.beginPath();pts.forEach(([x,y],i)=>i?g.lineTo(P.X(x),P.Y(y)):g.moveTo(P.X(x),P.Y(y)));g.stroke();g.restore()}
+function dots(P,pts,col,r){const g=P.g;g.fillStyle=col;pts.forEach(([x,y])=>{g.beginPath();g.arc(P.X(x),P.Y(y),r||3,0,7);g.fill()})}
+function niceTicks(lo,hi,k){const st=nice((hi-lo)/(k||5)),a=[];for(let v=Math.ceil(lo/st-1e-9)*st;v<=hi+1e-9;v+=st)a.push([v,String(+v.toFixed(6))]);return a}
+function logTicks(lo,hi){const a=[];for(let e=Math.ceil(lo-1e-9);e<=hi+1e-9;e++)a.push([e,nlab(Math.pow(10,e))]);return a}
+function mom(a){const n=a.length;let m=0;for(const v of a)m+=v;m/=n;let v2=0,v3=0,v4=0;for(const v of a){const d=v-m;v2+=d*d;v3+=d*d*d;v4+=d*d*d*d}v2/=n;v3/=n;v4/=n;const sd=Math.sqrt(v2);return{n,m,sd,sk:sd>0?v3/(sd*sd*sd):0,ku:v2>0?v4/(v2*v2)-3:0}}
+function ksN(z){const a=Array.from(z).sort((x,y)=>x-y),n=a.length;let d=0;for(let i=0;i<n;i++){const F=normCdf(a[i]);d=Math.max(d,Math.abs((i+1)/n-F),Math.abs(i/n-F))}return d}
+/* histogram of data as density with optional overlay curves [{f,col,lw,dash}] */
+function hist(cv,data,lo,hi,bins,ov,col){const cnt=new Float64Array(bins),bw=(hi-lo)/bins;let n=0;for(const v of data){if(v<lo||v>=hi)continue;cnt[Math.floor((v-lo)/bw)]++;n++}
+ const N=data.length;let ym=0;for(let i=0;i<bins;i++){cnt[i]/=N*bw;ym=Math.max(ym,cnt[i])}
+ (ov||[]).forEach(o=>{for(let i=0;i<=80;i++)ym=Math.max(ym,o.f(lo+(hi-lo)*i/80)||0)});
+ const P=mk(cv,lo,hi,ym*1.12);
+ P.g.fillStyle=col||'rgba(110,168,255,.5)';for(let i=0;i<bins;i++){if(cnt[i]<=0)continue;const a=P.X(lo+i*bw),b=P.X(lo+(i+1)*bw);P.g.fillRect(a,P.Y(cnt[i]),Math.max(1,b-a-1),P.Y(0)-P.Y(cnt[i]))}
+ (ov||[]).forEach(o=>P.line(o.f,o.col,o.lw||2.4,lo,hi,200,o.dash));return P}
+const fmt=x=>f3(x);
+
+/* ---------- shared for this page ---------- */
+const POPS=['norm','unif','expo','logn','bimo','par5'];
+D.norm.med=0;D.norm.q90=1.2815516;D.unif.med=.5;D.unif.q90=.9;D.expo.med=Math.LN2;D.expo.q90=Math.log(10);D.logn.med=1;D.logn.q90=Math.exp(1.2815516);
+D.bimo.med=0;D.bimo.q90=qc(x=>.5*normCdf((x+2)/.5)+.5*normCdf((x-2)/.5),-10,10,.9,80);D.par5.med=Math.pow(2,.2);D.par5.q90=Math.pow(10,.2);
+const SF={mean:a=>mean(a),median:a=>{const b=Float64Array.from(a).sort(),n=b.length;return n%2?b[(n-1)/2]:(b[n/2-1]+b[n/2])/2},sd:a=>{const n=a.length,m=mean(a);let s=0;for(const v of a)s+=(v-m)*(v-m);return Math.sqrt(s/(n-1))},q90:a=>{const b=Float64Array.from(a).sort();return b[Math.round(.9*(b.length-1))]}};
+function truth(key,st){const d=D[key];return st==='mean'?d.mu:st==='median'?d.med:st==='sd'?d.sd:d.q90}
+const SNAME={mean:'sample mean',median:'sample median',sd:'sample SD',q90:'90th percentile'};
+const N10=[2,3,5,10,20,50,100,200,500,1000];
+function pct(a,p){const b=Float64Array.from(a).sort();return b[Math.min(b.length-1,Math.max(0,Math.floor(p*b.length)))]}
+function histLines(cv,arrs,cols,lo,hi,bins,vl){const bw=(hi-lo)/bins,dens=arrs.map(a=>{const c=new Float64Array(bins);for(const v of a){if(v<lo||v>=hi)continue;c[Math.floor((v-lo)/bw)]++}for(let i=0;i<bins;i++)c[i]/=a.length*bw;return c});let ym=0;dens.forEach(c=>c.forEach(v=>ym=Math.max(ym,v)));const P=mk(cv,lo,hi,ym*1.15||1);
+ dens.forEach((c,k)=>{const pts=[];for(let i=0;i<bins;i++){pts.push([lo+i*bw,c[i]]);pts.push([lo+(i+1)*bw,c[i]])}clip(P,()=>poly(P,pts,cols[k],2.2))});(vl||[]).forEach(v=>P.vline(v[0],v[1],v[2],v[3]));return P}
+function sdOf(a){return mom(a).sd}
+
+/* ---------- ML helpers ---------- */
+function digamma(x){let r=0;while(x<6){r-=1/x;x++}const f=1/(x*x);return r+Math.log(x)-.5/x-f*(1/12-f*(1/120-f/252))}
+function trigamma(x){let r=0;while(x<6){r+=1/(x*x);x++}const f=1/(x*x);return r+1/x+.5*f+f/x*(1/6-f*(1/30-f/42))}
+function poisS(l){if(l<=0)return 0;if(l<30){const L=Math.exp(-l);let k=0,p=1;do{k++;p*=Math.random()}while(p>L);return k-1}const m=Math.floor(.875*l),g=gammaS(m);return g<l?m+poisS(l-g):binF(m-1,l/g)}
+function llb(k,n,p){return(k?k*Math.log(p):0)+(n-k?(n-k)*Math.log(1-p):0)}
+function lrInt(k,n,cut){const ph=k/n,l0=llb(k,n,ph),g=p=>2*(l0-llb(k,n,p))-cut;let lo=0,hi=1;
+ if(k>0){let a=1e-12,b=ph;for(let i=0;i<70;i++){const m=(a+b)/2;if(g(m)>0)a=m;else b=m}lo=(a+b)/2}
+ if(k<n){let a=ph,b=1-1e-12;for(let i=0;i<70;i++){const m=(a+b)/2;if(g(m)>0)b=m;else a=m}hi=(a+b)/2}return[lo,hi]}
+function solveAlpha(s){if(!(s>1e-9))return 1e6;let a=(3-s+Math.sqrt((3-s)*(3-s)+24*s))/(12*s);for(let i=0;i<8;i++){const f=Math.log(a)-digamma(a)-s,fp=1/a-trigamma(a);let n=a-f/fp;if(!(n>0))n=a/2;a=n}return a}
+function normPdfAt(x,m,s){return Math.exp(-(x-m)*(x-m)/(2*s*s))/(s*2.5066282746)}
+/* ---------- Regression helpers ---------- */
+function idx(id,arr,ff){const e=$(id),o=$(id+'v'),f=()=>{o.textContent=ff?ff(arr[+e.value]):arr[+e.value]};e.addEventListener('input',f);f()}
+function scl(id,ff){const e=$(id),o=$(id+'v'),f=()=>{o.textContent=ff(+e.value)};e.addEventListener('input',f);f()}
+function pctTicks(a,b,st){const r=[];for(let v=a;v<=b+1e-9;v+=st)r.push([v,Math.round(v*100)+'%']);return r}
+const _tq={};function tq(v,p){const k=v+'_'+p;return _tq[k]||(_tq[k]=qc(x=>tcdf(x,v),0,500,p,80))}
+function simple(x,y){const n=x.length;let xm=0,ym=0;for(let i=0;i<n;i++){xm+=x[i];ym+=y[i]}xm/=n;ym/=n;let sxx=0,sxy=0,syy=0;for(let i=0;i<n;i++){const dx=x[i]-xm,dy=y[i]-ym;sxx+=dx*dx;sxy+=dx*dy;syy+=dy*dy}const b=sxy/sxx,a=ym-b*xm,res=new Float64Array(n);let sse=0;for(let i=0;i<n;i++){res[i]=y[i]-a-b*x[i];sse+=res[i]*res[i]}return{n,xm,ym,sxx,sxy,syy,b,a,res,sse,sst:syy,r2:1-sse/syy}}
+function gj(A,B){const p=A.length;const M=A.map((r,i)=>Array.from(r).concat(B?[B[i]]:[]));for(let c=0;c<p;c++){let m=c;for(let r=c+1;r<p;r++)if(Math.abs(M[r][c])>Math.abs(M[m][c]))m=r;[M[c],M[m]]=[M[m],M[c]];const d=M[c][c]||1e-12;for(let k=c;k<M[c].length;k++)M[c][k]/=d;for(let r=0;r<p;r++)if(r!==c){const f=M[r][c];if(f!==0)for(let k=c;k<M[c].length;k++)M[r][k]-=f*M[c][k]}}return M}
+function olsMulti(cols,y,needInv){const n=y.length,k=cols.length,p=k+1,A=[],B=new Float64Array(p);for(let i=0;i<p;i++)A.push(new Float64Array(p));
+ for(let r=0;r<n;r++){const row=[1];for(let j=0;j<k;j++)row.push(cols[j][r]);for(let i=0;i<p;i++){B[i]+=row[i]*y[r];for(let j=i;j<p;j++)A[i][j]+=row[i]*row[j]}}
+ for(let i=0;i<p;i++){for(let j=0;j<i;j++)A[i][j]=A[j][i];if(i>0)A[i][i]+=1e-9}
+ let beta,inv=null;if(needInv){const I=[];for(let i=0;i<p;i++){const e=new Float64Array(p);e[i]=1;I.push(e)}const M=gj(A,null);const aug=A.map((r,i)=>Array.from(r).concat(Array.from(I[i])));
+  const m=aug;for(let c=0;c<p;c++){let q=c;for(let r=c+1;r<p;r++)if(Math.abs(m[r][c])>Math.abs(m[q][c]))q=r;[m[c],m[q]]=[m[q],m[c]];const d=m[c][c]||1e-12;for(let kk=0;kk<2*p;kk++)m[c][kk]/=d;for(let r=0;r<p;r++)if(r!==c){const f=m[r][c];if(f!==0)for(let kk=0;kk<2*p;kk++)m[r][kk]-=f*m[c][kk]}}
+  inv=m.map(r=>r.slice(p));beta=inv.map(r=>{let s=0;for(let j=0;j<p;j++)s+=r[j]*B[j];return s})}
+ else{const M=gj(A,B);beta=M.map(r=>r[p])}
+ const res=new Float64Array(n);let sse=0;for(let r=0;r<n;r++){let f=beta[0];for(let j=0;j<k;j++)f+=beta[j+1]*cols[j][r];res[r]=y[r]-f;sse+=res[r]*res[r]}
+ const out={beta,res,sse,n,p,inv};if(inv){const s2=sse/(n-p);out.s2=s2;out.se=inv.map((r,i)=>Math.sqrt(s2*r[i]))}return out}
+function scatterAxes(cv,xs,ys,xlo,xhi,ylo,yhi,L){return mk(cv,xlo,xhi,yhi,{y0:ylo,L:L||44})}
+function range(a,pad){let lo=1e99,hi=-1e99;for(const v of a){if(v<lo)lo=v;if(v>hi)hi=v}const w=(hi-lo)||1;return[lo-(pad||.05)*w,hi+(pad||.05)*w]}
+
+
+function bars(P,groups,cols,yt){/* groups: array of arrays of values (0..1) */const g=P.g,G=groups.length,B=groups[0].length,W=(P.w-P.L-P.R)/G;groups.forEach((vals,gi)=>vals.forEach((v,bi)=>{const bw=W*.78/B,x=P.L+W*gi+W*.11+bw*bi;g.fillStyle=cols[bi];g.fillRect(x,P.Y(v),bw-2,P.Y(0)-P.Y(v));g.fillStyle=C.fg;g.textAlign='center';g.font='10px system-ui';g.fillText(Math.round(v*100)+'%',x+bw/2-1,P.Y(v)-3)}));g.font='11px system-ui'}
+function gridG(P,yt,labels){customGrid(P,[],yt);const G=labels.length,W=(P.w-P.L-P.R)/G;P.g.fillStyle=C.mu;P.g.textAlign='center';labels.forEach((l,i)=>P.g.fillText(l,P.L+W*(i+.5),P.h-P.B+15))}
+function legend(P,items,y){let x=P.L+8;items.forEach(([s,c])=>{P.text('■ '+s,x,y,c);x+=P.g.measureText('■ '+s).width+16})}
+
+/* ---------- GLM machinery ---------- */
+const LK={logit:{mu:e=>1/(1+Math.exp(-e)),d:e=>{const m=1/(1+Math.exp(-e));return m*(1-m)}},
+ probit:{mu:e=>normCdf(e),d:e=>npdf(e)},
+ cll:{mu:e=>1-Math.exp(-Math.exp(e)),d:e=>Math.exp(e-Math.exp(e))},
+ log:{mu:e=>Math.exp(e),d:e=>Math.exp(e)}};
+function minv(A){const p=A.length,m=A.map((r,i)=>{const row=Array.from(r);for(let j=0;j<p;j++)row.push(i===j?1:0);return row});
+ for(let c=0;c<p;c++){let q=c;for(let r=c+1;r<p;r++)if(Math.abs(m[r][c])>Math.abs(m[q][c]))q=r;[m[c],m[q]]=[m[q],m[c]];const d=m[c][c]||1e-12;for(let k=0;k<2*p;k++)m[c][k]/=d;for(let r=0;r<p;r++)if(r!==c){const f=m[r][c];if(f!==0)for(let k=0;k<2*p;k++)m[r][k]-=f*m[c][k]}}
+ return m.map(r=>r.slice(p))}
+function glm(cols,y,o){o=o||{};const n=y.length,k=cols.length,p=k+1,fam=o.fam||'binom',L=LK[o.link||(fam==='pois'?'log':'logit')],off=o.off,X=[new Float64Array(n).fill(1)].concat(cols),V=m=>fam==='pois'?m:m*(1-m);
+ let b=new Float64Array(p);if(o.init)b=Float64Array.from(o.init);else if(fam==='pois'){let m=0;for(const v of y)m+=v;b[0]=Math.log(Math.max(m/n,1e-3))-(off?mean(off):0)}
+ function ev(b){const eta=new Float64Array(n),mu=new Float64Array(n);let ll=0;for(let i=0;i<n;i++){let e=off?off[i]:0;for(let j=0;j<p;j++)e+=b[j]*X[j][i];e=Math.max(-30,Math.min(30,e));eta[i]=e;let m=L.mu(e);m=fam==='binom'?Math.min(1-1e-12,Math.max(1e-12,m)):Math.max(m,1e-12);mu[i]=m;ll+=fam==='pois'?y[i]*Math.log(m)-m-lgamma(y[i]+1):y[i]*Math.log(m)+(1-y[i])*Math.log(1-m)}return{eta,mu,ll}}
+ function info(c){const A=[];for(let i=0;i<p;i++)A.push(new Float64Array(p));const w=new Float64Array(n);for(let r=0;r<n;r++){const d=L.d(c.eta[r]),wi=d*d/V(c.mu[r]);w[r]=wi;for(let i=0;i<p;i++){const xi=X[i][r]*wi;for(let j=i;j<p;j++)A[i][j]+=xi*X[j][r]}}for(let i=0;i<p;i++)for(let j=0;j<i;j++)A[i][j]=A[j][i];return{A,w}}
+ let cur=ev(b),it=0,conv=false,maxit=o.maxit==null?40:o.maxit;
+ for(;it<maxit;it++){const{A,w}=info(cur),Ai=minv(A),g=new Float64Array(p);
+  for(let r=0;r<n;r++){const d=L.d(cur.eta[r]),v=V(cur.mu[r]);let s=(y[r]-cur.mu[r])*d/v;if(o.firth){let h=0;for(let i=0;i<p;i++)for(let j=0;j<p;j++)h+=X[i][r]*Ai[i][j]*X[j][r];h*=w[r];s+=h*(.5-cur.mu[r])}for(let i=0;i<p;i++)g[i]+=X[i][r]*s}
+  const st=new Float64Array(p);let mx=0;for(let i=0;i<p;i++){let s=0;for(let j=0;j<p;j++)s+=Ai[i][j]*g[j];st[i]=s}
+  if(o.firth){for(let i=0;i<p;i++){st[i]=Math.max(-1,Math.min(1,st[i]));mx=Math.max(mx,Math.abs(st[i]))}b=b.map((v,i)=>v+st[i]);cur=ev(b);if(mx<1e-8){conv=true;it++;break}}
+  else{let a=1,nb,nc;for(let h=0;h<25;h++){nb=b.map((v,i)=>v+a*st[i]);nc=ev(nb);if(nc.ll>=cur.ll-1e-10)break;a/=2}for(let i=0;i<p;i++)mx=Math.max(mx,Math.abs(a*st[i]));const dl=Math.abs(nc.ll-cur.ll);b=nb;cur=nc;if(mx<1e-8||dl<1e-11){conv=true;it++;break}}}
+ const{A,w}=info(cur),Ai=minv(A),se=Ai.map((r,i)=>Math.sqrt(Math.max(r[i],0)));let dev;
+ if(fam==='binom')dev=-2*cur.ll;else{dev=0;for(let i=0;i<n;i++){const yy=y[i],m=cur.mu[i];dev+=2*((yy>0?yy*Math.log(yy/m):0)-(yy-m))}}
+ return{beta:b,mu:cur.mu,eta:cur.eta,ll:cur.ll,dev,inv:Ai,se,iter:it,conv,X,w,p,n,A}}
+function auc(sc,y){const n=y.length,idx=Array.from({length:n},(_,i)=>i).sort((a,b)=>sc[a]-sc[b]);let rk=0,np=0,i=0;while(i<n){let j=i;while(j+1<n&&sc[idx[j+1]]===sc[idx[i]])j++;const r=(i+j)/2+1;for(let t=i;t<=j;t++)if(y[idx[t]]===1){rk+=r;np++}i=j+1}const nn=n-np;return np&&nn?(rk-np*(np+1)/2)/(np*nn):.5}
+function sepTest(x,y){let a1=1e99,b1=-1e99,a0=1e99,b0=-1e99,n1=0,n0=0;for(let i=0;i<x.length;i++){if(y[i]===1){n1++;a1=Math.min(a1,x[i]);b1=Math.max(b1,x[i])}else{n0++;a0=Math.min(a0,x[i]);b0=Math.max(b0,x[i])}}return n1>0&&n0>0&&(a1>b0||a0>b1)}
+const sig=e=>1/(1+Math.exp(-e));
+function lgt(p){return Math.log(p/(1-p))}
+function binaryData(n,a,b,sd){const x=new Float64Array(n),y=new Float64Array(n);for(let i=0;i<n;i++){x[i]=(sd||1)*randn();y[i]=Math.random()<sig(a+b*x[i])?1:0}return{x,y}}
+function heat(P,gx,gy,vals,x0,x1,y0,y1){const g=P.g,nx=gx,ny=gy;let mn=1e99,mx=-1e99;vals.forEach(v=>{if(isFinite(v)){mn=Math.min(mn,v);mx=Math.max(mx,v)}});mn=Math.max(mn,mx-30);for(let i=0;i<nx;i++)for(let j=0;j<ny;j++){const v=vals[i*ny+j],t=isFinite(v)?Math.max(0,Math.min(1,(v-mn)/(mx-mn))):0,tt=Math.pow(t,1.6),c=Math.round(40+190*tt);g.fillStyle=`rgb(${Math.round(20+60*tt)},${Math.round(30+100*tt)},${c})`;const xa=P.X(x0+(x1-x0)*i/nx),xb=P.X(x0+(x1-x0)*(i+1)/nx),ya=P.Y(y0+(y1-y0)*j/ny),yb=P.Y(y0+(y1-y0)*(j+1)/ny);g.fillRect(xa,Math.min(ya,yb),xb-xa+1,Math.abs(ya-yb)+1)}}
+/* ---------- confounding helpers ---------- */
+const U01=()=>1-Math.random();
+function sdv(a){const m=mean(a);let s=0;for(const v of a)s+=(v-m)*(v-m);return Math.sqrt(s/Math.max(a.length-1,1))}
+function barV(cv,vals,cols,labs,ymax,ff){const P=mk(cv,0,vals.length,ymax,{y0:0,noGrid:true,L:50});customGrid(P,[],niceTicks(0,ymax,5));const W=(P.w-P.L-P.R)/vals.length,g=P.g;vals.forEach((v,i)=>{const w=W*.5,x=P.L+W*i+W*.25;g.fillStyle=cols[i];g.fillRect(x,P.Y(v),w,P.Y(0)-P.Y(v));g.fillStyle=C.fg;g.textAlign='center';g.fillText((ff||fmt)(v),x+w/2,P.Y(v)-4);g.fillStyle=C.mu;g.fillText(labs[i],x+w/2,P.h-P.B+15)});return P}
+function barL(cv,vals,cols,labs,lo,hi,ff){const P=mk(cv,0,vals.length,hi,{y0:lo,noGrid:true,L:50});customGrid(P,[],niceTicks(lo,hi,5));const W=(P.w-P.L-P.R)/vals.length,g=P.g;vals.forEach((v,i)=>{const w=W*.5,x=P.L+W*i+W*.25;g.fillStyle=cols[i];g.fillRect(x,P.Y(v),w,P.Y(lo)-P.Y(v));g.fillStyle=C.fg;g.textAlign='center';g.fillText((ff||fmt)(v),x+w/2,P.Y(v)-4);g.fillStyle=C.mu;g.fillText(labs[i],x+w/2,P.h-P.B+15)});return P}
+const avg=a=>{let s=0;for(const v of a)s+=v;return s/a.length};
+function corr(a,b){const n=a.length;let ma=0,mb=0;for(let i=0;i<n;i++){ma+=a[i];mb+=b[i]}ma/=n;mb/=n;let sa=0,sb=0,sab=0;for(let i=0;i<n;i++){const x=a[i]-ma,y=b[i]-mb;sa+=x*x;sb+=y*y;sab+=x*y}return sab/Math.sqrt(sa*sb||1e-12)}
+const pcor=(x,y,z)=>corr(simple(z,x).res,simple(z,y).res);
+const lin=(n,f)=>{const a=new Float64Array(n);for(let i=0;i<n;i++)a[i]=f(i);return a};
+const rn=(n,s)=>lin(n,()=>(s||1)*randn());
+/* signed bars from zero */
+function barZ(cv,vals,cols,labs,lo,hi,ff){const P=mk(cv,0,vals.length,hi,{y0:lo,noGrid:true,L:50});customGrid(P,[],niceTicks(lo,hi,5));const W=(P.w-P.L-P.R)/vals.length,g=P.g;vals.forEach((v,i)=>{const w=W*.5,x=P.L+W*i+W*.25,y0=P.Y(0),y1=P.Y(v);g.fillStyle=cols[i];g.fillRect(x,Math.min(y0,y1),w,Math.abs(y0-y1));g.fillStyle=C.fg;g.textAlign='center';g.fillText((ff||fmt)(v),x+w/2,v>=0?y1-4:y1+13);g.fillStyle=C.mu;g.fillText(labs[i],x+w/2,P.h-P.B+15)});P.hline(0,C.mu,'');return P}
+/* grouped signed bars: groups[g][b] */
+function barG(cv,groups,cols,glabs,lo,hi,ff){const P=mk(cv,0,groups.length,hi,{y0:lo,noGrid:true,L:50});customGrid(P,[],niceTicks(lo,hi,5));const G=groups.length,B=groups[0].length,W=(P.w-P.L-P.R)/G,g=P.g;groups.forEach((vs,gi)=>vs.forEach((v,bi)=>{const bw=W*.7/B,x=P.L+W*gi+W*.15+bw*bi,y0=P.Y(0),y1=P.Y(v);g.fillStyle=cols[bi];g.fillRect(x,Math.min(y0,y1),bw-3,Math.abs(y0-y1));g.fillStyle=C.fg;g.textAlign='center';g.font='10px system-ui';g.fillText((ff||fmt)(v),x+bw/2-1,v>=0?y1-3:y1+11)}));g.font='11px system-ui';g.fillStyle=C.mu;g.textAlign='center';glabs.forEach((l,i)=>g.fillText(l,P.L+W*(i+.5),P.h-P.B+15));P.hline(0,C.mu,'');return P}
+/* scatter with optional per-point colours; draws at most nmax points */
+function scat(P,xs,ys,col,nmax,r,colf){const n=xs.length,st=Math.max(1,Math.floor(n/(nmax||500))),pts=[];clip(P,()=>{for(let i=0;i<n;i+=st){P.g.fillStyle=colf?colf(i):col;P.g.beginPath();P.g.arc(P.X(xs[i]),P.Y(ys[i]),r||2.2,0,7);P.g.fill()}})}
+function fitLine(P,s,col,lw,dash,x0,x1){clip(P,()=>P.line(x=>s.a+s.b*x,col,lw||2,x0,x1,2,dash))}
+const ordIdx=p=>Array.from({length:p.length},(_,i)=>i).sort((a,b)=>p[a]-p[b]);
+/* ---------- experiment helpers ---------- */
+const sgn=v=>(v>=0?'+':'−')+Math.abs(v).toFixed(3);
+const rng2=(a,b,pad)=>range(Array.from(a).concat(Array.from(b)),pad||.05);
+const pct0=x=>Math.round(x*100)+'%';
+const lgs=x=>1/(1+Math.exp(-x));
+function rgam(a){if(a<1)return rgam(a+1)*Math.pow(U01(),1/a);const d=a-1/3,c=1/Math.sqrt(9*d);for(;;){let x,v;do{x=randn();v=1+c*x}while(v<=0);v=v*v*v;const u=U01();if(u<1-.0331*x*x*x*x||Math.log(u)<.5*x*x+d*(1-v+Math.log(v)))return d*v}}
+const rbeta=(a,b)=>{const x=rgam(a),y=rgam(b);return x/(x+y)};
+function rbin(n,p){if(n<=30){let k=0;for(let i=0;i<n;i++)if(Math.random()<p)k++;return k}const m=n*p,s=Math.sqrt(n*p*(1-p)),k=Math.round(m+s*randn());return Math.max(0,Math.min(n,k))}
+function welch(a,b){const na=a.length,nb=b.length,ma=avg(a),mb=avg(b);let va=0,vb=0;for(const v of a)va+=(v-ma)*(v-ma);for(const v of b)vb+=(v-mb)*(v-mb);va/=na-1;vb/=nb-1;const se2=va/na+vb/nb,se=Math.sqrt(se2),t=(ma-mb)/se,df=se2*se2/((va/na)*(va/na)/(na-1)+(vb/nb)*(vb/nb)/(nb-1));return{d:ma-mb,se,t,df,p:2*(1-tcdf(Math.abs(t),df))}}
+const diffMeans=(Y,T)=>{let s1=0,s0=0,n1=0,n0=0;for(let i=0;i<Y.length;i++){if(T[i]){s1+=Y[i];n1++}else{s0+=Y[i];n0++}}return s1/n1-s0/n0};
+/* ---------- observational-causal helpers ---------- */
+function logitFit(cols,y){const n=y.length,k=cols.length,p=k+1,b=new Float64Array(p),lin_=i=>{let s=b[0];for(let j=0;j<k;j++)s+=b[j+1]*cols[j][i];return s};
+ for(let it=0;it<30;it++){const A=[];for(let i=0;i<p;i++)A.push(new Float64Array(p));const g=new Float64Array(p);
+  for(let i=0;i<n;i++){const m=lgs(lin_(i)),w=Math.max(m*(1-m),1e-8),r=y[i]-m,row=[1];for(let j=0;j<k;j++)row.push(cols[j][i]);for(let a=0;a<p;a++){g[a]+=row[a]*r;for(let c=a;c<p;c++)A[a][c]+=w*row[a]*row[c]}}
+  for(let a=0;a<p;a++){for(let c=0;c<a;c++)A[a][c]=A[c][a];A[a][a]+=1e-8}
+  const M=gj(A,Array.from(g)),d=M.map(r=>r[p]);let mx=0;for(let a=0;a<p;a++){b[a]+=d[a];mx=Math.max(mx,Math.abs(d[a]))}if(mx<1e-6)break}
+ const pr=new Float64Array(n),lo=new Float64Array(n);for(let i=0;i<n;i++){pr[i]=Math.min(.9999,Math.max(.0001,lgs(lin_(i))));lo[i]=Math.log(pr[i]/(1-pr[i]))}return{beta:b,pr,lo}}
+/* Hajek IPW estimate of the ATE; keep(i)=false drops a unit */
+function ipwATE(Y,T,e,keep){let a1=0,b1=0,a0=0,b0=0;for(let i=0;i<Y.length;i++){if(keep&&!keep(i))continue;if(T[i]){const w=1/e[i];a1+=w*Y[i];b1+=w}else{const w=1/(1-e[i]);a0+=w*Y[i];b0+=w}}return a1/b1-a0/b0}
+function smd(x,T,w){let m1=0,m0=0,w1=0,w0=0,n1=0,n0=0;for(let i=0;i<x.length;i++){const ww=w?w[i]:1;if(T[i]){m1+=ww*x[i];w1+=ww;n1++}else{m0+=ww*x[i];w0+=ww;n0++}}m1/=w1;m0/=w0;let v1=0,v0=0,a1=0,a0=0;for(let i=0;i<x.length;i++){if(T[i]){a1+=x[i]}else a0+=x[i]}a1/=n1;a0/=n0;for(let i=0;i<x.length;i++){if(T[i])v1+=(x[i]-a1)*(x[i]-a1);else v0+=(x[i]-a0)*(x[i]-a0)}v1/=n1-1;v0/=n0-1;return(m1-m0)/Math.sqrt((v1+v0)/2)}
+/* confounded data: X1,X2; treatment strength a; effect tau (function of x1 optional) */
+function confData(n,a,tauF,nl){const X1=rn(n),X2=rn(n),e=lin(n,i=>lgs(a*(.8*X1[i]+.5*X2[i]+(nl?.4*(X1[i]*X1[i]-1):0))/1.5)),T=new Uint8Array(n),Y=new Float64Array(n);
+ for(let i=0;i<n;i++){T[i]=Math.random()<e[i]?1:0;Y[i]=(T[i]?(tauF?tauF(X1[i]):1):0)+X1[i]+.8*X2[i]+(nl?.6*X1[i]*X1[i]:0)+randn()}return{X1,X2,T,Y,e}}
+/* one-to-one nearest-neighbour matching with replacement on a score; returns ATT and the matched control index per treated unit (-1 if dropped) */
+function matchATT(sc,T,Y,cal){const ctr=[];for(let i=0;i<T.length;i++)if(!T[i])ctr.push(i);ctr.sort((a,b)=>sc[a]-sc[b]);const cs=ctr.map(i=>sc[i]),m=new Int32Array(T.length).fill(-1);let sum=0,k=0;
+ for(let i=0;i<T.length;i++){if(!T[i])continue;let lo=0,hi=cs.length-1;while(lo<hi){const mid=(lo+hi)>>1;if(cs[mid]<sc[i])lo=mid+1;else hi=mid}let b=lo;if(lo>0&&Math.abs(cs[lo-1]-sc[i])<Math.abs(cs[lo]-sc[i]))b=lo-1;if(Math.abs(cs[b]-sc[i])>cal)continue;m[i]=ctr[b];sum+=Y[i]-Y[ctr[b]];k++}return{att:sum/k,m,kept:k}}
+const quant=(a,p)=>{const b=Float64Array.from(a).sort();return b[Math.min(b.length-1,Math.floor(p*b.length))]};
+/* ---------- uplift helpers ---------- */
+const polyCols=(x,deg)=>{const c=[];for(let k=1;k<=deg;k++)c.push(lin(x.length,i=>Math.pow(x[i],k)));return c};
+const fitPoly=(x,y,deg)=>olsMulti(polyCols(x,deg),y).beta;
+const evalPoly=(b,x)=>{let s=b[0],p=1;for(let k=1;k<b.length;k++){p*=x;s+=b[k]*p}return s};
+const arr=(a,ix)=>ix.map(i=>a[i]);
+/* effect estimate and its variance in a subset (indices ix) of randomised data */
+function subEff(Y,T,ix){let s1=0,s0=0,q1=0,q0=0,n1=0,n0=0;for(const i of ix){const y=Y[i];if(T[i]){s1+=y;q1+=y*y;n1++}else{s0+=y;q0+=y*y;n0++}}if(n1<3||n0<3)return null;const m1=s1/n1,m0=s0/n0,v1=(q1-n1*m1*m1)/(n1-1),v0=(q0-n0*m0*m0)/(n0-1);return{d:m1-m0,v:v1/n1+v0/n0,n1,n0}}
+function qini(score,T,Y,pts){const n=score.length,o=ordIdx(Array.from(score,v=>-v));let yt=0,yc=0,nt=0,nc=0,j=0;const out=[[0,0]];for(let p=1;p<=pts;p++){const k=Math.round(p/pts*n);for(;j<k;j++){const i=o[j];if(T[i]){nt++;yt+=Y[i]}else{nc++;yc+=Y[i]}}out.push([p/pts,(nt&&nc)?(yt/nt-yc/nc)*k*1000/n:out[out.length-1][1]])}return out}
+const qiniArea=c=>{const end=c[c.length-1][1];let a=0;for(let i=1;i<c.length;i++){const x0=c[i-1][0],x1=c[i][0];a+=(x1-x0)*((c[i-1][1]-end*x0)+(c[i][1]-end*x1))/2}return a};
+/* ---------- Ch1 four types ---------- */
+(function(){scl('c1p',v=>v+'%');scl('c1d',v=>v+'%');scl('c1k',v=>v);
+ function run(){const pP=val('c1p')/100,pD=val('c1d')/100,c=val('c1k'),V=100,rest=Math.max(0,1-pP-pD),
+  S=[{n:'persuadables',s:pP,b:.05,t:.25},{n:'sure things',s:rest/2,b:.5,t:.5},{n:'lost causes',s:rest/2,b:.05,t:.05},{n:'sleeping dogs',s:pD,b:.35,t:.15}];
+  const P=barG($('c1cv'),S.map(s=>[s.b,s.t]),[C.a,C.y],S.map(s=>s.n),0,.6,pct0);legend(P,[['without contact',C.a],['with contact',C.y]],P.T+12);
+  const val_=s=>(s.t-s.b)*V-c,all=1000*S.reduce((a,s)=>a+s.s*val_(s),0),ordered=[...S].sort((a,b)=>b.b-a.b);let left=.3,resp=0;for(const s of ordered){const take=Math.min(s.s,left);resp+=1000*take*val_(s);left-=take;if(left<=0)break}
+  const upl=1000*S.reduce((a,s)=>a+s.s*Math.max(0,val_(s)),0),vals=[0,all,resp,upl],lo=Math.min(0,...vals)-60,hi=Math.max(0,...vals)+80;
+  barZ($('c1cv2'),vals,[C.mu,C.r,C.y,C.g],['contact nobody','contact all','response model','uplift model'],lo,hi,x=>Math.round(x).toLocaleString('en-US'));
+  const ate=S.reduce((a,s)=>a+s.s*(s.t-s.b),0);
+  $('c1st').innerHTML=stat('average effect (ATE)',pc(ate)+' points',ate<.02?'warn':'in')+stat('contact all · response model',Math.round(all)+' · '+Math.round(resp),all<0?'hot':'')+stat('uplift model',Math.round(upl),'ok')+stat('uplift gain over contact all',Math.round(upl-all),'');
+  $('c1rd').innerHTML=`Contacting everybody changes conversion by only ${pc(ate)} on average, and nets ${Math.round(all).toLocaleString('en-US')} per 1000 customers once the sleeping dogs (${pc(pD)}), the sure things and the lost causes are paid for. Targeting the highest baseline responders (a response model) nets ${Math.round(resp).toLocaleString('en-US')}: it picks sure things and sleeping dogs. Targeting only customers whose uplift beats the cost nets ${Math.round(upl).toLocaleString('en-US')}.`}
+ ['c1p','c1d','c1k'].forEach(i=>{$(i).addEventListener('input',run)});run();})();
+
+/* ---------- Ch2 subgroup CATE ---------- */
+(function(){scl('c2n',v=>v.toLocaleString('en-US'));scl('c2h',v=>fmt(v/100));
+ function sample(n,hh){const x=lin(n,()=>Math.random()),T=lin(n,(i)=>i&1),Y=lin(n,i=>T[i]*(.1+hh*x[i])+randn());return{x,T,Y}}
+ function est(d){const n=d.x.length,dec=[];for(let k=0;k<10;k++){const ix=[];for(let i=0;i<n;i++)if(d.x[i]>=k/10&&d.x[i]<(k+1)/10)ix.push(i);dec.push(subEff(d.Y,d.T,ix))}
+  const TX=lin(n,i=>d.T[i]*d.x[i]),b=olsMulti([d.T,d.x,TX],d.Y).beta,c=diffMeans(d.Y,d.T);return{dec,lin:k=>b[1]+b[3]*k,c}}
+ function run(){const n=val('c2n'),hh=val('c2h')/100,R=200,d=sample(n,hh),e=est(d),ctr=Array.from({length:10},(_,k)=>(k+.5)/10);
+  const ests=e.dec.map(v=>v?v.d:0),los=e.dec.map(v=>v?v.d-1.96*Math.sqrt(v.v):0),his=e.dec.map(v=>v?v.d+1.96*Math.sqrt(v.v):0),lo=Math.min(...los,0)-.05,hi=Math.max(...his,.1+hh)+.05,P=mk($('c2cv'),0,1,hi,{y0:lo,L:44});
+  P.line(x=>.1+hh*x,C.fg,2.4,0,1,2,true);ctr.forEach((x,i)=>{P.g.strokeStyle=C.y;P.g.lineWidth=2;P.g.beginPath();P.g.moveTo(P.X(x),P.Y(los[i]));P.g.lineTo(P.X(x),P.Y(his[i]));P.g.stroke()});dots(P,ctr.map((x,i)=>[x,ests[i]]),C.y,4);legend(P,[['decile estimate ± 95%',C.y],['true effect',C.fg]],P.T+12);P.text('x →',P.w-P.R-24,P.h-P.B-6,C.mu);
+  const se=[0,0,0];for(let r=0;r<R;r++){const dd=sample(n,hh),ee=est(dd);ctr.forEach((x,k)=>{const t=.1+hh*x,v=ee.dec[k]?ee.dec[k].d:0;se[0]+=(v-t)*(v-t);se[1]+=(ee.lin(x)-t)*(ee.lin(x)-t);se[2]+=(ee.c-t)*(ee.c-t)})}
+  const rm=se.map(v=>Math.sqrt(v/(R*10))),P2=barV($('c2cv2'),rm,[C.y,C.g,C.a],['deciles','linear interaction','constant effect'],Math.max(...rm)*1.25,x=>x.toFixed(3));P2.text('RMSE of the estimated effect',P2.L+6,P2.T+12,C.mu);
+  const best=rm.indexOf(Math.min(...rm));
+  $('c2st').innerHTML=stat('RMSE: deciles · linear · constant',rm.map(v=>v.toFixed(3)).join(' · '),'in')+stat('best estimator',['deciles','linear interaction','constant effect'][best],'ok')+stat('customers per decile',Math.round(n/10).toLocaleString('en-US'),'')+stat('true effect range',fmt(.1)+' to '+fmt(.1+hh),'');
+  $('c2rd').innerHTML=`With ${n.toLocaleString('en-US')} customers each decile has about ${Math.round(n/10)} customers and its effect is estimated with an error of ${rm[0].toFixed(3)}. ${best===2?'The effect varies so little that the single average is the most accurate estimate for every decile: borrowing strength across customers beats subgroup estimates.':best===1?'The linear interaction model uses all customers to estimate a smooth slope and beats the separate deciles; it is right here because the truth is linear.':'The deciles are best here: heterogeneity is large relative to their noise.'} The error bars show how often the ranking of individual deciles is noise.`}
+ ['c2n','c2h'].forEach(i=>$(i).addEventListener('change',run));$('c2go').onclick=run;run();})();
+
+/* ---------- Ch3 meta-learners ---------- */
+(function(){scl('c3n',v=>v.toLocaleString('en-US'));scl('c3p',v=>v+'%');scl('c3s',v=>fmt(v/10));scl('c3h',v=>fmt(v/10));
+ const G=Array.from({length:41},(_,i)=>-1+i/20),m=x=>x+.8*Math.sin(2*x)+.5*x*x;
+ function sim(n,pt,sg,h){const x=lin(n,()=>2*Math.random()-1),T=new Uint8Array(n);for(let i=0;i<n;i++)T[i]=Math.random()<pt?1:0;const Y=lin(n,i=>m(x[i])+T[i]*(.5+h*Math.sin(3*x[i]))+sg*randn());return{x,T,Y}}
+ function learn(d,pt){const n=d.x.length,i1=[],i0=[];for(let i=0;i<n;i++)(d.T[i]?i1:i0).push(i);const x1=arr(d.x,i1),y1=arr(d.Y,i1),x0=arr(d.x,i0),y0=arr(d.Y,i0),
+  bs=olsMulti(polyCols(d.x,5).concat([Float64Array.from(d.T)]),d.Y).beta,s=bs[6],b1=fitPoly(x1,y1,5),b0=fitPoly(x0,y0,5),
+  D1=lin(x1.length,k=>y1[k]-evalPoly(b0,x1[k])),D0=lin(x0.length,k=>evalPoly(b1,x0[k])-y0[k]),g1=fitPoly(x1,D1,3),g0=fitPoly(x0,D0,3);
+  return{S:G.map(()=>s),T:G.map(x=>evalPoly(b1,x)-evalPoly(b0,x)),X:G.map(x=>pt*evalPoly(g0,x)+(1-pt)*evalPoly(g1,x))}}
+ function run(){const n=val('c3n'),pt=val('c3p')/100,sg=val('c3s')/10,h=val('c3h')/10,R=100,tr=G.map(x=>.5+h*Math.sin(3*x)),se=[0,0,0];
+  for(let r=0;r<R;r++){const e=learn(sim(n,pt,sg,h),pt);['S','T','X'].forEach((k,j)=>{for(let g=0;g<G.length;g++)se[j]+=Math.pow(e[k][g]-tr[g],2)/(G.length*R)})}
+  const e=learn(sim(n,pt,sg,h),pt),all=[...tr,...e.S,...e.T,...e.X].filter(isFinite),lo=Math.max(-3,Math.min(...all))-.1,hi=Math.min(4,Math.max(...all))+.1,P=mk($('c3cv'),-1,1,hi,{y0:lo,L:44});
+  const cl=a=>a.map((v,i)=>[G[i],Math.max(lo,Math.min(hi,v))]);poly(P,cl(tr),C.fg,2.4,true);poly(P,cl(e.S),C.r,2.2);poly(P,cl(e.T),C.y,2.2);poly(P,cl(e.X),C.g,2.4);legend(P,[['truth',C.fg],['S',C.r],['T',C.y],['X',C.g]],P.T+12);P.text('x →',P.w-P.R-24,P.h-P.B-6,C.mu);
+  const rm=se.map(Math.sqrt),P2=barV($('c3cv2'),rm,[C.r,C.y,C.g],['S-learner','T-learner','X-learner'],Math.max(...rm)*1.25,x=>x.toFixed(3));P2.text('RMSE of the estimated effect',P2.L+6,P2.T+12,C.mu);
+  const best=rm.indexOf(Math.min(...rm));
+  $('c3st').innerHTML=stat('RMSE: S · T · X',rm.map(v=>v.toFixed(3)).join(' · '),'in')+stat('best learner',['S','T','X'][best],'ok')+stat('treated customers',Math.round(n*pt).toLocaleString('en-US'),pt<.1?'warn':'')+stat('effect range',fmt(.5-h)+' to '+fmt(.5+h),'');
+  $('c3rd').innerHTML=`The S-learner (additive treatment term) can only return a constant effect, so its error is the size of the heterogeneity (${rm[0].toFixed(3)}). With ${pt*100}% treated the T-learner’s treated-arm model is estimated on only ${Math.round(n*pt)} customers and is noisy (${rm[1].toFixed(3)}); the X-learner uses the large control arm to impute the treated customers’ counterfactuals and gets ${rm[2].toFixed(3)}. Raise the treated share towards 50% and the T-learner catches up.`}
+ ['c3n','c3p','c3s','c3h'].forEach(i=>$(i).addEventListener('change',run));$('c3go').onclick=run;run();})();
+
+/* ---------- Ch4 honest trees ---------- */
+(function(){scl('c4n',v=>v.toLocaleString('en-US'));scl('c4h',v=>fmt(v/10));scl('c4p',v=>v);
+ function run(){const n=val('c4n'),hh=val('c4h')/10,p=val('c4p'),R=120,AD=[],HO=[];let right=0;const half=Math.floor(n/2);
+  for(let r=0;r<R;r++){const X=[];for(let j=0;j<p;j++)X.push(lin(n,()=>2*Math.random()-1));const T=new Uint8Array(n);for(let i=0;i<n;i++)T[i]=Math.random()<.5?1:0;const Y=lin(n,i=>randn()+T[i]*(.3+(hh/2)*(X[0][i]>0?1:-1)));
+   const A=Array.from({length:half},(_,i)=>i),B=Array.from({length:n-half},(_,i)=>i+half);let best=null;
+   for(let j=0;j<p;j++){const xs=arr(X[j],A).sort((a,b)=>a-b);for(let q=1;q<=9;q++){const th=xs[Math.floor(q/10*xs.length)],L=A.filter(i=>X[j][i]<=th),Rr=A.filter(i=>X[j][i]>th),eL=subEff(Y,T,L),eR=subEff(Y,T,Rr);if(!eL||!eR||eL.n1<10||eL.n0<10||eR.n1<10||eR.n0<10)continue;const dl=eR.d-eL.d,sc=L.length*Rr.length*dl*dl;if(!best||sc>best.sc)best={sc,j,th,dl}}}
+   if(!best){r--;continue}if(best.j===0)right++;const sg=best.dl>=0?1:-1,eL=subEff(Y,T,B.filter(i=>X[best.j][i]<=best.th)),eR=subEff(Y,T,B.filter(i=>X[best.j][i]>best.th));if(!eL||!eR){r--;continue}AD.push(Math.abs(best.dl));HO.push(sg*(eR.d-eL.d))}
+  const mA=avg(AD),mH=avg(HO),P=barV($('c4cv'),[hh,mA,mH],[C.fg,C.r,C.g],['true difference','adaptive (same half)','honest (other half)'],Math.max(hh,mA,mH)*1.3+.05,x=>x.toFixed(2));P.text('effect difference between the two leaves',P.L+6,P.T+12,C.mu);
+  const [l,h2]=rng2(AD,HO,.1),P2=histLines($('c4cv2'),[AD,HO],[C.r,C.g],Math.min(l,hh-.1,-.1),Math.max(h2,hh+.1),40,[[hh,C.fg,'true',true]]);legend(P2,[['adaptive |Δ|',C.r],['honest Δ (aligned)',C.g]],P2.T+12);P2.text('estimated difference →',P2.w-P2.R-125,P2.h-P2.B-6,C.mu);
+  $('c4st').innerHTML=stat('true difference',fmt(hh),'in')+stat('adaptive · honest estimate',fmt(mA)+' · '+fmt(mH),mA-hh>.1?'hot':'ok')+stat('adaptive overstatement',sgn(mA-Math.max(hh,0)),'')+stat('split on the right feature',pc(right/R),p>1&&hh<.05?'':'in');
+  $('c4rd').innerHTML=hh<.05?`There is no real heterogeneity, yet the best split (of ${p} features × 9 thresholds) shows a difference of ${fmt(mA)} between the leaves when estimated on the data that chose it. On the other half the estimate falls to ${fmt(mH)}: honest estimation exposes the spurious split.`:`The true leaf difference is ${fmt(hh)}. Estimated on the data that chose the split it is ${fmt(mA)} (${mA>hh?'inflated':'deflated'} by selection among ${p*9} candidate splits); on the other half it is ${fmt(mH)}${p>1?`, and the right feature is found ${pc(right/R)} of the time`:''}. More noise features, or a smaller sample, make the adaptive overstatement worse.`}
+ ['c4n','c4h','c4p'].forEach(i=>$(i).addEventListener('change',run));$('c4go').onclick=run;run();})();
+
+/* ---------- Ch5 Qini ---------- */
+(function(){scl('c5r',v=>fmt(v/100));scl('c5n',v=>v.toLocaleString('en-US'));
+ function run(){const rho=val('c5r')/100,n=val('c5n'),u=rn(n,.05).map(v=>v+.02),b=lin(n,()=>Math.max(.02,Math.min(.85,.1+.08*randn()))),T=new Uint8Array(n),Y=new Float64Array(n);
+  for(let i=0;i<n;i++){T[i]=Math.random()<.5?1:0;const pr=Math.max(0,Math.min(1,b[i]+T[i]*u[i]));Y[i]=Math.random()<pr?1:0}
+  const sm=lin(n,i=>rho*(u[i]-.02)/.05+Math.sqrt(1-rho*rho)*randn()),rd=lin(n,()=>Math.random()),pts=20,curves=[qini(u,T,Y,pts),qini(sm,T,Y,pts),qini(b,T,Y,pts)],end=curves[0][pts][1],cols=[C.fg,C.g,C.r],names=['oracle ranking','uplift model','response model'];
+  const all=curves.flat().map(p=>p[1]),P=mk($('c5cv'),0,100,Math.max(...all,end)+1,{y0:Math.min(0,...all)-1,L:44});P.line(x=>end*x/100,C.mu,2,0,100,2,true);curves.forEach((c,i)=>poly(P,c.map(p=>[p[0]*100,p[1]]),cols[i],2.6));legend(P,[['oracle',C.fg],['uplift model',C.g],['response model',C.r],['random',C.mu]],P.T+12);P.text('share of customers contacted (%) →',P.w-P.R-180,P.h-P.B-6,C.mu);
+  const ar=curves.map(qiniArea),ra=qiniArea(qini(rd,T,Y,pts)),vals=[ar[0],ar[1],ar[2],ra],lo=Math.min(0,...vals)-1,hi=Math.max(...vals)+1.5;barZ($('c5cv2'),vals,[C.fg,C.g,C.r,C.mu],['oracle','uplift model','response model','random'],lo,hi,x=>x.toFixed(1));
+  $('c5st').innerHTML=stat('overall effect (per 1000)',fmt(end),'in')+stat('Qini area: oracle · model',ar[0].toFixed(1)+' · '+ar[1].toFixed(1),'ok')+stat('response model · random',ar[2].toFixed(1)+' · '+ra.toFixed(1),Math.abs(ar[2])<3?'warn':'')+stat('share of oracle area',pc(ar[1]/ar[0]),'');
+  $('c5rd').innerHTML=`Contacting everyone yields ${fmt(end)} extra conversions per 1000 customers. Contacting only the best 30% by the oracle ranking would already deliver ${fmt(curves[0][6][1])}; the uplift model (quality ρ = ${fmt(rho)}) delivers ${fmt(curves[1][6][1])}; the response model delivers ${fmt(curves[2][6][1])}, close to the random line (${fmt(end*.3)}), because who converts is unrelated to who is persuaded. The Qini area summarises this: ${ar[1].toFixed(1)} for the model against ${ar[0].toFixed(1)} for the oracle and about 0 for a ranking with no uplift information.`}
+ ['c5r','c5n'].forEach(i=>$(i).addEventListener('change',run));$('c5go').onclick=run;run();})();
+
+/* ---------- Ch6 targeting and winner's curse ---------- */
+(function(){scl('c6k',v=>fmt(v/10));scl('c6s',v=>v+' pts');
+ function run(){const c=val('c6k')/10,sg=val('c6s')/100,n=20000,V=100,u=rn(n,.05).map(v=>v+.02),uh=lin(n,i=>u[i]+sg*randn()),o=ordIdx(Array.from(uh,v=>-v));let cr=0,cp=0;const re=[[0,0]],pr=[[0,0]];let bestR=[0,-1e99],bestP=[0,-1e99];
+  const step=n/50;for(let j=0;j<n;j++){const i=o[j];cr+=V*u[i]-c;cp+=V*uh[i]-c;if((j+1)%step===0){const x=(j+1)/n*100;re.push([x,cr*1000/n]);pr.push([x,cp*1000/n]);if(cr>bestR[1])bestR=[x,cr];if(cp>bestP[1])bestP=[x,cp]}}
+  const allv=re.concat(pr).map(p=>p[1]),endv=re[re.length-1][1],P=mk($('c6cv'),0,100,Math.max(...allv,1)*1.1,{y0:Math.min(0,...allv)-5,L:50});poly(P,pr,C.r,2.6);poly(P,re,C.g,2.6);P.hline(endv,C.mu,'contact all');P.hline(0,C.mu,'');legend(P,[['predicted',C.r],['realised',C.g]],P.T+12);P.text('share contacted (%) →',P.w-P.R-110,P.h-P.B-6,C.mu);
+  const m=k=>{let a=0,b=0;for(let j=0;j<k;j++){a+=uh[o[j]];b+=u[o[j]]}return[a/k,b/k]},g=[m(n*.1),m(n*.3),m(n)];
+  barG($('c6cv2'),g,[C.r,C.g],['top 10%','top 30%','all'],Math.min(0,...g.flat())-.01,Math.max(...g.flat())+.015,x=>(x*100).toFixed(1)+'%');
+  const realAtP=re[Math.round(bestP[0]/2)]?re[Math.round(bestP[0]/2)][1]:0,bestRv=Math.max(...re.map(p=>p[1]));
+  $('c6st').innerHTML=stat('best cut-off by prediction · reality',Math.round(bestP[0])+'% · '+Math.round(bestR[0])+'%','in')+stat('profit at the predicted optimum (realised)',Math.round(realAtP),'')+stat('best possible realised profit',Math.round(bestRv),'ok')+stat('top 10%: predicted vs realised uplift',(g[0][0]*100).toFixed(1)+'% · '+(g[0][1]*100).toFixed(1)+'%',g[0][0]-g[0][1]>.01?'hot':'ok');
+  $('c6rd').innerHTML=`With estimation noise of ${(sg*100).toFixed(0)} points, the model says the top 10% have an uplift of ${(g[0][0]*100).toFixed(1)}%, but the realised value is ${(g[0][1]*100).toFixed(1)}%: ranking on a noisy estimate selects partly on the noise. The predicted profit curve peaks at ${Math.round(bestP[0])}% contacted and overstates the profit (${Math.round(Math.max(...pr.map(p=>p[1])))} predicted against ${Math.round(realAtP)} realised at that point); the realised optimum is at ${Math.round(bestR[0])}%. Validate the uplift of the selected group on held-out randomised data.`}
+ ['c6k','c6s'].forEach(i=>$(i).addEventListener('change',run));$('c6go').onclick=run;run();})();
+/* ---------- Ch7 DR-learner ---------- */
+(function(){scl('c7a',v=>fmt(v/10));
+ const G=Array.from({length:21},(_,i)=>-2+i*.2);
+ function fitAll(d,ow,pw){const n=d.T.length,sq=d.X1.map(v=>v*v),oc=ow?[d.X1,d.X2]:[d.X1,d.X2,sq],pcl=pw?[d.X1,d.X2]:[d.X1,d.X2,sq],e=logitFit(pcl,d.T).pr,i1=[],i0=[];for(let i=0;i<n;i++)(d.T[i]?i1:i0).push(i);
+  const sub=(cols,ix)=>cols.map(c=>ix.map(i=>c[i])),m1=olsMulti(sub(oc,i1),i1.map(i=>d.Y[i])).beta,m0=olsMulti(sub(oc,i0),i0.map(i=>d.Y[i])).beta,pr=(b,i)=>{let s=b[0];for(let j=0;j<oc.length;j++)s+=b[j+1]*oc[j][i];return s};
+  const psi=lin(n,i=>{const u1=pr(m1,i),u0=pr(m0,i);return u1-u0+(d.T[i]?(d.Y[i]-u1)/e[i]:0)-(!d.T[i]?(d.Y[i]-u0)/(1-e[i]):0)}),dr=simple(d.X1,psi);
+  const pt=x=>{let s1=m1[0]+m1[1]*x,s0=m0[0]+m0[1]*x;if(!ow){s1+=m1[3]*x*x;s0+=m0[3]*x*x}return s1-s0};
+  return{T:G.map(pt),DR:G.map(x=>dr.a+dr.b*x)}}
+ function run(){const a=val('c7a')/10,ow=+$('c7o').value,pw=+$('c7p').value,R=100,n=4000,tr=G.map(x=>1+.8*x),sm={T:new Float64Array(G.length),DR:new Float64Array(G.length)},sq={T:new Float64Array(G.length),DR:new Float64Array(G.length)};
+  for(let r=0;r<R;r++){const e=fitAll(confData(n,a,x=>1+.8*x,true),ow,pw);['T','DR'].forEach(k=>{for(let g=0;g<G.length;g++){sm[k][g]+=e[k][g]/R;sq[k][g]+=e[k][g]*e[k][g]/R}})}
+  const dec=k=>{let b2=0,v=0;for(let g=0;g<G.length;g++){const m=sm[k][g];b2+=Math.pow(m-tr[g],2)/G.length;v+=Math.max(0,sq[k][g]-m*m)/G.length}return{bias:Math.sqrt(b2),sd:Math.sqrt(v),rmse:Math.sqrt(b2+v)}},dT=dec('T'),dD=dec('DR');
+  const all=[...tr,...Array.from(sm.T),...Array.from(sm.DR)],lo=Math.max(-4,Math.min(...all))-.1,hi=Math.min(6,Math.max(...all))+.1,P=mk($('c7cv'),-2,2,hi,{y0:lo,L:44}),cl=a=>a.map((v,i)=>[G[i],Math.max(lo,Math.min(hi,v))]);
+  poly(P,cl(tr),C.fg,2.4,true);poly(P,cl(Array.from(sm.T)),C.r,2.4);poly(P,cl(Array.from(sm.DR)),C.g,2.4);legend(P,[['truth',C.fg],['T-learner (average)',C.r],['DR-learner (average)',C.g]],P.T+12);P.text('x₁ →',P.w-P.R-30,P.h-P.B-6,C.mu);
+  const hi2=Math.max(dT.rmse,dD.rmse,dT.bias,dD.bias,dT.sd,dD.sd)*1.25+.01,P2=barG($('c7cv2'),[[dT.rmse,dD.rmse],[dT.bias,dD.bias],[dT.sd,dD.sd]],[C.r,C.g],['RMSE','bias','sd'],0,hi2,x=>x.toFixed(2));legend(P2,[['T-learner',C.r],['DR-learner',C.g]],P2.T+12);
+  $('c7st').innerHTML=stat('bias: T · DR',dT.bias.toFixed(3)+' · '+dD.bias.toFixed(3),dT.bias>.15?'hot':'ok')+stat('sd: T · DR',dT.sd.toFixed(3)+' · '+dD.sd.toFixed(3),'in')+stat('RMSE: T · DR',dT.rmse.toFixed(3)+' · '+dD.rmse.toFixed(3),'')+stat('models',(ow?'outcome wrong':'outcome right')+' · '+(pw?'propensity wrong':'propensity right'),(ow&&pw)?'warn':'ok');
+  $('c7rd').innerHTML=ow&&pw?`Both nuisance models are wrong, so neither learner is protected (bias ${dT.bias.toFixed(3)} and ${dD.bias.toFixed(3)}).`:!ow&&!pw?`Both models are right: both learners are essentially unbiased (${dT.bias.toFixed(3)}, ${dD.bias.toFixed(3)}); the DR-learner pays for its inverse-propensity weights with a larger sd (${dD.sd.toFixed(3)} against ${dT.sd.toFixed(3)}).`:ow?`The outcome models are wrong (linear): the T-learner is biased by ${dT.bias.toFixed(3)} (its average line misses the truth) but is precise (sd ${dT.sd.toFixed(3)}). The DR-learner, with a correct propensity model, removes the bias (${dD.bias.toFixed(3)}) at the price of a larger sd (${dD.sd.toFixed(3)}); more data or better overlap shrinks the variance but never the bias, so ${dD.rmse<dT.rmse?'it already wins on RMSE here':'in samples this size the biased learner can still have the lower RMSE'}.`:`The propensity model is wrong while the outcome models are right: both learners remain nearly unbiased (${dT.bias.toFixed(3)} and ${dD.bias.toFixed(3)}), the DR-learner thanks to double robustness.`}
+ ['c7a','c7o','c7p'].forEach(i=>$(i).addEventListener('change',run));$('c7go').onclick=run;run();})();
+
+/* ---------- Ch8 BLP test and subgroup hunt ---------- */
+(function(){scl('c8n',v=>v.toLocaleString('en-US'));scl('c8h',v=>fmt(v/10));
+ function gen(n,hh){const X=[];for(let j=0;j<8;j++)X.push(rn(n));const T=new Uint8Array(n);for(let i=0;i<n;i++)T[i]=Math.random()<.5?1:0;const Y=lin(n,i=>X[0][i]+X[1][i]+2*randn()+T[i]*(.3+hh*X[0][i]));return{X,T,Y}}
+ function blp(d,n){const half=Math.floor(n/2),A=Array.from({length:half},(_,i)=>i),B=Array.from({length:n-half},(_,i)=>i+half),fit=ix=>olsMulti(d.X.map(c=>ix.map(i=>c[i])),ix.map(i=>d.Y[i])).beta,
+  i1=A.filter(i=>d.T[i]),i0=A.filter(i=>!d.T[i]),b1=fit(i1),b0=fit(i0),tau=B.map(i=>{let s=b1[0]-b0[0];for(let j=0;j<8;j++)s+=(b1[j+1]-b0[j+1])*d.X[j][i];return s}),m=avg(tau),dd=tau.map(v=>v-m),T=B.map(i=>d.T[i]),Y=B.map(i=>d.Y[i]),TD=dd.map((v,k)=>v*T[k]),r=olsMulti([T,dd,TD],Y,true);return{c:r.beta[3],t:r.beta[3]/r.se[3]}}
+ function hunt(d,n){const ix=Array.from({length:n},(_,i)=>i);for(let j=0;j<8;j++){const a=subEff(d.Y,d.T,ix.filter(i=>d.X[j][i]>0)),b=subEff(d.Y,d.T,ix.filter(i=>d.X[j][i]<=0));if(a&&b&&Math.abs(a.d-b.d)/Math.sqrt(a.v+b.v)>1.96)return true}return false}
+ function run(){const n=val('c8n'),hh=val('c8h')/10,R=200,C1=[];let nh0=0,bl0=0,nh1=0,bl1=0;
+  for(let r=0;r<R;r++){const d0=gen(n,0),d1=gen(n,hh);if(hunt(d0,n))nh0++;if(Math.abs(blp(d0,n).t)>1.96)bl0++;if(hunt(d1,n))nh1++;const b=blp(d1,n);C1.push(b.c);if(Math.abs(b.t)>1.96)bl1++}
+  const f=C1.filter(v=>Math.abs(v)<4),P=histLines($('c8cv'),[f],[C.a],-1.5,3.5,40,[[1,C.g,'calibrated = 1',true],[0,C.r,'no signal = 0',true]]);P.text('BLP coefficient on T·d →',P.w-P.R-140,P.h-P.B-6,C.mu);
+  const P2=barG($('c8cv2'),[[nh0/R,bl0/R],[nh1/R,bl1/R]],[C.r,C.g],['size (h = 0)','power (your h)'],0,1.1,pct0);P2.hline(.05,C.fg,'5%');legend(P2,[['subgroup hunt (8 tests)',C.r],['BLP test',C.g]],P2.T+12);
+  $('c8st').innerHTML=stat('size: hunt · BLP',pc(nh0/R)+' · '+pc(bl0/R),nh0/R>.15?'hot':'ok')+stat('power: hunt · BLP',pc(nh1/R)+' · '+pc(bl1/R),'in')+stat('mean BLP coefficient',fmt(avg(f)),'')+stat('true h',fmt(hh),'');
+  $('c8rd').innerHTML=`With no heterogeneity at all, the habit of testing eight candidate subgroups declares “a subgroup effect” in ${pc(nh0/R)} of experiments; the single BLP test on held-out data stays at ${pc(bl0/R)}. At your h the BLP test detects heterogeneity ${pc(bl1/R)} of the time and its coefficient averages ${fmt(avg(f))}${hh>0?' (the model is trained on half of the data, so it is attenuated below 1)':''}. The hunt’s apparent power is ${pc(nh1/R)}, but it cannot be separated from its false positives.`}
+ ['c8n','c8h'].forEach(i=>$(i).addEventListener('change',run));$('c8go').onclick=run;run();})();
+
+/* ---------- Ch9 off-policy evaluation ---------- */
+(function(){scl('c9l',v=>v+'%');scl('c9s',v=>v+'%');scl('c9n',v=>v.toLocaleString('en-US'));
+ function run(){const l=val('c9l')/100,sh=val('c9s')/100,n=val('c9n'),R=200,q=qn(1-sh),Vt=.3*sh+.4*npdf(q),DM=[],IP=[],DR=[];
+  for(let r=0;r<R;r++){const x=rn(n),T=new Uint8Array(n);for(let i=0;i<n;i++)T[i]=Math.random()<l?1:0;const Y=lin(n,i=>Math.sin(1.5*x[i])+.5*x[i]+T[i]*(.3+.4*x[i])+randn()),i1=[],i0=[];for(let i=0;i<n;i++)(T[i]?i1:i0).push(i);
+   if(i1.length<10){r--;continue}const f1=simple(arr(x,i1),arr(Y,i1)),f0=simple(arr(x,i0),arr(Y,i0));let dm=0,ip=0,dr=0;
+   for(let i=0;i<n;i++){const pi=x[i]>q?1:0,mu=pi?f1.a+f1.b*x[i]:f0.a+f0.b*x[i],pa=pi?l:1-l;dm+=mu;if(T[i]===pi){ip+=Y[i]/pa;dr+=(Y[i]-mu)/pa}dr+=mu}DM.push(dm/n);IP.push(ip/n);DR.push(dr/n)}
+  const [lo,hi]=rng2(DM,IP,.1),P=histLines($('c9cv'),[DM,IP,DR],[C.r,C.y,C.g],Math.min(lo,Vt-.05),Math.max(hi,Vt+.05),44,[[Vt,C.fg,'true value',true]]);legend(P,[['direct',C.r],['IPW',C.y],['doubly robust',C.g]],P.T+12);P.text('estimated policy value →',P.w-P.R-130,P.h-P.B-6,C.mu);
+  const bs=[DM,IP,DR].map(a=>avg(a)-Vt),ss=[DM,IP,DR].map(sdv),hi2=Math.max(...ss,...bs.map(Math.abs))*1.3+.01,lo2=Math.min(0,...bs)-.02;const Pb=barG($('c9cv2'),[bs,ss],[C.r,C.y,C.g],['bias','sd'],lo2,hi2,x=>x.toFixed(3));legend(Pb,[['direct',C.r],['IPW',C.y],['doubly robust',C.g]],Pb.T+12);
+  $('c9st').innerHTML=stat('true policy value',fmt(Vt),'in')+stat('bias: DM · IPW · DR',bs.map(sgn).join(' · '),Math.abs(bs[0])>.03?'warn':'')+stat('sd: DM · IPW · DR',ss.map(v=>v.toFixed(3)).join(' · '),'')+stat('treated in the log',Math.round(n*l).toLocaleString('en-US'),l<.1?'warn':'');
+  $('c9rd').innerHTML=`The policy’s true value is ${fmt(Vt)}. The direct method, with linear outcome models for a nonlinear baseline, is off by ${sgn(bs[0])}; IPW is unbiased (${sgn(bs[1])}) but its sd is ${ss[1].toFixed(3)}; the doubly robust estimator keeps the low bias (${sgn(bs[2])}) with sd ${ss[2].toFixed(3)}. With only ${pc(l)} treated in the log, the treated customers that the policy wants are scarce and the weights for them are large, so the IPW variance grows.`}
+ ['c9l','c9s','c9n'].forEach(i=>$(i).addEventListener('change',run));$('c9go').onclick=run;run();})();
+
+/* ---------- Ch10 pilot to deployment ---------- */
+(function(){const SZ=[200,500,1000,2000,5000,10000,20000];idx('c10p',SZ,v=>v.toLocaleString('en-US'));scl('c10h',v=>fmt(v/10));scl('c10k',v=>fmt(v/10));
+ const ND=20000;let dep=null;
+ function mkDep(){dep={x1:rn(ND),x2:rn(ND)}}
+ function pilot(np,hh,c,dd){const x1=rn(np),x2=rn(np),T=new Uint8Array(np);for(let i=0;i<np;i++)T[i]=Math.random()<.5?1:0;const Y=lin(np,i=>2+x1[i]+x2[i]+T[i]*(.5+hh*x1[i])+3*randn()),i1=[],i0=[];for(let i=0;i<np;i++)(T[i]?i1:i0).push(i);
+  const fit=ix=>olsMulti([arr(x1,ix),arr(x2,ix)],arr(Y,ix)).beta,b1=fit(i1),b0=fit(i0),bp=olsMulti([x1,x2],Y).beta;let up=0;const pred=new Float64Array(ND);
+  for(let i=0;i<ND;i++){const th=(b1[0]-b0[0])+(b1[1]-b0[1])*dd.x1[i]+(b1[2]-b0[2])*dd.x2[i];if(th>c)up+=(.5+hh*dd.x1[i]-c);pred[i]=bp[0]+bp[1]*dd.x1[i]+bp[2]*dd.x2[i]}
+  const med=quant(pred,.5);let rs=0;for(let i=0;i<ND;i++)if(pred[i]>=med)rs+=.5+hh*dd.x1[i]-c;return{up:up/ND,resp:rs/ND}}
+ function run(){mkDep();const np=SZ[val('c10p')],hh=val('c10h')/10,c=val('c10k')/10;let all=0,orc=0;for(let i=0;i<ND;i++){const t=.5+hh*dep.x1[i]-c;all+=t;orc+=Math.max(0,t)}all/=ND;orc/=ND;
+  let up=0,rp=0,R=60;for(let r=0;r<R;r++){const o=pilot(np,hh,c,dep);up+=o.up/R;rp+=o.resp/R}
+  const vals=[0,all,rp,up,orc],lo=Math.min(0,...vals)-.05,hi=Math.max(...vals)+.08;barZ($('c10cv'),vals,[C.mu,C.r,C.y,C.g,C.fg],['contact nobody','contact all','response model','uplift policy','oracle'],lo,hi,x=>x.toFixed(3));
+  const prof=SZ.map(s=>{let a=0;for(let r=0;r<30;r++)a+=pilot(s,hh,c,dep).up/30;return a}),lo2=Math.min(0,all,...prof)-.05,hi2=Math.max(orc,...prof)+.08,P=mk($('c10cv2'),0,6,hi2,{y0:lo2,L:50});poly(P,prof.map((v,i)=>[i,v]),C.g,2.6);dots(P,prof.map((v,i)=>[i,v]),C.g,3.5);P.hline(orc,C.fg,'oracle');P.hline(Math.max(all,0),C.mu,'best of none / all');P.vline(val('c10p'),C.mu,'',true);
+  const g=P.g;g.fillStyle=C.mu;g.textAlign='center';SZ.forEach((s,i)=>g.fillText(s>=1000?s/1000+'k':s,P.X(i),P.h-P.B+15));P.text('pilot size →',P.w-P.R-70,P.h-P.B-6,C.mu);
+  $('c10st').innerHTML=stat('profit/customer: uplift · oracle',up.toFixed(3)+' · '+orc.toFixed(3),'ok')+stat('share of the oracle gain over “best of none/all”',orc>Math.max(all,0)+1e-6?pc((up-Math.max(all,0))/(orc-Math.max(all,0))):'—','in')+stat('contact all · response model',all.toFixed(3)+' · '+rp.toFixed(3),'')+stat('pilot size',np.toLocaleString('en-US'),'');
+  $('c10rd').innerHTML=`With a pilot of ${np.toLocaleString('en-US')} customers the uplift policy earns ${up.toFixed(3)} per customer against ${orc.toFixed(3)} for the oracle and ${Math.max(all,0).toFixed(3)} for the better of contacting nobody or everybody. The response model (contact the 50% with the highest predicted baseline) earns ${rp.toFixed(3)}. ${hh<.1?'There is almost no heterogeneity, so the best policy is simply all or none and a pilot adds little.':'The right panel shows the learning curve: noisy small pilots give policies worse than the simple rules, large pilots approach the oracle.'} (Costs of running the pilot are not counted here.)`}
+ ['c10p','c10h','c10k'].forEach(i=>$(i).addEventListener('change',run));$('c10go').onclick=run;run();})();
+
+/* ---------- Ch11 fairness constraint ---------- */
+(function(){scl('c11k',v=>v+'%');scl('c11g',v=>(v/10).toFixed(1)+' pts');scl('c11k2',v=>fmt(v/10));
+ function run(){const k=val('c11k')/100,gap=val('c11g')/1000,c=val('c11k2')/10,V=100,nA=12000,nB=8000,uA=lin(nA,()=>.05+.04*randn()),uB=lin(nB,()=>.05-gap+.04*randn());
+  const sA=Array.from(uA).sort((a,b)=>b-a),sB=Array.from(uB).sort((a,b)=>b-a),pre=a=>{const o=[0];for(let i=0;i<a.length;i++)o.push(o[i]+V*a[i]-c);return o},cA=pre(sA),cB=pre(sB),all=Array.from(uA).concat(Array.from(uB)).sort((a,b)=>b-a),cAll=pre(all),N=nA+nB;
+  const unc=s=>cAll[Math.round(s*N)]*1000/N,par=s=>(cA[Math.round(s*nA)]+cB[Math.round(s*nB)])*1000/N,pts1=[],pts2=[];for(let s=0;s<=1.0001;s+=.025){pts1.push([s*100,unc(s)]);pts2.push([s*100,par(s)])}
+  const ys=pts1.concat(pts2).map(p=>p[1]),P=mk($('c11cv'),0,100,Math.max(...ys)*1.1+1,{y0:Math.min(0,...ys)-3,L:50});P.hline(0,C.mu,'');poly(P,pts1,C.y,2.6);poly(P,pts2,C.g,2.6);dots(P,[[k*100,unc(k)],[k*100,par(k)]],C.fg,5);P.vline(k*100,C.mu,'',true);legend(P,[['rank by uplift',C.y],['equal rate in each group',C.g]],P.T+12);P.text('share contacted (%) →',P.w-P.R-110,P.h-P.B-6,C.mu);
+  const thr=all[Math.round(k*N)-1]||0;let tA=0,tB=0;for(const v of uA)if(v>=thr)tA++;for(const v of uB)if(v>=thr)tB++;const rA=tA/nA,rB=tB/nB;
+  barG($('c11cv2'),[[rA,k],[rB,k]],[C.y,C.g],['group A (60%)','group B (40%)'],0,1.15,pct0);
+  const pf=unc(k)-par(k);
+  $('c11st').innerHTML=stat('value per 1000: ranked · equal rates',unc(k).toFixed(1)+' · '+par(k).toFixed(1),'in')+stat('price of fairness',pf.toFixed(1)+' per 1000 ('+(unc(k)>0?pc(pf/unc(k)):'—')+')',pf>1?'warn':'ok')+stat('treatment rate A · B (ranked)',pc(rA)+' · '+pc(rB),Math.abs(rA-rB)>.1?'hot':'ok')+stat('group B share of contacts',pc(tB/Math.max(tA+tB,1))+' (40% of customers)','');
+  $('c11rd').innerHTML=gap<.0005?'With no difference in uplift between the groups, ranking by uplift already treats them at equal rates and the constraint costs nothing.':`Group B’s average uplift is ${(gap*100).toFixed(1)} points lower, so ranking by uplift alone contacts ${pc(rA)} of group A but only ${pc(rB)} of group B at a budget of ${pc(k)}. Forcing equal rates (${pc(k)} in each) reduces the total net value by ${pf.toFixed(1)} per 1000 customers (${unc(k)>0?pc(pf/unc(k)):'—'}). That is the price of fairness for this policy; whether it is acceptable is a governance decision, but it should be measured, not assumed.`}
+ ['c11k','c11g','c11k2'].forEach(i=>$(i).addEventListener('input',run));run();})();
+const QZ=[{"l": "Beginner", "q": "Uplift (or the CATE) of a retention call for a customer is…", "o": ["The probability the customer accepts the call", "The probability the customer churns", "The average churn rate", "The change in that customer’s churn probability caused by the call"], "a": 3, "e": "It compares the outcome with and without treatment for customers like this one."}, {"l": "Beginner", "q": "Which customers should a retention campaign contact first?", "o": ["Those who answer the phone", "Those most likely to churn", "Those with the largest positive uplift net of cost", "Those most likely to stay"], "a": 2, "e": "The decision depends on the effect of contact, not on the baseline risk."}, {"l": "Intermediate", "q": "A response model trained to predict conversion tends to rank first the…", "o": ["Sleeping dogs", "Sure things, whose conversion is high with or without treatment", "Persuadables", "Lost causes"], "a": 1, "e": "High baseline conversion is not the same as being moved by the treatment."}, {"l": "Intermediate", "q": "The S-learner with an additive treatment term in a linear model returns…", "o": ["A constant effect for all customers", "A negative effect", "An effect equal to the outcome mean", "The true CATE"], "a": 0, "e": "Without interactions between T and X there is no heterogeneity to represent."}, {"l": "Intermediate", "q": "The X-learner is mainly useful when…", "o": ["The outcome is binary", "There is no overlap", "The effect is exactly zero", "One treatment arm is much larger than the other"], "a": 3, "e": "It imputes effects and weights by the propensity, borrowing from the large arm."}, {"l": "Intermediate", "q": "In a randomised test, a Qini curve plots…", "o": ["Calibration of the churn probability", "The distribution of the score", "Cumulative incremental outcome against the share of customers contacted in order of predicted uplift", "The ROC curve of the uplift score"], "a": 2, "e": "The area between the Qini curve and the random line summarises ranking quality."}, {"l": "Advanced", "q": "A tree grows a split by maximising the difference in estimated effects between the leaves and reports those same leaf effects. They are…", "o": ["Exact", "Biased away from the truth by selection; honest estimation on a separate sample fixes it", "Unbiased because randomisation protects them", "Biased towards zero"], "a": 1, "e": "The split is chosen where noise makes effects differ most; honesty separates choosing from estimating."}, {"l": "Advanced", "q": "A model ranks customers by noisy estimated uplift; the top decile’s average predicted uplift is 6 points, but a randomised test shows 3. This is…", "o": ["The winner’s curse: selection on noisy estimates overstates the top group", "Evidence the experiment is invalid", "A sign the model is under-fitted", "Expected only with trees"], "a": 0, "e": "The more noise in the estimates, the more selection inflates the predicted uplift of the selected."}, {"l": "Advanced", "q": "The doubly robust (DR) pseudo-outcome for the CATE is unbiased if…", "o": ["Both models are wrong", "The sample is large", "Only the outcome model is correct", "Either the outcome models or the propensity model is correct"], "a": 3, "e": "The augmentation term corrects the error of one model using the other."}, {"l": "Advanced", "q": "The BLP calibration test regresses the held-out outcome on T, the centred predicted effect d and T·d. The coefficient on T·d being near 1 means…", "o": ["The model overfits", "There is no heterogeneity", "The predicted heterogeneity is well calibrated", "The treatment has no effect"], "a": 2, "e": "Zero means the predictions carry no heterogeneity signal; one means calibrated."}, {"l": "Advanced", "q": "Why is testing eight candidate subgroups for interaction a poor way to find heterogeneity?", "o": ["It cannot be run on randomised data", "The chance of at least one false positive is about one in three even with none", "It has too little power for large effects", "It needs a propensity score"], "a": 1, "e": "1 − 0.95⁸ ≈ 34%: a multiple-testing problem."}, {"l": "Expert", "q": "Off-policy evaluation of a new targeting policy from logged randomised data requires that…", "o": ["The logging policy gave every action a positive probability for the customers the policy would treat", "The logging policy was identical to the new policy", "Outcomes were binary", "No customers were treated"], "a": 0, "e": "Without overlap between logged and target actions the value cannot be estimated without a model."}, {"l": "Expert", "q": "The inverse-propensity-weighting estimator of a policy’s value is unbiased but can have high variance when…", "o": ["The sample is large", "The outcome model is right", "The policy treats everyone", "The logging probability of the action the policy picks is small"], "a": 3, "e": "Large weights 1/P(action) let few observations dominate."}, {"l": "Expert", "q": "A bank wants to keep a permanent 5% never-contacted holdout in its retention programme. The main reason is to…", "o": ["Satisfy the propensity assumption", "Increase the model’s accuracy on the training set", "Re-estimate effects and detect drift in the uplift model with a clean comparison", "Reduce contact cost"], "a": 2, "e": "A randomised holdout is the one source of unbiased ongoing evidence about effects."}, {"l": "Expert", "q": "Enforcing equal treatment rates across two groups with different uplift distributions will…", "o": ["Have no effect on value", "Typically reduce total value; the reduction is the price of fairness, to be measured and reported", "Remove the need for monitoring", "Always increase value"], "a": 1, "e": "It forces contact with lower-uplift customers in one group at the expense of higher-uplift customers in the other."}, {"l": "Expert", "q": "Which statement about uplift models trained on past, non-randomised campaigns is correct?", "o": ["They need ignorability and overlap; the learned effects can be confounded by whoever was targeted in the past", "They do not need propensity scores", "They are valid only for binary outcomes", "They are always valid because the data are large"], "a": 0, "e": "Observational uplift modelling inherits all the identification problems of the previous pages."}, {"l": "Expert", "q": "A pilot to train an uplift model is expensive. The best justification for a larger pilot is…", "o": ["A very small deployment population", "A zero contact cost", "A uniform effect across customers", "Large expected heterogeneity, noisy outcomes and a wide margin between the benefit and the contact cost"], "a": 3, "e": "The value of finding who responds grows with heterogeneity and stakes, and shrinks if the answer is “treat all” or “treat none”."}, {"l": "Expert", "q": "A churn model has an AUC of 0.85 for predicting who will churn. As an uplift tool it is…", "o": ["Useless, since AUC is always misleading", "Valid only for linear models", "Unproven: high accuracy for baseline risk says nothing about who is moved by the call; check the Qini curve on randomised data", "Excellent, since it finds the riskiest customers"], "a": 2, "e": "Baseline risk and treatment effect are different quantities; a risk model may even rank sleeping dogs first."}];
+(function(){const st=store.get('up_quiz',{});
+ function render(){const box=$('quiz');box.innerHTML='';
+  QZ.forEach((q,i)=>{const d=document.createElement('div');d.className='q'+(st[i]!=null?' done':'');d.innerHTML=`<div class="qh">Q${i+1} · ${q.l}</div><div style="margin:4px 0 6px"><b>${q.q}</b></div>`;
+   q.o.forEach((o,j)=>{const b=document.createElement('button');b.className='opt';b.textContent=o;if(st[i]!=null){if(j===q.a)b.classList.add('good');else if(j===st[i])b.classList.add('bad')}b.onclick=()=>{if(st[i]!=null)return;st[i]=j;store.set('up_quiz',st);render();meter()};d.appendChild(b)});
+   const e=document.createElement('div');e.className='ex';e.innerHTML=(st[i]===q.a?'✅ ':'❌ ')+q.e;d.appendChild(e);box.appendChild(d)});
+  const ans=Object.keys(st).length,ok=QZ.filter((q,i)=>st[i]===q.a).length;
+  $('qscore').innerHTML=stat('answered',ans+' / '+QZ.length,'in')+stat('correct',ok,'ok')+stat('score',ans?Math.round(100*ok/ans)+'%':'—',ok/Math.max(ans,1)>=.8?'ok':'warn')+stat('verdict',ans<QZ.length?'keep going':ok>=16?'uplift master':ok>=13?'strong':'review ch. 1–11','')}
+ $('qreset').onclick=()=>{Object.keys(st).forEach(k=>delete st[k]);store.set('up_quiz',st);render();meter()};
+ window.__qst=st;render();})();
+const CHK=["Define the CATE and uplift and describe the four customer types.", "Explain why a response model is not an uplift model.", "Estimate subgroup effects from an experiment and shrink them sensibly.", "Describe the S, T and X meta-learners and choose among them.", "Explain causal trees and forests and why honest estimation matters.", "Evaluate an uplift model with Qini or uplift curves on a randomised test set.", "Choose the targeted share from predicted uplift, value and cost, and explain the winner’s curse in the selected group.", "Build a DR-learner pseudo-outcome and explain orthogonality and cross-fitting.", "Run and interpret a BLP calibration test and avoid subgroup hunting.", "Estimate a targeting policy’s value off-policy (direct, IPW, doubly robust).", "Plan a pilot, a holdout and an exploration band for uplift modelling.", "Measure the price of a fairness constraint on a targeting policy.", "State the identification assumptions when uplift is learned from non-randomised data.", "Write the effect-estimation and governance section of an uplift-model validation file."];
+(function(){const st=store.get('up_chk',{}),box=$('chk');CHK.forEach((t,i)=>{const l=document.createElement('label'),c=document.createElement('input');c.type='checkbox';c.checked=!!st[i];c.onchange=()=>{st[i]=c.checked;store.set('up_chk',st);meter()};l.appendChild(c);const s=document.createElement('span');s.textContent=t;l.appendChild(s);box.appendChild(l)});window.__cst=st;})();
+function meter(){const q=window.__qst||{},c=window.__cst||{};const ok=QZ.filter((x,i)=>q[i]===x.a).length,ck=Object.values(c).filter(Boolean).length;const p=Math.round(100*(.6*ok/QZ.length+.4*ck/CHK.length));$('mtxt').textContent='Mastery: '+p+'%  (exam + checklist)';$('mbar').style.width=p+'%';store.set('mastery_up',p)}
+meter();
+
+/* ---------- Navigation ---------- */
+(function(){const nav=$('nav');let html='';
+ document.querySelectorAll('main .part, main section.ch').forEach(el=>{if(el.classList.contains('part'))html+=`<div class="pt">${el.textContent}</div>`;else{const h=el.querySelector('h2'),num=h.querySelector('.num').textContent,t=Array.from(h.childNodes).filter(n=>n.nodeType===3).map(n=>n.textContent).join('').trim();html+=`<a href="#${el.id}" data-id="${el.id}">${num}. ${t}</a>`}});
+ nav.innerHTML=html;const links=nav.querySelectorAll('a'),io=new IntersectionObserver(es=>{es.forEach(e=>{if(e.isIntersecting)links.forEach(a=>a.classList.toggle('on',a.dataset.id===e.target.id))})},{rootMargin:'-20% 0px -70% 0px'});
+ document.querySelectorAll('section.ch').forEach(s=>io.observe(s));
+ $('menu').onclick=()=>$('side').classList.toggle('open');nav.addEventListener('click',e=>{if(e.target.tagName==='A')$('side').classList.remove('open')});
+ window.addEventListener('scroll',()=>{const h=document.documentElement;$('prog').style.width=(100*h.scrollTop/(h.scrollHeight-h.clientHeight))+'%'},{passive:true});})();
+</script>
+</body>
+</html>

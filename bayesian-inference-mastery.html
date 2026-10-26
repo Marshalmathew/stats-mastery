@@ -1,0 +1,660 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Bayesian Inference Mastery</title>
+<style>
+:root{--bg:#0b0e17;--panel:#121726;--panel2:#171d30;--line:#232a3d;--fg:#e8ebf5;--mu:#8a93ab;--a:#6ea8ff;--r:#ff6b81;--y:#ffd166;--g:#4ade80;--p:#c084fc;--t:#5eead4}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;background:var(--bg);color:var(--fg);font:16px/1.7 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+a{color:var(--a)}
+#prog{position:fixed;top:0;left:0;height:3px;background:linear-gradient(90deg,var(--a),var(--p),var(--r));width:0;z-index:50}
+.side{position:fixed;left:0;top:0;bottom:0;width:290px;background:#0e1220;border-right:1px solid var(--line);overflow:auto;padding:18px 14px 90px;z-index:40;transition:transform .25s}
+.side h1{font-size:15px;margin:0 0 2px}
+.side small{color:var(--mu)}
+.side .pt{margin:16px 0 4px;font-size:11px;text-transform:uppercase;letter-spacing:1.3px;color:var(--p)}
+.side a{display:block;color:var(--mu);text-decoration:none;padding:5px 9px;border-radius:7px;font-size:13.5px;line-height:1.35}
+.side a:hover{background:var(--panel);color:var(--fg)}
+.side a.on{background:var(--panel2);color:var(--fg);box-shadow:inset 3px 0 var(--a)}
+.side a.back{color:var(--t);padding-left:0;margin-bottom:6px}
+.meter{position:fixed;left:0;bottom:0;width:290px;background:#0e1220;border-top:1px solid var(--line);padding:10px 16px;z-index:41;font-size:12px;color:var(--mu)}
+.meter .bar{height:7px;background:var(--line);border-radius:6px;margin-top:5px;overflow:hidden}
+.meter .bar i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--g),var(--t));transition:width .4s}
+#menu{display:none;position:fixed;top:10px;left:10px;z-index:60;background:var(--panel2);color:var(--fg);border:1px solid var(--line);border-radius:9px;padding:7px 12px;font-size:14px;cursor:pointer}
+main{margin-left:290px;padding:0 34px 120px;max-width:1090px}
+.hero{padding:70px 0 30px}
+.hero h1{font-size:clamp(32px,5vw,56px);line-height:1.08;margin:0 0 14px;background:linear-gradient(100deg,#fff,var(--y) 40%,var(--r));-webkit-background-clip:text;background-clip:text;color:transparent}
+.hero p{font-size:19px;color:#c3c9dc;max-width:780px}
+.chips{display:flex;flex-wrap:wrap;gap:8px;margin:18px 0}
+.chip{border:1px solid var(--line);background:var(--panel);padding:5px 12px;border-radius:99px;font-size:13px;color:var(--mu)}
+.chip b{color:var(--fg)}
+.part{margin:90px 0 0;padding-top:22px;border-top:1px solid var(--line);font-size:12px;letter-spacing:2px;text-transform:uppercase;color:var(--p)}
+section.ch{padding-top:30px}
+h2{font-size:30px;line-height:1.2;margin:10px 0 8px;display:flex;gap:12px;align-items:center;flex-wrap:wrap}
+h2 .num{display:inline-grid;place-items:center;width:40px;height:40px;border-radius:12px;background:var(--panel2);border:1px solid var(--line);font-size:18px;color:var(--a)}
+.lvl{font-size:11px;font-weight:600;letter-spacing:.8px;text-transform:uppercase;padding:3px 9px;border-radius:99px;border:1px solid}
+.lvl.b{color:var(--g);border-color:#1f5c3a}.lvl.i{color:var(--a);border-color:#244a85}.lvl.a{color:var(--y);border-color:#6b5420}.lvl.e{color:var(--r);border-color:#7a2c3a}
+h3{font-size:19px;margin:30px 0 6px;color:#fff}
+p{margin:10px 0}li{margin:5px 0}
+code,.f{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace}
+code{background:var(--panel2);padding:1px 6px;border-radius:5px;font-size:.9em}
+.f{display:block;white-space:pre-wrap;background:#0e1322;border:1px solid var(--line);border-left:3px solid var(--a);padding:12px 16px;border-radius:9px;margin:14px 0;overflow-x:auto;font-size:15px;color:#dbe4ff;line-height:1.8}
+.co{border-radius:12px;padding:13px 17px;margin:16px 0;border:1px solid var(--line);background:var(--panel)}
+.co>b:first-child{display:block;margin-bottom:2px;font-size:12px;letter-spacing:1px;text-transform:uppercase}
+.co.def{border-left:4px solid var(--a)}.co.def>b:first-child{color:var(--a)}
+.co.warn{border-left:4px solid var(--r)}.co.warn>b:first-child{color:var(--r)}
+.co.tip{border-left:4px solid var(--g)}.co.tip>b:first-child{color:var(--g)}
+.co.key{border-left:4px solid var(--y);background:#171608}.co.key>b:first-child{color:var(--y)}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:18px 20px;margin:22px 0;box-shadow:0 8px 30px rgba(0,0,0,.25)}
+.card>h4{margin:0 0 3px;font-size:13px;letter-spacing:1.2px;text-transform:uppercase;color:var(--t)}
+.card>p.sub{margin:0 0 12px;color:var(--mu);font-size:14.5px}
+.ctl{display:flex;flex-wrap:wrap;gap:10px 22px;align-items:center;margin:8px 0 10px}
+.ctl label{display:flex;gap:8px;align-items:center;font-size:14px;color:#c3c9dc}
+.ctl output{min-width:38px;font-family:ui-monospace,monospace;color:var(--y);font-size:13px}
+input[type=range]{accent-color:var(--a);width:150px}
+input[type=checkbox]{accent-color:var(--a)}
+select,input[type=number],input[type=text]{background:#0e1322;color:var(--fg);border:1px solid var(--line);border-radius:8px;padding:6px 9px;font:inherit;font-size:14px}
+button{background:linear-gradient(180deg,#2c4a80,#233b68);color:#fff;border:1px solid #3a5a98;border-radius:9px;padding:7px 14px;font:inherit;font-size:14px;cursor:pointer}
+button:hover{filter:brightness(1.15)}
+button.alt{background:var(--panel2);border-color:var(--line);color:var(--fg)}
+canvas{width:100%;height:270px;display:block;background:#0e1322;border:1px solid var(--line);border-radius:10px;margin-top:6px}
+canvas.sm{height:210px}canvas.tl{height:330px}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(125px,1fr));gap:9px;margin:12px 0}
+.stat{background:#0e1322;border:1px solid var(--line);border-radius:10px;padding:8px 11px}
+.stat b{display:block;font-size:17px;font-family:ui-monospace,monospace}
+.stat span{font-size:11.5px;color:var(--mu);text-transform:uppercase;letter-spacing:.7px}
+.stat.hot b{color:var(--r)}.stat.ok b{color:var(--g)}.stat.warn b{color:var(--y)}.stat.in b{color:var(--a)}
+.read{margin:8px 0 0;padding:10px 14px;background:#0e1322;border:1px dashed #33406a;border-radius:10px;font-size:14.5px;color:#d3dbf3}
+table{border-collapse:collapse;width:100%;margin:12px 0;font-size:14px}
+th,td{border:1px solid var(--line);padding:7px 10px;text-align:left;vertical-align:top}
+th{background:var(--panel2);font-size:12px;text-transform:uppercase;letter-spacing:.6px;color:var(--mu)}
+td.n{font-family:ui-monospace,monospace;text-align:right}
+.tw{overflow-x:auto}
+.pill{display:inline-block;padding:1px 9px;border-radius:99px;font-size:12px;font-weight:600}
+.pill.r{background:#3a1520;color:var(--r)}.pill.g{background:#10321f;color:var(--g)}.pill.y{background:#3a2f0e;color:var(--y)}.pill.m{background:#202637;color:var(--mu)}
+details{background:var(--panel);border:1px solid var(--line);border-radius:11px;padding:9px 15px;margin:9px 0}
+details summary{cursor:pointer;font-weight:600}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.q{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:14px 18px;margin:14px 0}
+.q .qh{font-size:12px;letter-spacing:1px;text-transform:uppercase;color:var(--mu)}
+.q .opt{display:block;width:100%;text-align:left;margin:6px 0;background:#0e1322;border:1px solid var(--line);color:var(--fg);border-radius:9px;padding:9px 12px}
+.q .opt.good{border-color:var(--g);background:#0e2418}.q .opt.bad{border-color:var(--r);background:#2a1119}
+.q .ex{display:none;margin-top:8px;font-size:14.5px;color:#c3c9dc}
+.q.done .ex{display:block}
+.chk label{display:flex;gap:10px;align-items:flex-start;padding:6px 0;cursor:pointer}
+.chk input{margin-top:6px;accent-color:var(--g);width:17px;height:17px}
+.sigrow{display:grid;grid-template-columns:minmax(170px,2fr) 1fr 1fr auto;gap:8px 14px;align-items:center;padding:6px 0;border-top:1px dashed #1b2236}
+.sigrow:first-of-type{border-top:0}
+.sigrow label{display:flex;gap:6px;align-items:center;font-size:13.5px;color:#c3c9dc}
+@media(max-width:900px){
+ .side{transform:translateX(-100%)}.side.open{transform:none}.meter{display:none}
+ #menu{display:block}main{margin-left:0;padding:0 16px 100px}.two{grid-template-columns:1fr}.hero{padding-top:60px}
+ .sigrow{grid-template-columns:1fr 1fr}
+}
+</style>
+</head>
+<body>
+<div id="prog"></div>
+<button id="menu">☰ Contents</button>
+<nav class="side" id="side"><a class="back" href="index.html">← All courses</a><h1>Bayesian Inference</h1><small>12 chapters · 11 labs · exam</small><div id="nav"></div></nav>
+<div class="meter"><div id="mtxt">Mastery: 0%</div><div class="bar"><i id="mbar"></i></div></div>
+
+<main>
+<header class="hero">
+ <h1>Bayesian inference: updating beliefs with data, and knowing what the prior is doing.</h1>
+ <p>Frequentist methods answer “how would this procedure behave over repeated samples?”. Bayesian methods answer the question people usually ask: “given the data I have, what do I now believe about the parameter?”. The price is a prior, and the skill is knowing when it matters. This page builds the machinery on models where everything can be computed exactly (conjugate models, so no sampling algorithm is needed until the next page): posterior = prior × likelihood, credible intervals and their frequentist coverage, priors from flat to informative, posterior predictive checks, Bayesian regression as ridge with uncertainty, how priors wash out (or fail to), Bayes factors and the Lindley paradox, and three bank-style applications: shrinking noisy branch rates, A/B decisions with peeking, and probability of default for portfolios with almost no defaults. As always, each lab simulates data with a known truth.</p>
+ <div class="chips"><span class="chip"><b>Part I</b> Updating and priors</span><span class="chip"><b>Part II</b> Checking, regression, comparison</span><span class="chip"><b>Part III</b> Practice in a bank</span></div>
+ <div class="co tip"><b>How to use this</b>Sliders change the setting; heavy labs update when you release a slider or press the button. Prerequisites: Bayes’ theorem and conditional probability, maximum likelihood, and regularisation (item 14). Item 27 adds the computation (MCMC and variational methods) that non-conjugate models need.</div>
+</header>
+
+<div class="part">Part I · Updating and priors</div>
+
+<section class="ch" id="c1">
+<h2><span class="num">1</span>Prior, likelihood, posterior <span class="lvl b">Beginner</span></h2>
+<p>Bayes’ theorem applied to a parameter θ says that what you believe after seeing data y is what you believed before, reweighted by how well each θ explains y:</p>
+<div class="f">p(θ | y) ∝ p(y | θ) · p(θ)          posterior ∝ likelihood × prior</div>
+<p>The likelihood is the one used for maximum likelihood; the new ingredient is the <b>prior</b> p(θ), which says which values were plausible before the data. The result is a whole distribution for θ, from which point estimates (the posterior mean or median), intervals and probabilities such as P(PD &gt; 2% | data) follow directly. The simplest case is a rate: with a Beta(a, b) prior and k successes in n trials, the posterior is exactly Beta(a + k, b + n − k). Read a and b as pseudo-counts of successes and failures that came before: the posterior mean (a + k)/(a + b + n) is a weighted average of the prior mean and the sample rate, with weight n/(n + a + b) on the data.</p>
+<div class="co warn"><b>A different kind of statement</b>A 95% credible interval says that, given the model and prior, θ lies in the interval with probability 0.95. A frequentist confidence interval makes no probability statement about the one interval you computed. The Bayesian statement is what people want to say, and it is conditional on the prior being reasonable.</div>
+<div class="card"><h4>Lab 1 · A beta prior meets binomial data</h4>
+ <p class="sub">The true rate is set by the slider and data are simulated from it (one fixed dataset, so sliders move smoothly; the button draws a new one). Left: prior, normalised likelihood and posterior (the dashed vertical line is the truth). Right: how the posterior mean (green) travels from the prior mean towards the sample rate (yellow) and the truth as the trials accumulate; the dashed line is your n.</p>
+ <div class="ctl"><label>prior mean <input type="range" id="c1a" min="10" max="90" step="1" value="30"><output id="c1av"></output></label><label>prior strength (pseudo-obs) <input type="range" id="c1s" min="2" max="200" step="1" value="10"><output id="c1sv"></output></label><label>trials n <input type="range" id="c1n" min="0" max="500" step="1" value="20"><output id="c1nv"></output></label><label>true rate <input type="range" id="c1t" min="1" max="60" step="1" value="12"><output id="c1tv"></output></label><button id="c1go">New data</button></div>
+ <div class="two"><canvas class="sm" id="c1cv"></canvas><canvas class="sm" id="c1cv2"></canvas></div><div class="stats" id="c1st"></div><div class="read" id="c1rd"></div></div>
+</section>
+
+<section class="ch" id="c2">
+<h2><span class="num">2</span>Conjugate models and sequential updating <span class="lvl i">Intermediate</span></h2>
+<p>A prior is <b>conjugate</b> to a likelihood when the posterior is in the same family, so updating is arithmetic instead of numerical integration. The three workhorses: <b>beta–binomial</b> for proportions (above); <b>gamma–Poisson</b> for counts (Gamma(a, b) prior on a Poisson rate gives Gamma(a + Σy, b + n)); and <b>normal–normal</b> for a mean with known variance σ². In the normal case the quantities that add are the <em>precisions</em> (inverse variances):</p>
+<div class="f">1/s₁² = 1/s₀² + n/σ²          m₁ = s₁² · ( m₀/s₀² + n·ȳ/σ² )</div>
+<p>so the posterior mean is a precision-weighted average of the prior mean and the sample mean, and the posterior is always narrower than either source. A prior of sd s₀ carries as much information as σ²/s₀² observations, a useful way to ask “is this prior sensible?”. Because the data enter through a sufficient statistic, <b>sequential updating</b> gives the same posterior as processing all the data at once: yesterday’s posterior is today’s prior. This is why Bayesian models suit streams of transactions and is the idea behind online credit and fraud scorecards.</p>
+<div class="card"><h4>Lab 2 · Precisions add</h4>
+ <p class="sub">Data: n draws from N(1, 2²), σ known. Prior N(m₀, s₀²). Left: prior, likelihood (the sample mean’s sampling distribution) and posterior; the dashed vertical line is the truth. Right: the weight the posterior puts on the data as n grows, for your prior sd and for a prior three times tighter and looser.</p>
+ <div class="ctl"><label>sample size n <input type="range" id="c2n" min="1" max="200" step="1" value="5"><output id="c2nv"></output></label><label>prior mean <input type="range" id="c2m" min="-6" max="10" step="1" value="6"><output id="c2mv"></output></label><label>prior sd <input type="range" id="c2s" min="2" max="50" step="1" value="10"><output id="c2sv"></output></label><button id="c2go">New data</button></div>
+ <div class="two"><canvas class="sm" id="c2cv"></canvas><canvas class="sm" id="c2cv2"></canvas></div><div class="stats" id="c2st"></div><div class="read" id="c2rd"></div></div>
+</section>
+
+<section class="ch" id="c3">
+<h2><span class="num">3</span>Choosing priors <span class="lvl i">Intermediate</span></h2>
+<p>Priors come in a spectrum. <b>Flat or “non-informative”</b> priors (uniform on a proportion; Jeffreys’ prior, Beta(½, ½), which is invariant to reparametrisation) try to let the data speak. They are not neutral: a uniform prior on a probability is not uniform on the log-odds, and for a rare event it says that a default rate of 40% was as plausible as 1%. <b>Weakly informative</b> priors rule out the absurd (PD above 50% for a prime portfolio) without pretending to precision. <b>Informative</b> priors encode real knowledge (an earlier model, external ratings, a regulator’s benchmark) and are valuable exactly when data are scarce. Practical rules: choose the prior on a scale you can reason about, check it by simulating data from it (a <b>prior predictive check</b>: would these datasets look possible?), report a sensitivity analysis with two or three alternative priors, and write down where an informative prior came from. In a regulated model, the prior is a documented assumption like any other.</p>
+<div class="card"><h4>Lab 3 · The same data under five priors</h4>
+ <p class="sub">A portfolio has a true default rate set by the slider; the simulated data are d defaults among n obligors. Left: the five posteriors (the dashed line is the truth). Right: posterior means, with the MLE for comparison.</p>
+ <div class="ctl"><label>obligors n <input type="range" id="c3n" min="20" max="3000" step="10" value="200"><output id="c3nv"></output></label><label>true default rate <input type="range" id="c3p" min="1" max="100" step="1" value="15"><output id="c3pv"></output></label><button id="c3go">New data</button></div>
+ <div class="two"><canvas class="sm" id="c3cv"></canvas><canvas class="sm" id="c3cv2"></canvas></div><div class="stats" id="c3st"></div><div class="read" id="c3rd"></div></div>
+</section>
+
+<section class="ch" id="c4">
+<h2><span class="num">4</span>Credible intervals and their coverage <span class="lvl i">Intermediate</span></h2>
+<p>A 95% <b>credible interval</b> contains 95% of the posterior probability. Two standard choices: the <b>equal-tailed</b> interval (2.5% in each tail), easy to compute from quantiles, and the <b>highest posterior density (HPD)</b> interval, the shortest one, which is better for skewed posteriors and for those piled against a boundary (a PD near zero). Credible intervals answer a different question from confidence intervals, but it is fair to ask how a Bayesian interval behaves in repeated samples. Two facts frame the answer: if θ really is drawn from the prior, the credible interval covers exactly 95% <em>on average over the prior</em>; at one fixed θ its coverage can be higher or lower. And in standard problems with moderate n, Bayesian intervals with reasonable priors have coverage close to nominal, often better than the Wald interval, which fails badly for small proportions.</p>
+<div class="card"><h4>Lab 4 · Exact coverage of three intervals for a proportion</h4>
+ <p class="sub">For n trials, the exact probability that each interval contains the true p, computed over all possible outcomes. Left: coverage against p. Right: average coverage over p drawn uniformly from (0, 1) and over a low-default range (0.1% to 5%).</p>
+ <div class="ctl"><label>trials n <input type="range" id="c4n" min="10" max="200" step="5" value="30"><output id="c4nv"></output></label></div>
+ <div class="two"><canvas class="sm" id="c4cv"></canvas><canvas class="sm" id="c4cv2"></canvas></div><div class="stats" id="c4st"></div><div class="read" id="c4rd"></div></div>
+</section>
+
+<div class="part">Part II · Checking, regression and model comparison</div>
+
+<section class="ch" id="c5">
+<h2><span class="num">5</span>Posterior predictive distributions and model checks <span class="lvl a">Advanced</span></h2>
+<p>To predict a new observation ỹ you average the model’s prediction over the posterior instead of plugging in one estimate:</p>
+<div class="f">p(ỹ | y) = ∫ p(ỹ | θ) · p(θ | y) dθ</div>
+<p>This is wider than the plug-in prediction because it carries parameter uncertainty as well as noise (for a Poisson rate with a gamma posterior, the predictive distribution is negative binomial). It is also the tool for checking the model. A <b>posterior predictive check</b> simulates replicate datasets from the fitted model, computes a statistic T that targets a feature you care about (dispersion, the share of zeros, the maximum, the autocorrelation), and compares the observed T(y) with the replicated T(y_rep). A tail probability near 0 or 1 says the model cannot reproduce that feature. Pick statistics that the model could <em>fail</em>: the mean is usually fitted by construction, so a check on it is uninformative. The usual predictive p-value is conservative because the data were used twice (to fit and to check), so treat extreme values as evidence and middling ones as an absence of evidence.</p>
+<div class="card"><h4>Lab 5 · A Poisson model for over-dispersed counts</h4>
+ <p class="sub">n customers’ monthly counts of disputes, true mean 2, with extra customer-to-customer variation controlled by the slider (0 means exactly Poisson). The fitted model is Poisson with a gamma prior. Left: replicated variance-to-mean ratios against the observed one. Right: replicated share of zeros against the observed one.</p>
+ <div class="ctl"><label>customers n <input type="range" id="c5n" min="100" max="2000" step="100" value="400"><output id="c5nv"></output></label><label>over-dispersion φ <input type="range" id="c5f" min="0" max="20" step="1" value="8"><output id="c5fv"></output></label><button id="c5go">Re-simulate</button></div>
+ <div class="two"><canvas class="sm" id="c5cv"></canvas><canvas class="sm" id="c5cv2"></canvas></div><div class="stats" id="c5st"></div><div class="read" id="c5rd"></div></div>
+</section>
+
+<section class="ch" id="c6">
+<h2><span class="num">6</span>Bayesian regression and its link to ridge <span class="lvl a">Advanced</span></h2>
+<p>In a linear model y = Xβ + ε with ε ~ N(0, σ²) and a prior β ~ N(0, τ²I), the posterior of β is normal with</p>
+<div class="f">mean = (X′X + λI)⁻¹ X′y,          covariance = σ² (X′X + λI)⁻¹,          λ = σ²/τ²</div>
+<p>The posterior mean is exactly the <b>ridge estimate</b> of item 14, so ridge regression is Bayesian regression with a normal prior and the penalty is the prior precision. The Bayesian view adds two things: the covariance (credible intervals for every coefficient and predictions with honest uncertainty) and a principled way to choose λ, as a statement about how large coefficients typically are. A Laplace (double-exponential) prior gives the lasso as its posterior <em>mode</em>, but the posterior mean under that prior is not sparse. With many predictors and few observations, a prior that matches reality can beat OLS by a wide margin, while a prior that is too tight biases every coefficient towards zero and produces intervals that are too narrow to be trusted.</p>
+<div class="card"><h4>Lab 6 · Ten coefficients, little data</h4>
+ <p class="sub">The true coefficients are drawn from N(0, s²) (s is set by the slider), noise sd is 1, and there are ten standard-normal predictors. Left: root-mean-squared coefficient error against the prior sd over 100 datasets, with OLS for comparison. Right: the error for four estimators; the statistics add the coverage of 95% credible intervals.</p>
+ <div class="ctl"><label>observations n <input type="range" id="c6n" min="15" max="200" step="5" value="15"><output id="c6nv"></output></label><label>true coefficient sd s <input type="range" id="c6s" min="10" max="150" step="5" value="50"><output id="c6sv"></output></label><label>your prior sd τ <input type="range" id="c6t" min="5" max="400" step="5" value="200"><output id="c6tv"></output></label><button id="c6go">Re-simulate</button></div>
+ <div class="two"><canvas class="sm" id="c6cv"></canvas><canvas class="sm" id="c6cv2"></canvas></div><div class="stats" id="c6st"></div><div class="read" id="c6rd"></div></div>
+</section>
+
+<section class="ch" id="c7">
+<h2><span class="num">7</span>Priors, data and asymptotics <span class="lvl a">Advanced</span></h2>
+<p>As n grows, the likelihood concentrates and, for regular models and any prior that puts positive density near the truth, the posterior converges to a normal distribution centred at the MLE with variance equal to the inverse Fisher information (the <b>Bernstein–von Mises theorem</b>). Credible intervals then agree with Wald confidence intervals, and the prior washes out at rate 1/n: two analysts with different reasonable priors end up in the same place. Three cautions. First, “enough data” depends on the prior’s strength: a prior worth 200 observations is still visible at n = 200. Second, a prior with probability zero on the truth never recovers, however much data arrive (<b>Cromwell’s rule</b>); leave a little mass everywhere you cannot rule out. Third, <b>prior–data conflict</b> (the data are far from where the prior put its mass) is itself a diagnostic: rather than trusting the posterior blindly, ask whether the prior or the model is wrong. A related fact: the posterior depends on the data only through the likelihood, so the stopping rule does not change it (the <em>likelihood principle</em>), though it does change a frequentist p-value and the long-run error rate of a decision rule built on the posterior (chapter 10).</p>
+<div class="card"><h4>Lab 7 · Three priors, one stream of data</h4>
+ <p class="sub">The same simulated observations feed three posteriors for a rate: a flat prior, a confident prior centred at 20% (worth 200 observations) and a prior that gives zero probability to any rate above 20%. Left: posterior means against n (log scale). Right: the three posteriors at the n you choose (dashed vertical line: the truth).</p>
+ <div class="ctl"><label>true rate <input type="range" id="c7t" min="10" max="60" step="1" value="35"><output id="c7tv"></output></label><label>observations n <input type="range" id="c7i" min="0" max="9" step="1" value="5"><output id="c7iv"></output></label><button id="c7go">New data</button></div>
+ <div class="two"><canvas class="sm" id="c7cv"></canvas><canvas class="sm" id="c7cv2"></canvas></div><div class="stats" id="c7st"></div><div class="read" id="c7rd"></div></div>
+</section>
+
+<section class="ch" id="c8">
+<h2><span class="num">8</span>Bayes factors and the Lindley paradox <span class="lvl e">Expert</span></h2>
+<p>To compare two models M₀ and M₁ the Bayesian uses the <b>marginal likelihood</b> p(y | M) = ∫ p(y | θ, M) p(θ | M) dθ, the probability the model gave to the data averaged over its own prior. The ratio of two marginal likelihoods is the <b>Bayes factor</b> and turns prior odds into posterior odds. Marginal likelihoods automatically penalise complexity (an Occam effect): a model with a diffuse prior spreads its probability over many datasets and gives little to the one observed. The corollary is uncomfortable: <b>Bayes factors are sensitive to the prior under the alternative</b>. For a point null H₀: μ = 0 against H₁: μ ~ N(0, τ²), with r = nτ²/σ² and a fixed z-statistic,</p>
+<div class="f">BF₀₁ = √(1 + r) · exp( − (z²/2) · r/(1 + r) )</div>
+<p>which grows like √n for fixed z: a result that is “just significant” at p = 0.05 supports the null more strongly as the sample grows (the <b>Jeffreys–Lindley paradox</b>), because with huge n a small departure from zero would have produced a much larger z if H₁ were true. The resolution is not to prefer one framework but to be explicit: significance asks whether the data are surprising under H₀, Bayes factors ask which hypothesis predicted the data better, and with a point null the two can disagree sharply. Report the prior on the effect, and ask whether a point null is even sensible. For predictive model comparison between non-nested models, use cross-validation or information criteria such as WAIC and LOO instead of Bayes factors, which are fragile to priors.</p>
+<div class="card"><h4>Lab 8 · A fixed p-value and a growing sample</h4>
+ <p class="sub">The z-statistic is held fixed. Left: the log₁₀ Bayes factor for H₀ against n, for your prior sd on the effect (in σ units) and for priors five times tighter and looser. Right: the posterior probability of H₀ for the prior probability you choose.</p>
+ <div class="ctl"><label>z-statistic <input type="range" id="c8z" min="100" max="400" step="1" value="196"><output id="c8zv"></output></label><label>prior sd of the effect (σ units) <input type="range" id="c8t" min="1" max="50" step="1" value="10"><output id="c8tv"></output></label><label>prior P(H₀) <input type="range" id="c8p" min="10" max="90" step="5" value="50"><output id="c8pv"></output></label><label>sample size n <input type="range" id="c8i" min="0" max="10" step="1" value="6"><output id="c8iv"></output></label></div>
+ <div class="two"><canvas class="sm" id="c8cv"></canvas><canvas class="sm" id="c8cv2"></canvas></div><div class="stats" id="c8st"></div><div class="read" id="c8rd"></div></div>
+</section>
+
+<div class="part">Part III · Practice in a bank</div>
+
+<section class="ch" id="c9">
+<h2><span class="num">9</span>Empirical Bayes: borrowing strength across many units <span class="lvl e">Expert</span></h2>
+<p>A bank has hundreds of branches, merchants or segments, each with its own default or fraud rate and very different volumes. The raw rate of a small unit is noisy; ranking units by raw rates puts the small ones at both ends. <b>Empirical Bayes</b> treats the units’ true rates as draws from a common distribution (here a Beta(a, b)), estimates that distribution from all the units, and then applies the ordinary Bayesian update unit by unit: each estimate is (a + x)/(a + b + n), a shrinkage of the raw rate towards the overall mean, stronger for small n. It is the first step towards the full hierarchical (partial pooling) models of item 28, which also account for the uncertainty in a and b that empirical Bayes ignores. The same logic is the fix for the winner’s curse met earlier: after selecting the most extreme units, their raw rates overstate the truth, while shrunken estimates do not.</p>
+<div class="card"><h4>Lab 9 · Raw, shrunken and pooled branch rates</h4>
+ <p class="sub">Branch sizes run from about 20 to 1000 accounts; true rates are drawn from a beta distribution with the mean and strength you choose (low strength means very different branches). Left: root-mean-squared error of three estimators over 60 portfolios. Right: for the ten branches that look worst, the rate you would report and what their true rate is.</p>
+ <div class="ctl"><label>branches <input type="range" id="c9j" min="50" max="500" step="50" value="200"><output id="c9jv"></output></label><label>mean default rate <input type="range" id="c9m" min="1" max="10" step="1" value="4"><output id="c9mv"></output></label><label>prior strength (accounts) <input type="range" id="c9k" min="10" max="1000" step="10" value="80"><output id="c9kv"></output></label><button id="c9go">Re-simulate</button></div>
+ <div class="two"><canvas class="sm" id="c9cv"></canvas><canvas class="sm" id="c9cv2"></canvas></div><div class="stats" id="c9st"></div><div class="read" id="c9rd"></div></div>
+</section>
+
+<section class="ch" id="c10">
+<h2><span class="num">10</span>Bayesian A/B testing, decisions and peeking <span class="lvl e">Expert</span></h2>
+<p>With a beta–binomial model for each arm, the posterior of the difference gives the quantities decision-makers ask for: <b>P(B &gt; A | data)</b>, the posterior of the lift, and the <b>expected loss</b> of choosing each arm (the average amount you give up if the choice turns out wrong). A <b>region of practical equivalence (ROPE)</b> turns “is there any difference?” into “is the difference big enough to matter?”, and informative priors from earlier tests (shrinking implausible lifts) make small tests behave. All of these are valid summaries of what the data say <em>now</em>. What is not automatic is the error rate of a stopping rule: “run until P(B &gt; A) &gt; 95%” is a sequential procedure, and checking the posterior at every look gives it far more chances to cross than a single look has. Bayesian updating is unaffected by when you stop, but the long-run false-win rate of the rule is, so tune the threshold (and the number of looks) by simulation under the null, as for the group-sequential and always-valid methods of the experiments page. Choose actions by expected loss against a business cost, and do not read P(B &gt; A) as a guarantee.</p>
+<div class="card"><h4>Lab 10 · Stop when P(B beats A) passes the threshold</h4>
+ <p class="sub">Two arms, 5,000 users each at most, a look every 200 users per arm, flat Beta(1, 1) priors. Left: the first 30 experiments’ posterior probability that B beats A; red paths crossed the threshold. Right: how often B is declared the winner for three monitoring schedules over 400 experiments.</p>
+ <div class="ctl"><label>baseline conversion <input type="range" id="c10p" min="2" max="20" step="1" value="5"><output id="c10pv"></output></label><label>true relative lift of B <input type="range" id="c10l" min="-20" max="30" step="1" value="0"><output id="c10lv"></output></label><label>threshold on P(B &gt; A) <input type="range" id="c10th" min="90" max="99" step="1" value="95"><output id="c10thv"></output></label><button id="c10go">Re-simulate</button></div>
+ <div class="two"><canvas class="sm" id="c10cv"></canvas><canvas class="sm" id="c10cv2"></canvas></div><div class="stats" id="c10st"></div><div class="read" id="c10rd"></div></div>
+</section>
+
+<section class="ch" id="c11">
+<h2><span class="num">11</span>Low-default portfolios and documented priors <span class="lvl e">Expert</span></h2>
+<p>Highly rated corporates, banks and sovereigns produce very few defaults, so the maximum-likelihood PD is often exactly zero and a data-only bound is wide. A Bayesian treatment is natural: a beta prior built from external information (agency default studies, a pooled internal history, a regulator’s benchmark), updated with the portfolio’s own record, yields a positive posterior mean and a defensible upper bound. A data-only alternative, the <b>most prudent estimation</b> style bound, takes the upper confidence limit given zero defaults (about 3/n at 95%) and lets the user choose the percentile. Either way, the answer carries an assumption that must be governed: the source and period of the external data and why it applies, the prior strength (how many obligors it is “worth”), a sensitivity table over plausible priors, a back-test of the posterior against later defaults, and how the result flows downstream (use the posterior distribution, not just its mean, in stress tests). Reviewers will ask what the number would be under a prior twice as strong or centred somewhere else, and the lab shows the answer.</p>
+<div class="card"><h4>Lab 11 · A PD for a portfolio with almost no defaults</h4>
+ <p class="sub">The true PD is set by the slider (in basis points; 1 bp = 0.01%) and defaults are simulated among n obligors. The external prior has the mean and strength you choose. Left: prior, likelihood and posterior (the dashed vertical line is the true PD). Right: five estimates and bounds.</p>
+ <div class="ctl"><label>obligors n <input type="range" id="c11n" min="50" max="5000" step="50" value="400"><output id="c11nv"></output></label><label>true PD <input type="range" id="c11t" min="5" max="300" step="5" value="40"><output id="c11tv"></output></label><label>prior mean PD <input type="range" id="c11m" min="5" max="300" step="5" value="50"><output id="c11mv"></output></label><label>prior strength (obligors) <input type="range" id="c11s" min="10" max="2000" step="10" value="300"><output id="c11sv"></output></label><button id="c11go">New data</button></div>
+ <div class="two"><canvas class="sm" id="c11cv"></canvas><canvas class="sm" id="c11cv2"></canvas></div><div class="stats" id="c11st"></div><div class="read" id="c11rd"></div></div>
+</section>
+
+<section class="ch" id="c12">
+<h2><span class="num">12</span>Final exam, mastery checklist, cheat sheet <span class="lvl e">Expert</span></h2>
+<h3>Exam (18 questions — click an answer)</h3>
+<div id="quiz"></div>
+<div class="card"><h4>Score</h4><div class="stats" id="qscore"></div><button class="alt" id="qreset">Reset exam</button></div>
+<h3>Mastery checklist — tick when you can do it without notes</h3>
+<div class="card chk" id="chk"></div>
+<h3>Cheat sheet</h3>
+<div class="tw"><table>
+<tr><th>Idea</th><th>One line</th></tr>
+<tr><td>Bayes for parameters</td><td>p(θ | y) ∝ p(y | θ) p(θ); the posterior is the prior reweighted by the likelihood</td></tr>
+<tr><td>Beta–binomial</td><td>Beta(a, b) prior and k of n gives Beta(a + k, b + n − k); posterior mean is a weighted average with weight n/(n + a + b) on the data</td></tr>
+<tr><td>Normal–normal</td><td>Precisions add; posterior mean is precision-weighted; the prior is worth σ²/s₀² observations</td></tr>
+<tr><td>Gamma–Poisson</td><td>Gamma(a, b) prior gives Gamma(a + Σy, b + n); predictive distribution is negative binomial</td></tr>
+<tr><td>Sequential updating</td><td>Yesterday’s posterior is today’s prior; same result as one batch</td></tr>
+<tr><td>Priors</td><td>Flat is not neutral; Jeffreys is reparametrisation-invariant; prefer weakly informative or documented informative priors; check by simulation and report sensitivity</td></tr>
+<tr><td>Credible intervals</td><td>Equal-tailed or HPD; probability statement about θ given prior and data; coverage is exactly nominal on average over the prior only</td></tr>
+<tr><td>Predictive checks</td><td>Simulate replicate data from the fitted model, compare a failure-prone statistic; the mean is usually uninformative</td></tr>
+<tr><td>Bayesian regression</td><td>Normal prior gives the ridge estimate with λ = σ²/τ² plus a posterior covariance σ²(X′X + λI)⁻¹</td></tr>
+<tr><td>Asymptotics</td><td>Bernstein–von Mises: the prior washes out unless it gives zero (or negligible) mass to the truth; the likelihood principle: the stopping rule does not change the posterior</td></tr>
+<tr><td>Bayes factors</td><td>Ratio of marginal likelihoods; Occam effect; sensitive to the prior under the alternative; Jeffreys–Lindley: fixed p, growing n favours H₀</td></tr>
+<tr><td>Empirical Bayes</td><td>Estimate the prior from many units, shrink each estimate in proportion to its noise; cures the winner’s curse in rankings</td></tr>
+<tr><td>Bayesian A/B</td><td>P(B &gt; A), expected loss, ROPE; peeking at a threshold rule inflates false wins, so calibrate by simulation</td></tr>
+<tr><td>Low-default PD</td><td>External beta prior plus own data; report prior source, strength, sensitivity and the data-only upper bound</td></tr>
+</table></div>
+<div class="co tip"><b>Stage 6 begun</b>Item 26 covered the exact (conjugate) side of Bayesian inference. Item 27 adds MCMC and variational inference for models without closed-form posteriors, followed by hierarchical models (28) and Bayesian decision theory (29).</div>
+</section>
+</main>
+<script>
+/*MATH*/
+function lgamma(x){const c=[76.18009172947146,-86.50532032941677,24.01409824083091,-1.231739572450155,0.1208650973866179e-2,-0.5395239384953e-5];let y=x,t=x+5.5;t-=(x+.5)*Math.log(t);let s=1.000000000190015;for(let j=0;j<6;j++)s+=c[j]/++y;return -t+Math.log(2.5066282746310005*s/x);}
+function gser(a,x){let ap=a,sum=1/a,del=sum;for(let n=0;n<1000;n++){ap++;del*=x/ap;sum+=del;if(Math.abs(del)<Math.abs(sum)*1e-15)break;}return sum*Math.exp(-x+a*Math.log(x)-lgamma(a));}
+function gcf(a,x){let b=x+1-a,c=1/1e-300,d=1/b,h=d;for(let i=1;i<1000;i++){const an=-i*(i-a);b+=2;d=an*d+b;if(Math.abs(d)<1e-300)d=1e-300;c=b+an/c;if(Math.abs(c)<1e-300)c=1e-300;d=1/d;const del=d*c;h*=del;if(Math.abs(del-1)<1e-15)break;}return Math.exp(-x+a*Math.log(x)-lgamma(a))*h;}
+function gammaQ(a,x){if(x<=0)return 1;return x<a+1?1-gser(a,x):gcf(a,x);}
+function betacf(a,b,x){const qab=a+b,qap=a+1,qam=a-1;let c=1,d=1-qab*x/qap;if(Math.abs(d)<1e-300)d=1e-300;d=1/d;let h=d;for(let m=1;m<=1000;m++){const m2=2*m;let aa=m*(b-m)*x/((qam+m2)*(a+m2));d=1+aa*d;if(Math.abs(d)<1e-300)d=1e-300;c=1+aa/c;if(Math.abs(c)<1e-300)c=1e-300;d=1/d;h*=d*c;aa=-(a+m)*(qab+m)*x/((a+m2)*(qap+m2));d=1+aa*d;if(Math.abs(d)<1e-300)d=1e-300;c=1+aa/c;if(Math.abs(c)<1e-300)c=1e-300;d=1/d;const del=d*c;h*=del;if(Math.abs(del-1)<1e-15)break;}return h;}
+function betai(a,b,x){if(x<=0)return 0;if(x>=1)return 1;const bt=Math.exp(lgamma(a+b)-lgamma(a)-lgamma(b)+a*Math.log(x)+b*Math.log(1-x));return x<(a+1)/(a+b+2)?bt*betacf(a,b,x)/a:1-bt*betacf(b,a,1-x)/b;}
+function normSf(z){const q=0.5*gammaQ(.5,z*z/2);return z>=0?q:1-q;}
+function normCdf(z){return normSf(-z);}
+function npdf(x){return Math.exp(-x*x/2)/2.5066282746310002;}
+function lbin(n,k){return lgamma(n+1)-lgamma(k+1)-lgamma(n-k+1);}
+function binom(n,k,p){return Math.exp(lbin(n,k)+k*Math.log(p)+(n-k)*Math.log(1-p));}
+function betapdf(x,a,b){return x<=0||x>=1?0:Math.exp(lgamma(a+b)-lgamma(a)-lgamma(b)+(a-1)*Math.log(x)+(b-1)*Math.log(1-x));}
+function betacdf(x,a,b){return betai(a,b,x);}
+function gampdf(x,a,r){return x<=0?0:Math.exp(a*Math.log(r)+(a-1)*Math.log(x)-r*x-lgamma(a));}
+function gamcdf(x,a,r){return x<=0?0:1-gammaQ(a,r*x);}
+function randn(){let u=0;while(!u)u=Math.random();return Math.sqrt(-2*Math.log(u))*Math.cos(2*Math.PI*Math.random());}
+function gammaS(a){if(a<1)return gammaS(a+1)*Math.pow(Math.random(),1/a);const d=a-1/3,c=1/Math.sqrt(9*d);for(;;){let x,v;do{x=randn();v=1+c*x}while(v<=0);v=v*v*v;const u=Math.random();if(Math.log(u)<.5*x*x+d-d*v+d*Math.log(v))return d*v;}}
+function betaS(a,b){const x=gammaS(a),y=gammaS(b);return x/(x+y);}
+function binS(n,p){let k=0;for(let i=0;i<n;i++)if(Math.random()<p)k++;return k;}
+function mean(a){let s=0;for(const v of a)s+=v;return s/a.length;}
+function qc(cdf,lo,hi,p,it){for(let i=0;i<(it||100);i++){const m=(lo+hi)/2;if(cdf(m)<p)lo=m;else hi=m}return(lo+hi)/2;}
+function qb(a,b,p){return qc(x=>betai(a,b,x),0,1,p,50);}
+function tcdf(x,v){const t=.5*betai(v/2,.5,v/(v+x*x));return x>0?1-t:t}
+function qn(p){return qc(normCdf,-9,9,p,70)}
+function pois(k,l){return Math.exp(-l+k*Math.log(l)-lgamma(k+1))}
+function binF(n,p){let k=0;for(;;){if(n<=0||p<=0)return k;if(p>=1)return k+n;if(n<=40){for(let i=0;i<n;i++)if(Math.random()<p)k++;return k}const a=1+(n>>1),bb=1+n-a,x=betaS(a,bb);if(x>=p){n=a-1;p=p/x}else{k+=a;n=bb-1;p=(p-x)/(1-x)}}}
+/*ENDMATH*/
+
+const $=id=>document.getElementById(id), val=id=>+$(id).value;
+const C={fg:'#e8ebf5',mu:'#8a93ab',gr:'#232a3d',a:'#6ea8ff',r:'#ff6b81',y:'#ffd166',g:'#4ade80',p:'#c084fc',t:'#5eead4'};
+const store={get(k,d){try{const v=JSON.parse(localStorage.getItem(k));return v==null?d:v}catch(e){return d}},set(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}};
+function stat(l,v,c){return `<div class="stat ${c||''}"><b>${v}</b><span>${l}</span></div>`}
+function f3(x){if(!isFinite(x))return String(x);const a=Math.abs(x);if(a!==0&&(a<1e-3||a>=1e6))return x.toExponential(2);return String(+x.toFixed(a<1?4:a<100?3:a<1000?2:0))}
+function pc(x){return f3(100*x)+'%'}
+const resizers=[];
+function reg(fn){fn();resizers.push(fn)}
+function on(ids,fn){ids.split(' ').forEach(i=>{const e=$(i);e.addEventListener('input',fn);e.addEventListener('change',fn)})}
+let rt;window.addEventListener('resize',()=>{clearTimeout(rt);rt=setTimeout(()=>resizers.forEach(f=>f()),150)});
+document.querySelectorAll('input[type=range]').forEach(i=>{const o=$(i.id+'v');if(!o)return;const f=()=>{o.textContent=i.value};i.addEventListener('input',f);f()});
+
+function nice(x){const e=Math.pow(10,Math.floor(Math.log10(x))),f=x/e;return (f<1.5?1:f<3?2:f<7?5:10)*e}
+function mk(cv,x0,x1,ymax,o){o=o||{};const y0=o.y0||0,dpr=window.devicePixelRatio||1,r=cv.getBoundingClientRect(),w=r.width||600,h=r.height||270;
+ cv.width=w*dpr;cv.height=h*dpr;const g=cv.getContext('2d');g.setTransform(dpr,0,0,dpr,0,0);g.clearRect(0,0,w,h);
+ const L=o.L||42,R=12,T=14,B=28,X=x=>L+(x-x0)/(x1-x0)*(w-L-R),Y=y=>h-B-(y-y0)/(ymax-y0)*(h-T-B);
+ g.font='11px system-ui';g.lineWidth=1;g.strokeStyle=C.gr;g.fillStyle=C.mu;
+ if(!o.noGrid){const sx=nice((x1-x0)/7);for(let x=Math.ceil(x0/sx-1e-9)*sx;!o.noX&&x<=x1+1e-9;x+=sx){g.beginPath();g.moveTo(X(x),T);g.lineTo(X(x),h-B);g.stroke();g.textAlign='center';g.fillText(String(+x.toFixed(6)),X(x),h-B+15)}
+ const sy=nice((ymax-y0)/4);for(let y=Math.ceil(y0/sy-1e-9)*sy;y<=ymax+1e-9;y+=sy){g.beginPath();g.moveTo(L,Y(y));g.lineTo(w-R,Y(y));g.stroke();g.textAlign='right';g.fillText(String(+y.toFixed(4)),L-5,Y(y)+3)}}
+ return{g,w,h,X,Y,L,R,T,B,
+  line(f,col,lw,a,b,n,dash){a=a==null?x0:a;b=b==null?x1:b;n=n||260;g.save();if(dash)g.setLineDash([5,4]);g.beginPath();g.strokeStyle=col;g.lineWidth=lw||2;let st=false;for(let i=0;i<=n;i++){const x=a+(b-a)*i/n,y=f(x);if(!isFinite(y)){st=false;continue}st?g.lineTo(X(x),Y(y)):g.moveTo(X(x),Y(y));st=true}g.stroke();g.restore()},
+  area(f,a,b,col,n){a=Math.max(a,x0);b=Math.min(b,x1);if(b<=a)return;n=n||200;g.beginPath();g.moveTo(X(a),Y(0));for(let i=0;i<=n;i++){const x=a+(b-a)*i/n;g.lineTo(X(x),Y(f(x)))}g.lineTo(X(b),Y(0));g.closePath();g.fillStyle=col;g.fill()},
+  vline(x,col,lab,dash){g.save();g.strokeStyle=col;g.lineWidth=1.6;if(dash)g.setLineDash([5,4]);g.beginPath();g.moveTo(X(x),T);g.lineTo(X(x),h-B);g.stroke();g.restore();if(lab){g.fillStyle=col;g.textAlign='center';g.fillText(lab,Math.min(Math.max(X(x),34),w-34),T+10)}},
+  hline(y,col,lab){g.save();g.strokeStyle=col;g.lineWidth=1.4;g.setLineDash([5,4]);g.beginPath();g.moveTo(L,Y(y));g.lineTo(w-R,Y(y));g.stroke();g.restore();if(lab){g.fillStyle=col;g.textAlign='right';g.fillText(lab,w-R-3,Y(y)-4)}},
+  text(s,x,y,col,al){g.fillStyle=col||C.fg;g.textAlign=al||'left';g.fillText(s,x,y)}};}
+
+/* ---------- shared helpers for this page ---------- */
+const D={
+ norm:{n:'Normal(0,1)',s:()=>randn(),mu:0,sd:1,sk:0},
+ unif:{n:'Uniform(0,1)',s:()=>Math.random(),mu:.5,sd:Math.sqrt(1/12),sk:0},
+ expo:{n:'Exponential(1)',s:()=>-Math.log(1-Math.random()),mu:1,sd:1,sk:2},
+ logn:{n:'Lognormal(0,1)',s:()=>Math.exp(randn()),mu:Math.exp(.5),sd:Math.sqrt((Math.E-1)*Math.E),sk:(Math.E+2)*Math.sqrt(Math.E-1),disc:0},
+ b05:{n:'Bernoulli(0.5)',s:()=>Math.random()<.5?1:0,mu:.5,sd:.5,sk:0,disc:1},
+ b05s:{n:'Bernoulli(0.05)',s:()=>Math.random()<.05?1:0,mu:.05,sd:Math.sqrt(.0475),sk:.9/Math.sqrt(.0475),disc:1},
+ bimo:{n:'Two humps',s:()=>(Math.random()<.5?-2:2)+.5*randn(),mu:0,sd:Math.sqrt(4.25),sk:0},
+ par5:{n:'Pareto(α=5)',s:()=>Math.pow(1-Math.random(),-.2),mu:1.25,sd:Math.sqrt(5/48),sk:6*Math.sqrt(.6)},
+ cauchy:{n:'Cauchy (no mean)',s:()=>Math.tan(Math.PI*(Math.random()-.5)),mu:NaN,sd:Infinity,sk:NaN}
+};
+function fillSel(id,keys,def){const e=$(id);e.innerHTML=keys.map(k=>`<option value="${k}">${D[k].n}</option>`).join('');e.value=def}
+const PAL=[C.a,C.r,C.y,C.g,C.p,C.t,'#ff9f43','#9aa4bf'];
+function tgrid(N,M){const T=[];let prev=0;for(let i=0;i<M;i++){let n=Math.round(Math.pow(10,Math.log10(N)*i/(M-1)));if(i===M-1)n=N;n=Math.max(prev+1,n);if(n>N)break;T.push(n);prev=n}if(T[T.length-1]!==N)T[T.length-1]=N;return T}
+function nlab(n){return n>=1e6?(n/1e6)+'M':n>=1000?(n/1000)+'k':String(n)}
+function customGrid(P,xt,yt){const g=P.g;g.save();g.strokeStyle=C.gr;g.fillStyle=C.mu;g.font='11px system-ui';g.lineWidth=1;
+ xt.forEach(([v,l])=>{g.beginPath();g.moveTo(P.X(v),P.T);g.lineTo(P.X(v),P.h-P.B);g.stroke();g.textAlign='center';g.fillText(l,P.X(v),P.h-P.B+15)});
+ yt.forEach(([v,l])=>{g.beginPath();g.moveTo(P.L,P.Y(v));g.lineTo(P.w-P.R,P.Y(v));g.stroke();g.textAlign='right';g.fillText(l,P.L-5,P.Y(v)+3)});g.restore()}
+function clip(P,fn){const g=P.g;g.save();g.beginPath();g.rect(P.L,P.T,P.w-P.L-P.R,P.h-P.T-P.B);g.clip();fn();g.restore()}
+function poly(P,pts,col,lw,dash){const g=P.g;g.save();if(dash)g.setLineDash([5,4]);g.strokeStyle=col;g.lineWidth=lw||2;g.beginPath();pts.forEach(([x,y],i)=>i?g.lineTo(P.X(x),P.Y(y)):g.moveTo(P.X(x),P.Y(y)));g.stroke();g.restore()}
+function dots(P,pts,col,r){const g=P.g;g.fillStyle=col;pts.forEach(([x,y])=>{g.beginPath();g.arc(P.X(x),P.Y(y),r||3,0,7);g.fill()})}
+function niceTicks(lo,hi,k){const st=nice((hi-lo)/(k||5)),a=[];for(let v=Math.ceil(lo/st-1e-9)*st;v<=hi+1e-9;v+=st)a.push([v,String(+v.toFixed(6))]);return a}
+function logTicks(lo,hi){const a=[];for(let e=Math.ceil(lo-1e-9);e<=hi+1e-9;e++)a.push([e,nlab(Math.pow(10,e))]);return a}
+function mom(a){const n=a.length;let m=0;for(const v of a)m+=v;m/=n;let v2=0,v3=0,v4=0;for(const v of a){const d=v-m;v2+=d*d;v3+=d*d*d;v4+=d*d*d*d}v2/=n;v3/=n;v4/=n;const sd=Math.sqrt(v2);return{n,m,sd,sk:sd>0?v3/(sd*sd*sd):0,ku:v2>0?v4/(v2*v2)-3:0}}
+function ksN(z){const a=Array.from(z).sort((x,y)=>x-y),n=a.length;let d=0;for(let i=0;i<n;i++){const F=normCdf(a[i]);d=Math.max(d,Math.abs((i+1)/n-F),Math.abs(i/n-F))}return d}
+/* histogram of data as density with optional overlay curves [{f,col,lw,dash}] */
+function hist(cv,data,lo,hi,bins,ov,col){const cnt=new Float64Array(bins),bw=(hi-lo)/bins;let n=0;for(const v of data){if(v<lo||v>=hi)continue;cnt[Math.floor((v-lo)/bw)]++;n++}
+ const N=data.length;let ym=0;for(let i=0;i<bins;i++){cnt[i]/=N*bw;ym=Math.max(ym,cnt[i])}
+ (ov||[]).forEach(o=>{for(let i=0;i<=80;i++)ym=Math.max(ym,o.f(lo+(hi-lo)*i/80)||0)});
+ const P=mk(cv,lo,hi,ym*1.12);
+ P.g.fillStyle=col||'rgba(110,168,255,.5)';for(let i=0;i<bins;i++){if(cnt[i]<=0)continue;const a=P.X(lo+i*bw),b=P.X(lo+(i+1)*bw);P.g.fillRect(a,P.Y(cnt[i]),Math.max(1,b-a-1),P.Y(0)-P.Y(cnt[i]))}
+ (ov||[]).forEach(o=>P.line(o.f,o.col,o.lw||2.4,lo,hi,200,o.dash));return P}
+const fmt=x=>f3(x);
+
+/* ---------- shared for this page ---------- */
+const POPS=['norm','unif','expo','logn','bimo','par5'];
+D.norm.med=0;D.norm.q90=1.2815516;D.unif.med=.5;D.unif.q90=.9;D.expo.med=Math.LN2;D.expo.q90=Math.log(10);D.logn.med=1;D.logn.q90=Math.exp(1.2815516);
+D.bimo.med=0;D.bimo.q90=qc(x=>.5*normCdf((x+2)/.5)+.5*normCdf((x-2)/.5),-10,10,.9,80);D.par5.med=Math.pow(2,.2);D.par5.q90=Math.pow(10,.2);
+const SF={mean:a=>mean(a),median:a=>{const b=Float64Array.from(a).sort(),n=b.length;return n%2?b[(n-1)/2]:(b[n/2-1]+b[n/2])/2},sd:a=>{const n=a.length,m=mean(a);let s=0;for(const v of a)s+=(v-m)*(v-m);return Math.sqrt(s/(n-1))},q90:a=>{const b=Float64Array.from(a).sort();return b[Math.round(.9*(b.length-1))]}};
+function truth(key,st){const d=D[key];return st==='mean'?d.mu:st==='median'?d.med:st==='sd'?d.sd:d.q90}
+const SNAME={mean:'sample mean',median:'sample median',sd:'sample SD',q90:'90th percentile'};
+const N10=[2,3,5,10,20,50,100,200,500,1000];
+function pct(a,p){const b=Float64Array.from(a).sort();return b[Math.min(b.length-1,Math.max(0,Math.floor(p*b.length)))]}
+function histLines(cv,arrs,cols,lo,hi,bins,vl){const bw=(hi-lo)/bins,dens=arrs.map(a=>{const c=new Float64Array(bins);for(const v of a){if(v<lo||v>=hi)continue;c[Math.floor((v-lo)/bw)]++}for(let i=0;i<bins;i++)c[i]/=a.length*bw;return c});let ym=0;dens.forEach(c=>c.forEach(v=>ym=Math.max(ym,v)));const P=mk(cv,lo,hi,ym*1.15||1);
+ dens.forEach((c,k)=>{const pts=[];for(let i=0;i<bins;i++){pts.push([lo+i*bw,c[i]]);pts.push([lo+(i+1)*bw,c[i]])}clip(P,()=>poly(P,pts,cols[k],2.2))});(vl||[]).forEach(v=>P.vline(v[0],v[1],v[2],v[3]));return P}
+function sdOf(a){return mom(a).sd}
+
+/* ---------- ML helpers ---------- */
+function digamma(x){let r=0;while(x<6){r-=1/x;x++}const f=1/(x*x);return r+Math.log(x)-.5/x-f*(1/12-f*(1/120-f/252))}
+function trigamma(x){let r=0;while(x<6){r+=1/(x*x);x++}const f=1/(x*x);return r+1/x+.5*f+f/x*(1/6-f*(1/30-f/42))}
+function poisS(l){if(l<=0)return 0;if(l<30){const L=Math.exp(-l);let k=0,p=1;do{k++;p*=Math.random()}while(p>L);return k-1}const m=Math.floor(.875*l),g=gammaS(m);return g<l?m+poisS(l-g):binF(m-1,l/g)}
+function llb(k,n,p){return(k?k*Math.log(p):0)+(n-k?(n-k)*Math.log(1-p):0)}
+function lrInt(k,n,cut){const ph=k/n,l0=llb(k,n,ph),g=p=>2*(l0-llb(k,n,p))-cut;let lo=0,hi=1;
+ if(k>0){let a=1e-12,b=ph;for(let i=0;i<70;i++){const m=(a+b)/2;if(g(m)>0)a=m;else b=m}lo=(a+b)/2}
+ if(k<n){let a=ph,b=1-1e-12;for(let i=0;i<70;i++){const m=(a+b)/2;if(g(m)>0)b=m;else a=m}hi=(a+b)/2}return[lo,hi]}
+function solveAlpha(s){if(!(s>1e-9))return 1e6;let a=(3-s+Math.sqrt((3-s)*(3-s)+24*s))/(12*s);for(let i=0;i<8;i++){const f=Math.log(a)-digamma(a)-s,fp=1/a-trigamma(a);let n=a-f/fp;if(!(n>0))n=a/2;a=n}return a}
+function normPdfAt(x,m,s){return Math.exp(-(x-m)*(x-m)/(2*s*s))/(s*2.5066282746)}
+/* ---------- Regression helpers ---------- */
+function idx(id,arr,ff){const e=$(id),o=$(id+'v'),f=()=>{o.textContent=ff?ff(arr[+e.value]):arr[+e.value]};e.addEventListener('input',f);f()}
+function scl(id,ff){const e=$(id),o=$(id+'v'),f=()=>{o.textContent=ff(+e.value)};e.addEventListener('input',f);f()}
+function pctTicks(a,b,st){const r=[];for(let v=a;v<=b+1e-9;v+=st)r.push([v,Math.round(v*100)+'%']);return r}
+const _tq={};function tq(v,p){const k=v+'_'+p;return _tq[k]||(_tq[k]=qc(x=>tcdf(x,v),0,500,p,80))}
+function simple(x,y){const n=x.length;let xm=0,ym=0;for(let i=0;i<n;i++){xm+=x[i];ym+=y[i]}xm/=n;ym/=n;let sxx=0,sxy=0,syy=0;for(let i=0;i<n;i++){const dx=x[i]-xm,dy=y[i]-ym;sxx+=dx*dx;sxy+=dx*dy;syy+=dy*dy}const b=sxy/sxx,a=ym-b*xm,res=new Float64Array(n);let sse=0;for(let i=0;i<n;i++){res[i]=y[i]-a-b*x[i];sse+=res[i]*res[i]}return{n,xm,ym,sxx,sxy,syy,b,a,res,sse,sst:syy,r2:1-sse/syy}}
+function gj(A,B){const p=A.length;const M=A.map((r,i)=>Array.from(r).concat(B?[B[i]]:[]));for(let c=0;c<p;c++){let m=c;for(let r=c+1;r<p;r++)if(Math.abs(M[r][c])>Math.abs(M[m][c]))m=r;[M[c],M[m]]=[M[m],M[c]];const d=M[c][c]||1e-12;for(let k=c;k<M[c].length;k++)M[c][k]/=d;for(let r=0;r<p;r++)if(r!==c){const f=M[r][c];if(f!==0)for(let k=c;k<M[c].length;k++)M[r][k]-=f*M[c][k]}}return M}
+function olsMulti(cols,y,needInv){const n=y.length,k=cols.length,p=k+1,A=[],B=new Float64Array(p);for(let i=0;i<p;i++)A.push(new Float64Array(p));
+ for(let r=0;r<n;r++){const row=[1];for(let j=0;j<k;j++)row.push(cols[j][r]);for(let i=0;i<p;i++){B[i]+=row[i]*y[r];for(let j=i;j<p;j++)A[i][j]+=row[i]*row[j]}}
+ for(let i=0;i<p;i++){for(let j=0;j<i;j++)A[i][j]=A[j][i];if(i>0)A[i][i]+=1e-9}
+ let beta,inv=null;if(needInv){const I=[];for(let i=0;i<p;i++){const e=new Float64Array(p);e[i]=1;I.push(e)}const M=gj(A,null);const aug=A.map((r,i)=>Array.from(r).concat(Array.from(I[i])));
+  const m=aug;for(let c=0;c<p;c++){let q=c;for(let r=c+1;r<p;r++)if(Math.abs(m[r][c])>Math.abs(m[q][c]))q=r;[m[c],m[q]]=[m[q],m[c]];const d=m[c][c]||1e-12;for(let kk=0;kk<2*p;kk++)m[c][kk]/=d;for(let r=0;r<p;r++)if(r!==c){const f=m[r][c];if(f!==0)for(let kk=0;kk<2*p;kk++)m[r][kk]-=f*m[c][kk]}}
+  inv=m.map(r=>r.slice(p));beta=inv.map(r=>{let s=0;for(let j=0;j<p;j++)s+=r[j]*B[j];return s})}
+ else{const M=gj(A,B);beta=M.map(r=>r[p])}
+ const res=new Float64Array(n);let sse=0;for(let r=0;r<n;r++){let f=beta[0];for(let j=0;j<k;j++)f+=beta[j+1]*cols[j][r];res[r]=y[r]-f;sse+=res[r]*res[r]}
+ const out={beta,res,sse,n,p,inv};if(inv){const s2=sse/(n-p);out.s2=s2;out.se=inv.map((r,i)=>Math.sqrt(s2*r[i]))}return out}
+function scatterAxes(cv,xs,ys,xlo,xhi,ylo,yhi,L){return mk(cv,xlo,xhi,yhi,{y0:ylo,L:L||44})}
+function range(a,pad){let lo=1e99,hi=-1e99;for(const v of a){if(v<lo)lo=v;if(v>hi)hi=v}const w=(hi-lo)||1;return[lo-(pad||.05)*w,hi+(pad||.05)*w]}
+
+
+function bars(P,groups,cols,yt){/* groups: array of arrays of values (0..1) */const g=P.g,G=groups.length,B=groups[0].length,W=(P.w-P.L-P.R)/G;groups.forEach((vals,gi)=>vals.forEach((v,bi)=>{const bw=W*.78/B,x=P.L+W*gi+W*.11+bw*bi;g.fillStyle=cols[bi];g.fillRect(x,P.Y(v),bw-2,P.Y(0)-P.Y(v));g.fillStyle=C.fg;g.textAlign='center';g.font='10px system-ui';g.fillText(Math.round(v*100)+'%',x+bw/2-1,P.Y(v)-3)}));g.font='11px system-ui'}
+function gridG(P,yt,labels){customGrid(P,[],yt);const G=labels.length,W=(P.w-P.L-P.R)/G;P.g.fillStyle=C.mu;P.g.textAlign='center';labels.forEach((l,i)=>P.g.fillText(l,P.L+W*(i+.5),P.h-P.B+15))}
+function legend(P,items,y){let x=P.L+8;items.forEach(([s,c])=>{P.text('■ '+s,x,y,c);x+=P.g.measureText('■ '+s).width+16})}
+
+/* ---------- GLM machinery ---------- */
+const LK={logit:{mu:e=>1/(1+Math.exp(-e)),d:e=>{const m=1/(1+Math.exp(-e));return m*(1-m)}},
+ probit:{mu:e=>normCdf(e),d:e=>npdf(e)},
+ cll:{mu:e=>1-Math.exp(-Math.exp(e)),d:e=>Math.exp(e-Math.exp(e))},
+ log:{mu:e=>Math.exp(e),d:e=>Math.exp(e)}};
+function minv(A){const p=A.length,m=A.map((r,i)=>{const row=Array.from(r);for(let j=0;j<p;j++)row.push(i===j?1:0);return row});
+ for(let c=0;c<p;c++){let q=c;for(let r=c+1;r<p;r++)if(Math.abs(m[r][c])>Math.abs(m[q][c]))q=r;[m[c],m[q]]=[m[q],m[c]];const d=m[c][c]||1e-12;for(let k=0;k<2*p;k++)m[c][k]/=d;for(let r=0;r<p;r++)if(r!==c){const f=m[r][c];if(f!==0)for(let k=0;k<2*p;k++)m[r][k]-=f*m[c][k]}}
+ return m.map(r=>r.slice(p))}
+function glm(cols,y,o){o=o||{};const n=y.length,k=cols.length,p=k+1,fam=o.fam||'binom',L=LK[o.link||(fam==='pois'?'log':'logit')],off=o.off,X=[new Float64Array(n).fill(1)].concat(cols),V=m=>fam==='pois'?m:m*(1-m);
+ let b=new Float64Array(p);if(o.init)b=Float64Array.from(o.init);else if(fam==='pois'){let m=0;for(const v of y)m+=v;b[0]=Math.log(Math.max(m/n,1e-3))-(off?mean(off):0)}
+ function ev(b){const eta=new Float64Array(n),mu=new Float64Array(n);let ll=0;for(let i=0;i<n;i++){let e=off?off[i]:0;for(let j=0;j<p;j++)e+=b[j]*X[j][i];e=Math.max(-30,Math.min(30,e));eta[i]=e;let m=L.mu(e);m=fam==='binom'?Math.min(1-1e-12,Math.max(1e-12,m)):Math.max(m,1e-12);mu[i]=m;ll+=fam==='pois'?y[i]*Math.log(m)-m-lgamma(y[i]+1):y[i]*Math.log(m)+(1-y[i])*Math.log(1-m)}return{eta,mu,ll}}
+ function info(c){const A=[];for(let i=0;i<p;i++)A.push(new Float64Array(p));const w=new Float64Array(n);for(let r=0;r<n;r++){const d=L.d(c.eta[r]),wi=d*d/V(c.mu[r]);w[r]=wi;for(let i=0;i<p;i++){const xi=X[i][r]*wi;for(let j=i;j<p;j++)A[i][j]+=xi*X[j][r]}}for(let i=0;i<p;i++)for(let j=0;j<i;j++)A[i][j]=A[j][i];return{A,w}}
+ let cur=ev(b),it=0,conv=false,maxit=o.maxit==null?40:o.maxit;
+ for(;it<maxit;it++){const{A,w}=info(cur),Ai=minv(A),g=new Float64Array(p);
+  for(let r=0;r<n;r++){const d=L.d(cur.eta[r]),v=V(cur.mu[r]);let s=(y[r]-cur.mu[r])*d/v;if(o.firth){let h=0;for(let i=0;i<p;i++)for(let j=0;j<p;j++)h+=X[i][r]*Ai[i][j]*X[j][r];h*=w[r];s+=h*(.5-cur.mu[r])}for(let i=0;i<p;i++)g[i]+=X[i][r]*s}
+  const st=new Float64Array(p);let mx=0;for(let i=0;i<p;i++){let s=0;for(let j=0;j<p;j++)s+=Ai[i][j]*g[j];st[i]=s}
+  if(o.firth){for(let i=0;i<p;i++){st[i]=Math.max(-1,Math.min(1,st[i]));mx=Math.max(mx,Math.abs(st[i]))}b=b.map((v,i)=>v+st[i]);cur=ev(b);if(mx<1e-8){conv=true;it++;break}}
+  else{let a=1,nb,nc;for(let h=0;h<25;h++){nb=b.map((v,i)=>v+a*st[i]);nc=ev(nb);if(nc.ll>=cur.ll-1e-10)break;a/=2}for(let i=0;i<p;i++)mx=Math.max(mx,Math.abs(a*st[i]));const dl=Math.abs(nc.ll-cur.ll);b=nb;cur=nc;if(mx<1e-8||dl<1e-11){conv=true;it++;break}}}
+ const{A,w}=info(cur),Ai=minv(A),se=Ai.map((r,i)=>Math.sqrt(Math.max(r[i],0)));let dev;
+ if(fam==='binom')dev=-2*cur.ll;else{dev=0;for(let i=0;i<n;i++){const yy=y[i],m=cur.mu[i];dev+=2*((yy>0?yy*Math.log(yy/m):0)-(yy-m))}}
+ return{beta:b,mu:cur.mu,eta:cur.eta,ll:cur.ll,dev,inv:Ai,se,iter:it,conv,X,w,p,n,A}}
+function auc(sc,y){const n=y.length,idx=Array.from({length:n},(_,i)=>i).sort((a,b)=>sc[a]-sc[b]);let rk=0,np=0,i=0;while(i<n){let j=i;while(j+1<n&&sc[idx[j+1]]===sc[idx[i]])j++;const r=(i+j)/2+1;for(let t=i;t<=j;t++)if(y[idx[t]]===1){rk+=r;np++}i=j+1}const nn=n-np;return np&&nn?(rk-np*(np+1)/2)/(np*nn):.5}
+function sepTest(x,y){let a1=1e99,b1=-1e99,a0=1e99,b0=-1e99,n1=0,n0=0;for(let i=0;i<x.length;i++){if(y[i]===1){n1++;a1=Math.min(a1,x[i]);b1=Math.max(b1,x[i])}else{n0++;a0=Math.min(a0,x[i]);b0=Math.max(b0,x[i])}}return n1>0&&n0>0&&(a1>b0||a0>b1)}
+const sig=e=>1/(1+Math.exp(-e));
+function lgt(p){return Math.log(p/(1-p))}
+function binaryData(n,a,b,sd){const x=new Float64Array(n),y=new Float64Array(n);for(let i=0;i<n;i++){x[i]=(sd||1)*randn();y[i]=Math.random()<sig(a+b*x[i])?1:0}return{x,y}}
+function heat(P,gx,gy,vals,x0,x1,y0,y1){const g=P.g,nx=gx,ny=gy;let mn=1e99,mx=-1e99;vals.forEach(v=>{if(isFinite(v)){mn=Math.min(mn,v);mx=Math.max(mx,v)}});mn=Math.max(mn,mx-30);for(let i=0;i<nx;i++)for(let j=0;j<ny;j++){const v=vals[i*ny+j],t=isFinite(v)?Math.max(0,Math.min(1,(v-mn)/(mx-mn))):0,tt=Math.pow(t,1.6),c=Math.round(40+190*tt);g.fillStyle=`rgb(${Math.round(20+60*tt)},${Math.round(30+100*tt)},${c})`;const xa=P.X(x0+(x1-x0)*i/nx),xb=P.X(x0+(x1-x0)*(i+1)/nx),ya=P.Y(y0+(y1-y0)*j/ny),yb=P.Y(y0+(y1-y0)*(j+1)/ny);g.fillRect(xa,Math.min(ya,yb),xb-xa+1,Math.abs(ya-yb)+1)}}
+/* ---------- confounding helpers ---------- */
+const U01=()=>1-Math.random();
+function sdv(a){const m=mean(a);let s=0;for(const v of a)s+=(v-m)*(v-m);return Math.sqrt(s/Math.max(a.length-1,1))}
+function barV(cv,vals,cols,labs,ymax,ff){const P=mk(cv,0,vals.length,ymax,{y0:0,noGrid:true,L:50});customGrid(P,[],niceTicks(0,ymax,5));const W=(P.w-P.L-P.R)/vals.length,g=P.g;vals.forEach((v,i)=>{const w=W*.5,x=P.L+W*i+W*.25;g.fillStyle=cols[i];g.fillRect(x,P.Y(v),w,P.Y(0)-P.Y(v));g.fillStyle=C.fg;g.textAlign='center';g.fillText((ff||fmt)(v),x+w/2,P.Y(v)-4);g.fillStyle=C.mu;g.fillText(labs[i],x+w/2,P.h-P.B+15)});return P}
+function barL(cv,vals,cols,labs,lo,hi,ff){const P=mk(cv,0,vals.length,hi,{y0:lo,noGrid:true,L:50});customGrid(P,[],niceTicks(lo,hi,5));const W=(P.w-P.L-P.R)/vals.length,g=P.g;vals.forEach((v,i)=>{const w=W*.5,x=P.L+W*i+W*.25;g.fillStyle=cols[i];g.fillRect(x,P.Y(v),w,P.Y(lo)-P.Y(v));g.fillStyle=C.fg;g.textAlign='center';g.fillText((ff||fmt)(v),x+w/2,P.Y(v)-4);g.fillStyle=C.mu;g.fillText(labs[i],x+w/2,P.h-P.B+15)});return P}
+const avg=a=>{let s=0;for(const v of a)s+=v;return s/a.length};
+function corr(a,b){const n=a.length;let ma=0,mb=0;for(let i=0;i<n;i++){ma+=a[i];mb+=b[i]}ma/=n;mb/=n;let sa=0,sb=0,sab=0;for(let i=0;i<n;i++){const x=a[i]-ma,y=b[i]-mb;sa+=x*x;sb+=y*y;sab+=x*y}return sab/Math.sqrt(sa*sb||1e-12)}
+const pcor=(x,y,z)=>corr(simple(z,x).res,simple(z,y).res);
+const lin=(n,f)=>{const a=new Float64Array(n);for(let i=0;i<n;i++)a[i]=f(i);return a};
+const rn=(n,s)=>lin(n,()=>(s||1)*randn());
+/* signed bars from zero */
+function barZ(cv,vals,cols,labs,lo,hi,ff){const P=mk(cv,0,vals.length,hi,{y0:lo,noGrid:true,L:50});customGrid(P,[],niceTicks(lo,hi,5));const W=(P.w-P.L-P.R)/vals.length,g=P.g;vals.forEach((v,i)=>{const w=W*.5,x=P.L+W*i+W*.25,y0=P.Y(0),y1=P.Y(v);g.fillStyle=cols[i];g.fillRect(x,Math.min(y0,y1),w,Math.abs(y0-y1));g.fillStyle=C.fg;g.textAlign='center';g.fillText((ff||fmt)(v),x+w/2,v>=0?y1-4:y1+13);g.fillStyle=C.mu;g.fillText(labs[i],x+w/2,P.h-P.B+15)});P.hline(0,C.mu,'');return P}
+/* grouped signed bars: groups[g][b] */
+function barG(cv,groups,cols,glabs,lo,hi,ff){const P=mk(cv,0,groups.length,hi,{y0:lo,noGrid:true,L:50});customGrid(P,[],niceTicks(lo,hi,5));const G=groups.length,B=groups[0].length,W=(P.w-P.L-P.R)/G,g=P.g;groups.forEach((vs,gi)=>vs.forEach((v,bi)=>{const bw=W*.7/B,x=P.L+W*gi+W*.15+bw*bi,y0=P.Y(0),y1=P.Y(v);g.fillStyle=cols[bi];g.fillRect(x,Math.min(y0,y1),bw-3,Math.abs(y0-y1));g.fillStyle=C.fg;g.textAlign='center';g.font='10px system-ui';g.fillText((ff||fmt)(v),x+bw/2-1,v>=0?y1-3:y1+11)}));g.font='11px system-ui';g.fillStyle=C.mu;g.textAlign='center';glabs.forEach((l,i)=>g.fillText(l,P.L+W*(i+.5),P.h-P.B+15));P.hline(0,C.mu,'');return P}
+/* scatter with optional per-point colours; draws at most nmax points */
+function scat(P,xs,ys,col,nmax,r,colf){const n=xs.length,st=Math.max(1,Math.floor(n/(nmax||500))),pts=[];clip(P,()=>{for(let i=0;i<n;i+=st){P.g.fillStyle=colf?colf(i):col;P.g.beginPath();P.g.arc(P.X(xs[i]),P.Y(ys[i]),r||2.2,0,7);P.g.fill()}})}
+function fitLine(P,s,col,lw,dash,x0,x1){clip(P,()=>P.line(x=>s.a+s.b*x,col,lw||2,x0,x1,2,dash))}
+const ordIdx=p=>Array.from({length:p.length},(_,i)=>i).sort((a,b)=>p[a]-p[b]);
+/* ---------- experiment helpers ---------- */
+const sgn=v=>(v>=0?'+':'−')+Math.abs(v).toFixed(3);
+const rng2=(a,b,pad)=>range(Array.from(a).concat(Array.from(b)),pad||.05);
+const pct0=x=>Math.round(x*100)+'%';
+const lgs=x=>1/(1+Math.exp(-x));
+function rgam(a){if(a<1)return rgam(a+1)*Math.pow(U01(),1/a);const d=a-1/3,c=1/Math.sqrt(9*d);for(;;){let x,v;do{x=randn();v=1+c*x}while(v<=0);v=v*v*v;const u=U01();if(u<1-.0331*x*x*x*x||Math.log(u)<.5*x*x+d*(1-v+Math.log(v)))return d*v}}
+const rbeta=(a,b)=>{const x=rgam(a),y=rgam(b);return x/(x+y)};
+function rbin(n,p){if(n<=30){let k=0;for(let i=0;i<n;i++)if(Math.random()<p)k++;return k}const m=n*p,s=Math.sqrt(n*p*(1-p)),k=Math.round(m+s*randn());return Math.max(0,Math.min(n,k))}
+function welch(a,b){const na=a.length,nb=b.length,ma=avg(a),mb=avg(b);let va=0,vb=0;for(const v of a)va+=(v-ma)*(v-ma);for(const v of b)vb+=(v-mb)*(v-mb);va/=na-1;vb/=nb-1;const se2=va/na+vb/nb,se=Math.sqrt(se2),t=(ma-mb)/se,df=se2*se2/((va/na)*(va/na)/(na-1)+(vb/nb)*(vb/nb)/(nb-1));return{d:ma-mb,se,t,df,p:2*(1-tcdf(Math.abs(t),df))}}
+const diffMeans=(Y,T)=>{let s1=0,s0=0,n1=0,n0=0;for(let i=0;i<Y.length;i++){if(T[i]){s1+=Y[i];n1++}else{s0+=Y[i];n0++}}return s1/n1-s0/n0};
+/* ---------- observational-causal helpers ---------- */
+function logitFit(cols,y){const n=y.length,k=cols.length,p=k+1,b=new Float64Array(p),lin_=i=>{let s=b[0];for(let j=0;j<k;j++)s+=b[j+1]*cols[j][i];return s};
+ for(let it=0;it<30;it++){const A=[];for(let i=0;i<p;i++)A.push(new Float64Array(p));const g=new Float64Array(p);
+  for(let i=0;i<n;i++){const m=lgs(lin_(i)),w=Math.max(m*(1-m),1e-8),r=y[i]-m,row=[1];for(let j=0;j<k;j++)row.push(cols[j][i]);for(let a=0;a<p;a++){g[a]+=row[a]*r;for(let c=a;c<p;c++)A[a][c]+=w*row[a]*row[c]}}
+  for(let a=0;a<p;a++){for(let c=0;c<a;c++)A[a][c]=A[c][a];A[a][a]+=1e-8}
+  const M=gj(A,Array.from(g)),d=M.map(r=>r[p]);let mx=0;for(let a=0;a<p;a++){b[a]+=d[a];mx=Math.max(mx,Math.abs(d[a]))}if(mx<1e-6)break}
+ const pr=new Float64Array(n),lo=new Float64Array(n);for(let i=0;i<n;i++){pr[i]=Math.min(.9999,Math.max(.0001,lgs(lin_(i))));lo[i]=Math.log(pr[i]/(1-pr[i]))}return{beta:b,pr,lo}}
+/* Hajek IPW estimate of the ATE; keep(i)=false drops a unit */
+function ipwATE(Y,T,e,keep){let a1=0,b1=0,a0=0,b0=0;for(let i=0;i<Y.length;i++){if(keep&&!keep(i))continue;if(T[i]){const w=1/e[i];a1+=w*Y[i];b1+=w}else{const w=1/(1-e[i]);a0+=w*Y[i];b0+=w}}return a1/b1-a0/b0}
+function smd(x,T,w){let m1=0,m0=0,w1=0,w0=0,n1=0,n0=0;for(let i=0;i<x.length;i++){const ww=w?w[i]:1;if(T[i]){m1+=ww*x[i];w1+=ww;n1++}else{m0+=ww*x[i];w0+=ww;n0++}}m1/=w1;m0/=w0;let v1=0,v0=0,a1=0,a0=0;for(let i=0;i<x.length;i++){if(T[i]){a1+=x[i]}else a0+=x[i]}a1/=n1;a0/=n0;for(let i=0;i<x.length;i++){if(T[i])v1+=(x[i]-a1)*(x[i]-a1);else v0+=(x[i]-a0)*(x[i]-a0)}v1/=n1-1;v0/=n0-1;return(m1-m0)/Math.sqrt((v1+v0)/2)}
+/* confounded data: X1,X2; treatment strength a; effect tau (function of x1 optional) */
+function confData(n,a,tauF,nl){const X1=rn(n),X2=rn(n),e=lin(n,i=>lgs(a*(.8*X1[i]+.5*X2[i]+(nl?.4*(X1[i]*X1[i]-1):0))/1.5)),T=new Uint8Array(n),Y=new Float64Array(n);
+ for(let i=0;i<n;i++){T[i]=Math.random()<e[i]?1:0;Y[i]=(T[i]?(tauF?tauF(X1[i]):1):0)+X1[i]+.8*X2[i]+(nl?.6*X1[i]*X1[i]:0)+randn()}return{X1,X2,T,Y,e}}
+/* one-to-one nearest-neighbour matching with replacement on a score; returns ATT and the matched control index per treated unit (-1 if dropped) */
+function matchATT(sc,T,Y,cal){const ctr=[];for(let i=0;i<T.length;i++)if(!T[i])ctr.push(i);ctr.sort((a,b)=>sc[a]-sc[b]);const cs=ctr.map(i=>sc[i]),m=new Int32Array(T.length).fill(-1);let sum=0,k=0;
+ for(let i=0;i<T.length;i++){if(!T[i])continue;let lo=0,hi=cs.length-1;while(lo<hi){const mid=(lo+hi)>>1;if(cs[mid]<sc[i])lo=mid+1;else hi=mid}let b=lo;if(lo>0&&Math.abs(cs[lo-1]-sc[i])<Math.abs(cs[lo]-sc[i]))b=lo-1;if(Math.abs(cs[b]-sc[i])>cal)continue;m[i]=ctr[b];sum+=Y[i]-Y[ctr[b]];k++}return{att:sum/k,m,kept:k}}
+const quant=(a,p)=>{const b=Float64Array.from(a).sort();return b[Math.min(b.length-1,Math.floor(p*b.length))]};
+/* ---------- Bayesian helpers ---------- */
+const bp=x=>(100*x).toFixed(x<.1?2:1)+'%';
+/* density curves with optional fill: curves=[{f,col,fill,dash,lw}] ; returns P */
+function dcurves(cv,x0,x1,curves,vl,ref){let ym=0,yr=0;curves.forEach((c,k)=>{for(let i=0;i<=300;i++){const v=c.f(x0+(x1-x0)*i/300);if(isFinite(v)){ym=Math.max(ym,v);if(k===(ref==null?curves.length-1:ref))yr=Math.max(yr,v)}}});
+ const top=Math.min(ym,yr*2.5)||ym||1,P=mk(cv,x0,x1,top*1.12);clip(P,()=>curves.forEach(c=>{if(c.fill)P.area(c.f,x0,x1,c.fill,240);P.line(c.f,c.col,c.lw||2.4,x0,x1,300,c.dash)}));(vl||[]).forEach(v=>P.vline(v[0],v[1],null,v[3]));return P}
+/* quantile of Beta(a,b), cached by rounding */
+const bq=(a,b,p)=>qb(a,b,p);
+function bint(a,b,m){const t=(1-(m||.95))/2;return[bq(a,b,t),bq(a,b,1-t)]}
+/* shortest (HPD) interval of a unimodal Beta */
+function bhpd(a,b,m){m=m||.95;if(a<=1)return[0,bq(a,b,m)];if(b<=1)return[bq(a,b,1-m),1];let best=[0,1],bw=9;for(let i=1;i<80;i++){const lo=(1-m)*i/80,l=bq(a,b,lo),u=bq(a,b,lo+m);if(u-l<bw){bw=u-l;best=[l,u]}}return best}
+const bmean=(a,b)=>a/(a+b);
+/* fixed uniforms so sliders move a stable dataset */
+const UU=(n)=>Array.from({length:n},()=>Math.random());
+const cnt=(U,n,p)=>{let k=0;for(let i=0;i<n;i++)if(U[i]<p)k++;return k};
+/* solve (A + lam I) beta = b and return diag of the inverse (A symmetric p x p) */
+function ridgeSolve(A,b,lam){const p=b.length,M=[];for(let i=0;i<p;i++){const r=new Float64Array(2*p+1);for(let j=0;j<p;j++)r[j]=A[i][j]+(i===j?lam:0);r[p+i]=1;r[2*p]=b[i];M.push(r)}
+ for(let c=0;c<p;c++){let m=c;for(let r=c+1;r<p;r++)if(Math.abs(M[r][c])>Math.abs(M[m][c]))m=r;[M[c],M[m]]=[M[m],M[c]];const d=M[c][c]||1e-12;for(let k=0;k<=2*p;k++)M[c][k]/=d;for(let r=0;r<p;r++)if(r!==c){const f=M[r][c];if(f!==0)for(let k=0;k<=2*p;k++)M[r][k]-=f*M[c][k]}}
+ return{beta:M.map(r=>r[2*p]),dinv:M.map((r,i)=>r[p+i])}}
+/* Bayes factor of H0: mu = 0 against H1: mu ~ N(0, tau^2) with z fixed; r = n tau^2 / sigma^2 */
+const bf01=(z,r)=>Math.sqrt(1+r)*Math.exp(-z*z/2*r/(1+r));
+const pc1=x=>(100*x).toFixed(1)+'%';
+/* ---------- Ch1 beta-binomial updating ---------- */
+(function(){scl('c1a',v=>v+'%');scl('c1s',v=>v);scl('c1n',v=>v);scl('c1t',v=>v+'%');
+ let U=UU(600);
+ function run(){const m=val('c1a')/100,s=val('c1s'),n=val('c1n'),tp=val('c1t')/100,k=cnt(U,n,tp),a0=m*s,b0=(1-m)*s,a1=a0+k,b1=b0+n-k,ci=bint(a1,b1,.95);
+  const q=[bq(a0,b0,.002),bq(a1,b1,.002),bq(k+1,n-k+1,.002)],r=[bq(a0,b0,.998),bq(a1,b1,.998),bq(k+1,n-k+1,.998)],x0=Math.max(0,Math.min(...q,tp)-.01),x1=Math.min(1,Math.max(...r,tp)+.01);
+  const P=dcurves($('c1cv'),x0,x1,[{f:x=>betapdf(x,a0,b0),col:C.a,lw:2.2},{f:x=>betapdf(x,k+1,n-k+1),col:C.y,lw:2.2,dash:true},{f:x=>betapdf(x,a1,b1),col:C.g,fill:'rgba(74,222,128,.16)',lw:2.8}],[[tp,C.fg,'truth',true]],2);
+  legend(P,[['prior',C.a],['likelihood',C.y],['posterior',C.g]],P.T+12);
+  const N=Math.max(n,20),pm=[],ml=[];for(let i=0;i<=N;i++){const ki=cnt(U,i,tp);pm.push([i,(a0+ki)/(s+i)]);if(i>0)ml.push([i,ki/i])}
+  const hi=Math.min(1,Math.max(...pm.map(v=>v[1]),...ml.map(v=>v[1]),m,tp)*1.15+.02),P2=mk($('c1cv2'),0,N,hi,{L:44});
+  P2.hline(m,C.a,'prior mean');P2.hline(tp,C.fg,'truth');clip(P2,()=>{poly(P2,ml,C.y,1.6);poly(P2,pm,C.g,2.6)});P2.vline(n,C.mu,null,true);legend(P2,[['posterior mean',C.g],['sample rate k/n',C.y]],P2.T+12);P2.text('trials seen →',P2.w-P2.R-4,P2.h-P2.B-6,C.mu,'right');
+  const w=n/(n+s);
+  $('c1st').innerHTML=stat('data',k+' of '+n,'in')+stat('prior mean · sample rate',bp(m)+' · '+(n?bp(k/n):'—'),'')+stat('posterior mean',bp(a1/(a1+b1)),'ok')+stat('95% credible interval',bp(ci[0])+' to '+bp(ci[1]),'')+stat('weight on the data',pc1(w),w<.3?'warn':'ok');
+  $('c1rd').innerHTML=`The prior is worth ${s} pseudo-observations (${(a0).toFixed(1)} successes and ${(b0).toFixed(1)} failures) and the data are ${n} real ones, so the posterior mean ${bp(a1/(a1+b1))} is the weighted average of the prior mean ${bp(m)} and the sample rate ${n?bp(k/n):'—'} with weight ${pc1(w)} on the data. With little data the posterior sits near the prior; the right panel shows the posterior mean moving from the prior mean towards the truth as trials accumulate.`}
+ ['c1a','c1s','c1n','c1t'].forEach(i=>$(i).addEventListener('input',run));$('c1go').onclick=()=>{U=UU(600);run()};run();})();
+
+/* ---------- Ch2 normal-normal ---------- */
+(function(){scl('c2n',v=>v);scl('c2m',v=>fmt(v/2));scl('c2s',v=>fmt(v/10));
+ const SIG=2,MU=1;let Z=Array.from({length:300},()=>randn());
+ function run(){const n=val('c2n'),m0=val('c2m')/2,s0=val('c2s')/10;let sm=0;for(let i=0;i<n;i++)sm+=MU+SIG*Z[i];const xb=sm/n,pr0=1/(s0*s0),prd=n/(SIG*SIG),pv=1/(pr0+prd),pm=pv*(pr0*m0+prd*xb),w=prd/(pr0+prd),ps=Math.sqrt(pv),ls=SIG/Math.sqrt(n);
+  const P=dcurves($('c2cv'),-4,6,[{f:x=>normPdfAt(x,m0,s0),col:C.a,lw:2.2},{f:x=>normPdfAt(x,xb,ls),col:C.y,lw:2.2,dash:true},{f:x=>normPdfAt(x,pm,ps),col:C.g,fill:'rgba(74,222,128,.16)',lw:2.8}],[[MU,C.fg,'truth',true]],2);legend(P,[['prior',C.a],['likelihood',C.y],['posterior',C.g]],P.T+12);
+  const wf=s=>k=>k/(k+SIG*SIG/(s*s)),P2=mk($('c2cv2'),0,200,1.02,{L:44});P2.line(wf(s0/3),C.a,1.8,0,200,200,true);P2.line(wf(s0*3),C.y,1.8,0,200,200,true);P2.line(wf(s0),C.g,2.8,0,200,200);P2.vline(n,C.mu,null,true);
+  legend(P2,[['prior sd '+fmt(s0),C.g],['tighter ('+fmt(s0/3)+')',C.a],['looser ('+fmt(s0*3)+')',C.y]],P2.T+12+0);P2.text('n →',P2.w-P2.R-4,P2.h-P2.B-6,C.mu,'right');
+  $('c2st').innerHTML=stat('sample mean',fmt(xb),'in')+stat('posterior mean · sd',fmt(pm)+' · '+fmt(ps),'ok')+stat('weight on the data',pc1(w),w<.4?'warn':'ok')+stat('prior worth',fmt(SIG*SIG/(s0*s0))+' observations','');
+  $('c2rd').innerHTML=`Precisions add: prior precision ${fmt(pr0)} plus data precision ${fmt(prd)} gives posterior sd ${fmt(ps)}, smaller than either source alone. The posterior mean ${fmt(pm)} is a precision-weighted average of the prior mean ${fmt(m0)} and the sample mean ${fmt(xb)}; the data get weight ${pc1(w)}. A prior with sd ${fmt(s0)} is worth σ²/s₀² = ${fmt(SIG*SIG/(s0*s0))} observations, so it is overwhelmed once n is much larger than that.`}
+ ['c2n','c2m','c2s'].forEach(i=>$(i).addEventListener('input',run));$('c2go').onclick=()=>{Z=Array.from({length:300},()=>randn());run()};run();})();
+
+/* ---------- Ch3 priors for a rare event ---------- */
+(function(){scl('c3n',v=>v);scl('c3p',v=>fmt(v/10)+'%');
+ const PR=[['uniform',1,1,C.a],['Jeffreys',.5,.5,C.p],['weak (mean 5%)',1,19,C.t],['external (mean 2%, n₀ = 100)',2,98,C.g],['confident, wrong (mean 30%)',30,70,C.r]];let U=UU(3000);
+ function run(){const n=val('c3n'),p=val('c3p')/1000,d=cnt(U,n,p),post=PR.map(q=>[q[1]+d,q[2]+n-d]),x1=Math.min(1,Math.max(bq(post[0][0],post[0][1],.995)*1.15,p*2.2,.02));
+  const P=dcurves($('c3cv'),0,x1,PR.map((q,i)=>({f:x=>betapdf(x,post[i][0],post[i][1]),col:q[3],lw:2.3})),[[p,C.fg,'truth',true]],0);
+  let lx=P.L+8,ly=P.T+12;PR.forEach(q=>{const t='■ '+q[0],wd=P.g.measureText(t).width+14;if(lx+wd>P.w-8){lx=P.L+8;ly+=14}P.text(t,lx,ly,q[3]);lx+=wd});
+  const means=[d/n].concat(post.map(a=>a[0]/(a[0]+a[1])).map(x=>x)),vals=means.map(x=>100*x),hi=Math.max(...vals,100*p)*1.2+.1;
+  barV($('c3cv2'),vals,[C.y].concat(PR.map(q=>q[3])),['MLE','uniform','Jeffreys','weak','external','wrong'],hi,x=>x.toFixed(2)+'%');
+  $('c3st').innerHTML=stat('defaults seen',d+' of '+n,'in')+stat('true rate',bp(p),'')+stat('MLE',bp(d/n),d===0?'hot':'')+stat('posterior means (uniform … wrong)',means.slice(1).map(x=>(100*x).toFixed(2)).join(' · ')+'%','');
+  $('c3rd').innerHTML=`The MLE is ${bp(d/n)}${d===0?', a rate of zero that no risk system can use':''}. A uniform prior is worth 2 pseudo-observations and a Jeffreys prior 1, so with ${n} real observations they barely differ. The external prior (worth 100 observations) is the useful one when it is right, here ${(100*2/100).toFixed(0)}% against a truth of ${bp(p)}. The confident wrong prior is worth 100 observations too but sits at 30%: with only ${n} data points it drags the answer to ${(100*means[5]).toFixed(1)}%. Raise n to see priors lose their grip; the data must be able to beat the prior if the prior is wrong.`}
+ ['c3n','c3p'].forEach(i=>$(i).addEventListener('input',run));$('c3go').onclick=()=>{U=UU(3000);run()};run();})();
+
+/* ---------- Ch4 credible against confidence intervals ---------- */
+(function(){scl('c4n',v=>v);
+ function ints(n){const W=[],A=[],J=[];for(let x=0;x<=n;x++){const ph=x/n,h=1.96*Math.sqrt(ph*(1-ph)/n);W.push([ph-h,ph+h]);A.push(bint(1+x,1+n-x));J.push(bint(.5+x,.5+n-x))}return[W,A,J]}
+ function cover(I,n,p){let c=0;for(let x=0;x<=n;x++)if(p>=I[x][0]&&p<=I[x][1])c+=binom(n,x,p);return c}
+ function run(){const n=val('c4n'),I=ints(n),cols=[C.r,C.a,C.g],names=['Wald (MLE ± 1.96 se)','Bayes, uniform prior','Bayes, Jeffreys prior'],G1=Array.from({length:160},(_,i)=>.005+.99*i/159),G2=Array.from({length:80},(_,i)=>.001+.049*i/79);
+  const c1=I.map(Ik=>G1.map(p=>cover(Ik,n,p))),c2=I.map(Ik=>G2.map(p=>cover(Ik,n,p))),av=a=>a.reduce((s,v)=>s+v,0)/a.length;
+  const P=mk($('c4cv'),0,1,1.12,{y0:.3,L:44});P.hline(.95,C.mu,'95%');clip(P,()=>I.forEach((_,k)=>poly(P,G1.map((p,i)=>[p,Math.max(.3,c1[k][i])]),cols[k],1.6)));legend(P,[['Wald',C.r],['uniform prior',C.a],['Jeffreys',C.g]],P.T+12);P.text('true p →',P.w-P.R-4,P.h-P.B-6,C.mu,'right');
+  const grp=[[av(c1[0]),av(c1[1]),av(c1[2])],[av(c2[0]),av(c2[1]),av(c2[2])]],P2=barG($('c4cv2'),grp,cols,['p ~ uniform(0, 1)','p in (0.1%, 5%)'],0,1.12,x=>(100*x).toFixed(1)+'%');legend(P2,[['Wald',C.r],['uniform',C.a],['Jeffreys',C.g]],P2.T+12);
+  $('c4st').innerHTML=stat('average coverage, p anywhere',grp[0].map(x=>(100*x).toFixed(1)).join(' · ')+'%',Math.abs(grp[0][1]-.95)<.01?'ok':'')+stat('average coverage, p small',grp[1].map(x=>(100*x).toFixed(1)).join(' · ')+'%',grp[1][0]<.9?'hot':'')+stat('Wald worst case',(100*Math.min(...c1[0])).toFixed(0)+'%','warn');
+  $('c4rd').innerHTML=`Coverage is the frequentist question (“in repeated samples at a fixed p, how often does the interval contain p?”). The Wald interval collapses for small p (it is the empty point when no events are seen), as the red curve and bars show. The Bayesian intervals with a uniform prior cover about 95% <em>on average over p ~ uniform</em> by construction (the blue bar), but at a particular p they can be above or below 95%. Within a bank-like range (0.1–5%) the Wald interval covers far too rarely, while both Bayesian intervals stay much closer to 95% (one slightly liberal, the other slightly conservative, depending on n); a prior that matches the portfolio you are modelling would do better still.`}
+ $('c4n').addEventListener('input',run);run();})();
+
+/* ---------- Ch5 posterior predictive checks ---------- */
+(function(){scl('c5n',v=>v);scl('c5f',v=>v?fmt(v/10):'0 (Poisson)');
+ function run(){const n=val('c5n'),phi=val('c5f')/10,R=300,x=new Float64Array(n);let sx=0,sq=0,zz=0;
+  for(let i=0;i<n;i++){const lam=phi>0?2*phi*gammaS(1/phi):2;x[i]=poisS(lam);sx+=x[i];sq+=x[i]*x[i];if(x[i]===0)zz++}
+  const mu=sx/n,vr=(sq-n*mu*mu)/(n-1),T1=vr/Math.max(mu,1e-9),T2=zz/n,a=1+sx,b=.5+n,t1=[],t2=[],tm=[];
+  for(let r=0;r<R;r++){const lam=gammaS(a)/b;let s=0,q=0,z=0;for(let i=0;i<n;i++){const y=poisS(lam);s+=y;q+=y*y;if(y===0)z++}const m=s/n;t1.push(((q-n*m*m)/(n-1))/Math.max(m,1e-9));t2.push(z/n);tm.push(m)}
+  const pp=(a_,o)=>a_.filter(v=>v>=o).length/R,p1=pp(t1,T1),p2=pp(t2,T2),pm=pp(tm,mu);
+  const lo1=Math.min(...t1,T1)*.95,hi1=Math.max(...t1,T1)*1.05,lo2=Math.min(...t2,T2)*.95,hi2=Math.max(...t2,T2)*1.05;
+  const P=histLines($('c5cv'),[t1],[C.a],lo1,hi1+1e-6,30,[[T1,C.r,'observed',true]]);P.text('variance ÷ mean →',P.w-P.R-4,P.h-P.B-6,C.mu,'right');
+  const Q=histLines($('c5cv2'),[t2],[C.g],lo2,hi2+1e-6,30,[[T2,C.r,'observed',true]]);Q.text('share of zeros →',Q.w-Q.R-4,Q.h-Q.B-6,C.mu,'right');
+  const flag=p=>p<.025||p>.975;
+  $('c5st').innerHTML=stat('variance ÷ mean: observed · replicated',fmt(T1)+' · '+fmt(mean(t1)),flag(p1)?'hot':'ok')+stat('predictive p (variance ratio)',fmt(p1),flag(p1)?'hot':'ok')+stat('predictive p (zeros)',fmt(p2),flag(p2)?'hot':'ok')+stat('predictive p (mean)',fmt(pm),'in')+stat('verdict',flag(p1)||flag(p2)?'model misfits':'no misfit seen',flag(p1)||flag(p2)?'warn':'ok');
+  $('c5rd').innerHTML=phi===0?`The data really are Poisson, so datasets simulated from the fitted model look like the real one on every statistic (predictive p-values are unremarkable).`:`The data are over-dispersed (a gamma mixture of Poisson rates), but the fitted model is a plain Poisson with a gamma prior. The posterior mean fits the average count perfectly (p = ${fmt(pm)}, uninformative), yet datasets generated from the model have a variance-to-mean ratio of about ${fmt(mean(t1))} against the observed ${fmt(T1)} (p = ${fmt(p1)}). A check must target a feature the model could get wrong: the mean cannot detect this, the dispersion can.`}
+ ['c5n','c5f'].forEach(i=>$(i).addEventListener('change',run));$('c5go').onclick=run;run();})();
+
+/* ---------- Ch6 Bayesian regression and ridge ---------- */
+(function(){scl('c6n',v=>v);scl('c6s',v=>fmt(v/100));scl('c6t',v=>fmt(v/100));
+ const p=10,TG=Array.from({length:26},(_,i)=>Math.pow(10,-1.3+2*i/25));
+ function run(){const n=val('c6n'),s=val('c6s')/100,tc=val('c6t')/100,R=100,curve=new Float64Array(TG.length);let sOLS=0,sCh=0,sOr=0,sTi=0,cvCh=0,cvTi=0,cvOr=0;const tt=s/5;
+  for(let r=0;r<R;r++){const X=[],y=new Float64Array(n),bt=Array.from({length:p},()=>s*randn());for(let i=0;i<n;i++){const row=Array.from({length:p},()=>randn());X.push(row);let e=randn();for(let j=0;j<p;j++)e+=row[j]*bt[j];y[i]=e}
+   const A=Array.from({length:p},()=>new Float64Array(p)),b=new Float64Array(p);for(let i=0;i<n;i++)for(let j=0;j<p;j++){b[j]+=X[i][j]*y[i];for(let k=0;k<p;k++)A[j][k]+=X[i][j]*X[i][k]}
+   const ms=(l,cov)=>{const f=ridgeSolve(A,b,l);let m=0,c=0;for(let j=0;j<p;j++){const d=f.beta[j]-bt[j];m+=d*d/p;if(Math.abs(d)<1.96*Math.sqrt(f.dinv[j]))c++}return[m,c/p]};
+   sOLS+=ms(1e-6)[0]/R;TG.forEach((t,i)=>{curve[i]+=ms(1/(t*t))[0]/R});
+   const ch=ms(1/(tc*tc)),orr=ms(1/(s*s)),ti=ms(1/(tt*tt));sCh+=ch[0]/R;cvCh+=ch[1]/R;sOr+=orr[0]/R;cvOr+=orr[1]/R;sTi+=ti[0]/R;cvTi+=ti[1]/R}
+  const rm=v=>Math.sqrt(v),cu=Array.from(curve).map(rm),hi=Math.max(...cu,rm(sOLS))*1.1,P=mk($('c6cv'),-1.3,.7,hi,{noGrid:true,L:44});customGrid(P,[-1,-.5,0,.5].map(v=>[v,fmt(Math.pow(10,v))]),niceTicks(0,hi,4));
+  clip(P,()=>{P.hline(rm(sOLS),C.r,'OLS (flat prior)');poly(P,TG.map((t,i)=>[Math.log10(t),cu[i]]),C.g,2.8)});P.vline(Math.log10(s),C.fg,'true sd',true);P.vline(Math.log10(tc),C.y,'your prior',true);P.text('prior sd of each coefficient →',P.w-P.R-4,P.h-P.B-6,C.mu,'right');
+  const v4=[rm(sOLS),rm(sCh),rm(sOr),rm(sTi)],hi2=Math.max(...v4)*1.2;barV($('c6cv2'),v4,[C.r,C.y,C.g,C.p],['OLS','your prior','prior = truth','too tight'],hi2,x=>x.toFixed(3));
+  $('c6st').innerHTML=stat('RMSE: OLS · your prior',fmt(v4[0])+' · '+fmt(v4[1]),'')+stat('RMSE: matched · too tight',fmt(v4[2])+' · '+fmt(v4[3]),'ok')+stat('95% interval coverage: yours · matched · too tight',(100*cvCh).toFixed(0)+' · '+(100*cvOr).toFixed(0)+' · '+(100*cvTi).toFixed(0)+'%',cvTi<.85?'warn':'in')+stat('equivalent ridge λ (σ² = 1)',fmt(1/(tc*tc)),'');
+  $('c6rd').innerHTML=`With a normal prior β ~ N(0, τ²) and normal noise (σ = 1), the posterior mean is the ridge estimate with λ = σ²/τ² = ${fmt(1/(tc*tc))}. The green curve is the error as a function of the prior sd: it is lowest when the prior matches how large the coefficients really are (${fmt(s)}), and a flat prior (OLS, red) is clearly worse when n is small relative to ${p} coefficients. The Bayesian extra is the posterior variance: with a matched prior the 95% intervals cover about ${(100*cvOr).toFixed(0)}% of the coefficients, while an over-confident (too tight) prior covers only ${(100*cvTi).toFixed(0)}%.`}
+ ['c6n','c6s','c6t'].forEach(i=>$(i).addEventListener('change',run));$('c6go').onclick=run;run();})();
+/* ---------- Ch7 priors wash out, unless they cannot ---------- */
+(function(){const NS=[5,10,20,50,100,200,500,1000,5000,20000];idx('c7i',NS,v=>v.toLocaleString('en-US'));scl('c7t',v=>v+'%');
+ let U=UU(20000);
+ function tmean(k,n,hi){const G=400;let sw=0,sm=0;for(let i=0;i<G;i++){const p=hi*(i+.5)/G,lw=k*Math.log(p)+(n-k)*Math.log(1-p);sw+=Math.exp(lw-(k*Math.log(Math.min(hi,Math.max(k/n,1e-6)))+(n-k)*Math.log(1-Math.min(hi,Math.max(k/n,1e-6)))));sm+=p*Math.exp(lw-(k*Math.log(Math.min(hi,Math.max(k/n,1e-6)))+(n-k)*Math.log(1-Math.min(hi,Math.max(k/n,1e-6)))))}return sm/sw}
+ function est(n,p){const k=cnt(U,n,p);return{k,A:(1+k)/(2+n),B:(40+k)/(200+n),C:tmean(k,n,.2)}}
+ function run(){const p=val('c7t')/100,ni=+$('c7i').value,n=NS[ni],E=NS.map(m=>est(m,p)),e=E[ni],hi=Math.min(.8,Math.max(.7*p+.35,.5)),P=mk($('c7cv'),Math.log10(5),Math.log10(20000),hi,{noGrid:true,L:44});
+  customGrid(P,[1,2,3,4].map(v=>[v,nlab(Math.pow(10,v))]),niceTicks(0,hi,5));P.hline(p,C.fg,'truth');
+  [['A',C.a],['B',C.r],['C',C.y]].forEach(([k,c])=>{poly(P,NS.map((m,i)=>[Math.log10(m),E[i][k]]),c,2.4);dots(P,NS.map((m,i)=>[Math.log10(m),E[i][k]]),c,3)});P.vline(Math.log10(n),C.mu,null,true);
+  legend(P,[['flat prior',C.a],['confident, wrong (mean 20%)',C.r],['prior zero above 20%',C.y]],P.T+12);P.text('number of observations →',P.w-P.R-4,P.h-P.B-6,C.mu,'right');
+  const mA=e.A,mB=e.B,mC=e.C,sd=Math.sqrt(Math.max(p*(1-p),1e-4)/n),x0=Math.max(0,Math.min(p,mA,mB,mC)-Math.max(.03,4*sd)),x1=Math.min(1,Math.max(p,mA,mB,mC)+Math.max(.03,4*sd)),cdf2=betai(e.k+1,n-e.k+1,.2);
+  const Q=dcurves($('c7cv2'),x0,x1,[{f:x=>betapdf(x,e.k+40,n-e.k+160),col:C.r,lw:2.2},{f:x=>x<.2?betapdf(x,e.k+1,n-e.k+1)/Math.max(cdf2,1e-300):0,col:C.y,lw:2.2},{f:x=>betapdf(x,e.k+1,n-e.k+1),col:C.a,fill:'rgba(110,168,255,.15)',lw:2.8}],[[p,C.fg,'truth',true]],2);
+  $('c7st').innerHTML=stat('truth · sample rate',bp(p)+' · '+bp(e.k/n),'in')+stat('posterior mean: flat prior',bp(mA),Math.abs(mA-p)<.02?'ok':'')+stat('wrong confident prior',bp(mB),Math.abs(mB-p)<.02?'ok':'warn')+stat('prior with no support above 20%',bp(mC),Math.abs(mC-p)>.05?'hot':'');
+  $('c7rd').innerHTML=`At n = ${n.toLocaleString('en-US')} the flat prior has landed on the truth (${bp(mA)}), and the confident wrong prior has been overruled once the data outweigh its 200 pseudo-observations (${bp(mB)}). The third prior assigns probability zero to every rate above 20%, so no amount of data can move it past the boundary: it ends at ${bp(mC)} for the truth of ${bp(p)} (Cromwell’s rule: never assign probability 0 or 1 to anything that is merely unlikely). Posteriors become approximately normal and centred on the MLE as n grows (the Bernstein–von Mises theorem), provided the prior puts mass around the truth.`}
+ ['c7t','c7i'].forEach(i=>$(i).addEventListener('input',run));$('c7go').onclick=()=>{U=UU(20000);run()};run();})();
+
+/* ---------- Ch8 Bayes factors and Lindley ---------- */
+(function(){const nf=n=>{const r=Math.round(n);return r>=1e6?(r/1e6).toFixed(1).replace(/\.0$/,'')+'M':r>=1000?(r/1000).toFixed(r>=1e5?0:1).replace(/\.0$/,'')+'k':String(r)};scl('c8z',v=>fmt(v/100));scl('c8t',v=>fmt(v/10));scl('c8p',v=>v+'%');idx('c8i',[0,1,2,3,4,5,6,7,8,9,10],v=>nf(Math.pow(10,1+v/2)));
+ const nOf=i=>Math.pow(10,1+i/2);
+ function run(){const z=val('c8z')/100,t=val('c8t')/10,pi0=val('c8p')/100,ni=+$('c8i').value,n=nOf(ni),G=Array.from({length:101},(_,i)=>1+5*i/100),lb=(tt,nn)=>Math.log10(bf01(z,nn*tt*tt)),post=B=>pi0*B/(pi0*B+1-pi0);
+  const ys=[],ts=[[t/5,C.a,true],[t,C.g,false],[t*5,C.y,true]];ts.forEach(q=>G.forEach(g=>ys.push(lb(q[0],Math.pow(10,g)))));const hi=Math.max(1,...ys)+.2,lo=Math.min(-1,...ys)-.2,P=mk($('c8cv'),1,6,hi,{y0:lo,noGrid:true,L:44});
+  customGrid(P,[1,2,3,4,5,6].map(v=>[v,nlab(Math.pow(10,v))]),niceTicks(lo,hi,5));P.hline(0,C.mu,null);ts.forEach(q=>poly(P,G.map(g=>[g,lb(q[0],Math.pow(10,g))]),q[1],q[2]?1.8:2.8,q[2]));P.vline(Math.log10(n),C.mu,null,true);
+  legend(P,[['prior sd '+fmt(t/5),C.a],['prior sd '+fmt(t),C.g],['prior sd '+fmt(t*5),C.y]],P.T+12);P.text('log10 Bayes factor for H0 (above 0 favours H0) · n →',P.w-P.R-4,P.h-P.B-6,C.mu,'right');
+  const Q=mk($('c8cv2'),1,6,1,{noGrid:true,L:44});customGrid(Q,[1,2,3,4,5,6].map(v=>[v,nlab(Math.pow(10,v))]),niceTicks(0,1,5));Q.hline(pi0,C.mu,'prior P(H0)');ts.forEach(q=>poly(Q,G.map(g=>[g,post(bf01(z,Math.pow(10,g)*q[0]*q[0]))]),q[1],q[2]?1.8:2.8,q[2]));Q.vline(Math.log10(n),C.mu,null,true);Q.text('posterior probability of H0 · n →',Q.w-Q.R-4,Q.h-Q.B-6,C.mu,'right');
+  const B=bf01(z,n*t*t),pv=2*normSf(z);let cross=null;for(let g=1;g<=6.001;g+=.01){if(bf01(z,Math.pow(10,g)*t*t)>1){cross=Math.pow(10,g);break}}
+  $('c8st').innerHTML=stat('p-value (z fixed)',pv<.001?pv.toExponential(1):pv.toFixed(3),pv<.05?'hot':'in')+stat('Bayes factor for H0 at n',B>100?Math.round(B):B.toFixed(2),B>1?'warn':'ok')+stat('P(H0 | data)',pc1(post(B)),post(B)>.5?'warn':'ok')+stat('H0 overtakes at n ≈',cross?nf(cross):'never (z > ~1 and n too small)','');
+  $('c8rd').innerHTML=`The test statistic is held at z = ${fmt(z)} (p = ${pv.toFixed(3)}) while n grows. The p-value never changes; the evidence does. With a prior sd of ${fmt(t)}σ for the effect under H₁, the Bayes factor for the null is ${B>100?Math.round(B):B.toFixed(2)} at n = ${nf(n)}, so the posterior probability of H₀ is ${pc1(post(B))}${post(B)>.5?': the “significant” result now favours the null (the Jeffreys–Lindley paradox)':''}. A larger prior sd on the effect (yellow) penalises H₁ more, a tighter one (blue) less: Bayes factors depend on the prior for the alternative, which must be justified, not defaulted.`}
+ ['c8z','c8t','c8p','c8i'].forEach(i=>$(i).addEventListener('input',run));run();})();
+
+/* ---------- Ch9 empirical Bayes ---------- */
+(function(){scl('c9j',v=>v);scl('c9m',v=>v+'%');scl('c9k',v=>v);
+ function run(){const J=val('c9j'),m=val('c9m')/100,kap=val('c9k'),R=60,a0=m*kap,b0=(1-m)*kap;let eR=0,eE=0,eP=0,kh=0,tr=0,tt=0,te=0,tet=0,wsum=0;
+  for(let r=0;r<R;r++){const nj=Array.from({length:J},()=>Math.round(Math.pow(10,1.3+1.7*Math.random()))),pj=Array.from({length:J},()=>betaS(a0,b0)),xj=nj.map((n,i)=>binF(n,pj[i])),ph=xj.map((x,i)=>x/nj[i]);
+   let sx=0,sn=0;for(let i=0;i<J;i++){sx+=xj[i];sn+=nj[i]}const mh=sx/sn;let num=0,den=0;for(let i=0;i<J;i++){num+=nj[i]*((ph[i]-mh)*(ph[i]-mh)-mh*(1-mh)/nj[i]);den+=nj[i]*(1-1/nj[i])}
+   const V=Math.max(num/den,1e-7),k2=Math.min(1e5,Math.max(2,mh*(1-mh)/V-1)),eb=xj.map((x,i)=>(mh*k2+x)/(k2+nj[i]));kh+=k2/R;
+   let a=0,b=0,c=0;for(let i=0;i<J;i++){a+=Math.pow(ph[i]-pj[i],2);b+=Math.pow(eb[i]-pj[i],2);c+=Math.pow(mh-pj[i],2);wsum+=nj[i]/(k2+nj[i])/(J*R)}
+   eR+=Math.sqrt(a/J)/R;eE+=Math.sqrt(b/J)/R;eP+=Math.sqrt(c/J)/R;
+   const o1=ordIdx(Array.from(ph,v=>-v)).slice(0,10),o2=ordIdx(Array.from(eb,v=>-v)).slice(0,10),mn=(ix,f)=>ix.reduce((s,i)=>s+f(i),0)/ix.length;
+   tr+=mn(o1,i=>ph[i])/R;tt+=mn(o1,i=>pj[i])/R;te+=mn(o2,i=>eb[i])/R;tet+=mn(o2,i=>pj[i])/R}
+  const v3=[eR,eE,eP].map(x=>100*x),hi=Math.max(...v3)*1.25;barV($('c9cv'),v3,[C.r,C.g,C.mu],['raw rate','empirical Bayes','one pooled rate'],hi,x=>x.toFixed(2)+' pts');
+  const v4=[tr,tt,te,tet].map(x=>100*x),hi2=Math.max(...v4)*1.2;barV($('c9cv2'),v4,[C.r,C.fg,C.g,C.fg],['top 10 by raw: raw','…their true rate','top 10 by EB: EB','…their true rate'],hi2,x=>x.toFixed(2)+'%');
+  $('c9st').innerHTML=stat('RMSE: raw · EB · pooled',v3.map(x=>x.toFixed(2)).join(' · ')+' pts','')+stat('prior strength: true · estimated',kap+' · '+Math.round(kh),Math.abs(kh-kap)/kap<.4?'ok':'warn')+stat('average weight on own data',pc1(wsum),'in')+stat('overstatement of the raw top 10',((tr-tt)*100).toFixed(2)+' pts','hot');
+  $('c9rd').innerHTML=`Branches with few accounts have noisy rates, so the worst-looking branches by raw rate are partly just the smallest ones: the raw top 10 average ${(100*tr).toFixed(2)}% against a true ${(100*tt).toFixed(2)}%. Empirical Bayes estimates the prior from all the branches (strength about ${Math.round(kh)} accounts) and shrinks each rate towards the overall mean in proportion to how little data it has: it cuts the error to ${(100*eE).toFixed(2)} points against ${(100*eR).toFixed(2)} for the raw rates, and its ranking is more honest (${(100*te).toFixed(2)}% estimated for a true ${(100*tet).toFixed(2)}%). Pooling everything into one rate is best only when the branches really are identical (large strength).`}
+ ['c9j','c9m','c9k'].forEach(i=>$(i).addEventListener('change',run));$('c9go').onclick=run;run();})();
+
+/* ---------- Ch10 Bayesian A/B and peeking ---------- */
+(function(){scl('c10p',v=>v+'%');scl('c10l',v=>(v>0?'+':'')+v+'%');scl('c10th',v=>v+'%');
+ function run(){const p0=val('c10p')/100,lift=val('c10l')/100,th=val('c10th')/100,pB=Math.max(.001,p0*(1+lift)),R=400,L=25,step=200,sh={all:0,every5:0,end:0},rg={all:0},st=[],paths=[];let nAt=0,nStop=0;
+  for(let r=0;r<R;r++){let xa=0,xb=0,n=0,hitAll=false,hit5=false,hitEnd=false;const path=[];
+   for(let l=1;l<=L;l++){xa+=binF(step,p0);xb+=binF(step,pB);n+=step;const ma=(1+xa)/(2+n),mb=(1+xb)/(2+n),va=ma*(1-ma)/(3+n),vb=mb*(1-mb)/(3+n),pr=normCdf((mb-ma)/Math.sqrt(va+vb));path.push(pr);
+    if(!hitAll&&pr>th){hitAll=true;nAt+=n;nStop++}if(l%5===0&&pr>th)hit5=true;if(l===L&&pr>th)hitEnd=true}
+   if(hitAll){sh.all++;rg.all+=Math.max(p0-pB,0)}if(hit5)sh.every5++;if(hitEnd)sh.end++;if(r<30)paths.push(path)}
+  const P=mk($('c10cv'),step,L*step,1,{L:44});P.hline(th,C.r,'stop threshold');clip(P,()=>paths.forEach(pa=>{const hit=pa.some(v=>v>th);poly(P,pa.map((v,i)=>[(i+1)*step,v]),hit?C.r:'rgba(138,147,171,.55)',hit?1.6:1)}));P.text('users per arm →',P.w-P.R-4,P.h-P.B-6,C.mu,'right');
+  const v=[sh.all,sh.every5,sh.end].map(x=>x/R),hi=Math.max(...v,th>.9?.3:.2)*1.25+.01;barV($('c10cv2'),v.map(x=>100*x),[C.r,C.y,C.g],['check every look','every 5th look','one look at the end'],100*hi,x=>x.toFixed(1)+'%');
+  const lab=lift===0?'false “B wins” rate (truth: no difference)':lift<0?'“B wins” although B is worse':'power (B really better)';
+  $('c10st').innerHTML=stat(lab+': peeking · every 5th · once',v.map(x=>(100*x).toFixed(1)).join(' · ')+'%',lift<=0&&v[0]>1.8*(1-th)?'hot':'in')+stat('nominal error of one look',((1-th)*100).toFixed(1)+'%','')+stat('average users per arm at stopping',nStop?Math.round(nAt/nStop).toLocaleString('en-US'):'—','')+stat('average true loss when B is declared',(100*(sh.all?rg.all/sh.all:0)).toFixed(3)+' pts','');
+  $('c10rd').innerHTML=`The posterior probability that B beats A is a legitimate summary at any moment, but a <em>decision rule</em> built on it (“stop when it first exceeds ${pc1(th)}”) is a sequential procedure, and its error rate depends on how often you look. Checking after every 200 users per arm ${lift<=0?`declares B the winner in ${(100*v[0]).toFixed(1)}% of experiments where B is no better`:`reaches a declaration in ${(100*v[0]).toFixed(1)}% of experiments`}, against ${(100*v[2]).toFixed(1)}% for one look at the end. Bayesian updating itself is not changed by stopping, but the long-run behaviour of the stopping rule is; calibrate the threshold by simulation, as in the sequential-testing chapter of the experiments page.`}
+ ['c10p','c10l','c10th'].forEach(i=>$(i).addEventListener('change',run));$('c10go').onclick=run;run();})();
+
+/* ---------- Ch11 low-default portfolios ---------- */
+(function(){scl('c11n',v=>v);scl('c11t',v=>v+' bp');scl('c11m',v=>v+' bp');scl('c11s',v=>v);
+ let U=UU(5000);
+ function run(){const n=val('c11n'),p=val('c11t')/1e4,m=val('c11m')/1e4,s=val('c11s'),d=cnt(U,n,p),a0=m*s,b0=(1-m)*s,a1=a0+d,b1=b0+n-d,x1=Math.max(bq(d+1,n-d+1,.995)*1.1,p*3,m*2.5,.001);
+  const P=dcurves($('c11cv'),0,Math.min(1,x1),[{f:x=>betapdf(x,a0,b0),col:C.a,lw:2.2},{f:x=>betapdf(x,d+1,n-d+1),col:C.y,lw:2.2,dash:true},{f:x=>betapdf(x,a1,b1),col:C.g,fill:'rgba(74,222,128,.16)',lw:2.8}],[[p,C.fg,'truth',true]],2);
+  legend(P,[['external prior',C.a],['likelihood',C.y],['posterior',C.g]],P.T+12);
+  const mle=d/n,flat=(d+1)/(n+2),inf=a1/(a1+b1),up=bq(d+1,n-d,.95),upI=bq(a1,b1,.95),vals=[mle,flat,inf,up,upI].map(x=>1e4*x),hi=Math.max(...vals,p*1e4)*1.2;
+  barV($('c11cv2'),vals,[C.y,C.a,C.g,C.r,C.g],['MLE','flat prior','informed','upper (data)','upper (informed)'],hi,x=>x.toFixed(1)+' bp');
+  $('c11st').innerHTML=stat('defaults observed',d+' of '+n,d===0?'warn':'in')+stat('true PD · informed posterior mean',(p*1e4).toFixed(0)+' · '+(1e4*inf).toFixed(1)+' bp','ok')+stat('95% upper bound: data only · informed',(1e4*up).toFixed(0)+' · '+(1e4*upI).toFixed(0)+' bp','')+stat('weight on the portfolio data',pc1(n/(n+s)),n/(n+s)<.3?'warn':'');
+  $('c11rd').innerHTML=`${d===0?'No defaults were observed, so the MLE is zero, a PD no capital rule or pricing model can use. ':''}A data-only 95% upper bound (the “rule of three”, about 3/n) gives ${(1e4*up).toFixed(0)} bp, which is conservative but loose; a prior built from external ratings (mean ${(m*1e4).toFixed(0)} bp, worth ${s} obligors) gives a posterior mean of ${(1e4*inf).toFixed(1)} bp and a tighter upper bound of ${(1e4*upI).toFixed(0)} bp. The prior is an assumption that must be documented: move its mean away from the truth, or raise its strength, and the answer follows it. Reporting the posterior next to the data-only bound, with the prior’s source and a sensitivity range, is the defensible way to use this in a model-risk file.`}
+ ['c11n','c11t','c11m','c11s'].forEach(i=>$(i).addEventListener('input',run));$('c11go').onclick=()=>{U=UU(5000);run()};run();})();
+const QZ=[{"l":"Beginner","q":"In Bayesian inference the posterior distribution of a parameter is proportional to…","o":["The likelihood divided by the prior","The likelihood multiplied by the prior","The likelihood alone","The prior alone"],"a":1,"e":"Posterior ∝ likelihood × prior: the prior is reweighted by how well each parameter value explains the data."},{"l":"Beginner","q":"A Beta(2, 8) prior is updated with 3 successes in 10 trials. The posterior is…","o":["Beta(5, 15)","Beta(5, 8)","Beta(3, 7)","Beta(2, 8), unchanged"],"a":0,"e":"Add the successes to the first parameter (2 + 3) and the failures to the second (8 + 7)."},{"l":"Intermediate","q":"With a N(m₀, s₀²) prior and normal data of known variance σ², the prior is worth about how many observations?","o":["s₀² / σ²","n / s₀²","σ² · s₀²","σ² / s₀²"],"a":3,"e":"A single observation has precision 1/σ² and the prior has precision 1/s₀², so the prior equals σ²/s₀² observations."},{"l":"Intermediate","q":"Why is a uniform prior on a default probability not a neutral “no information” choice?","o":["It always favours p = 0.5","It cannot be updated by data","It is not uniform after reparametrisation (log-odds), and for rare events it gives large prior weight to implausibly high rates","It is an improper prior"],"a":2,"e":"Flatness depends on the scale; a uniform prior says a 40% default rate was as plausible as 1%, which is rarely believed."},{"l":"Intermediate","q":"A 95% credible interval is…","o":["The set where the likelihood exceeds 5% of its maximum","An interval with 95% posterior probability of containing the parameter, given the model, prior and data","The Wald interval computed with a prior","An interval that contains the true parameter in 95% of repeated samples for every parameter value"],"a":1,"e":"Credible intervals are probability statements about the parameter given the data and the prior; coverage over repeated samples is a separate property."},{"l":"Intermediate","q":"Why do Bayesian intervals for a proportion usually beat the Wald interval when the rate is near zero?","o":["They stay inside (0, 1) and give a positive upper limit even with zero events, while the Wald interval collapses to a point","They ignore the data when events are rare","They always have exactly 95% coverage for every p","They use a normal approximation that is more accurate"],"a":0,"e":"With zero events the Wald standard error is zero; the posterior is still a proper distribution with a positive upper quantile."},{"l":"Advanced","q":"A Poisson model for counts is checked with the sample mean as the test statistic, and the observed mean looks perfectly typical. What follows?","o":["The prior is too strong","The model is correct","The model is wrong","Little: the fitted mean is matched by construction, so choose a statistic such as the variance-to-mean ratio that could expose a misfit"],"a":3,"e":"A posterior predictive check is informative only for features the model could fail to reproduce."},{"l":"Advanced","q":"The posterior predictive distribution is wider than a plug-in prediction because it…","o":["Uses a flatter prior","Ignores the data","Includes parameter uncertainty as well as sampling noise","Assumes over-dispersion"],"a":2,"e":"It averages the model’s predictions over the whole posterior rather than at a single estimate."},{"l":"Advanced","q":"In a normal linear model with prior β ~ N(0, τ²I) and noise variance σ², the posterior mean equals the ridge estimate with…","o":["λ = σ² · τ²","λ = σ² / τ²","λ = 1 / (σ τ)","λ = τ² / σ²"],"a":1,"e":"A tighter prior (small τ) means a larger penalty λ, and the posterior covariance is σ²(X′X + λI)⁻¹."},{"l":"Advanced","q":"Which prior can never be overcome by data, however many observations arrive?","o":["One that assigns probability zero to the true parameter value","A uniform prior","One with a very large variance","A conjugate prior"],"a":0,"e":"Cromwell’s rule: a posterior is zero wherever the prior is zero, so no data can revive that region."},{"l":"Advanced","q":"Two analysts use different reasonable priors, both with positive density near the truth. As n grows, their posteriors…","o":["Converge to their respective priors","Stay different by an amount fixed by their priors","Become uniform","Converge to the same approximately normal distribution around the MLE (Bernstein–von Mises)"],"a":3,"e":"The likelihood concentrates and the prior’s influence decays at rate 1/n."},{"l":"Expert","q":"A result is just significant (p ≈ 0.05) with a very large sample and a point null. The Bayes factor against a diffuse alternative typically…","o":["Strongly favours the alternative","Equals the p-value","Favours the null (the Jeffreys–Lindley paradox)","Is exactly 1"],"a":2,"e":"With large n, a fixed z-statistic corresponds to a tiny effect that a diffuse alternative predicted poorly, so the null predicted the data better."},{"l":"Expert","q":"The main criticism of Bayes factors for model comparison is that they…","o":["Cannot be computed for any model","Depend strongly on the prior under each model, so vague priors penalise the alternative","Are identical to p-values","Ignore the data"],"a":1,"e":"The marginal likelihood averages over the prior; widening the prior changes the Occam penalty and the answer."},{"l":"Expert","q":"Empirical Bayes shrinkage of branch default rates helps most when…","o":["Branches are small and their rates noisy compared with the real spread between branches","Every branch has a very large number of accounts","The true rates are known exactly","Each rate must be estimated without using other branches"],"a":0,"e":"Shrinkage trades a little bias for a large variance reduction when the data per unit are thin."},{"l":"Expert","q":"Ranking branches by raw default rate and quoting the worst ten’s rates tends to…","o":["Understate their true rates","Be unbiased, since ranks do not depend on noise","Match the posterior means exactly","Overstate their true rates, because small branches with unlucky noise dominate the extremes"],"a":3,"e":"Selecting the most extreme values selects noise as well as signal (the winner’s curse); shrinkage corrects for it."},{"l":"Expert","q":"You stop an A/B test as soon as P(B > A) first exceeds 95%, checking after every batch. Compared with one look at the end, the false-win rate when there is no true difference is…","o":["Zero","Exactly 5%, because the posterior is valid at any time","Higher than 5%, because every look is another chance to cross the threshold","Lower than 5%"],"a":2,"e":"The posterior is a valid summary at each look, but the stopping rule’s error rate is a sequential property and must be calibrated by simulation."},{"l":"Expert","q":"A portfolio has zero defaults among n obligors. Which statement is correct?","o":["Bayesian methods cannot be used with zero events","The MLE is zero, but a beta prior from external data gives a positive posterior mean and an upper bound that depends on the documented prior mean and strength","The prior has no effect when there are no events","The data-only 95% upper bound is also zero"],"a":1,"e":"With no data signal the prior carries the answer, which is why its source, strength and sensitivity must be documented."},{"l":"Expert","q":"One experimenter fixed n in advance; another kept sampling until a condition was met, and both ended with identical data. With the same prior, their Bayesian posteriors are…","o":["Identical, because the likelihood is proportional (the likelihood principle), although their p-values may differ","Undefined","Different, because the stopping rule changes the posterior","Identical only if the prior is flat"],"a":0,"e":"The posterior depends on the data only through the likelihood; the stopping rule changes frequentist error rates, not the posterior."}];
+(function(){const st=store.get('bi_quiz',{});
+ function render(){const box=$('quiz');box.innerHTML='';
+  QZ.forEach((q,i)=>{const d=document.createElement('div');d.className='q'+(st[i]!=null?' done':'');d.innerHTML=`<div class="qh">Q${i+1} · ${q.l}</div><div style="margin:4px 0 6px"><b>${q.q}</b></div>`;
+   q.o.forEach((o,j)=>{const b=document.createElement('button');b.className='opt';b.textContent=o;if(st[i]!=null){if(j===q.a)b.classList.add('good');else if(j===st[i])b.classList.add('bad')}b.onclick=()=>{if(st[i]!=null)return;st[i]=j;store.set('bi_quiz',st);render();meter()};d.appendChild(b)});
+   const e=document.createElement('div');e.className='ex';e.innerHTML=(st[i]===q.a?'✅ ':'❌ ')+q.e;d.appendChild(e);box.appendChild(d)});
+  const ans=Object.keys(st).length,ok=QZ.filter((q,i)=>st[i]===q.a).length;
+  $('qscore').innerHTML=stat('answered',ans+' / '+QZ.length,'in')+stat('correct',ok,'ok')+stat('score',ans?Math.round(100*ok/ans)+'%':'—',ok/Math.max(ans,1)>=.8?'ok':'warn')+stat('verdict',ans<QZ.length?'keep going':ok>=16?'Bayesian master':ok>=13?'strong':'review ch. 1–11','')}
+ $('qreset').onclick=()=>{Object.keys(st).forEach(k=>delete st[k]);store.set('bi_quiz',st);render();meter()};
+ window.__qst=st;render();})();
+const CHK=["State Bayes’ theorem for a parameter and carry out a beta–binomial update.","Interpret a prior as pseudo-observations and compute the weight the posterior puts on the data.","Apply normal–normal and gamma–Poisson updating (precisions add).","Explain sequential updating and the likelihood principle.","Choose among flat, Jeffreys, weakly informative and informative priors and justify the choice.","Run a prior predictive check and a prior sensitivity analysis.","Compute equal-tailed and HPD credible intervals and interpret them correctly.","Explain the frequentist coverage of Bayesian intervals and the failure of the Wald interval for rare events.","Build a posterior predictive distribution and design a check statistic that can fail.","Show that a normal prior gives ridge regression and read the posterior covariance.","Explain Bernstein–von Mises, Cromwell’s rule and prior–data conflict.","Compute and interpret a Bayes factor and explain the Jeffreys–Lindley paradox.","Apply empirical Bayes shrinkage to many noisy rates and explain how it fixes the winner’s curse.","Document a Bayesian PD for a low-default portfolio (prior source, strength, sensitivity, back-test)."];
+(function(){const st=store.get('bi_chk',{}),box=$('chk');CHK.forEach((t,i)=>{const l=document.createElement('label'),c=document.createElement('input');c.type='checkbox';c.checked=!!st[i];c.onchange=()=>{st[i]=c.checked;store.set('bi_chk',st);meter()};l.appendChild(c);const s=document.createElement('span');s.textContent=t;l.appendChild(s);box.appendChild(l)});window.__cst=st;})();
+function meter(){const q=window.__qst||{},c=window.__cst||{};const ok=QZ.filter((x,i)=>q[i]===x.a).length,ck=Object.values(c).filter(Boolean).length;const p=Math.round(100*(.6*ok/QZ.length+.4*ck/CHK.length));$('mtxt').textContent='Mastery: '+p+'%  (exam + checklist)';$('mbar').style.width=p+'%';store.set('mastery_bi',p)}
+meter();
+
+/* ---------- Navigation ---------- */
+(function(){const nav=$('nav');let html='';
+ document.querySelectorAll('main .part, main section.ch').forEach(el=>{if(el.classList.contains('part'))html+=`<div class="pt">${el.textContent}</div>`;else{const h=el.querySelector('h2'),num=h.querySelector('.num').textContent,t=Array.from(h.childNodes).filter(n=>n.nodeType===3).map(n=>n.textContent).join('').trim();html+=`<a href="#${el.id}" data-id="${el.id}">${num}. ${t}</a>`}});
+ nav.innerHTML=html;const links=nav.querySelectorAll('a'),io=new IntersectionObserver(es=>{es.forEach(e=>{if(e.isIntersecting)links.forEach(a=>a.classList.toggle('on',a.dataset.id===e.target.id))})},{rootMargin:'-20% 0px -70% 0px'});
+ document.querySelectorAll('section.ch').forEach(s=>io.observe(s));
+ $('menu').onclick=()=>$('side').classList.toggle('open');nav.addEventListener('click',e=>{if(e.target.tagName==='A')$('side').classList.remove('open')});
+ window.addEventListener('scroll',()=>{const h=document.documentElement;$('prog').style.width=(100*h.scrollTop/(h.scrollHeight-h.clientHeight))+'%'},{passive:true});})();
+</script>
+</body>
+</html>
