@@ -1,0 +1,652 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>MCMC and Variational Inference Mastery</title>
+<style>
+:root{--bg:#0b0e17;--panel:#121726;--panel2:#171d30;--line:#232a3d;--fg:#e8ebf5;--mu:#8a93ab;--a:#6ea8ff;--r:#ff6b81;--y:#ffd166;--g:#4ade80;--p:#c084fc;--t:#5eead4}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;background:var(--bg);color:var(--fg);font:16px/1.7 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+a{color:var(--a)}
+#prog{position:fixed;top:0;left:0;height:3px;background:linear-gradient(90deg,var(--a),var(--p),var(--r));width:0;z-index:50}
+.side{position:fixed;left:0;top:0;bottom:0;width:290px;background:#0e1220;border-right:1px solid var(--line);overflow:auto;padding:18px 14px 90px;z-index:40;transition:transform .25s}
+.side h1{font-size:15px;margin:0 0 2px}
+.side small{color:var(--mu)}
+.side .pt{margin:16px 0 4px;font-size:11px;text-transform:uppercase;letter-spacing:1.3px;color:var(--p)}
+.side a{display:block;color:var(--mu);text-decoration:none;padding:5px 9px;border-radius:7px;font-size:13.5px;line-height:1.35}
+.side a:hover{background:var(--panel);color:var(--fg)}
+.side a.on{background:var(--panel2);color:var(--fg);box-shadow:inset 3px 0 var(--a)}
+.side a.back{color:var(--t);padding-left:0;margin-bottom:6px}
+.meter{position:fixed;left:0;bottom:0;width:290px;background:#0e1220;border-top:1px solid var(--line);padding:10px 16px;z-index:41;font-size:12px;color:var(--mu)}
+.meter .bar{height:7px;background:var(--line);border-radius:6px;margin-top:5px;overflow:hidden}
+.meter .bar i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--g),var(--t));transition:width .4s}
+#menu{display:none;position:fixed;top:10px;left:10px;z-index:60;background:var(--panel2);color:var(--fg);border:1px solid var(--line);border-radius:9px;padding:7px 12px;font-size:14px;cursor:pointer}
+main{margin-left:290px;padding:0 34px 120px;max-width:1090px}
+.hero{padding:70px 0 30px}
+.hero h1{font-size:clamp(32px,5vw,56px);line-height:1.08;margin:0 0 14px;background:linear-gradient(100deg,#fff,var(--y) 40%,var(--r));-webkit-background-clip:text;background-clip:text;color:transparent}
+.hero p{font-size:19px;color:#c3c9dc;max-width:780px}
+.chips{display:flex;flex-wrap:wrap;gap:8px;margin:18px 0}
+.chip{border:1px solid var(--line);background:var(--panel);padding:5px 12px;border-radius:99px;font-size:13px;color:var(--mu)}
+.chip b{color:var(--fg)}
+.part{margin:90px 0 0;padding-top:22px;border-top:1px solid var(--line);font-size:12px;letter-spacing:2px;text-transform:uppercase;color:var(--p)}
+section.ch{padding-top:30px}
+h2{font-size:30px;line-height:1.2;margin:10px 0 8px;display:flex;gap:12px;align-items:center;flex-wrap:wrap}
+h2 .num{display:inline-grid;place-items:center;width:40px;height:40px;border-radius:12px;background:var(--panel2);border:1px solid var(--line);font-size:18px;color:var(--a)}
+.lvl{font-size:11px;font-weight:600;letter-spacing:.8px;text-transform:uppercase;padding:3px 9px;border-radius:99px;border:1px solid}
+.lvl.b{color:var(--g);border-color:#1f5c3a}.lvl.i{color:var(--a);border-color:#244a85}.lvl.a{color:var(--y);border-color:#6b5420}.lvl.e{color:var(--r);border-color:#7a2c3a}
+h3{font-size:19px;margin:30px 0 6px;color:#fff}
+p{margin:10px 0}li{margin:5px 0}
+code,.f{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace}
+code{background:var(--panel2);padding:1px 6px;border-radius:5px;font-size:.9em}
+.f{display:block;white-space:pre-wrap;background:#0e1322;border:1px solid var(--line);border-left:3px solid var(--a);padding:12px 16px;border-radius:9px;margin:14px 0;overflow-x:auto;font-size:15px;color:#dbe4ff;line-height:1.8}
+.co{border-radius:12px;padding:13px 17px;margin:16px 0;border:1px solid var(--line);background:var(--panel)}
+.co>b:first-child{display:block;margin-bottom:2px;font-size:12px;letter-spacing:1px;text-transform:uppercase}
+.co.def{border-left:4px solid var(--a)}.co.def>b:first-child{color:var(--a)}
+.co.warn{border-left:4px solid var(--r)}.co.warn>b:first-child{color:var(--r)}
+.co.tip{border-left:4px solid var(--g)}.co.tip>b:first-child{color:var(--g)}
+.co.key{border-left:4px solid var(--y);background:#171608}.co.key>b:first-child{color:var(--y)}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:18px 20px;margin:22px 0;box-shadow:0 8px 30px rgba(0,0,0,.25)}
+.card>h4{margin:0 0 3px;font-size:13px;letter-spacing:1.2px;text-transform:uppercase;color:var(--t)}
+.card>p.sub{margin:0 0 12px;color:var(--mu);font-size:14.5px}
+.ctl{display:flex;flex-wrap:wrap;gap:10px 22px;align-items:center;margin:8px 0 10px}
+.ctl label{display:flex;gap:8px;align-items:center;font-size:14px;color:#c3c9dc}
+.ctl output{min-width:38px;font-family:ui-monospace,monospace;color:var(--y);font-size:13px}
+input[type=range]{accent-color:var(--a);width:150px}
+input[type=checkbox]{accent-color:var(--a)}
+select,input[type=number],input[type=text]{background:#0e1322;color:var(--fg);border:1px solid var(--line);border-radius:8px;padding:6px 9px;font:inherit;font-size:14px}
+button{background:linear-gradient(180deg,#2c4a80,#233b68);color:#fff;border:1px solid #3a5a98;border-radius:9px;padding:7px 14px;font:inherit;font-size:14px;cursor:pointer}
+button:hover{filter:brightness(1.15)}
+button.alt{background:var(--panel2);border-color:var(--line);color:var(--fg)}
+canvas{width:100%;height:270px;display:block;background:#0e1322;border:1px solid var(--line);border-radius:10px;margin-top:6px}
+canvas.sm{height:210px}canvas.tl{height:330px}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(125px,1fr));gap:9px;margin:12px 0}
+.stat{background:#0e1322;border:1px solid var(--line);border-radius:10px;padding:8px 11px}
+.stat b{display:block;font-size:17px;font-family:ui-monospace,monospace}
+.stat span{font-size:11.5px;color:var(--mu);text-transform:uppercase;letter-spacing:.7px}
+.stat.hot b{color:var(--r)}.stat.ok b{color:var(--g)}.stat.warn b{color:var(--y)}.stat.in b{color:var(--a)}
+.read{margin:8px 0 0;padding:10px 14px;background:#0e1322;border:1px dashed #33406a;border-radius:10px;font-size:14.5px;color:#d3dbf3}
+table{border-collapse:collapse;width:100%;margin:12px 0;font-size:14px}
+th,td{border:1px solid var(--line);padding:7px 10px;text-align:left;vertical-align:top}
+th{background:var(--panel2);font-size:12px;text-transform:uppercase;letter-spacing:.6px;color:var(--mu)}
+td.n{font-family:ui-monospace,monospace;text-align:right}
+.tw{overflow-x:auto}
+.pill{display:inline-block;padding:1px 9px;border-radius:99px;font-size:12px;font-weight:600}
+.pill.r{background:#3a1520;color:var(--r)}.pill.g{background:#10321f;color:var(--g)}.pill.y{background:#3a2f0e;color:var(--y)}.pill.m{background:#202637;color:var(--mu)}
+details{background:var(--panel);border:1px solid var(--line);border-radius:11px;padding:9px 15px;margin:9px 0}
+details summary{cursor:pointer;font-weight:600}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.q{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:14px 18px;margin:14px 0}
+.q .qh{font-size:12px;letter-spacing:1px;text-transform:uppercase;color:var(--mu)}
+.q .opt{display:block;width:100%;text-align:left;margin:6px 0;background:#0e1322;border:1px solid var(--line);color:var(--fg);border-radius:9px;padding:9px 12px}
+.q .opt.good{border-color:var(--g);background:#0e2418}.q .opt.bad{border-color:var(--r);background:#2a1119}
+.q .ex{display:none;margin-top:8px;font-size:14.5px;color:#c3c9dc}
+.q.done .ex{display:block}
+.chk label{display:flex;gap:10px;align-items:flex-start;padding:6px 0;cursor:pointer}
+.chk input{margin-top:6px;accent-color:var(--g);width:17px;height:17px}
+.sigrow{display:grid;grid-template-columns:minmax(170px,2fr) 1fr 1fr auto;gap:8px 14px;align-items:center;padding:6px 0;border-top:1px dashed #1b2236}
+.sigrow:first-of-type{border-top:0}
+.sigrow label{display:flex;gap:6px;align-items:center;font-size:13.5px;color:#c3c9dc}
+@media(max-width:900px){
+ .side{transform:translateX(-100%)}.side.open{transform:none}.meter{display:none}
+ #menu{display:block}main{margin-left:0;padding:0 16px 100px}.two{grid-template-columns:1fr}.hero{padding-top:60px}
+ .sigrow{grid-template-columns:1fr 1fr}
+}
+</style>
+</head>
+<body>
+<div id="prog"></div>
+<button id="menu">☰ Contents</button>
+<nav class="side" id="side"><a class="back" href="index.html">← All courses</a><h1>MCMC and Variational Inference</h1><small>12 chapters · 11 labs · exam</small><div id="nav"></div></nav>
+<div class="meter"><div id="mtxt">Mastery: 0%</div><div class="bar"><i id="mbar"></i></div></div>
+
+<main>
+<header class="hero">
+ <h1>MCMC and variational inference: getting answers from posteriors you can only evaluate.</h1>
+ <p>Last page’s models were conjugate, so the posterior had a formula. Almost every real model (a logistic PD model, a hierarchical model, a mixture) does not, and the posterior is known only up to a constant: you can compute p(y | θ)p(θ) at any θ but not integrate it. This page covers the two families of answers. <b>Sampling</b> (Monte Carlo, importance sampling, Metropolis–Hastings, Gibbs, Hamiltonian Monte Carlo) produces draws whose averages converge to posterior quantities; <b>approximation</b> (Laplace, variational inference) replaces the posterior by a simple distribution fitted by optimisation. For each, the lab shows where it works, where it quietly fails, and the diagnostic that tells you: acceptance rates, effective sample size, R̂, divergences, tail accuracy. Every lab has a known target, so the errors are measurable.</p>
+ <div class="chips"><span class="chip"><b>Part I</b> Sampling the posterior</span><span class="chip"><b>Part II</b> Diagnostics and Hamiltonian MC</span><span class="chip"><b>Part III</b> Approximations and practice</span></div>
+ <div class="co tip"><b>How to use this</b>Sliders change the setting; the heavier labs recompute when you release a slider or press the button. Prerequisite: Bayesian inference (item 26). Item 28 builds hierarchical models, which is where these samplers are used every day.</div>
+</header>
+
+<div class="part">Part I · Sampling the posterior</div>
+
+<section class="ch" id="c1">
+<h2><span class="num">1</span>Why sample at all? <span class="lvl b">Beginner</span></h2>
+<p>A posterior is useful through the questions you ask of it: its mean, an interval, the probability that a PD exceeds a threshold, a prediction. Each is an integral over the posterior, E[g(θ)] = ∫ g(θ) p(θ | y) dθ. Two ways to compute it. <b>Numerical integration on a grid</b> works for one or two parameters and is hopeless beyond: a grid with 100 points per parameter needs 100^d evaluations, which is 10²⁰ for ten parameters. <b>Monte Carlo</b> draws θ₁, …, θ_M from the posterior and averages g(θ_i); its error shrinks like 1/√M regardless of the dimension, which is the whole reason for the method. The catch is that you must be able to <em>draw</em> from the posterior, and for a posterior known only up to a constant that is the hard part: the rest of the page is a toolbox for it.</p>
+<div class="card"><h4>Lab 1 · Exact grid against draws, and the 1/√M law</h4>
+ <p class="sub">A rare-default rate with a normal prior on the log-odds: the posterior is not a standard distribution, but one parameter can be done exactly on a grid. Left: the grid posterior (green) and a histogram of M draws; the dashed line marks a 10% PD. Right: the average error of the posterior mean and of P(PD &gt; 10%) against the number of draws (log–log), with a slope −½ reference.</p>
+ <div class="ctl"><label>obligors n <input type="range" id="c1n" min="10" max="200" step="1" value="40"><output id="c1nv"></output></label><label>defaults d <input type="range" id="c1d" min="0" max="20" step="1" value="3"><output id="c1dv"></output></label><label>number of draws M <input type="range" id="c1i" min="0" max="6" step="1" value="4"><output id="c1iv"></output></label><button id="c1go">New draws</button></div>
+ <div class="two"><canvas class="sm" id="c1cv"></canvas><canvas class="sm" id="c1cv2"></canvas></div><div class="stats" id="c1st"></div><div class="read" id="c1rd"></div></div>
+</section>
+
+<section class="ch" id="c2">
+<h2><span class="num">2</span>Importance sampling <span class="lvl i">Intermediate</span></h2>
+<p>If you can evaluate the target p but not draw from it, draw from an easy proposal q and correct with <b>weights</b> w = p/q: E_p[g] ≈ Σ w_i g(θ_i)/Σ w_i. It is unbiased (or consistent, when p is known only up to a constant) but its variance depends on how well q covers p. The <b>effective sample size</b> ESS = (Σw)²/Σw² measures the damage: the weighted sample is worth that many equally weighted draws. If the weights vary wildly (a few huge ones), ESS collapses. The danger zone is a proposal with lighter tails than the target: the variance of the weights is then infinite and no amount of data repairs it, which is why proposals are usually heavy-tailed (a Student t, not a normal). Importance sampling is the foundation of particle filters and of methods that reweight an existing sample (for example to test a different prior), but in high dimensions it is hard to find a proposal that works, which motivates Markov chains.</p>
+<div class="card"><h4>Lab 2 · A Student-t target and a chosen proposal</h4>
+ <p class="sub">Target: Student t with the chosen degrees of freedom (a heavy-tailed posterior). Proposal: a scaled Student t. The estimated quantity is P(x &gt; 3). Left: target and proposal. Right: the effective sample fraction as the proposal scale changes (dashed line: your choice).</p>
+ <div class="ctl"><label>target df <input type="range" id="c2d" min="3" max="30" step="1" value="5"><output id="c2dv"></output></label><label>proposal df (30 ≈ normal) <input type="range" id="c2q" min="1" max="30" step="1" value="3"><output id="c2qv"></output></label><label>proposal scale <input type="range" id="c2s" min="3" max="40" step="1" value="12"><output id="c2sv"></output></label><label>draws n <input type="range" id="c2n" min="100" max="5000" step="100" value="1000"><output id="c2nv"></output></label><button id="c2go">Re-simulate</button></div>
+ <div class="two"><canvas class="sm" id="c2cv"></canvas><canvas class="sm" id="c2cv2"></canvas></div><div class="stats" id="c2st"></div><div class="read" id="c2rd"></div></div>
+</section>
+
+<section class="ch" id="c3">
+<h2><span class="num">3</span>Markov chains and Metropolis–Hastings <span class="lvl i">Intermediate</span></h2>
+<p>A <b>Markov chain Monte Carlo</b> (MCMC) method builds a chain θ₁, θ₂, … whose long-run distribution is the posterior, so that the draws can be averaged although they are dependent. <b>Random-walk Metropolis</b> is the simplest: from the current θ propose θ* = θ + step × noise; accept with probability min(1, p(θ*)/p(θ)), otherwise repeat θ. The target enters only through a ratio, so the normalising constant cancels: exactly what a posterior requires. The chain has the posterior as its stationary distribution (detailed balance), but it needs <b>warm-up</b> to forget its starting point, and its draws are autocorrelated, so you pay in effective sample size. The only tuning knob is the proposal step. Too small and almost every proposal is accepted but the chain crawls; too large and almost every proposal is rejected and the chain stands still. Between lies an optimum, with acceptance about 44% in one dimension and about 23% in many. Metropolis–Hastings generalises this to asymmetric proposals by adding the ratio of proposal densities.</p>
+<div class="card"><h4>Lab 3 · The step size of a random-walk Metropolis chain</h4>
+ <p class="sub">The target is a standard normal, so the right answers are mean 0 and sd 1. Left: the trace of the chain from the starting point you set. Right: the efficiency (effective draws ÷ draws, green) and the acceptance rate (blue) for each step size, from stationary chains; the dashed line is your step.</p>
+ <div class="ctl"><label>proposal step (target sd = 1) <input type="range" id="c3s" min="-13" max="13" step="1" value="-5"><output id="c3sv"></output></label><label>starting point <input type="range" id="c3x" min="-10" max="10" step="1" value="8"><output id="c3xv"></output></label><label>iterations <input type="range" id="c3n" min="500" max="20000" step="500" value="2000"><output id="c3nv"></output></label><button id="c3go">Re-run</button></div>
+ <div class="two"><canvas class="sm" id="c3cv"></canvas><canvas class="sm" id="c3cv2"></canvas></div><div class="stats" id="c3st"></div><div class="read" id="c3rd"></div></div>
+</section>
+
+<section class="ch" id="c4">
+<h2><span class="num">4</span>Gibbs sampling <span class="lvl i">Intermediate</span></h2>
+<p><b>Gibbs sampling</b> updates one parameter (or block) at a time by drawing it from its <em>full conditional</em> distribution given all the others, p(θ_j | θ_−j, y). Every draw is accepted, there is nothing to tune, and for conjugate hierarchical models the conditionals are standard distributions, which is why BUGS and JAGS were built on it. Its weakness is geometry: moves are parallel to the axes, so when parameters are strongly correlated in the posterior the chain zig-zags along a narrow ridge in tiny steps. For a bivariate normal with correlation ρ the autocorrelation of one coordinate is ρ² per step, and n draws are worth n(1 − ρ²)/(1 + ρ²) independent ones: at ρ = 0.95 that is about 5%. Remedies are to sample correlated parameters together (blocking), to reparametrise (centre the covariates, use a non-centred hierarchical form), or to use a sampler that follows the geometry, as in the next chapters.</p>
+<div class="card"><h4>Lab 4 · Gibbs on a correlated pair</h4>
+ <p class="sub">The target is a bivariate normal with correlation ρ (marginal sd 1). Left: the draws, the 95% region (dashed) and the first 60 Gibbs updates (yellow zig-zag). Right: effective sample fraction of x₁ against ρ, measured (dots) and theoretical (curve).</p>
+ <div class="ctl"><label>correlation ρ <input type="range" id="c4r" min="0" max="99" step="1" value="95"><output id="c4rv"></output></label><label>iterations <input type="range" id="c4n" min="200" max="5000" step="200" value="2000"><output id="c4nv"></output></label><button id="c4go">Re-run</button></div>
+ <div class="two"><canvas class="sm" id="c4cv"></canvas><canvas class="sm" id="c4cv2"></canvas></div><div class="stats" id="c4st"></div><div class="read" id="c4rd"></div></div>
+</section>
+
+<div class="part">Part II · Diagnostics and Hamiltonian Monte Carlo</div>
+
+<section class="ch" id="c5">
+<h2><span class="num">5</span>Has the chain converged? Warm-up and R̂ <span class="lvl a">Advanced</span></h2>
+<p>MCMC theory promises convergence eventually; practice needs a check now. The standard protocol: run <b>several chains from dispersed starting points</b>, discard an initial <b>warm-up</b> (the early draws, still influenced by the start), and compare chains. <b>R̂</b> (split R-hat) compares the variance between chains with the variance within them (after splitting each chain in two, so that a chain drifting from one half to the other is also caught); it falls to 1 as the chains agree. The modern rule is R̂ &lt; 1.01 together with enough effective sample size (a few hundred in total for means, much more for tails). Look at trace plots as well: a good chain looks like a fuzzy caterpillar with no trend. R̂ cannot detect what no chain has seen: if every chain stays in the same mode of a multimodal posterior, R̂ is perfect and the answer is wrong, which is why dispersed starts matter. In a model-risk file, document the number of chains, the warm-up, R̂, ESS and the seed.</p>
+<div class="card"><h4>Lab 5 · Four chains, one target</h4>
+ <p class="sub">Four random-walk Metropolis chains start at −10, −3, 3 and 10. Choose a unimodal target or a bimodal one with modes at ±4. Left: the traces. Right: split R̂ as the chains lengthen (the first half of each prefix is discarded as warm-up); green line 1.01, yellow 1.1.</p>
+ <div class="ctl"><label>target <select id="c5t"><option value="0">one mode (standard normal)</option><option value="1">two modes at ±4</option></select></label><label>proposal step <input type="range" id="c5s" min="-10" max="12" step="1" value="-3"><output id="c5sv"></output></label><label>iterations <input type="range" id="c5n" min="200" max="5000" step="200" value="1000"><output id="c5nv"></output></label><button id="c5go">Re-run</button></div>
+ <div class="two"><canvas class="sm" id="c5cv"></canvas><canvas class="sm" id="c5cv2"></canvas></div><div class="stats" id="c5st"></div><div class="read" id="c5rd"></div></div>
+</section>
+
+<section class="ch" id="c6">
+<h2><span class="num">6</span>Effective sample size and Monte Carlo error <span class="lvl a">Advanced</span></h2>
+<p>Correlated draws carry less information. If the autocorrelation at lag k is ρ_k, the <b>integrated autocorrelation time</b> is τ = 1 + 2Σρ_k and the <b>effective sample size</b> is ESS = n/τ. The <b>Monte Carlo standard error</b> of a posterior mean is sd/√ESS, and it is a different thing from the posterior sd: the posterior sd is the uncertainty about θ that no amount of computing removes, while the MCSE is the numerical error you can shrink by running longer. Report both, and make the MCSE small relative to the posterior sd (a few percent) for every quantity you quote. ESS is estimated from the sample autocorrelations with a rule that stops summing when they become noise (Geyer’s initial positive sequence). Two common mistakes: using n in place of ESS (intervals too narrow), and <b>thinning</b> (keeping every k-th draw) to “remove autocorrelation”, which discards information and never increases ESS; thin only to save memory. Modern software reports separate bulk-ESS (for the centre) and tail-ESS (for quantiles), because the tails mix more slowly.</p>
+<div class="card"><h4>Lab 6 · Autocorrelated draws and honest error bars</h4>
+ <p class="sub">An AR(1) chain with autocorrelation ρ stands in for MCMC output (true mean 0). Left: sample autocorrelation (blue) against the true ρᵏ (green). Right: how often an interval mean ± 1.96 × se contains the truth across 80 chains, using the naive se = sd/√n or the se based on the effective sample size.</p>
+ <div class="ctl"><label>autocorrelation ρ <input type="range" id="c6r" min="0" max="98" step="1" value="90"><output id="c6rv"></output></label><label>draws n <input type="range" id="c6n" min="500" max="10000" step="500" value="2000"><output id="c6nv"></output></label><label>thin by k <input type="range" id="c6k" min="1" max="30" step="1" value="10"><output id="c6kv"></output></label><button id="c6go">Re-simulate</button></div>
+ <div class="two"><canvas class="sm" id="c6cv"></canvas><canvas class="sm" id="c6cv2"></canvas></div><div class="stats" id="c6st"></div><div class="read" id="c6rd"></div></div>
+</section>
+
+<section class="ch" id="c7">
+<h2><span class="num">7</span>Hamiltonian Monte Carlo and NUTS <span class="lvl a">Advanced</span></h2>
+<p>Random walks explore by diffusion; <b>Hamiltonian Monte Carlo (HMC)</b> explores by <em>momentum</em>. Treat −log p(θ) as a potential-energy landscape, give the current point a random momentum, and simulate Hamiltonian dynamics for L steps of size ε with the leapfrog integrator, which follows the landscape’s gradient; then accept or reject with a Metropolis correction for the integration error. A trajectory can travel far along a correlated ridge and still be accepted with high probability, so successive draws are nearly independent even in hundreds of dimensions. It needs the gradient ∇log p (automatic differentiation provides it), a step size ε small enough for stable integration (about the narrowest width of the posterior) and a trajectory length long enough to move far without turning back. <b>NUTS</b>, the No-U-Turn Sampler, chooses the trajectory length adaptively, and the step size is tuned during warm-up; this is the engine of Stan, PyMC and NumPyro. When ε is too large for the local geometry the integrator becomes unstable, the energy error explodes and the software reports <b>divergent transitions</b>: a signal that the sampler cannot explore some region (a funnel in a hierarchical model, for instance) and the results may be biased. Treat divergences as errors to fix, usually by reparametrising, not as warnings to ignore.</p>
+<div class="card"><h4>Lab 7 · HMC against random-walk Metropolis and Gibbs</h4>
+ <p class="sub">A bivariate normal with strong correlation. Left: the first 80 HMC iterations (yellow) over the draws and the 95% region. Right: effective draws per 1000 target evaluations (a gradient costs one evaluation; HMC pays L + 1 per iteration; a Gibbs sweep costs two).</p>
+ <div class="ctl"><label>correlation ρ <input type="range" id="c7r" min="0" max="99" step="1" value="98"><output id="c7rv"></output></label><label>step size ε <input type="range" id="c7e" min="2" max="60" step="1" value="20"><output id="c7ev"></output></label><label>leapfrog steps L <input type="range" id="c7l" min="1" max="60" step="1" value="10"><output id="c7lv"></output></label><button id="c7go">Re-run</button></div>
+ <div class="two"><canvas class="sm" id="c7cv"></canvas><canvas class="sm" id="c7cv2"></canvas></div><div class="stats" id="c7st"></div><div class="read" id="c7rd"></div></div>
+</section>
+
+<section class="ch" id="c8">
+<h2><span class="num">8</span>A real model: Bayesian logistic regression <span class="lvl e">Expert</span></h2>
+<p>A logistic PD model has no conjugate prior, so its posterior is sampled. The log posterior is the Bernoulli log-likelihood plus the log prior; one evaluation costs a pass through the data, and the efficiency of the sampler decides whether the run takes seconds or hours. Practical points: <b>standardise the predictors</b> (centred, unit scale) so the posterior is not wildly elongated; correlated predictors still produce strongly correlated coefficients (and non-identifiability when collinear: the prior is then what keeps the posterior proper); the <b>Laplace approximation</b> (a normal at the posterior mode with covariance equal to the inverse Hessian) is a cheap, often excellent shape guide for the proposal covariance; and the prior matters for weakly identified coefficients and for rare events, where a weakly informative prior also prevents the infinite estimates of separation. Compare to maximum likelihood: with plenty of data they agree, with little data the posterior is shrunk and wider, and it carries the full joint uncertainty into predictions. Posterior draws of the coefficients give a posterior for every customer’s PD, and so for portfolio-level quantities such as expected loss.</p>
+<div class="card"><h4>Lab 8 · Sampling the posterior of a four-coefficient PD model</h4>
+ <p class="sub">Data come from a logistic model with true coefficients (−3, 0.8, −0.5, 0.4); the first two predictors are 90% correlated. Two Metropolis samplers run 5000 iterations: isotropic steps of 0.12, and steps shaped by the Laplace covariance. Left: traces of β₁. Right: truth, maximum likelihood and posterior mean for each coefficient.</p>
+ <div class="ctl"><label>customers n <input type="range" id="c8n" min="200" max="3000" step="200" value="1000"><output id="c8nv"></output></label><label>prior sd of each coefficient <input type="range" id="c8s" min="5" max="100" step="5" value="25"><output id="c8sv"></output></label><button id="c8go">New data and run</button></div>
+ <div class="two"><canvas class="sm" id="c8cv"></canvas><canvas class="sm" id="c8cv2"></canvas></div><div class="stats" id="c8st"></div><div class="read" id="c8rd"></div></div>
+</section>
+
+<div class="part">Part III · Approximations and practice</div>
+
+<section class="ch" id="c9">
+<h2><span class="num">9</span>Variational inference <span class="lvl e">Expert</span></h2>
+<p><b>Variational inference (VI)</b> turns inference into optimisation. Choose a family of simple distributions q_φ(θ) (independent normals, “mean-field”, is the common one) and find the φ that minimises KL(q ‖ p(· | y)), equivalently maximises the <b>evidence lower bound (ELBO)</b> = E_q[log p(y, θ)] − E_q[log q(θ)]. Stochastic-gradient versions (ADVI, reparametrisation gradients) scale to millions of observations and are how Bayesian deep models and large topic models are fitted. What you give up is accuracy where it matters for risk. The direction of the KL makes q avoid regions where p is small, so it is <b>too narrow</b>: mean-field q ignores posterior correlation and underestimates marginal variances (for equicorrelated normals the sd ratio is exactly √((1 − ρ)(1 + (d − 1)ρ)/(1 + (d − 2)ρ)), shrinking as ρ or the dimension grow), it can miss modes, and its tails are thin. Means are usually decent, intervals are not. Use VI for speed, initialisation and prediction; for uncertainty that someone will rely on, validate against MCMC on a subset, or use importance-sampling corrections (Pareto-smoothed) to diagnose the fit.</p>
+<div class="card"><h4>Lab 9 · How much uncertainty does mean-field lose?</h4>
+ <p class="sub">The exact posterior is a normal with equicorrelated parameters (correlation ρ, marginal sd 1), for which the optimal mean-field q is known. Left: the true 95% region against the mean-field one for two of the parameters. Right: the sd ratio and the real coverage of q’s nominal 95% interval against ρ for the chosen number of parameters (dashed line: your ρ).</p>
+ <div class="ctl"><label>correlation ρ <input type="range" id="c9r" min="0" max="99" step="1" value="90"><output id="c9rv"></output></label><label>number of parameters <input type="range" id="c9d" min="2" max="20" step="1" value="2"><output id="c9dv"></output></label></div>
+ <div class="two"><canvas class="sm" id="c9cv"></canvas><canvas class="sm" id="c9cv2"></canvas></div><div class="stats" id="c9st"></div><div class="read" id="c9rd"></div></div>
+</section>
+
+<section class="ch" id="c10">
+<h2><span class="num">10</span>Laplace, VI and the exact answer for a rare PD <span class="lvl e">Expert</span></h2>
+<p>The <b>Laplace approximation</b> fits a normal at the posterior mode with covariance equal to the inverse of the negative Hessian there: one optimisation and one matrix inversion, and it is exact for a normal posterior. It is the engine of INLA and of many “Bayesian” logistic models in production, and it is the reason maximum-likelihood standard errors and the Bayesian posterior agree with plenty of data (Bernstein–von Mises, item 26). It fails when the posterior is skewed, bounded or multimodal, and the failure is greatest in small samples, exactly the low-default portfolio case: a normal on the log-odds scale places too little mass in the upper tail. The same holds for a fitted normal q (VI). The honest workflow is to approximate quickly, then check the approximation on the quantity you will report (the 95% or 99% upper bound for a PD, the probability of exceeding a threshold) against a grid, MCMC or a more flexible family. With one parameter you can have the exact answer for free, as in this lab, and the comparison shows what is at stake.</p>
+<div class="card"><h4>Lab 10 · Exact, Laplace and variational posteriors for a PD</h4>
+ <p class="sub">The model is the one from item 26 with the PD on the log-odds scale (prior mean −4, about 1.8% PD). Left: the exact posterior of the PD and the two normal approximations fitted on the log-odds scale, transformed back. Right: posterior mean and 95% upper bound under each.</p>
+ <div class="ctl"><label>obligors n <input type="range" id="c10n" min="20" max="2000" step="10" value="100"><output id="c10nv"></output></label><label>defaults d <input type="range" id="c10d" min="0" max="30" step="1" value="2"><output id="c10dv"></output></label><label>prior sd of the log-odds <input type="range" id="c10p" min="5" max="30" step="1" value="15"><output id="c10pv"></output></label></div>
+ <div class="two"><canvas class="sm" id="c10cv"></canvas><canvas class="sm" id="c10cv2"></canvas></div><div class="stats" id="c10st"></div><div class="read" id="c10rd"></div></div>
+</section>
+
+<section class="ch" id="c11">
+<h2><span class="num">11</span>A workflow you can defend, and the tail problem <span class="lvl e">Expert</span></h2>
+<p>A defensible Bayesian computation has a standard shape. <b>Before:</b> simulate from the model and prior (prior predictive), and test the sampler on fake data with known parameters, so you know it can recover the truth. <b>During:</b> several chains from dispersed starts, enough warm-up, adaptation turned on, a fixed seed recorded. <b>After:</b> R̂ &lt; 1.01, bulk- and tail-ESS in the hundreds at least, no divergences, trace and rank plots checked, MCSE small beside the posterior sd, posterior predictive checks (item 26) and a prior sensitivity run. Then <b>report the uncertainty</b>: posterior intervals and probabilities, not just the mean. Be especially careful with tails. A 99th or 99.9th percentile, or the probability of breaching a threshold, depends on a handful of draws, and the relative error of an estimated tail probability p from ESS effective draws is about √((1 − p)/(p · ESS)): 1% of 1000 effective draws gives only 10 draws in the tail and about 32% error. Plan the number of effective draws from the quantity you must report, not from what the mean needs.</p>
+<div class="card"><h4>Lab 11 · How many effective draws does a tail need?</h4>
+ <p class="sub">Left: the relative error of an estimated tail probability against the effective sample size, for several tail probabilities (log–log; the horizontal line is 10%; the dot is your setting). Right: the effective draws required for 10% and 5% relative error against the tail probability.</p>
+ <div class="ctl"><label>tail probability <input type="range" id="c11p" min="0" max="5" step="1" value="3"><output id="c11pv"></output></label><label>effective draws <input type="range" id="c11e" min="0" max="6" step="1" value="2"><output id="c11ev"></output></label></div>
+ <div class="two"><canvas class="sm" id="c11cv"></canvas><canvas class="sm" id="c11cv2"></canvas></div><div class="stats" id="c11st"></div><div class="read" id="c11rd"></div></div>
+</section>
+
+<section class="ch" id="c12">
+<h2><span class="num">12</span>Final exam, mastery checklist, cheat sheet <span class="lvl e">Expert</span></h2>
+<h3>Exam (18 questions — click an answer)</h3>
+<div id="quiz"></div>
+<div class="card"><h4>Score</h4><div class="stats" id="qscore"></div><button class="alt" id="qreset">Reset exam</button></div>
+<h3>Mastery checklist — tick when you can do it without notes</h3>
+<div class="card chk" id="chk"></div>
+<h3>Cheat sheet</h3>
+<div class="tw"><table>
+<tr><th>Idea</th><th>One line</th></tr>
+<tr><td>Why sample</td><td>Posterior summaries are integrals; Monte Carlo error is 1/√M in any dimension, whereas a grid needs 100^d points</td></tr>
+<tr><td>Importance sampling</td><td>Weights w = p/q; ESS = (Σw)²/Σw²; the proposal needs tails at least as heavy as the target, or the weights have infinite variance</td></tr>
+<tr><td>Metropolis–Hastings</td><td>Accept with min(1, p(θ*)/p(θ)): only a ratio, so the normalising constant cancels; step size tuned for about 44% (1-d) or 23% (many-d) acceptance</td></tr>
+<tr><td>Gibbs</td><td>Draw each parameter from its full conditional; no tuning, always accepted; slow when parameters are highly correlated (ESS fraction (1 − ρ²)/(1 + ρ²) for a bivariate normal)</td></tr>
+<tr><td>Warm-up and chains</td><td>Several chains from dispersed starts; discard warm-up; fix and record the seed</td></tr>
+<tr><td>R̂</td><td>Between- over within-chain variance on split chains; require below 1.01; blind to modes no chain visits</td></tr>
+<tr><td>ESS and MCSE</td><td>ESS = n/(1 + 2Σρ_k); MCSE = sd/√ESS; do not thin to gain precision; check bulk-ESS and tail-ESS</td></tr>
+<tr><td>HMC and NUTS</td><td>Gradient-guided long moves with a Metropolis correction; ε near the narrowest width; NUTS picks the trajectory length; divergences signal biased exploration</td></tr>
+<tr><td>Logistic regression</td><td>Standardise predictors; use the Laplace covariance to shape proposals; correlated predictors give correlated coefficients</td></tr>
+<tr><td>Laplace approximation</td><td>Normal at the mode with the inverse Hessian; exact for normal posteriors; poor for skewed, bounded or multimodal ones</td></tr>
+<tr><td>Variational inference</td><td>Maximise the ELBO (minimise KL(q ‖ p)) over a simple family; fast; mean-field underestimates variance and has thin tails</td></tr>
+<tr><td>Tail probabilities</td><td>Relative error ≈ √((1 − p)/(p · ESS)): rare events need many effective draws</td></tr>
+<tr><td>Workflow</td><td>Test on simulated data, several chains, R̂ and ESS and divergences, MCSE below the posterior sd, predictive checks, prior sensitivity</td></tr>
+</table></div>
+<div class="co tip"><b>Next in Stage 6</b>Item 28 covers hierarchical (partial pooling) models: the structure that most real Bayesian models in a bank have, fitted with the samplers from this page. Item 29 closes Stage 6 with Bayesian decision theory.</div>
+</section>
+</main>
+<script>
+/*MATH*/
+function lgamma(x){const c=[76.18009172947146,-86.50532032941677,24.01409824083091,-1.231739572450155,0.1208650973866179e-2,-0.5395239384953e-5];let y=x,t=x+5.5;t-=(x+.5)*Math.log(t);let s=1.000000000190015;for(let j=0;j<6;j++)s+=c[j]/++y;return -t+Math.log(2.5066282746310005*s/x);}
+function gser(a,x){let ap=a,sum=1/a,del=sum;for(let n=0;n<1000;n++){ap++;del*=x/ap;sum+=del;if(Math.abs(del)<Math.abs(sum)*1e-15)break;}return sum*Math.exp(-x+a*Math.log(x)-lgamma(a));}
+function gcf(a,x){let b=x+1-a,c=1/1e-300,d=1/b,h=d;for(let i=1;i<1000;i++){const an=-i*(i-a);b+=2;d=an*d+b;if(Math.abs(d)<1e-300)d=1e-300;c=b+an/c;if(Math.abs(c)<1e-300)c=1e-300;d=1/d;const del=d*c;h*=del;if(Math.abs(del-1)<1e-15)break;}return Math.exp(-x+a*Math.log(x)-lgamma(a))*h;}
+function gammaQ(a,x){if(x<=0)return 1;return x<a+1?1-gser(a,x):gcf(a,x);}
+function betacf(a,b,x){const qab=a+b,qap=a+1,qam=a-1;let c=1,d=1-qab*x/qap;if(Math.abs(d)<1e-300)d=1e-300;d=1/d;let h=d;for(let m=1;m<=1000;m++){const m2=2*m;let aa=m*(b-m)*x/((qam+m2)*(a+m2));d=1+aa*d;if(Math.abs(d)<1e-300)d=1e-300;c=1+aa/c;if(Math.abs(c)<1e-300)c=1e-300;d=1/d;h*=d*c;aa=-(a+m)*(qab+m)*x/((a+m2)*(qap+m2));d=1+aa*d;if(Math.abs(d)<1e-300)d=1e-300;c=1+aa/c;if(Math.abs(c)<1e-300)c=1e-300;d=1/d;const del=d*c;h*=del;if(Math.abs(del-1)<1e-15)break;}return h;}
+function betai(a,b,x){if(x<=0)return 0;if(x>=1)return 1;const bt=Math.exp(lgamma(a+b)-lgamma(a)-lgamma(b)+a*Math.log(x)+b*Math.log(1-x));return x<(a+1)/(a+b+2)?bt*betacf(a,b,x)/a:1-bt*betacf(b,a,1-x)/b;}
+function normSf(z){const q=0.5*gammaQ(.5,z*z/2);return z>=0?q:1-q;}
+function normCdf(z){return normSf(-z);}
+function npdf(x){return Math.exp(-x*x/2)/2.5066282746310002;}
+function lbin(n,k){return lgamma(n+1)-lgamma(k+1)-lgamma(n-k+1);}
+function binom(n,k,p){return Math.exp(lbin(n,k)+k*Math.log(p)+(n-k)*Math.log(1-p));}
+function betapdf(x,a,b){return x<=0||x>=1?0:Math.exp(lgamma(a+b)-lgamma(a)-lgamma(b)+(a-1)*Math.log(x)+(b-1)*Math.log(1-x));}
+function betacdf(x,a,b){return betai(a,b,x);}
+function gampdf(x,a,r){return x<=0?0:Math.exp(a*Math.log(r)+(a-1)*Math.log(x)-r*x-lgamma(a));}
+function gamcdf(x,a,r){return x<=0?0:1-gammaQ(a,r*x);}
+function randn(){let u=0;while(!u)u=Math.random();return Math.sqrt(-2*Math.log(u))*Math.cos(2*Math.PI*Math.random());}
+function gammaS(a){if(a<1)return gammaS(a+1)*Math.pow(Math.random(),1/a);const d=a-1/3,c=1/Math.sqrt(9*d);for(;;){let x,v;do{x=randn();v=1+c*x}while(v<=0);v=v*v*v;const u=Math.random();if(Math.log(u)<.5*x*x+d-d*v+d*Math.log(v))return d*v;}}
+function betaS(a,b){const x=gammaS(a),y=gammaS(b);return x/(x+y);}
+function binS(n,p){let k=0;for(let i=0;i<n;i++)if(Math.random()<p)k++;return k;}
+function mean(a){let s=0;for(const v of a)s+=v;return s/a.length;}
+function qc(cdf,lo,hi,p,it){for(let i=0;i<(it||100);i++){const m=(lo+hi)/2;if(cdf(m)<p)lo=m;else hi=m}return(lo+hi)/2;}
+function qb(a,b,p){return qc(x=>betai(a,b,x),0,1,p,50);}
+function tcdf(x,v){const t=.5*betai(v/2,.5,v/(v+x*x));return x>0?1-t:t}
+function qn(p){return qc(normCdf,-9,9,p,70)}
+function pois(k,l){return Math.exp(-l+k*Math.log(l)-lgamma(k+1))}
+function binF(n,p){let k=0;for(;;){if(n<=0||p<=0)return k;if(p>=1)return k+n;if(n<=40){for(let i=0;i<n;i++)if(Math.random()<p)k++;return k}const a=1+(n>>1),bb=1+n-a,x=betaS(a,bb);if(x>=p){n=a-1;p=p/x}else{k+=a;n=bb-1;p=(p-x)/(1-x)}}}
+/*ENDMATH*/
+
+const $=id=>document.getElementById(id), val=id=>+$(id).value;
+const C={fg:'#e8ebf5',mu:'#8a93ab',gr:'#232a3d',a:'#6ea8ff',r:'#ff6b81',y:'#ffd166',g:'#4ade80',p:'#c084fc',t:'#5eead4'};
+const store={get(k,d){try{const v=JSON.parse(localStorage.getItem(k));return v==null?d:v}catch(e){return d}},set(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}};
+function stat(l,v,c){return `<div class="stat ${c||''}"><b>${v}</b><span>${l}</span></div>`}
+function f3(x){if(!isFinite(x))return String(x);const a=Math.abs(x);if(a!==0&&(a<1e-3||a>=1e6))return x.toExponential(2);return String(+x.toFixed(a<1?4:a<100?3:a<1000?2:0))}
+function pc(x){return f3(100*x)+'%'}
+const resizers=[];
+function reg(fn){fn();resizers.push(fn)}
+function on(ids,fn){ids.split(' ').forEach(i=>{const e=$(i);e.addEventListener('input',fn);e.addEventListener('change',fn)})}
+let rt;window.addEventListener('resize',()=>{clearTimeout(rt);rt=setTimeout(()=>resizers.forEach(f=>f()),150)});
+document.querySelectorAll('input[type=range]').forEach(i=>{const o=$(i.id+'v');if(!o)return;const f=()=>{o.textContent=i.value};i.addEventListener('input',f);f()});
+
+function nice(x){const e=Math.pow(10,Math.floor(Math.log10(x))),f=x/e;return (f<1.5?1:f<3?2:f<7?5:10)*e}
+function mk(cv,x0,x1,ymax,o){o=o||{};const y0=o.y0||0,dpr=window.devicePixelRatio||1,r=cv.getBoundingClientRect(),w=r.width||600,h=r.height||270;
+ cv.width=w*dpr;cv.height=h*dpr;const g=cv.getContext('2d');g.setTransform(dpr,0,0,dpr,0,0);g.clearRect(0,0,w,h);
+ const L=o.L||42,R=12,T=14,B=28,X=x=>L+(x-x0)/(x1-x0)*(w-L-R),Y=y=>h-B-(y-y0)/(ymax-y0)*(h-T-B);
+ g.font='11px system-ui';g.lineWidth=1;g.strokeStyle=C.gr;g.fillStyle=C.mu;
+ if(!o.noGrid){const sx=nice((x1-x0)/7);for(let x=Math.ceil(x0/sx-1e-9)*sx;!o.noX&&x<=x1+1e-9;x+=sx){g.beginPath();g.moveTo(X(x),T);g.lineTo(X(x),h-B);g.stroke();g.textAlign='center';g.fillText(String(+x.toFixed(6)),X(x),h-B+15)}
+ const sy=nice((ymax-y0)/4);for(let y=Math.ceil(y0/sy-1e-9)*sy;y<=ymax+1e-9;y+=sy){g.beginPath();g.moveTo(L,Y(y));g.lineTo(w-R,Y(y));g.stroke();g.textAlign='right';g.fillText(String(+y.toFixed(4)),L-5,Y(y)+3)}}
+ return{g,w,h,X,Y,L,R,T,B,
+  line(f,col,lw,a,b,n,dash){a=a==null?x0:a;b=b==null?x1:b;n=n||260;g.save();if(dash)g.setLineDash([5,4]);g.beginPath();g.strokeStyle=col;g.lineWidth=lw||2;let st=false;for(let i=0;i<=n;i++){const x=a+(b-a)*i/n,y=f(x);if(!isFinite(y)){st=false;continue}st?g.lineTo(X(x),Y(y)):g.moveTo(X(x),Y(y));st=true}g.stroke();g.restore()},
+  area(f,a,b,col,n){a=Math.max(a,x0);b=Math.min(b,x1);if(b<=a)return;n=n||200;g.beginPath();g.moveTo(X(a),Y(0));for(let i=0;i<=n;i++){const x=a+(b-a)*i/n;g.lineTo(X(x),Y(f(x)))}g.lineTo(X(b),Y(0));g.closePath();g.fillStyle=col;g.fill()},
+  vline(x,col,lab,dash){g.save();g.strokeStyle=col;g.lineWidth=1.6;if(dash)g.setLineDash([5,4]);g.beginPath();g.moveTo(X(x),T);g.lineTo(X(x),h-B);g.stroke();g.restore();if(lab){g.fillStyle=col;g.textAlign='center';g.fillText(lab,Math.min(Math.max(X(x),34),w-34),T+10)}},
+  hline(y,col,lab){g.save();g.strokeStyle=col;g.lineWidth=1.4;g.setLineDash([5,4]);g.beginPath();g.moveTo(L,Y(y));g.lineTo(w-R,Y(y));g.stroke();g.restore();if(lab){g.fillStyle=col;g.textAlign='right';g.fillText(lab,w-R-3,Y(y)-4)}},
+  text(s,x,y,col,al){g.fillStyle=col||C.fg;g.textAlign=al||'left';g.fillText(s,x,y)}};}
+
+/* ---------- shared helpers for this page ---------- */
+const D={
+ norm:{n:'Normal(0,1)',s:()=>randn(),mu:0,sd:1,sk:0},
+ unif:{n:'Uniform(0,1)',s:()=>Math.random(),mu:.5,sd:Math.sqrt(1/12),sk:0},
+ expo:{n:'Exponential(1)',s:()=>-Math.log(1-Math.random()),mu:1,sd:1,sk:2},
+ logn:{n:'Lognormal(0,1)',s:()=>Math.exp(randn()),mu:Math.exp(.5),sd:Math.sqrt((Math.E-1)*Math.E),sk:(Math.E+2)*Math.sqrt(Math.E-1),disc:0},
+ b05:{n:'Bernoulli(0.5)',s:()=>Math.random()<.5?1:0,mu:.5,sd:.5,sk:0,disc:1},
+ b05s:{n:'Bernoulli(0.05)',s:()=>Math.random()<.05?1:0,mu:.05,sd:Math.sqrt(.0475),sk:.9/Math.sqrt(.0475),disc:1},
+ bimo:{n:'Two humps',s:()=>(Math.random()<.5?-2:2)+.5*randn(),mu:0,sd:Math.sqrt(4.25),sk:0},
+ par5:{n:'Pareto(α=5)',s:()=>Math.pow(1-Math.random(),-.2),mu:1.25,sd:Math.sqrt(5/48),sk:6*Math.sqrt(.6)},
+ cauchy:{n:'Cauchy (no mean)',s:()=>Math.tan(Math.PI*(Math.random()-.5)),mu:NaN,sd:Infinity,sk:NaN}
+};
+function fillSel(id,keys,def){const e=$(id);e.innerHTML=keys.map(k=>`<option value="${k}">${D[k].n}</option>`).join('');e.value=def}
+const PAL=[C.a,C.r,C.y,C.g,C.p,C.t,'#ff9f43','#9aa4bf'];
+function tgrid(N,M){const T=[];let prev=0;for(let i=0;i<M;i++){let n=Math.round(Math.pow(10,Math.log10(N)*i/(M-1)));if(i===M-1)n=N;n=Math.max(prev+1,n);if(n>N)break;T.push(n);prev=n}if(T[T.length-1]!==N)T[T.length-1]=N;return T}
+function nlab(n){return n>=1e6?(n/1e6)+'M':n>=1000?(n/1000)+'k':String(n)}
+function customGrid(P,xt,yt){const g=P.g;g.save();g.strokeStyle=C.gr;g.fillStyle=C.mu;g.font='11px system-ui';g.lineWidth=1;
+ xt.forEach(([v,l])=>{g.beginPath();g.moveTo(P.X(v),P.T);g.lineTo(P.X(v),P.h-P.B);g.stroke();g.textAlign='center';g.fillText(l,P.X(v),P.h-P.B+15)});
+ yt.forEach(([v,l])=>{g.beginPath();g.moveTo(P.L,P.Y(v));g.lineTo(P.w-P.R,P.Y(v));g.stroke();g.textAlign='right';g.fillText(l,P.L-5,P.Y(v)+3)});g.restore()}
+function clip(P,fn){const g=P.g;g.save();g.beginPath();g.rect(P.L,P.T,P.w-P.L-P.R,P.h-P.T-P.B);g.clip();fn();g.restore()}
+function poly(P,pts,col,lw,dash){const g=P.g;g.save();if(dash)g.setLineDash([5,4]);g.strokeStyle=col;g.lineWidth=lw||2;g.beginPath();pts.forEach(([x,y],i)=>i?g.lineTo(P.X(x),P.Y(y)):g.moveTo(P.X(x),P.Y(y)));g.stroke();g.restore()}
+function dots(P,pts,col,r){const g=P.g;g.fillStyle=col;pts.forEach(([x,y])=>{g.beginPath();g.arc(P.X(x),P.Y(y),r||3,0,7);g.fill()})}
+function niceTicks(lo,hi,k){const st=nice((hi-lo)/(k||5)),a=[];for(let v=Math.ceil(lo/st-1e-9)*st;v<=hi+1e-9;v+=st)a.push([v,String(+v.toFixed(6))]);return a}
+function logTicks(lo,hi){const a=[];for(let e=Math.ceil(lo-1e-9);e<=hi+1e-9;e++)a.push([e,nlab(Math.pow(10,e))]);return a}
+function mom(a){const n=a.length;let m=0;for(const v of a)m+=v;m/=n;let v2=0,v3=0,v4=0;for(const v of a){const d=v-m;v2+=d*d;v3+=d*d*d;v4+=d*d*d*d}v2/=n;v3/=n;v4/=n;const sd=Math.sqrt(v2);return{n,m,sd,sk:sd>0?v3/(sd*sd*sd):0,ku:v2>0?v4/(v2*v2)-3:0}}
+function ksN(z){const a=Array.from(z).sort((x,y)=>x-y),n=a.length;let d=0;for(let i=0;i<n;i++){const F=normCdf(a[i]);d=Math.max(d,Math.abs((i+1)/n-F),Math.abs(i/n-F))}return d}
+/* histogram of data as density with optional overlay curves [{f,col,lw,dash}] */
+function hist(cv,data,lo,hi,bins,ov,col){const cnt=new Float64Array(bins),bw=(hi-lo)/bins;let n=0;for(const v of data){if(v<lo||v>=hi)continue;cnt[Math.floor((v-lo)/bw)]++;n++}
+ const N=data.length;let ym=0;for(let i=0;i<bins;i++){cnt[i]/=N*bw;ym=Math.max(ym,cnt[i])}
+ (ov||[]).forEach(o=>{for(let i=0;i<=80;i++)ym=Math.max(ym,o.f(lo+(hi-lo)*i/80)||0)});
+ const P=mk(cv,lo,hi,ym*1.12);
+ P.g.fillStyle=col||'rgba(110,168,255,.5)';for(let i=0;i<bins;i++){if(cnt[i]<=0)continue;const a=P.X(lo+i*bw),b=P.X(lo+(i+1)*bw);P.g.fillRect(a,P.Y(cnt[i]),Math.max(1,b-a-1),P.Y(0)-P.Y(cnt[i]))}
+ (ov||[]).forEach(o=>P.line(o.f,o.col,o.lw||2.4,lo,hi,200,o.dash));return P}
+const fmt=x=>f3(x);
+
+/* ---------- shared for this page ---------- */
+const POPS=['norm','unif','expo','logn','bimo','par5'];
+D.norm.med=0;D.norm.q90=1.2815516;D.unif.med=.5;D.unif.q90=.9;D.expo.med=Math.LN2;D.expo.q90=Math.log(10);D.logn.med=1;D.logn.q90=Math.exp(1.2815516);
+D.bimo.med=0;D.bimo.q90=qc(x=>.5*normCdf((x+2)/.5)+.5*normCdf((x-2)/.5),-10,10,.9,80);D.par5.med=Math.pow(2,.2);D.par5.q90=Math.pow(10,.2);
+const SF={mean:a=>mean(a),median:a=>{const b=Float64Array.from(a).sort(),n=b.length;return n%2?b[(n-1)/2]:(b[n/2-1]+b[n/2])/2},sd:a=>{const n=a.length,m=mean(a);let s=0;for(const v of a)s+=(v-m)*(v-m);return Math.sqrt(s/(n-1))},q90:a=>{const b=Float64Array.from(a).sort();return b[Math.round(.9*(b.length-1))]}};
+function truth(key,st){const d=D[key];return st==='mean'?d.mu:st==='median'?d.med:st==='sd'?d.sd:d.q90}
+const SNAME={mean:'sample mean',median:'sample median',sd:'sample SD',q90:'90th percentile'};
+const N10=[2,3,5,10,20,50,100,200,500,1000];
+function pct(a,p){const b=Float64Array.from(a).sort();return b[Math.min(b.length-1,Math.max(0,Math.floor(p*b.length)))]}
+function histLines(cv,arrs,cols,lo,hi,bins,vl){const bw=(hi-lo)/bins,dens=arrs.map(a=>{const c=new Float64Array(bins);for(const v of a){if(v<lo||v>=hi)continue;c[Math.floor((v-lo)/bw)]++}for(let i=0;i<bins;i++)c[i]/=a.length*bw;return c});let ym=0;dens.forEach(c=>c.forEach(v=>ym=Math.max(ym,v)));const P=mk(cv,lo,hi,ym*1.15||1);
+ dens.forEach((c,k)=>{const pts=[];for(let i=0;i<bins;i++){pts.push([lo+i*bw,c[i]]);pts.push([lo+(i+1)*bw,c[i]])}clip(P,()=>poly(P,pts,cols[k],2.2))});(vl||[]).forEach(v=>P.vline(v[0],v[1],v[2],v[3]));return P}
+function sdOf(a){return mom(a).sd}
+
+/* ---------- ML helpers ---------- */
+function digamma(x){let r=0;while(x<6){r-=1/x;x++}const f=1/(x*x);return r+Math.log(x)-.5/x-f*(1/12-f*(1/120-f/252))}
+function trigamma(x){let r=0;while(x<6){r+=1/(x*x);x++}const f=1/(x*x);return r+1/x+.5*f+f/x*(1/6-f*(1/30-f/42))}
+function poisS(l){if(l<=0)return 0;if(l<30){const L=Math.exp(-l);let k=0,p=1;do{k++;p*=Math.random()}while(p>L);return k-1}const m=Math.floor(.875*l),g=gammaS(m);return g<l?m+poisS(l-g):binF(m-1,l/g)}
+function llb(k,n,p){return(k?k*Math.log(p):0)+(n-k?(n-k)*Math.log(1-p):0)}
+function lrInt(k,n,cut){const ph=k/n,l0=llb(k,n,ph),g=p=>2*(l0-llb(k,n,p))-cut;let lo=0,hi=1;
+ if(k>0){let a=1e-12,b=ph;for(let i=0;i<70;i++){const m=(a+b)/2;if(g(m)>0)a=m;else b=m}lo=(a+b)/2}
+ if(k<n){let a=ph,b=1-1e-12;for(let i=0;i<70;i++){const m=(a+b)/2;if(g(m)>0)b=m;else a=m}hi=(a+b)/2}return[lo,hi]}
+function solveAlpha(s){if(!(s>1e-9))return 1e6;let a=(3-s+Math.sqrt((3-s)*(3-s)+24*s))/(12*s);for(let i=0;i<8;i++){const f=Math.log(a)-digamma(a)-s,fp=1/a-trigamma(a);let n=a-f/fp;if(!(n>0))n=a/2;a=n}return a}
+function normPdfAt(x,m,s){return Math.exp(-(x-m)*(x-m)/(2*s*s))/(s*2.5066282746)}
+/* ---------- Regression helpers ---------- */
+function idx(id,arr,ff){const e=$(id),o=$(id+'v'),f=()=>{o.textContent=ff?ff(arr[+e.value]):arr[+e.value]};e.addEventListener('input',f);f()}
+function scl(id,ff){const e=$(id),o=$(id+'v'),f=()=>{o.textContent=ff(+e.value)};e.addEventListener('input',f);f()}
+function pctTicks(a,b,st){const r=[];for(let v=a;v<=b+1e-9;v+=st)r.push([v,Math.round(v*100)+'%']);return r}
+const _tq={};function tq(v,p){const k=v+'_'+p;return _tq[k]||(_tq[k]=qc(x=>tcdf(x,v),0,500,p,80))}
+function simple(x,y){const n=x.length;let xm=0,ym=0;for(let i=0;i<n;i++){xm+=x[i];ym+=y[i]}xm/=n;ym/=n;let sxx=0,sxy=0,syy=0;for(let i=0;i<n;i++){const dx=x[i]-xm,dy=y[i]-ym;sxx+=dx*dx;sxy+=dx*dy;syy+=dy*dy}const b=sxy/sxx,a=ym-b*xm,res=new Float64Array(n);let sse=0;for(let i=0;i<n;i++){res[i]=y[i]-a-b*x[i];sse+=res[i]*res[i]}return{n,xm,ym,sxx,sxy,syy,b,a,res,sse,sst:syy,r2:1-sse/syy}}
+function gj(A,B){const p=A.length;const M=A.map((r,i)=>Array.from(r).concat(B?[B[i]]:[]));for(let c=0;c<p;c++){let m=c;for(let r=c+1;r<p;r++)if(Math.abs(M[r][c])>Math.abs(M[m][c]))m=r;[M[c],M[m]]=[M[m],M[c]];const d=M[c][c]||1e-12;for(let k=c;k<M[c].length;k++)M[c][k]/=d;for(let r=0;r<p;r++)if(r!==c){const f=M[r][c];if(f!==0)for(let k=c;k<M[c].length;k++)M[r][k]-=f*M[c][k]}}return M}
+function olsMulti(cols,y,needInv){const n=y.length,k=cols.length,p=k+1,A=[],B=new Float64Array(p);for(let i=0;i<p;i++)A.push(new Float64Array(p));
+ for(let r=0;r<n;r++){const row=[1];for(let j=0;j<k;j++)row.push(cols[j][r]);for(let i=0;i<p;i++){B[i]+=row[i]*y[r];for(let j=i;j<p;j++)A[i][j]+=row[i]*row[j]}}
+ for(let i=0;i<p;i++){for(let j=0;j<i;j++)A[i][j]=A[j][i];if(i>0)A[i][i]+=1e-9}
+ let beta,inv=null;if(needInv){const I=[];for(let i=0;i<p;i++){const e=new Float64Array(p);e[i]=1;I.push(e)}const M=gj(A,null);const aug=A.map((r,i)=>Array.from(r).concat(Array.from(I[i])));
+  const m=aug;for(let c=0;c<p;c++){let q=c;for(let r=c+1;r<p;r++)if(Math.abs(m[r][c])>Math.abs(m[q][c]))q=r;[m[c],m[q]]=[m[q],m[c]];const d=m[c][c]||1e-12;for(let kk=0;kk<2*p;kk++)m[c][kk]/=d;for(let r=0;r<p;r++)if(r!==c){const f=m[r][c];if(f!==0)for(let kk=0;kk<2*p;kk++)m[r][kk]-=f*m[c][kk]}}
+  inv=m.map(r=>r.slice(p));beta=inv.map(r=>{let s=0;for(let j=0;j<p;j++)s+=r[j]*B[j];return s})}
+ else{const M=gj(A,B);beta=M.map(r=>r[p])}
+ const res=new Float64Array(n);let sse=0;for(let r=0;r<n;r++){let f=beta[0];for(let j=0;j<k;j++)f+=beta[j+1]*cols[j][r];res[r]=y[r]-f;sse+=res[r]*res[r]}
+ const out={beta,res,sse,n,p,inv};if(inv){const s2=sse/(n-p);out.s2=s2;out.se=inv.map((r,i)=>Math.sqrt(s2*r[i]))}return out}
+function scatterAxes(cv,xs,ys,xlo,xhi,ylo,yhi,L){return mk(cv,xlo,xhi,yhi,{y0:ylo,L:L||44})}
+function range(a,pad){let lo=1e99,hi=-1e99;for(const v of a){if(v<lo)lo=v;if(v>hi)hi=v}const w=(hi-lo)||1;return[lo-(pad||.05)*w,hi+(pad||.05)*w]}
+
+
+function bars(P,groups,cols,yt){/* groups: array of arrays of values (0..1) */const g=P.g,G=groups.length,B=groups[0].length,W=(P.w-P.L-P.R)/G;groups.forEach((vals,gi)=>vals.forEach((v,bi)=>{const bw=W*.78/B,x=P.L+W*gi+W*.11+bw*bi;g.fillStyle=cols[bi];g.fillRect(x,P.Y(v),bw-2,P.Y(0)-P.Y(v));g.fillStyle=C.fg;g.textAlign='center';g.font='10px system-ui';g.fillText(Math.round(v*100)+'%',x+bw/2-1,P.Y(v)-3)}));g.font='11px system-ui'}
+function gridG(P,yt,labels){customGrid(P,[],yt);const G=labels.length,W=(P.w-P.L-P.R)/G;P.g.fillStyle=C.mu;P.g.textAlign='center';labels.forEach((l,i)=>P.g.fillText(l,P.L+W*(i+.5),P.h-P.B+15))}
+function legend(P,items,y){let x=P.L+8;items.forEach(([s,c])=>{P.text('■ '+s,x,y,c);x+=P.g.measureText('■ '+s).width+16})}
+
+/* ---------- GLM machinery ---------- */
+const LK={logit:{mu:e=>1/(1+Math.exp(-e)),d:e=>{const m=1/(1+Math.exp(-e));return m*(1-m)}},
+ probit:{mu:e=>normCdf(e),d:e=>npdf(e)},
+ cll:{mu:e=>1-Math.exp(-Math.exp(e)),d:e=>Math.exp(e-Math.exp(e))},
+ log:{mu:e=>Math.exp(e),d:e=>Math.exp(e)}};
+function minv(A){const p=A.length,m=A.map((r,i)=>{const row=Array.from(r);for(let j=0;j<p;j++)row.push(i===j?1:0);return row});
+ for(let c=0;c<p;c++){let q=c;for(let r=c+1;r<p;r++)if(Math.abs(m[r][c])>Math.abs(m[q][c]))q=r;[m[c],m[q]]=[m[q],m[c]];const d=m[c][c]||1e-12;for(let k=0;k<2*p;k++)m[c][k]/=d;for(let r=0;r<p;r++)if(r!==c){const f=m[r][c];if(f!==0)for(let k=0;k<2*p;k++)m[r][k]-=f*m[c][k]}}
+ return m.map(r=>r.slice(p))}
+function glm(cols,y,o){o=o||{};const n=y.length,k=cols.length,p=k+1,fam=o.fam||'binom',L=LK[o.link||(fam==='pois'?'log':'logit')],off=o.off,X=[new Float64Array(n).fill(1)].concat(cols),V=m=>fam==='pois'?m:m*(1-m);
+ let b=new Float64Array(p);if(o.init)b=Float64Array.from(o.init);else if(fam==='pois'){let m=0;for(const v of y)m+=v;b[0]=Math.log(Math.max(m/n,1e-3))-(off?mean(off):0)}
+ function ev(b){const eta=new Float64Array(n),mu=new Float64Array(n);let ll=0;for(let i=0;i<n;i++){let e=off?off[i]:0;for(let j=0;j<p;j++)e+=b[j]*X[j][i];e=Math.max(-30,Math.min(30,e));eta[i]=e;let m=L.mu(e);m=fam==='binom'?Math.min(1-1e-12,Math.max(1e-12,m)):Math.max(m,1e-12);mu[i]=m;ll+=fam==='pois'?y[i]*Math.log(m)-m-lgamma(y[i]+1):y[i]*Math.log(m)+(1-y[i])*Math.log(1-m)}return{eta,mu,ll}}
+ function info(c){const A=[];for(let i=0;i<p;i++)A.push(new Float64Array(p));const w=new Float64Array(n);for(let r=0;r<n;r++){const d=L.d(c.eta[r]),wi=d*d/V(c.mu[r]);w[r]=wi;for(let i=0;i<p;i++){const xi=X[i][r]*wi;for(let j=i;j<p;j++)A[i][j]+=xi*X[j][r]}}for(let i=0;i<p;i++)for(let j=0;j<i;j++)A[i][j]=A[j][i];return{A,w}}
+ let cur=ev(b),it=0,conv=false,maxit=o.maxit==null?40:o.maxit;
+ for(;it<maxit;it++){const{A,w}=info(cur),Ai=minv(A),g=new Float64Array(p);
+  for(let r=0;r<n;r++){const d=L.d(cur.eta[r]),v=V(cur.mu[r]);let s=(y[r]-cur.mu[r])*d/v;if(o.firth){let h=0;for(let i=0;i<p;i++)for(let j=0;j<p;j++)h+=X[i][r]*Ai[i][j]*X[j][r];h*=w[r];s+=h*(.5-cur.mu[r])}for(let i=0;i<p;i++)g[i]+=X[i][r]*s}
+  const st=new Float64Array(p);let mx=0;for(let i=0;i<p;i++){let s=0;for(let j=0;j<p;j++)s+=Ai[i][j]*g[j];st[i]=s}
+  if(o.firth){for(let i=0;i<p;i++){st[i]=Math.max(-1,Math.min(1,st[i]));mx=Math.max(mx,Math.abs(st[i]))}b=b.map((v,i)=>v+st[i]);cur=ev(b);if(mx<1e-8){conv=true;it++;break}}
+  else{let a=1,nb,nc;for(let h=0;h<25;h++){nb=b.map((v,i)=>v+a*st[i]);nc=ev(nb);if(nc.ll>=cur.ll-1e-10)break;a/=2}for(let i=0;i<p;i++)mx=Math.max(mx,Math.abs(a*st[i]));const dl=Math.abs(nc.ll-cur.ll);b=nb;cur=nc;if(mx<1e-8||dl<1e-11){conv=true;it++;break}}}
+ const{A,w}=info(cur),Ai=minv(A),se=Ai.map((r,i)=>Math.sqrt(Math.max(r[i],0)));let dev;
+ if(fam==='binom')dev=-2*cur.ll;else{dev=0;for(let i=0;i<n;i++){const yy=y[i],m=cur.mu[i];dev+=2*((yy>0?yy*Math.log(yy/m):0)-(yy-m))}}
+ return{beta:b,mu:cur.mu,eta:cur.eta,ll:cur.ll,dev,inv:Ai,se,iter:it,conv,X,w,p,n,A}}
+function auc(sc,y){const n=y.length,idx=Array.from({length:n},(_,i)=>i).sort((a,b)=>sc[a]-sc[b]);let rk=0,np=0,i=0;while(i<n){let j=i;while(j+1<n&&sc[idx[j+1]]===sc[idx[i]])j++;const r=(i+j)/2+1;for(let t=i;t<=j;t++)if(y[idx[t]]===1){rk+=r;np++}i=j+1}const nn=n-np;return np&&nn?(rk-np*(np+1)/2)/(np*nn):.5}
+function sepTest(x,y){let a1=1e99,b1=-1e99,a0=1e99,b0=-1e99,n1=0,n0=0;for(let i=0;i<x.length;i++){if(y[i]===1){n1++;a1=Math.min(a1,x[i]);b1=Math.max(b1,x[i])}else{n0++;a0=Math.min(a0,x[i]);b0=Math.max(b0,x[i])}}return n1>0&&n0>0&&(a1>b0||a0>b1)}
+const sig=e=>1/(1+Math.exp(-e));
+function lgt(p){return Math.log(p/(1-p))}
+function binaryData(n,a,b,sd){const x=new Float64Array(n),y=new Float64Array(n);for(let i=0;i<n;i++){x[i]=(sd||1)*randn();y[i]=Math.random()<sig(a+b*x[i])?1:0}return{x,y}}
+function heat(P,gx,gy,vals,x0,x1,y0,y1){const g=P.g,nx=gx,ny=gy;let mn=1e99,mx=-1e99;vals.forEach(v=>{if(isFinite(v)){mn=Math.min(mn,v);mx=Math.max(mx,v)}});mn=Math.max(mn,mx-30);for(let i=0;i<nx;i++)for(let j=0;j<ny;j++){const v=vals[i*ny+j],t=isFinite(v)?Math.max(0,Math.min(1,(v-mn)/(mx-mn))):0,tt=Math.pow(t,1.6),c=Math.round(40+190*tt);g.fillStyle=`rgb(${Math.round(20+60*tt)},${Math.round(30+100*tt)},${c})`;const xa=P.X(x0+(x1-x0)*i/nx),xb=P.X(x0+(x1-x0)*(i+1)/nx),ya=P.Y(y0+(y1-y0)*j/ny),yb=P.Y(y0+(y1-y0)*(j+1)/ny);g.fillRect(xa,Math.min(ya,yb),xb-xa+1,Math.abs(ya-yb)+1)}}
+/* ---------- confounding helpers ---------- */
+const U01=()=>1-Math.random();
+function sdv(a){const m=mean(a);let s=0;for(const v of a)s+=(v-m)*(v-m);return Math.sqrt(s/Math.max(a.length-1,1))}
+function barV(cv,vals,cols,labs,ymax,ff){const P=mk(cv,0,vals.length,ymax,{y0:0,noGrid:true,L:50});customGrid(P,[],niceTicks(0,ymax,5));const W=(P.w-P.L-P.R)/vals.length,g=P.g;vals.forEach((v,i)=>{const w=W*.5,x=P.L+W*i+W*.25;g.fillStyle=cols[i];g.fillRect(x,P.Y(v),w,P.Y(0)-P.Y(v));g.fillStyle=C.fg;g.textAlign='center';g.fillText((ff||fmt)(v),x+w/2,P.Y(v)-4);g.fillStyle=C.mu;g.fillText(labs[i],x+w/2,P.h-P.B+15)});return P}
+function barL(cv,vals,cols,labs,lo,hi,ff){const P=mk(cv,0,vals.length,hi,{y0:lo,noGrid:true,L:50});customGrid(P,[],niceTicks(lo,hi,5));const W=(P.w-P.L-P.R)/vals.length,g=P.g;vals.forEach((v,i)=>{const w=W*.5,x=P.L+W*i+W*.25;g.fillStyle=cols[i];g.fillRect(x,P.Y(v),w,P.Y(lo)-P.Y(v));g.fillStyle=C.fg;g.textAlign='center';g.fillText((ff||fmt)(v),x+w/2,P.Y(v)-4);g.fillStyle=C.mu;g.fillText(labs[i],x+w/2,P.h-P.B+15)});return P}
+const avg=a=>{let s=0;for(const v of a)s+=v;return s/a.length};
+function corr(a,b){const n=a.length;let ma=0,mb=0;for(let i=0;i<n;i++){ma+=a[i];mb+=b[i]}ma/=n;mb/=n;let sa=0,sb=0,sab=0;for(let i=0;i<n;i++){const x=a[i]-ma,y=b[i]-mb;sa+=x*x;sb+=y*y;sab+=x*y}return sab/Math.sqrt(sa*sb||1e-12)}
+const pcor=(x,y,z)=>corr(simple(z,x).res,simple(z,y).res);
+const lin=(n,f)=>{const a=new Float64Array(n);for(let i=0;i<n;i++)a[i]=f(i);return a};
+const rn=(n,s)=>lin(n,()=>(s||1)*randn());
+/* signed bars from zero */
+function barZ(cv,vals,cols,labs,lo,hi,ff){const P=mk(cv,0,vals.length,hi,{y0:lo,noGrid:true,L:50});customGrid(P,[],niceTicks(lo,hi,5));const W=(P.w-P.L-P.R)/vals.length,g=P.g;vals.forEach((v,i)=>{const w=W*.5,x=P.L+W*i+W*.25,y0=P.Y(0),y1=P.Y(v);g.fillStyle=cols[i];g.fillRect(x,Math.min(y0,y1),w,Math.abs(y0-y1));g.fillStyle=C.fg;g.textAlign='center';g.fillText((ff||fmt)(v),x+w/2,v>=0?y1-4:y1+13);g.fillStyle=C.mu;g.fillText(labs[i],x+w/2,P.h-P.B+15)});P.hline(0,C.mu,'');return P}
+/* grouped signed bars: groups[g][b] */
+function barG(cv,groups,cols,glabs,lo,hi,ff){const P=mk(cv,0,groups.length,hi,{y0:lo,noGrid:true,L:50});customGrid(P,[],niceTicks(lo,hi,5));const G=groups.length,B=groups[0].length,W=(P.w-P.L-P.R)/G,g=P.g;groups.forEach((vs,gi)=>vs.forEach((v,bi)=>{const bw=W*.7/B,x=P.L+W*gi+W*.15+bw*bi,y0=P.Y(0),y1=P.Y(v);g.fillStyle=cols[bi];g.fillRect(x,Math.min(y0,y1),bw-3,Math.abs(y0-y1));g.fillStyle=C.fg;g.textAlign='center';g.font='10px system-ui';g.fillText((ff||fmt)(v),x+bw/2-1,v>=0?y1-3:y1+11)}));g.font='11px system-ui';g.fillStyle=C.mu;g.textAlign='center';glabs.forEach((l,i)=>g.fillText(l,P.L+W*(i+.5),P.h-P.B+15));P.hline(0,C.mu,'');return P}
+/* scatter with optional per-point colours; draws at most nmax points */
+function scat(P,xs,ys,col,nmax,r,colf){const n=xs.length,st=Math.max(1,Math.floor(n/(nmax||500))),pts=[];clip(P,()=>{for(let i=0;i<n;i+=st){P.g.fillStyle=colf?colf(i):col;P.g.beginPath();P.g.arc(P.X(xs[i]),P.Y(ys[i]),r||2.2,0,7);P.g.fill()}})}
+function fitLine(P,s,col,lw,dash,x0,x1){clip(P,()=>P.line(x=>s.a+s.b*x,col,lw||2,x0,x1,2,dash))}
+const ordIdx=p=>Array.from({length:p.length},(_,i)=>i).sort((a,b)=>p[a]-p[b]);
+/* ---------- experiment helpers ---------- */
+const sgn=v=>(v>=0?'+':'−')+Math.abs(v).toFixed(3);
+const rng2=(a,b,pad)=>range(Array.from(a).concat(Array.from(b)),pad||.05);
+const pct0=x=>Math.round(x*100)+'%';
+const lgs=x=>1/(1+Math.exp(-x));
+function rgam(a){if(a<1)return rgam(a+1)*Math.pow(U01(),1/a);const d=a-1/3,c=1/Math.sqrt(9*d);for(;;){let x,v;do{x=randn();v=1+c*x}while(v<=0);v=v*v*v;const u=U01();if(u<1-.0331*x*x*x*x||Math.log(u)<.5*x*x+d*(1-v+Math.log(v)))return d*v}}
+const rbeta=(a,b)=>{const x=rgam(a),y=rgam(b);return x/(x+y)};
+function rbin(n,p){if(n<=30){let k=0;for(let i=0;i<n;i++)if(Math.random()<p)k++;return k}const m=n*p,s=Math.sqrt(n*p*(1-p)),k=Math.round(m+s*randn());return Math.max(0,Math.min(n,k))}
+function welch(a,b){const na=a.length,nb=b.length,ma=avg(a),mb=avg(b);let va=0,vb=0;for(const v of a)va+=(v-ma)*(v-ma);for(const v of b)vb+=(v-mb)*(v-mb);va/=na-1;vb/=nb-1;const se2=va/na+vb/nb,se=Math.sqrt(se2),t=(ma-mb)/se,df=se2*se2/((va/na)*(va/na)/(na-1)+(vb/nb)*(vb/nb)/(nb-1));return{d:ma-mb,se,t,df,p:2*(1-tcdf(Math.abs(t),df))}}
+const diffMeans=(Y,T)=>{let s1=0,s0=0,n1=0,n0=0;for(let i=0;i<Y.length;i++){if(T[i]){s1+=Y[i];n1++}else{s0+=Y[i];n0++}}return s1/n1-s0/n0};
+/* ---------- observational-causal helpers ---------- */
+function logitFit(cols,y){const n=y.length,k=cols.length,p=k+1,b=new Float64Array(p),lin_=i=>{let s=b[0];for(let j=0;j<k;j++)s+=b[j+1]*cols[j][i];return s};
+ for(let it=0;it<30;it++){const A=[];for(let i=0;i<p;i++)A.push(new Float64Array(p));const g=new Float64Array(p);
+  for(let i=0;i<n;i++){const m=lgs(lin_(i)),w=Math.max(m*(1-m),1e-8),r=y[i]-m,row=[1];for(let j=0;j<k;j++)row.push(cols[j][i]);for(let a=0;a<p;a++){g[a]+=row[a]*r;for(let c=a;c<p;c++)A[a][c]+=w*row[a]*row[c]}}
+  for(let a=0;a<p;a++){for(let c=0;c<a;c++)A[a][c]=A[c][a];A[a][a]+=1e-8}
+  const M=gj(A,Array.from(g)),d=M.map(r=>r[p]);let mx=0;for(let a=0;a<p;a++){b[a]+=d[a];mx=Math.max(mx,Math.abs(d[a]))}if(mx<1e-6)break}
+ const pr=new Float64Array(n),lo=new Float64Array(n);for(let i=0;i<n;i++){pr[i]=Math.min(.9999,Math.max(.0001,lgs(lin_(i))));lo[i]=Math.log(pr[i]/(1-pr[i]))}return{beta:b,pr,lo}}
+/* Hajek IPW estimate of the ATE; keep(i)=false drops a unit */
+function ipwATE(Y,T,e,keep){let a1=0,b1=0,a0=0,b0=0;for(let i=0;i<Y.length;i++){if(keep&&!keep(i))continue;if(T[i]){const w=1/e[i];a1+=w*Y[i];b1+=w}else{const w=1/(1-e[i]);a0+=w*Y[i];b0+=w}}return a1/b1-a0/b0}
+function smd(x,T,w){let m1=0,m0=0,w1=0,w0=0,n1=0,n0=0;for(let i=0;i<x.length;i++){const ww=w?w[i]:1;if(T[i]){m1+=ww*x[i];w1+=ww;n1++}else{m0+=ww*x[i];w0+=ww;n0++}}m1/=w1;m0/=w0;let v1=0,v0=0,a1=0,a0=0;for(let i=0;i<x.length;i++){if(T[i]){a1+=x[i]}else a0+=x[i]}a1/=n1;a0/=n0;for(let i=0;i<x.length;i++){if(T[i])v1+=(x[i]-a1)*(x[i]-a1);else v0+=(x[i]-a0)*(x[i]-a0)}v1/=n1-1;v0/=n0-1;return(m1-m0)/Math.sqrt((v1+v0)/2)}
+/* confounded data: X1,X2; treatment strength a; effect tau (function of x1 optional) */
+function confData(n,a,tauF,nl){const X1=rn(n),X2=rn(n),e=lin(n,i=>lgs(a*(.8*X1[i]+.5*X2[i]+(nl?.4*(X1[i]*X1[i]-1):0))/1.5)),T=new Uint8Array(n),Y=new Float64Array(n);
+ for(let i=0;i<n;i++){T[i]=Math.random()<e[i]?1:0;Y[i]=(T[i]?(tauF?tauF(X1[i]):1):0)+X1[i]+.8*X2[i]+(nl?.6*X1[i]*X1[i]:0)+randn()}return{X1,X2,T,Y,e}}
+/* one-to-one nearest-neighbour matching with replacement on a score; returns ATT and the matched control index per treated unit (-1 if dropped) */
+function matchATT(sc,T,Y,cal){const ctr=[];for(let i=0;i<T.length;i++)if(!T[i])ctr.push(i);ctr.sort((a,b)=>sc[a]-sc[b]);const cs=ctr.map(i=>sc[i]),m=new Int32Array(T.length).fill(-1);let sum=0,k=0;
+ for(let i=0;i<T.length;i++){if(!T[i])continue;let lo=0,hi=cs.length-1;while(lo<hi){const mid=(lo+hi)>>1;if(cs[mid]<sc[i])lo=mid+1;else hi=mid}let b=lo;if(lo>0&&Math.abs(cs[lo-1]-sc[i])<Math.abs(cs[lo]-sc[i]))b=lo-1;if(Math.abs(cs[b]-sc[i])>cal)continue;m[i]=ctr[b];sum+=Y[i]-Y[ctr[b]];k++}return{att:sum/k,m,kept:k}}
+const quant=(a,p)=>{const b=Float64Array.from(a).sort();return b[Math.min(b.length-1,Math.floor(p*b.length))]};
+/* ---------- MCMC helpers ---------- */
+function acfv(x,K){const n=x.length;let m=0;for(let i=0;i<n;i++)m+=x[i];m/=n;const c=new Float64Array(K+1);for(let k=0;k<=K;k++){let s=0;for(let i=0;i+k<n;i++)s+=(x[i]-m)*(x[i+k]-m);c[k]=s/n}const r=new Float64Array(K+1);for(let k=0;k<=K;k++)r[k]=c[0]>0?c[k]/c[0]:0;return r}
+/* effective sample size with Geyer's initial positive sequence */
+function essOf(x,K){K=Math.min(K||150,x.length-2);if(K<2)return x.length;const r=acfv(x,K);let sum=0;for(let t=0;2*t+1<=K;t++){const g=r[2*t]+r[2*t+1];if(g<=0)break;sum+=g}const tau=Math.max(2*sum-1,.2);return x.length/tau}
+/* random-walk Metropolis for a 1-d log density */
+function mhRW(logp,x0,step,n){const x=new Float64Array(n);let c=x0,lc=logp(c),acc=0;for(let i=0;i<n;i++){const y=c+step*randn(),ly=logp(y);if(Math.log(Math.random())<ly-lc){c=y;lc=ly;acc++}x[i]=c}return{x,acc:acc/n}}
+/* split R-hat of an array of chains (each an array of equal length) */
+function rhatOf(ch){const seq=[];ch.forEach(c=>{const h=Math.floor(c.length/2);if(h<2)return;seq.push(c.slice(0,h));seq.push(c.slice(h,2*h))});const m=seq.length,n=seq[0]?seq[0].length:0;if(m<2||n<2)return NaN;const mu=seq.map(s=>{let a=0;for(const v of s)a+=v;return a/n}),va=seq.map((s,i)=>{let a=0;for(const v of s)a+=(v-mu[i])*(v-mu[i]);return a/(n-1)});const W=va.reduce((a,b)=>a+b,0)/m,gm=mu.reduce((a,b)=>a+b,0)/m;let B=0;for(const v of mu)B+=(v-gm)*(v-gm);B*=n/(m-1);const vp=(n-1)/n*W+B/n;return Math.sqrt(vp/Math.max(W,1e-12))}
+/* grid posterior from an unnormalised log density */
+function gridPost(logf,lo,hi,N){N=N||900;const x=new Float64Array(N),f=new Float64Array(N);let mx=-1e300;for(let i=0;i<N;i++){x[i]=lo+(hi-lo)*i/(N-1);f[i]=logf(x[i]);if(f[i]>mx)mx=f[i]}let Z=0;const h=(hi-lo)/(N-1);for(let i=0;i<N;i++){f[i]=Math.exp(f[i]-mx);Z+=f[i]*h}const pdf=new Float64Array(N),cdf=new Float64Array(N);let c=0,m1=0,m2=0;for(let i=0;i<N;i++){pdf[i]=f[i]/Z;c+=pdf[i]*h;cdf[i]=c;m1+=x[i]*pdf[i]*h;m2+=x[i]*x[i]*pdf[i]*h}
+ const q=u=>{let a=0,b=N-1;while(b-a>1){const m=(a+b)>>1;if(cdf[m]<u)a=m;else b=m}const d=cdf[b]-cdf[a];return x[a]+(d>0?(u-cdf[a])/d:0)*(x[b]-x[a])};
+ const pd=v=>{if(v<=lo||v>=hi)return 0;const t=(v-lo)/(hi-lo)*(N-1),i=Math.floor(t);return pdf[i]+(t-i)*(pdf[Math.min(i+1,N-1)]-pdf[i])};
+ const cd=v=>{if(v<=lo)return 0;if(v>=hi)return 1;const t=(v-lo)/(hi-lo)*(N-1),i=Math.floor(t);return cdf[i]+(t-i)*(cdf[Math.min(i+1,N-1)]-cdf[i])};
+ return{x,pdf,cdf,mean:m1,sd:Math.sqrt(Math.max(m2-m1*m1,0)),q,pd,cd}}
+const tpdf=(x,v)=>Math.exp(lgamma((v+1)/2)-lgamma(v/2))/Math.sqrt(v*Math.PI)*Math.pow(1+x*x/v,-(v+1)/2);
+const rtv=v=>randn()/Math.sqrt(2*gammaS(v/2)/v);
+const expit=x=>1/(1+Math.exp(-x)),logit=p=>Math.log(p/(1-p));
+function invMat(A){const n=A.length,M=A.map((r,i)=>{const a=Array.from(r);for(let j=0;j<n;j++)a.push(i===j?1:0);return a});for(let c=0;c<n;c++){let m=c;for(let r=c+1;r<n;r++)if(Math.abs(M[r][c])>Math.abs(M[m][c]))m=r;[M[c],M[m]]=[M[m],M[c]];const d=M[c][c]||1e-12;for(let k=0;k<2*n;k++)M[c][k]/=d;for(let r=0;r<n;r++)if(r!==c){const f=M[r][c];if(f!==0)for(let k=0;k<2*n;k++)M[r][k]-=f*M[c][k]}}return M.map(r=>r.slice(n))}
+function cholL(S){const n=S.length,L=S.map(()=>new Float64Array(n));for(let i=0;i<n;i++)for(let j=0;j<=i;j++){let s=S[i][j];for(let k=0;k<j;k++)s-=L[i][k]*L[j][k];L[i][j]=i===j?Math.sqrt(Math.max(s,1e-12)):s/L[j][j]}return L}
+function logdetM(A){const n=A.length,M=A.map(r=>Array.from(r));let ld=0;for(let c=0;c<n;c++){let m=c;for(let r=c+1;r<n;r++)if(Math.abs(M[r][c])>Math.abs(M[m][c]))m=r;[M[c],M[m]]=[M[m],M[c]];ld+=Math.log(Math.abs(M[c][c])||1e-300);for(let r=c+1;r<n;r++){const f=M[r][c]/M[c][c];for(let k=c;k<n;k++)M[r][k]-=f*M[c][k]}}return ld}
+/* Gauss-Hermite nodes (21 points, probabilists' weights summing to 1) from the Golub-Welsch idea: computed numerically on a fine normal grid instead */
+const GH=(()=>{const z=[],w=[];let s=0;for(let i=0;i<41;i++){const v=-4+8*i/40,p=Math.exp(-v*v/2);z.push(v);w.push(p);s+=p}return{z,w:w.map(v=>v/s)}})();
+/* log-log tick helper for axes holding log10 values */
+const lg10=v=>Math.log10(Math.max(v,1e-12));
+const pc1=x=>(100*x).toFixed(1)+'%';
+/* density curves with optional fill: curves=[{f,col,fill,dash,lw}] ; returns P */
+function dcurves(cv,x0,x1,curves,vl,ref){let ym=0,yr=0;curves.forEach((c,k)=>{for(let i=0;i<=300;i++){const v=c.f(x0+(x1-x0)*i/300);if(isFinite(v)){ym=Math.max(ym,v);if(k===(ref==null?curves.length-1:ref))yr=Math.max(yr,v)}}});
+ const top=Math.min(ym,yr*2.5)||ym||1,P=mk(cv,x0,x1,top*1.12);clip(P,()=>curves.forEach(c=>{if(c.fill)P.area(c.f,x0,x1,c.fill,240);P.line(c.f,c.col,c.lw||2.4,x0,x1,300,c.dash)}));(vl||[]).forEach(v=>P.vline(v[0],v[1],null,v[3]));return P}
+/* solve (A + lam I) beta = b and return diag of the inverse (A symmetric p x p) */
+function ridgeSolve(A,b,lam){const p=b.length,M=[];for(let i=0;i<p;i++){const r=new Float64Array(2*p+1);for(let j=0;j<p;j++)r[j]=A[i][j]+(i===j?lam:0);r[p+i]=1;r[2*p]=b[i];M.push(r)}
+ for(let c=0;c<p;c++){let m=c;for(let r=c+1;r<p;r++)if(Math.abs(M[r][c])>Math.abs(M[m][c]))m=r;[M[c],M[m]]=[M[m],M[c]];const d=M[c][c]||1e-12;for(let k=0;k<=2*p;k++)M[c][k]/=d;for(let r=0;r<p;r++)if(r!==c){const f=M[r][c];if(f!==0)for(let k=0;k<=2*p;k++)M[r][k]-=f*M[c][k]}}
+ return{beta:M.map(r=>r[2*p]),dinv:M.map((r,i)=>r[p+i])}}
+/* ---------- Ch1 why sample ---------- */
+(function(){const MS=[10,30,100,300,1000,3000,10000];scl('c1n',v=>v);scl('c1d',v=>v);idx('c1i',MS,v=>v.toLocaleString('en-US'));
+ function run(){const n=val('c1n'),d=val('c1d'),M=MS[+$('c1i').value],T0=logit(.1),g=gridPost(t=>d*t-n*Math.log(1+Math.exp(t))-(t+3)*(t+3)/(2*2.25),-10,3),mT=g.mean,pT=1-g.cd(T0),R=120,em=[],ep=[];
+  MS.forEach(m=>{let a=0,b=0;for(let r=0;r<R;r++){let s=0,c=0;for(let i=0;i<m;i++){const t=g.q(Math.random());s+=t;if(t>T0)c++}a+=Math.pow(s/m-mT,2);b+=Math.pow(c/m-pT,2)}em.push(Math.sqrt(a/R));ep.push(Math.sqrt(b/R)/Math.max(pT,1e-9))});
+  const draws=[];for(let i=0;i<M;i++)draws.push(g.q(Math.random()));const lo=g.q(.0005),hi=g.q(.9995),P=hist($('c1cv'),draws,lo,hi,36,[{f:g.pd,col:C.g,lw:2.8}],'rgba(110,168,255,.5)');P.vline(T0,C.y,null,true);P.text('θ = log-odds of default →',P.w-P.R-4,P.h-P.B-6,C.mu,'right');
+  const ys=[...em.map(lg10),...ep.map(lg10)],ylo=Math.floor(Math.min(...ys)),yhi=Math.ceil(Math.max(...ys)),Q=mk($('c1cv2'),1,4,yhi,{y0:ylo,noGrid:true,L:44});customGrid(Q,[1,2,3,4].map(v=>[v,nlab(Math.pow(10,v))]),Array.from({length:yhi-ylo+1},(_,i)=>[ylo+i,'1e'+(ylo+i)]));
+  const xs=MS.map(lg10);poly(Q,xs.map((x,i)=>[x,lg10(em[i])]),C.g,2.6);dots(Q,xs.map((x,i)=>[x,lg10(em[i])]),C.g,3);poly(Q,xs.map((x,i)=>[x,lg10(ep[i])]),C.y,2.6);dots(Q,xs.map((x,i)=>[x,lg10(ep[i])]),C.y,3);poly(Q,xs.map(x=>[x,lg10(em[0])-.5*(x-1)]),C.mu,1.5,true);legend(Q,[['error of posterior mean',C.g],['relative error of P(PD > 10%)',C.y],['slope −½',C.mu]],Q.T+12);Q.text('number of draws →',Q.w-Q.R-4,Q.h-Q.B-6,C.mu,'right');
+  let sm=0,sc=0;for(const t of draws){sm+=t;if(t>T0)sc++}
+  $('c1st').innerHTML=stat('posterior mean of θ: exact · from draws',fmt(mT)+' · '+fmt(sm/M),'ok')+stat('P(PD > 10%): exact · from draws',pc1(pT)+' · '+pc1(sc/M),'in')+stat('error at 10 → 10 000 draws',fmt(em[0])+' → '+fmt(em[6]),'')+stat('grid points for 1 · 5 · 20 parameters','10² · 10¹⁰ · 10⁴⁰','warn');
+  $('c1rd').innerHTML=`Here the posterior of one parameter is not a named distribution, but a grid of ${900} points gets it exactly. Drawing from it gives the same answers with a random error that shrinks like 1/√M (the slope −½ line): ${M.toLocaleString('en-US')} draws put the mean within about ${fmt(em[MS.indexOf(M)])} of the exact value. The grid is exact only in one or two dimensions: it needs 100^d points (10²⁰ for ten parameters is already out of reach), whereas the 1/√M law does not depend on the dimension. That is the case for sampling methods; the rest of the page is about how to draw from a posterior you can only evaluate up to a constant.`}
+ ['c1n','c1d','c1i'].forEach(i=>$(i).addEventListener('change',run));$('c1go').onclick=run;run();})();
+
+/* ---------- Ch2 importance sampling ---------- */
+(function(){scl('c2d',v=>v);scl('c2q',v=>v);scl('c2s',v=>fmt(v/10));scl('c2n',v=>v);
+ const XS=Array.from({length:2001},(_,i)=>-100+i*.1);
+ function ef(dq,s,dp){if(dq>=2*dp)return 0;let t=0;for(const x of XS){const p=tpdf(x,dp),q=tpdf(x/s,dq)/s;if(q>1e-300)t+=p*p/q}return Math.min(1,1/(t*.1))}
+ function run(){const dp=val('c2d'),dq=val('c2q'),s=val('c2s')/10,n=val('c2n'),R=150,tr=1-tcdf(3,dp);let e1=0,e2=0;
+  for(let r=0;r<R;r++){let a=0,b=0;for(let i=0;i<n;i++){const x=s*rtv(dq),w=tpdf(x,dp)/(tpdf(x/s,dq)/s);if(x>3)a+=w;if(rtv(dp)>3)b++}e1+=Math.pow(a/n-tr,2);e2+=Math.pow(b/n-tr,2)}
+  const rI=Math.sqrt(e1/R)/tr,rD=Math.sqrt(e2/R)/tr;let sw=0,sw2=0;for(let i=0;i<n;i++){const x=s*rtv(dq),w=tpdf(x,dp)/(tpdf(x/s,dq)/s);sw+=w;sw2+=w*w}
+  const P=dcurves($('c2cv'),-8,8,[{f:x=>tpdf(x,dp),col:C.fg,lw:2.8},{f:x=>tpdf(x/s,dq)/s,col:C.a,lw:2.4,dash:true}],[[3,C.y,null,true]],0);legend(P,[['target (Student t)',C.fg],['proposal',C.a]],P.T+12);P.text('x →',P.w-P.R-4,P.h-P.B-6,C.mu,'right');
+  const SG=Array.from({length:50},(_,i)=>.3+i*.08),ys=SG.map(v=>ef(dq,v,dp)),Q=mk($('c2cv2'),.3,4.2,1,{L:44});poly(Q,SG.map((v,i)=>[v,ys[i]]),C.g,2.8);Q.vline(s,C.y,null,true);Q.text('proposal scale →',Q.w-Q.R-4,Q.h-Q.B-6,C.mu,'right');Q.text('effective sample size ÷ n',Q.L+8,Q.T+12,C.g);
+  const E=ef(dq,s,dp);
+  $('c2st').innerHTML=stat('effective sample fraction',dq>=2*dp?'≈ 0 (infinite variance)':pc1(E),dq>=2*dp?'hot':E<.3?'warn':'ok')+stat('ESS in one run',Math.round(sw*sw/sw2)+' of '+n,'in')+stat('relative error of P(x > 3): importance · direct draws',fmt(rI)+' · '+fmt(rD),rI>1.5*rD?'warn':'ok')+stat('true P(x > 3)',pc1(tr),'');
+  $('c2rd').innerHTML=dq>=2*dp?`The proposal (df ${dq}) has lighter tails than the target (df ${dp}) by enough that the weights p/q have infinite variance: a few draws in the tail get enormous weights, the effective sample size collapses (${Math.round(sw*sw/sw2)} of ${n} here) and the estimate of the tail probability is erratic (relative error ${fmt(rI)} against ${fmt(rD)} for direct draws). A proposal must have tails at least as heavy as the target.`:`Importance sampling draws from an easy proposal q and reweights by w = p/q. The effective sample size (Σw)²/Σw² says how many equally weighted draws the weighted sample is worth: ${pc1(E)} of n for this proposal. A heavier-tailed or better-scaled proposal pushes it towards 100%, and a poor one loses almost everything; the curve on the right shows the cost of a wrong scale. The relative error of the tail probability (${fmt(rI)}) is compared with plain draws from the target itself (${fmt(rD)}), which are not available for a real posterior.`}
+ ['c2d','c2q','c2s','c2n'].forEach(i=>$(i).addEventListener('change',run));$('c2go').onclick=run;run();})();
+
+/* ---------- Ch3 Metropolis step size ---------- */
+(function(){scl('c3s',v=>fmt(Math.pow(10,v/10)));scl('c3x',v=>v);scl('c3n',v=>v);
+ const lp=x=>-x*x/2;
+ function run(){const st=Math.pow(10,val('c3s')/10),x0=val('c3x'),n=val('c3n'),ch=mhRW(lp,x0,st,n),b=Math.floor(n*.1),post=ch.x.slice(b),L=Math.min(n,1500),hi=Math.max(11,Math.abs(x0)+1),P=mk($('c3cv'),0,L,hi,{y0:-hi,L:40});
+  P.hline(0,C.mu,null);poly(P,Array.from({length:L},(_,i)=>[i,ch.x[i]]),C.a,1.3);P.text('iteration →',P.w-P.R-4,P.h-P.B-6,C.mu,'right');
+  const G=[],ea=[],ee=[];for(let k=-13;k<=13;k+=2){const s=Math.pow(10,k/10),c=mhRW(lp,0,s,3000);G.push(k/10);ea.push(c.acc);ee.push(essOf(c.x,100)/3000)}
+  const Q=mk($('c3cv2'),-1.3,1.3,1,{noGrid:true,L:44});customGrid(Q,[-1,-.5,0,.5,1].map(v=>[v,fmt(Math.pow(10,v))]),niceTicks(0,1,5));poly(Q,G.map((g,i)=>[g,ee[i]]),C.g,2.8);poly(Q,G.map((g,i)=>[g,ea[i]]),C.a,1.8,true);Q.vline(Math.log10(st),C.y,null,true);legend(Q,[['effective draws ÷ n',C.g],['acceptance rate',C.a]],Q.T+12);Q.text('proposal step (log scale) →',Q.w-Q.R-4,Q.h-Q.B-6,C.mu,'right');
+  const m=mean(post),sd=sdv(post),ess=essOf(post,150);
+  $('c3st').innerHTML=stat('acceptance rate',pc1(ch.acc),ch.acc<.1||ch.acc>.7?'warn':'ok')+stat('effective sample size (after 10% warm-up)',Math.round(ess)+' of '+post.length,ess<100?'hot':ess/post.length<.1?'warn':'ok')+stat('mean · sd (truth 0 · 1)',fmt(m)+' · '+fmt(sd),Math.abs(m)>.3||Math.abs(sd-1)>.2?'warn':'ok')+stat('step ÷ target sd',fmt(st),'');
+  $('c3rd').innerHTML=st<.8?`A small step is accepted almost always (${pc1(ch.acc)}) but the chain barely moves: successive draws are nearly identical, so ${post.length} draws are worth only ${Math.round(ess)}, and from the start at ${x0} it takes a long time to arrive (look at the trace).`:st>6?`A huge step proposes points far in the tails that are almost always rejected (acceptance ${pc1(ch.acc)}), so the chain sits still for long stretches: again few effective draws (${Math.round(ess)}).`:`A step of the order of the target’s own width balances the two failures: the chain accepts about ${pc1(ch.acc)} of proposals and moves about as far as it can. The classic guidance is an acceptance rate near 44% in one dimension (23% in many) and a step near 2.4 posterior standard deviations; the right panel shows the efficiency peak.`}
+ ['c3s','c3x','c3n'].forEach(i=>$(i).addEventListener('change',run));$('c3go').onclick=run;run();})();
+
+/* ---------- Ch4 Gibbs ---------- */
+(function(){scl('c4r',v=>fmt(v/100));scl('c4n',v=>v);
+ function gibbs(r,n,keep){const s=Math.sqrt(1-r*r),x=new Float64Array(n),y=new Float64Array(n),path=[];let a=-3,b=3;if(keep)path.push([a,b]);for(let i=0;i<n;i++){a=r*b+s*randn();if(keep&&i<60)path.push([a,b]);b=r*a+s*randn();if(keep&&i<60)path.push([a,b]);x[i]=a;y[i]=b}return{x,y,path}}
+ function run(){const r=val('c4r')/100,n=val('c4n'),g=gibbs(r,n,true),P=mk($('c4cv'),-4,4,4,{y0:-4,L:34}),rr=Math.sqrt(5.991),el=[];for(let k=0;k<=120;k++){const t=2*Math.PI*k/120;el.push([rr*Math.cos(t),r*rr*Math.cos(t)+Math.sqrt(1-r*r)*rr*Math.sin(t)])}
+  scat(P,Array.from(g.x),Array.from(g.y),'rgba(110,168,255,.22)',600,1.8);poly(P,el,C.fg,2,true);poly(P,g.path,C.y,1.6);dots(P,[g.path[0]],C.r,4);P.text('x₁ →',P.w-P.R-4,P.h-P.B-6,C.mu,'right');
+  const RG=[0,.1,.2,.3,.4,.5,.6,.7,.8,.9,.95,.98],em=RG.map(q=>essOf(gibbs(q,4000,false).x,150)/4000),Q=mk($('c4cv2'),0,1,1.05,{L:44});Q.line(q=>(1-q*q)/(1+q*q),C.g,2.6,0,.995,120);dots(Q,RG.map((q,i)=>[q,em[i]]),C.y,4);Q.vline(r,C.mu,null,true);legend(Q,[['theory (1 − ρ²)/(1 + ρ²)',C.g],['measured',C.y]],Q.T+12);Q.text('correlation ρ →',Q.w-Q.R-4,Q.h-Q.B-6,C.mu,'right');
+  const e=essOf(g.x,150),a1=acfv(g.x,2)[1];
+  $('c4st').innerHTML=stat('effective sample size of x₁',Math.round(e)+' of '+n,e/n<.2?'warn':'ok')+stat('effective fraction · theory',pc1(e/n)+' · '+pc1((1-r*r)/(1+r*r)),'in')+stat('lag-1 autocorrelation · ρ²',fmt(a1)+' · '+fmt(r*r),'')+stat('draws needed for 1000 effective',Math.round(1000*(1+r*r)/(1-r*r)).toLocaleString('en-US'),r>.9?'hot':'');
+  $('c4rd').innerHTML=`Gibbs sampling updates one coordinate at a time from its exact conditional distribution, with no accept/reject step. The yellow path shows the cost of correlation: each move is axis-parallel and as long as the conditional sd √(1−ρ²) = ${fmt(Math.sqrt(1-r*r))}, so it creeps along the ridge. The autocorrelation of x₁ is ρ² = ${fmt(r*r)} per step, so n draws are worth about n(1 − ρ²)/(1 + ρ²) = ${Math.round(e)} (${pc1((1-r*r)/(1+r*r))}). Gibbs is very efficient when conditionals are easy and parameters nearly independent, and slow when they are tightly correlated (reparametrise, or move the correlated block jointly).`}
+ ['c4r','c4n'].forEach(i=>$(i).addEventListener('change',run));$('c4go').onclick=run;run();})();
+
+/* ---------- Ch5 convergence: R-hat ---------- */
+(function(){scl('c5s',v=>fmt(Math.pow(10,v/10)));scl('c5n',v=>v);
+ const S0=[-10,-3,3,10],cols=[C.a,C.r,C.y,C.g];
+ const lse=(a,b)=>{const m=Math.max(a,b);return m+Math.log(Math.exp(a-m)+Math.exp(b-m))};
+ function run(){const bi=+$('c5t').value,st=Math.pow(10,val('c5s')/10),n=val('c5n'),lp=bi?x=>lse(-(x+4)*(x+4)/2,-(x-4)*(x-4)/2):x=>-x*x/2,ch=S0.map(s=>mhRW(lp,s,st,n)),hi=14;
+  const P=mk($('c5cv'),0,n,hi,{y0:-hi,L:40});clip(P,()=>ch.forEach((c,k)=>poly(P,Array.from({length:Math.min(n,800)},(_,i)=>{const j=Math.floor(i*n/Math.min(n,800));return[j,c.x[j]]}),cols[k],1.2)));P.text('iteration →',P.w-P.R-4,P.h-P.B-6,C.mu,'right');
+  const Ls=Array.from({length:14},(_,i)=>Math.max(40,Math.round(n*(i+1)/14))),rh=Ls.map(L=>rhatOf(ch.map(c=>c.x.slice(Math.floor(L/2),L)))),top=Math.min(3,Math.max(1.3,...rh.filter(isFinite)))*1.05,Q=mk($('c5cv2'),0,n,top,{y0:.95,L:44});
+  Q.hline(1.01,C.g,'1.01');Q.hline(1.1,C.y,null);clip(Q,()=>poly(Q,Ls.map((L,i)=>[L,Math.min(top,rh[i])]),C.r,2.8));Q.text('chain length (first half discarded) →',Q.w-Q.R-4,Q.h-Q.B-6,C.mu,'right');Q.text('split R̂',Q.L+8,Q.T+12,C.r);
+  const fin=rh[rh.length-1],tails=ch.map(c=>c.x.slice(Math.floor(n/2))),ess=tails.reduce((a,t)=>a+essOf(t,100),0),right=tails.map(t=>t.filter(v=>v>0).length/t.length);
+  $('c5st').innerHTML=stat('split R̂ (second half of every chain)',isFinite(fin)?fin.toFixed(3):'—',fin<1.01?'ok':fin<1.1?'warn':'hot')+stat('effective sample size, 4 chains',Math.round(ess)+' of '+4*tails[0].length,ess<400?'warn':'ok')+stat('share of draws above 0, per chain',right.map(v=>Math.round(100*v)).join(' · ')+'%',bi&&Math.abs(right[0]-right[3])>.5?'hot':'in')+stat('verdict',fin<1.01&&ess>400?'trust it':'do not trust',fin<1.01&&ess>400?'ok':'hot');
+  $('c5rd').innerHTML=bi?`The target has two well-separated modes at ±4 (each should receive half the draws). With a small step the chains cannot cross the valley, and each stays in the mode it started closest to: the shares above 0 are ${right.map(v=>Math.round(100*v)+'%').join(', ')}. R̂ = ${isFinite(fin)?fin.toFixed(2):'—'} is the alarm, because the chains disagree with one another. A single long chain would look perfectly stable inside its own mode and nothing would warn you, which is why several chains from dispersed starts are the standard check.`:`Four chains start far apart (−10, −3, 3, 10). R̂ compares the variation between chains with the variation within them; it is large while the chains are still travelling and approaches 1 once they have all forgotten their starts and explore the same distribution. The usual rule is to require R̂ below 1.01 (with enough effective draws) before using the results, and to discard the early part of each chain as warm-up. Increase the step or the length to watch it drop.`}
+ ['c5t','c5s','c5n'].forEach(i=>$(i).addEventListener('change',run));$('c5go').onclick=run;run();})();
+
+/* ---------- Ch6 ESS and Monte Carlo error ---------- */
+(function(){scl('c6r',v=>fmt(v/100));scl('c6n',v=>v);scl('c6k',v=>v);
+ function ar(r,n){const x=new Float64Array(n),s=Math.sqrt(1-r*r);let c=randn();for(let i=0;i<n;i++){c=r*c+s*randn();x[i]=c}return x}
+ function run(){const r=val('c6r')/100,n=val('c6n'),k=val('c6k'),x=ar(r,n),a=acfv(x,40),R=80;let cN=0,cE=0;
+  for(let q=0;q<R;q++){const y=ar(r,n),m=mean(y),sd=sdv(y),e=essOf(y,60);if(Math.abs(m)<1.96*sd/Math.sqrt(n))cN++;if(Math.abs(m)<1.96*sd/Math.sqrt(e))cE++}
+  const P=mk($('c6cv'),0,40,1.05,{y0:-.1,L:40});P.hline(0,C.mu,null);poly(P,Array.from(a).map((v,i)=>[i,v]),C.a,2.4);dots(P,Array.from(a).map((v,i)=>[i,v]),C.a,2.5);P.line(j=>Math.pow(r,j),C.g,2,0,40,160,true);legend(P,[['measured autocorrelation',C.a],['ρᵏ (true)',C.g]],P.T+12);P.text('lag →',P.w-P.R-4,P.h-P.B-6,C.mu,'right');
+  barV($('c6cv2'),[cN/R*100,cE/R*100],[C.r,C.g],['naive sd/√n','sd/√ESS'],115,x=>x.toFixed(0)+'%');
+  const e=essOf(x,100),th=Float64Array.from({length:Math.floor(n/k)},(_,i)=>x[i*k]),et=essOf(th,60);
+  $('c6st').innerHTML=stat('effective sample size · n',Math.round(e)+' · '+n,e/n<.1?'warn':'ok')+stat('theory n(1 − ρ)/(1 + ρ)',Math.round(n*(1-r)/(1+r)),'in')+stat('coverage of mean ± 1.96 se: naive · with ESS',Math.round(100*cN/R)+' · '+Math.round(100*cE/R)+'%',cN/R<.85?'hot':'ok')+stat('ESS after keeping every '+k+'th draw',Math.round(et)+' of '+th.length,et<e?'warn':'ok');
+  $('c6rd').innerHTML=`Draws from a Markov chain are positively correlated, so n of them carry the information of only n/τ independent draws, where τ = 1 + 2Σρₖ is the integrated autocorrelation time (here about ${fmt(n/e)}). The Monte Carlo standard error of a posterior mean is sd/√ESS, not sd/√n: intervals that use n are too narrow, and the right panel shows how often they miss (${Math.round(100*cN/R)}% coverage instead of 95%). Thinning (keeping every ${k}th draw) is not a remedy: the thinned sample has ESS ${Math.round(et)} against ${Math.round(e)} for all draws, because it throws information away. Thin only to save memory.`}
+ ['c6r','c6n','c6k'].forEach(i=>$(i).addEventListener('change',run));$('c6go').onclick=run;run();})();
+/* ---------- Ch7 HMC ---------- */
+(function(){scl('c7r',v=>fmt(v/100));scl('c7e',v=>fmt(v/100));scl('c7l',v=>v);
+ function run(){const r=val('c7r')/100,eps=val('c7e')/100,L=val('c7l'),N=3000,q=1/(1-r*r),grad=(a,b)=>[-q*(a-r*b),-q*(b-r*a)],lp=(a,b)=>-.5*q*(a*a-2*r*a*b+b*b);
+  let a=-1,b=1,acc=0;const hx=new Float64Array(N),hy=new Float64Array(N),path=[[a,b]];
+  for(let i=0;i<N;i++){let p1=randn(),p2=randn(),x1=a,x2=b;const H0=-lp(a,b)+.5*(p1*p1+p2*p2);let g=grad(x1,x2);p1+=.5*eps*g[0];p2+=.5*eps*g[1];for(let l=0;l<L;l++){x1+=eps*p1;x2+=eps*p2;g=grad(x1,x2);const f=l===L-1?.5:1;p1+=f*eps*g[0];p2+=f*eps*g[1]}
+   const H1=-lp(x1,x2)+.5*(p1*p1+p2*p2),dH=H1-H0;if(isFinite(dH)&&Math.log(Math.random())<-dH){a=x1;b=x2;acc++}hx[i]=a;hy[i]=b;if(i<80)path.push([a,b])}
+  const st=Math.max(.04,1.68*Math.sqrt(1-r)),rw=(()=>{const x=new Float64Array(N),y=new Float64Array(N);let c1=-1,c2=1,l0=lp(c1,c2),k=0;for(let i=0;i<N;i++){const y1=c1+st*randn(),y2=c2+st*randn(),l1=lp(y1,y2);if(Math.log(Math.random())<l1-l0){c1=y1;c2=y2;l0=l1;k++}x[i]=c1;y[i]=c2}return{x,y,acc:k/N}})();
+  const gb=(()=>{const s=Math.sqrt(1-r*r),x=new Float64Array(N),y=new Float64Array(N);let c1=-1,c2=1;for(let i=0;i<N;i++){c1=r*c2+s*randn();c2=r*c1+s*randn();x[i]=c1;y[i]=c2}return{x,y}})();
+  const e=(o)=>Math.min(essOf(o.x||o[0],150),essOf(o.y||o[1],150)),eH=e({x:hx,y:hy}),eR=e(rw),eG=e(gb),per=[eR/N*1000/1,eG/N*1000/2,eH/(N*(L+1))*1000];
+  const P=mk($('c7cv'),-4,4,4,{y0:-4,L:34}),rr=Math.sqrt(5.991),el=[];for(let k=0;k<=120;k++){const t=2*Math.PI*k/120;el.push([rr*Math.cos(t),r*rr*Math.cos(t)+Math.sqrt(1-r*r)*rr*Math.sin(t)])}
+  scat(P,Array.from(hx),Array.from(hy),'rgba(110,168,255,.22)',600,1.8);poly(P,el,C.fg,2,true);poly(P,path,C.y,1.4);dots(P,path.slice(0,1),C.r,4);P.text('x₁ →',P.w-P.R-4,P.h-P.B-6,C.mu,'right');
+  barV($('c7cv2'),per,[C.a,C.p,C.g],['random-walk Metropolis','Gibbs','HMC'],Math.max(...per)*1.25+1,x=>x.toFixed(0));
+  $('c7st').innerHTML=stat('HMC acceptance',pc1(acc/N),acc/N<.4?'hot':acc/N<.65?'warn':'ok')+stat('effective draws per 1000 evaluations: RW · Gibbs · HMC',per.map(v=>v.toFixed(0)).join(' · '),'in')+stat('trajectory length ε·L',fmt(eps*L),'')+stat('stability limit for ε (twice the smallest sd)',fmt(2*Math.sqrt(1-r)),eps>2*Math.sqrt(1-r)?'hot':'ok');
+  $('c7rd').innerHTML=eps>2*Math.sqrt(1-r)?`The step ε = ${fmt(eps)} is larger than twice the narrowest width of the target (${fmt(Math.sqrt(1-r))}), so the leapfrog integration is unstable: the energy error explodes, almost every proposal is rejected (${pc1(acc/N)} accepted) and the chain stalls. This is what a “divergent transition” in Stan or PyMC reports.`:`Hamiltonian Monte Carlo treats the negative log posterior as a landscape, gives the current point a random momentum and rolls it along the landscape for L leapfrog steps before an accept/reject correction. Long coordinated moves along the correlated ridge give almost independent draws: here about ${Math.round(per[2])} effective draws per 1000 gradient evaluations against ${Math.round(per[0])} for random-walk Metropolis and ${Math.round(per[1])} for Gibbs. HMC needs gradients, and a step size and trajectory length that suit the geometry; NUTS (the default in Stan, PyMC and NumPyro) chooses the trajectory length automatically and adapts the step size during warm-up.`}
+ ['c7r','c7e','c7l'].forEach(i=>$(i).addEventListener('change',run));$('c7go').onclick=run;run();})();
+
+/* ---------- Ch8 Bayesian logistic regression ---------- */
+(function(){scl('c8n',v=>v);scl('c8s',v=>fmt(v/10));
+ const TB=[-3,.8,-.5,.4],p=4;
+ function run(){const n=val('c8n'),s=val('c8s')/10,X=new Float64Array(n*p),y=new Float64Array(n),c1=new Float64Array(n),c2=new Float64Array(n),c3=new Float64Array(n);
+  for(let i=0;i<n;i++){const a=randn(),b=.9*a+Math.sqrt(1-.81)*randn(),c=randn();c1[i]=a;c2[i]=b;c3[i]=c;X[i*p]=1;X[i*p+1]=a;X[i*p+2]=b;X[i*p+3]=c;y[i]=Math.random()<expit(TB[0]+TB[1]*a+TB[2]*b+TB[3]*c)?1:0}
+  const ps=1/(s*s),lp=be=>{let l=0;for(let i=0;i<n;i++){const e=be[0]+be[1]*X[i*p+1]+be[2]*X[i*p+2]+be[3]*X[i*p+3];l+=y[i]*e-(e>0?e+Math.log(1+Math.exp(-e)):Math.log(1+Math.exp(e)))}for(let j=0;j<p;j++)l-=ps*be[j]*be[j]/2;return l};
+  let bm=[0,0,0,0],H=null;for(let it=0;it<10;it++){const g=[0,0,0,0],A=Array.from({length:p},()=>new Float64Array(p));for(let i=0;i<n;i++){const e=bm[0]+bm[1]*X[i*p+1]+bm[2]*X[i*p+2]+bm[3]*X[i*p+3],pr=expit(e),w=pr*(1-pr);for(let j=0;j<p;j++){g[j]+=X[i*p+j]*(y[i]-pr);for(let k=0;k<p;k++)A[j][k]+=w*X[i*p+j]*X[i*p+k]}}for(let j=0;j<p;j++){g[j]-=ps*bm[j];A[j][j]+=ps}H=A;const f=ridgeSolve(A,g,0).beta;bm=bm.map((v,j)=>v+f[j])}
+  const Sg=invMat(H),Lc=cholL(Sg),mle=logitFit([c1,c2,c3],y).beta,NI=5000;
+  const run1=(prop)=>{const out=new Float64Array(NI);let cur=[0,0,0,0],lc=lp(cur),acc=0;for(let i=0;i<NI;i++){const z=prop(),y2=cur.map((v,j)=>v+z[j]),l2=lp(y2);if(Math.log(Math.random())<l2-lc){cur=y2;lc=l2;acc++}out[i]=cur[1];if(i===0)out.all=[];out.all.push(cur)}out.acc=acc/NI;return out};
+  const A1=run1(()=>[.12*randn(),.12*randn(),.12*randn(),.12*randn()]),A2=run1(()=>{const z=[randn(),randn(),randn(),randn()],sc=2.38/2;return[0,1,2,3].map(i=>{let t=0;for(let k=0;k<=i;k++)t+=Lc[i][k]*z[k];return sc*t})});
+  const bn=500,pm=[0,1,2,3].map(j=>{let t=0;for(let i=bn;i<NI;i++)t+=A2.all[i][j];return t/(NI-bn)}),sdb=(()=>{const a=[];for(let i=bn;i<NI;i++)a.push(A2.all[i][1]);return sdv(a)})();
+  const L=1500,hi=Math.max(1.5,...Array.from(A1.slice(0,L)),...Array.from(A2.slice(0,L)))+.2,lo=Math.min(-.2,...Array.from(A1.slice(0,L)),...Array.from(A2.slice(0,L)))-.1,P=mk($('c8cv'),0,L,hi,{y0:lo,L:40});P.hline(TB[1],C.fg,'true β₁');poly(P,Array.from({length:L},(_,i)=>[i,A1[i]]),C.r,1.2);poly(P,Array.from({length:L},(_,i)=>[i,A2[i]]),C.g,1.2);legend(P,[['plain random walk',C.r],['Laplace-shaped proposal',C.g]],P.T+12);P.text('iteration →',P.w-P.R-4,P.h-P.B-6,C.mu,'right');
+  const grp=[0,1,2,3].map(j=>[TB[j],mle[j],pm[j]]),lo2=Math.min(-3.6,...grp.flat())-.2,hi2=Math.max(1.2,...grp.flat())+.2,Q=barG($('c8cv2'),grp,[C.fg,C.y,C.g],['intercept','β₁','β₂','β₃'],lo2,hi2,x=>x.toFixed(2));legend(Q,[['truth',C.fg],['maximum likelihood',C.y],['posterior mean',C.g]],Q.T+12);
+  const e1=essOf(A1.slice(bn),150),e2=essOf(A2.slice(bn),150);
+  $('c8st').innerHTML=stat('acceptance: plain · shaped',pc1(A1.acc)+' · '+pc1(A2.acc),'')+stat('effective draws of β₁ (4500): plain · shaped',Math.round(e1)+' · '+Math.round(e2),e1<150?'warn':'in')+stat('β₁ posterior mean · sd',fmt(pm[1])+' · '+fmt(sdb),'ok')+stat('correlation of the two predictors',pc1(.9),'');
+  $('c8rd').innerHTML=`Logistic regression has no conjugate prior, so the posterior must be sampled. Two of the predictors are 90% correlated, so β₁ and β₂ are strongly negatively correlated in the posterior; a plain isotropic random walk (red) has to take tiny steps to avoid leaving the narrow ridge and moves slowly (${Math.round(e1)} effective draws of 4500), while a proposal whose covariance is taken from the Laplace approximation at the mode (green) follows the ridge and gets ${Math.round(e2)}. The posterior means are close to the maximum-likelihood estimates here because the prior (sd ${fmt(s)}) is weak relative to ${n} customers; shrink the prior sd or the sample to see the posterior pull the estimates towards zero. Both are noisy estimates of the truth. This is the same computation PyMC or Stan perform, with better samplers.`}
+ ['c8n','c8s'].forEach(i=>$(i).addEventListener('change',run));$('c8go').onclick=run;run();})();
+
+/* ---------- Ch9 mean-field variational inference ---------- */
+(function(){scl('c9r',v=>fmt(v/100));scl('c9d',v=>v);
+ const sig=(r,d)=>Array.from({length:d},(_,i)=>Array.from({length:d},(_,j)=>i===j?1:r));
+ const ratio=(r,d)=>{const L=invMat(sig(r,d));return Math.sqrt(1/L[0][0])};
+ function run(){const r=val('c9r')/100,d=val('c9d'),S=sig(r,d),Lm=invMat(S),q=Math.sqrt(1/Lm[0][0]),cov=2*normCdf(1.96*q)-1;let ld=logdetM(Lm);for(let i=0;i<d;i++)ld-=Math.log(Lm[i][i]);const kl=-.5*ld;
+  const P=mk($('c9cv'),-3.5,3.5,3.5,{y0:-3.5,L:34}),rr=Math.sqrt(5.991),el=[],em=[];for(let k=0;k<=120;k++){const t=2*Math.PI*k/120;el.push([rr*Math.cos(t),r*rr*Math.cos(t)+Math.sqrt(1-r*r)*rr*Math.sin(t)]);em.push([q*rr*Math.cos(t),q*rr*Math.sin(t)])}
+  poly(P,el,C.fg,2.6);poly(P,em,C.r,2.6,true);legend(P,[['true posterior (95% region)',C.fg],['mean-field approximation',C.r]],P.T+12);P.text('θ₁ →',P.w-P.R-4,P.h-P.B-6,C.mu,'right');
+  const RG=Array.from({length:50},(_,i)=>i*.0198),Q=mk($('c9cv2'),0,1,1.05,{L:44});Q.line(x=>ratio(Math.min(x,.99),d),C.g,2.6,0,.99,50);Q.line(x=>2*normCdf(1.96*ratio(Math.min(x,.99),d))-1,C.y,2.6,0,.99,50);Q.vline(r,C.mu,null,true);legend(Q,[['sd of q ÷ true sd',C.g],['coverage of its 95% interval',C.y]],Q.T+12);Q.text('correlation ρ among the '+d+' parameters →',Q.w-Q.R-4,Q.h-Q.B-6,C.mu,'right');
+  $('c9st').innerHTML=stat('mean-field sd ÷ true sd',fmt(q),q<.7?'hot':q<.9?'warn':'ok')+stat('real coverage of the nominal 95% interval',pc1(cov),cov<.85?'hot':'ok')+stat('KL(q ‖ p)',fmt(kl),'in')+stat('posterior means',d===2?'exact':'exact (for a normal target)','ok');
+  $('c9rd').innerHTML=`Variational inference replaces sampling by optimisation: choose a simple family (here independent normals, “mean-field”) and the member q closest to the posterior in KL(q ‖ p), equivalently the one that maximises the evidence lower bound (ELBO). It is fast and scales to huge models. The price is visible here: the means are right, but the mean-field standard deviations are only ${fmt(q)} of the true ones, because q ignores the correlation and is penalised for putting mass where p has none, so its nominal 95% intervals really cover ${pc1(cov)}. The effect grows with the correlation ρ and with the number of correlated parameters (try d = 10). Use VI for speed and point predictions; do not trust its uncertainty without checking against MCMC on a subset or with simulation-based calibration.`}
+ ['c9r','c9d'].forEach(i=>$(i).addEventListener('input',run));run();})();
+
+/* ---------- Ch10 Laplace and VI against exact ---------- */
+(function(){scl('c10n',v=>v);scl('c10d',v=>v);scl('c10p',v=>fmt(v/10));
+ function run(){const n=val('c10n'),d=val('c10d'),s=val('c10p')/10,lf=t=>d*t-n*Math.log(1+Math.exp(t))-(t+4)*(t+4)/(2*s*s),g=gridPost(lf,-16,3,1500);
+  let m=-4;for(let i=0;i<60;i++){const pr=expit(m),gr=d-n*pr-(m+4)/(s*s),h=n*pr*(1-pr)+1/(s*s);m+=gr/h}const pr0=expit(m),hs=n*pr0*(1-pr0)+1/(s*s),ls=1/Math.sqrt(hs);
+  const elbo=(a,b)=>{let t=0;for(let i=0;i<GH.z.length;i++)t+=GH.w[i]*lf(a+b*GH.z[i]);return t+Math.log(b)};let a=m,b=ls,step=.5,best=elbo(a,b);for(let it=0;it<200&&step>1e-5;it++){let imp=false;for(const [da,db] of [[step,0],[-step,0],[0,step*.5],[0,-step*.5]]){const na=a+da,nb=b*Math.exp(db);if(nb<=0)continue;const v=elbo(na,nb);if(v>best){best=v;a=na;b=nb;imp=true;break}}if(!imp)step/=2}
+  const fp=(f)=>x=>x<=0||x>=1?0:f(logit(x))/(x*(1-x)),pdE=fp(g.pd),pdL=fp(t=>normPdfAt(t,m,ls)),pdV=fp(t=>normPdfAt(t,a,b)),x1=Math.min(1,Math.max(expit(g.q(.995)),.01));
+  const P=dcurves($('c10cv'),0,x1,[{f:pdE,col:C.fg,fill:'rgba(232,235,245,.12)',lw:2.8},{f:pdL,col:C.r,lw:2.2,dash:true},{f:pdV,col:C.y,lw:2.2,dash:true}],null,0);legend(P,[['exact (grid)',C.fg],['Laplace (normal at the mode)',C.r],['variational normal',C.y]],P.T+12);P.text('PD →',P.w-P.R-4,P.h-P.B-6,C.mu,'right');
+  const mn=(mm,ss)=>{let t=0;for(let i=0;i<GH.z.length;i++)t+=GH.w[i]*expit(mm+ss*GH.z[i]);return t},mE=(()=>{let t=0;const h=g.x[1]-g.x[0];for(let i=0;i<g.x.length;i++)t+=expit(g.x[i])*g.pdf[i]*h;return t})(),uE=expit(g.q(.95)),uL=expit(m+1.645*ls),uV=expit(a+1.645*b),mL=mn(m,ls),mV=mn(a,b);
+  const grp=[[mE,mL,mV].map(v=>100*v),[uE,uL,uV].map(v=>100*v)],hi=Math.max(...grp.flat())*1.2;const Q=barG($('c10cv2'),grp,[C.fg,C.r,C.y],['posterior mean PD','95% upper bound'],0,hi,x=>x.toFixed(2)+'%');legend(Q,[['exact',C.fg],['Laplace',C.r],['variational',C.y]],Q.T+12);
+  $('c10st').innerHTML=stat('observed',d+' defaults in '+n,'in')+stat('mean PD: exact · Laplace · VI',grp[0].map(v=>v.toFixed(2)).join(' · ')+'%','')+stat('95% upper bound: exact · Laplace · VI',grp[1].map(v=>v.toFixed(2)).join(' · ')+'%',Math.abs(uL-uE)/uE>.1||Math.abs(uV-uE)/uE>.1?'warn':'ok')+stat('mode · sd of θ (Laplace)',fmt(m)+' · '+fmt(ls),'');
+  $('c10rd').innerHTML=`The exact posterior of a rare PD (on the probability scale) is skewed with a long upper tail. Both normal approximations are fitted on the log-odds scale: Laplace matches the mode and curvature, variational inference maximises the ELBO over normal q. With ${n} obligors and ${d} defaults they put the 95% upper bound at ${(100*uL).toFixed(2)}% and ${(100*uV).toFixed(2)}% against the exact ${(100*uE).toFixed(2)}%${Math.abs(uL-uE)/uE>.1||Math.abs(uV-uE)/uE>.1?': the tail that a capital or provisioning number depends on is the part they get wrong most':' (close, because the data are informative enough)'}. Try few defaults and a small portfolio: the approximations are least reliable exactly when the data are thin and the answer matters most.`}
+ ['c10n','c10d','c10p'].forEach(i=>$(i).addEventListener('change',run));run();})();
+
+/* ---------- Ch11 tails need effective draws ---------- */
+(function(){const PS=[.2,.1,.05,.01,.005,.001],ES=[100,300,1000,3000,10000,30000,100000];idx('c11p',PS,v=>pc1(v));idx('c11e',ES,v=>v.toLocaleString('en-US'));
+ function run(){const p=PS[+$('c11p').value],E=ES[+$('c11e').value],R=400,th=Math.sqrt((1-p)/(p*E));let s2=0;for(let r=0;r<R;r++){const ph=binF(E,p)/E;s2+=Math.pow((ph-p)/p,2)}const sim=Math.sqrt(s2/R),z=qn(1-p),qs=Math.sqrt(p*(1-p)/E)/npdf(z),need=q=>Math.ceil((1-p)/(p*q*q));
+  const lo=-2.6,hi=1.2,P=mk($('c11cv'),2,5,hi,{y0:lo,noGrid:true,L:44}),xs=[2,3,4,5];customGrid(P,xs.map(v=>[v,nlab(Math.pow(10,v))]),[[-2,'1%'],[-1,'10%'],[0,'100%'],[1,'1000%']]);P.hline(-1,C.mu,null);
+  clip(P,()=>[[.2,C.a],[.05,C.p],[.01,C.y],[.001,C.r]].forEach(([pp,c])=>poly(P,[2,5].map(x=>[x,Math.log10(Math.sqrt((1-pp)/(pp*Math.pow(10,x))))]),c,2.2)));dots(P,[[Math.log10(E),Math.log10(th)]],C.fg,5);legend(P,[['tail 20%',C.a],['5%',C.p],['1%',C.y],['0.1%',C.r]],P.T+12);P.text('effective draws →',P.w-P.R-4,P.h-P.B-6,C.mu,'right');P.text('relative error of the tail probability',P.L+6,P.T+26,C.mu);
+  const Q=mk($('c11cv2'),-3,-.6,8,{y0:1,noGrid:true,L:44});customGrid(Q,[-3,-2,-1].map(v=>[v,pc1(Math.pow(10,v))]),[1,2,3,4,5,6,7,8].map(v=>[v,nlab(Math.pow(10,v))]));
+  poly(Q,Array.from({length:30},(_,i)=>{const x=-3+i*.08,pp=Math.pow(10,x);return[x,Math.log10((1-pp)/(pp*.01))]}),C.g,2.6);poly(Q,Array.from({length:30},(_,i)=>{const x=-3+i*.08,pp=Math.pow(10,x);return[x,Math.log10((1-pp)/(pp*.0025))]}),C.y,2.6,true);Q.vline(Math.log10(p),C.fg,null,true);legend(Q,[['10% relative error',C.g],['5%',C.y]],Q.T+12);Q.text('tail probability (log scale) →',Q.w-Q.R-4,Q.h-Q.B-6,C.mu,'right');
+  $('c11st').innerHTML=stat('relative error of P̂ (theory · simulated)',pc1(th)+' · '+pc1(sim),th>.2?'hot':th>.1?'warn':'ok')+stat('error of the '+pc1(1-p)+' quantile (in sds of the posterior)',fmt(qs),'in')+stat('effective draws for 10% · 5% relative error',need(.1).toLocaleString('en-US')+' · '+need(.05).toLocaleString('en-US'),'')+stat('your effective draws',E.toLocaleString('en-US'),E>=need(.1)?'ok':'warn');
+  $('c11rd').innerHTML=`With ${E.toLocaleString('en-US')} effective draws, only about ${Math.round(E*p)} of them fall in a tail of probability ${pc1(p)}, so its estimate has a relative error near ${pc1(th)} (simulated: ${pc1(sim)}); the ${pc1(1-p)} quantile of the posterior is known to about ${fmt(qs)} posterior standard deviations. Means need few effective draws (a few hundred), but the quantities a risk model is judged on are often in the tail: a 99.9th percentile or a probability of exceeding a regulatory threshold needs tens of thousands of <em>effective</em> draws, which for a slowly mixing chain can mean millions of raw ones. Plan the run length from the tail you need, not from R̂ alone.`}
+ ['c11p','c11e'].forEach(i=>$(i).addEventListener('input',run));run();})();
+const QZ=[{"l":"Beginner","q":"Why is Monte Carlo preferred to grid integration for posteriors with many parameters?","o":["It removes the need for a prior","Its error shrinks like 1/√M whatever the number of parameters, while a grid needs exponentially many points","It always gives the exact posterior","It needs no likelihood"],"a":1,"e":"A grid with 100 points per parameter needs 100^d evaluations; Monte Carlo’s error rate does not depend on d."},{"l":"Beginner","q":"What does an MCMC algorithm produce?","o":["A sequence of dependent draws whose long-run distribution is the posterior","The posterior mode only","Independent draws from the posterior","A closed-form posterior"],"a":0,"e":"The chain’s draws are correlated but, after warm-up, are distributed according to the posterior, so their averages estimate posterior quantities."},{"l":"Intermediate","q":"In importance sampling a handful of draws receive enormous weights. The effective sample size is then…","o":["Larger than n","Equal to n","Undefined","Much smaller than n: the weighted sample is worth few equally weighted draws"],"a":3,"e":"ESS = (Σw)²/Σw² falls towards 1 when a single weight dominates."},{"l":"Intermediate","q":"Which proposal is dangerous for importance sampling of a heavy-tailed target?","o":["A Student t with fewer degrees of freedom than the target","A proposal wider than the target","A normal proposal, because its lighter tails give weights with infinite variance","A proposal centred on the target’s mode"],"a":2,"e":"Weights p/q explode in the tails when q decays faster than p; heavier-tailed proposals are safe."},{"l":"Intermediate","q":"A random-walk Metropolis chain accepts 98% of its proposals. The most likely problem is…","o":["The chain has converged perfectly","The steps are too small, so the chain crawls and has low effective sample size","The target is multimodal","The steps are too large"],"a":1,"e":"Near-total acceptance means proposals barely move; efficiency peaks at an acceptance of roughly 23–44%."},{"l":"Intermediate","q":"Gibbs sampling is slow when…","o":["Parameters are strongly correlated in the posterior, because axis-parallel moves creep along the ridge","The conditionals are conjugate","The prior is flat","There are few parameters"],"a":0,"e":"For a bivariate normal the effective fraction is (1 − ρ²)/(1 + ρ²), about 5% at ρ = 0.95."},{"l":"Advanced","q":"Four chains all start in the same mode of a bimodal posterior and R̂ = 1.00. The right conclusion is…","o":["The effective sample size must be large","The sampler has converged to the full posterior","The posterior is unimodal","R̂ cannot detect a mode that no chain visited; use dispersed starts and other checks"],"a":3,"e":"R̂ compares chains with one another: if they all miss the same region, they agree and R̂ is perfect."},{"l":"Advanced","q":"A chain of 10,000 draws has an effective sample size of 100. The Monte Carlo standard error of the posterior mean is about…","o":["sd / 100","sd / 1000","sd / 10","zero, because the chain is long"],"a":2,"e":"MCSE = sd/√ESS = sd/√100."},{"l":"Advanced","q":"Keeping only every 10th draw of a chain (thinning)…","o":["Is required for R̂ to be valid","Never increases the effective sample size; it discards information and is useful only to save storage","Removes autocorrelation, so doubles the ESS","Reduces the bias of the posterior mean"],"a":1,"e":"The thinned sample is less autocorrelated but much smaller; its ESS is at most that of the full chain."},{"l":"Advanced","q":"Compared with random-walk Metropolis, HMC is more efficient in high dimensions because…","o":["Gradient-guided trajectories make long moves that are still accepted, so draws are nearly independent","It does not need an accept/reject step","It uses a proposal with heavier tails","It does not need the posterior density"],"a":0,"e":"The leapfrog trajectory follows the geometry of the posterior; the Metropolis step corrects the integration error."},{"l":"Advanced","q":"A sampler reports many divergent transitions. This means…","o":["The effective sample size is too high","The prior is too weak","The chain has converged","The integrator is unstable in some region (for example a funnel), so exploration there may be biased; reparametrise or reduce the step size"],"a":3,"e":"Divergences flag trajectories where the energy error explodes; they should be fixed, not ignored."},{"l":"Expert","q":"Mean-field variational inference on a posterior with strongly correlated parameters typically…","o":["Is exact when there are many parameters","Gets the correlations right but the means wrong","Recovers the means roughly but underestimates the marginal variances","Overestimates the variances"],"a":2,"e":"The factorised q ignores correlation and, through KL(q ‖ p), avoids regions where p is small, so it is too narrow."},{"l":"Expert","q":"Maximising the evidence lower bound (ELBO) over a family of distributions q is equivalent to…","o":["Matching the first two moments of the posterior","Minimising KL(q ‖ posterior)","Minimising the posterior variance","Maximising the likelihood"],"a":1,"e":"log p(y) = ELBO + KL(q ‖ p(θ | y)), and log p(y) does not depend on q."},{"l":"Expert","q":"The Laplace approximation is most likely to be inaccurate for…","o":["A skewed posterior such as a rare PD from few defaults, especially in its upper tail","A one-parameter model","A posterior that is nearly normal","A model with a large sample"],"a":0,"e":"A normal on the log-odds scale has the wrong tail shape when the data are thin, and tail bounds are what a risk number depends on."},{"l":"Expert","q":"Estimating a 1% tail probability from 1000 effective draws gives a relative error of about…","o":["3%","10%","1%","30%"],"a":3,"e":"√((1 − p)/(p · ESS)) = √(0.99/10) ≈ 0.31: only about 10 draws fall in the tail."},{"l":"Expert","q":"In logistic regression with two predictors correlated at 90%, a plain isotropic random-walk Metropolis sampler is slow because…","o":["The prior is conjugate","The coefficients are independent","The posterior of the two coefficients is a narrow tilted ridge that axis-aligned steps cross poorly; a proposal shaped by the Laplace covariance helps","The likelihood is flat"],"a":2,"e":"Correlated predictors give negatively correlated coefficients; steps must be small in the narrow direction, so movement along the ridge is slow."},{"l":"Expert","q":"Which statement about Monte Carlo standard error (MCSE) and the posterior sd is correct?","o":["The posterior sd shrinks with more MCMC iterations","The posterior sd is real uncertainty about the parameter; the MCSE is numerical error that shrinks with more effective draws and should be small beside it","The MCSE is the uncertainty that remains with infinite data","They are the same quantity"],"a":1,"e":"Running longer reduces the MCSE, not the posterior sd, which is determined by the data and prior."},{"l":"Expert","q":"Which step best checks that a sampler and model are implemented correctly?","o":["Simulate data from the model with known parameters and check that the posterior recovers them (for example by calibration of intervals)","Check that R̂ is below 1.01 on the real data","Use a flat prior","Increase the number of iterations"],"a":0,"e":"Convergence diagnostics say the chains agree, not that the code targets the intended posterior; fake-data recovery tests the whole pipeline."}];
+(function(){const st=store.get('mc_quiz',{});
+ function render(){const box=$('quiz');box.innerHTML='';
+  QZ.forEach((q,i)=>{const d=document.createElement('div');d.className='q'+(st[i]!=null?' done':'');d.innerHTML=`<div class="qh">Q${i+1} · ${q.l}</div><div style="margin:4px 0 6px"><b>${q.q}</b></div>`;
+   q.o.forEach((o,j)=>{const b=document.createElement('button');b.className='opt';b.textContent=o;if(st[i]!=null){if(j===q.a)b.classList.add('good');else if(j===st[i])b.classList.add('bad')}b.onclick=()=>{if(st[i]!=null)return;st[i]=j;store.set('mc_quiz',st);render();meter()};d.appendChild(b)});
+   const e=document.createElement('div');e.className='ex';e.innerHTML=(st[i]===q.a?'✅ ':'❌ ')+q.e;d.appendChild(e);box.appendChild(d)});
+  const ans=Object.keys(st).length,ok=QZ.filter((q,i)=>st[i]===q.a).length;
+  $('qscore').innerHTML=stat('answered',ans+' / '+QZ.length,'in')+stat('correct',ok,'ok')+stat('score',ans?Math.round(100*ok/ans)+'%':'—',ok/Math.max(ans,1)>=.8?'ok':'warn')+stat('verdict',ans<QZ.length?'keep going':ok>=16?'sampling master':ok>=13?'strong':'review ch. 1–11','')}
+ $('qreset').onclick=()=>{Object.keys(st).forEach(k=>delete st[k]);store.set('mc_quiz',st);render();meter()};
+ window.__qst=st;render();})();
+const CHK=["Explain why posterior summaries are integrals and why Monte Carlo beats a grid as dimension grows.","Implement importance sampling, compute weights and the effective sample size, and say when it fails.","Write the Metropolis–Hastings acceptance rule and explain why the normalising constant cancels.","Tune a random-walk proposal using acceptance rate and effective sample size.","Explain Gibbs sampling, full conditionals and why correlation slows it.","Run several chains from dispersed starts, choose a warm-up and read R̂.","Compute effective sample size and Monte Carlo standard error, and explain why thinning does not help.","Explain Hamiltonian Monte Carlo, NUTS and what divergent transitions mean.","Fit a Bayesian logistic regression by MCMC and use the Laplace covariance for proposals.","Describe the Laplace approximation and when it breaks.","Explain the ELBO, KL(q ‖ p) and why mean-field variational inference underestimates uncertainty.","Compare approximate and exact posteriors on the quantity you will report.","Plan the number of effective draws needed for a tail probability or quantile.","Write the checklist for a defensible MCMC run (fake-data test, chains, R̂, ESS, divergences, predictive checks, sensitivity, seed)."];
+(function(){const st=store.get('mc_chk',{}),box=$('chk');CHK.forEach((t,i)=>{const l=document.createElement('label'),c=document.createElement('input');c.type='checkbox';c.checked=!!st[i];c.onchange=()=>{st[i]=c.checked;store.set('mc_chk',st);meter()};l.appendChild(c);const s=document.createElement('span');s.textContent=t;l.appendChild(s);box.appendChild(l)});window.__cst=st;})();
+function meter(){const q=window.__qst||{},c=window.__cst||{};const ok=QZ.filter((x,i)=>q[i]===x.a).length,ck=Object.values(c).filter(Boolean).length;const p=Math.round(100*(.6*ok/QZ.length+.4*ck/CHK.length));$('mtxt').textContent='Mastery: '+p+'%  (exam + checklist)';$('mbar').style.width=p+'%';store.set('mastery_mc',p)}
+meter();
+
+/* ---------- Navigation ---------- */
+(function(){const nav=$('nav');let html='';
+ document.querySelectorAll('main .part, main section.ch').forEach(el=>{if(el.classList.contains('part'))html+=`<div class="pt">${el.textContent}</div>`;else{const h=el.querySelector('h2'),num=h.querySelector('.num').textContent,t=Array.from(h.childNodes).filter(n=>n.nodeType===3).map(n=>n.textContent).join('').trim();html+=`<a href="#${el.id}" data-id="${el.id}">${num}. ${t}</a>`}});
+ nav.innerHTML=html;const links=nav.querySelectorAll('a'),io=new IntersectionObserver(es=>{es.forEach(e=>{if(e.isIntersecting)links.forEach(a=>a.classList.toggle('on',a.dataset.id===e.target.id))})},{rootMargin:'-20% 0px -70% 0px'});
+ document.querySelectorAll('section.ch').forEach(s=>io.observe(s));
+ $('menu').onclick=()=>$('side').classList.toggle('open');nav.addEventListener('click',e=>{if(e.target.tagName==='A')$('side').classList.remove('open')});
+ window.addEventListener('scroll',()=>{const h=document.documentElement;$('prog').style.width=(100*h.scrollTop/(h.scrollHeight-h.clientHeight))+'%'},{passive:true});})();
+</script>
+</body>
+</html>
