@@ -1,0 +1,663 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Bayesian Decision Theory Mastery</title>
+<style>
+:root{--bg:#0b0e17;--panel:#121726;--panel2:#171d30;--line:#232a3d;--fg:#e8ebf5;--mu:#8a93ab;--a:#6ea8ff;--r:#ff6b81;--y:#ffd166;--g:#4ade80;--p:#c084fc;--t:#5eead4}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;background:var(--bg);color:var(--fg);font:16px/1.7 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+a{color:var(--a)}
+#prog{position:fixed;top:0;left:0;height:3px;background:linear-gradient(90deg,var(--a),var(--p),var(--r));width:0;z-index:50}
+.side{position:fixed;left:0;top:0;bottom:0;width:290px;background:#0e1220;border-right:1px solid var(--line);overflow:auto;padding:18px 14px 90px;z-index:40;transition:transform .25s}
+.side h1{font-size:15px;margin:0 0 2px}
+.side small{color:var(--mu)}
+.side .pt{margin:16px 0 4px;font-size:11px;text-transform:uppercase;letter-spacing:1.3px;color:var(--p)}
+.side a{display:block;color:var(--mu);text-decoration:none;padding:5px 9px;border-radius:7px;font-size:13.5px;line-height:1.35}
+.side a:hover{background:var(--panel);color:var(--fg)}
+.side a.on{background:var(--panel2);color:var(--fg);box-shadow:inset 3px 0 var(--a)}
+.side a.back{color:var(--t);padding-left:0;margin-bottom:6px}
+.meter{position:fixed;left:0;bottom:0;width:290px;background:#0e1220;border-top:1px solid var(--line);padding:10px 16px;z-index:41;font-size:12px;color:var(--mu)}
+.meter .bar{height:7px;background:var(--line);border-radius:6px;margin-top:5px;overflow:hidden}
+.meter .bar i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--g),var(--t));transition:width .4s}
+#menu{display:none;position:fixed;top:10px;left:10px;z-index:60;background:var(--panel2);color:var(--fg);border:1px solid var(--line);border-radius:9px;padding:7px 12px;font-size:14px;cursor:pointer}
+main{margin-left:290px;padding:0 34px 120px;max-width:1090px}
+.hero{padding:70px 0 30px}
+.hero h1{font-size:clamp(32px,5vw,56px);line-height:1.08;margin:0 0 14px;background:linear-gradient(100deg,#fff,var(--y) 40%,var(--r));-webkit-background-clip:text;background-clip:text;color:transparent}
+.hero p{font-size:19px;color:#c3c9dc;max-width:780px}
+.chips{display:flex;flex-wrap:wrap;gap:8px;margin:18px 0}
+.chip{border:1px solid var(--line);background:var(--panel);padding:5px 12px;border-radius:99px;font-size:13px;color:var(--mu)}
+.chip b{color:var(--fg)}
+.part{margin:90px 0 0;padding-top:22px;border-top:1px solid var(--line);font-size:12px;letter-spacing:2px;text-transform:uppercase;color:var(--p)}
+section.ch{padding-top:30px}
+h2{font-size:30px;line-height:1.2;margin:10px 0 8px;display:flex;gap:12px;align-items:center;flex-wrap:wrap}
+h2 .num{display:inline-grid;place-items:center;width:40px;height:40px;border-radius:12px;background:var(--panel2);border:1px solid var(--line);font-size:18px;color:var(--a)}
+.lvl{font-size:11px;font-weight:600;letter-spacing:.8px;text-transform:uppercase;padding:3px 9px;border-radius:99px;border:1px solid}
+.lvl.b{color:var(--g);border-color:#1f5c3a}.lvl.i{color:var(--a);border-color:#244a85}.lvl.a{color:var(--y);border-color:#6b5420}.lvl.e{color:var(--r);border-color:#7a2c3a}
+h3{font-size:19px;margin:30px 0 6px;color:#fff}
+p{margin:10px 0}li{margin:5px 0}
+code,.f{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace}
+code{background:var(--panel2);padding:1px 6px;border-radius:5px;font-size:.9em}
+.f{display:block;white-space:pre-wrap;background:#0e1322;border:1px solid var(--line);border-left:3px solid var(--a);padding:12px 16px;border-radius:9px;margin:14px 0;overflow-x:auto;font-size:15px;color:#dbe4ff;line-height:1.8}
+.co{border-radius:12px;padding:13px 17px;margin:16px 0;border:1px solid var(--line);background:var(--panel)}
+.co>b:first-child{display:block;margin-bottom:2px;font-size:12px;letter-spacing:1px;text-transform:uppercase}
+.co.def{border-left:4px solid var(--a)}.co.def>b:first-child{color:var(--a)}
+.co.warn{border-left:4px solid var(--r)}.co.warn>b:first-child{color:var(--r)}
+.co.tip{border-left:4px solid var(--g)}.co.tip>b:first-child{color:var(--g)}
+.co.key{border-left:4px solid var(--y);background:#171608}.co.key>b:first-child{color:var(--y)}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:18px 20px;margin:22px 0;box-shadow:0 8px 30px rgba(0,0,0,.25)}
+.card>h4{margin:0 0 3px;font-size:13px;letter-spacing:1.2px;text-transform:uppercase;color:var(--t)}
+.card>p.sub{margin:0 0 12px;color:var(--mu);font-size:14.5px}
+.ctl{display:flex;flex-wrap:wrap;gap:10px 22px;align-items:center;margin:8px 0 10px}
+.ctl label{display:flex;gap:8px;align-items:center;font-size:14px;color:#c3c9dc}
+.ctl output{min-width:38px;font-family:ui-monospace,monospace;color:var(--y);font-size:13px}
+input[type=range]{accent-color:var(--a);width:150px}
+input[type=checkbox]{accent-color:var(--a)}
+select,input[type=number],input[type=text]{background:#0e1322;color:var(--fg);border:1px solid var(--line);border-radius:8px;padding:6px 9px;font:inherit;font-size:14px}
+button{background:linear-gradient(180deg,#2c4a80,#233b68);color:#fff;border:1px solid #3a5a98;border-radius:9px;padding:7px 14px;font:inherit;font-size:14px;cursor:pointer}
+button:hover{filter:brightness(1.15)}
+button.alt{background:var(--panel2);border-color:var(--line);color:var(--fg)}
+canvas{width:100%;height:270px;display:block;background:#0e1322;border:1px solid var(--line);border-radius:10px;margin-top:6px}
+canvas.sm{height:210px}canvas.tl{height:330px}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(125px,1fr));gap:9px;margin:12px 0}
+.stat{background:#0e1322;border:1px solid var(--line);border-radius:10px;padding:8px 11px}
+.stat b{display:block;font-size:17px;font-family:ui-monospace,monospace}
+.stat span{font-size:11.5px;color:var(--mu);text-transform:uppercase;letter-spacing:.7px}
+.stat.hot b{color:var(--r)}.stat.ok b{color:var(--g)}.stat.warn b{color:var(--y)}.stat.in b{color:var(--a)}
+.read{margin:8px 0 0;padding:10px 14px;background:#0e1322;border:1px dashed #33406a;border-radius:10px;font-size:14.5px;color:#d3dbf3}
+table{border-collapse:collapse;width:100%;margin:12px 0;font-size:14px}
+th,td{border:1px solid var(--line);padding:7px 10px;text-align:left;vertical-align:top}
+th{background:var(--panel2);font-size:12px;text-transform:uppercase;letter-spacing:.6px;color:var(--mu)}
+td.n{font-family:ui-monospace,monospace;text-align:right}
+.tw{overflow-x:auto}
+.pill{display:inline-block;padding:1px 9px;border-radius:99px;font-size:12px;font-weight:600}
+.pill.r{background:#3a1520;color:var(--r)}.pill.g{background:#10321f;color:var(--g)}.pill.y{background:#3a2f0e;color:var(--y)}.pill.m{background:#202637;color:var(--mu)}
+details{background:var(--panel);border:1px solid var(--line);border-radius:11px;padding:9px 15px;margin:9px 0}
+details summary{cursor:pointer;font-weight:600}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.q{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:14px 18px;margin:14px 0}
+.q .qh{font-size:12px;letter-spacing:1px;text-transform:uppercase;color:var(--mu)}
+.q .opt{display:block;width:100%;text-align:left;margin:6px 0;background:#0e1322;border:1px solid var(--line);color:var(--fg);border-radius:9px;padding:9px 12px}
+.q .opt.good{border-color:var(--g);background:#0e2418}.q .opt.bad{border-color:var(--r);background:#2a1119}
+.q .ex{display:none;margin-top:8px;font-size:14.5px;color:#c3c9dc}
+.q.done .ex{display:block}
+.chk label{display:flex;gap:10px;align-items:flex-start;padding:6px 0;cursor:pointer}
+.chk input{margin-top:6px;accent-color:var(--g);width:17px;height:17px}
+.sigrow{display:grid;grid-template-columns:minmax(170px,2fr) 1fr 1fr auto;gap:8px 14px;align-items:center;padding:6px 0;border-top:1px dashed #1b2236}
+.sigrow:first-of-type{border-top:0}
+.sigrow label{display:flex;gap:6px;align-items:center;font-size:13.5px;color:#c3c9dc}
+@media(max-width:900px){
+ .side{transform:translateX(-100%)}.side.open{transform:none}.meter{display:none}
+ #menu{display:block}main{margin-left:0;padding:0 16px 100px}.two{grid-template-columns:1fr}.hero{padding-top:60px}
+ .sigrow{grid-template-columns:1fr 1fr}
+}
+</style>
+</head>
+<body>
+<div id="prog"></div>
+<button id="menu">☰ Contents</button>
+<nav class="side" id="side"><a class="back" href="index.html">← All courses</a><h1>Bayesian Decision Theory</h1><small>12 chapters · 11 labs · exam</small><div id="nav"></div></nav>
+<div class="meter"><div id="mtxt">Mastery: 0%</div><div class="bar"><i id="mbar"></i></div></div>
+
+<main>
+<header class="hero">
+ <h1>Bayesian decision theory: from a posterior to an action, and what it is worth to know more.</h1>
+ <p>A model’s output is a distribution; a business needs an action. <b>Decision theory</b> joins them: specify actions, losses or utilities, and choose the action with the smallest posterior expected loss. It shows that the “best” summary of a posterior depends on the costs (mean, median, quantile), that classification thresholds come from cost ratios and not from 0.5, that miscalibrated probabilities spoil them, that uncertainty about parameters belongs inside the decision, and that more data have a computable value. The second half applies the same logic to risk aversion, sequential stopping, sensitivity of a decision to the prior, estimator risk and constrained allocation. This closes Stage 6 on Bayesian methods.</p>
+ <div class="chips"><span class="chip"><b>Part I</b> Losses and rules</span><span class="chip"><b>Part II</b> Information and risk</span><span class="chip"><b>Part III</b> Robust and constrained</span></div>
+ <div class="co tip"><b>How to use this</b>Sliders change the setting; heavier labs recompute when you release a slider or press the button. Prerequisites: Bayesian inference (item 26), calibration and scoring rules (item 16) and hierarchical models (item 28).</div>
+</header>
+
+<div class="part">Part I · Losses and decision rules</div>
+
+<section class="ch" id="c1">
+<h2><span class="num">1</span>Loss, risk and the Bayes action <span class="lvl b">Beginner</span></h2>
+<p>A posterior says what you believe; a decision says what you do. To connect them you need three things: the possible <b>actions</b> a, the unknown <b>state</b> θ, and a <b>loss function</b> L(a, θ) that scores how bad action a is if the truth is θ. The Bayes action is the one with the smallest <b>posterior expected loss</b>, E[L(a, θ) | data]. Which summary of the posterior you should report is therefore not a statistical question but a question about costs: squared-error loss gives the <b>mean</b>, absolute-error loss the <b>median</b>, and an “all or nothing” loss (right within a tolerance, wrong otherwise) the <b>mode</b>. For a skewed posterior they are quite different numbers, and each is the best answer to a different question.</p>
+<div class="f">a* = argmin over a of E[L(a, θ) | y]  ·  squared loss → posterior mean  ·  absolute loss → median  ·  0–1 loss → mode</div>
+<div class="card"><h4>Lab 1 · Same posterior, three losses</h4>
+ <p class="sub">The posterior is a gamma distribution with mean 1; a small shape makes it skewed. Left: the posterior with its mean, median and mode. Right: the expected loss of each action under each loss, rescaled so the three can share an axis; each curve’s lowest point is its Bayes action.</p>
+ <div class="ctl"><label>posterior shape <input type="range" id="c1k" min="1" max="30" step="1" value="2"><output id="c1kv"></output></label></div>
+ <div class="two"><canvas class="sm" id="c1cv"></canvas><canvas class="sm" id="c1cv2"></canvas></div><div class="stats" id="c1st"></div><div class="read" id="c1rd"></div></div>
+</section>
+
+<section class="ch" id="c2">
+<h2><span class="num">2</span>Asymmetric costs and quantiles <span class="lvl i">Intermediate</span></h2>
+<p>In most business decisions the two kinds of error do not cost the same. If running out of stock costs cᵤ per unit and surplus costs cₒ per unit, the loss is linear on each side of the demand, and the Bayes action is the <b>quantile</b> of the predictive distribution at level cᵤ/(cᵤ + cₒ). A cost ratio of 4 means the best stock level is the 80th percentile of demand, not its mean. The same logic sets a provision above the expected credit loss, a liquidity buffer, and an exposure limit: whenever under- and over-estimating cost different amounts, the answer is a quantile of the predictive distribution, and a point forecast alone is not enough to decide.</p>
+<div class="f">loss = cᵤ·max(D − a, 0) + cₒ·max(a − D, 0)  →  a* = the cᵤ/(cᵤ + cₒ) quantile of D</div>
+<div class="card"><h4>Lab 2 · Newsvendor with a predictive distribution</h4>
+ <p class="sub">Demand has a gamma-shaped predictive distribution with mean 100. Left: expected cost against the stock level, with the mean, the median and the Bayes action marked. Right: average cost of the three stock levels in 20,000 simulated periods.</p>
+ <div class="ctl"><label>cost of a shortage per unit (surplus costs 1) <input type="range" id="c2r" min="1" max="20" step="1" value="4"><output id="c2rv"></output></label><label>demand shape (high = less variable) <input type="range" id="c2k" min="2" max="40" step="1" value="5"><output id="c2kv"></output></label><button id="c2go">Re-simulate</button></div>
+ <div class="two"><canvas class="sm" id="c2cv"></canvas><canvas class="sm" id="c2cv2"></canvas></div><div class="stats" id="c2st"></div><div class="read" id="c2rd"></div></div>
+</section>
+
+<section class="ch" id="c3">
+<h2><span class="num">3</span>Decision thresholds from costs <span class="lvl i">Intermediate</span></h2>
+<p>For a yes/no action on a calibrated probability p (flag a transaction, approve a loan, send a letter), the expected cost of acting is (1 − p)·c_FP and the expected cost of not acting is p·c_FN. Acting is better when p exceeds <b>c_FP/(c_FP + c_FN)</b>. This one line replaces three common habits: using 0.5, using the base rate, and picking the threshold that maximises accuracy or F1 on a validation set. It also shows why different uses of the same model should have different cut-offs: a screening step that costs little to follow up has a low threshold, an automatic account freeze with large harm if wrong has a high one. The threshold belongs to the decision, not to the model, and it depends only on the cost ratio.</p>
+<div class="f">act if p &gt; c_FP / (c_FP + c_FN)  ·  with c = c_FN / c_FP:  threshold = 1 / (1 + c)</div>
+<div class="card"><h4>Lab 3 · Cost against threshold</h4>
+ <p class="sub">Scores are exactly calibrated and spread out (logit-normal). Left: expected cost per case against the threshold, with the Bayes threshold in green and 0.5 in red. Right: cost per case for flagging nobody, using 0.5, using the Bayes threshold and flagging everybody.</p>
+ <div class="ctl"><label>cost of a missed positive, as a multiple of a false alarm <input type="range" id="c3w" min="1" max="50" step="1" value="10"><output id="c3wv"></output><output </label><label>base rate <input type="range" id="c3b" min="1" max="30" step="1" value="8"><output id="c3bv"></output></label><button id="c3go">Recompute</button></div>
+ <div class="two"><canvas class="sm" id="c3cv"></canvas><canvas class="sm" id="c3cv2"></canvas></div><div class="stats" id="c3st"></div><div class="read" id="c3rd"></div></div>
+</section>
+
+<section class="ch" id="c4">
+<h2><span class="num">4</span>When the probabilities are not calibrated <span class="lvl a">Advanced</span></h2>
+<p>The threshold rule above assumes the score <em>is</em> the probability. Most classifiers are not calibrated: boosted trees and neural networks tend to be overconfident, and a model fitted on resampled data is miscalibrated by construction (item 17). Applying 1/(1 + c) to the raw score then gives the wrong cut-off, and the loss from this can exceed the loss from any difference in ranking quality between models. The remedy is to <b>recalibrate</b> on held-out labelled data (Platt or isotonic regression, item 16), after which the same rule is valid. This separates three questions that are often blurred: ranking quality (discrimination), probability accuracy (calibration), and the cost-based cut-off (the decision), which can each be fixed in turn. A model with a good AUC and poor calibration is a good ranking with a wrong threshold.</p>
+<div class="card"><h4>Lab 4 · A distorted score</h4>
+ <p class="sub">True risk is the calibrated probability p; the model reports a score whose log-odds are the true log-odds times the distortion factor (above 1 is overconfident). Left: the true event rate at each score. Right: cost per case when the Bayes threshold is applied to the raw score, to a recalibrated score, and to the true probability.</p>
+ <div class="ctl"><label>distortion factor <input type="range" id="c4f" min="3" max="30" step="1" value="20"><output id="c4fv"></output></label><label>cost of a missed positive, as a multiple of a false alarm <input type="range" id="c4w" min="1" max="50" step="1" value="10"><output id="c4wv"></output><output </label><label>calibration set size <input type="range" id="c4n" min="200" max="5000" step="100" value="1000"><output id="c4nv"></output></label><button id="c4go">Re-run</button></div>
+ <div class="two"><canvas class="sm" id="c4cv"></canvas><canvas class="sm" id="c4cv2"></canvas></div><div class="stats" id="c4st"></div><div class="read" id="c4rd"></div></div>
+</section>
+
+<div class="part">Part II · Information, uncertainty and risk</div>
+
+<section class="ch" id="c5">
+<h2><span class="num">5</span>The value of information <span class="lvl a">Advanced</span></h2>
+<p>Should you collect more data before deciding? Decision theory answers with the <b>expected value of perfect information</b> (EVPI): the expected improvement in payoff if you could learn the truth before acting, equal to the expected loss of deciding now. It is an upper bound on what any study can be worth. The <b>expected value of sample information</b> (EVSI) is the value of a specific experiment: average, over the data the experiment might produce, the improvement from the decision you would then make. EVSI rises with sample size and flattens, so subtracting the cost of the data gives an optimal sample size, and sometimes the answer is zero: when the prior is far from the decision boundary relative to the noise, no feasible study changes what you would do. This is the right framework for deciding whether to run a pilot, buy a data feed, or label more cases, and it uses no p-values.</p>
+<div class="f">EVPI = E[max(θ, 0)] − max(E[θ], 0)  ·  EVSI(n) = E over data of [value of the best action] − value now</div>
+<div class="card"><h4>Lab 5 · How much is an experiment worth?</h4>
+ <p class="sub">The payoff of acting is θ and of not acting is 0, with prior θ ~ N(m, 1) and noisy observations. Left: EVSI against sample size with the cost of data and the net value. Right: formula against simulation at the sample size you set, with EVPI for scale.</p>
+ <div class="ctl"><label>prior mean of θ (prior sd 1) <input type="range" id="c5m" min="-20" max="20" step="1" value="3"><output id="c5mv"></output></label><label>noise sd of one observation <input type="range" id="c5s" min="5" max="60" step="1" value="30"><output id="c5sv"></output></label><label>cost per observation <input type="range" id="c5w" min="0" max="30" step="1" value="5"><output id="c5wv"></output><output </label><label>sample size to check <input type="range" id="c5n" min="1" max="300" step="1" value="20"><output id="c5nv"></output></label><button id="c5go">Re-simulate</button></div>
+ <div class="two"><canvas class="sm" id="c5cv"></canvas><canvas class="sm" id="c5cv2"></canvas></div><div class="stats" id="c5st"></div><div class="read" id="c5rd"></div></div>
+</section>
+
+<section class="ch" id="c6">
+<h2><span class="num">6</span>Plug-in rules against predictive decisions <span class="lvl a">Advanced</span></h2>
+<p>A decision that depends on an unknown parameter can be made by <b>plugging in</b> the best estimate or by averaging the loss over the posterior (the Bayes rule). With plenty of data they agree; with little data they do not, because the plug-in ignores the uncertainty in the estimate. For a quantile of demand or loss the effect is systematic: the plug-in quantile is too low, so shortages, or capital shortfalls, occur more often than the target. The posterior predictive distribution has heavier tails (for a normal model with unknown mean and sd, a Student t) and its quantile is calibrated by construction. This is the same message as for prediction intervals in earlier items: report the predictive distribution, not the fitted one. It applies directly to value-at-risk from a short history, to loss reserves for a new product, and to any threshold set from a small sample.</p>
+<div class="card"><h4>Lab 6 · Service level from a short history</h4>
+ <p class="sub">Demand is normal with mean 100 and sd 20, both estimated from the past n periods. Left: how often demand falls below the stock level for the plug-in rule and the Bayes rule at your n. Right: the plug-in service level as the history grows.</p>
+ <div class="ctl"><label>past periods used <input type="range" id="c6n" min="3" max="60" step="1" value="6"><output id="c6nv"></output></label><label>target service level <input type="range" id="c6q" min="50" max="99" step="1" value="95"><output id="c6qv"></output></label><button id="c6go">Re-simulate</button></div>
+ <div class="two"><canvas class="sm" id="c6cv"></canvas><canvas class="sm" id="c6cv2"></canvas></div><div class="stats" id="c6st"></div><div class="read" id="c6rd"></div></div>
+</section>
+
+<section class="ch" id="c7">
+<h2><span class="num">7</span>Utility and risk aversion <span class="lvl a">Advanced</span></h2>
+<p>Losses are in money, but a decision-maker may care about more than expected money: a bank holds capital because it is risk averse about large losses. <b>Expected utility</b> theory handles this by evaluating each action with a concave utility function. For exponential utility and a normal outcome the answer is simple: choose the action with the highest <b>certainty equivalent</b>, mean − (λ/2)·variance, where λ is the degree of risk aversion. The variance has two parts, the inherent noise in the outcome and the <em>uncertainty in the parameter</em>, so a risk-averse decision favours options that are well measured. Two cautions: the utility function is a statement about the institution, not a fact the data can supply, so it should be explicit and its effect shown over a range of λ; and for a regulated bank much of the risk appetite is already fixed by capital rules, which act like a constraint on the choice.</p>
+<div class="f">CE = E[X] − (λ/2)·Var[X]  with  Var[X] = outcome noise + posterior variance of the mean</div>
+<div class="card"><h4>Lab 7 · Safe or risky?</h4>
+ <p class="sub">A risky option has a posterior mean and sd for its mean return, plus outcome noise, and a safe option pays 0.3. Left: the certainty equivalent against risk aversion, with the break-even marked. Right: realised certainty equivalent when choosing between six options of very different precision by posterior mean and by certainty equivalent.</p>
+ <div class="ctl"><label>risk aversion λ <input type="range" id="c7l" min="0" max="40" step="1" value="20"><output id="c7lv"></output></label><label>risky option: posterior mean <input type="range" id="c7m" min="0" max="20" step="1" value="8"><output id="c7mv"></output></label><label>risky option: posterior sd of the mean <input type="range" id="c7v" min="1" max="30" step="1" value="10"><output id="c7vv"></output></label><label>outcome noise sd <input type="range" id="c7o" min="1" max="20" step="1" value="5"><output id="c7ov"></output></label><button id="c7go">Re-simulate</button></div>
+ <div class="two"><canvas class="sm" id="c7cv"></canvas><canvas class="sm" id="c7cv2"></canvas></div><div class="stats" id="c7st"></div><div class="read" id="c7rd"></div></div>
+</section>
+
+<section class="ch" id="c8">
+<h2><span class="num">8</span>Sequential decisions and stopping <span class="lvl e">Expert</span></h2>
+<p>Most real decisions are made while data are still arriving, and the question is when to stop. For a test of two options the Bayesian rule is to stop when the <b>posterior expected loss</b> of picking the current leader falls below the cost of continuing, a threshold in the same units as the business outcome (here, conversion rate). It is a decision rule: it compares the regret still at stake with the cost of waiting, and under the Bayesian posterior the stopping rule does not change the inference, so peeking is not a problem for the posterior. It is, however, not a significance test. Its frequentist error rates (false-winner rate at zero effect, power at a given effect) should be established by simulation before a regulator or an internal controls function is shown the result. Compare it with the group-sequential designs of item 23, which fix those error rates and ask for a different guarantee.</p>
+<div class="card"><h4>Lab 8 · Stop when little is left to lose</h4>
+ <p class="sub">Two page designs, A at 5% conversion and B at a relative lift you choose; users arrive in blocks of 2,000 per arm, up to 60,000. The test stops when the expected loss of picking the leader is under the threshold. Left: where the 150 simulated tests stopped. Right: how often the wrong version was chosen, against a fixed-size test with the same mean size and with the full size.</p>
+ <div class="ctl"><label>true relative lift of B <input type="range" id="c8d" min="0" max="30" step="1" value="10"><output id="c8dv"></output></label><label>stop when expected loss is below <input type="range" id="c8e" min="1" max="30" step="1" value="5"><output id="c8ev"></output></label><button id="c8go">Re-simulate</button></div>
+ <div class="two"><canvas class="sm" id="c8cv"></canvas><canvas class="sm" id="c8cv2"></canvas></div><div class="stats" id="c8st"></div><div class="read" id="c8rd"></div></div>
+</section>
+
+<div class="part">Part III · Robustness, sequential and constrained decisions</div>
+
+<section class="ch" id="c9">
+<h2><span class="num">9</span>Is the decision sensitive to the prior? <span class="lvl e">Expert</span></h2>
+<p>Sensitivity analysis matters most for the decision, not the posterior. Two priors may give different posteriors and the same decision, in which case the choice of prior is immaterial, or the same prior differences may flip the decision, in which case it is material and must be reported. The practical way is to map the decision over a range of defensible priors (for a rate, the mean and strength of a beta prior) and mark the region where the action changes, then ask how much more data would settle it. When a decision is robust over all the priors a sceptical reviewer would accept, say so; when it is not, say that the data alone do not decide it and the answer rests on judgement, and name the judgement. For model documentation under SR 11-7 or SR 26-2 this map is a compact way to show the effect of an assumption on the outcome that matters.</p>
+<div class="card"><h4>Lab 9 · Prior map for an approve-or-reject decision</h4>
+ <p class="sub">A portfolio shows some defaults among its first accounts; approve if the posterior default rate is below the break-even cut-off. Left: the decision for every beta prior (mean across, strength up). Right: how the posterior default rate moves with prior strength for three prior means.</p>
+ <div class="ctl"><label>accounts observed <input type="range" id="c9n" min="20" max="2000" step="10" value="200"><output id="c9nv"></output></label><label>observed default rate <input type="range" id="c9x" min="1" max="100" step="1" value="40"><output id="c9xv"></output></label><label>break-even default rate <input type="range" id="c9w" min="1" max="10" step="1" value="5"><output id="c9wv"></output><output </label></div>
+ <div class="two"><canvas class="sm" id="c9cv"></canvas><canvas class="sm" id="c9cv2"></canvas></div><div class="stats" id="c9st"></div><div class="read" id="c9rd"></div></div>
+</section>
+
+<section class="ch" id="c10">
+<h2><span class="num">10</span>Bayes risk, minimax and admissibility <span class="lvl e">Expert</span></h2>
+<p>Before the data arrive an estimator can be judged by its <b>risk</b>, the expected loss at each possible true value, which is a frequentist question. The Bayes view averages this over a prior to give the <b>Bayes risk</b>, and the Bayes estimator minimises it. The <b>minimax</b> estimator instead minimises the worst-case risk and needs no prior. In a normal-mean problem the unbiased estimator has flat risk and is minimax, while a shrinkage estimator has lower risk near the prior centre and higher risk far from it; it wins on average if the prior is right and can lose badly where the prior is wrong. A rule is <b>admissible</b> if nothing beats it everywhere, and every Bayes rule with a proper prior is admissible; Stein’s result shows that for three or more means the sample mean is not. Practically: shrinking is a bet on the prior, and the size of the bet should match your confidence in it.</p>
+<div class="f">risk R(θ, δ) = E[(δ(y) − θ)² | θ]  ·  Bayes risk = ∫ R(θ, δ) π(θ) dθ  ·  minimax: minimise sup over θ of R</div>
+<div class="card"><h4>Lab 10 · Risk functions of two estimators</h4>
+ <p class="sub">One effect θ is estimated from n observations with noise sd 2. Left: mean squared error at each true θ for the sample mean and for shrinkage with the assumed prior sd, against shrinkage with the correct prior sd. Right: average risk under the true prior for every assumed prior sd.</p>
+ <div class="ctl"><label>observations n <input type="range" id="c10n" min="1" max="50" step="1" value="4"><output id="c10nv"></output></label><label>assumed prior sd τ <input type="range" id="c10t" min="1" max="60" step="1" value="10"><output id="c10tv"></output></label><label>true spread of θ <input type="range" id="c10t0" min="1" max="60" step="1" value="10"><output id="c10t0v"></output></label></div>
+ <div class="two"><canvas class="sm" id="c10cv"></canvas><canvas class="sm" id="c10cv2"></canvas></div><div class="stats" id="c10st"></div><div class="read" id="c10rd"></div></div>
+</section>
+
+<section class="ch" id="c11">
+<h2><span class="num">11</span>Allocating a limited capacity <span class="lvl e">Expert</span></h2>
+<p>Fraud, AML and collections teams can review only a fraction of the alerts they raise. With a single capacity constraint and a known value for each action, the Bayes allocation is simple: rank cases by <b>expected value</b> and work down the list until capacity runs out. For a review that prevents a loss A if the case is genuine, the value is p·A, minus the cost of the review; ranking by the probability alone ignores exposure, and ranking by exposure alone ignores the chance that the case is genuine. With several constraints (analyst hours by skill, regulatory deadlines) the same idea becomes a linear program on expected values. The ceiling is the oracle that knows the labels; the distance between it and the expected-value ranking is the price of uncertainty, which only better probabilities can reduce. Reported gains should come from a held-out period, and the calibration of p matters as much as its rank order here, since values multiply probabilities.</p>
+<div class="card"><h4>Lab 11 · Triage under a review budget</h4>
+ <p class="sub">Alerts have a calibrated fraud probability and an exposure; only a share can be reviewed. Left: share of fraud value caught by three ranking rules and by the oracle at your capacity. Right: the same against the review capacity.</p>
+ <div class="ctl"><label>alerts per period <input type="range" id="c11n" min="200" max="2000" step="100" value="1000"><output id="c11nv"></output></label><label>share that can be reviewed <input type="range" id="c11k" min="2" max="40" step="2" value="10"><output id="c11kv"></output></label><label>spread of exposure (log sd) <input type="range" id="c11s" min="0" max="20" step="1" value="12"><output id="c11sv"></output></label><button id="c11go">Re-simulate</button></div>
+ <div class="two"><canvas class="sm" id="c11cv"></canvas><canvas class="sm" id="c11cv2"></canvas></div><div class="stats" id="c11st"></div><div class="read" id="c11rd"></div></div>
+</section>
+
+<section class="ch" id="c12">
+<h2><span class="num">12</span>Final exam, mastery checklist, cheat sheet <span class="lvl e">Expert</span></h2>
+<h3>Exam (18 questions — click an answer)</h3>
+<div id="quiz"></div>
+<div class="card"><h4>Score</h4><div class="stats" id="qscore"></div><button class="alt" id="qreset">Reset exam</button></div>
+<h3>Mastery checklist — tick when you can do it without notes</h3>
+<div class="card chk" id="chk"></div>
+<h3>Cheat sheet</h3>
+<div class="tw"><table>
+<tr><th>Idea</th><th>One line</th></tr>
+<tr><td>Bayes action</td><td>Choose the action with the smallest posterior expected loss, E[L(a, θ) | y]</td></tr>
+<tr><td>Loss and summary</td><td>Squared loss → mean; absolute loss → median; 0–1 loss → mode; linear asymmetric loss → quantile</td></tr>
+<tr><td>Quantile rule</td><td>Under-cost cᵤ, over-cost cₒ: act at the cᵤ/(cᵤ + cₒ) quantile of the predictive distribution</td></tr>
+<tr><td>Threshold</td><td>Act if p &gt; c_FP/(c_FP + c_FN) = 1/(1 + c), for calibrated p; independent of the base rate</td></tr>
+<tr><td>Calibration first</td><td>Recalibrate on held-out labels before applying a cost-based cut-off to a score</td></tr>
+<tr><td>EVPI and EVSI</td><td>EVPI = expected loss of deciding now; EVSI(n) rises towards EVPI; collect data while EVSI − cost increases</td></tr>
+<tr><td>Parameter uncertainty</td><td>Plug-in quantiles are too low; the posterior predictive (t for unknown mean and sd) is calibrated</td></tr>
+<tr><td>Utility</td><td>Exponential utility, normal outcome: maximise mean − (λ/2)·variance, including parameter uncertainty</td></tr>
+<tr><td>Sequential stopping</td><td>Stop when posterior expected loss of the leader is below the cost of waiting; check error rates by simulation</td></tr>
+<tr><td>Prior sensitivity</td><td>Map the decision over defensible priors; report whether it flips</td></tr>
+<tr><td>Risk and minimax</td><td>Risk is MSE at each θ; Bayes risk averages it over the prior; minimax guards the worst case; shrinkage bets on the prior</td></tr>
+<tr><td>Limited capacity</td><td>Rank by expected value per unit of capacity (p × exposure − cost); the oracle is the ceiling</td></tr>
+</table></div>
+<div class="co tip"><b>Stage 6 is complete</b>Next is Stage 7, the specialist topics, starting with item 30, multivariate methods: principal components, factor analysis, mixtures and Mahalanobis distance.</div>
+</section>
+</main>
+<script>
+/*MATH*/
+function lgamma(x){const c=[76.18009172947146,-86.50532032941677,24.01409824083091,-1.231739572450155,0.1208650973866179e-2,-0.5395239384953e-5];let y=x,t=x+5.5;t-=(x+.5)*Math.log(t);let s=1.000000000190015;for(let j=0;j<6;j++)s+=c[j]/++y;return -t+Math.log(2.5066282746310005*s/x);}
+function gser(a,x){let ap=a,sum=1/a,del=sum;for(let n=0;n<1000;n++){ap++;del*=x/ap;sum+=del;if(Math.abs(del)<Math.abs(sum)*1e-15)break;}return sum*Math.exp(-x+a*Math.log(x)-lgamma(a));}
+function gcf(a,x){let b=x+1-a,c=1/1e-300,d=1/b,h=d;for(let i=1;i<1000;i++){const an=-i*(i-a);b+=2;d=an*d+b;if(Math.abs(d)<1e-300)d=1e-300;c=b+an/c;if(Math.abs(c)<1e-300)c=1e-300;d=1/d;const del=d*c;h*=del;if(Math.abs(del-1)<1e-15)break;}return Math.exp(-x+a*Math.log(x)-lgamma(a))*h;}
+function gammaQ(a,x){if(x<=0)return 1;return x<a+1?1-gser(a,x):gcf(a,x);}
+function betacf(a,b,x){const qab=a+b,qap=a+1,qam=a-1;let c=1,d=1-qab*x/qap;if(Math.abs(d)<1e-300)d=1e-300;d=1/d;let h=d;for(let m=1;m<=1000;m++){const m2=2*m;let aa=m*(b-m)*x/((qam+m2)*(a+m2));d=1+aa*d;if(Math.abs(d)<1e-300)d=1e-300;c=1+aa/c;if(Math.abs(c)<1e-300)c=1e-300;d=1/d;h*=d*c;aa=-(a+m)*(qab+m)*x/((a+m2)*(qap+m2));d=1+aa*d;if(Math.abs(d)<1e-300)d=1e-300;c=1+aa/c;if(Math.abs(c)<1e-300)c=1e-300;d=1/d;const del=d*c;h*=del;if(Math.abs(del-1)<1e-15)break;}return h;}
+function betai(a,b,x){if(x<=0)return 0;if(x>=1)return 1;const bt=Math.exp(lgamma(a+b)-lgamma(a)-lgamma(b)+a*Math.log(x)+b*Math.log(1-x));return x<(a+1)/(a+b+2)?bt*betacf(a,b,x)/a:1-bt*betacf(b,a,1-x)/b;}
+function normSf(z){const q=0.5*gammaQ(.5,z*z/2);return z>=0?q:1-q;}
+function normCdf(z){return normSf(-z);}
+function npdf(x){return Math.exp(-x*x/2)/2.5066282746310002;}
+function lbin(n,k){return lgamma(n+1)-lgamma(k+1)-lgamma(n-k+1);}
+function binom(n,k,p){return Math.exp(lbin(n,k)+k*Math.log(p)+(n-k)*Math.log(1-p));}
+function betapdf(x,a,b){return x<=0||x>=1?0:Math.exp(lgamma(a+b)-lgamma(a)-lgamma(b)+(a-1)*Math.log(x)+(b-1)*Math.log(1-x));}
+function betacdf(x,a,b){return betai(a,b,x);}
+function gampdf(x,a,r){return x<=0?0:Math.exp(a*Math.log(r)+(a-1)*Math.log(x)-r*x-lgamma(a));}
+function gamcdf(x,a,r){return x<=0?0:1-gammaQ(a,r*x);}
+function randn(){let u=0;while(!u)u=Math.random();return Math.sqrt(-2*Math.log(u))*Math.cos(2*Math.PI*Math.random());}
+function gammaS(a){if(a<1)return gammaS(a+1)*Math.pow(Math.random(),1/a);const d=a-1/3,c=1/Math.sqrt(9*d);for(;;){let x,v;do{x=randn();v=1+c*x}while(v<=0);v=v*v*v;const u=Math.random();if(Math.log(u)<.5*x*x+d-d*v+d*Math.log(v))return d*v;}}
+function betaS(a,b){const x=gammaS(a),y=gammaS(b);return x/(x+y);}
+function binS(n,p){let k=0;for(let i=0;i<n;i++)if(Math.random()<p)k++;return k;}
+function mean(a){let s=0;for(const v of a)s+=v;return s/a.length;}
+function qc(cdf,lo,hi,p,it){for(let i=0;i<(it||100);i++){const m=(lo+hi)/2;if(cdf(m)<p)lo=m;else hi=m}return(lo+hi)/2;}
+function qb(a,b,p){return qc(x=>betai(a,b,x),0,1,p,50);}
+function tcdf(x,v){const t=.5*betai(v/2,.5,v/(v+x*x));return x>0?1-t:t}
+function qn(p){return qc(normCdf,-9,9,p,70)}
+function pois(k,l){return Math.exp(-l+k*Math.log(l)-lgamma(k+1))}
+function binF(n,p){let k=0;for(;;){if(n<=0||p<=0)return k;if(p>=1)return k+n;if(n<=40){for(let i=0;i<n;i++)if(Math.random()<p)k++;return k}const a=1+(n>>1),bb=1+n-a,x=betaS(a,bb);if(x>=p){n=a-1;p=p/x}else{k+=a;n=bb-1;p=(p-x)/(1-x)}}}
+/*ENDMATH*/
+
+const $=id=>document.getElementById(id), val=id=>+$(id).value;
+const C={fg:'#e8ebf5',mu:'#8a93ab',gr:'#232a3d',a:'#6ea8ff',r:'#ff6b81',y:'#ffd166',g:'#4ade80',p:'#c084fc',t:'#5eead4'};
+const store={get(k,d){try{const v=JSON.parse(localStorage.getItem(k));return v==null?d:v}catch(e){return d}},set(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}};
+function stat(l,v,c){return `<div class="stat ${c||''}"><b>${v}</b><span>${l}</span></div>`}
+function f3(x){if(!isFinite(x))return String(x);const a=Math.abs(x);if(a!==0&&(a<1e-3||a>=1e6))return x.toExponential(2);return String(+x.toFixed(a<1?4:a<100?3:a<1000?2:0))}
+function pc(x){return f3(100*x)+'%'}
+const resizers=[];
+function reg(fn){fn();resizers.push(fn)}
+function on(ids,fn){ids.split(' ').forEach(i=>{const e=$(i);e.addEventListener('input',fn);e.addEventListener('change',fn)})}
+let rt;window.addEventListener('resize',()=>{clearTimeout(rt);rt=setTimeout(()=>resizers.forEach(f=>f()),150)});
+document.querySelectorAll('input[type=range]').forEach(i=>{const o=$(i.id+'v');if(!o)return;const f=()=>{o.textContent=i.value};i.addEventListener('input',f);f()});
+
+function nice(x){const e=Math.pow(10,Math.floor(Math.log10(x))),f=x/e;return (f<1.5?1:f<3?2:f<7?5:10)*e}
+function mk(cv,x0,x1,ymax,o){o=o||{};const y0=o.y0||0,dpr=window.devicePixelRatio||1,r=cv.getBoundingClientRect(),w=r.width||600,h=r.height||270;
+ cv.width=w*dpr;cv.height=h*dpr;const g=cv.getContext('2d');g.setTransform(dpr,0,0,dpr,0,0);g.clearRect(0,0,w,h);
+ const L=o.L||42,R=12,T=14,B=28,X=x=>L+(x-x0)/(x1-x0)*(w-L-R),Y=y=>h-B-(y-y0)/(ymax-y0)*(h-T-B);
+ g.font='11px system-ui';g.lineWidth=1;g.strokeStyle=C.gr;g.fillStyle=C.mu;
+ if(!o.noGrid){const sx=nice((x1-x0)/7);for(let x=Math.ceil(x0/sx-1e-9)*sx;!o.noX&&x<=x1+1e-9;x+=sx){g.beginPath();g.moveTo(X(x),T);g.lineTo(X(x),h-B);g.stroke();g.textAlign='center';g.fillText(String(+x.toFixed(6)),X(x),h-B+15)}
+ const sy=nice((ymax-y0)/4);for(let y=Math.ceil(y0/sy-1e-9)*sy;y<=ymax+1e-9;y+=sy){g.beginPath();g.moveTo(L,Y(y));g.lineTo(w-R,Y(y));g.stroke();g.textAlign='right';g.fillText(String(+y.toFixed(4)),L-5,Y(y)+3)}}
+ return{g,w,h,X,Y,L,R,T,B,
+  line(f,col,lw,a,b,n,dash){a=a==null?x0:a;b=b==null?x1:b;n=n||260;g.save();if(dash)g.setLineDash([5,4]);g.beginPath();g.strokeStyle=col;g.lineWidth=lw||2;let st=false;for(let i=0;i<=n;i++){const x=a+(b-a)*i/n,y=f(x);if(!isFinite(y)){st=false;continue}st?g.lineTo(X(x),Y(y)):g.moveTo(X(x),Y(y));st=true}g.stroke();g.restore()},
+  area(f,a,b,col,n){a=Math.max(a,x0);b=Math.min(b,x1);if(b<=a)return;n=n||200;g.beginPath();g.moveTo(X(a),Y(0));for(let i=0;i<=n;i++){const x=a+(b-a)*i/n;g.lineTo(X(x),Y(f(x)))}g.lineTo(X(b),Y(0));g.closePath();g.fillStyle=col;g.fill()},
+  vline(x,col,lab,dash){g.save();g.strokeStyle=col;g.lineWidth=1.6;if(dash)g.setLineDash([5,4]);g.beginPath();g.moveTo(X(x),T);g.lineTo(X(x),h-B);g.stroke();g.restore();if(lab){g.fillStyle=col;g.textAlign='center';g.fillText(lab,Math.min(Math.max(X(x),34),w-34),T+10)}},
+  hline(y,col,lab){g.save();g.strokeStyle=col;g.lineWidth=1.4;g.setLineDash([5,4]);g.beginPath();g.moveTo(L,Y(y));g.lineTo(w-R,Y(y));g.stroke();g.restore();if(lab){g.fillStyle=col;g.textAlign='right';g.fillText(lab,w-R-3,Y(y)-4)}},
+  text(s,x,y,col,al){g.fillStyle=col||C.fg;g.textAlign=al||'left';g.fillText(s,x,y)}};}
+
+/* ---------- shared helpers for this page ---------- */
+const D={
+ norm:{n:'Normal(0,1)',s:()=>randn(),mu:0,sd:1,sk:0},
+ unif:{n:'Uniform(0,1)',s:()=>Math.random(),mu:.5,sd:Math.sqrt(1/12),sk:0},
+ expo:{n:'Exponential(1)',s:()=>-Math.log(1-Math.random()),mu:1,sd:1,sk:2},
+ logn:{n:'Lognormal(0,1)',s:()=>Math.exp(randn()),mu:Math.exp(.5),sd:Math.sqrt((Math.E-1)*Math.E),sk:(Math.E+2)*Math.sqrt(Math.E-1),disc:0},
+ b05:{n:'Bernoulli(0.5)',s:()=>Math.random()<.5?1:0,mu:.5,sd:.5,sk:0,disc:1},
+ b05s:{n:'Bernoulli(0.05)',s:()=>Math.random()<.05?1:0,mu:.05,sd:Math.sqrt(.0475),sk:.9/Math.sqrt(.0475),disc:1},
+ bimo:{n:'Two humps',s:()=>(Math.random()<.5?-2:2)+.5*randn(),mu:0,sd:Math.sqrt(4.25),sk:0},
+ par5:{n:'Pareto(α=5)',s:()=>Math.pow(1-Math.random(),-.2),mu:1.25,sd:Math.sqrt(5/48),sk:6*Math.sqrt(.6)},
+ cauchy:{n:'Cauchy (no mean)',s:()=>Math.tan(Math.PI*(Math.random()-.5)),mu:NaN,sd:Infinity,sk:NaN}
+};
+function fillSel(id,keys,def){const e=$(id);e.innerHTML=keys.map(k=>`<option value="${k}">${D[k].n}</option>`).join('');e.value=def}
+const PAL=[C.a,C.r,C.y,C.g,C.p,C.t,'#ff9f43','#9aa4bf'];
+function tgrid(N,M){const T=[];let prev=0;for(let i=0;i<M;i++){let n=Math.round(Math.pow(10,Math.log10(N)*i/(M-1)));if(i===M-1)n=N;n=Math.max(prev+1,n);if(n>N)break;T.push(n);prev=n}if(T[T.length-1]!==N)T[T.length-1]=N;return T}
+function nlab(n){return n>=1e6?(n/1e6)+'M':n>=1000?(n/1000)+'k':String(n)}
+function customGrid(P,xt,yt){const g=P.g;g.save();g.strokeStyle=C.gr;g.fillStyle=C.mu;g.font='11px system-ui';g.lineWidth=1;
+ xt.forEach(([v,l])=>{g.beginPath();g.moveTo(P.X(v),P.T);g.lineTo(P.X(v),P.h-P.B);g.stroke();g.textAlign='center';g.fillText(l,P.X(v),P.h-P.B+15)});
+ yt.forEach(([v,l])=>{g.beginPath();g.moveTo(P.L,P.Y(v));g.lineTo(P.w-P.R,P.Y(v));g.stroke();g.textAlign='right';g.fillText(l,P.L-5,P.Y(v)+3)});g.restore()}
+function clip(P,fn){const g=P.g;g.save();g.beginPath();g.rect(P.L,P.T,P.w-P.L-P.R,P.h-P.T-P.B);g.clip();fn();g.restore()}
+function poly(P,pts,col,lw,dash){const g=P.g;g.save();if(dash)g.setLineDash([5,4]);g.strokeStyle=col;g.lineWidth=lw||2;g.beginPath();pts.forEach(([x,y],i)=>i?g.lineTo(P.X(x),P.Y(y)):g.moveTo(P.X(x),P.Y(y)));g.stroke();g.restore()}
+function dots(P,pts,col,r){const g=P.g;g.fillStyle=col;pts.forEach(([x,y])=>{g.beginPath();g.arc(P.X(x),P.Y(y),r||3,0,7);g.fill()})}
+function niceTicks(lo,hi,k){const st=nice((hi-lo)/(k||5)),a=[];for(let v=Math.ceil(lo/st-1e-9)*st;v<=hi+1e-9;v+=st)a.push([v,String(+v.toFixed(6))]);return a}
+function logTicks(lo,hi){const a=[];for(let e=Math.ceil(lo-1e-9);e<=hi+1e-9;e++)a.push([e,nlab(Math.pow(10,e))]);return a}
+function mom(a){const n=a.length;let m=0;for(const v of a)m+=v;m/=n;let v2=0,v3=0,v4=0;for(const v of a){const d=v-m;v2+=d*d;v3+=d*d*d;v4+=d*d*d*d}v2/=n;v3/=n;v4/=n;const sd=Math.sqrt(v2);return{n,m,sd,sk:sd>0?v3/(sd*sd*sd):0,ku:v2>0?v4/(v2*v2)-3:0}}
+function ksN(z){const a=Array.from(z).sort((x,y)=>x-y),n=a.length;let d=0;for(let i=0;i<n;i++){const F=normCdf(a[i]);d=Math.max(d,Math.abs((i+1)/n-F),Math.abs(i/n-F))}return d}
+/* histogram of data as density with optional overlay curves [{f,col,lw,dash}] */
+function hist(cv,data,lo,hi,bins,ov,col){const cnt=new Float64Array(bins),bw=(hi-lo)/bins;let n=0;for(const v of data){if(v<lo||v>=hi)continue;cnt[Math.floor((v-lo)/bw)]++;n++}
+ const N=data.length;let ym=0;for(let i=0;i<bins;i++){cnt[i]/=N*bw;ym=Math.max(ym,cnt[i])}
+ (ov||[]).forEach(o=>{for(let i=0;i<=80;i++)ym=Math.max(ym,o.f(lo+(hi-lo)*i/80)||0)});
+ const P=mk(cv,lo,hi,ym*1.12);
+ P.g.fillStyle=col||'rgba(110,168,255,.5)';for(let i=0;i<bins;i++){if(cnt[i]<=0)continue;const a=P.X(lo+i*bw),b=P.X(lo+(i+1)*bw);P.g.fillRect(a,P.Y(cnt[i]),Math.max(1,b-a-1),P.Y(0)-P.Y(cnt[i]))}
+ (ov||[]).forEach(o=>P.line(o.f,o.col,o.lw||2.4,lo,hi,200,o.dash));return P}
+const fmt=x=>f3(x);
+
+/* ---------- shared for this page ---------- */
+const POPS=['norm','unif','expo','logn','bimo','par5'];
+D.norm.med=0;D.norm.q90=1.2815516;D.unif.med=.5;D.unif.q90=.9;D.expo.med=Math.LN2;D.expo.q90=Math.log(10);D.logn.med=1;D.logn.q90=Math.exp(1.2815516);
+D.bimo.med=0;D.bimo.q90=qc(x=>.5*normCdf((x+2)/.5)+.5*normCdf((x-2)/.5),-10,10,.9,80);D.par5.med=Math.pow(2,.2);D.par5.q90=Math.pow(10,.2);
+const SF={mean:a=>mean(a),median:a=>{const b=Float64Array.from(a).sort(),n=b.length;return n%2?b[(n-1)/2]:(b[n/2-1]+b[n/2])/2},sd:a=>{const n=a.length,m=mean(a);let s=0;for(const v of a)s+=(v-m)*(v-m);return Math.sqrt(s/(n-1))},q90:a=>{const b=Float64Array.from(a).sort();return b[Math.round(.9*(b.length-1))]}};
+function truth(key,st){const d=D[key];return st==='mean'?d.mu:st==='median'?d.med:st==='sd'?d.sd:d.q90}
+const SNAME={mean:'sample mean',median:'sample median',sd:'sample SD',q90:'90th percentile'};
+const N10=[2,3,5,10,20,50,100,200,500,1000];
+function pct(a,p){const b=Float64Array.from(a).sort();return b[Math.min(b.length-1,Math.max(0,Math.floor(p*b.length)))]}
+function histLines(cv,arrs,cols,lo,hi,bins,vl){const bw=(hi-lo)/bins,dens=arrs.map(a=>{const c=new Float64Array(bins);for(const v of a){if(v<lo||v>=hi)continue;c[Math.floor((v-lo)/bw)]++}for(let i=0;i<bins;i++)c[i]/=a.length*bw;return c});let ym=0;dens.forEach(c=>c.forEach(v=>ym=Math.max(ym,v)));const P=mk(cv,lo,hi,ym*1.15||1);
+ dens.forEach((c,k)=>{const pts=[];for(let i=0;i<bins;i++){pts.push([lo+i*bw,c[i]]);pts.push([lo+(i+1)*bw,c[i]])}clip(P,()=>poly(P,pts,cols[k],2.2))});(vl||[]).forEach(v=>P.vline(v[0],v[1],v[2],v[3]));return P}
+function sdOf(a){return mom(a).sd}
+
+/* ---------- ML helpers ---------- */
+function digamma(x){let r=0;while(x<6){r-=1/x;x++}const f=1/(x*x);return r+Math.log(x)-.5/x-f*(1/12-f*(1/120-f/252))}
+function trigamma(x){let r=0;while(x<6){r+=1/(x*x);x++}const f=1/(x*x);return r+1/x+.5*f+f/x*(1/6-f*(1/30-f/42))}
+function poisS(l){if(l<=0)return 0;if(l<30){const L=Math.exp(-l);let k=0,p=1;do{k++;p*=Math.random()}while(p>L);return k-1}const m=Math.floor(.875*l),g=gammaS(m);return g<l?m+poisS(l-g):binF(m-1,l/g)}
+function llb(k,n,p){return(k?k*Math.log(p):0)+(n-k?(n-k)*Math.log(1-p):0)}
+function lrInt(k,n,cut){const ph=k/n,l0=llb(k,n,ph),g=p=>2*(l0-llb(k,n,p))-cut;let lo=0,hi=1;
+ if(k>0){let a=1e-12,b=ph;for(let i=0;i<70;i++){const m=(a+b)/2;if(g(m)>0)a=m;else b=m}lo=(a+b)/2}
+ if(k<n){let a=ph,b=1-1e-12;for(let i=0;i<70;i++){const m=(a+b)/2;if(g(m)>0)b=m;else a=m}hi=(a+b)/2}return[lo,hi]}
+function solveAlpha(s){if(!(s>1e-9))return 1e6;let a=(3-s+Math.sqrt((3-s)*(3-s)+24*s))/(12*s);for(let i=0;i<8;i++){const f=Math.log(a)-digamma(a)-s,fp=1/a-trigamma(a);let n=a-f/fp;if(!(n>0))n=a/2;a=n}return a}
+function normPdfAt(x,m,s){return Math.exp(-(x-m)*(x-m)/(2*s*s))/(s*2.5066282746)}
+/* ---------- Regression helpers ---------- */
+function idx(id,arr,ff){const e=$(id),o=$(id+'v'),f=()=>{o.textContent=ff?ff(arr[+e.value]):arr[+e.value]};e.addEventListener('input',f);f()}
+function scl(id,ff){const e=$(id),o=$(id+'v'),f=()=>{o.textContent=ff(+e.value)};e.addEventListener('input',f);f()}
+function pctTicks(a,b,st){const r=[];for(let v=a;v<=b+1e-9;v+=st)r.push([v,Math.round(v*100)+'%']);return r}
+const _tq={};function tq(v,p){const k=v+'_'+p;return _tq[k]||(_tq[k]=qc(x=>tcdf(x,v),0,500,p,80))}
+function simple(x,y){const n=x.length;let xm=0,ym=0;for(let i=0;i<n;i++){xm+=x[i];ym+=y[i]}xm/=n;ym/=n;let sxx=0,sxy=0,syy=0;for(let i=0;i<n;i++){const dx=x[i]-xm,dy=y[i]-ym;sxx+=dx*dx;sxy+=dx*dy;syy+=dy*dy}const b=sxy/sxx,a=ym-b*xm,res=new Float64Array(n);let sse=0;for(let i=0;i<n;i++){res[i]=y[i]-a-b*x[i];sse+=res[i]*res[i]}return{n,xm,ym,sxx,sxy,syy,b,a,res,sse,sst:syy,r2:1-sse/syy}}
+function gj(A,B){const p=A.length;const M=A.map((r,i)=>Array.from(r).concat(B?[B[i]]:[]));for(let c=0;c<p;c++){let m=c;for(let r=c+1;r<p;r++)if(Math.abs(M[r][c])>Math.abs(M[m][c]))m=r;[M[c],M[m]]=[M[m],M[c]];const d=M[c][c]||1e-12;for(let k=c;k<M[c].length;k++)M[c][k]/=d;for(let r=0;r<p;r++)if(r!==c){const f=M[r][c];if(f!==0)for(let k=c;k<M[c].length;k++)M[r][k]-=f*M[c][k]}}return M}
+function olsMulti(cols,y,needInv){const n=y.length,k=cols.length,p=k+1,A=[],B=new Float64Array(p);for(let i=0;i<p;i++)A.push(new Float64Array(p));
+ for(let r=0;r<n;r++){const row=[1];for(let j=0;j<k;j++)row.push(cols[j][r]);for(let i=0;i<p;i++){B[i]+=row[i]*y[r];for(let j=i;j<p;j++)A[i][j]+=row[i]*row[j]}}
+ for(let i=0;i<p;i++){for(let j=0;j<i;j++)A[i][j]=A[j][i];if(i>0)A[i][i]+=1e-9}
+ let beta,inv=null;if(needInv){const I=[];for(let i=0;i<p;i++){const e=new Float64Array(p);e[i]=1;I.push(e)}const M=gj(A,null);const aug=A.map((r,i)=>Array.from(r).concat(Array.from(I[i])));
+  const m=aug;for(let c=0;c<p;c++){let q=c;for(let r=c+1;r<p;r++)if(Math.abs(m[r][c])>Math.abs(m[q][c]))q=r;[m[c],m[q]]=[m[q],m[c]];const d=m[c][c]||1e-12;for(let kk=0;kk<2*p;kk++)m[c][kk]/=d;for(let r=0;r<p;r++)if(r!==c){const f=m[r][c];if(f!==0)for(let kk=0;kk<2*p;kk++)m[r][kk]-=f*m[c][kk]}}
+  inv=m.map(r=>r.slice(p));beta=inv.map(r=>{let s=0;for(let j=0;j<p;j++)s+=r[j]*B[j];return s})}
+ else{const M=gj(A,B);beta=M.map(r=>r[p])}
+ const res=new Float64Array(n);let sse=0;for(let r=0;r<n;r++){let f=beta[0];for(let j=0;j<k;j++)f+=beta[j+1]*cols[j][r];res[r]=y[r]-f;sse+=res[r]*res[r]}
+ const out={beta,res,sse,n,p,inv};if(inv){const s2=sse/(n-p);out.s2=s2;out.se=inv.map((r,i)=>Math.sqrt(s2*r[i]))}return out}
+function scatterAxes(cv,xs,ys,xlo,xhi,ylo,yhi,L){return mk(cv,xlo,xhi,yhi,{y0:ylo,L:L||44})}
+function range(a,pad){let lo=1e99,hi=-1e99;for(const v of a){if(v<lo)lo=v;if(v>hi)hi=v}const w=(hi-lo)||1;return[lo-(pad||.05)*w,hi+(pad||.05)*w]}
+
+
+function bars(P,groups,cols,yt){/* groups: array of arrays of values (0..1) */const g=P.g,G=groups.length,B=groups[0].length,W=(P.w-P.L-P.R)/G;groups.forEach((vals,gi)=>vals.forEach((v,bi)=>{const bw=W*.78/B,x=P.L+W*gi+W*.11+bw*bi;g.fillStyle=cols[bi];g.fillRect(x,P.Y(v),bw-2,P.Y(0)-P.Y(v));g.fillStyle=C.fg;g.textAlign='center';g.font='10px system-ui';g.fillText(Math.round(v*100)+'%',x+bw/2-1,P.Y(v)-3)}));g.font='11px system-ui'}
+function gridG(P,yt,labels){customGrid(P,[],yt);const G=labels.length,W=(P.w-P.L-P.R)/G;P.g.fillStyle=C.mu;P.g.textAlign='center';labels.forEach((l,i)=>P.g.fillText(l,P.L+W*(i+.5),P.h-P.B+15))}
+function legend(P,items,y){let x=P.L+8;items.forEach(([s,c])=>{P.text('■ '+s,x,y,c);x+=P.g.measureText('■ '+s).width+16})}
+
+/* ---------- GLM machinery ---------- */
+const LK={logit:{mu:e=>1/(1+Math.exp(-e)),d:e=>{const m=1/(1+Math.exp(-e));return m*(1-m)}},
+ probit:{mu:e=>normCdf(e),d:e=>npdf(e)},
+ cll:{mu:e=>1-Math.exp(-Math.exp(e)),d:e=>Math.exp(e-Math.exp(e))},
+ log:{mu:e=>Math.exp(e),d:e=>Math.exp(e)}};
+function minv(A){const p=A.length,m=A.map((r,i)=>{const row=Array.from(r);for(let j=0;j<p;j++)row.push(i===j?1:0);return row});
+ for(let c=0;c<p;c++){let q=c;for(let r=c+1;r<p;r++)if(Math.abs(m[r][c])>Math.abs(m[q][c]))q=r;[m[c],m[q]]=[m[q],m[c]];const d=m[c][c]||1e-12;for(let k=0;k<2*p;k++)m[c][k]/=d;for(let r=0;r<p;r++)if(r!==c){const f=m[r][c];if(f!==0)for(let k=0;k<2*p;k++)m[r][k]-=f*m[c][k]}}
+ return m.map(r=>r.slice(p))}
+function glm(cols,y,o){o=o||{};const n=y.length,k=cols.length,p=k+1,fam=o.fam||'binom',L=LK[o.link||(fam==='pois'?'log':'logit')],off=o.off,X=[new Float64Array(n).fill(1)].concat(cols),V=m=>fam==='pois'?m:m*(1-m);
+ let b=new Float64Array(p);if(o.init)b=Float64Array.from(o.init);else if(fam==='pois'){let m=0;for(const v of y)m+=v;b[0]=Math.log(Math.max(m/n,1e-3))-(off?mean(off):0)}
+ function ev(b){const eta=new Float64Array(n),mu=new Float64Array(n);let ll=0;for(let i=0;i<n;i++){let e=off?off[i]:0;for(let j=0;j<p;j++)e+=b[j]*X[j][i];e=Math.max(-30,Math.min(30,e));eta[i]=e;let m=L.mu(e);m=fam==='binom'?Math.min(1-1e-12,Math.max(1e-12,m)):Math.max(m,1e-12);mu[i]=m;ll+=fam==='pois'?y[i]*Math.log(m)-m-lgamma(y[i]+1):y[i]*Math.log(m)+(1-y[i])*Math.log(1-m)}return{eta,mu,ll}}
+ function info(c){const A=[];for(let i=0;i<p;i++)A.push(new Float64Array(p));const w=new Float64Array(n);for(let r=0;r<n;r++){const d=L.d(c.eta[r]),wi=d*d/V(c.mu[r]);w[r]=wi;for(let i=0;i<p;i++){const xi=X[i][r]*wi;for(let j=i;j<p;j++)A[i][j]+=xi*X[j][r]}}for(let i=0;i<p;i++)for(let j=0;j<i;j++)A[i][j]=A[j][i];return{A,w}}
+ let cur=ev(b),it=0,conv=false,maxit=o.maxit==null?40:o.maxit;
+ for(;it<maxit;it++){const{A,w}=info(cur),Ai=minv(A),g=new Float64Array(p);
+  for(let r=0;r<n;r++){const d=L.d(cur.eta[r]),v=V(cur.mu[r]);let s=(y[r]-cur.mu[r])*d/v;if(o.firth){let h=0;for(let i=0;i<p;i++)for(let j=0;j<p;j++)h+=X[i][r]*Ai[i][j]*X[j][r];h*=w[r];s+=h*(.5-cur.mu[r])}for(let i=0;i<p;i++)g[i]+=X[i][r]*s}
+  const st=new Float64Array(p);let mx=0;for(let i=0;i<p;i++){let s=0;for(let j=0;j<p;j++)s+=Ai[i][j]*g[j];st[i]=s}
+  if(o.firth){for(let i=0;i<p;i++){st[i]=Math.max(-1,Math.min(1,st[i]));mx=Math.max(mx,Math.abs(st[i]))}b=b.map((v,i)=>v+st[i]);cur=ev(b);if(mx<1e-8){conv=true;it++;break}}
+  else{let a=1,nb,nc;for(let h=0;h<25;h++){nb=b.map((v,i)=>v+a*st[i]);nc=ev(nb);if(nc.ll>=cur.ll-1e-10)break;a/=2}for(let i=0;i<p;i++)mx=Math.max(mx,Math.abs(a*st[i]));const dl=Math.abs(nc.ll-cur.ll);b=nb;cur=nc;if(mx<1e-8||dl<1e-11){conv=true;it++;break}}}
+ const{A,w}=info(cur),Ai=minv(A),se=Ai.map((r,i)=>Math.sqrt(Math.max(r[i],0)));let dev;
+ if(fam==='binom')dev=-2*cur.ll;else{dev=0;for(let i=0;i<n;i++){const yy=y[i],m=cur.mu[i];dev+=2*((yy>0?yy*Math.log(yy/m):0)-(yy-m))}}
+ return{beta:b,mu:cur.mu,eta:cur.eta,ll:cur.ll,dev,inv:Ai,se,iter:it,conv,X,w,p,n,A}}
+function auc(sc,y){const n=y.length,idx=Array.from({length:n},(_,i)=>i).sort((a,b)=>sc[a]-sc[b]);let rk=0,np=0,i=0;while(i<n){let j=i;while(j+1<n&&sc[idx[j+1]]===sc[idx[i]])j++;const r=(i+j)/2+1;for(let t=i;t<=j;t++)if(y[idx[t]]===1){rk+=r;np++}i=j+1}const nn=n-np;return np&&nn?(rk-np*(np+1)/2)/(np*nn):.5}
+function sepTest(x,y){let a1=1e99,b1=-1e99,a0=1e99,b0=-1e99,n1=0,n0=0;for(let i=0;i<x.length;i++){if(y[i]===1){n1++;a1=Math.min(a1,x[i]);b1=Math.max(b1,x[i])}else{n0++;a0=Math.min(a0,x[i]);b0=Math.max(b0,x[i])}}return n1>0&&n0>0&&(a1>b0||a0>b1)}
+const sig=e=>1/(1+Math.exp(-e));
+function lgt(p){return Math.log(p/(1-p))}
+function binaryData(n,a,b,sd){const x=new Float64Array(n),y=new Float64Array(n);for(let i=0;i<n;i++){x[i]=(sd||1)*randn();y[i]=Math.random()<sig(a+b*x[i])?1:0}return{x,y}}
+function heat(P,gx,gy,vals,x0,x1,y0,y1){const g=P.g,nx=gx,ny=gy;let mn=1e99,mx=-1e99;vals.forEach(v=>{if(isFinite(v)){mn=Math.min(mn,v);mx=Math.max(mx,v)}});mn=Math.max(mn,mx-30);for(let i=0;i<nx;i++)for(let j=0;j<ny;j++){const v=vals[i*ny+j],t=isFinite(v)?Math.max(0,Math.min(1,(v-mn)/(mx-mn))):0,tt=Math.pow(t,1.6),c=Math.round(40+190*tt);g.fillStyle=`rgb(${Math.round(20+60*tt)},${Math.round(30+100*tt)},${c})`;const xa=P.X(x0+(x1-x0)*i/nx),xb=P.X(x0+(x1-x0)*(i+1)/nx),ya=P.Y(y0+(y1-y0)*j/ny),yb=P.Y(y0+(y1-y0)*(j+1)/ny);g.fillRect(xa,Math.min(ya,yb),xb-xa+1,Math.abs(ya-yb)+1)}}
+/* ---------- confounding helpers ---------- */
+const U01=()=>1-Math.random();
+function sdv(a){const m=mean(a);let s=0;for(const v of a)s+=(v-m)*(v-m);return Math.sqrt(s/Math.max(a.length-1,1))}
+function barV(cv,vals,cols,labs,ymax,ff){const P=mk(cv,0,vals.length,ymax,{y0:0,noGrid:true,L:50});customGrid(P,[],niceTicks(0,ymax,5));const W=(P.w-P.L-P.R)/vals.length,g=P.g;vals.forEach((v,i)=>{const w=W*.5,x=P.L+W*i+W*.25;g.fillStyle=cols[i];g.fillRect(x,P.Y(v),w,P.Y(0)-P.Y(v));g.fillStyle=C.fg;g.textAlign='center';g.fillText((ff||fmt)(v),x+w/2,P.Y(v)-4);g.fillStyle=C.mu;g.fillText(labs[i],x+w/2,P.h-P.B+15)});return P}
+function barL(cv,vals,cols,labs,lo,hi,ff){const P=mk(cv,0,vals.length,hi,{y0:lo,noGrid:true,L:50});customGrid(P,[],niceTicks(lo,hi,5));const W=(P.w-P.L-P.R)/vals.length,g=P.g;vals.forEach((v,i)=>{const w=W*.5,x=P.L+W*i+W*.25;g.fillStyle=cols[i];g.fillRect(x,P.Y(v),w,P.Y(lo)-P.Y(v));g.fillStyle=C.fg;g.textAlign='center';g.fillText((ff||fmt)(v),x+w/2,P.Y(v)-4);g.fillStyle=C.mu;g.fillText(labs[i],x+w/2,P.h-P.B+15)});return P}
+const avg=a=>{let s=0;for(const v of a)s+=v;return s/a.length};
+function corr(a,b){const n=a.length;let ma=0,mb=0;for(let i=0;i<n;i++){ma+=a[i];mb+=b[i]}ma/=n;mb/=n;let sa=0,sb=0,sab=0;for(let i=0;i<n;i++){const x=a[i]-ma,y=b[i]-mb;sa+=x*x;sb+=y*y;sab+=x*y}return sab/Math.sqrt(sa*sb||1e-12)}
+const pcor=(x,y,z)=>corr(simple(z,x).res,simple(z,y).res);
+const lin=(n,f)=>{const a=new Float64Array(n);for(let i=0;i<n;i++)a[i]=f(i);return a};
+const rn=(n,s)=>lin(n,()=>(s||1)*randn());
+/* signed bars from zero */
+function barZ(cv,vals,cols,labs,lo,hi,ff){const P=mk(cv,0,vals.length,hi,{y0:lo,noGrid:true,L:50});customGrid(P,[],niceTicks(lo,hi,5));const W=(P.w-P.L-P.R)/vals.length,g=P.g;vals.forEach((v,i)=>{const w=W*.5,x=P.L+W*i+W*.25,y0=P.Y(0),y1=P.Y(v);g.fillStyle=cols[i];g.fillRect(x,Math.min(y0,y1),w,Math.abs(y0-y1));g.fillStyle=C.fg;g.textAlign='center';g.fillText((ff||fmt)(v),x+w/2,v>=0?y1-4:y1+13);g.fillStyle=C.mu;g.fillText(labs[i],x+w/2,P.h-P.B+15)});P.hline(0,C.mu,'');return P}
+/* grouped signed bars: groups[g][b] */
+function barG(cv,groups,cols,glabs,lo,hi,ff){const P=mk(cv,0,groups.length,hi,{y0:lo,noGrid:true,L:50});customGrid(P,[],niceTicks(lo,hi,5));const G=groups.length,B=groups[0].length,W=(P.w-P.L-P.R)/G,g=P.g;groups.forEach((vs,gi)=>vs.forEach((v,bi)=>{const bw=W*.7/B,x=P.L+W*gi+W*.15+bw*bi,y0=P.Y(0),y1=P.Y(v);g.fillStyle=cols[bi];g.fillRect(x,Math.min(y0,y1),bw-3,Math.abs(y0-y1));g.fillStyle=C.fg;g.textAlign='center';g.font='10px system-ui';g.fillText((ff||fmt)(v),x+bw/2-1,v>=0?y1-3:y1+11)}));g.font='11px system-ui';g.fillStyle=C.mu;g.textAlign='center';glabs.forEach((l,i)=>g.fillText(l,P.L+W*(i+.5),P.h-P.B+15));P.hline(0,C.mu,'');return P}
+/* scatter with optional per-point colours; draws at most nmax points */
+function scat(P,xs,ys,col,nmax,r,colf){const n=xs.length,st=Math.max(1,Math.floor(n/(nmax||500))),pts=[];clip(P,()=>{for(let i=0;i<n;i+=st){P.g.fillStyle=colf?colf(i):col;P.g.beginPath();P.g.arc(P.X(xs[i]),P.Y(ys[i]),r||2.2,0,7);P.g.fill()}})}
+function fitLine(P,s,col,lw,dash,x0,x1){clip(P,()=>P.line(x=>s.a+s.b*x,col,lw||2,x0,x1,2,dash))}
+const ordIdx=p=>Array.from({length:p.length},(_,i)=>i).sort((a,b)=>p[a]-p[b]);
+/* ---------- experiment helpers ---------- */
+const sgn=v=>(v>=0?'+':'−')+Math.abs(v).toFixed(3);
+const rng2=(a,b,pad)=>range(Array.from(a).concat(Array.from(b)),pad||.05);
+const pct0=x=>Math.round(x*100)+'%';
+const lgs=x=>1/(1+Math.exp(-x));
+function rgam(a){if(a<1)return rgam(a+1)*Math.pow(U01(),1/a);const d=a-1/3,c=1/Math.sqrt(9*d);for(;;){let x,v;do{x=randn();v=1+c*x}while(v<=0);v=v*v*v;const u=U01();if(u<1-.0331*x*x*x*x||Math.log(u)<.5*x*x+d*(1-v+Math.log(v)))return d*v}}
+const rbeta=(a,b)=>{const x=rgam(a),y=rgam(b);return x/(x+y)};
+function rbin(n,p){if(n<=30){let k=0;for(let i=0;i<n;i++)if(Math.random()<p)k++;return k}const m=n*p,s=Math.sqrt(n*p*(1-p)),k=Math.round(m+s*randn());return Math.max(0,Math.min(n,k))}
+function welch(a,b){const na=a.length,nb=b.length,ma=avg(a),mb=avg(b);let va=0,vb=0;for(const v of a)va+=(v-ma)*(v-ma);for(const v of b)vb+=(v-mb)*(v-mb);va/=na-1;vb/=nb-1;const se2=va/na+vb/nb,se=Math.sqrt(se2),t=(ma-mb)/se,df=se2*se2/((va/na)*(va/na)/(na-1)+(vb/nb)*(vb/nb)/(nb-1));return{d:ma-mb,se,t,df,p:2*(1-tcdf(Math.abs(t),df))}}
+const diffMeans=(Y,T)=>{let s1=0,s0=0,n1=0,n0=0;for(let i=0;i<Y.length;i++){if(T[i]){s1+=Y[i];n1++}else{s0+=Y[i];n0++}}return s1/n1-s0/n0};
+/* ---------- observational-causal helpers ---------- */
+function logitFit(cols,y){const n=y.length,k=cols.length,p=k+1,b=new Float64Array(p),lin_=i=>{let s=b[0];for(let j=0;j<k;j++)s+=b[j+1]*cols[j][i];return s};
+ for(let it=0;it<30;it++){const A=[];for(let i=0;i<p;i++)A.push(new Float64Array(p));const g=new Float64Array(p);
+  for(let i=0;i<n;i++){const m=lgs(lin_(i)),w=Math.max(m*(1-m),1e-8),r=y[i]-m,row=[1];for(let j=0;j<k;j++)row.push(cols[j][i]);for(let a=0;a<p;a++){g[a]+=row[a]*r;for(let c=a;c<p;c++)A[a][c]+=w*row[a]*row[c]}}
+  for(let a=0;a<p;a++){for(let c=0;c<a;c++)A[a][c]=A[c][a];A[a][a]+=1e-8}
+  const M=gj(A,Array.from(g)),d=M.map(r=>r[p]);let mx=0;for(let a=0;a<p;a++){b[a]+=d[a];mx=Math.max(mx,Math.abs(d[a]))}if(mx<1e-6)break}
+ const pr=new Float64Array(n),lo=new Float64Array(n);for(let i=0;i<n;i++){pr[i]=Math.min(.9999,Math.max(.0001,lgs(lin_(i))));lo[i]=Math.log(pr[i]/(1-pr[i]))}return{beta:b,pr,lo}}
+/* Hajek IPW estimate of the ATE; keep(i)=false drops a unit */
+function ipwATE(Y,T,e,keep){let a1=0,b1=0,a0=0,b0=0;for(let i=0;i<Y.length;i++){if(keep&&!keep(i))continue;if(T[i]){const w=1/e[i];a1+=w*Y[i];b1+=w}else{const w=1/(1-e[i]);a0+=w*Y[i];b0+=w}}return a1/b1-a0/b0}
+function smd(x,T,w){let m1=0,m0=0,w1=0,w0=0,n1=0,n0=0;for(let i=0;i<x.length;i++){const ww=w?w[i]:1;if(T[i]){m1+=ww*x[i];w1+=ww;n1++}else{m0+=ww*x[i];w0+=ww;n0++}}m1/=w1;m0/=w0;let v1=0,v0=0,a1=0,a0=0;for(let i=0;i<x.length;i++){if(T[i]){a1+=x[i]}else a0+=x[i]}a1/=n1;a0/=n0;for(let i=0;i<x.length;i++){if(T[i])v1+=(x[i]-a1)*(x[i]-a1);else v0+=(x[i]-a0)*(x[i]-a0)}v1/=n1-1;v0/=n0-1;return(m1-m0)/Math.sqrt((v1+v0)/2)}
+/* confounded data: X1,X2; treatment strength a; effect tau (function of x1 optional) */
+function confData(n,a,tauF,nl){const X1=rn(n),X2=rn(n),e=lin(n,i=>lgs(a*(.8*X1[i]+.5*X2[i]+(nl?.4*(X1[i]*X1[i]-1):0))/1.5)),T=new Uint8Array(n),Y=new Float64Array(n);
+ for(let i=0;i<n;i++){T[i]=Math.random()<e[i]?1:0;Y[i]=(T[i]?(tauF?tauF(X1[i]):1):0)+X1[i]+.8*X2[i]+(nl?.6*X1[i]*X1[i]:0)+randn()}return{X1,X2,T,Y,e}}
+/* one-to-one nearest-neighbour matching with replacement on a score; returns ATT and the matched control index per treated unit (-1 if dropped) */
+function matchATT(sc,T,Y,cal){const ctr=[];for(let i=0;i<T.length;i++)if(!T[i])ctr.push(i);ctr.sort((a,b)=>sc[a]-sc[b]);const cs=ctr.map(i=>sc[i]),m=new Int32Array(T.length).fill(-1);let sum=0,k=0;
+ for(let i=0;i<T.length;i++){if(!T[i])continue;let lo=0,hi=cs.length-1;while(lo<hi){const mid=(lo+hi)>>1;if(cs[mid]<sc[i])lo=mid+1;else hi=mid}let b=lo;if(lo>0&&Math.abs(cs[lo-1]-sc[i])<Math.abs(cs[lo]-sc[i]))b=lo-1;if(Math.abs(cs[b]-sc[i])>cal)continue;m[i]=ctr[b];sum+=Y[i]-Y[ctr[b]];k++}return{att:sum/k,m,kept:k}}
+const quant=(a,p)=>{const b=Float64Array.from(a).sort();return b[Math.min(b.length-1,Math.floor(p*b.length))]};
+/* ---------- MCMC helpers ---------- */
+function acfv(x,K){const n=x.length;let m=0;for(let i=0;i<n;i++)m+=x[i];m/=n;const c=new Float64Array(K+1);for(let k=0;k<=K;k++){let s=0;for(let i=0;i+k<n;i++)s+=(x[i]-m)*(x[i+k]-m);c[k]=s/n}const r=new Float64Array(K+1);for(let k=0;k<=K;k++)r[k]=c[0]>0?c[k]/c[0]:0;return r}
+/* effective sample size with Geyer's initial positive sequence */
+function essOf(x,K){K=Math.min(K||150,x.length-2);if(K<2)return x.length;const r=acfv(x,K);let sum=0;for(let t=0;2*t+1<=K;t++){const g=r[2*t]+r[2*t+1];if(g<=0)break;sum+=g}const tau=Math.max(2*sum-1,.2);return x.length/tau}
+/* random-walk Metropolis for a 1-d log density */
+function mhRW(logp,x0,step,n){const x=new Float64Array(n);let c=x0,lc=logp(c),acc=0;for(let i=0;i<n;i++){const y=c+step*randn(),ly=logp(y);if(Math.log(Math.random())<ly-lc){c=y;lc=ly;acc++}x[i]=c}return{x,acc:acc/n}}
+/* split R-hat of an array of chains (each an array of equal length) */
+function rhatOf(ch){const seq=[];ch.forEach(c=>{const h=Math.floor(c.length/2);if(h<2)return;seq.push(c.slice(0,h));seq.push(c.slice(h,2*h))});const m=seq.length,n=seq[0]?seq[0].length:0;if(m<2||n<2)return NaN;const mu=seq.map(s=>{let a=0;for(const v of s)a+=v;return a/n}),va=seq.map((s,i)=>{let a=0;for(const v of s)a+=(v-mu[i])*(v-mu[i]);return a/(n-1)});const W=va.reduce((a,b)=>a+b,0)/m,gm=mu.reduce((a,b)=>a+b,0)/m;let B=0;for(const v of mu)B+=(v-gm)*(v-gm);B*=n/(m-1);const vp=(n-1)/n*W+B/n;return Math.sqrt(vp/Math.max(W,1e-12))}
+/* grid posterior from an unnormalised log density */
+function gridPost(logf,lo,hi,N){N=N||900;const x=new Float64Array(N),f=new Float64Array(N);let mx=-1e300;for(let i=0;i<N;i++){x[i]=lo+(hi-lo)*i/(N-1);f[i]=logf(x[i]);if(f[i]>mx)mx=f[i]}let Z=0;const h=(hi-lo)/(N-1);for(let i=0;i<N;i++){f[i]=Math.exp(f[i]-mx);Z+=f[i]*h}const pdf=new Float64Array(N),cdf=new Float64Array(N);let c=0,m1=0,m2=0;for(let i=0;i<N;i++){pdf[i]=f[i]/Z;c+=pdf[i]*h;cdf[i]=c;m1+=x[i]*pdf[i]*h;m2+=x[i]*x[i]*pdf[i]*h}
+ const q=u=>{let a=0,b=N-1;while(b-a>1){const m=(a+b)>>1;if(cdf[m]<u)a=m;else b=m}const d=cdf[b]-cdf[a];return x[a]+(d>0?(u-cdf[a])/d:0)*(x[b]-x[a])};
+ const pd=v=>{if(v<=lo||v>=hi)return 0;const t=(v-lo)/(hi-lo)*(N-1),i=Math.floor(t);return pdf[i]+(t-i)*(pdf[Math.min(i+1,N-1)]-pdf[i])};
+ const cd=v=>{if(v<=lo)return 0;if(v>=hi)return 1;const t=(v-lo)/(hi-lo)*(N-1),i=Math.floor(t);return cdf[i]+(t-i)*(cdf[Math.min(i+1,N-1)]-cdf[i])};
+ return{x,pdf,cdf,mean:m1,sd:Math.sqrt(Math.max(m2-m1*m1,0)),q,pd,cd}}
+const tpdf=(x,v)=>Math.exp(lgamma((v+1)/2)-lgamma(v/2))/Math.sqrt(v*Math.PI)*Math.pow(1+x*x/v,-(v+1)/2);
+const rtv=v=>randn()/Math.sqrt(2*gammaS(v/2)/v);
+const expit=x=>1/(1+Math.exp(-x)),logit=p=>Math.log(p/(1-p));
+function invMat(A){const n=A.length,M=A.map((r,i)=>{const a=Array.from(r);for(let j=0;j<n;j++)a.push(i===j?1:0);return a});for(let c=0;c<n;c++){let m=c;for(let r=c+1;r<n;r++)if(Math.abs(M[r][c])>Math.abs(M[m][c]))m=r;[M[c],M[m]]=[M[m],M[c]];const d=M[c][c]||1e-12;for(let k=0;k<2*n;k++)M[c][k]/=d;for(let r=0;r<n;r++)if(r!==c){const f=M[r][c];if(f!==0)for(let k=0;k<2*n;k++)M[r][k]-=f*M[c][k]}}return M.map(r=>r.slice(n))}
+function cholL(S){const n=S.length,L=S.map(()=>new Float64Array(n));for(let i=0;i<n;i++)for(let j=0;j<=i;j++){let s=S[i][j];for(let k=0;k<j;k++)s-=L[i][k]*L[j][k];L[i][j]=i===j?Math.sqrt(Math.max(s,1e-12)):s/L[j][j]}return L}
+function logdetM(A){const n=A.length,M=A.map(r=>Array.from(r));let ld=0;for(let c=0;c<n;c++){let m=c;for(let r=c+1;r<n;r++)if(Math.abs(M[r][c])>Math.abs(M[m][c]))m=r;[M[c],M[m]]=[M[m],M[c]];ld+=Math.log(Math.abs(M[c][c])||1e-300);for(let r=c+1;r<n;r++){const f=M[r][c]/M[c][c];for(let k=c;k<n;k++)M[r][k]-=f*M[c][k]}}return ld}
+/* Gauss-Hermite nodes (21 points, probabilists' weights summing to 1) from the Golub-Welsch idea: computed numerically on a fine normal grid instead */
+const GH=(()=>{const z=[],w=[];let s=0;for(let i=0;i<41;i++){const v=-4+8*i/40,p=Math.exp(-v*v/2);z.push(v);w.push(p);s+=p}return{z,w:w.map(v=>v/s)}})();
+/* log-log tick helper for axes holding log10 values */
+const lg10=v=>Math.log10(Math.max(v,1e-12));
+const pc1=x=>(100*x).toFixed(1)+'%';
+/* density curves with optional fill: curves=[{f,col,fill,dash,lw}] ; returns P */
+function dcurves(cv,x0,x1,curves,vl,ref){let ym=0,yr=0;curves.forEach((c,k)=>{for(let i=0;i<=300;i++){const v=c.f(x0+(x1-x0)*i/300);if(isFinite(v)){ym=Math.max(ym,v);if(k===(ref==null?curves.length-1:ref))yr=Math.max(yr,v)}}});
+ const top=Math.min(ym,yr*2.5)||ym||1,P=mk(cv,x0,x1,top*1.12);clip(P,()=>curves.forEach(c=>{if(c.fill)P.area(c.f,x0,x1,c.fill,240);P.line(c.f,c.col,c.lw||2.4,x0,x1,300,c.dash)}));(vl||[]).forEach(v=>P.vline(v[0],v[1],null,v[3]));return P}
+/* solve (A + lam I) beta = b and return diag of the inverse (A symmetric p x p) */
+function ridgeSolve(A,b,lam){const p=b.length,M=[];for(let i=0;i<p;i++){const r=new Float64Array(2*p+1);for(let j=0;j<p;j++)r[j]=A[i][j]+(i===j?lam:0);r[p+i]=1;r[2*p]=b[i];M.push(r)}
+ for(let c=0;c<p;c++){let m=c;for(let r=c+1;r<p;r++)if(Math.abs(M[r][c])>Math.abs(M[m][c]))m=r;[M[c],M[m]]=[M[m],M[c]];const d=M[c][c]||1e-12;for(let k=0;k<=2*p;k++)M[c][k]/=d;for(let r=0;r<p;r++)if(r!==c){const f=M[r][c];if(f!==0)for(let k=0;k<=2*p;k++)M[r][k]-=f*M[c][k]}}
+ return{beta:M.map(r=>r[2*p]),dinv:M.map((r,i)=>r[p+i])}}
+/* ---------- Bayesian decision theory helpers ---------- */
+const bdphi=x=>Math.exp(-x*x/2)/Math.sqrt(2*Math.PI);
+const bdPhi=x=>normCdf(x);
+/* quantile of Student t by bisection */
+function bdQt(p,v){let lo=-80,hi=80;for(let i=0;i<70;i++){const m=(lo+hi)/2;if(tcdf(m,v)<p)lo=m;else hi=m}return(lo+hi)/2}
+/* E[max(-d,0)] for d ~ N(mu,s^2): expected loss of acting as if d>0 */
+const bdEL=(mu,s)=>s<1e-12?Math.max(-mu,0):s*bdphi(mu/s)-mu*bdPhi(-mu/s);
+/* E[max(X,0)] for X ~ N(m,s^2) */
+const bdPos=(m,s)=>s<1e-12?Math.max(m,0):s*bdphi(m/s)+m*bdPhi(m/s);
+const bdSort=key=>Array.from({length:key.length},(_,i)=>i).sort((a,b)=>key[b]-key[a]);
+/* logit-normal population of calibrated probabilities with mean base rate: z ~ N(mu, sd^2), p = expit(z) */
+function bdPop(base,sd){let lo=-15,hi=5;const N=500,zs=new Float64Array(N),w=new Float64Array(N),f=m=>{let s=0,t=0;for(let i=0;i<N;i++){const z=m-6*sd+12*sd*i/(N-1),ww=Math.exp(-(z-m)*(z-m)/(2*sd*sd));s+=ww;t+=ww*expit(z)}return t/s};
+ for(let i=0;i<60;i++){const m=(lo+hi)/2;if(f(m)<base)lo=m;else hi=m}const mu=(lo+hi)/2;let s=0;for(let i=0;i<N;i++){zs[i]=mu-6*sd+12*sd*i/(N-1);w[i]=Math.exp(-(zs[i]-mu)*(zs[i]-mu)/(2*sd*sd));s+=w[i]}for(let i=0;i<N;i++)w[i]/=s;return{mu,sd,zs,w,N}}
+/* expected cost per case of flagging when p > t: false positive costs 1, false negative costs c (p calibrated) */
+function bdCost(pop,t,c){let s=0;for(let i=0;i<pop.N;i++){const p=expit(pop.zs[i]);s+=pop.w[i]*(p>t?(1-p):c*p)}return s}
+/* logistic regression of y on feature x with intercept (Newton), returns [a,b] */
+function bdPlatt(x,y){let sy=0;for(let i=0;i<y.length;i++)sy+=y[i];const yb=Math.min(.999,Math.max(.001,sy/y.length));let a=Math.log(yb/(1-yb)),b=0;for(let it=0;it<60;it++){let g0=0,g1=0,h00=1e-6,h01=0,h11=1e-6;for(let i=0;i<x.length;i++){const p=expit(a+b*x[i]),r=y[i]-p,w=p*(1-p)+1e-9;g0+=r;g1+=r*x[i];h00+=w;h01+=w*x[i];h11+=w*x[i]*x[i]}const d=h00*h11-h01*h01;if(!isFinite(d)||Math.abs(d)<1e-12)break;let da=(h11*g0-h01*g1)/d,db=(-h01*g0+h00*g1)/d;const m=Math.max(Math.abs(da),Math.abs(db));if(m>1){da/=m;db/=m}a+=da;b+=db;if(Math.abs(da)+Math.abs(db)<1e-8)break}return[a,b]}
+/* ---------- Ch1 loss and Bayes action ---------- */
+(function(){scl('c1k',v=>v);
+ function run(){const k=val('c1k'),xm=Math.max(3,1+5/Math.sqrt(k)),g=gridPost(x=>(k-1)*Math.log(x)-k*x,1e-6,xm,700),h=(xm-1e-6)/699,med=g.q(.5),mode=k>1?(k-1)/k:0,mean=g.mean,w=.1;
+  const P=dcurves($('c1cv'),0,xm,[{f:g.pd,col:C.a,fill:'rgba(96,165,250,.16)',lw:2.6}],[[mean,C.g,null,false],[med,C.y,null,false],[mode,C.r,null,true]],0);
+  P.text('green: mean · yellow: median · red dashed: mode',P.L+8,P.T+12,C.mu);P.text('unknown quantity θ →',P.w-P.R-4,P.h-P.B-6,C.mu,'right');
+  const A=Array.from({length:161},(_,i)=>i*xm/160),e2=A.map(a=>g.sd*g.sd+(mean-a)*(mean-a)),e1=A.map(a=>{let s=0;for(let i=0;i<700;i++)s+=Math.abs(g.x[i]-a)*g.pdf[i]*h;return s}),e0=A.map(a=>1-(g.cd(a+w)-g.cd(a-w)));
+  const nz=v=>{const lo=Math.min(...v),hi=Math.max(...v);return v.map(t=>(t-lo)/(hi-lo||1))},n2=nz(e2),n1=nz(e1),n0=nz(e0),Q=mk($('c1cv2'),0,xm,1.05,{L:44});
+  [[n2,C.g],[n1,C.y],[n0,C.r]].forEach(([n,c])=>poly(Q,A.map((a,i)=>[a,n[i]]),c,2.6));legend(Q,[['squared loss',C.g],['absolute loss',C.y],['0–1 loss (±0.1)',C.r]],Q.T+12);Q.text('action a →',Q.w-Q.R-4,Q.h-Q.B-6,C.mu,'right');Q.text('expected loss (each scaled 0 to 1)',Q.L+6,Q.T+28,C.mu);
+  const worse=(g.sd*g.sd+(mean-med)*(mean-med))/(g.sd*g.sd)-1;
+  $('c1st').innerHTML=stat('Bayes action: squared · absolute · 0–1',fmt(mean)+' · '+fmt(med)+' · '+fmt(mode),'ok')+stat('posterior sd',fmt(g.sd),'')+stat('squared-loss penalty for using the median',pc1(worse),worse>.02?'warn':'in')+stat('gap: mean − mode',fmt(mean-mode),'');
+  $('c1rd').innerHTML=`The posterior here is a gamma distribution with shape ${k} and mean 1, skewed right when the shape is small. The <b>Bayes action</b> is the action with the smallest posterior expected loss, and each loss function picks a different summary: <b>squared loss</b> the mean (${fmt(mean)}), <b>absolute loss</b> the median (${fmt(med)}), <b>0–1 loss</b> the mode (${fmt(mode)}). The right-hand curves are the expected loss as a function of the action, each rescaled, and each bottoms out at its own summary. With a skewed posterior the three are far apart and the choice of loss really is the choice of answer; as the shape grows the posterior becomes symmetric and they coincide. Using the median when squared error is the cost raises expected loss by ${pc1(worse)}.`}
+ $('c1k').addEventListener('change',run);run();})();
+
+/* ---------- Ch2 asymmetric loss and quantiles ---------- */
+(function(){scl('c2r',v=>v);scl('c2k',v=>v);
+ function run(){const cu=val('c2r'),k=val('c2k'),q=cu/(1+cu),xm=Math.max(3,1+5/Math.sqrt(k)),g=gridPost(x=>(k-1)*Math.log(x)-k*x,1e-6,xm,700),h=(xm-1e-6)/699,S=100;
+  const el=a=>{let s=0;for(let i=0;i<700;i++){const d=g.x[i]-a;s+=(d>0?cu*d:-d)*g.pdf[i]*h}return s*S},aM=g.mean,aD=g.q(.5),aQ=g.q(q),ELq=el(aQ),ELm=el(aM),ELd=el(aD);
+  const A=Array.from({length:121},(_,i)=>.2*S+(xm*S*.8)*i/120),pts=A.map(a=>[a,el(a/S)]),ymx=Math.max(...pts.map(p=>p[1]))*.75,P=mk($('c2cv'),A[0],A[120],ymx,{L:50});
+  clip(P,()=>poly(P,pts,C.a,2.8));P.vline(aM*S,C.g,null,true);P.vline(aD*S,C.y,null,true);P.vline(aQ*S,C.r,null,false);P.text('red: Bayes action (quantile '+pc1(q)+') · green: mean · yellow: median',P.L+8,P.T+12,C.mu);P.text('stock level a →',P.w-P.R-4,P.h-P.B-6,C.mu,'right');P.text('expected cost per period',P.L+6,P.T+28,C.mu);
+  const N=20000,D=Array.from({length:N},()=>S*gammaS(k)/k),sim=a=>{let s=0;for(const d of D)s+=d>a?cu*(d-a):a-d;return s/N},sm=sim(aM*S),sd=sim(aD*S),sq=sim(aQ*S),mx=Math.max(sm,sd,sq)*1.15;
+  barV($('c2cv2'),[sm,sd,sq],[C.g,C.y,C.r],['mean','median','Bayes quantile'],mx,fmt);
+  $('c2st').innerHTML=stat('Bayes action (quantile '+pc1(q)+')',fmt(aQ*S),'ok')+stat('mean · median of demand',fmt(aM*S)+' · '+fmt(aD*S),'')+stat('cost of stocking the mean vs Bayes (theory)',pc1(ELm/ELq-1),ELm/ELq>1.1?'hot':'warn')+stat('simulated cost: mean · median · Bayes',fmt(sm)+' · '+fmt(sd)+' · '+fmt(sq),'in');
+  $('c2rd').innerHTML=`Demand is uncertain with a gamma-shaped predictive distribution (mean 100). Running short costs ${cu} per unit and holding surplus costs 1, so the best stock level is the <b>${pc1(q)} quantile</b>, ${fmt(aQ*S)}, because the Bayes action under linear asymmetric loss is the quantile at cu/(cu + co). Stocking the mean (${fmt(aM*S)}) costs ${pc1(ELm/ELq-1)} more in expectation; the bars show the same thing in 20,000 simulated periods. The more asymmetric the costs, and the more variable the demand (small shape), the larger the gap. A forecast reported only as a mean cannot support this decision: you need the whole predictive distribution.`}
+ ['c2r','c2k'].forEach(i=>$(i).addEventListener('change',run));$('c2go').onclick=run;run();})();
+
+/* ---------- Ch3 classification thresholds ---------- */
+(function(){scl('c3w',v=>v);scl('c3b',v=>v+'%');
+ function run(){const c=val('c3w'),base=val('c3b')/100,pop=bdPop(base,1.5),ts=Array.from({length:99},(_,i)=>.01+i*.01),cs=ts.map(t=>bdCost(pop,t,c)),ts_=1/(1+c);
+  const mx=Math.max(...cs)*1.05,P=mk($('c3cv'),0,1,mx,{L:50});poly(P,ts.map((t,i)=>[t,cs[i]]),C.a,2.8);P.vline(ts_,C.g,null,false);P.vline(.5,C.r,null,true);P.text('green: Bayes threshold 1/(1+c) · red dashed: 0.5',P.L+8,P.T+12,C.mu);P.text('threshold on the predicted probability →',P.w-P.R-4,P.h-P.B-6,C.mu,'right');P.text('expected cost per case',P.L+6,P.T+28,C.mu);
+  let best=ts[0],bc=cs[0];ts.forEach((t,i)=>{if(cs[i]<bc){bc=cs[i];best=t}});
+  const cn=c*base,c5=bdCost(pop,.5,c),cb=bdCost(pop,ts_,c),ca=1-base,m2=Math.max(cn,c5,cb,ca)*1.15;
+  barV($('c3cv2'),[cn,c5,cb,ca],[C.mu,C.r,C.g,C.y],['flag none','t = 0.5','Bayes t','flag all'],m2,fmt);
+  $('c3st').innerHTML=stat('Bayes threshold 1/(1+c) · grid minimum',fmt(ts_)+' · '+fmt(best),'ok')+stat('cost per case: t = 0.5 · Bayes t',fmt(c5)+' · '+fmt(cb),'')+stat('saving from using the Bayes threshold',pc1(1-cb/c5),cb<c5*.95?'ok':'in')+stat('cost of flag none · flag all',fmt(cn)+' · '+fmt(ca),'');
+  $('c3rd').innerHTML=`The model’s probabilities are exactly calibrated, a case costs ${c} if a true positive is missed and 1 if a negative is flagged, and the base rate is ${pc1(base)}. Flagging a case with probability p has expected cost 1 − p, not flagging it has expected cost c·p, so flag when <b>p &gt; 1/(1 + c) = ${fmt(ts_)}</b>. That is the minimum of the curve (grid minimum ${fmt(best)}), and it has nothing to do with 0.5 or with the base rate. The default 0.5 costs ${pc1(c5/cb-1)} more than the Bayes threshold here. The threshold comes from the costs alone; the probabilities supply the rest, which is why calibration (item 16) matters before this rule can be applied.`}
+ ['c3w','c3b'].forEach(i=>$(i).addEventListener('change',run));$('c3go').onclick=run;run();})();
+
+/* ---------- Ch4 miscalibration breaks the rule ---------- */
+(function(){scl('c4f',v=>fmt(v/10));scl('c4w',v=>v);scl('c4n',v=>v);
+ function run(){const f=val('c4f')/10,c=val('c4w'),n=val('c4n'),pop=bdPop(.08,1.5),ts=1/(1+c),lg=Math.log(ts/(1-ts)),R=40;let sumRe=0,sumFit=0,ok=0;const tr=Math.min(.999,Math.max(.001,expit(lg/f)));
+  for(let r=0;r<R;r++){const xs=new Float64Array(n),ys=new Float64Array(n);for(let i=0;i<n;i++){const z=pop.mu+pop.sd*randn(),p=expit(z);ys[i]=Math.random()<p?1:0;xs[i]=f*z}
+   const[a,b]=bdPlatt(xs,ys),bb=Math.max(b,.02),zthr=(lg-a)/bb/f;sumRe+=bdCost(pop,expit(zthr),c);sumFit+=b;ok++}
+  const raw=bdCost(pop,tr,c),rec=sumRe/ok,orc=bdCost(pop,ts,c),mx=Math.max(raw,rec,orc)*1.2;
+  const S=Array.from({length:99},(_,i)=>.01+i*.01),P=mk($('c4cv'),0,1,1,{L:44});P.line(x=>x,C.mu,1.4,0,1,2,true);poly(P,S.map(s=>[s,expit(Math.log(s/(1-s))/f)]),C.a,2.8);P.vline(ts,C.g,null,true);P.text('blue: true risk at each predicted score · diagonal: perfect calibration',P.L+8,P.T+12,C.mu);P.text('predicted score s →',P.w-P.R-4,P.h-P.B-6,C.mu,'right');P.text('actual rate',P.L+6,P.T+28,C.mu);
+  barV($('c4cv2'),[orc,rec,raw],[C.g,C.a,C.r],['true p (oracle)','recalibrated','raw score'],mx,fmt);
+  $('c4st').innerHTML=stat('excess cost: raw score · recalibrated',pc1(raw/orc-1)+' · '+pc1(rec/orc-1),raw/orc-1>.1?'hot':'in')+stat('Bayes threshold on the score: used · correct',fmt(ts)+' · '+fmt(tr),'')+stat('fitted calibration slope (truth '+fmt(1/f)+')',fmt(sumFit/ok),'ok')+stat('calibration set size',n,'');
+  $('c4rd').innerHTML=`The model’s scores are ${f>1?'over':f<1?'under':'perfectly '}${f===1?'calibrated':'confident'} (distortion ${fmt(f)}). Applying the Bayes threshold ${fmt(ts)} to the raw score is correct only if the score is a calibrated probability; here the equivalent threshold on the true probability is ${fmt(tr)}, so the raw rule costs ${pc1(raw/orc-1)} more than the oracle. Refitting the mapping on ${n} labelled cases (logistic recalibration, averaged over ${R} calibration sets) recovers most of the loss: ${pc1(rec/orc-1)} above the oracle, and the remainder shrinks as the calibration set grows. The decision rule is only as good as the probabilities it is fed, so recalibrate first and then apply the cost-based threshold.`}
+ ['c4f','c4w','c4n'].forEach(i=>$(i).addEventListener('change',run));$('c4go').onclick=run;run();})();
+
+/* ---------- Ch5 value of information ---------- */
+(function(){scl('c5m',v=>fmt(v/10));scl('c5s',v=>fmt(v/10));scl('c5w',v=>(v/1000).toFixed(3));scl('c5n',v=>v);
+ function run(){const m=val('c5m')/10,sg=val('c5s')/10,cc=val('c5w')/1000,n0=val('c5n'),base=Math.max(m,0),evpi=bdPos(m,1)-base,NM=300;
+  const sdM=n=>{const sn2=1/(1+n/(sg*sg));return Math.sqrt(Math.max(1-sn2,0))},evsi=n=>bdPos(m,sdM(n))-base;
+  const ns=Array.from({length:NM+1},(_,i)=>i),net=ns.map(n=>evsi(n)-cc*n);let bn=0,bv=0;ns.forEach((n,i)=>{if(net[i]>bv){bv=net[i];bn=n}});
+  const mx=Math.max(evpi,cc*NM*.5)*1.15||.1,P=mk($('c5cv'),0,NM,mx,{L:50});P.hline(evpi,C.mu,'EVPI',true);poly(P,ns.map(n=>[n,evsi(n)]),C.g,2.8);poly(P,ns.map(n=>[n,cc*n]),C.r,2);poly(P,ns.map((n,i)=>[n,net[i]]),C.y,2.4);
+  legend(P,[['EVSI(n)',C.g],['cost of data',C.r],['net value',C.y]],P.T+12);P.text('observations n →',P.w-P.R-4,P.h-P.B-6,C.mu,'right');if(bv>0)P.vline(bn,C.y,null,true);
+  const R=4000,s2=sg*sg,sn2=1/(1+n0/s2);let acc=0;for(let r=0;r<R;r++){const th=m+randn(),yb=th+Math.sqrt(s2/n0)*randn(),M=sn2*(m+n0*yb/s2);acc+=M>0?th:0}const sim=acc/R-base,th0=evsi(n0),mx2=Math.max(evpi,th0,sim,cc*n0)*1.2||.1;
+  barV($('c5cv2'),[evpi,th0,sim,cc*n0],[C.mu,C.g,C.a,C.r],['EVPI','EVSI (theory)','EVSI (simulated)','cost of n'],mx2,fmt);
+  $('c5st').innerHTML=stat('EVPI (perfect information)',fmt(evpi),'in')+stat('best sample size · net value',(bv>0?bn:0)+' · '+fmt(Math.max(bv,0)),bv>0?'ok':'warn')+stat('EVSI at n = '+n0+': theory · simulated',fmt(th0)+' · '+fmt(sim),'')+stat('share of EVPI bought at n = '+n0,pc1(evpi>0?th0/evpi:0),'');
+  $('c5rd').innerHTML=`The decision is whether to act: acting pays θ, not acting pays 0, and θ is currently N(${fmt(m)}, 1). With no further data the best action is ${m>0?'to act':'not to act'}, worth ${fmt(base)}. <b>EVPI</b> = E[max(θ, 0)] − max(E[θ], 0) = ${fmt(evpi)} is the most any information could be worth: it is the expected loss from deciding now. <b>EVSI</b>(n) is the value of an experiment with n observations (noise sd ${fmt(sg)}), computed by averaging the best-action value over the posterior means the experiment could produce; it rises towards EVPI with diminishing returns, and the simulation of ${R} experiments agrees with the formula. At ${cc.toFixed(3)} per observation the best sample size is ${bv>0?bn:0}. When EVPI is small, or the prior is far from zero relative to the noise, collecting data is not worth the cost, whatever p-values it would produce.`}
+ ['c5m','c5s','c5w','c5n'].forEach(i=>$(i).addEventListener('change',run));$('c5go').onclick=run;run();})();
+
+/* ---------- Ch6 plug-in against predictive decisions ---------- */
+(function(){scl('c6n',v=>v);scl('c6q',v=>v+'%');const MU=100,SD=20;
+ function sim(n,q,R){const zq=qn(q),tq=bdQt(q,n-1);let cp=0,cb=0,lp=0,lb=0;for(let r=0;r<R;r++){let s=0;const xs=new Float64Array(n);for(let i=0;i<n;i++){xs[i]=MU+SD*randn();s+=xs[i]}const xb=s/n;let ss=0;for(let i=0;i<n;i++)ss+=(xs[i]-xb)*(xs[i]-xb);const sm=Math.sqrt(ss/n),su=Math.sqrt(ss/(n-1)),ap=xb+zq*sm,ab=xb+tq*su*Math.sqrt(1+1/n),D=MU+SD*randn();
+   if(D<=ap)cp++;if(D<=ab)cb++;lp+=q*Math.max(D-ap,0)+(1-q)*Math.max(ap-D,0);lb+=q*Math.max(D-ab,0)+(1-q)*Math.max(ab-D,0)}return{cp:cp/R,cb:cb/R,lp:lp/R,lb:lb/R}}
+ function run(){const n=val('c6n'),q=val('c6q')/100,o=sim(n,q,5000),NS=[3,4,6,10,20,40,80],cv=NS.map(m=>sim(m,q,2500).cp);
+  const P=barV($('c6cv'),[o.cp,o.cb],[C.r,C.g],['plug-in (MLE)','Bayes predictive'],1.08,pc1);P.hline(q,C.y,'target '+pc1(q),true);
+  const Q=mk($('c6cv2'),0,NS.length-1,1.02,{y0:Math.max(0,q-.25),noGrid:true,L:44});customGrid(Q,NS.map((m,i)=>[i,String(m)]),niceTicks(Math.max(0,q-.25),1,5));poly(Q,NS.map((m,i)=>[i,cv[i]]),C.r,2.8);dots(Q,NS.map((m,i)=>[i,cv[i]]),C.r,3.4);Q.hline(q,C.g,'Bayes: '+pc1(q),true);Q.text('sample size n →',Q.w-Q.R-4,Q.h-Q.B-6,C.mu,'right');Q.text('plug-in service level',Q.L+6,Q.T+14,C.r);
+  $('c6st').innerHTML=stat('service level at n = '+n+': plug-in · Bayes',pc1(o.cp)+' · '+pc1(o.cb),o.cp<q-.02?'hot':'in')+stat('target service level',pc1(q),'')+stat('expected loss: plug-in · Bayes',fmt(o.lp)+' · '+fmt(o.lb),o.lb<o.lp?'ok':'')+stat('loss reduction from the Bayes rule',pc1(1-o.lb/o.lp),'ok');
+  $('c6rd').innerHTML=`Demand is normal with true mean ${MU} and sd ${SD}, but both are estimated from n = ${n} past periods, and stock is set to the ${pc1(q)} quantile. The <b>plug-in</b> rule treats the estimates as truth and sets stock at x̄ + z·s, which covers demand only ${pc1(o.cp)} of the time (the target is ${pc1(q)}), because it ignores that the mean and sd are themselves uncertain. The <b>Bayes</b> rule uses the posterior predictive distribution, a Student t with n − 1 degrees of freedom and scale s√(1 + 1/n), and by construction hits ${pc1(q)} on average (simulated ${pc1(o.cb)}); it also lowers the expected quantile loss by ${pc1(1-o.lb/o.lp)}. The right-hand panel shows the plug-in shortfall closing only slowly as history grows, and being worst for extreme quantiles. Parameter uncertainty is part of the risk being decided on.`}
+ ['c6n','c6q'].forEach(i=>$(i).addEventListener('change',run));$('c6go').onclick=run;run();})();
+/* ---------- Ch7 utility and risk aversion ---------- */
+(function(){scl('c7l',v=>fmt(v/10));scl('c7m',v=>fmt(v/10));scl('c7v',v=>fmt(v/10));scl('c7o',v=>fmt(v/10));const SAFE=.3,SJ=[.3,.5,.8,1.2,2,3.5];
+ function run(){const lam=val('c7l')/10,m=val('c7m')/10,sp=val('c7v')/10,so=val('c7o')/10,ce=l=>m-l*(sp*sp+so*so)/2,LM=4,P=mk($('c7cv'),0,LM,Math.max(m,SAFE)+.3,{y0:Math.min(ce(LM),0)-.1,L:44});
+  P.line(l=>ce(l),C.a,2.8,0,LM,2);P.hline(SAFE,C.g,'safe option',true);P.vline(lam,C.y,null,true);const lstar=(m-SAFE)*2/(sp*sp+so*so);if(lstar>0&&lstar<LM)P.vline(lstar,C.r,null,true);
+  P.text('blue: certainty equivalent of the risky option · red dashed: break-even aversion',P.L+8,P.T+12,C.mu);P.text('risk aversion λ →',P.w-P.R-4,P.h-P.B-6,C.mu,'right');
+  const R=20000;let ag=0,xM=0,xC=0,vM=[],vC=[];
+  for(let r=0;r<R;r++){let bm=-1e9,ib=0,bc=-1e9,ic=0,mm=[],th=[],ys=[];for(let j=0;j<SJ.length;j++){const s=SJ[j],t=randn(),y=t+s*randn(),Mj=y/(1+s*s),vj=s*s/(1+s*s);th.push(t);mm.push(Mj);if(Mj>bm){bm=Mj;ib=j}const c=Mj-lam*(vj+so*so)/2;if(c>bc){bc=c;ic=j}}
+   const eps=so*randn(),XM=th[ib]+eps,XC=th[ic]+eps;xM+=XM;xC+=XC;if(ib===ic)ag++;vM.push(XM);vC.push(XC)}
+  const sdM=sdv(vM),sdC=sdv(vC),uM=xM/R-lam*sdM*sdM/2,uC=xC/R-lam*sdC*sdC/2,lo=Math.min(uM,uC)-.15,hi=Math.max(uM,uC)+.15;
+  barL($('c7cv2'),[uM,uC],[C.r,C.g],['pick best mean','pick best certainty equiv.'],lo,hi,fmt);
+  $('c7st').innerHTML=stat('risky option: certainty equivalent · safe',fmt(ce(lam))+' · '+fmt(SAFE),ce(lam)>SAFE?'ok':'warn')+stat('break-even risk aversion',lstar>0?fmt(lstar):'none',lstar>0&&lam>lstar?'hot':'in')+stat('realised certainty equivalent: best mean · best CE',fmt(uM)+' · '+fmt(uC),uC>uM?'ok':'')+stat('same option chosen · outcome sd: mean-rule · CE-rule',pc1(ag/R)+' · '+fmt(sdM)+' · '+fmt(sdC),'in');
+  $('c7rd').innerHTML=`Utility is exponential, u(x) = 1 − exp(−λx), with risk aversion λ = ${fmt(lam)}. For a normal outcome the expected utility is monotone in the <b>certainty equivalent</b> mean − λ·variance/2, here ${fmt(m)} − ${fmt(lam)}·(${fmt(sp*sp)} + ${fmt(so*so)})/2 = ${fmt(ce(lam))}, against a sure ${fmt(SAFE)}: ${ce(lam)>SAFE?'the risky option is still preferred':'the safe option wins even though its mean is lower'}. The variance includes the posterior uncertainty about the mean (${fmt(sp*sp)}) as well as the outcome noise (${fmt(so*so)}), which is why uncertainty about the parameter matters to a risk-averse decision-maker. The bars come from simulating six options measured with very different precision: picking by posterior mean alone chooses the same option ${pc1(ag/R)} of the time, and the realised certainty equivalent (mean − λ/2 × variance of the simulated outcomes, a stable way to average exponential utility) is ${fmt(uC)} for the certainty-equivalent rule against ${fmt(uM)} for the mean rule, with outcome sd ${fmt(sdC)} against ${fmt(sdM)}. At λ = 0 the two rules coincide; the gain grows with λ and with the differences in precision between options.`}
+ ['c7l','c7m','c7v','c7o'].forEach(i=>$(i).addEventListener('change',run));$('c7go').onclick=run;run();})();
+
+/* ---------- Ch8 sequential decisions: stopping on expected loss ---------- */
+(function(){scl('c8d',v=>v+'%');scl('c8e',v=>(v/100).toFixed(2)+' pt');const PA=.05,B=2000,NB=30;
+ function post(xa,xb,n){const aa=1+xa,ba=1+n-xa,ab=1+xb,bb=1+n-xb,ma=aa/(aa+ba),mb=ab/(ab+bb),va=aa*ba/((aa+ba)*(aa+ba)*(aa+ba+1)),vb=ab*bb/((ab+bb)*(ab+bb)*(ab+bb+1));return{mu:mb-ma,s:Math.sqrt(va+vb)}}
+ function one(pB,eps){let xa=0,xb=0;for(let b=1;b<=NB;b++){xa+=Math.max(0,Math.min(B,Math.round(B*PA+Math.sqrt(B*PA*(1-PA))*randn())));xb+=Math.max(0,Math.min(B,Math.round(B*pB+Math.sqrt(B*pB*(1-pB))*randn())));const n=b*B,o=post(xa,xb,n);if(bdEL(Math.abs(o.mu),o.s)<eps||b===NB)return{n,pick:o.mu>0?1:0}}}
+ function fixed(pB,nb){let xa=0,xb=0;const n=nb*B;for(let b=0;b<nb;b++){xa+=Math.round(B*PA+Math.sqrt(B*PA*(1-PA))*randn());xb+=Math.round(B*pB+Math.sqrt(B*pB*(1-pB))*randn())}return xb>xa?1:0}
+ function run(){const lift=val('c8d')/100,pB=PA*(1+lift),eps=val('c8e')/10000,R=150,ns=[],picks=[];for(let r=0;r<R;r++){const o=one(pB,eps);ns.push(o.n);picks.push(o.pick)}
+  const better=pB>PA?1:0,mean_n=avg(ns),early=ns.filter(n=>n<NB*B).length/R,wrong=lift>0?picks.filter(p=>p!==better).length/R:NaN,nbm=Math.max(1,Math.round(mean_n/B));let wf=0,wm=0;if(lift>0){for(let r=0;r<400;r++){if(fixed(pB,nbm)!==better)wf++;if(fixed(pB,NB)!==better)wm++}wf/=400;wm/=400}
+  const P=histLines($('c8cv'),[ns],[C.a],0,NB*B+B,NB+1,[[mean_n,C.y,'mean',true]]);P.text('stopping sample size per arm →',P.w-P.R-4,P.h-P.B-6,C.mu,'right');
+  if(lift>0){const mx=Math.max(wrong,wf,wm,.02)*1.25;barV($('c8cv2'),[wrong,wf,wm],[C.g,C.r,C.a],['sequential','fixed, same mean n','fixed, max n'],mx,pc1)}else{const Q=mk($('c8cv2'),0,1,1,{noGrid:true});Q.text('no true difference: wrong choices undefined',Q.w/2,Q.h/2,C.mu,'center')}
+  $('c8st').innerHTML=stat('mean stopping size per arm · stopped early',Math.round(mean_n)+' · '+pc1(early),'in')+stat('wrong arm chosen: sequential',lift>0?pc1(wrong):'n/a','ok')+stat('wrong arm: fixed design at same mean n',lift>0?pc1(wf):'n/a',lift>0&&wf>wrong?'warn':'')+stat('true rates A · B',pc1(PA)+' · '+pc1(pB),'');
+  $('c8rd').innerHTML=`Two versions of a page convert at ${pc1(PA)} and ${pc1(pB)}. After every ${B} users per arm the posterior of the difference is updated and the test stops as soon as the <b>posterior expected loss</b> of picking the leader, E[max(loss in conversion rate)], falls below ${(eps*100).toFixed(2)} percentage points. This is a decision rule, not a significance test: it stops when the remaining regret is smaller than the cost of waiting, and the stopping rule does not invalidate the posterior. It stopped early in ${pc1(early)} of 150 runs, with a mean of ${Math.round(mean_n)} users per arm.${lift>0?` The wrong arm was chosen in ${pc1(wrong)}; a fixed-size test with the same average size chose wrongly ${pc1(wf)} of the time, and using the full maximum size ${pc1(wm)}. Sequential stopping buys speed when the effect is large and spends more when it is small.`:' With no true difference both arms are equally good, so the loss threshold is reached quickly in some runs and the choice does not matter.'} The frequentist error rates of such a rule still need to be checked by simulation if a regulator or a pre-registration requires them (item 23).`}
+ ['c8d','c8e'].forEach(i=>$(i).addEventListener('change',run));$('c8go').onclick=run;run();})();
+
+/* ---------- Ch9 prior sensitivity of a decision ---------- */
+(function(){scl('c9n',v=>v);scl('c9x',v=>fmt(v/10)+'%');scl('c9w',v=>v+'%');
+ function run(){const n=val('c9n'),rate=val('c9x')/1000,cut=val('c9w')/100,x=Math.round(rate*n),post=(m,k)=>(m*k+x)/(k+n),NM=48,NK=48,mlo=.005,mhi=.12,klo=Math.log10(2),khi=3.3;
+  const P=mk($('c9cv'),mlo,mhi,khi,{y0:klo,L:44});const g=P.g,cw=(P.X(mhi)-P.X(mlo))/NM,ch=(P.Y(klo)-P.Y(khi))/NK;let ap=0;
+  for(let i=0;i<NM;i++)for(let j=0;j<NK;j++){const m=mlo+(i+.5)*(mhi-mlo)/NM,kk=Math.pow(10,klo+(j+.5)*(khi-klo)/NK),a=post(m,kk)<cut;if(a)ap++;g.fillStyle=a?'rgba(74,222,128,.55)':'rgba(248,113,113,.55)';g.fillRect(P.X(mlo)+i*cw,P.Y(klo)-(j+1)*ch,cw+.6,ch+.6)}
+  P.vline(rate,C.fg,null,true);P.vline(cut,C.y,null,true);P.text('green: approve · red: reject · prior mean →',P.w-P.R-4,P.h-P.B-6,C.fg,'right');P.text('log10 prior strength κ (accounts)',P.L+6,P.T+12,C.fg);
+  const Q=mk($('c9cv2'),klo,khi,.14,{noGrid:true,L:44});customGrid(Q,[[1,'10'],[2,'100'],[3,'1000']],niceTicks(0,.14,5));Q.hline(cut,C.y,'cut-off',true);const LS=[[.02,C.g],[.05,C.a],[.09,C.r]];LS.forEach(([m,c])=>poly(Q,Array.from({length:60},(_,i)=>{const l=klo+(khi-klo)*i/59;return[l,post(m,Math.pow(10,l))]}),c,2.4));legend(Q,[['prior mean 2%',C.g],['5%',C.a],['9%',C.r]],Q.T+12);Q.text('prior strength κ →',Q.w-Q.R-4,Q.h-Q.B-6,C.mu,'right');Q.text('posterior default rate',Q.L+6,Q.T+28,C.mu);
+  const share=ap/(NM*NK),w=post(cut,2),dat=x/n,flip=(m=>{for(let j=0;j<=200;j++){const l=klo+(khi-klo)*j/200;if((post(m,Math.pow(10,l))<cut)!==(post(m,2)<cut))return Math.pow(10,l)}return null})(.02);
+  $('c9st').innerHTML=stat('observed rate · cut-off',pc1(dat)+' · '+pc1(cut),dat<cut?'ok':'hot')+stat('share of prior settings that approve',pc1(share),share>.05&&share<.95?'warn':'ok')+stat('decision with the data alone',dat<cut?'approve':'reject','')+stat('decision is robust to the prior?',share>.95?'yes: approve':share<.05?'yes: reject':'no: it depends on the prior',share>.05&&share<.95?'hot':'ok');
+  $('c9rd').innerHTML=`${x} defaults in ${n} accounts (${pc1(dat)}). The portfolio is approved when its posterior mean default rate is below the break-even ${pc1(cut)}, which is the Bayes action for a payoff that is linear in the rate. Each cell on the left is one prior (a beta distribution with the stated mean and strength κ, in equivalent accounts); the colour is the resulting decision. ${share>.95||share<.05?'Every reasonable prior gives the same decision, so the choice of prior does not matter here and the answer can be reported as robust.':`The decision changes across the plausible priors (${pc1(share)} approve), so it depends on the prior as much as on the data; the honest report names the prior, shows this map, and notes how many extra accounts would settle it.`} On the right, a strong prior (large κ) holds the posterior at its own mean and a weak one releases it to the data rate. With more data the map becomes uniformly one colour. Sensitivity analysis for the <em>decision</em>, not just for the posterior, is what a reviewer actually needs.`}
+ ['c9n','c9x','c9w'].forEach(i=>$(i).addEventListener('change',run));run();})();
+
+/* ---------- Ch10 Bayes risk, minimax and admissibility ---------- */
+(function(){scl('c10n',v=>v);scl('c10t',v=>fmt(v/10));scl('c10t0',v=>fmt(v/10));const SG=2;
+ function run(){const n=val('c10n'),ta=val('c10t')/10,t0=val('c10t0')/10,v=SG*SG/n,Bf=t=>v/(v+t*t),Ba=Bf(ta),B0=Bf(t0),rk=(B,th)=>(1-B)*(1-B)*v+B*B*th*th,bay=(B)=>(1-B)*(1-B)*v+B*B*t0*t0,TH=Math.max(3,3*t0),P=mk($('c10cv'),-TH,TH,Math.max(v*2.5,rk(Ba,TH)*1.1,rk(B0,TH)*1.1),{L:50});
+  P.line(()=>v,C.r,2.6,-TH,TH,2);P.line(t=>rk(Ba,t),C.a,2.8,-TH,TH,100);P.line(t=>rk(B0,t),C.g,2,-TH,TH,100,true);legend(P,[['MLE (no shrinkage)',C.r],['Bayes, assumed τ',C.a],['Bayes, true τ',C.g]],P.T+12);P.text('true effect θ →',P.w-P.R-4,P.h-P.B-6,C.mu,'right');P.text('mean squared error',P.L+6,P.T+28,C.mu);
+  const T=Array.from({length:60},(_,i)=>Math.pow(10,-1+2.2*i/59)),vals=T.map(t=>bay(Bf(t))),Q=mk($('c10cv2'),-1,1.2,Math.max(v*1.3,...vals)*1.1,{noGrid:true,L:50});customGrid(Q,[[-1,'0.1'],[0,'1'],[1,'10']],niceTicks(0,Math.max(v*1.3,...vals)*1.1,5));Q.hline(v,C.r,'MLE',true);poly(Q,T.map((t,i)=>[Math.log10(t),vals[i]]),C.a,2.8);Q.vline(Math.log10(t0),C.g,null,true);Q.vline(Math.log10(ta),C.y,null,true);Q.text('assumed prior sd τ (log scale) →',Q.w-Q.R-4,Q.h-Q.B-6,C.mu,'right');Q.text('average risk under the true prior',Q.L+6,Q.T+14,C.mu);
+  const R=30000;let se=0,sm=0;for(let r=0;r<R;r++){const th=t0*randn(),y=th+Math.sqrt(v)*randn();se+=Math.pow((1-Ba)*y-th,2);sm+=Math.pow(y-th,2)}se/=R;sm/=R;const th4=Math.max(...[TH]),worst=rk(Ba,TH);
+  $('c10st').innerHTML=stat('average risk: MLE · assumed-τ Bayes',fmt(v)+' · '+fmt(bay(Ba)),bay(Ba)<v?'ok':'hot')+stat('average risk: simulated check',fmt(sm)+' · '+fmt(se),'in')+stat('best possible average risk (τ = true)',fmt(bay(B0)),'')+stat('risk of the Bayes rule at θ = ±'+fmt(TH)+' vs MLE',fmt(worst)+' · '+fmt(v),worst>v?'warn':'ok');
+  $('c10rd').innerHTML=`One group effect θ is estimated from the mean of n = ${n} observations (variance ${fmt(v)}). The <b>risk</b> of an estimator is its mean squared error at a given θ: the MLE has flat risk ${fmt(v)}, while the Bayes estimator with assumed prior sd τ = ${fmt(ta)} has lower risk near the prior centre but rising risk away from it, ${fmt(worst)} at θ = ±${fmt(TH)}. The <b>Bayes risk</b> averages the risk over the prior the world really has (sd ${fmt(t0)}): ${fmt(bay(Ba))} for the Bayes rule against ${fmt(v)} for the MLE, confirmed by simulation (${fmt(se)}). On the right, the average risk is smallest when the assumed τ equals the true one and falls below the MLE’s unless the assumed τ is too small (below about ${fmt(Math.sqrt(Math.max(0,(t0*t0-v)/2)))} here): shrinking too hard is the way a wrong prior hurts. The MLE is <b>minimax</b> here (its worst-case risk is the smallest of any rule), the Bayes rule is better on average; which one is right depends on whether you can defend a prior or must guard against the worst case.`}
+ ['c10n','c10t','c10t0'].forEach(i=>$(i).addEventListener('change',run));run();})();
+
+/* ---------- Ch11 capacity-constrained triage ---------- */
+(function(){scl('c11n',v=>v);scl('c11k',v=>v+'%');scl('c11s',v=>fmt(v/10));
+ function run(){const N=val('c11n'),cap=val('c11k')/100,sa=val('c11s')/10,KS=[2,4,6,8,10,12,14,16,18,20,22,24,26,28,30,32,34,36,38,40],R=120,rules=['by probability','by amount','by p × amount','oracle'],acc=rules.map(()=>new Float64Array(KS.length));
+  for(let r=0;r<R;r++){const p=new Float64Array(N),A=new Float64Array(N),y=new Float64Array(N),pa=new Float64Array(N),fa=new Float64Array(N);let tot=0;for(let i=0;i<N;i++){p[i]=expit(-3.2+1.4*randn());A[i]=Math.exp(Math.log(1000)+sa*randn());y[i]=Math.random()<p[i]?1:0;pa[i]=p[i]*A[i];fa[i]=y[i]*A[i];tot+=fa[i]}
+   if(tot===0)continue;[p,A,pa,fa].forEach((key,ri)=>{const o=bdSort(key);let c=0,kk=0;for(let j=0;j<N&&kk<KS.length;j++){c+=fa[o[j]];while(kk<KS.length&&j+1>=Math.round(KS[kk]*N/100)){acc[ri][kk]+=c/tot/R;kk++}}})}
+  const ic=KS.indexOf(Math.round(cap*100)),cur=rules.map((_,ri)=>{if(ic>=0)return acc[ri][ic];let b=0;for(let k=0;k<KS.length;k++)if(KS[k]<=cap*100)b=acc[ri][k];return b});
+  barV($('c11cv'),cur,[C.r,C.y,C.g,C.mu],['by p','by amount','by p × amount','oracle'],1.08,pc1);
+  const Q=mk($('c11cv2'),0,40,1.02,{L:44});[[0,C.r],[1,C.y],[2,C.g],[3,C.mu]].forEach(([k,c])=>poly(Q,[[0,0],...KS.map((s,i)=>[s,acc[k][i]])],c,k===2?3:2));legend(Q,[['by p',C.r],['by amount',C.y],['by p × amount',C.g],['oracle',C.mu]],Q.T+12);Q.vline(cap*100,C.fg,null,true);Q.text('share of alerts reviewed (%) →',Q.w-Q.R-4,Q.h-Q.B-6,C.mu,'right');Q.text('share of fraud value caught',Q.L+6,Q.T+28,C.mu);
+  $('c11st').innerHTML=stat('value caught: by p · by amount',pc1(cur[0])+' · '+pc1(cur[1]),'')+stat('by p × amount (expected loss)',pc1(cur[2]),'ok')+stat('oracle (knows the labels)',pc1(cur[3]),'in')+stat('gain over ranking by p alone',pc1(cur[2]-cur[0]),cur[2]>cur[0]?'ok':'');
+  $('c11rd').innerHTML=`${N} alerts arrive, each with a calibrated fraud probability p and an exposure A (log-normal, spread ${fmt(sa)}); only ${Math.round(cap*100)}% can be reviewed. A reviewed fraud saves its full amount, so the value of reviewing an alert is its <b>expected loss prevented p × A</b> (less the review cost, which would be subtracted before ranking and used to decide whether to review at all). Ranking by that product catches ${pc1(cur[2])} of the fraud value, against ${pc1(cur[0])} when ranking by probability and ${pc1(cur[1])} by amount; the oracle that knows the labels reaches ${pc1(cur[3])}, which is the ceiling no model can pass. With one constraint, the Bayes action is a threshold on expected value per unit of capacity, so with equal review effort you simply fill the queue in descending order of expected value. When all amounts are alike (spread 0) ranking by p and by p × A coincide.`}
+ ['c11n','c11k','c11s'].forEach(i=>$(i).addEventListener('change',run));$('c11go').onclick=run;run();})();
+const QZ=[{"l":"Beginner","q":"What is the Bayes action?","o":["The action chosen by the most accurate model","The action with the smallest posterior expected loss","The action that maximises the posterior mode","The action with the smallest worst-case loss"],"a":1,"e":"Bayes action = argmin over a of E[L(a, θ) | data]; the loss function says how bad each action is for each possible truth."},{"l":"Beginner","q":"Under squared-error loss, which posterior summary is the Bayes estimate?","o":["The posterior mean","The posterior mode","The prior mean","The posterior median"],"a":0,"e":"E[(θ − a)²] is minimised at a = E[θ]; absolute loss gives the median and 0–1 loss the mode."},{"l":"Intermediate","q":"A shortage costs 4 per unit and a surplus costs 1 per unit. The best stock level is the…","o":["Median of demand","20th percentile of demand","Mean of demand","80th percentile of the predictive demand distribution"],"a":3,"e":"The Bayes action for linear asymmetric loss is the quantile at cᵤ/(cᵤ + cₒ) = 4/5."},{"l":"Intermediate","q":"A missed fraud costs 10 times as much as a false alarm. With calibrated probabilities, the cost-minimising rule is to flag when p exceeds…","o":["10/11, about 0.91","0.5","1/11, about 0.09","The base rate of fraud"],"a":2,"e":"Flag if p·c_FN-avoided exceeds (1 − p)·c_FP, i.e. p > c_FP/(c_FP + c_FN) = 1/11."},{"l":"Intermediate","q":"Why can the same model need different thresholds in two applications?","o":["Because probabilities change when thresholds change","Because the thresholds depend on the costs of each decision, not only on the model","Because accuracy changes with the threshold","Because the model changes between applications"],"a":1,"e":"The Bayes threshold is set by the cost ratio of the decision; the same probabilities feed different cost ratios."},{"l":"Intermediate","q":"EVPI (expected value of perfect information) equals…","o":["The expected loss from deciding now rather than knowing the truth","The probability the decision is wrong","The cost of the best experiment","The posterior variance"],"a":0,"e":"EVPI = E[value under the best action given θ] − value of the best action now = the expected loss of deciding without more information."},{"l":"Advanced","q":"You apply the threshold 1/(1 + c) to the raw scores of an overconfident model. What is the likely effect?","o":["The threshold becomes equal to the base rate","Nothing: the ranking is what matters","The model’s AUC falls","The cut-off is wrong, so cost rises; recalibrating on held-out labels fixes it"],"a":3,"e":"The rule needs calibrated probabilities. Overconfident scores sit too far from 0.5, so the right cut-off on the score is not 1/(1 + c); recalibrate first."},{"l":"Advanced","q":"The plug-in 95% quantile from 6 past periods is used to set stock. Compared with the Bayes predictive quantile it will…","o":["Have the same service level for every sample size","Be exactly right on average","Be too low, so shortages occur more often than 5%","Be too high"],"a":2,"e":"The plug-in ignores uncertainty in the mean and sd; the predictive t quantile is wider, and only it achieves the nominal coverage on average."},{"l":"Advanced","q":"EVSI(n) as a function of the sample size n…","o":["Exceeds EVPI for large n","Increases with diminishing returns towards EVPI","Is constant","Decreases with n"],"a":1,"e":"More data never reduces expected value, but with diminishing returns; EVSI is bounded above by EVPI."},{"l":"Advanced","q":"With exponential utility and a normal outcome, a risk-averse decision-maker ranks options by…","o":["Mean minus (λ/2) times variance, where the variance includes parameter uncertainty","The variance alone","The probability of a loss","The mean alone"],"a":0,"e":"The certainty equivalent is mean − (λ/2)·variance; the predictive variance includes the posterior variance of the mean."},{"l":"Advanced","q":"A Bayesian A/B test stops when the posterior expected loss of the leader falls below a threshold. Which statement is correct?","o":["It cannot stop before the planned sample size","It controls the type I error exactly at 5%","It is invalid because peeking inflates the posterior","The posterior remains valid under this stopping rule, but its frequentist error rates should be checked by simulation"],"a":3,"e":"Posterior inference is unaffected by the stopping rule; error rates in the frequentist sense are not guaranteed and are studied by simulation."},{"l":"Expert","q":"A decision to approve a portfolio flips when the prior strength moves from weak to moderate. What should you report?","o":["The decision under the weakest prior only","Nothing: priors do not affect decisions","That the decision depends on the prior, with the map of where it flips and how much more data would settle it","The decision under the average prior"],"a":2,"e":"A decision that is not robust over defensible priors rests on judgement; say so and show the sensitivity."},{"l":"Expert","q":"Why can the posterior mean fail as the answer to a decision problem?","o":["It cannot be computed by MCMC","It is the Bayes action only for squared loss; other losses call for other summaries such as a quantile or the mode","It ignores the prior","It is always biased"],"a":1,"e":"Different losses give different Bayes actions; the mean is right only when errors are costed quadratically and symmetrically."},{"l":"Expert","q":"A prior-based shrinkage estimator has Bayes risk below the sample mean’s. At a θ far from the prior centre it will…","o":["Have higher risk than the sample mean, since it is a bet on the prior","Always have lower risk, since it is Bayes","Have exactly the same risk","Be inadmissible"],"a":0,"e":"Shrinkage trades bias for variance: lower risk near the prior centre, higher risk far from it. The sample mean’s flat risk is minimax."},{"l":"Expert","q":"You can review 10% of alerts. Alerts differ widely in exposure. Which ranking maximises expected fraud value caught (ignoring review cost)?","o":["Random","Descending p","Descending exposure","Descending p × exposure"],"a":3,"e":"The expected loss prevented by reviewing a case is p·A; with equal review effort, fill capacity in descending order of that product."},{"l":"Expert","q":"In a threshold decision with calibrated probabilities, how does the Bayes threshold change when the base rate of positives doubles?","o":["It moves to 0.5","It doubles","It does not change; the threshold depends only on the cost ratio","It halves"],"a":2,"e":"The rule compares p·c_FN with (1 − p)·c_FP, so only costs enter. The base rate changes how many cases exceed the threshold, not the threshold."},{"l":"Expert","q":"The risk of an estimator, as opposed to its Bayes risk, is…","o":["Its worst-case loss over all data","Its expected loss at a particular true θ, with no prior averaging","Its loss on the observed data","Its posterior expected loss"],"a":1,"e":"Risk R(θ, δ) is a frequentist expectation over the data at fixed θ; Bayes risk averages R over a prior; the maximum over θ gives the minimax criterion."},{"l":"Expert","q":"Two options have equal posterior mean return, but one is measured much less precisely. A risk-averse Bayesian…","o":["Prefers the better-measured option, because parameter uncertainty adds to the outcome variance","Prefers the less precisely measured one","Must use the median to choose","Is indifferent between them"],"a":0,"e":"The certainty equivalent subtracts (λ/2) times the predictive variance, and the posterior variance of the mean is part of it."}];
+(function(){const st=store.get('bd_quiz',{});
+ function render(){const box=$('quiz');box.innerHTML='';
+  QZ.forEach((q,i)=>{const d=document.createElement('div');d.className='q'+(st[i]!=null?' done':'');d.innerHTML=`<div class="qh">Q${i+1} · ${q.l}</div><div style="margin:4px 0 6px"><b>${q.q}</b></div>`;
+   q.o.forEach((o,j)=>{const b=document.createElement('button');b.className='opt';b.textContent=o;if(st[i]!=null){if(j===q.a)b.classList.add('good');else if(j===st[i])b.classList.add('bad')}b.onclick=()=>{if(st[i]!=null)return;st[i]=j;store.set('bd_quiz',st);render();meter()};d.appendChild(b)});
+   const e=document.createElement('div');e.className='ex';e.innerHTML=(st[i]===q.a?'✅ ':'❌ ')+q.e;d.appendChild(e);box.appendChild(d)});
+  const ans=Object.keys(st).length,ok=QZ.filter((q,i)=>st[i]===q.a).length;
+  $('qscore').innerHTML=stat('answered',ans+' / '+QZ.length,'in')+stat('correct',ok,'ok')+stat('score',ans?Math.round(100*ok/ans)+'%':'—',ok/Math.max(ans,1)>=.8?'ok':'warn')+stat('verdict',ans<QZ.length?'keep going':ok>=16?'decision master':ok>=13?'strong':'review ch. 1–11','')}
+ $('qreset').onclick=()=>{Object.keys(st).forEach(k=>delete st[k]);store.set('bd_quiz',st);render();meter()};
+ window.__qst=st;render();})();
+const CHK=["Define actions, states, loss and the Bayes action as the minimiser of posterior expected loss.","Say which posterior summary each loss function gives (mean, median, mode, quantile).","Derive the cᵤ/(cᵤ + cₒ) quantile rule for asymmetric linear loss.","Derive the threshold 1/(1 + c) for a yes/no action from calibrated probabilities.","Explain why the threshold does not depend on the base rate and why 0.5 is usually wrong.","Show how miscalibration spoils a cost-based cut-off and recalibrate before deciding.","Define EVPI and EVSI and find a cost-justified sample size.","Explain why plug-in quantiles are too low and use the posterior predictive instead.","Use certainty equivalents for exponential utility and include parameter uncertainty in the variance.","Describe stopping a test on posterior expected loss and how to check its error rates.","Map a decision over defensible priors and report whether it flips.","Distinguish risk, Bayes risk and minimax, and say when shrinkage hurts.","Allocate limited review capacity by expected value and compare with the oracle ceiling.","Write down the loss, the predictive distribution and the sensitivity checks behind a model-based decision."];
+(function(){const st=store.get('bd_chk',{}),box=$('chk');CHK.forEach((t,i)=>{const l=document.createElement('label'),c=document.createElement('input');c.type='checkbox';c.checked=!!st[i];c.onchange=()=>{st[i]=c.checked;store.set('bd_chk',st);meter()};l.appendChild(c);const s=document.createElement('span');s.textContent=t;l.appendChild(s);box.appendChild(l)});window.__cst=st;})();
+function meter(){const q=window.__qst||{},c=window.__cst||{};const ok=QZ.filter((x,i)=>q[i]===x.a).length,ck=Object.values(c).filter(Boolean).length;const p=Math.round(100*(.6*ok/QZ.length+.4*ck/CHK.length));$('mtxt').textContent='Mastery: '+p+'%  (exam + checklist)';$('mbar').style.width=p+'%';store.set('mastery_bd',p)}
+meter();
+
+/* ---------- Navigation ---------- */
+(function(){const nav=$('nav');let html='';
+ document.querySelectorAll('main .part, main section.ch').forEach(el=>{if(el.classList.contains('part'))html+=`<div class="pt">${el.textContent}</div>`;else{const h=el.querySelector('h2'),num=h.querySelector('.num').textContent,t=Array.from(h.childNodes).filter(n=>n.nodeType===3).map(n=>n.textContent).join('').trim();html+=`<a href="#${el.id}" data-id="${el.id}">${num}. ${t}</a>`}});
+ nav.innerHTML=html;const links=nav.querySelectorAll('a'),io=new IntersectionObserver(es=>{es.forEach(e=>{if(e.isIntersecting)links.forEach(a=>a.classList.toggle('on',a.dataset.id===e.target.id))})},{rootMargin:'-20% 0px -70% 0px'});
+ document.querySelectorAll('section.ch').forEach(s=>io.observe(s));
+ $('menu').onclick=()=>$('side').classList.toggle('open');nav.addEventListener('click',e=>{if(e.target.tagName==='A')$('side').classList.remove('open')});
+ window.addEventListener('scroll',()=>{const h=document.documentElement;$('prog').style.width=(100*h.scrollTop/(h.scrollHeight-h.clientHeight))+'%'},{passive:true});})();
+</script>
+</body>
+</html>
