@@ -1,0 +1,672 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Hierarchical Models Mastery</title>
+<style>
+:root{--bg:#0b0e17;--panel:#121726;--panel2:#171d30;--line:#232a3d;--fg:#e8ebf5;--mu:#8a93ab;--a:#6ea8ff;--r:#ff6b81;--y:#ffd166;--g:#4ade80;--p:#c084fc;--t:#5eead4}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;background:var(--bg);color:var(--fg);font:16px/1.7 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+a{color:var(--a)}
+#prog{position:fixed;top:0;left:0;height:3px;background:linear-gradient(90deg,var(--a),var(--p),var(--r));width:0;z-index:50}
+.side{position:fixed;left:0;top:0;bottom:0;width:290px;background:#0e1220;border-right:1px solid var(--line);overflow:auto;padding:18px 14px 90px;z-index:40;transition:transform .25s}
+.side h1{font-size:15px;margin:0 0 2px}
+.side small{color:var(--mu)}
+.side .pt{margin:16px 0 4px;font-size:11px;text-transform:uppercase;letter-spacing:1.3px;color:var(--p)}
+.side a{display:block;color:var(--mu);text-decoration:none;padding:5px 9px;border-radius:7px;font-size:13.5px;line-height:1.35}
+.side a:hover{background:var(--panel);color:var(--fg)}
+.side a.on{background:var(--panel2);color:var(--fg);box-shadow:inset 3px 0 var(--a)}
+.side a.back{color:var(--t);padding-left:0;margin-bottom:6px}
+.meter{position:fixed;left:0;bottom:0;width:290px;background:#0e1220;border-top:1px solid var(--line);padding:10px 16px;z-index:41;font-size:12px;color:var(--mu)}
+.meter .bar{height:7px;background:var(--line);border-radius:6px;margin-top:5px;overflow:hidden}
+.meter .bar i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--g),var(--t));transition:width .4s}
+#menu{display:none;position:fixed;top:10px;left:10px;z-index:60;background:var(--panel2);color:var(--fg);border:1px solid var(--line);border-radius:9px;padding:7px 12px;font-size:14px;cursor:pointer}
+main{margin-left:290px;padding:0 34px 120px;max-width:1090px}
+.hero{padding:70px 0 30px}
+.hero h1{font-size:clamp(32px,5vw,56px);line-height:1.08;margin:0 0 14px;background:linear-gradient(100deg,#fff,var(--y) 40%,var(--r));-webkit-background-clip:text;background-clip:text;color:transparent}
+.hero p{font-size:19px;color:#c3c9dc;max-width:780px}
+.chips{display:flex;flex-wrap:wrap;gap:8px;margin:18px 0}
+.chip{border:1px solid var(--line);background:var(--panel);padding:5px 12px;border-radius:99px;font-size:13px;color:var(--mu)}
+.chip b{color:var(--fg)}
+.part{margin:90px 0 0;padding-top:22px;border-top:1px solid var(--line);font-size:12px;letter-spacing:2px;text-transform:uppercase;color:var(--p)}
+section.ch{padding-top:30px}
+h2{font-size:30px;line-height:1.2;margin:10px 0 8px;display:flex;gap:12px;align-items:center;flex-wrap:wrap}
+h2 .num{display:inline-grid;place-items:center;width:40px;height:40px;border-radius:12px;background:var(--panel2);border:1px solid var(--line);font-size:18px;color:var(--a)}
+.lvl{font-size:11px;font-weight:600;letter-spacing:.8px;text-transform:uppercase;padding:3px 9px;border-radius:99px;border:1px solid}
+.lvl.b{color:var(--g);border-color:#1f5c3a}.lvl.i{color:var(--a);border-color:#244a85}.lvl.a{color:var(--y);border-color:#6b5420}.lvl.e{color:var(--r);border-color:#7a2c3a}
+h3{font-size:19px;margin:30px 0 6px;color:#fff}
+p{margin:10px 0}li{margin:5px 0}
+code,.f{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace}
+code{background:var(--panel2);padding:1px 6px;border-radius:5px;font-size:.9em}
+.f{display:block;white-space:pre-wrap;background:#0e1322;border:1px solid var(--line);border-left:3px solid var(--a);padding:12px 16px;border-radius:9px;margin:14px 0;overflow-x:auto;font-size:15px;color:#dbe4ff;line-height:1.8}
+.co{border-radius:12px;padding:13px 17px;margin:16px 0;border:1px solid var(--line);background:var(--panel)}
+.co>b:first-child{display:block;margin-bottom:2px;font-size:12px;letter-spacing:1px;text-transform:uppercase}
+.co.def{border-left:4px solid var(--a)}.co.def>b:first-child{color:var(--a)}
+.co.warn{border-left:4px solid var(--r)}.co.warn>b:first-child{color:var(--r)}
+.co.tip{border-left:4px solid var(--g)}.co.tip>b:first-child{color:var(--g)}
+.co.key{border-left:4px solid var(--y);background:#171608}.co.key>b:first-child{color:var(--y)}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:18px 20px;margin:22px 0;box-shadow:0 8px 30px rgba(0,0,0,.25)}
+.card>h4{margin:0 0 3px;font-size:13px;letter-spacing:1.2px;text-transform:uppercase;color:var(--t)}
+.card>p.sub{margin:0 0 12px;color:var(--mu);font-size:14.5px}
+.ctl{display:flex;flex-wrap:wrap;gap:10px 22px;align-items:center;margin:8px 0 10px}
+.ctl label{display:flex;gap:8px;align-items:center;font-size:14px;color:#c3c9dc}
+.ctl output{min-width:38px;font-family:ui-monospace,monospace;color:var(--y);font-size:13px}
+input[type=range]{accent-color:var(--a);width:150px}
+input[type=checkbox]{accent-color:var(--a)}
+select,input[type=number],input[type=text]{background:#0e1322;color:var(--fg);border:1px solid var(--line);border-radius:8px;padding:6px 9px;font:inherit;font-size:14px}
+button{background:linear-gradient(180deg,#2c4a80,#233b68);color:#fff;border:1px solid #3a5a98;border-radius:9px;padding:7px 14px;font:inherit;font-size:14px;cursor:pointer}
+button:hover{filter:brightness(1.15)}
+button.alt{background:var(--panel2);border-color:var(--line);color:var(--fg)}
+canvas{width:100%;height:270px;display:block;background:#0e1322;border:1px solid var(--line);border-radius:10px;margin-top:6px}
+canvas.sm{height:210px}canvas.tl{height:330px}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(125px,1fr));gap:9px;margin:12px 0}
+.stat{background:#0e1322;border:1px solid var(--line);border-radius:10px;padding:8px 11px}
+.stat b{display:block;font-size:17px;font-family:ui-monospace,monospace}
+.stat span{font-size:11.5px;color:var(--mu);text-transform:uppercase;letter-spacing:.7px}
+.stat.hot b{color:var(--r)}.stat.ok b{color:var(--g)}.stat.warn b{color:var(--y)}.stat.in b{color:var(--a)}
+.read{margin:8px 0 0;padding:10px 14px;background:#0e1322;border:1px dashed #33406a;border-radius:10px;font-size:14.5px;color:#d3dbf3}
+table{border-collapse:collapse;width:100%;margin:12px 0;font-size:14px}
+th,td{border:1px solid var(--line);padding:7px 10px;text-align:left;vertical-align:top}
+th{background:var(--panel2);font-size:12px;text-transform:uppercase;letter-spacing:.6px;color:var(--mu)}
+td.n{font-family:ui-monospace,monospace;text-align:right}
+.tw{overflow-x:auto}
+.pill{display:inline-block;padding:1px 9px;border-radius:99px;font-size:12px;font-weight:600}
+.pill.r{background:#3a1520;color:var(--r)}.pill.g{background:#10321f;color:var(--g)}.pill.y{background:#3a2f0e;color:var(--y)}.pill.m{background:#202637;color:var(--mu)}
+details{background:var(--panel);border:1px solid var(--line);border-radius:11px;padding:9px 15px;margin:9px 0}
+details summary{cursor:pointer;font-weight:600}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.q{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:14px 18px;margin:14px 0}
+.q .qh{font-size:12px;letter-spacing:1px;text-transform:uppercase;color:var(--mu)}
+.q .opt{display:block;width:100%;text-align:left;margin:6px 0;background:#0e1322;border:1px solid var(--line);color:var(--fg);border-radius:9px;padding:9px 12px}
+.q .opt.good{border-color:var(--g);background:#0e2418}.q .opt.bad{border-color:var(--r);background:#2a1119}
+.q .ex{display:none;margin-top:8px;font-size:14.5px;color:#c3c9dc}
+.q.done .ex{display:block}
+.chk label{display:flex;gap:10px;align-items:flex-start;padding:6px 0;cursor:pointer}
+.chk input{margin-top:6px;accent-color:var(--g);width:17px;height:17px}
+.sigrow{display:grid;grid-template-columns:minmax(170px,2fr) 1fr 1fr auto;gap:8px 14px;align-items:center;padding:6px 0;border-top:1px dashed #1b2236}
+.sigrow:first-of-type{border-top:0}
+.sigrow label{display:flex;gap:6px;align-items:center;font-size:13.5px;color:#c3c9dc}
+@media(max-width:900px){
+ .side{transform:translateX(-100%)}.side.open{transform:none}.meter{display:none}
+ #menu{display:block}main{margin-left:0;padding:0 16px 100px}.two{grid-template-columns:1fr}.hero{padding-top:60px}
+ .sigrow{grid-template-columns:1fr 1fr}
+}
+</style>
+</head>
+<body>
+<div id="prog"></div>
+<button id="menu">☰ Contents</button>
+<nav class="side" id="side"><a class="back" href="index.html">← All courses</a><h1>Hierarchical Models</h1><small>12 chapters · 11 labs · exam</small><div id="nav"></div></nav>
+<div class="meter"><div id="mtxt">Mastery: 0%</div><div class="bar"><i id="mbar"></i></div></div>
+
+<main>
+<header class="hero">
+ <h1>Hierarchical models: groups that learn from each other, without pretending to be identical.</h1>
+ <p>A bank’s data come in groups: branches, merchants, customer segments, products, vintages, regions. Some groups have thousands of observations and many have a handful. Analysing each group separately (<b>no pooling</b>) gives noisy, extreme estimates for the small ones; lumping everything together (<b>complete pooling</b>) throws away real differences. A <b>hierarchical</b> (multilevel, partial pooling) model treats the groups’ true effects as draws from a common population whose spread is itself estimated: each group borrows exactly as much strength from the others as the data justify. This page works through the normal hierarchical model, where the shrinkage can be seen in closed form, then the issues that decide whether it works in practice: estimating the spread, priors for it, the funnel that breaks samplers, full against empirical Bayes, varying slopes, group-level predictors, new groups, rankings, and the situation where pooling does harm.</p>
+ <div class="chips"><span class="chip"><b>Part I</b> Pooling and shrinkage</span><span class="chip"><b>Part II</b> Fitting and structure</span><span class="chip"><b>Part III</b> Practice and limits</span></div>
+ <div class="co tip"><b>How to use this</b>Sliders change the setting; heavier labs recompute when you release a slider or press the button. Prerequisites: Bayesian inference (item 26), MCMC (item 27) and dependent data with mixed models (item 20). Item 29 turns posteriors into decisions.</div>
+</header>
+
+<div class="part">Part I · Pooling and shrinkage</div>
+
+<section class="ch" id="c1">
+<h2><span class="num">1</span>Complete, no and partial pooling <span class="lvl b">Beginner</span></h2>
+<p>Suppose J groups each give an estimate ȳⱼ of an underlying group effect θⱼ with noise variance vⱼ = σ²/nⱼ. Three ways to estimate θⱼ. <b>No pooling:</b> θ̂ⱼ = ȳⱼ. Unbiased, but noisy when nⱼ is small, and the most extreme values are largely noise. <b>Complete pooling:</b> θ̂ⱼ = ȳ for all j. Very stable, but wrong by the full group difference if the groups really differ. <b>Partial pooling:</b> assume θⱼ ~ N(μ, τ²), where τ measures how much the groups differ, and estimate θⱼ by a weighted average of ȳⱼ and the overall mean μ, with weights set by the noise variance against τ². When τ is large partial pooling behaves like no pooling; when τ is near 0 like complete pooling; in between it beats both. This is the same idea as the beta-binomial shrinkage of item 26, now with the group spread τ as an explicit, estimable quantity.</p>
+<div class="card"><h4>Lab 1 · Three estimators across groups</h4>
+ <p class="sub">Group effects are drawn from N(0, τ²) and each group mean is observed with noise sd 2/√n. Left: one dataset, groups sorted by true effect; grey segments join the raw mean to its partially pooled value. Right: root-mean-squared error of the three estimators against the true τ (dashed line: your τ).</p>
+ <div class="ctl"><label>groups J <input type="range" id="c1j" min="5" max="60" step="1" value="20"><output id="c1jv"></output></label><label>observations per group n <input type="range" id="c1n" min="2" max="50" step="1" value="6"><output id="c1nv"></output></label><label>true between-group sd τ <input type="range" id="c1t" min="0" max="40" step="1" value="10"><output id="c1tv"></output></label><button id="c1go">New data</button></div>
+ <div class="two"><canvas class="sm" id="c1cv"></canvas><canvas class="sm" id="c1cv2"></canvas></div><div class="stats" id="c1st"></div><div class="read" id="c1rd"></div></div>
+</section>
+
+<section class="ch" id="c2">
+<h2><span class="num">2</span>The shrinkage factor <span class="lvl i">Intermediate</span></h2>
+<p>With known μ, τ and σ the posterior for group j is normal, and its mean is a weighted average:</p>
+<div class="f">E[θⱼ | y] = (1 − Bⱼ)·ȳⱼ + Bⱼ·μ,     Bⱼ = (σ²/nⱼ) / (σ²/nⱼ + τ²),     Var[θⱼ | y] = (1 − Bⱼ)·σ²/nⱼ</div>
+<p>Bⱼ is the <b>shrinkage factor</b>: the share of the group’s total variance that is noise. It is near 1 (shrink almost all the way to μ) for groups with few observations or when τ is small, and near 0 for large groups or very different groups. Two consequences. The posterior variance (1 − Bⱼ)vⱼ is always smaller than vⱼ: pooling reduces uncertainty for every group, most of all for the smallest. And shrinkage cures the <em>winner’s curse</em>: if you rank groups by raw mean, the top ones include small groups with lucky noise, and their raw means overstate their true effects; the pooled means correct this in proportion to each group’s noise.</p>
+<div class="card"><h4>Lab 2 · Twelve groups of very different size</h4>
+ <p class="sub">Group sizes run from 2 to the maximum you choose. Left: the weight on the grand mean against group size for your τ (green) and for half and double that τ; the white dots are the twelve groups. Right: error of the raw mean (red) and of the partially pooled estimate (green), as lines (theory) and dots (400 simulations).</p>
+ <div class="ctl"><label>between-group sd τ <input type="range" id="c2t" min="1" max="30" step="1" value="10"><output id="c2tv"></output></label><label>noise sd σ <input type="range" id="c2s" min="5" max="40" step="1" value="20"><output id="c2sv"></output></label><label>largest group size <input type="range" id="c2n" min="10" max="200" step="1" value="100"><output id="c2nv"></output></label><button id="c2go">Re-simulate</button></div>
+ <div class="two"><canvas class="sm" id="c2cv"></canvas><canvas class="sm" id="c2cv2"></canvas></div><div class="stats" id="c2st"></div><div class="read" id="c2rd"></div></div>
+</section>
+
+<section class="ch" id="c3">
+<h2><span class="num">3</span>Estimating the spread τ <span class="lvl i">Intermediate</span></h2>
+<p>In practice τ is unknown, and it is the hardest quantity in the model: it is learned from only J group means. A classic fact: with few groups, or noise large against τ, the maximum-likelihood or moment estimate of τ is very often exactly zero, which silently switches the model to complete pooling. The Bayesian answer is the <b>marginal posterior of τ</b>, p(τ | y) ∝ p(τ) · ∏ N(ȳⱼ | μ̂, σⱼ² + τ²) (with μ integrated out), which for a normal model can be computed on a grid. It is typically wide, skewed to the right and not at zero, and averaging the group estimates over it makes shrinkage depend honestly on how well τ is known. The practical rules: report an interval for τ, expect it to be wide with fewer than about eight to ten groups, and do not read a point estimate of 0 as evidence that groups are identical.</p>
+<div class="card"><h4>Lab 3 · What the data say about τ</h4>
+ <p class="sub">Group means have noise sd 3/√n. Left: the exact posterior of τ for one dataset (flat prior on τ), with the true τ (white) and the moment estimate (red). Right: the moment estimate over 300 fresh datasets.</p>
+ <div class="ctl"><label>groups J <input type="range" id="c3j" min="3" max="40" step="1" value="8"><output id="c3jv"></output></label><label>true τ <input type="range" id="c3t" min="0" max="30" step="1" value="15"><output id="c3tv"></output></label><label>observations per group <input type="range" id="c3n" min="2" max="100" step="1" value="6"><output id="c3nv"></output></label><button id="c3go">New data</button></div>
+ <div class="two"><canvas class="sm" id="c3cv"></canvas><canvas class="sm" id="c3cv2"></canvas></div><div class="stats" id="c3st"></div><div class="read" id="c3rd"></div></div>
+</section>
+
+<section class="ch" id="c4">
+<h2><span class="num">4</span>Priors for the group spread <span class="lvl i">Intermediate</span></h2>
+<p>Because τ is weakly identified, its prior is influential when J is small, and choosing it carelessly is the classic way to get a hierarchical model wrong. Good defaults are <b>weakly informative priors on the standard deviation τ</b>, on the scale of the outcome: a half-Cauchy or half-normal (or half-t), or a flat prior on τ when there are enough groups. The older habit of an inverse-gamma(ε, ε) prior on the <em>variance</em> τ² looks “non-informative” but is not: for small ε it concentrates mass near 0, and as the data weaken the posterior of τ follows the prior towards zero, over-shrinking all groups. Whatever prior you choose, check the sensitivity of the group estimates to it, plot the prior against the posterior to see how much the data moved it, and document the choice. If there are very few groups (say fewer than five), τ is essentially set by the prior, and the right response may be an informative prior from earlier or similar data.</p>
+<div class="card"><h4>Lab 4 · One dataset, four priors for τ</h4>
+ <p class="sub">Few groups, each mean with noise sd 3/√6. Left: posterior of τ under each prior (white dashed: truth). Right: raw mean, estimate under each prior, and truth for the group with the highest raw mean.</p>
+ <div class="ctl"><label>groups J <input type="range" id="c4j" min="3" max="20" step="1" value="5"><output id="c4jv"></output></label><label>true τ <input type="range" id="c4t" min="0" max="30" step="1" value="10"><output id="c4tv"></output></label><button id="c4go">New data</button></div>
+ <div class="two"><canvas class="sm" id="c4cv"></canvas><canvas class="sm" id="c4cv2"></canvas></div><div class="stats" id="c4st"></div><div class="read" id="c4rd"></div></div>
+</section>
+
+<div class="part">Part II · Fitting and structure</div>
+
+<section class="ch" id="c5">
+<h2><span class="num">5</span>Sampling hierarchical models: the funnel <span class="lvl a">Advanced</span></h2>
+<p>Hierarchical posteriors have a shape that defeats naive samplers: when τ is small the group effects θⱼ are forced close together, and when they are close together τ is forced to be small, so the joint density of (θ, τ) looks like a <b>funnel</b>, wide at large τ and a narrow neck at small τ. A sampler with one step size cannot suit both ends; in Hamiltonian Monte Carlo this shows up as divergent transitions near the neck. The standard fix is the <b>non-centred parametrisation</b>: write θⱼ = μ + τ·ηⱼ with ηⱼ ~ N(0, 1) and sample (μ, τ, η) instead, which makes the ηⱼ independent of τ a priori and removes the funnel. It helps most when data per group are weak or τ is small; with strong data the centred form is better, because then the likelihood makes θⱼ nearly independent of τ. Both parametrisations describe the same model; only the geometry the sampler sees changes. Practical consequences: if you see divergences in a multilevel model, try non-centring first, and be suspicious of a model whose τ posterior hits a wall at zero.</p>
+<div class="card"><h4>Lab 5 · Centred against non-centred Gibbs sampling</h4>
+ <p class="sub">The same data and posterior, two samplers (4000 iterations each; the group noise sd is 2). Left: the trace of τ. Right: the joint draws of θ₁ and log τ (centred red, non-centred green): the red cloud is the funnel and stays away from its neck.</p>
+ <div class="ctl"><label>groups J <input type="range" id="c5j" min="4" max="30" step="1" value="8"><output id="c5jv"></output></label><label>true τ <input type="range" id="c5t" min="1" max="30" step="1" value="5"><output id="c5tv"></output></label><button id="c5go">New data and run</button></div>
+ <div class="two"><canvas class="sm" id="c5cv"></canvas><canvas class="sm" id="c5cv2"></canvas></div><div class="stats" id="c5st"></div><div class="read" id="c5rd"></div></div>
+</section>
+
+<section class="ch" id="c6">
+<h2><span class="num">6</span>Rates: full Bayes against empirical Bayes <span class="lvl a">Advanced</span></h2>
+<p>For counts of defaults, fraud or conversions in each branch, the natural hierarchical model is beta-binomial: xⱼ ~ Binomial(nⱼ, θⱼ), θⱼ ~ Beta(mκ, (1 − m)κ), with population mean m and strength κ. <b>Empirical Bayes</b> estimates (m, κ) once from all the branches (as on the previous page) and treats them as known; <b>full Bayes</b> gives (m, κ) a prior and integrates over their posterior. For point estimates the two nearly agree. For <em>intervals</em> they differ: empirical Bayes ignores uncertainty in (m, κ) and its intervals are too short, an effect that grows as the number of branches falls. The marginal likelihood of (m, κ) is available in closed form (a product of beta functions), so a grid suffices here; in larger models the same job is done by MCMC. The practical lesson is to carry hyperparameter uncertainty through to the quantities you report, especially when you have few groups.</p>
+<div class="card"><h4>Lab 6 · Interval coverage for branch default rates</h4>
+ <p class="sub">Branch sizes run from about 20 to 600 accounts; true rates come from a beta distribution with the mean and strength you set. Left: the 95% intervals of the 10 smallest branches in one dataset (white dot: the true rate). Right: how often the intervals contain the truth over 25 datasets.</p>
+ <div class="ctl"><label>branches J <input type="range" id="c6j" min="6" max="100" step="2" value="12"><output id="c6jv"></output></label><label>true strength κ (accounts) <input type="range" id="c6k" min="10" max="500" step="10" value="60"><output id="c6kv"></output></label><label>mean default rate <input type="range" id="c6m" min="1" max="10" step="1" value="4"><output id="c6mv"></output></label><button id="c6go">Re-simulate</button></div>
+ <div class="two"><canvas class="sm" id="c6cv"></canvas><canvas class="sm" id="c6cv2"></canvas></div><div class="stats" id="c6st"></div><div class="read" id="c6rd"></div></div>
+</section>
+
+<section class="ch" id="c7">
+<h2><span class="num">7</span>Varying intercepts and slopes <span class="lvl a">Advanced</span></h2>
+<p>Groups can differ in more than their level. In a model y = aⱼ + bⱼx + ε with each group’s intercept aⱼ and slope bⱼ drawn from a bivariate normal with mean (μ_a, μ_b) and covariance Σ, partial pooling shrinks the <em>pair</em> (aⱼ, bⱼ) towards the population mean, and the direction of shrinkage follows the correlation in Σ. For a group with few points, the posterior mean is (Σ⁻¹ + XⱼᵀXⱼ/σ²)⁻¹(Σ⁻¹μ + Xⱼᵀyⱼ/σ²): a precision-weighted average of the population mean and the group’s own least-squares fit, exactly the scalar formula in matrix form. This is the random-slopes mixed model of item 20 viewed as a Bayesian hierarchical model, with the extra benefits that the uncertainty in Σ propagates and that groups with too few points to fit a line (one or two) still get a sensible estimate. The covariance matrix needs a prior too; the standard choice factorises it into scales (half-t) and a correlation matrix (an LKJ prior).</p>
+<div class="card"><h4>Lab 7 · Shrinking lines towards the population</h4>
+ <p class="sub">Group intercepts have sd 1 and slopes mean 1 and sd 0.5, with the correlation you set; the noise sd is 1 and the predictor is standard normal. Population mean and covariance are taken as known to isolate the shrinkage. Left: 25 groups’ true (intercept, slope), their separate fits and the partially pooled estimates. Right: errors of the three estimators.</p>
+ <div class="ctl"><label>groups J <input type="range" id="c7j" min="10" max="100" step="10" value="40"><output id="c7jv"></output></label><label>points per group <input type="range" id="c7n" min="3" max="30" step="1" value="5"><output id="c7nv"></output></label><label>correlation of intercept and slope <input type="range" id="c7r" min="-90" max="90" step="10" value="-60"><output id="c7rv"></output></label><button id="c7go">New data</button></div>
+ <div class="two"><canvas class="sm" id="c7cv"></canvas><canvas class="sm" id="c7cv2"></canvas></div><div class="stats" id="c7st"></div><div class="read" id="c7rd"></div></div>
+</section>
+
+<section class="ch" id="c8">
+<h2><span class="num">8</span>Group-level predictors <span class="lvl e">Expert</span></h2>
+<p>The population distribution need not be a single normal. A group-level regression θⱼ = γ₀ + γ₁zⱼ + uⱼ, uⱼ ~ N(0, τ_u²), lets branch or segment characteristics zⱼ predict the group effects, and partial pooling shrinks each group towards its predicted value. The residual spread τ_u is smaller than the total spread, so the groups are shrunk <em>more</em>, but towards a better target; the net effect is lower error for small groups. This is the multilevel regression that, combined with poststratification (MRP), produces reliable small-area estimates from sparse data, a technique with direct uses for regional or segment-level risk and demand estimates. Two cautions. A group-level predictor correlated with an omitted group-level cause can create an ecological fallacy: associations between group averages need not hold within groups. And with few groups the regression coefficients γ are themselves poorly determined; give them proper priors.</p>
+<div class="card"><h4>Lab 8 · Shrinking towards a regression line</h4>
+ <p class="sub">Group effects have total sd 1.5, of which the group predictor explains the share you set; group means have noise sd 3/√n. Left: error of three estimators against the explained share (dashed: your setting). Right: the errors at your setting.</p>
+ <div class="ctl"><label>groups J <input type="range" id="c8j" min="10" max="100" step="10" value="30"><output id="c8jv"></output></label><label>observations per group <input type="range" id="c8n" min="3" max="50" step="1" value="8"><output id="c8nv"></output></label><label>share explained by the predictor <input type="range" id="c8r" min="0" max="95" step="5" value="60"><output id="c8rv"></output></label><button id="c8go">Re-simulate</button></div>
+ <div class="two"><canvas class="sm" id="c8cv"></canvas><canvas class="sm" id="c8cv2"></canvas></div><div class="stats" id="c8st"></div><div class="read" id="c8rd"></div></div>
+</section>
+
+<div class="part">Part III · Practice and limits</div>
+
+<section class="ch" id="c9">
+<h2><span class="num">9</span>Predicting a new group <span class="lvl e">Expert</span></h2>
+<p>A hierarchical model answers two different questions. <b>Existing groups:</b> what is θⱼ for a group we have observed? (shrinkage, above). <b>A new group:</b> what do we expect for a branch, merchant or product that is not in the data? The answer comes from the population distribution: before any data, the new group’s effect is N(μ, τ²) (with the uncertainty in μ and τ carried along), and as its own data accumulate the prediction moves from the population towards the group’s own mean, with the same shrinkage weight as before. Treating the new group as identical to the average (complete pooling) gives intervals that are far too narrow; estimating it from its own data alone gives correct but, for small n, useless intervals. The hierarchical interval is both calibrated and narrower. Cold-start problems (a new branch, a new card product, a newly onboarded merchant) are the natural application, and the calibration of such predictions should be back-tested on groups held out entirely.</p>
+<div class="card"><h4>Lab 9 · Intervals for a brand-new group</h4>
+ <p class="sub">The population has mean 0 and sd τ; the new group’s mean is observed with noise sd σ/√n. The existing J groups each have 20 observations and give an estimate of the population mean. Left: width of the 95% interval for the new group’s true effect. Right: how often it contains it (3000 simulations per point).</p>
+ <div class="ctl"><label>between-group sd τ <input type="range" id="c9t" min="2" max="30" step="1" value="10"><output id="c9tv"></output></label><label>noise sd σ <input type="range" id="c9s" min="10" max="60" step="1" value="30"><output id="c9sv"></output></label><label>existing groups <input type="range" id="c9j" min="3" max="100" step="1" value="20"><output id="c9jv"></output></label><label>highlight n <input type="range" id="c9i" min="0" max="9" step="1" value="4"><output id="c9iv"></output></label></div>
+ <div class="two"><canvas class="sm" id="c9cv"></canvas><canvas class="sm" id="c9cv2"></canvas></div><div class="stats" id="c9st"></div><div class="read" id="c9rd"></div></div>
+</section>
+
+<section class="ch" id="c10">
+<h2><span class="num">10</span>Ranking and flagging groups <span class="lvl e">Expert</span></h2>
+<p>Banks rank branches, relationship managers, merchants and models, and flag the worst. A ranking from raw means is dominated by sample size: small groups are over-represented at both ends. Hierarchical estimates improve it in two ways. The posterior means correct for size, and the posterior draws give a full <b>posterior distribution of each group’s rank</b> and the <b>probability that a group belongs in the worst k%</b>. Ranking by that probability (or by the posterior expected rank) is the sensible way to select a watch list, since it accounts for both the size of the estimated effect and the certainty. The rank intervals are often humbling: with realistic noise, even the “worst” groups’ ranks span a large part of the list, which is the honest message for any league table. Report the interval or the probability next to every flag; for supervisory or HR-sensitive uses, make this explicit, since a flag based on noise is an unfair one.</p>
+<div class="card"><h4>Lab 10 · Who really belongs in the worst group?</h4>
+ <p class="sub">Group sizes run from 2 to 100 observations (noise sd 3/√n) and the groups with the highest true effect are the “worst”. Left: the share of flagged groups that truly belong, for three ranking rules (average of 60 datasets). Right: posterior rank intervals (90%) of the 25 worst-looking groups in one dataset.</p>
+ <div class="ctl"><label>groups J <input type="range" id="c10j" min="20" max="100" step="10" value="50"><output id="c10jv"></output></label><label>between-group sd τ <input type="range" id="c10t" min="1" max="30" step="1" value="10"><output id="c10tv"></output></label><label>flag the worst <input type="range" id="c10k" min="5" max="30" step="5" value="10"><output id="c10kv"></output></label><button id="c10go">New data</button></div>
+ <div class="two"><canvas class="sm" id="c10cv"></canvas><canvas class="sm" id="c10cv2"></canvas></div><div class="stats" id="c10st"></div><div class="read" id="c10rd"></div></div>
+</section>
+
+<section class="ch" id="c11">
+<h2><span class="num">11</span>When pooling hurts <span class="lvl e">Expert</span></h2>
+<p>Partial pooling rests on <b>exchangeability</b>: before seeing the data, nothing distinguishes one group from another except its label, so all are draws from the same population. If that is false, shrinkage can do damage: a genuinely unusual group (a fraud ring, a mis-booked portfolio, a branch in a flood zone, a product with a new feature) is pulled towards the pack, and with a normal population its estimate is shrunk exactly as much as an ordinary group of the same size. Remedies: (1) add group-level predictors that explain the unusual group; (2) use a <b>heavy-tailed population distribution</b> (Student t or a scale mixture), which shrinks ordinary groups but lets extreme evidence through; (3) use a mixture population with an “other” component; (4) check with posterior predictive checks and with leave-one-group-out cross-validation, which highlights groups the model predicts poorly. Also watch for the opposite failure: a model that never shrinks (τ forced large by the prior) is no better than no pooling. Choose the population model deliberately and say why.</p>
+<div class="card"><h4>Lab 11 · One unusual group among ordinary ones</h4>
+ <p class="sub">Ordinary groups have effects N(0, 1); one group has an effect of the stated number of standard deviations. Group means have noise sd 3/√n; the population mean and sd are taken as known. Left: for one dataset, the data alone (yellow), the normal-population posterior (red) and the t-population posterior (green); white dashed: the truth. Right: average absolute error over 60 datasets.</p>
+ <div class="ctl"><label>groups J <input type="range" id="c11j" min="10" max="60" step="5" value="25"><output id="c11jv"></output></label><label>size of the unusual effect (sd units) <input type="range" id="c11d" min="0" max="16" step="1" value="10"><output id="c11dv"></output></label><label>observations per group <input type="range" id="c11n" min="3" max="50" step="1" value="12"><output id="c11nv"></output></label><label>t degrees of freedom <input type="range" id="c11v" min="1" max="30" step="1" value="4"><output id="c11vv"></output></label><button id="c11go">New data</button></div>
+ <div class="two"><canvas class="sm" id="c11cv"></canvas><canvas class="sm" id="c11cv2"></canvas></div><div class="stats" id="c11st"></div><div class="read" id="c11rd"></div></div>
+</section>
+
+<section class="ch" id="c12">
+<h2><span class="num">12</span>Final exam, mastery checklist, cheat sheet <span class="lvl e">Expert</span></h2>
+<h3>Exam (18 questions — click an answer)</h3>
+<div id="quiz"></div>
+<div class="card"><h4>Score</h4><div class="stats" id="qscore"></div><button class="alt" id="qreset">Reset exam</button></div>
+<h3>Mastery checklist — tick when you can do it without notes</h3>
+<div class="card chk" id="chk"></div>
+<h3>Cheat sheet</h3>
+<div class="tw"><table>
+<tr><th>Idea</th><th>One line</th></tr>
+<tr><td>Three pooling levels</td><td>No pooling: noisy, unbiased; complete pooling: stable, biased; partial pooling: estimates how different the groups are and weighs accordingly</td></tr>
+<tr><td>Normal hierarchical model</td><td>yⱼ ~ N(θⱼ, σ²/nⱼ), θⱼ ~ N(μ, τ²); posterior mean (1 − Bⱼ)ȳⱼ + Bⱼμ with Bⱼ = (σ²/nⱼ)/(σ²/nⱼ + τ²)</td></tr>
+<tr><td>Who is shrunk most</td><td>Small groups and similar groups (small τ); the posterior variance (1 − Bⱼ)σ²/nⱼ falls for every group</td></tr>
+<tr><td>Estimating τ</td><td>Learned from J group means: wide posterior with few groups; point estimates often hit zero; use the marginal posterior of τ</td></tr>
+<tr><td>Priors on τ</td><td>Weakly informative on the sd (half-Cauchy, half-normal, flat with enough groups); avoid inverse-gamma(ε, ε) on τ²; check sensitivity</td></tr>
+<tr><td>Funnel</td><td>Small τ forces the θⱼ together: samplers struggle; non-centre with θⱼ = μ + τηⱼ; divergences are the warning</td></tr>
+<tr><td>Full vs empirical Bayes</td><td>Empirical Bayes plugs in estimated hyperparameters and gives intervals that are too short; full Bayes integrates them out</td></tr>
+<tr><td>Varying slopes</td><td>Shrink the (intercept, slope) pair towards the population mean along their correlation; prior on Σ via scales and an LKJ correlation</td></tr>
+<tr><td>Group predictors</td><td>θⱼ = γ₀ + γ₁zⱼ + uⱼ: shrink towards a prediction, pay only for the residual spread; beware ecological fallacy</td></tr>
+<tr><td>New groups</td><td>Predict from the population distribution; calibrated and narrower than own-data-only intervals; back-test on held-out groups</td></tr>
+<tr><td>Rankings</td><td>Rank by posterior expected rank or probability of being in the worst k%; report rank intervals</td></tr>
+<tr><td>When pooling hurts</td><td>Exchangeability fails for unusual groups: add predictors, use a t or mixture population, check with predictive checks and leave-one-group-out CV</td></tr>
+</table></div>
+<div class="co tip"><b>Next in Stage 6</b>Item 29 closes the stage with Bayesian decision theory: from posterior distributions to actions, using loss and utility, value of information and expected loss. Stage 7 then covers specialist topics.</div>
+</section>
+</main>
+<script>
+/*MATH*/
+function lgamma(x){const c=[76.18009172947146,-86.50532032941677,24.01409824083091,-1.231739572450155,0.1208650973866179e-2,-0.5395239384953e-5];let y=x,t=x+5.5;t-=(x+.5)*Math.log(t);let s=1.000000000190015;for(let j=0;j<6;j++)s+=c[j]/++y;return -t+Math.log(2.5066282746310005*s/x);}
+function gser(a,x){let ap=a,sum=1/a,del=sum;for(let n=0;n<1000;n++){ap++;del*=x/ap;sum+=del;if(Math.abs(del)<Math.abs(sum)*1e-15)break;}return sum*Math.exp(-x+a*Math.log(x)-lgamma(a));}
+function gcf(a,x){let b=x+1-a,c=1/1e-300,d=1/b,h=d;for(let i=1;i<1000;i++){const an=-i*(i-a);b+=2;d=an*d+b;if(Math.abs(d)<1e-300)d=1e-300;c=b+an/c;if(Math.abs(c)<1e-300)c=1e-300;d=1/d;const del=d*c;h*=del;if(Math.abs(del-1)<1e-15)break;}return Math.exp(-x+a*Math.log(x)-lgamma(a))*h;}
+function gammaQ(a,x){if(x<=0)return 1;return x<a+1?1-gser(a,x):gcf(a,x);}
+function betacf(a,b,x){const qab=a+b,qap=a+1,qam=a-1;let c=1,d=1-qab*x/qap;if(Math.abs(d)<1e-300)d=1e-300;d=1/d;let h=d;for(let m=1;m<=1000;m++){const m2=2*m;let aa=m*(b-m)*x/((qam+m2)*(a+m2));d=1+aa*d;if(Math.abs(d)<1e-300)d=1e-300;c=1+aa/c;if(Math.abs(c)<1e-300)c=1e-300;d=1/d;h*=d*c;aa=-(a+m)*(qab+m)*x/((a+m2)*(qap+m2));d=1+aa*d;if(Math.abs(d)<1e-300)d=1e-300;c=1+aa/c;if(Math.abs(c)<1e-300)c=1e-300;d=1/d;const del=d*c;h*=del;if(Math.abs(del-1)<1e-15)break;}return h;}
+function betai(a,b,x){if(x<=0)return 0;if(x>=1)return 1;const bt=Math.exp(lgamma(a+b)-lgamma(a)-lgamma(b)+a*Math.log(x)+b*Math.log(1-x));return x<(a+1)/(a+b+2)?bt*betacf(a,b,x)/a:1-bt*betacf(b,a,1-x)/b;}
+function normSf(z){const q=0.5*gammaQ(.5,z*z/2);return z>=0?q:1-q;}
+function normCdf(z){return normSf(-z);}
+function npdf(x){return Math.exp(-x*x/2)/2.5066282746310002;}
+function lbin(n,k){return lgamma(n+1)-lgamma(k+1)-lgamma(n-k+1);}
+function binom(n,k,p){return Math.exp(lbin(n,k)+k*Math.log(p)+(n-k)*Math.log(1-p));}
+function betapdf(x,a,b){return x<=0||x>=1?0:Math.exp(lgamma(a+b)-lgamma(a)-lgamma(b)+(a-1)*Math.log(x)+(b-1)*Math.log(1-x));}
+function betacdf(x,a,b){return betai(a,b,x);}
+function gampdf(x,a,r){return x<=0?0:Math.exp(a*Math.log(r)+(a-1)*Math.log(x)-r*x-lgamma(a));}
+function gamcdf(x,a,r){return x<=0?0:1-gammaQ(a,r*x);}
+function randn(){let u=0;while(!u)u=Math.random();return Math.sqrt(-2*Math.log(u))*Math.cos(2*Math.PI*Math.random());}
+function gammaS(a){if(a<1)return gammaS(a+1)*Math.pow(Math.random(),1/a);const d=a-1/3,c=1/Math.sqrt(9*d);for(;;){let x,v;do{x=randn();v=1+c*x}while(v<=0);v=v*v*v;const u=Math.random();if(Math.log(u)<.5*x*x+d-d*v+d*Math.log(v))return d*v;}}
+function betaS(a,b){const x=gammaS(a),y=gammaS(b);return x/(x+y);}
+function binS(n,p){let k=0;for(let i=0;i<n;i++)if(Math.random()<p)k++;return k;}
+function mean(a){let s=0;for(const v of a)s+=v;return s/a.length;}
+function qc(cdf,lo,hi,p,it){for(let i=0;i<(it||100);i++){const m=(lo+hi)/2;if(cdf(m)<p)lo=m;else hi=m}return(lo+hi)/2;}
+function qb(a,b,p){return qc(x=>betai(a,b,x),0,1,p,50);}
+function tcdf(x,v){const t=.5*betai(v/2,.5,v/(v+x*x));return x>0?1-t:t}
+function qn(p){return qc(normCdf,-9,9,p,70)}
+function pois(k,l){return Math.exp(-l+k*Math.log(l)-lgamma(k+1))}
+function binF(n,p){let k=0;for(;;){if(n<=0||p<=0)return k;if(p>=1)return k+n;if(n<=40){for(let i=0;i<n;i++)if(Math.random()<p)k++;return k}const a=1+(n>>1),bb=1+n-a,x=betaS(a,bb);if(x>=p){n=a-1;p=p/x}else{k+=a;n=bb-1;p=(p-x)/(1-x)}}}
+/*ENDMATH*/
+
+const $=id=>document.getElementById(id), val=id=>+$(id).value;
+const C={fg:'#e8ebf5',mu:'#8a93ab',gr:'#232a3d',a:'#6ea8ff',r:'#ff6b81',y:'#ffd166',g:'#4ade80',p:'#c084fc',t:'#5eead4'};
+const store={get(k,d){try{const v=JSON.parse(localStorage.getItem(k));return v==null?d:v}catch(e){return d}},set(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}};
+function stat(l,v,c){return `<div class="stat ${c||''}"><b>${v}</b><span>${l}</span></div>`}
+function f3(x){if(!isFinite(x))return String(x);const a=Math.abs(x);if(a!==0&&(a<1e-3||a>=1e6))return x.toExponential(2);return String(+x.toFixed(a<1?4:a<100?3:a<1000?2:0))}
+function pc(x){return f3(100*x)+'%'}
+const resizers=[];
+function reg(fn){fn();resizers.push(fn)}
+function on(ids,fn){ids.split(' ').forEach(i=>{const e=$(i);e.addEventListener('input',fn);e.addEventListener('change',fn)})}
+let rt;window.addEventListener('resize',()=>{clearTimeout(rt);rt=setTimeout(()=>resizers.forEach(f=>f()),150)});
+document.querySelectorAll('input[type=range]').forEach(i=>{const o=$(i.id+'v');if(!o)return;const f=()=>{o.textContent=i.value};i.addEventListener('input',f);f()});
+
+function nice(x){const e=Math.pow(10,Math.floor(Math.log10(x))),f=x/e;return (f<1.5?1:f<3?2:f<7?5:10)*e}
+function mk(cv,x0,x1,ymax,o){o=o||{};const y0=o.y0||0,dpr=window.devicePixelRatio||1,r=cv.getBoundingClientRect(),w=r.width||600,h=r.height||270;
+ cv.width=w*dpr;cv.height=h*dpr;const g=cv.getContext('2d');g.setTransform(dpr,0,0,dpr,0,0);g.clearRect(0,0,w,h);
+ const L=o.L||42,R=12,T=14,B=28,X=x=>L+(x-x0)/(x1-x0)*(w-L-R),Y=y=>h-B-(y-y0)/(ymax-y0)*(h-T-B);
+ g.font='11px system-ui';g.lineWidth=1;g.strokeStyle=C.gr;g.fillStyle=C.mu;
+ if(!o.noGrid){const sx=nice((x1-x0)/7);for(let x=Math.ceil(x0/sx-1e-9)*sx;!o.noX&&x<=x1+1e-9;x+=sx){g.beginPath();g.moveTo(X(x),T);g.lineTo(X(x),h-B);g.stroke();g.textAlign='center';g.fillText(String(+x.toFixed(6)),X(x),h-B+15)}
+ const sy=nice((ymax-y0)/4);for(let y=Math.ceil(y0/sy-1e-9)*sy;y<=ymax+1e-9;y+=sy){g.beginPath();g.moveTo(L,Y(y));g.lineTo(w-R,Y(y));g.stroke();g.textAlign='right';g.fillText(String(+y.toFixed(4)),L-5,Y(y)+3)}}
+ return{g,w,h,X,Y,L,R,T,B,
+  line(f,col,lw,a,b,n,dash){a=a==null?x0:a;b=b==null?x1:b;n=n||260;g.save();if(dash)g.setLineDash([5,4]);g.beginPath();g.strokeStyle=col;g.lineWidth=lw||2;let st=false;for(let i=0;i<=n;i++){const x=a+(b-a)*i/n,y=f(x);if(!isFinite(y)){st=false;continue}st?g.lineTo(X(x),Y(y)):g.moveTo(X(x),Y(y));st=true}g.stroke();g.restore()},
+  area(f,a,b,col,n){a=Math.max(a,x0);b=Math.min(b,x1);if(b<=a)return;n=n||200;g.beginPath();g.moveTo(X(a),Y(0));for(let i=0;i<=n;i++){const x=a+(b-a)*i/n;g.lineTo(X(x),Y(f(x)))}g.lineTo(X(b),Y(0));g.closePath();g.fillStyle=col;g.fill()},
+  vline(x,col,lab,dash){g.save();g.strokeStyle=col;g.lineWidth=1.6;if(dash)g.setLineDash([5,4]);g.beginPath();g.moveTo(X(x),T);g.lineTo(X(x),h-B);g.stroke();g.restore();if(lab){g.fillStyle=col;g.textAlign='center';g.fillText(lab,Math.min(Math.max(X(x),34),w-34),T+10)}},
+  hline(y,col,lab){g.save();g.strokeStyle=col;g.lineWidth=1.4;g.setLineDash([5,4]);g.beginPath();g.moveTo(L,Y(y));g.lineTo(w-R,Y(y));g.stroke();g.restore();if(lab){g.fillStyle=col;g.textAlign='right';g.fillText(lab,w-R-3,Y(y)-4)}},
+  text(s,x,y,col,al){g.fillStyle=col||C.fg;g.textAlign=al||'left';g.fillText(s,x,y)}};}
+
+/* ---------- shared helpers for this page ---------- */
+const D={
+ norm:{n:'Normal(0,1)',s:()=>randn(),mu:0,sd:1,sk:0},
+ unif:{n:'Uniform(0,1)',s:()=>Math.random(),mu:.5,sd:Math.sqrt(1/12),sk:0},
+ expo:{n:'Exponential(1)',s:()=>-Math.log(1-Math.random()),mu:1,sd:1,sk:2},
+ logn:{n:'Lognormal(0,1)',s:()=>Math.exp(randn()),mu:Math.exp(.5),sd:Math.sqrt((Math.E-1)*Math.E),sk:(Math.E+2)*Math.sqrt(Math.E-1),disc:0},
+ b05:{n:'Bernoulli(0.5)',s:()=>Math.random()<.5?1:0,mu:.5,sd:.5,sk:0,disc:1},
+ b05s:{n:'Bernoulli(0.05)',s:()=>Math.random()<.05?1:0,mu:.05,sd:Math.sqrt(.0475),sk:.9/Math.sqrt(.0475),disc:1},
+ bimo:{n:'Two humps',s:()=>(Math.random()<.5?-2:2)+.5*randn(),mu:0,sd:Math.sqrt(4.25),sk:0},
+ par5:{n:'Pareto(α=5)',s:()=>Math.pow(1-Math.random(),-.2),mu:1.25,sd:Math.sqrt(5/48),sk:6*Math.sqrt(.6)},
+ cauchy:{n:'Cauchy (no mean)',s:()=>Math.tan(Math.PI*(Math.random()-.5)),mu:NaN,sd:Infinity,sk:NaN}
+};
+function fillSel(id,keys,def){const e=$(id);e.innerHTML=keys.map(k=>`<option value="${k}">${D[k].n}</option>`).join('');e.value=def}
+const PAL=[C.a,C.r,C.y,C.g,C.p,C.t,'#ff9f43','#9aa4bf'];
+function tgrid(N,M){const T=[];let prev=0;for(let i=0;i<M;i++){let n=Math.round(Math.pow(10,Math.log10(N)*i/(M-1)));if(i===M-1)n=N;n=Math.max(prev+1,n);if(n>N)break;T.push(n);prev=n}if(T[T.length-1]!==N)T[T.length-1]=N;return T}
+function nlab(n){return n>=1e6?(n/1e6)+'M':n>=1000?(n/1000)+'k':String(n)}
+function customGrid(P,xt,yt){const g=P.g;g.save();g.strokeStyle=C.gr;g.fillStyle=C.mu;g.font='11px system-ui';g.lineWidth=1;
+ xt.forEach(([v,l])=>{g.beginPath();g.moveTo(P.X(v),P.T);g.lineTo(P.X(v),P.h-P.B);g.stroke();g.textAlign='center';g.fillText(l,P.X(v),P.h-P.B+15)});
+ yt.forEach(([v,l])=>{g.beginPath();g.moveTo(P.L,P.Y(v));g.lineTo(P.w-P.R,P.Y(v));g.stroke();g.textAlign='right';g.fillText(l,P.L-5,P.Y(v)+3)});g.restore()}
+function clip(P,fn){const g=P.g;g.save();g.beginPath();g.rect(P.L,P.T,P.w-P.L-P.R,P.h-P.T-P.B);g.clip();fn();g.restore()}
+function poly(P,pts,col,lw,dash){const g=P.g;g.save();if(dash)g.setLineDash([5,4]);g.strokeStyle=col;g.lineWidth=lw||2;g.beginPath();pts.forEach(([x,y],i)=>i?g.lineTo(P.X(x),P.Y(y)):g.moveTo(P.X(x),P.Y(y)));g.stroke();g.restore()}
+function dots(P,pts,col,r){const g=P.g;g.fillStyle=col;pts.forEach(([x,y])=>{g.beginPath();g.arc(P.X(x),P.Y(y),r||3,0,7);g.fill()})}
+function niceTicks(lo,hi,k){const st=nice((hi-lo)/(k||5)),a=[];for(let v=Math.ceil(lo/st-1e-9)*st;v<=hi+1e-9;v+=st)a.push([v,String(+v.toFixed(6))]);return a}
+function logTicks(lo,hi){const a=[];for(let e=Math.ceil(lo-1e-9);e<=hi+1e-9;e++)a.push([e,nlab(Math.pow(10,e))]);return a}
+function mom(a){const n=a.length;let m=0;for(const v of a)m+=v;m/=n;let v2=0,v3=0,v4=0;for(const v of a){const d=v-m;v2+=d*d;v3+=d*d*d;v4+=d*d*d*d}v2/=n;v3/=n;v4/=n;const sd=Math.sqrt(v2);return{n,m,sd,sk:sd>0?v3/(sd*sd*sd):0,ku:v2>0?v4/(v2*v2)-3:0}}
+function ksN(z){const a=Array.from(z).sort((x,y)=>x-y),n=a.length;let d=0;for(let i=0;i<n;i++){const F=normCdf(a[i]);d=Math.max(d,Math.abs((i+1)/n-F),Math.abs(i/n-F))}return d}
+/* histogram of data as density with optional overlay curves [{f,col,lw,dash}] */
+function hist(cv,data,lo,hi,bins,ov,col){const cnt=new Float64Array(bins),bw=(hi-lo)/bins;let n=0;for(const v of data){if(v<lo||v>=hi)continue;cnt[Math.floor((v-lo)/bw)]++;n++}
+ const N=data.length;let ym=0;for(let i=0;i<bins;i++){cnt[i]/=N*bw;ym=Math.max(ym,cnt[i])}
+ (ov||[]).forEach(o=>{for(let i=0;i<=80;i++)ym=Math.max(ym,o.f(lo+(hi-lo)*i/80)||0)});
+ const P=mk(cv,lo,hi,ym*1.12);
+ P.g.fillStyle=col||'rgba(110,168,255,.5)';for(let i=0;i<bins;i++){if(cnt[i]<=0)continue;const a=P.X(lo+i*bw),b=P.X(lo+(i+1)*bw);P.g.fillRect(a,P.Y(cnt[i]),Math.max(1,b-a-1),P.Y(0)-P.Y(cnt[i]))}
+ (ov||[]).forEach(o=>P.line(o.f,o.col,o.lw||2.4,lo,hi,200,o.dash));return P}
+const fmt=x=>f3(x);
+
+/* ---------- shared for this page ---------- */
+const POPS=['norm','unif','expo','logn','bimo','par5'];
+D.norm.med=0;D.norm.q90=1.2815516;D.unif.med=.5;D.unif.q90=.9;D.expo.med=Math.LN2;D.expo.q90=Math.log(10);D.logn.med=1;D.logn.q90=Math.exp(1.2815516);
+D.bimo.med=0;D.bimo.q90=qc(x=>.5*normCdf((x+2)/.5)+.5*normCdf((x-2)/.5),-10,10,.9,80);D.par5.med=Math.pow(2,.2);D.par5.q90=Math.pow(10,.2);
+const SF={mean:a=>mean(a),median:a=>{const b=Float64Array.from(a).sort(),n=b.length;return n%2?b[(n-1)/2]:(b[n/2-1]+b[n/2])/2},sd:a=>{const n=a.length,m=mean(a);let s=0;for(const v of a)s+=(v-m)*(v-m);return Math.sqrt(s/(n-1))},q90:a=>{const b=Float64Array.from(a).sort();return b[Math.round(.9*(b.length-1))]}};
+function truth(key,st){const d=D[key];return st==='mean'?d.mu:st==='median'?d.med:st==='sd'?d.sd:d.q90}
+const SNAME={mean:'sample mean',median:'sample median',sd:'sample SD',q90:'90th percentile'};
+const N10=[2,3,5,10,20,50,100,200,500,1000];
+function pct(a,p){const b=Float64Array.from(a).sort();return b[Math.min(b.length-1,Math.max(0,Math.floor(p*b.length)))]}
+function histLines(cv,arrs,cols,lo,hi,bins,vl){const bw=(hi-lo)/bins,dens=arrs.map(a=>{const c=new Float64Array(bins);for(const v of a){if(v<lo||v>=hi)continue;c[Math.floor((v-lo)/bw)]++}for(let i=0;i<bins;i++)c[i]/=a.length*bw;return c});let ym=0;dens.forEach(c=>c.forEach(v=>ym=Math.max(ym,v)));const P=mk(cv,lo,hi,ym*1.15||1);
+ dens.forEach((c,k)=>{const pts=[];for(let i=0;i<bins;i++){pts.push([lo+i*bw,c[i]]);pts.push([lo+(i+1)*bw,c[i]])}clip(P,()=>poly(P,pts,cols[k],2.2))});(vl||[]).forEach(v=>P.vline(v[0],v[1],v[2],v[3]));return P}
+function sdOf(a){return mom(a).sd}
+
+/* ---------- ML helpers ---------- */
+function digamma(x){let r=0;while(x<6){r-=1/x;x++}const f=1/(x*x);return r+Math.log(x)-.5/x-f*(1/12-f*(1/120-f/252))}
+function trigamma(x){let r=0;while(x<6){r+=1/(x*x);x++}const f=1/(x*x);return r+1/x+.5*f+f/x*(1/6-f*(1/30-f/42))}
+function poisS(l){if(l<=0)return 0;if(l<30){const L=Math.exp(-l);let k=0,p=1;do{k++;p*=Math.random()}while(p>L);return k-1}const m=Math.floor(.875*l),g=gammaS(m);return g<l?m+poisS(l-g):binF(m-1,l/g)}
+function llb(k,n,p){return(k?k*Math.log(p):0)+(n-k?(n-k)*Math.log(1-p):0)}
+function lrInt(k,n,cut){const ph=k/n,l0=llb(k,n,ph),g=p=>2*(l0-llb(k,n,p))-cut;let lo=0,hi=1;
+ if(k>0){let a=1e-12,b=ph;for(let i=0;i<70;i++){const m=(a+b)/2;if(g(m)>0)a=m;else b=m}lo=(a+b)/2}
+ if(k<n){let a=ph,b=1-1e-12;for(let i=0;i<70;i++){const m=(a+b)/2;if(g(m)>0)b=m;else a=m}hi=(a+b)/2}return[lo,hi]}
+function solveAlpha(s){if(!(s>1e-9))return 1e6;let a=(3-s+Math.sqrt((3-s)*(3-s)+24*s))/(12*s);for(let i=0;i<8;i++){const f=Math.log(a)-digamma(a)-s,fp=1/a-trigamma(a);let n=a-f/fp;if(!(n>0))n=a/2;a=n}return a}
+function normPdfAt(x,m,s){return Math.exp(-(x-m)*(x-m)/(2*s*s))/(s*2.5066282746)}
+/* ---------- Regression helpers ---------- */
+function idx(id,arr,ff){const e=$(id),o=$(id+'v'),f=()=>{o.textContent=ff?ff(arr[+e.value]):arr[+e.value]};e.addEventListener('input',f);f()}
+function scl(id,ff){const e=$(id),o=$(id+'v'),f=()=>{o.textContent=ff(+e.value)};e.addEventListener('input',f);f()}
+function pctTicks(a,b,st){const r=[];for(let v=a;v<=b+1e-9;v+=st)r.push([v,Math.round(v*100)+'%']);return r}
+const _tq={};function tq(v,p){const k=v+'_'+p;return _tq[k]||(_tq[k]=qc(x=>tcdf(x,v),0,500,p,80))}
+function simple(x,y){const n=x.length;let xm=0,ym=0;for(let i=0;i<n;i++){xm+=x[i];ym+=y[i]}xm/=n;ym/=n;let sxx=0,sxy=0,syy=0;for(let i=0;i<n;i++){const dx=x[i]-xm,dy=y[i]-ym;sxx+=dx*dx;sxy+=dx*dy;syy+=dy*dy}const b=sxy/sxx,a=ym-b*xm,res=new Float64Array(n);let sse=0;for(let i=0;i<n;i++){res[i]=y[i]-a-b*x[i];sse+=res[i]*res[i]}return{n,xm,ym,sxx,sxy,syy,b,a,res,sse,sst:syy,r2:1-sse/syy}}
+function gj(A,B){const p=A.length;const M=A.map((r,i)=>Array.from(r).concat(B?[B[i]]:[]));for(let c=0;c<p;c++){let m=c;for(let r=c+1;r<p;r++)if(Math.abs(M[r][c])>Math.abs(M[m][c]))m=r;[M[c],M[m]]=[M[m],M[c]];const d=M[c][c]||1e-12;for(let k=c;k<M[c].length;k++)M[c][k]/=d;for(let r=0;r<p;r++)if(r!==c){const f=M[r][c];if(f!==0)for(let k=c;k<M[c].length;k++)M[r][k]-=f*M[c][k]}}return M}
+function olsMulti(cols,y,needInv){const n=y.length,k=cols.length,p=k+1,A=[],B=new Float64Array(p);for(let i=0;i<p;i++)A.push(new Float64Array(p));
+ for(let r=0;r<n;r++){const row=[1];for(let j=0;j<k;j++)row.push(cols[j][r]);for(let i=0;i<p;i++){B[i]+=row[i]*y[r];for(let j=i;j<p;j++)A[i][j]+=row[i]*row[j]}}
+ for(let i=0;i<p;i++){for(let j=0;j<i;j++)A[i][j]=A[j][i];if(i>0)A[i][i]+=1e-9}
+ let beta,inv=null;if(needInv){const I=[];for(let i=0;i<p;i++){const e=new Float64Array(p);e[i]=1;I.push(e)}const M=gj(A,null);const aug=A.map((r,i)=>Array.from(r).concat(Array.from(I[i])));
+  const m=aug;for(let c=0;c<p;c++){let q=c;for(let r=c+1;r<p;r++)if(Math.abs(m[r][c])>Math.abs(m[q][c]))q=r;[m[c],m[q]]=[m[q],m[c]];const d=m[c][c]||1e-12;for(let kk=0;kk<2*p;kk++)m[c][kk]/=d;for(let r=0;r<p;r++)if(r!==c){const f=m[r][c];if(f!==0)for(let kk=0;kk<2*p;kk++)m[r][kk]-=f*m[c][kk]}}
+  inv=m.map(r=>r.slice(p));beta=inv.map(r=>{let s=0;for(let j=0;j<p;j++)s+=r[j]*B[j];return s})}
+ else{const M=gj(A,B);beta=M.map(r=>r[p])}
+ const res=new Float64Array(n);let sse=0;for(let r=0;r<n;r++){let f=beta[0];for(let j=0;j<k;j++)f+=beta[j+1]*cols[j][r];res[r]=y[r]-f;sse+=res[r]*res[r]}
+ const out={beta,res,sse,n,p,inv};if(inv){const s2=sse/(n-p);out.s2=s2;out.se=inv.map((r,i)=>Math.sqrt(s2*r[i]))}return out}
+function scatterAxes(cv,xs,ys,xlo,xhi,ylo,yhi,L){return mk(cv,xlo,xhi,yhi,{y0:ylo,L:L||44})}
+function range(a,pad){let lo=1e99,hi=-1e99;for(const v of a){if(v<lo)lo=v;if(v>hi)hi=v}const w=(hi-lo)||1;return[lo-(pad||.05)*w,hi+(pad||.05)*w]}
+
+
+function bars(P,groups,cols,yt){/* groups: array of arrays of values (0..1) */const g=P.g,G=groups.length,B=groups[0].length,W=(P.w-P.L-P.R)/G;groups.forEach((vals,gi)=>vals.forEach((v,bi)=>{const bw=W*.78/B,x=P.L+W*gi+W*.11+bw*bi;g.fillStyle=cols[bi];g.fillRect(x,P.Y(v),bw-2,P.Y(0)-P.Y(v));g.fillStyle=C.fg;g.textAlign='center';g.font='10px system-ui';g.fillText(Math.round(v*100)+'%',x+bw/2-1,P.Y(v)-3)}));g.font='11px system-ui'}
+function gridG(P,yt,labels){customGrid(P,[],yt);const G=labels.length,W=(P.w-P.L-P.R)/G;P.g.fillStyle=C.mu;P.g.textAlign='center';labels.forEach((l,i)=>P.g.fillText(l,P.L+W*(i+.5),P.h-P.B+15))}
+function legend(P,items,y){let x=P.L+8;items.forEach(([s,c])=>{P.text('■ '+s,x,y,c);x+=P.g.measureText('■ '+s).width+16})}
+
+/* ---------- GLM machinery ---------- */
+const LK={logit:{mu:e=>1/(1+Math.exp(-e)),d:e=>{const m=1/(1+Math.exp(-e));return m*(1-m)}},
+ probit:{mu:e=>normCdf(e),d:e=>npdf(e)},
+ cll:{mu:e=>1-Math.exp(-Math.exp(e)),d:e=>Math.exp(e-Math.exp(e))},
+ log:{mu:e=>Math.exp(e),d:e=>Math.exp(e)}};
+function minv(A){const p=A.length,m=A.map((r,i)=>{const row=Array.from(r);for(let j=0;j<p;j++)row.push(i===j?1:0);return row});
+ for(let c=0;c<p;c++){let q=c;for(let r=c+1;r<p;r++)if(Math.abs(m[r][c])>Math.abs(m[q][c]))q=r;[m[c],m[q]]=[m[q],m[c]];const d=m[c][c]||1e-12;for(let k=0;k<2*p;k++)m[c][k]/=d;for(let r=0;r<p;r++)if(r!==c){const f=m[r][c];if(f!==0)for(let k=0;k<2*p;k++)m[r][k]-=f*m[c][k]}}
+ return m.map(r=>r.slice(p))}
+function glm(cols,y,o){o=o||{};const n=y.length,k=cols.length,p=k+1,fam=o.fam||'binom',L=LK[o.link||(fam==='pois'?'log':'logit')],off=o.off,X=[new Float64Array(n).fill(1)].concat(cols),V=m=>fam==='pois'?m:m*(1-m);
+ let b=new Float64Array(p);if(o.init)b=Float64Array.from(o.init);else if(fam==='pois'){let m=0;for(const v of y)m+=v;b[0]=Math.log(Math.max(m/n,1e-3))-(off?mean(off):0)}
+ function ev(b){const eta=new Float64Array(n),mu=new Float64Array(n);let ll=0;for(let i=0;i<n;i++){let e=off?off[i]:0;for(let j=0;j<p;j++)e+=b[j]*X[j][i];e=Math.max(-30,Math.min(30,e));eta[i]=e;let m=L.mu(e);m=fam==='binom'?Math.min(1-1e-12,Math.max(1e-12,m)):Math.max(m,1e-12);mu[i]=m;ll+=fam==='pois'?y[i]*Math.log(m)-m-lgamma(y[i]+1):y[i]*Math.log(m)+(1-y[i])*Math.log(1-m)}return{eta,mu,ll}}
+ function info(c){const A=[];for(let i=0;i<p;i++)A.push(new Float64Array(p));const w=new Float64Array(n);for(let r=0;r<n;r++){const d=L.d(c.eta[r]),wi=d*d/V(c.mu[r]);w[r]=wi;for(let i=0;i<p;i++){const xi=X[i][r]*wi;for(let j=i;j<p;j++)A[i][j]+=xi*X[j][r]}}for(let i=0;i<p;i++)for(let j=0;j<i;j++)A[i][j]=A[j][i];return{A,w}}
+ let cur=ev(b),it=0,conv=false,maxit=o.maxit==null?40:o.maxit;
+ for(;it<maxit;it++){const{A,w}=info(cur),Ai=minv(A),g=new Float64Array(p);
+  for(let r=0;r<n;r++){const d=L.d(cur.eta[r]),v=V(cur.mu[r]);let s=(y[r]-cur.mu[r])*d/v;if(o.firth){let h=0;for(let i=0;i<p;i++)for(let j=0;j<p;j++)h+=X[i][r]*Ai[i][j]*X[j][r];h*=w[r];s+=h*(.5-cur.mu[r])}for(let i=0;i<p;i++)g[i]+=X[i][r]*s}
+  const st=new Float64Array(p);let mx=0;for(let i=0;i<p;i++){let s=0;for(let j=0;j<p;j++)s+=Ai[i][j]*g[j];st[i]=s}
+  if(o.firth){for(let i=0;i<p;i++){st[i]=Math.max(-1,Math.min(1,st[i]));mx=Math.max(mx,Math.abs(st[i]))}b=b.map((v,i)=>v+st[i]);cur=ev(b);if(mx<1e-8){conv=true;it++;break}}
+  else{let a=1,nb,nc;for(let h=0;h<25;h++){nb=b.map((v,i)=>v+a*st[i]);nc=ev(nb);if(nc.ll>=cur.ll-1e-10)break;a/=2}for(let i=0;i<p;i++)mx=Math.max(mx,Math.abs(a*st[i]));const dl=Math.abs(nc.ll-cur.ll);b=nb;cur=nc;if(mx<1e-8||dl<1e-11){conv=true;it++;break}}}
+ const{A,w}=info(cur),Ai=minv(A),se=Ai.map((r,i)=>Math.sqrt(Math.max(r[i],0)));let dev;
+ if(fam==='binom')dev=-2*cur.ll;else{dev=0;for(let i=0;i<n;i++){const yy=y[i],m=cur.mu[i];dev+=2*((yy>0?yy*Math.log(yy/m):0)-(yy-m))}}
+ return{beta:b,mu:cur.mu,eta:cur.eta,ll:cur.ll,dev,inv:Ai,se,iter:it,conv,X,w,p,n,A}}
+function auc(sc,y){const n=y.length,idx=Array.from({length:n},(_,i)=>i).sort((a,b)=>sc[a]-sc[b]);let rk=0,np=0,i=0;while(i<n){let j=i;while(j+1<n&&sc[idx[j+1]]===sc[idx[i]])j++;const r=(i+j)/2+1;for(let t=i;t<=j;t++)if(y[idx[t]]===1){rk+=r;np++}i=j+1}const nn=n-np;return np&&nn?(rk-np*(np+1)/2)/(np*nn):.5}
+function sepTest(x,y){let a1=1e99,b1=-1e99,a0=1e99,b0=-1e99,n1=0,n0=0;for(let i=0;i<x.length;i++){if(y[i]===1){n1++;a1=Math.min(a1,x[i]);b1=Math.max(b1,x[i])}else{n0++;a0=Math.min(a0,x[i]);b0=Math.max(b0,x[i])}}return n1>0&&n0>0&&(a1>b0||a0>b1)}
+const sig=e=>1/(1+Math.exp(-e));
+function lgt(p){return Math.log(p/(1-p))}
+function binaryData(n,a,b,sd){const x=new Float64Array(n),y=new Float64Array(n);for(let i=0;i<n;i++){x[i]=(sd||1)*randn();y[i]=Math.random()<sig(a+b*x[i])?1:0}return{x,y}}
+function heat(P,gx,gy,vals,x0,x1,y0,y1){const g=P.g,nx=gx,ny=gy;let mn=1e99,mx=-1e99;vals.forEach(v=>{if(isFinite(v)){mn=Math.min(mn,v);mx=Math.max(mx,v)}});mn=Math.max(mn,mx-30);for(let i=0;i<nx;i++)for(let j=0;j<ny;j++){const v=vals[i*ny+j],t=isFinite(v)?Math.max(0,Math.min(1,(v-mn)/(mx-mn))):0,tt=Math.pow(t,1.6),c=Math.round(40+190*tt);g.fillStyle=`rgb(${Math.round(20+60*tt)},${Math.round(30+100*tt)},${c})`;const xa=P.X(x0+(x1-x0)*i/nx),xb=P.X(x0+(x1-x0)*(i+1)/nx),ya=P.Y(y0+(y1-y0)*j/ny),yb=P.Y(y0+(y1-y0)*(j+1)/ny);g.fillRect(xa,Math.min(ya,yb),xb-xa+1,Math.abs(ya-yb)+1)}}
+/* ---------- confounding helpers ---------- */
+const U01=()=>1-Math.random();
+function sdv(a){const m=mean(a);let s=0;for(const v of a)s+=(v-m)*(v-m);return Math.sqrt(s/Math.max(a.length-1,1))}
+function barV(cv,vals,cols,labs,ymax,ff){const P=mk(cv,0,vals.length,ymax,{y0:0,noGrid:true,L:50});customGrid(P,[],niceTicks(0,ymax,5));const W=(P.w-P.L-P.R)/vals.length,g=P.g;vals.forEach((v,i)=>{const w=W*.5,x=P.L+W*i+W*.25;g.fillStyle=cols[i];g.fillRect(x,P.Y(v),w,P.Y(0)-P.Y(v));g.fillStyle=C.fg;g.textAlign='center';g.fillText((ff||fmt)(v),x+w/2,P.Y(v)-4);g.fillStyle=C.mu;g.fillText(labs[i],x+w/2,P.h-P.B+15)});return P}
+function barL(cv,vals,cols,labs,lo,hi,ff){const P=mk(cv,0,vals.length,hi,{y0:lo,noGrid:true,L:50});customGrid(P,[],niceTicks(lo,hi,5));const W=(P.w-P.L-P.R)/vals.length,g=P.g;vals.forEach((v,i)=>{const w=W*.5,x=P.L+W*i+W*.25;g.fillStyle=cols[i];g.fillRect(x,P.Y(v),w,P.Y(lo)-P.Y(v));g.fillStyle=C.fg;g.textAlign='center';g.fillText((ff||fmt)(v),x+w/2,P.Y(v)-4);g.fillStyle=C.mu;g.fillText(labs[i],x+w/2,P.h-P.B+15)});return P}
+const avg=a=>{let s=0;for(const v of a)s+=v;return s/a.length};
+function corr(a,b){const n=a.length;let ma=0,mb=0;for(let i=0;i<n;i++){ma+=a[i];mb+=b[i]}ma/=n;mb/=n;let sa=0,sb=0,sab=0;for(let i=0;i<n;i++){const x=a[i]-ma,y=b[i]-mb;sa+=x*x;sb+=y*y;sab+=x*y}return sab/Math.sqrt(sa*sb||1e-12)}
+const pcor=(x,y,z)=>corr(simple(z,x).res,simple(z,y).res);
+const lin=(n,f)=>{const a=new Float64Array(n);for(let i=0;i<n;i++)a[i]=f(i);return a};
+const rn=(n,s)=>lin(n,()=>(s||1)*randn());
+/* signed bars from zero */
+function barZ(cv,vals,cols,labs,lo,hi,ff){const P=mk(cv,0,vals.length,hi,{y0:lo,noGrid:true,L:50});customGrid(P,[],niceTicks(lo,hi,5));const W=(P.w-P.L-P.R)/vals.length,g=P.g;vals.forEach((v,i)=>{const w=W*.5,x=P.L+W*i+W*.25,y0=P.Y(0),y1=P.Y(v);g.fillStyle=cols[i];g.fillRect(x,Math.min(y0,y1),w,Math.abs(y0-y1));g.fillStyle=C.fg;g.textAlign='center';g.fillText((ff||fmt)(v),x+w/2,v>=0?y1-4:y1+13);g.fillStyle=C.mu;g.fillText(labs[i],x+w/2,P.h-P.B+15)});P.hline(0,C.mu,'');return P}
+/* grouped signed bars: groups[g][b] */
+function barG(cv,groups,cols,glabs,lo,hi,ff){const P=mk(cv,0,groups.length,hi,{y0:lo,noGrid:true,L:50});customGrid(P,[],niceTicks(lo,hi,5));const G=groups.length,B=groups[0].length,W=(P.w-P.L-P.R)/G,g=P.g;groups.forEach((vs,gi)=>vs.forEach((v,bi)=>{const bw=W*.7/B,x=P.L+W*gi+W*.15+bw*bi,y0=P.Y(0),y1=P.Y(v);g.fillStyle=cols[bi];g.fillRect(x,Math.min(y0,y1),bw-3,Math.abs(y0-y1));g.fillStyle=C.fg;g.textAlign='center';g.font='10px system-ui';g.fillText((ff||fmt)(v),x+bw/2-1,v>=0?y1-3:y1+11)}));g.font='11px system-ui';g.fillStyle=C.mu;g.textAlign='center';glabs.forEach((l,i)=>g.fillText(l,P.L+W*(i+.5),P.h-P.B+15));P.hline(0,C.mu,'');return P}
+/* scatter with optional per-point colours; draws at most nmax points */
+function scat(P,xs,ys,col,nmax,r,colf){const n=xs.length,st=Math.max(1,Math.floor(n/(nmax||500))),pts=[];clip(P,()=>{for(let i=0;i<n;i+=st){P.g.fillStyle=colf?colf(i):col;P.g.beginPath();P.g.arc(P.X(xs[i]),P.Y(ys[i]),r||2.2,0,7);P.g.fill()}})}
+function fitLine(P,s,col,lw,dash,x0,x1){clip(P,()=>P.line(x=>s.a+s.b*x,col,lw||2,x0,x1,2,dash))}
+const ordIdx=p=>Array.from({length:p.length},(_,i)=>i).sort((a,b)=>p[a]-p[b]);
+/* ---------- experiment helpers ---------- */
+const sgn=v=>(v>=0?'+':'−')+Math.abs(v).toFixed(3);
+const rng2=(a,b,pad)=>range(Array.from(a).concat(Array.from(b)),pad||.05);
+const pct0=x=>Math.round(x*100)+'%';
+const lgs=x=>1/(1+Math.exp(-x));
+function rgam(a){if(a<1)return rgam(a+1)*Math.pow(U01(),1/a);const d=a-1/3,c=1/Math.sqrt(9*d);for(;;){let x,v;do{x=randn();v=1+c*x}while(v<=0);v=v*v*v;const u=U01();if(u<1-.0331*x*x*x*x||Math.log(u)<.5*x*x+d*(1-v+Math.log(v)))return d*v}}
+const rbeta=(a,b)=>{const x=rgam(a),y=rgam(b);return x/(x+y)};
+function rbin(n,p){if(n<=30){let k=0;for(let i=0;i<n;i++)if(Math.random()<p)k++;return k}const m=n*p,s=Math.sqrt(n*p*(1-p)),k=Math.round(m+s*randn());return Math.max(0,Math.min(n,k))}
+function welch(a,b){const na=a.length,nb=b.length,ma=avg(a),mb=avg(b);let va=0,vb=0;for(const v of a)va+=(v-ma)*(v-ma);for(const v of b)vb+=(v-mb)*(v-mb);va/=na-1;vb/=nb-1;const se2=va/na+vb/nb,se=Math.sqrt(se2),t=(ma-mb)/se,df=se2*se2/((va/na)*(va/na)/(na-1)+(vb/nb)*(vb/nb)/(nb-1));return{d:ma-mb,se,t,df,p:2*(1-tcdf(Math.abs(t),df))}}
+const diffMeans=(Y,T)=>{let s1=0,s0=0,n1=0,n0=0;for(let i=0;i<Y.length;i++){if(T[i]){s1+=Y[i];n1++}else{s0+=Y[i];n0++}}return s1/n1-s0/n0};
+/* ---------- observational-causal helpers ---------- */
+function logitFit(cols,y){const n=y.length,k=cols.length,p=k+1,b=new Float64Array(p),lin_=i=>{let s=b[0];for(let j=0;j<k;j++)s+=b[j+1]*cols[j][i];return s};
+ for(let it=0;it<30;it++){const A=[];for(let i=0;i<p;i++)A.push(new Float64Array(p));const g=new Float64Array(p);
+  for(let i=0;i<n;i++){const m=lgs(lin_(i)),w=Math.max(m*(1-m),1e-8),r=y[i]-m,row=[1];for(let j=0;j<k;j++)row.push(cols[j][i]);for(let a=0;a<p;a++){g[a]+=row[a]*r;for(let c=a;c<p;c++)A[a][c]+=w*row[a]*row[c]}}
+  for(let a=0;a<p;a++){for(let c=0;c<a;c++)A[a][c]=A[c][a];A[a][a]+=1e-8}
+  const M=gj(A,Array.from(g)),d=M.map(r=>r[p]);let mx=0;for(let a=0;a<p;a++){b[a]+=d[a];mx=Math.max(mx,Math.abs(d[a]))}if(mx<1e-6)break}
+ const pr=new Float64Array(n),lo=new Float64Array(n);for(let i=0;i<n;i++){pr[i]=Math.min(.9999,Math.max(.0001,lgs(lin_(i))));lo[i]=Math.log(pr[i]/(1-pr[i]))}return{beta:b,pr,lo}}
+/* Hajek IPW estimate of the ATE; keep(i)=false drops a unit */
+function ipwATE(Y,T,e,keep){let a1=0,b1=0,a0=0,b0=0;for(let i=0;i<Y.length;i++){if(keep&&!keep(i))continue;if(T[i]){const w=1/e[i];a1+=w*Y[i];b1+=w}else{const w=1/(1-e[i]);a0+=w*Y[i];b0+=w}}return a1/b1-a0/b0}
+function smd(x,T,w){let m1=0,m0=0,w1=0,w0=0,n1=0,n0=0;for(let i=0;i<x.length;i++){const ww=w?w[i]:1;if(T[i]){m1+=ww*x[i];w1+=ww;n1++}else{m0+=ww*x[i];w0+=ww;n0++}}m1/=w1;m0/=w0;let v1=0,v0=0,a1=0,a0=0;for(let i=0;i<x.length;i++){if(T[i]){a1+=x[i]}else a0+=x[i]}a1/=n1;a0/=n0;for(let i=0;i<x.length;i++){if(T[i])v1+=(x[i]-a1)*(x[i]-a1);else v0+=(x[i]-a0)*(x[i]-a0)}v1/=n1-1;v0/=n0-1;return(m1-m0)/Math.sqrt((v1+v0)/2)}
+/* confounded data: X1,X2; treatment strength a; effect tau (function of x1 optional) */
+function confData(n,a,tauF,nl){const X1=rn(n),X2=rn(n),e=lin(n,i=>lgs(a*(.8*X1[i]+.5*X2[i]+(nl?.4*(X1[i]*X1[i]-1):0))/1.5)),T=new Uint8Array(n),Y=new Float64Array(n);
+ for(let i=0;i<n;i++){T[i]=Math.random()<e[i]?1:0;Y[i]=(T[i]?(tauF?tauF(X1[i]):1):0)+X1[i]+.8*X2[i]+(nl?.6*X1[i]*X1[i]:0)+randn()}return{X1,X2,T,Y,e}}
+/* one-to-one nearest-neighbour matching with replacement on a score; returns ATT and the matched control index per treated unit (-1 if dropped) */
+function matchATT(sc,T,Y,cal){const ctr=[];for(let i=0;i<T.length;i++)if(!T[i])ctr.push(i);ctr.sort((a,b)=>sc[a]-sc[b]);const cs=ctr.map(i=>sc[i]),m=new Int32Array(T.length).fill(-1);let sum=0,k=0;
+ for(let i=0;i<T.length;i++){if(!T[i])continue;let lo=0,hi=cs.length-1;while(lo<hi){const mid=(lo+hi)>>1;if(cs[mid]<sc[i])lo=mid+1;else hi=mid}let b=lo;if(lo>0&&Math.abs(cs[lo-1]-sc[i])<Math.abs(cs[lo]-sc[i]))b=lo-1;if(Math.abs(cs[b]-sc[i])>cal)continue;m[i]=ctr[b];sum+=Y[i]-Y[ctr[b]];k++}return{att:sum/k,m,kept:k}}
+const quant=(a,p)=>{const b=Float64Array.from(a).sort();return b[Math.min(b.length-1,Math.floor(p*b.length))]};
+/* ---------- MCMC helpers ---------- */
+function acfv(x,K){const n=x.length;let m=0;for(let i=0;i<n;i++)m+=x[i];m/=n;const c=new Float64Array(K+1);for(let k=0;k<=K;k++){let s=0;for(let i=0;i+k<n;i++)s+=(x[i]-m)*(x[i+k]-m);c[k]=s/n}const r=new Float64Array(K+1);for(let k=0;k<=K;k++)r[k]=c[0]>0?c[k]/c[0]:0;return r}
+/* effective sample size with Geyer's initial positive sequence */
+function essOf(x,K){K=Math.min(K||150,x.length-2);if(K<2)return x.length;const r=acfv(x,K);let sum=0;for(let t=0;2*t+1<=K;t++){const g=r[2*t]+r[2*t+1];if(g<=0)break;sum+=g}const tau=Math.max(2*sum-1,.2);return x.length/tau}
+/* random-walk Metropolis for a 1-d log density */
+function mhRW(logp,x0,step,n){const x=new Float64Array(n);let c=x0,lc=logp(c),acc=0;for(let i=0;i<n;i++){const y=c+step*randn(),ly=logp(y);if(Math.log(Math.random())<ly-lc){c=y;lc=ly;acc++}x[i]=c}return{x,acc:acc/n}}
+/* split R-hat of an array of chains (each an array of equal length) */
+function rhatOf(ch){const seq=[];ch.forEach(c=>{const h=Math.floor(c.length/2);if(h<2)return;seq.push(c.slice(0,h));seq.push(c.slice(h,2*h))});const m=seq.length,n=seq[0]?seq[0].length:0;if(m<2||n<2)return NaN;const mu=seq.map(s=>{let a=0;for(const v of s)a+=v;return a/n}),va=seq.map((s,i)=>{let a=0;for(const v of s)a+=(v-mu[i])*(v-mu[i]);return a/(n-1)});const W=va.reduce((a,b)=>a+b,0)/m,gm=mu.reduce((a,b)=>a+b,0)/m;let B=0;for(const v of mu)B+=(v-gm)*(v-gm);B*=n/(m-1);const vp=(n-1)/n*W+B/n;return Math.sqrt(vp/Math.max(W,1e-12))}
+/* grid posterior from an unnormalised log density */
+function gridPost(logf,lo,hi,N){N=N||900;const x=new Float64Array(N),f=new Float64Array(N);let mx=-1e300;for(let i=0;i<N;i++){x[i]=lo+(hi-lo)*i/(N-1);f[i]=logf(x[i]);if(f[i]>mx)mx=f[i]}let Z=0;const h=(hi-lo)/(N-1);for(let i=0;i<N;i++){f[i]=Math.exp(f[i]-mx);Z+=f[i]*h}const pdf=new Float64Array(N),cdf=new Float64Array(N);let c=0,m1=0,m2=0;for(let i=0;i<N;i++){pdf[i]=f[i]/Z;c+=pdf[i]*h;cdf[i]=c;m1+=x[i]*pdf[i]*h;m2+=x[i]*x[i]*pdf[i]*h}
+ const q=u=>{let a=0,b=N-1;while(b-a>1){const m=(a+b)>>1;if(cdf[m]<u)a=m;else b=m}const d=cdf[b]-cdf[a];return x[a]+(d>0?(u-cdf[a])/d:0)*(x[b]-x[a])};
+ const pd=v=>{if(v<=lo||v>=hi)return 0;const t=(v-lo)/(hi-lo)*(N-1),i=Math.floor(t);return pdf[i]+(t-i)*(pdf[Math.min(i+1,N-1)]-pdf[i])};
+ const cd=v=>{if(v<=lo)return 0;if(v>=hi)return 1;const t=(v-lo)/(hi-lo)*(N-1),i=Math.floor(t);return cdf[i]+(t-i)*(cdf[Math.min(i+1,N-1)]-cdf[i])};
+ return{x,pdf,cdf,mean:m1,sd:Math.sqrt(Math.max(m2-m1*m1,0)),q,pd,cd}}
+const tpdf=(x,v)=>Math.exp(lgamma((v+1)/2)-lgamma(v/2))/Math.sqrt(v*Math.PI)*Math.pow(1+x*x/v,-(v+1)/2);
+const rtv=v=>randn()/Math.sqrt(2*gammaS(v/2)/v);
+const expit=x=>1/(1+Math.exp(-x)),logit=p=>Math.log(p/(1-p));
+function invMat(A){const n=A.length,M=A.map((r,i)=>{const a=Array.from(r);for(let j=0;j<n;j++)a.push(i===j?1:0);return a});for(let c=0;c<n;c++){let m=c;for(let r=c+1;r<n;r++)if(Math.abs(M[r][c])>Math.abs(M[m][c]))m=r;[M[c],M[m]]=[M[m],M[c]];const d=M[c][c]||1e-12;for(let k=0;k<2*n;k++)M[c][k]/=d;for(let r=0;r<n;r++)if(r!==c){const f=M[r][c];if(f!==0)for(let k=0;k<2*n;k++)M[r][k]-=f*M[c][k]}}return M.map(r=>r.slice(n))}
+function cholL(S){const n=S.length,L=S.map(()=>new Float64Array(n));for(let i=0;i<n;i++)for(let j=0;j<=i;j++){let s=S[i][j];for(let k=0;k<j;k++)s-=L[i][k]*L[j][k];L[i][j]=i===j?Math.sqrt(Math.max(s,1e-12)):s/L[j][j]}return L}
+function logdetM(A){const n=A.length,M=A.map(r=>Array.from(r));let ld=0;for(let c=0;c<n;c++){let m=c;for(let r=c+1;r<n;r++)if(Math.abs(M[r][c])>Math.abs(M[m][c]))m=r;[M[c],M[m]]=[M[m],M[c]];ld+=Math.log(Math.abs(M[c][c])||1e-300);for(let r=c+1;r<n;r++){const f=M[r][c]/M[c][c];for(let k=c;k<n;k++)M[r][k]-=f*M[c][k]}}return ld}
+/* Gauss-Hermite nodes (21 points, probabilists' weights summing to 1) from the Golub-Welsch idea: computed numerically on a fine normal grid instead */
+const GH=(()=>{const z=[],w=[];let s=0;for(let i=0;i<41;i++){const v=-4+8*i/40,p=Math.exp(-v*v/2);z.push(v);w.push(p);s+=p}return{z,w:w.map(v=>v/s)}})();
+/* log-log tick helper for axes holding log10 values */
+const lg10=v=>Math.log10(Math.max(v,1e-12));
+const pc1=x=>(100*x).toFixed(1)+'%';
+/* density curves with optional fill: curves=[{f,col,fill,dash,lw}] ; returns P */
+function dcurves(cv,x0,x1,curves,vl,ref){let ym=0,yr=0;curves.forEach((c,k)=>{for(let i=0;i<=300;i++){const v=c.f(x0+(x1-x0)*i/300);if(isFinite(v)){ym=Math.max(ym,v);if(k===(ref==null?curves.length-1:ref))yr=Math.max(yr,v)}}});
+ const top=Math.min(ym,yr*2.5)||ym||1,P=mk(cv,x0,x1,top*1.12);clip(P,()=>curves.forEach(c=>{if(c.fill)P.area(c.f,x0,x1,c.fill,240);P.line(c.f,c.col,c.lw||2.4,x0,x1,300,c.dash)}));(vl||[]).forEach(v=>P.vline(v[0],v[1],null,v[3]));return P}
+/* solve (A + lam I) beta = b and return diag of the inverse (A symmetric p x p) */
+function ridgeSolve(A,b,lam){const p=b.length,M=[];for(let i=0;i<p;i++){const r=new Float64Array(2*p+1);for(let j=0;j<p;j++)r[j]=A[i][j]+(i===j?lam:0);r[p+i]=1;r[2*p]=b[i];M.push(r)}
+ for(let c=0;c<p;c++){let m=c;for(let r=c+1;r<p;r++)if(Math.abs(M[r][c])>Math.abs(M[m][c]))m=r;[M[c],M[m]]=[M[m],M[c]];const d=M[c][c]||1e-12;for(let k=0;k<=2*p;k++)M[c][k]/=d;for(let r=0;r<p;r++)if(r!==c){const f=M[r][c];if(f!==0)for(let k=0;k<=2*p;k++)M[r][k]-=f*M[c][k]}}
+ return{beta:M.map(r=>r[2*p]),dinv:M.map((r,i)=>r[p+i])}}
+/* ---------- Hierarchical-model helpers ---------- */
+const bq=(a,b,p)=>qb(a,b,p);
+const lbeta=(a,b)=>lgamma(a)+lgamma(b)-lgamma(a+b);
+/* DerSimonian-Laird moment estimate of tau^2 from group means yb with known variances v */
+function dlMoM(yb,v){const J=yb.length;let sw=0,sw2=0,sy=0;for(let j=0;j<J;j++){const w=1/v[j];sw+=w;sw2+=w*w;sy+=w*yb[j]}const mu=sy/sw;let Q=0;for(let j=0;j<J;j++)Q+=(yb[j]-mu)*(yb[j]-mu)/v[j];return Math.max(0,(Q-(J-1))/(sw-sw2/sw))}
+function pooledMu(yb,v,t2){let sw=0,sy=0;for(let j=0;j<yb.length;j++){const w=1/(v[j]+t2);sw+=w;sy+=w*yb[j]}return sy/sw}
+/* log marginal posterior of tau with a flat prior on mu (up to a constant) */
+function tauLogPost(yb,v,t){const t2=t*t;let sw=0,sy=0,sl=0;for(let j=0;j<yb.length;j++){const w=1/(v[j]+t2);sw+=w;sy+=w*yb[j];sl+=Math.log(v[j]+t2)}const mu=sy/sw;let q=0;for(let j=0;j<yb.length;j++)q+=(yb[j]-mu)*(yb[j]-mu)/(v[j]+t2);return-.5*sl-.5*Math.log(sw)-.5*q}
+/* group sizes spread geometrically between nmin and nmax */
+const sizesG=(J,nmin,nmax)=>Array.from({length:J},(_,j)=>Math.max(1,Math.round(nmin*Math.pow(nmax/nmin,J>1?j/(J-1):0))));
+/* positive-truncated normal N(m, s^2) restricted to > 0 */
+function rtnormPos(m,s){const a=-m/s;if(a<1){for(let i=0;i<200;i++){const z=randn();if(z>a)return m+s*z}}const al=(a+Math.sqrt(a*a+4))/2;for(let i=0;i<500;i++){const z=a-Math.log(Math.random())/al;if(Math.random()<Math.exp(-(z-al)*(z-al)/2))return m+s*z}return Math.max(1e-6,m)}
+const ig=(a,b)=>b/gammaS(a);
+const rms=a=>Math.sqrt(a.reduce((s,v)=>s+v*v,0)/a.length);
+/* ---------- Ch1 complete, no and partial pooling ---------- */
+(function(){scl('c1j',v=>v);scl('c1n',v=>v);scl('c1t',v=>fmt(v/10));const SG=2;
+ function once(J,n,tau){const v=SG*SG/n,th=[],yb=[];for(let j=0;j<J;j++){const t=tau*randn();th.push(t);yb.push(t+Math.sqrt(v)*randn())}const vv=Array(J).fill(v),t2=dlMoM(yb,vv),mu=pooledMu(yb,vv,t2),B=v/(v+t2);return{th,yb,gm:mean(yb),part:yb.map(y=>B*mu+(1-B)*y),B,t2}}
+ function rm(J,n,tau,R){let a=0,b=0,c=0;for(let r=0;r<R;r++){const o=once(J,n,tau);for(let j=0;j<J;j++){a+=Math.pow(o.yb[j]-o.th[j],2);b+=Math.pow(o.gm-o.th[j],2);c+=Math.pow(o.part[j]-o.th[j],2)}}return[a,b,c].map(x=>Math.sqrt(x/(R*J)))}
+ function run(){const J=val('c1j'),n=val('c1n'),tau=val('c1t')/10,o=once(J,n,tau),ix=ordIdx(o.th),all=[...o.th,...o.yb,...o.part],lo=Math.min(...all)-.3,hi=Math.max(...all)+.3,P=mk($('c1cv'),0,J+1,hi,{y0:lo,L:40});
+  P.hline(o.gm,C.mu,'complete pooling');ix.forEach((j,k)=>poly(P,[[k+1,o.yb[j]],[k+1,o.part[j]]],'rgba(232,235,245,.3)',1));dots(P,ix.map((j,k)=>[k+1,o.yb[j]]),C.r,3.2);dots(P,ix.map((j,k)=>[k+1,o.part[j]]),C.g,3.2);dots(P,ix.map((j,k)=>[k+1,o.th[j]]),C.fg,4.2);
+  legend(P,[['true group effect',C.fg],['no pooling (raw mean)',C.r],['partial pooling',C.g]],P.T+12);P.text('groups sorted by true effect →',P.w-P.R-4,P.h-P.B-6,C.mu,'right');
+  const TG=Array.from({length:13},(_,i)=>i*.25),cur=TG.map(t=>rm(J,n,t,80)),mx=Math.max(...cur.flat())*1.1,Q=mk($('c1cv2'),0,3,mx,{L:44});
+  [[0,C.r],[1,C.mu],[2,C.g]].forEach(([k,c])=>poly(Q,TG.map((t,i)=>[t,cur[i][k]]),c,k===2?3:2));Q.vline(tau,C.y,null,true);legend(Q,[['no pooling',C.r],['complete pooling',C.mu],['partial pooling',C.g]],Q.T+12);Q.text('true between-group sd τ →',Q.w-Q.R-4,Q.h-Q.B-6,C.mu,'right');Q.text('error',Q.L+6,Q.T+26,C.mu);
+  const e=rm(J,n,tau,250);
+  $('c1st').innerHTML=stat('RMSE: no · complete · partial pooling',e.map(fmt).join(' · '),'ok')+stat('shrinkage weight on the grand mean',pc1(o.B),'in')+stat('estimated τ · true τ',fmt(Math.sqrt(o.t2))+' · '+fmt(tau),'')+stat('noise sd of one group mean',fmt(SG/Math.sqrt(n)),'');
+  $('c1rd').innerHTML=`Each group’s true effect is drawn from N(0, τ²) = N(0, ${fmt(tau*tau)}) and measured with noise ${fmt(SG/Math.sqrt(n))}. <b>No pooling</b> trusts every group’s own mean and is unbiased but noisy; <b>complete pooling</b> assumes the groups are identical and is stable but biased whenever τ &gt; 0; <b>partial pooling</b> weighs the two according to how large τ is compared with the noise. The right panel shows the pattern that makes it the default: partial pooling is never much worse than the better of the two extremes and is better than both in between (τ near the noise level). The weight on the grand mean here is ${pc1(o.B)}.`}
+ ['c1j','c1n','c1t'].forEach(i=>$(i).addEventListener('change',run));$('c1go').onclick=run;run();})();
+
+/* ---------- Ch2 shrinkage factor ---------- */
+(function(){scl('c2t',v=>fmt(v/10));scl('c2s',v=>fmt(v/10));scl('c2n',v=>v);const J=12;
+ function run(){const tau=val('c2t')/10,sig=val('c2s')/10,nmax=val('c2n'),ns=sizesG(J,2,nmax),v=ns.map(n=>sig*sig/n),Bf=(n,t)=>(sig*sig/n)/(sig*sig/n+t*t),R=400;
+  let er=new Float64Array(J),es=new Float64Array(J);for(let r=0;r<R;r++)for(let j=0;j<J;j++){const th=tau*randn(),y=th+Math.sqrt(v[j])*randn(),B=Bf(ns[j],tau);er[j]+=Math.pow(y-th,2)/R;es[j]+=Math.pow((1-B)*y-th,2)/R}
+  const P=mk($('c2cv'),Math.log10(2),Math.log10(nmax),1.02,{noGrid:true,L:44});customGrid(P,[1,2,3].filter(k=>Math.pow(10,k)<=nmax*1.01).map(k=>[k,String(Math.pow(10,k))]),niceTicks(0,1,5));
+  [[tau/2,C.a,true],[tau*2,C.y,true],[tau,C.g,false]].forEach(([t,c,d])=>P.line(x=>Bf(Math.pow(10,x),t),c,d?1.8:2.8,Math.log10(2),Math.log10(nmax),100,d));dots(P,ns.map(n=>[Math.log10(n),Bf(n,tau)]),C.fg,3.6);
+  legend(P,[['τ = '+fmt(tau),C.g],['τ/2',C.a],['2τ',C.y]],P.T+12);P.text('observations in the group →',P.w-P.R-4,P.h-P.B-6,C.mu,'right');P.text('weight on the grand mean',P.L+8,P.T+28,C.g);
+  const hi=Math.max(...v.map(Math.sqrt))*1.15,Q=mk($('c2cv2'),Math.log10(2),Math.log10(nmax),hi,{noGrid:true,L:44});customGrid(Q,[1,2,3].filter(k=>Math.pow(10,k)<=nmax*1.01).map(k=>[k,String(Math.pow(10,k))]),niceTicks(0,hi,4));
+  poly(Q,ns.map((n,j)=>[Math.log10(n),Math.sqrt(v[j])]),C.r,2.4);poly(Q,ns.map((n,j)=>[Math.log10(n),Math.sqrt(v[j]*(1-Bf(n,tau)))]),C.g,2.8);dots(Q,ns.map((n,j)=>[Math.log10(n),Math.sqrt(er[j])]),C.r,3);dots(Q,ns.map((n,j)=>[Math.log10(n),Math.sqrt(es[j])]),C.g,3);legend(Q,[['raw group mean',C.r],['partially pooled',C.g]],Q.T+12);Q.text('observations in the group →',Q.w-Q.R-4,Q.h-Q.B-6,C.mu,'right');Q.text('root-mean-squared error (dots: simulated)',Q.L+8,Q.T+28,C.mu);
+  const o=(()=>{let b=null;for(let r=0;r<40&&!b;r++){const th=ns.map(()=>tau*randn()),y=ns.map((n,j)=>th[j]+Math.sqrt(v[j])*randn()),j=y.indexOf(Math.max(...y));if(ns[j]<=6)b={n:ns[j],raw:y[j],sh:(1-Bf(ns[j],tau))*y[j],th:th[j]}}return b})();
+  $('c2st').innerHTML=stat('weight on the grand mean: smallest · largest group',pc1(Bf(ns[0],tau))+' · '+pc1(Bf(ns[J-1],tau)),'in')+stat('RMSE of the smallest group: raw · pooled',fmt(Math.sqrt(er[0]))+' · '+fmt(Math.sqrt(es[0])),'ok')+stat('RMSE of the largest group: raw · pooled',fmt(Math.sqrt(er[J-1]))+' · '+fmt(Math.sqrt(es[J-1])),'')+stat('an extreme small group',o?`n = ${o.n}: raw ${fmt(o.raw)}, pooled ${fmt(o.sh)}, truth ${fmt(o.th)}`:'—','warn');
+  $('c2rd').innerHTML=`For a group with n observations the posterior mean is (1 − B)·(group mean) + B·(overall mean), where B = (σ²/n)/(σ²/n + τ²) is the share of the group’s noise variance in the total. A group with ${ns[0]} observations is shrunk by ${pc1(Bf(ns[0],tau))} towards the overall mean, one with ${ns[J-1]} by only ${pc1(Bf(ns[J-1],tau))}. Shrinkage is a bias that buys a larger variance reduction: the green error is below the red one for every group, most for the smallest. It is also what repairs the ranking problem of the previous page: the most extreme raw group means come disproportionately from the smallest groups, and partial pooling pulls those back.`}
+ ['c2t','c2s','c2n'].forEach(i=>$(i).addEventListener('change',run));$('c2go').onclick=run;run();})();
+
+/* ---------- Ch3 the posterior of tau ---------- */
+(function(){scl('c3j',v=>v);scl('c3t',v=>fmt(v/10));scl('c3n',v=>v);const SG=3;
+ function gen(J,n,tau){const v=Array(J).fill(SG*SG/n),th=Array.from({length:J},()=>tau*randn()),yb=th.map(t=>t+Math.sqrt(v[0])*randn());return{v,yb}}
+ function run(){const J=val('c3j'),tau=val('c3t')/10,n=val('c3n'),d=gen(J,n,tau),g=gridPost(t=>tauLogPost(d.yb,d.v,t),.001,8,500),tm=Math.sqrt(dlMoM(d.yb,d.v)),R=300,est=[];let z=0;for(let r=0;r<R;r++){const e=gen(J,n,tau),t=Math.sqrt(dlMoM(e.yb,e.v));est.push(t);if(t===0)z++}
+  const P=dcurves($('c3cv'),0,8,[{f:g.pd,col:C.g,fill:'rgba(74,222,128,.16)',lw:2.8}],[[tau,C.fg,null,true],[tm,C.r,null,true]],0);P.text('white dashed: true τ · red dashed: moment estimate',P.L+8,P.T+12,C.mu);P.text('τ →',P.w-P.R-4,P.h-P.B-6,C.mu,'right');
+  const Q=histLines($('c3cv2'),[est],[C.a],0,Math.max(4,tau*2.5),30,[[tau,C.fg,'truth',true]]);Q.text('moment estimate of τ over 300 datasets →',Q.w-Q.R-4,Q.h-Q.B-6,C.mu,'right');
+  const lo=g.q(.025),hi=g.q(.975);
+  $('c3st').innerHTML=stat('posterior of τ: median · 95% interval',fmt(g.q(.5))+' · '+fmt(lo)+' to '+fmt(hi),tau>=lo&&tau<=hi?'ok':'warn')+stat('moment estimate of τ (this dataset)',fmt(tm),tm===0?'hot':'')+stat('datasets where the estimate is exactly 0',pc1(z/R),z/R>.2?'hot':'in')+stat('true τ · noise sd of a group mean',fmt(tau)+' · '+fmt(SG/Math.sqrt(n)),'');
+  $('c3rd').innerHTML=`The amount of pooling is controlled by τ, which has to be learned from only ${J} group means. When τ is small compared with the noise of a group mean (${fmt(SG/Math.sqrt(n))}), the data barely distinguish τ = 0 from a moderate value: the posterior is wide and the 95% interval runs from ${fmt(lo)} to ${fmt(hi)}, and a point estimate such as the moment or maximum-likelihood one is often exactly 0 (${pc1(z/R)} of simulated datasets), which would mean complete pooling. A fully Bayesian analysis carries the whole posterior of τ into the group estimates instead of committing to one value. Increase J or n, or τ, and the posterior concentrates.`}
+ ['c3j','c3t','c3n'].forEach(i=>$(i).addEventListener('change',run));$('c3go').onclick=run;run();})();
+
+/* ---------- Ch4 priors for tau ---------- */
+(function(){scl('c4j',v=>v);scl('c4t',v=>fmt(v/10));const SG=3,N6=6;
+ let D=null;
+ const PRI=[['flat on τ',t=>0,C.a],['half-Cauchy(2.5)',t=>-Math.log(1+t*t/6.25),C.g],['half-normal(2)',t=>-t*t/8,C.y],['inverse-gamma(.001, .001) on τ²',t=>-1.002*Math.log(t)-.001/(t*t),C.r]];
+ function gen(){const J=val('c4j'),tau=val('c4t')/10,v=Array(J).fill(SG*SG/N6),th=Array.from({length:J},()=>tau*randn()),yb=th.map(t=>t+Math.sqrt(v[0])*randn());D={J,tau,v,th,yb}}
+ function run(){if(!D||D.J!==val('c4j')||D.tau!==val('c4t')/10)gen();const{J,tau,v,th,yb}=D,gs=PRI.map(p=>gridPost(t=>tauLogPost(yb,v,t)+p[1](t),.02,10,700)),k=yb.indexOf(Math.max(...yb));
+  const P=dcurves($('c4cv'),0,10,gs.map((g,i)=>({f:g.pd,col:PRI[i][2],lw:2.4})),[[tau,C.fg,null,true]],0);let lx=P.L+8,ly=P.T+12;PRI.forEach(q=>{const t='■ '+q[0],w=P.g.measureText(t).width+14;if(lx+w>P.w-8){lx=P.L+8;ly+=14}P.text(t,lx,ly,q[2]);lx+=w});P.text('τ →',P.w-P.R-4,P.h-P.B-6,C.mu,'right');
+  const est=gs.map(g=>{const h=g.x[1]-g.x[0];let s=0;for(let i=0;i<g.x.length;i++){const t2=g.x[i]*g.x[i],B=v[0]/(v[0]+t2);s+=g.pdf[i]*h*(B*pooledMu(yb,v,t2)+(1-B)*yb[k])}return s}),vals=[yb[k],...est,th[k]],mn=Math.min(0,...vals)-.2,mx=Math.max(...vals)*1.15+.2;
+  const P2=barG($('c4cv2'),[vals],[C.mu,C.a,C.g,C.y,C.r,C.fg],['group with the highest raw mean'],mn,mx,x=>x.toFixed(2));legend(P2,[['raw mean',C.mu],['flat',C.a],['Cauchy',C.g],['half-normal',C.y],['inv-gamma',C.r],['truth',C.fg]],P2.T+12);
+  const q50=gs.map(g=>g.q(.5));
+  $('c4st').innerHTML=stat('true τ',fmt(tau),'in')+stat('posterior median of τ: flat · Cauchy · normal · inv-gamma',q50.map(fmt).join(' · '),Math.abs(q50[3]-q50[1])>.7?'warn':'')+stat('estimate for the top group (raw · 4 priors)',vals.slice(0,5).map(fmt).join(' · '),'')+stat('truth for that group',fmt(th[k]),'ok');
+  $('c4rd').innerHTML=`With only ${J} groups the data say little about τ, so the prior for it matters; the bars on the right show, for the group with the highest raw mean, the raw value, the estimate under each prior, and the truth. The flat prior on τ and the half-Cauchy are the usual defaults and behave alike; a half-normal gives a little more shrinkage. The once-popular inverse-gamma(0.001, 0.001) prior on τ² is not “non-informative”: it piles mass towards τ = 0 as the data get weaker (median ${fmt(q50[3])} against ${fmt(q50[1])}), so it shrinks the top group the hardest (${fmt(est[3])}). Use weakly informative priors on τ on the scale of the outcome, and run a sensitivity check when J is small.`}
+ ['c4j','c4t'].forEach(i=>$(i).addEventListener('change',run));$('c4go').onclick=()=>{gen();run()};run();})();
+
+/* ---------- Ch5 Gibbs: centred and non-centred ---------- */
+(function(){scl('c5j',v=>v);scl('c5t',v=>fmt(v/10));const SG=2;
+ function gC(yb,N){const J=yb.length,s2=SG*SG,tau=new Float64Array(N),t1=new Float64Array(N);let th=yb.slice(),mu=mean(yb),t2=1;for(let it=0;it<N;it++){let S=0;for(let j=0;j<J;j++)S+=(th[j]-mu)*(th[j]-mu);t2=Math.max(ig((J-1)/2,S/2),1e-10);for(let j=0;j<J;j++){const pr=1/s2+1/t2;th[j]=(yb[j]/s2+mu/t2)/pr+randn()/Math.sqrt(pr)}mu=mean(th)+Math.sqrt(t2/J)*randn();tau[it]=Math.sqrt(t2);t1[it]=th[0]}return{tau,t1}}
+ function gN(yb,N){const J=yb.length,s2=SG*SG,tau=new Float64Array(N),t1=new Float64Array(N);let eta=yb.map(()=>randn()),mu=mean(yb),t=1;for(let it=0;it<N;it++){let sm=0;for(let j=0;j<J;j++)sm+=yb[j]-t*eta[j];mu=sm/J+Math.sqrt(s2/J)*randn();let nu=0,de=0;for(let j=0;j<J;j++){nu+=eta[j]*(yb[j]-mu)/s2;de+=eta[j]*eta[j]/s2}t=rtnormPos(nu/de,1/Math.sqrt(de));for(let j=0;j<J;j++){const pr=1+t*t/s2;eta[j]=(t*(yb[j]-mu)/s2)/pr+randn()/Math.sqrt(pr)}tau[it]=t;t1[it]=mu+t*eta[0]}return{tau,t1}}
+ function run(){const J=val('c5j'),tau0=val('c5t')/10,N=4000,yb=Array.from({length:J},()=>tau0*randn()).map(t=>t+SG*randn()),A=gC(yb,N),B=gN(yb,N),bn=400;
+  const L=800,P=mk($('c5cv'),0,L,Math.max(...A.tau.slice(0,L),...B.tau.slice(0,L))*1.1,{L:40});clip(P,()=>{poly(P,Array.from({length:L},(_,i)=>[i,A.tau[i]]),C.r,1.2);poly(P,Array.from({length:L},(_,i)=>[i,B.tau[i]]),C.g,1.2)});legend(P,[['centred Gibbs',C.r],['non-centred Gibbs',C.g]],P.T+12);P.text('iteration (τ on the vertical axis) →',P.w-P.R-4,P.h-P.B-6,C.mu,'right');
+  const lg=a=>Array.from(a.slice(bn),Math.log),Q=mk($('c5cv2'),-8,8,3.5,{y0:-6,L:40});scat(Q,Array.from(A.t1.slice(bn)),lg(A.tau),'rgba(255,107,107,.35)',900,1.8);scat(Q,Array.from(B.t1.slice(bn)),lg(B.tau),'rgba(74,222,128,.35)',900,1.8);Q.text('θ₁ →',Q.w-Q.R-4,Q.h-Q.B-6,C.mu,'right');Q.text('log τ',Q.L+6,Q.T+12,C.mu);
+  const eA=essOf(A.tau.slice(bn),150),eB=essOf(B.tau.slice(bn),150),mA=Math.min(...A.tau.slice(bn)),mB=Math.min(...B.tau.slice(bn));
+  $('c5st').innerHTML=stat('effective draws of τ (3600): centred · non-centred',Math.round(eA)+' · '+Math.round(eB),eA<eB/2?'warn':'in')+stat('smallest τ visited',mA.toExponential(1)+' · '+mB.toExponential(1),'')+stat('posterior mean of τ: centred · non-centred',fmt(mean(A.tau.slice(bn)))+' · '+fmt(mean(B.tau.slice(bn))),'')+stat('true τ · groups',fmt(tau0)+' · '+J,'ok');
+  $('c5rd').innerHTML=`Both samplers target the same posterior. In the <b>centred</b> form (θⱼ drawn around μ with sd τ) the groups and τ are tightly coupled: when τ is small the θⱼ must be close together, and when the θⱼ are close together τ is forced to be small, so the chain moves slowly near τ = 0 (the funnel on the right, red). The <b>non-centred</b> form writes θⱼ = μ + τ·ηⱼ with ηⱼ ~ N(0, 1), which decouples τ from the standardised effects (green) and explores the funnel’s neck: here ${Math.round(eB)} effective draws of τ against ${Math.round(eA)}. When the data are weak (small τ or few observations per group) non-centring wins; with strong data the centred form can be better. In Stan and PyMC, divergences in a hierarchical model are the usual signal to try the other form.`}
+ ['c5j','c5t'].forEach(i=>$(i).addEventListener('change',run));$('c5go').onclick=run;run();})();
+
+/* ---------- Ch6 full Bayes against empirical Bayes for rates ---------- */
+(function(){scl('c6j',v=>v);scl('c6k',v=>v);scl('c6m',v=>v+'%');
+ const GM=20,GK=20;
+ function fit(x,n){const J=x.length,MG=Array.from({length:GM},(_,i)=>logit(.004)+(logit(.25)-logit(.004))*i/(GM-1)),KG=Array.from({length:GK},(_,i)=>Math.log(4)+(Math.log(3000)-Math.log(4))*i/(GK-1)),L=[];let mx=-1e300;
+  for(const mg of MG)for(const kg of KG){const m=expit(mg),k=Math.exp(kg),a=m*k,b=(1-m)*k;let l=0;for(let j=0;j<J;j++)l+=lbeta(a+x[j],b+n[j]-x[j])-lbeta(a,b);L.push([m,k,l]);if(l>mx)mx=l}
+  const w=L.map(q=>Math.exp(q[2]-mx)),sw=w.reduce((a,b)=>a+b,0),cw=[];let c=0;for(const v of w){c+=v/sw;cw.push(c)}return{L,pick:()=>{const u=Math.random();let i=0;while(i<cw.length-1&&cw[i]<u)i++;return L[i]}}}
+ function eb(x,n){const J=x.length;let sx=0,sn=0;for(let j=0;j<J;j++){sx+=x[j];sn+=n[j]}const m=sx/sn;let nu=0,de=0;for(let j=0;j<J;j++){const p=x[j]/n[j];nu+=n[j]*((p-m)*(p-m)-m*(1-m)/n[j]);de+=n[j]*(1-1/n[j])}const V=Math.max(nu/de,1e-7);return{m,k:Math.min(1e5,Math.max(2,m*(1-m)/V-1))}}
+ function run(){const J=val('c6j'),kap=val('c6k'),m0=val('c6m')/100,R=25,S=120;let cov=[0,0,0],wid=[0,0,0],tot=0,show=null;
+  for(let r=0;r<R;r++){const n=Array.from({length:J},()=>Math.round(Math.pow(10,1.3+1.5*Math.random()))),p=n.map(()=>betaS(m0*kap,(1-m0)*kap)),x=n.map((nn,j)=>binF(nn,p[j])),f=fit(x,n),e=eb(x,n),hs=Array.from({length:S},()=>f.pick()),I=[[],[],[]];
+   for(let j=0;j<J;j++){I[0].push([bq(.5+x[j],.5+n[j]-x[j],.025),bq(.5+x[j],.5+n[j]-x[j],.975)]);const a=e.m*e.k,b=(1-e.m)*e.k;I[1].push([bq(a+x[j],b+n[j]-x[j],.025),bq(a+x[j],b+n[j]-x[j],.975)]);const ds=hs.map(h=>betaS(h[0]*h[1]+x[j],(1-h[0])*h[1]+n[j]-x[j])).sort((u,v)=>u-v);I[2].push([ds[Math.floor(.025*S)],ds[Math.floor(.975*S)]])}
+   for(let j=0;j<J;j++){tot++;for(let q=0;q<3;q++){if(p[j]>=I[q][j][0]&&p[j]<=I[q][j][1])cov[q]++;wid[q]+=I[q][j][1]-I[q][j][0]}}
+   if(r===0){const o=ordIdx(n).slice(0,10);show={o,I,p,n,x}}}
+  const hi=Math.max(...show.o.map(j=>Math.max(show.I[0][j][1],show.I[2][j][1])))*1.05,P=mk($('c6cv'),0,Math.min(1,hi),11.5,{y0:0,L:30});show.o.forEach((j,k)=>{[[0,C.r,.25],[1,C.y,0],[2,C.g,-.25]].forEach(([q,c,off])=>poly(P,[[show.I[q][j][0],k+1+off],[show.I[q][j][1],k+1+off]],c,2.4));dots(P,[[show.p[j],k+1]],C.fg,4)});legend(P,[['no pooling (Jeffreys)',C.r],['empirical Bayes',C.y],['full Bayes',C.g]],P.T+12);P.text('PD → (white dot = truth; 10 smallest branches)',P.w-P.R-4,P.h-P.B-6,C.mu,'right');
+  const cv=cov.map(v=>100*v/tot);barV($('c6cv2'),cv,[C.r,C.y,C.g],['no pooling','empirical Bayes','full Bayes'],105,x=>x.toFixed(1)+'%');
+  $('c6st').innerHTML=stat('coverage of 95% intervals: none · EB · full',cv.map(v=>v.toFixed(1)).join(' · ')+'%',cv[2]<90?'warn':'ok')+stat('mean interval width (pts): none · EB · full',wid.map(v=>(100*v/tot).toFixed(2)).join(' · '),'in')+stat('branches · datasets',J+' · '+R,'')+stat('true prior strength',kap+' accounts','');
+  $('c6rd').innerHTML=`Interval estimates for each branch’s default rate under three treatments. <b>No pooling</b> uses only the branch’s own data and gives the widest intervals. <b>Empirical Bayes</b> plugs in the single best estimate of the population distribution and gets much narrower intervals, but ignores that this estimate is itself uncertain, so its intervals are a little too short (coverage ${cv[1].toFixed(1)}%). <b>Full Bayes</b> puts a prior on the population mean and strength, averages over their posterior (here a grid) and keeps the intervals honest (${cv[2].toFixed(1)}%) at a modest cost in width. The gap grows when the number of branches is small, which is exactly when partial pooling is used most.`}
+ ['c6j','c6k','c6m'].forEach(i=>$(i).addEventListener('change',run));$('c6go').onclick=run;run();})();
+/* ---------- Ch7 varying intercepts and slopes ---------- */
+(function(){scl('c7j',v=>v);scl('c7n',v=>v);scl('c7r',v=>fmt(v/100));const SA=1,SB=.5,SG=1,MA=0,MB=1;
+ function once(J,n,rho){const S11=SA*SA,S12=rho*SA*SB,S22=SB*SB,Si=(()=>{const d=S11*S22-S12*S12;return[S22/d,-S12/d,-S12/d,S11/d]})(),T=[],O=[],Q=[];let px=0,py=0,pxx=0,pxy=0,pn=0,sx=0,sy=0;
+  for(let j=0;j<J;j++){const z1=randn(),z2=randn(),a=MA+SA*z1,b=MB+rho*SB*z1+SB*Math.sqrt(1-rho*rho)*z2;let Sx=0,Sy=0,Sxx=0,Sxy=0;const xs=[],ys=[];for(let i=0;i<n;i++){const x=randn(),y=a+b*x+SG*randn();xs.push(x);ys.push(y);Sx+=x;Sy+=y;Sxx+=x*x;Sxy+=x*y}
+   const mx=Sx/n,my=Sy/n;let sxx=0,sxy=0;for(let i=0;i<n;i++){sxx+=(xs[i]-mx)*(xs[i]-mx);sxy+=(xs[i]-mx)*(ys[i]-my)}const bo=sxy/Math.max(sxx,1e-9),ao=my-bo*mx;
+   const A11=Si[0]+n/(SG*SG),A12=Si[1]+Sx/(SG*SG),A22=Si[3]+Sxx/(SG*SG),d=A11*A22-A12*A12,r1=Si[0]*MA+Si[1]*MB+Sy/(SG*SG),r2=Si[2]*MA+Si[3]*MB+Sxy/(SG*SG);
+   T.push([a,b]);O.push([ao,bo]);Q.push([(A22*r1-A12*r2)/d,(-A12*r1+A11*r2)/d]);px+=Sx;py+=Sy;pxx+=Sxx;pxy+=Sxy;pn+=n}
+  const mxp=px/pn,myp=py/pn,bp_=(pxy-pn*mxp*myp)/(pxx-pn*mxp*mxp),ap_=myp-bp_*mxp;return{T,O,Q,pool:[ap_,bp_]}}
+ function run(){const J=val('c7j'),n=val('c7n'),rho=val('c7r')/100,R=80;let e=[[0,0,0],[0,0,0]];for(let r=0;r<R;r++){const o=once(J,n,rho);for(let j=0;j<J;j++){e[0][0]+=Math.pow(o.O[j][0]-o.T[j][0],2);e[1][0]+=Math.pow(o.O[j][1]-o.T[j][1],2);e[0][1]+=Math.pow(o.pool[0]-o.T[j][0],2);e[1][1]+=Math.pow(o.pool[1]-o.T[j][1],2);e[0][2]+=Math.pow(o.Q[j][0]-o.T[j][0],2);e[1][2]+=Math.pow(o.Q[j][1]-o.T[j][1],2)}}
+  e=e.map(r=>r.map(v=>Math.sqrt(v/(R*J))));const o=once(J,n,rho),m=Math.min(J,25),pts=[...o.T.slice(0,m),...o.O.slice(0,m),...o.Q.slice(0,m)],xl=Math.min(...pts.map(p=>p[0]))-.3,xh=Math.max(...pts.map(p=>p[0]))+.3,yl=Math.min(...pts.map(p=>p[1]))-.3,yh=Math.max(...pts.map(p=>p[1]))+.3,P=mk($('c7cv'),xl,xh,yh,{y0:yl,L:40});
+  for(let j=0;j<m;j++)poly(P,[o.O[j],o.Q[j]],'rgba(232,235,245,.28)',1);dots(P,o.O.slice(0,m),C.r,3);dots(P,o.Q.slice(0,m),C.g,3.2);dots(P,o.T.slice(0,m),C.fg,4);dots(P,[o.pool],C.y,5);legend(P,[['true (intercept, slope)',C.fg],['fitted separately',C.r],['partial pooling',C.g],['one common line',C.y]],P.T+12);P.text('intercept →',P.w-P.R-4,P.h-P.B-6,C.mu,'right');P.text('slope',P.L+6,P.T+44,C.mu);
+  const Q2=barG($('c7cv2'),e,[C.r,C.y,C.g],['intercepts','slopes'],0,Math.max(...e.flat())*1.2,x=>x.toFixed(2));legend(Q2,[['separate',C.r],['common line',C.y],['partial pooling',C.g]],Q2.T+12);
+  $('c7st').innerHTML=stat('RMSE of intercepts: separate · common · partial',e[0].map(fmt).join(' · '),'ok')+stat('RMSE of slopes: separate · common · partial',e[1].map(fmt).join(' · '),'ok')+stat('true correlation of intercept and slope',fmt(rho),'in')+stat('observations per group',String(n),n<5?'warn':'');
+  $('c7rd').innerHTML=`Each group has its own line y = aⱼ + bⱼx. With only ${n} points per group the separate fits (red) are noisy, and a single common line (yellow) ignores real differences. Partial pooling (green) shrinks the <em>pair</em> (aⱼ, bⱼ) towards the population mean along the direction in which the two are correlated (true correlation ${fmt(rho)}): a group whose fitted slope is unusually high is also pulled in its intercept when the two are linked. The right panel shows lower error for both parameters. This is the varying-intercept, varying-slope (mixed-effects) model of item 20, read as a hierarchical Bayesian model; here the population mean and covariance are taken as known to isolate the shrinkage.`}
+ ['c7j','c7n','c7r'].forEach(i=>$(i).addEventListener('change',run));$('c7go').onclick=run;run();})();
+
+/* ---------- Ch8 group-level predictors ---------- */
+(function(){scl('c8j',v=>v);scl('c8n',v=>v);scl('c8r',v=>v+'%');const TT=1.5,SG=3;
+ function once(J,n,R2){const su=TT*Math.sqrt(1-R2),gm=Math.sqrt(R2)*TT,v=SG*SG/n,z=[],th=[],yb=[];for(let j=0;j<J;j++){const zz=randn(),t=gm*zz+su*randn();z.push(zz);th.push(t);yb.push(t+Math.sqrt(v)*randn())}
+  const mz=mean(z),my=mean(yb);let sxx=0,sxy=0;for(let j=0;j<J;j++){sxx+=(z[j]-mz)*(z[j]-mz);sxy+=(z[j]-mz)*(yb[j]-my)}const b1=sxy/sxx,b0=my-b1*mz,B1=v/(v+TT*TT),B2=v/(v+su*su+1e-9);
+  return{th,yb,z,raw:yb,grand:yb.map(y=>B1*my+(1-B1)*y),reg:yb.map((y,j)=>B2*(b0+b1*z[j])+(1-B2)*y)}}
+ function rm(J,n,R2,R){const e=[0,0,0];for(let r=0;r<R;r++){const o=once(J,n,R2);for(let j=0;j<J;j++){e[0]+=Math.pow(o.raw[j]-o.th[j],2);e[1]+=Math.pow(o.grand[j]-o.th[j],2);e[2]+=Math.pow(o.reg[j]-o.th[j],2)}}return e.map(x=>Math.sqrt(x/(R*J)))}
+ function run(){const J=val('c8j'),n=val('c8n'),R2=val('c8r')/100,GR=Array.from({length:11},(_,i)=>i*.095),cur=GR.map(r=>rm(J,n,r,60)),mx=Math.max(...cur.flat())*1.1,P=mk($('c8cv'),0,.95,mx,{L:44});
+  [[0,C.r],[1,C.y],[2,C.g]].forEach(([k,c])=>poly(P,GR.map((r,i)=>[r,cur[i][k]]),c,k===2?3:2));P.vline(R2,C.mu,null,true);legend(P,[['no pooling',C.r],['shrink to the grand mean',C.y],['shrink to the regression line',C.g]],P.T+12);P.text('share of the between-group variance explained by the group predictor →',P.w-P.R-4,P.h-P.B-6,C.mu,'right');
+  const e=rm(J,n,R2,150),Q=barV($('c8cv2'),e,[C.r,C.y,C.g],['no pooling','grand mean','regression line'],Math.max(...e)*1.25,x=>x.toFixed(3));
+  $('c8st').innerHTML=stat('RMSE: none · grand mean · regression',e.map(fmt).join(' · '),'ok')+stat('gain of regression over grand mean',pc1(1-e[2]/e[1]),e[2]<e[1]?'ok':'warn')+stat('between-group sd · residual sd',fmt(TT)+' · '+fmt(TT*Math.sqrt(1-R2)),'in')+stat('noise sd of a group mean',fmt(SG/Math.sqrt(n)),'');
+  $('c8rd').innerHTML=`Group means can themselves be modelled: θⱼ = γ₀ + γ₁zⱼ + uⱼ with a group-level predictor zⱼ (an urban index for a branch, a segment’s average income). Partial pooling then shrinks each group towards what its characteristics predict instead of towards the overall mean, and only the residual spread ${fmt(TT*Math.sqrt(1-R2))} (not the total ${fmt(TT)}) has to be paid for. When zⱼ explains ${pc1(R2)} of the variance, the regression version has ${pc1(1-e[2]/e[1])} lower error than shrinking to the grand mean; with R² near zero the two coincide. This is how small groups borrow strength: from the other groups and from the predictors that tell them which groups they resemble.`}
+ ['c8j','c8n','c8r'].forEach(i=>$(i).addEventListener('change',run));$('c8go').onclick=run;run();})();
+
+/* ---------- Ch9 predicting a new group ---------- */
+(function(){const NS=[1,2,3,5,8,12,20,40,80,160];scl('c9t',v=>fmt(v/10));scl('c9s',v=>fmt(v/10));scl('c9j',v=>v);idx('c9i',NS,v=>v);const N0=20;
+ function run(){const tau=val('c9t')/10,sig=val('c9s')/10,J=val('c9j'),ni=+$('c9i').value,sm2=(tau*tau+sig*sig/N0)/J,R=3000,W=[],Cv=[];
+  NS.forEach(n=>{const v=sig*sig/n,pr=1/(tau*tau)+1/v,B=(1/(tau*tau))/pr,w1=1.96*Math.sqrt(v),w2=1.96*sig/Math.sqrt(J*N0),w3=1.96*Math.sqrt(1/pr+B*B*sm2);let c=[0,0,0];for(let r=0;r<R;r++){const th=tau*randn(),y=th+Math.sqrt(v)*randn(),mh=Math.sqrt(sm2)*randn(),cen=B*mh+(1-B)*y;if(Math.abs(y-th)<w1)c[0]++;if(Math.abs(mh-th)<w2)c[1]++;if(Math.abs(cen-th)<w3)c[2]++}W.push([w1,w2,w3]);Cv.push(c.map(x=>x/R))});
+  const xs=NS.map(lg10),hi=Math.max(...W.flat())*1.1,P=mk($('c9cv'),0,Math.log10(160),hi,{noGrid:true,L:44});customGrid(P,[0,1,2].map(k=>[k,String(Math.pow(10,k))]),niceTicks(0,hi,4));[[0,C.r],[1,C.y],[2,C.g]].forEach(([k,c])=>poly(P,xs.map((x,i)=>[x,W[i][k]]),c,k===2?3:2));P.vline(lg10(NS[ni]),C.mu,null,true);legend(P,[['separate (no pooling)',C.r],['one common mean',C.y],['hierarchical',C.g]],P.T+12);P.text('observations for the new group →',P.w-P.R-4,P.h-P.B-6,C.mu,'right');P.text('width of the 95% interval',P.L+8,P.T+28,C.mu);
+  const Q=mk($('c9cv2'),0,Math.log10(160),1.02,{y0:0,noGrid:true,L:44});customGrid(Q,[0,1,2].map(k=>[k,String(Math.pow(10,k))]),niceTicks(0,1,5));Q.hline(.95,C.mu,'95%');[[0,C.r],[1,C.y],[2,C.g]].forEach(([k,c])=>poly(Q,xs.map((x,i)=>[x,Cv[i][k]]),c,k===2?3:2));Q.vline(lg10(NS[ni]),C.mu,null,true);Q.text('observations for the new group →',Q.w-Q.R-4,Q.h-Q.B-6,C.mu,'right');Q.text('actual coverage',Q.L+8,Q.T+28,C.mu);
+  const w=W[ni],c=Cv[ni];
+  $('c9st').innerHTML=stat('width at n = '+NS[ni]+': separate · common · hierarchical',w.map(fmt).join(' · '),'in')+stat('coverage at n = '+NS[ni]+': separate · common · hierarchical',c.map(x=>pc1(x)).join(' · '),c[1]<.85?'hot':'ok')+stat('gain in width, hierarchical vs separate',pc1(1-w[2]/w[0]),w[2]<w[0]?'ok':'warn')+stat('existing groups',J+' of '+N0+' observations','');
+  $('c9rd').innerHTML=`A new branch or segment with ${NS[ni]} observation${NS[ni]>1?'s':''}. Treating the groups as identical (yellow) gives an interval around the overall mean that is far too narrow, since it ignores the between-group spread τ = ${fmt(tau)}: coverage ${pc1(c[1])} instead of 95%. Using only the new group’s data (red) has the right coverage but a very wide interval when n is small. The hierarchical interval (green) keeps 95% coverage and is ${pc1(1-w[2]/w[0])} narrower at this n, because the population of existing groups acts as the prior for the new one; with no data at all the prediction is the population distribution itself, and with a lot of data the three methods converge to the separate one. This is the answer to “what do we say about a branch we have just opened?”`}
+ ['c9t','c9s','c9j','c9i'].forEach(i=>$(i).addEventListener('input',run));run();})();
+
+/* ---------- Ch10 ranking groups ---------- */
+(function(){scl('c10j',v=>v);scl('c10t',v=>fmt(v/10));scl('c10k',v=>v+'%');const SG=3,S=200;
+ function once(J,tau,K){const ns=sizesG(J,2,100).sort(()=>Math.random()-.5),v=ns.map(n=>SG*SG/n),th=ns.map(()=>tau*randn()),yb=th.map((t,j)=>t+Math.sqrt(v[j])*randn()),B=v.map(x=>x/(x+tau*tau)),m=yb.map((y,j)=>(1-B[j])*y),s=v.map((x,j)=>Math.sqrt(x*(1-B[j])));
+  const top=ix=>new Set(ix.slice(0,K)),ordD=a=>ordIdx(a.map(x=>-x)),truth=top(ordD(th)),pr=new Float64Array(J),ranks=Array.from({length:J},()=>[]);
+  for(let r=0;r<S;r++){const d=m.map((mm,j)=>mm+s[j]*randn()),o=ordD(d);o.forEach((j,k)=>{ranks[j].push(k+1);if(k<K)pr[j]++})}
+  const sel=[top(ordD(yb)),top(ordD(m)),top(ordD(Array.from(pr)))],prec=sel.map(s=>[...s].filter(j=>truth.has(j)).length/K);return{prec,ranks,m,ns}}
+ function run(){const J=val('c10j'),tau=val('c10t')/10,kp=val('c10k'),K=Math.max(1,Math.round(J*kp/100)),R=60,pr=[0,0,0];for(let r=0;r<R;r++){const o=once(J,tau,K);o.prec.forEach((v,i)=>pr[i]+=v/R)}
+  const o=once(J,tau,K),med=o.ranks.map(r=>{const s=r.slice().sort((a,b)=>a-b);return[s[Math.floor(.05*S)],s[Math.floor(.5*S)],s[Math.floor(.95*S)]]}),ix=ordIdx(med.map(q=>q[1])).slice(0,Math.min(25,J)),P=mk($('c10cv2'),0,J+1,ix.length+1,{y0:0,L:34});
+  P.vline(K+.5,C.r,'flag cut',true);ix.forEach((j,k)=>{poly(P,[[med[j][0],k+1],[med[j][2],k+1]],C.a,2.4);dots(P,[[med[j][1],k+1]],C.g,3.5)});P.text('rank of the group (1 = highest) with 90% interval; 25 worst-looking groups →',P.w-P.R-4,P.h-P.B-6,C.mu,'right');
+  barV($('c10cv'),pr.map(v=>100*v),[C.r,C.y,C.g],['raw mean','shrunken mean','P(in the worst '+kp+'%)'],105,x=>x.toFixed(0)+'%');
+  const wide=ix.filter(j=>med[j][2]-med[j][0]>J*.3).length;
+  $('c10st').innerHTML=stat('share of flagged groups that truly belong: raw · shrunken · probability',pr.map(v=>pc1(v)).join(' · '),pr[2]>pr[0]?'ok':'in')+stat('groups flagged',K+' of '+J,'')+stat('of the 25 worst-looking, ranks uncertain by more than 30% of J',wide+' of '+ix.length,wide>10?'warn':'')+stat('true τ · noise range of a group mean',fmt(tau)+' · '+fmt(SG/10)+' to '+fmt(SG/Math.SQRT2),'');
+  $('c10rd').innerHTML=`Flagging the worst ${kp}% of ${J} groups (highest true effect) from noisy data. Ranking by raw means over-selects small groups with lucky noise (only ${pc1(pr[0])} of the flagged are really in the worst ${kp}%). Ranking by the partially pooled mean does better (${pc1(pr[1])}), and ranking by the <em>posterior probability</em> of being in the worst ${kp}% does best or equal (${pc1(pr[2])}), because it also accounts for how sure we are. The caterpillar shows the honest message: even the groups that look worst have rank intervals that span a large part of the list. A league table without such intervals overstates what the data can say; a flag list should come with the probability behind each flag.`}
+ ['c10j','c10t','c10k'].forEach(i=>$(i).addEventListener('change',run));$('c10go').onclick=run;run();})();
+
+/* ---------- Ch11 when the population is not normal ---------- */
+(function(){scl('c11j',v=>v);scl('c11d',v=>fmt(v/2));scl('c11n',v=>v);scl('c11v',v=>v);const SG=3,TAU=1,GR=Array.from({length:701},(_,i)=>-12+i*26/700),H=26/700;
+ function post(yb,v,nu,pri){const w=new Float64Array(GR.length);let s=0,m=0;for(let i=0;i<GR.length;i++){w[i]=Math.exp(-(yb-GR[i])*(yb-GR[i])/(2*v))*pri[i];s+=w[i]}for(let i=0;i<GR.length;i++)m+=GR[i]*w[i]/s;return{w,s,m}}
+ function run(){const J=val('c11j'),D=val('c11d')/2,n=val('c11n'),nu=val('c11v'),v=SG*SG/n,B=v/(v+TAU*TAU),pri=Array.from(GR,x=>tpdf(x/TAU,nu)/TAU),R=60,eo=[0,0,0],ee=[0,0,0];
+  for(let r=0;r<R;r++){const to=D*TAU,yo=to+Math.sqrt(v)*randn();eo[0]+=Math.abs(yo-to)/R;eo[1]+=Math.abs((1-B)*yo-to)/R;eo[2]+=Math.abs(post(yo,v,nu,pri).m-to)/R;for(let j=0;j<J-1;j++){const t=TAU*randn(),y=t+Math.sqrt(v)*randn();ee[0]+=Math.abs(y-t)/(R*(J-1));ee[1]+=Math.abs((1-B)*y-t)/(R*(J-1));ee[2]+=Math.abs(post(y,v,nu,pri).m-t)/(R*(J-1))}}
+  const to=D*TAU,yo=to+Math.sqrt(v)*randn(),po=post(yo,v,nu,pri),mN=(1-B)*yo,sN=Math.sqrt((1-B)*v),lo=Math.min(-3,yo-4*Math.sqrt(v)),hi=Math.max(4,yo+4*Math.sqrt(v),to+2),P=dcurves($('c11cv'),lo,hi,[{f:x=>normPdfAt(x,yo,Math.sqrt(v)),col:C.y,lw:2.2,dash:true},{f:x=>normPdfAt(x,mN,sN),col:C.r,lw:2.4},{f:x=>{const i=(x+12)/H;if(i<0||i>=GR.length-1)return 0;const k=Math.floor(i);return po.w[k]/po.s/H},col:C.g,lw:2.8,fill:'rgba(74,222,128,.14)'}],[[to,C.fg,null,true]],2);legend(P,[['data alone',C.y],['normal population',C.r],['heavy-tailed (t) population',C.g]],P.T+12);P.text('effect of the unusual group →',P.w-P.R-4,P.h-P.B-6,C.mu,'right');
+  const Q=barG($('c11cv2'),[eo,ee],[C.y,C.r,C.g],['the unusual group','the other '+(J-1)+' groups'],0,Math.max(...eo,...ee)*1.2,x=>x.toFixed(2));legend(Q,[['no pooling',C.y],['normal population',C.r],['t population',C.g]],Q.T+12);
+  $('c11st').innerHTML=stat('error on the unusual group: none · normal · t',eo.map(fmt).join(' · '),eo[1]>1.3*eo[2]?'hot':'in')+stat('error on the ordinary groups: none · normal · t',ee.map(fmt).join(' · '),'in')+stat('this dataset: raw · normal · t estimate (truth '+fmt(to)+')',[yo,mN,po.m].map(fmt).join(' · '),'')+stat('shrinkage weight of the normal model',pc1(B),'');
+  $('c11rd').innerHTML=`One group has a genuinely unusual effect, ${fmt(D)} population standard deviations from the rest. A normal population model shrinks every group by the same factor (${pc1(B)}), so it drags the unusual group most of the way back to the pack (error ${fmt(eo[1])}). A heavy-tailed (Student t with ${nu} df) population still shrinks ordinary groups, but lets the data win when a group is far out, so the unusual group is hardly shrunk (error ${fmt(eo[2])}) while the ordinary groups cost almost nothing (${fmt(ee[2])} against ${fmt(ee[1])}). Over-shrinking is the failure mode of partial pooling: the exchangeability assumption says nobody is special, and an outlier (a fraud ring, a mis-booked branch, a new product) is exactly someone special. Check it with predictive checks and consider a t or mixture population.`}
+ ['c11j','c11d','c11n','c11v'].forEach(i=>$(i).addEventListener('change',run));$('c11go').onclick=run;run();})();
+const QZ=[{"l":"Beginner","q":"What does partial pooling do for a group with very few observations?","o":["Drops the group from the analysis","Pulls its estimate towards the overall mean, by an amount set by its noise relative to the between-group spread","Leaves its estimate equal to its own sample mean","Replaces it with the overall mean exactly"],"a":1,"e":"Partial pooling is a precision-weighted average of the group’s own mean and the population mean; small groups are noisy, so they get pulled most."},{"l":"Beginner","q":"Which estimator is unbiased for each group’s true effect but noisy for small groups?","o":["No pooling (the group’s own mean)","The population median","Complete pooling (the overall mean)","Partial pooling"],"a":0,"e":"The raw group mean is unbiased for its own group but has variance σ²/n, which is large for small n; pooling trades a little bias for much lower variance."},{"l":"Intermediate","q":"In the normal hierarchical model the shrinkage factor is B = (σ²/n)/(σ²/n + τ²). What happens as τ → 0?","o":["B → 0: no shrinkage","B becomes negative","B stays at 1/2","B → 1: all groups are shrunk to the common mean (complete pooling)"],"a":3,"e":"With τ² small against σ²/n the groups are almost identical, so the noise share of the variance goes to 1 and estimates collapse to μ."},{"l":"Intermediate","q":"A moment or maximum-likelihood estimate of τ comes out exactly 0 with 6 groups. The right reading is…","o":["τ must be set to 0 in all later analyses","The model is misspecified","The data cannot distinguish τ = 0 from small positive values; the posterior for τ is still wide and not at zero","The groups are proven identical"],"a":2,"e":"With few groups the likelihood for τ is flat near 0; the estimator often hits the boundary even when τ is positive. Use the marginal posterior instead."},{"l":"Intermediate","q":"Which prior for the group standard deviation τ is a sound weakly informative default?","o":["Inverse-gamma(0.001, 0.001) on τ²","A half-Cauchy or half-normal on τ, scaled to the outcome","A point mass at 0","A prior that forces τ to be large"],"a":1,"e":"Half-t priors on the sd behave well when the data are weak; inverse-gamma(ε, ε) on the variance piles mass near 0 and is influential for few groups."},{"l":"Intermediate","q":"Compared with the raw mean, the posterior variance of a group effect in a hierarchical model is…","o":["Smaller for every group, by the factor (1 − B)","Unchanged","Smaller only for the largest groups","Larger for small groups"],"a":0,"e":"Var(θⱼ | y) = (1 − Bⱼ)σ²/nⱼ < σ²/nⱼ: borrowing strength always reduces posterior variance in the known-hyperparameter model."},{"l":"Advanced","q":"What produces the “funnel” in a hierarchical posterior, and how is it handled?","o":["A bad random seed; change it","A multimodal likelihood; run more chains","Too many observations; thin the chain","Small τ forces group effects together while large τ lets them spread; non-centring (θⱼ = μ + τηⱼ) removes the dependence"],"a":3,"e":"The conditional spread of θ depends on τ, giving a neck at small τ that one step size cannot handle. Non-centring makes η independent of τ a priori."},{"l":"Advanced","q":"When is the centred parametrisation preferable to the non-centred one?","o":["When τ is near 0","When there are very few observations per group","When each group has strong data, so the likelihood pins down θⱼ independently of τ","Never; non-centred always wins"],"a":2,"e":"With informative group data θⱼ is nearly determined by the data, so sampling θ directly mixes well, whereas η then becomes strongly dependent on τ."},{"l":"Advanced","q":"Empirical Bayes intervals for group rates tend to undercover relative to full Bayes because…","o":["They shrink too little","They treat the estimated hyperparameters as known and ignore their uncertainty","They need more groups to be unbiased","They use the wrong likelihood"],"a":1,"e":"Plugging in (m, κ) ignores uncertainty about them; the effect is largest when the number of groups is small."},{"l":"Advanced","q":"In a varying-intercept, varying-slope model with correlation −0.6 between intercept and slope, partial pooling of a sparse group…","o":["Shrinks the pair towards the population mean along the correlated direction, so an extreme slope also moves the intercept","Shrinks each coefficient independently","Leaves the slope unchanged","Sets the correlation to zero"],"a":0,"e":"The posterior mean uses Σ⁻¹, so the shrinkage direction follows the population covariance, not the coordinate axes."},{"l":"Advanced","q":"Why does a group-level predictor (θⱼ = γ₀ + γ₁zⱼ + uⱼ) improve estimates for small groups?","o":["It removes the need for a prior on τ","It makes the groups independent","It increases the group sample size","They are shrunk toward a better-informed target, and only the smaller residual spread τ_u must be paid for"],"a":3,"e":"The prior mean moves from the grand mean to a prediction from zⱼ, and the residual spread is smaller, so shrinkage is stronger and better directed."},{"l":"Expert","q":"Why can a hierarchical estimate of a group-level regression coefficient mislead (ecological fallacy)?","o":["Group predictors cannot be used in Bayesian models","The coefficient is always biased upward","An association between group averages need not hold between individuals within groups","Group means have no sampling error"],"a":2,"e":"Group-level patterns can arise from composition or omitted group-level causes and need not reflect individual-level relationships."},{"l":"Expert","q":"You must give an interval for a brand-new branch’s effect, before any of its data. Which is calibrated?","o":["The interval from complete pooling","The predictive distribution N(μ, τ²), averaged over the posterior of μ and τ","A single group’s raw mean","μ̂ ± its standard error"],"a":1,"e":"A new group is a draw from the population: its variance is τ² plus the uncertainty in μ; using only the standard error of μ̂ ignores the group-to-group spread."},{"l":"Expert","q":"As a new group accumulates n observations, its predictive interval…","o":["Moves from the population distribution toward its own mean, with weight 1 − B(n) on its data, and narrows","Ignores the population entirely after n = 1","Widens, since more data adds noise","Stays at the population width"],"a":0,"e":"The same shrinkage weights apply: at n = 0 the interval is the population’s, and as n grows it narrows toward the group’s own data."},{"l":"Expert","q":"To flag the worst 10% of groups, which rule is best motivated?","o":["Rank by sample size","Rank by raw mean","Rank by the group’s p-value against zero","Rank by the posterior probability (or expected rank) of being in the worst 10%, and report intervals"],"a":3,"e":"Raw means over-select small noisy groups; posterior probabilities weigh effect size and certainty together and give a calibrated watch list."},{"l":"Expert","q":"One branch is truly far from the rest, but a normal population shrinks its estimate heavily. The remedy that keeps ordinary shrinkage while letting extreme evidence through is…","o":["Dropping the prior on τ","Fixing τ at 0","A heavy-tailed (Student t) population distribution, or group-level predictors that explain the branch","Using fewer observations per group"],"a":2,"e":"A t population has linear rather than quadratic penalty in the tails, so a well-supported outlier is shrunk much less while ordinary groups still pool."},{"l":"Expert","q":"Which diagnostic best targets the exchangeability assumption in a hierarchical model?","o":["A histogram of the raw data pooled over groups","Leave-one-group-out prediction and posterior predictive checks of group-level quantities","The acceptance rate","R̂ for μ"],"a":1,"e":"Exchangeability is about whether a group looks like a draw from the others; held-out-group prediction and group-level checks reveal groups the model treats badly."},{"l":"Expert","q":"With 4 groups, the posterior for τ looks almost identical to your half-Cauchy prior. What does that tell you?","o":["The data barely inform τ; results depend on the prior, so test sensitivity or bring in outside information","The prior is wrong","The sampler failed","τ equals the prior’s median"],"a":0,"e":"When the posterior tracks the prior, the data carry little information about τ; with so few groups an informative prior from related data may be the honest choice."}];
+(function(){const st=store.get('hm_quiz',{});
+ function render(){const box=$('quiz');box.innerHTML='';
+  QZ.forEach((q,i)=>{const d=document.createElement('div');d.className='q'+(st[i]!=null?' done':'');d.innerHTML=`<div class="qh">Q${i+1} · ${q.l}</div><div style="margin:4px 0 6px"><b>${q.q}</b></div>`;
+   q.o.forEach((o,j)=>{const b=document.createElement('button');b.className='opt';b.textContent=o;if(st[i]!=null){if(j===q.a)b.classList.add('good');else if(j===st[i])b.classList.add('bad')}b.onclick=()=>{if(st[i]!=null)return;st[i]=j;store.set('hm_quiz',st);render();meter()};d.appendChild(b)});
+   const e=document.createElement('div');e.className='ex';e.innerHTML=(st[i]===q.a?'✅ ':'❌ ')+q.e;d.appendChild(e);box.appendChild(d)});
+  const ans=Object.keys(st).length,ok=QZ.filter((q,i)=>st[i]===q.a).length;
+  $('qscore').innerHTML=stat('answered',ans+' / '+QZ.length,'in')+stat('correct',ok,'ok')+stat('score',ans?Math.round(100*ok/ans)+'%':'—',ok/Math.max(ans,1)>=.8?'ok':'warn')+stat('verdict',ans<QZ.length?'keep going':ok>=16?'hierarchical master':ok>=13?'strong':'review ch. 1–11','')}
+ $('qreset').onclick=()=>{Object.keys(st).forEach(k=>delete st[k]);store.set('hm_quiz',st);render();meter()};
+ window.__qst=st;render();})();
+const CHK=["Contrast no, complete and partial pooling and say when each is the right choice.","Write the posterior mean and variance of a group effect and the shrinkage factor B.","Explain why small groups are shrunk most and why shrinkage cures the winner’s curse.","Explain why estimates of τ are poorly determined with few groups and read its marginal posterior.","Choose and defend a prior for the group sd, and explain why inverse-gamma(ε, ε) on τ² misleads.","Explain the funnel, divergent transitions and the non-centred parametrisation.","Choose between centred and non-centred forms based on data strength.","Compare empirical and full Bayes for group rates and explain the interval undercoverage.","Specify a varying-intercept, varying-slope model with a prior on the covariance.","Use group-level predictors and describe the ecological fallacy.","Predict a new group and back-test the calibration on held-out groups.","Rank groups by posterior rank or probability of being in the worst k% and report intervals.","Explain exchangeability, and when pooling hurts an unusual group.","List the remedies: predictors, t or mixture populations, predictive checks, leave-one-group-out CV."];
+(function(){const st=store.get('hm_chk',{}),box=$('chk');CHK.forEach((t,i)=>{const l=document.createElement('label'),c=document.createElement('input');c.type='checkbox';c.checked=!!st[i];c.onchange=()=>{st[i]=c.checked;store.set('hm_chk',st);meter()};l.appendChild(c);const s=document.createElement('span');s.textContent=t;l.appendChild(s);box.appendChild(l)});window.__cst=st;})();
+function meter(){const q=window.__qst||{},c=window.__cst||{};const ok=QZ.filter((x,i)=>q[i]===x.a).length,ck=Object.values(c).filter(Boolean).length;const p=Math.round(100*(.6*ok/QZ.length+.4*ck/CHK.length));$('mtxt').textContent='Mastery: '+p+'%  (exam + checklist)';$('mbar').style.width=p+'%';store.set('mastery_hm',p)}
+meter();
+
+/* ---------- Navigation ---------- */
+(function(){const nav=$('nav');let html='';
+ document.querySelectorAll('main .part, main section.ch').forEach(el=>{if(el.classList.contains('part'))html+=`<div class="pt">${el.textContent}</div>`;else{const h=el.querySelector('h2'),num=h.querySelector('.num').textContent,t=Array.from(h.childNodes).filter(n=>n.nodeType===3).map(n=>n.textContent).join('').trim();html+=`<a href="#${el.id}" data-id="${el.id}">${num}. ${t}</a>`}});
+ nav.innerHTML=html;const links=nav.querySelectorAll('a'),io=new IntersectionObserver(es=>{es.forEach(e=>{if(e.isIntersecting)links.forEach(a=>a.classList.toggle('on',a.dataset.id===e.target.id))})},{rootMargin:'-20% 0px -70% 0px'});
+ document.querySelectorAll('section.ch').forEach(s=>io.observe(s));
+ $('menu').onclick=()=>$('side').classList.toggle('open');nav.addEventListener('click',e=>{if(e.target.tagName==='A')$('side').classList.remove('open')});
+ window.addEventListener('scroll',()=>{const h=document.documentElement;$('prog').style.width=(100*h.scrollTop/(h.scrollHeight-h.clientHeight))+'%'},{passive:true});})();
+</script>
+</body>
+</html>
