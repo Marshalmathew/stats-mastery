@@ -2,7 +2,7 @@
 
 > **The complete interactive visual curriculum for statistical mastery.**
 >
-> 29 comprehensive, self-contained interactive modules covering probability, classical inference, regression, causal inference, and Bayesian modeling — with interactive simulations, formula proofs, and self-assessment exams.
+> 31 comprehensive, self-contained interactive modules covering probability, classical inference, regression, causal inference, Bayesian modeling, and specialist depth — with interactive simulations, formula proofs, and self-assessment exams.
 
 ---
 
@@ -34,7 +34,7 @@ Then navigate to `http://localhost:8000`.
 
 ## 📊 Curriculum Overview
 
-The curriculum is structured across 7 progressive stages comprising **29 modules**, **362 chapters**, **342 interactive simulation labs**, and **516 exam questions**.
+The curriculum is structured across 7 progressive stages comprising **31 modules**, **386 chapters**, **364 interactive simulation labs**, and **552 exam questions**.
 
 ### Stage 1 · Foundations & Probability Theory
 1. [`random-variables-mastery.html`](random-variables-mastery.html) — **Random Variables, Expectation, Variance & Covariance** (15 chapters, 14 labs, 16 exam questions)
@@ -71,11 +71,15 @@ The curriculum is structured across 7 progressive stages comprising **29 modules
 24. [`observational-causal-mastery.html`](observational-causal-mastery.html) — **Observational Causal Methods (Matching, IPW, DiD, IV, RDD)** (12 chapters, 11 labs, 18 exam questions)
 25. [`uplift-heterogeneous-mastery.html`](uplift-heterogeneous-mastery.html) — **Uplift & Heterogeneous Treatment Effects** (12 chapters, 11 labs, 18 exam questions)
 
-### Stage 6 & 7 · Bayesian & Probabilistic Modelling
+### Stage 6 · Bayesian & Probabilistic Modelling
 26. [`bayesian-inference-mastery.html`](bayesian-inference-mastery.html) — **Bayesian Inference & Conjugate Updating** (12 chapters, 11 labs, 18 exam questions)
 27. [`mcmc-variational-mastery.html`](mcmc-variational-mastery.html) — **MCMC and Variational Inference** (12 chapters, 11 labs, 18 exam questions)
 28. [`hierarchical-models-mastery.html`](hierarchical-models-mastery.html) — **Hierarchical (Partial Pooling) Models** (12 chapters, 11 labs, 18 exam questions)
 29. [`bayesian-decision-theory-mastery.html`](bayesian-decision-theory-mastery.html) — **Bayesian Decision Theory & Utility** (12 chapters, 11 labs, 18 exam questions)
+
+### Stage 7 · Specialist Depth
+30. [`multivariate-methods-mastery.html`](multivariate-methods-mastery.html) — **Multivariate Methods (PCA, Factor Analysis, Mixtures & Mahalanobis)** (12 chapters, 11 labs, 18 exam questions)
+31. [`extreme-value-theory-mastery.html`](extreme-value-theory-mastery.html) — **Extreme Value Theory and Heavy Tails** (12 chapters, 11 labs, 18 exam questions)
 
 ---
 
@@ -84,7 +88,7 @@ The curriculum is structured across 7 progressive stages comprising **29 modules
 ```
 stats-mastery/
 ├── index.html                           # Main entry point and curriculum dashboard
-├── *.html                               # 29 interactive mastery learning modules
+├── *.html                               # 31 interactive mastery learning modules
 ├── README.md                            # Project documentation
 ├── .gitignore                           # Repository exclusions
 └── .snapshots/                          # Archived incremental ZIP snapshots (ignored)
@@ -95,3 +99,4 @@ stats-mastery/
 ## 📜 License & Acknowledgments
 
 All rights reserved by the author. Created and iteratively developed from October to November 2026.
+

@@ -1,0 +1,697 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Multivariate Methods Mastery</title>
+<style>
+:root{--bg:#0b0e17;--panel:#121726;--panel2:#171d30;--line:#232a3d;--fg:#e8ebf5;--mu:#8a93ab;--a:#6ea8ff;--r:#ff6b81;--y:#ffd166;--g:#4ade80;--p:#c084fc;--t:#5eead4}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;background:var(--bg);color:var(--fg);font:16px/1.7 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+a{color:var(--a)}
+#prog{position:fixed;top:0;left:0;height:3px;background:linear-gradient(90deg,var(--a),var(--p),var(--r));width:0;z-index:50}
+.side{position:fixed;left:0;top:0;bottom:0;width:290px;background:#0e1220;border-right:1px solid var(--line);overflow:auto;padding:18px 14px 90px;z-index:40;transition:transform .25s}
+.side h1{font-size:15px;margin:0 0 2px}
+.side small{color:var(--mu)}
+.side .pt{margin:16px 0 4px;font-size:11px;text-transform:uppercase;letter-spacing:1.3px;color:var(--p)}
+.side a{display:block;color:var(--mu);text-decoration:none;padding:5px 9px;border-radius:7px;font-size:13.5px;line-height:1.35}
+.side a:hover{background:var(--panel);color:var(--fg)}
+.side a.on{background:var(--panel2);color:var(--fg);box-shadow:inset 3px 0 var(--a)}
+.side a.back{color:var(--t);padding-left:0;margin-bottom:6px}
+.meter{position:fixed;left:0;bottom:0;width:290px;background:#0e1220;border-top:1px solid var(--line);padding:10px 16px;z-index:41;font-size:12px;color:var(--mu)}
+.meter .bar{height:7px;background:var(--line);border-radius:6px;margin-top:5px;overflow:hidden}
+.meter .bar i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--g),var(--t));transition:width .4s}
+#menu{display:none;position:fixed;top:10px;left:10px;z-index:60;background:var(--panel2);color:var(--fg);border:1px solid var(--line);border-radius:9px;padding:7px 12px;font-size:14px;cursor:pointer}
+main{margin-left:290px;padding:0 34px 120px;max-width:1090px}
+.hero{padding:70px 0 30px}
+.hero h1{font-size:clamp(32px,5vw,56px);line-height:1.08;margin:0 0 14px;background:linear-gradient(100deg,#fff,var(--y) 40%,var(--r));-webkit-background-clip:text;background-clip:text;color:transparent}
+.hero p{font-size:19px;color:#c3c9dc;max-width:780px}
+.chips{display:flex;flex-wrap:wrap;gap:8px;margin:18px 0}
+.chip{border:1px solid var(--line);background:var(--panel);padding:5px 12px;border-radius:99px;font-size:13px;color:var(--mu)}
+.chip b{color:var(--fg)}
+.part{margin:90px 0 0;padding-top:22px;border-top:1px solid var(--line);font-size:12px;letter-spacing:2px;text-transform:uppercase;color:var(--p)}
+section.ch{padding-top:30px}
+h2{font-size:30px;line-height:1.2;margin:10px 0 8px;display:flex;gap:12px;align-items:center;flex-wrap:wrap}
+h2 .num{display:inline-grid;place-items:center;width:40px;height:40px;border-radius:12px;background:var(--panel2);border:1px solid var(--line);font-size:18px;color:var(--a)}
+.lvl{font-size:11px;font-weight:600;letter-spacing:.8px;text-transform:uppercase;padding:3px 9px;border-radius:99px;border:1px solid}
+.lvl.b{color:var(--g);border-color:#1f5c3a}.lvl.i{color:var(--a);border-color:#244a85}.lvl.a{color:var(--y);border-color:#6b5420}.lvl.e{color:var(--r);border-color:#7a2c3a}
+h3{font-size:19px;margin:30px 0 6px;color:#fff}
+p{margin:10px 0}li{margin:5px 0}
+code,.f{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace}
+code{background:var(--panel2);padding:1px 6px;border-radius:5px;font-size:.9em}
+.f{display:block;white-space:pre-wrap;background:#0e1322;border:1px solid var(--line);border-left:3px solid var(--a);padding:12px 16px;border-radius:9px;margin:14px 0;overflow-x:auto;font-size:15px;color:#dbe4ff;line-height:1.8}
+.co{border-radius:12px;padding:13px 17px;margin:16px 0;border:1px solid var(--line);background:var(--panel)}
+.co>b:first-child{display:block;margin-bottom:2px;font-size:12px;letter-spacing:1px;text-transform:uppercase}
+.co.def{border-left:4px solid var(--a)}.co.def>b:first-child{color:var(--a)}
+.co.warn{border-left:4px solid var(--r)}.co.warn>b:first-child{color:var(--r)}
+.co.tip{border-left:4px solid var(--g)}.co.tip>b:first-child{color:var(--g)}
+.co.key{border-left:4px solid var(--y);background:#171608}.co.key>b:first-child{color:var(--y)}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:18px 20px;margin:22px 0;box-shadow:0 8px 30px rgba(0,0,0,.25)}
+.card>h4{margin:0 0 3px;font-size:13px;letter-spacing:1.2px;text-transform:uppercase;color:var(--t)}
+.card>p.sub{margin:0 0 12px;color:var(--mu);font-size:14.5px}
+.ctl{display:flex;flex-wrap:wrap;gap:10px 22px;align-items:center;margin:8px 0 10px}
+.ctl label{display:flex;gap:8px;align-items:center;font-size:14px;color:#c3c9dc}
+.ctl output{min-width:38px;font-family:ui-monospace,monospace;color:var(--y);font-size:13px}
+input[type=range]{accent-color:var(--a);width:150px}
+input[type=checkbox]{accent-color:var(--a)}
+select,input[type=number],input[type=text]{background:#0e1322;color:var(--fg);border:1px solid var(--line);border-radius:8px;padding:6px 9px;font:inherit;font-size:14px}
+button{background:linear-gradient(180deg,#2c4a80,#233b68);color:#fff;border:1px solid #3a5a98;border-radius:9px;padding:7px 14px;font:inherit;font-size:14px;cursor:pointer}
+button:hover{filter:brightness(1.15)}
+button.alt{background:var(--panel2);border-color:var(--line);color:var(--fg)}
+canvas{width:100%;height:270px;display:block;background:#0e1322;border:1px solid var(--line);border-radius:10px;margin-top:6px}
+canvas.sm{height:210px}canvas.tl{height:330px}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(125px,1fr));gap:9px;margin:12px 0}
+.stat{background:#0e1322;border:1px solid var(--line);border-radius:10px;padding:8px 11px}
+.stat b{display:block;font-size:17px;font-family:ui-monospace,monospace}
+.stat span{font-size:11.5px;color:var(--mu);text-transform:uppercase;letter-spacing:.7px}
+.stat.hot b{color:var(--r)}.stat.ok b{color:var(--g)}.stat.warn b{color:var(--y)}.stat.in b{color:var(--a)}
+.read{margin:8px 0 0;padding:10px 14px;background:#0e1322;border:1px dashed #33406a;border-radius:10px;font-size:14.5px;color:#d3dbf3}
+table{border-collapse:collapse;width:100%;margin:12px 0;font-size:14px}
+th,td{border:1px solid var(--line);padding:7px 10px;text-align:left;vertical-align:top}
+th{background:var(--panel2);font-size:12px;text-transform:uppercase;letter-spacing:.6px;color:var(--mu)}
+td.n{font-family:ui-monospace,monospace;text-align:right}
+.tw{overflow-x:auto}
+.pill{display:inline-block;padding:1px 9px;border-radius:99px;font-size:12px;font-weight:600}
+.pill.r{background:#3a1520;color:var(--r)}.pill.g{background:#10321f;color:var(--g)}.pill.y{background:#3a2f0e;color:var(--y)}.pill.m{background:#202637;color:var(--mu)}
+details{background:var(--panel);border:1px solid var(--line);border-radius:11px;padding:9px 15px;margin:9px 0}
+details summary{cursor:pointer;font-weight:600}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.q{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:14px 18px;margin:14px 0}
+.q .qh{font-size:12px;letter-spacing:1px;text-transform:uppercase;color:var(--mu)}
+.q .opt{display:block;width:100%;text-align:left;margin:6px 0;background:#0e1322;border:1px solid var(--line);color:var(--fg);border-radius:9px;padding:9px 12px}
+.q .opt.good{border-color:var(--g);background:#0e2418}.q .opt.bad{border-color:var(--r);background:#2a1119}
+.q .ex{display:none;margin-top:8px;font-size:14.5px;color:#c3c9dc}
+.q.done .ex{display:block}
+.chk label{display:flex;gap:10px;align-items:flex-start;padding:6px 0;cursor:pointer}
+.chk input{margin-top:6px;accent-color:var(--g);width:17px;height:17px}
+.sigrow{display:grid;grid-template-columns:minmax(170px,2fr) 1fr 1fr auto;gap:8px 14px;align-items:center;padding:6px 0;border-top:1px dashed #1b2236}
+.sigrow:first-of-type{border-top:0}
+.sigrow label{display:flex;gap:6px;align-items:center;font-size:13.5px;color:#c3c9dc}
+@media(max-width:900px){
+ .side{transform:translateX(-100%)}.side.open{transform:none}.meter{display:none}
+ #menu{display:block}main{margin-left:0;padding:0 16px 100px}.two{grid-template-columns:1fr}.hero{padding-top:60px}
+ .sigrow{grid-template-columns:1fr 1fr}
+}
+</style>
+</head>
+<body>
+<div id="prog"></div>
+<button id="menu">☰ Contents</button>
+<nav class="side" id="side"><a class="back" href="index.html">← All courses</a><h1>Multivariate Methods</h1><small>12 chapters · 11 labs · exam</small><div id="nav"></div></nav>
+<div class="meter"><div id="mtxt">Mastery: 0%</div><div class="bar"><i id="mbar"></i></div></div>
+
+<main>
+<header class="hero">
+ <h1>Multivariate methods: seeing the shape of many variables at once.</h1>
+ <p>Real data have many variables that move together. This page works from the geometry of the covariance matrix to the tools built on it: <b>Mahalanobis distance</b> for finding unusual combinations, <b>principal components</b> for compression, <b>factor analysis</b> for latent structure and why its answer is only defined up to a rotation, <b>Gaussian mixtures</b> for hidden groups, and then the places where each tool fails: too many variables for the sample, outliers that hide themselves, a predictive signal in a low-variance direction, distances that lose meaning in high dimension, and components that are not stable. It starts Stage 7, the specialist topics.</p>
+ <div class="chips"><span class="chip"><b>Part I</b> Geometry and components</span><span class="chip"><b>Part II</b> Latent structure</span><span class="chip"><b>Part III</b> Robustness and limits</span></div>
+ <div class="co tip"><b>How to use this</b>Sliders change the setting; heavier labs recompute when you release a slider or press the button. Prerequisites: random variables and covariance (item 1), dependent data (item 20) and regularisation (item 14).</div>
+</header>
+
+<div class="part">Part I · Geometry, distance and components</div>
+
+<section class="ch" id="c1">
+<h2><span class="num">1</span>The covariance matrix and its geometry <span class="lvl b">Beginner</span></h2>
+<p>With several variables measured on the same cases the basic summaries are a <b>mean vector</b> and a <b>covariance matrix</b> Σ, whose diagonal holds the variances and whose off-diagonal entries hold the covariances. Geometrically, a cloud of points that is roughly normal is an ellipse (an ellipsoid in more dimensions). The <b>eigenvectors</b> of Σ are the axes of the ellipse and the <b>eigenvalues</b> are the variances along those axes, so correlation is just the tilt of the cloud. Everything in this page builds on this: PCA rotates to the axes, Mahalanobis distance rescales each axis by its spread, factor analysis splits Σ into shared and unique parts, and mixtures use one Σ per cluster. Sample eigenvalues are biased apart: the largest is too large and the smallest too small, increasingly so when the sample is small.</p>
+<div class="f">Σ = V Λ Vᵀ  ·  eigenvectors V = axes  ·  eigenvalues Λ = variances along the axes  ·  total variance = trace Σ = Σλ</div>
+<div class="card"><h4>Lab 1 · Covariance as an ellipse</h4>
+ <p class="sub">Two variables with standard deviations 1 and a chosen value. Left: the sample cloud, the true 95% ellipse (white dashed), the sample ellipse (green) and the sample principal axes. Right: the sampling distribution of the two eigenvalues over 300 datasets, with the true values marked.</p>
+ <div class="ctl"><label>correlation <input type="range" id="c1r" min="-95" max="95" step="5" value="70"><output id="c1rv"></output></label><label>sd of the second variable <input type="range" id="c1a" min="10" max="40" step="1" value="20"><output id="c1av"></output></label><label>sample size <input type="range" id="c1n" min="30" max="1000" step="10" value="200"><output id="c1nv"></output></label><button id="c1go">New sample</button></div>
+ <div class="two"><canvas class="sm" id="c1cv"></canvas><canvas class="sm" id="c1cv2"></canvas></div><div class="stats" id="c1st"></div><div class="read" id="c1rd"></div></div>
+</section>
+
+<section class="ch" id="c2">
+<h2><span class="num">2</span>Mahalanobis distance <span class="lvl i">Intermediate</span></h2>
+<p>How far is a customer or transaction from the typical profile? The Euclidean distance treats every direction alike. The <b>Mahalanobis distance</b>, d² = (x − m)ᵀ S⁻¹ (x − m), measures distance in units of the data’s own spread along each direction, so a step against the correlation (unusual combinations) counts for much more than a step along it. For normal data d² has a χ² distribution with p degrees of freedom, which gives a principled threshold: flag points with d² above the 99% quantile of χ²_p. It is the basis of multivariate outlier screening, of the covariance-adjusted nearest-profile methods used in AML peer-group comparisons, and of the discriminant rules that come with Gaussian classification. Its weaknesses, estimating S in high dimension and the effect of the outliers on S, are the subject of chapters 7 and 8.</p>
+<div class="f">d² = (x − m)ᵀ S⁻¹ (x − m)  ~  χ²ₚ for normal data  ·  flag if d² &gt; χ²ₚ(0.99)</div>
+<div class="card"><h4>Lab 2 · Two ways to measure distance</h4>
+ <p class="sub">Variables share a common correlation; ten outliers differ from the pack in the direction in which the data vary least. Left: the first two variables, with the outliers in red. Right: squared Mahalanobis distances of normal points (blue) and outliers (red) with the χ² threshold.</p>
+ <div class="ctl"><label>correlation between variables <input type="range" id="c2r" min="0" max="95" step="5" value="85"><output id="c2rv"></output></label><label>outlier distance (Mahalanobis units) <input type="range" id="c2d" min="2" max="10" step="1" value="5"><output id="c2dv"></output></label><label>number of variables <input type="range" id="c2p" min="2" max="20" step="1" value="2"><output id="c2pv"></output></label><button id="c2go">New sample</button></div>
+ <div class="two"><canvas class="sm" id="c2cv"></canvas><canvas class="sm" id="c2cv2"></canvas></div><div class="stats" id="c2st"></div><div class="read" id="c2rd"></div></div>
+</section>
+
+<section class="ch" id="c3">
+<h2><span class="num">3</span>Principal components and how many to keep <span class="lvl i">Intermediate</span></h2>
+<p><b>Principal component analysis</b> rotates the data to the eigenvectors of the covariance (or correlation) matrix and orders the new axes by variance. Keeping the first k components compresses the variables with the least squared reconstruction error of any k-dimensional linear summary. Standardise first (use the correlation matrix) when the variables are in different units, otherwise the largest-scale variable dominates. The number to keep is the difficult part. Kaiser’s rule (eigenvalue above 1), a fixed share of variance (say 80%) and the eye-balled elbow of a scree plot are all common and all unreliable. <b>Parallel analysis</b> is better founded: keep the components whose eigenvalue exceeds what pure noise of the same size would give. Remember also that PCA finds directions of high variance, which are not necessarily the directions that matter for the question (chapter 9).</p>
+<div class="card"><h4>Lab 3 · A scree plot with a known answer</h4>
+ <p class="sub">Ten variables follow a chosen number of latent factors plus noise. Left: the scree plot against the population eigenvalues and the parallel-analysis threshold. Right: the number of components kept by three rules, against the truth.</p>
+ <div class="ctl"><label>true number of factors <input type="range" id="c3k" min="1" max="5" step="1" value="2"><output id="c3kv"></output></label><label>sample size <input type="range" id="c3n" min="50" max="2000" step="10" value="200"><output id="c3nv"></output></label><label>noise sd of each variable <input type="range" id="c3s" min="3" max="30" step="1" value="15"><output id="c3sv"></output></label><button id="c3go">New sample</button></div>
+ <div class="two"><canvas class="sm" id="c3cv"></canvas><canvas class="sm" id="c3cv2"></canvas></div><div class="stats" id="c3st"></div><div class="read" id="c3rd"></div></div>
+</section>
+
+<div class="part">Part II · Latent structure, mixtures and many variables</div>
+
+<section class="ch" id="c4">
+<h2><span class="num">4</span>PCA against factor analysis <span class="lvl a">Advanced</span></h2>
+<p>PCA and <b>factor analysis</b> look similar and answer different questions. PCA summarises the total variance of the variables. The factor model says each variable is a loading times a few latent factors plus its own unique noise, x = Λf + ε with Var(ε) = Ψ diagonal, so Σ = ΛΛᵀ + Ψ: the covariances come entirely from the common factors. Fitting that model (by principal-axis iteration, maximum likelihood or a Bayesian version) separates shared variance from noise. The practical difference is that PCA loadings absorb each variable’s noise and are biased upward, especially with few variables; the difference shrinks as the number of variables per factor grows. Use PCA to build compact inputs and FA when the aim is to interpret or measure a latent construct, such as a customer-engagement or financial-stress index, and say which was used.</p>
+<div class="f">Σ = Λ Λᵀ + Ψ  (factor analysis)  ·  Σ ≈ V₁ Λ₁ V₁ᵀ  (PCA, truncated)</div>
+<div class="card"><h4>Lab 4 · Loadings recovered by two methods</h4>
+ <p class="sub">One latent factor, true loadings 0.4 to 0.9, and unequal noise variances. Left: estimated against true loadings for one dataset. Right: average loading error of both methods for different numbers of variables.</p>
+ <div class="ctl"><label>number of variables <input type="range" id="c4p" min="4" max="40" step="1" value="6"><output id="c4pv"></output></label><label>unevenness of the noise variances <input type="range" id="c4h" min="0" max="10" step="1" value="6"><output id="c4hv"></output></label><label>sample size <input type="range" id="c4n" min="100" max="3000" step="50" value="500"><output id="c4nv"></output></label><button id="c4go">New sample</button></div>
+ <div class="two"><canvas class="sm" id="c4cv"></canvas><canvas class="sm" id="c4cv2"></canvas></div><div class="stats" id="c4st"></div><div class="read" id="c4rd"></div></div>
+</section>
+
+<section class="ch" id="c5">
+<h2><span class="num">5</span>Rotation and what a factor means <span class="lvl a">Advanced</span></h2>
+<p>A factor solution is not unique. If Λ is a set of loadings, ΛT for any orthogonal matrix T gives exactly the same fitted covariance, communalities and likelihood. The data cannot choose between these <b>rotations</b>, so the analyst does, usually by seeking <b>simple structure</b>: each variable loads strongly on one factor and little on the others. Varimax does this for orthogonal factors; oblique rotations (promax, oblimin) allow the factors to correlate and are more realistic for behavioural constructs. The consequence for model documentation is that a named factor (“credit appetite”) is an interpretation of one rotation, and loadings from two packages can differ for this reason alone. It also means factor scores are defined only up to the rotation, so a scoring system built on factors should freeze the rotation and its code.</p>
+<div class="card"><h4>Lab 5 · The same fit, different pictures</h4>
+ <p class="sub">Twelve variables, two factors with cross-loadings. Left: loadings of the principal-axis solution, turned by an arbitrary angle. Right: after varimax. The fitted covariance and communalities do not change; the interpretability does.</p>
+ <div class="ctl"><label>sample size <input type="range" id="c5n" min="100" max="3000" step="50" value="500"><output id="c5nv"></output></label><label>cross-loading <input type="range" id="c5x" min="0" max="60" step="5" value="30"><output id="c5xv"></output></label><label>arbitrary starting rotation <input type="range" id="c5g" min="0" max="90" step="5" value="0"><output id="c5gv"></output></label><button id="c5go">New sample</button></div>
+ <div class="two"><canvas class="sm" id="c5cv"></canvas><canvas class="sm" id="c5cv2"></canvas></div><div class="stats" id="c5st"></div><div class="read" id="c5rd"></div></div>
+</section>
+
+<section class="ch" id="c6">
+<h2><span class="num">6</span>Gaussian mixtures and the EM algorithm <span class="lvl a">Advanced</span></h2>
+<p>If the population is a blend of groups, a <b>Gaussian mixture</b> models it as a weighted sum of normal densities, each with its own mean and covariance. Fitting uses the <b>EM algorithm</b>: the E step gives every point a soft membership in each component given the current parameters, the M step re-estimates each component’s weight, mean and covariance from the weighted points, and the likelihood increases at every iteration. Three practical issues dominate. EM finds a local optimum, so use several starts. The number of components cannot be chosen by likelihood, which always improves with more components; use a penalised criterion (BIC) and check stability. A component can collapse onto a single point, so regularise the covariances. Mixtures also give soft cluster probabilities, which is more honest than k-means’ hard labels, but a fitted “segment” may be an artefact of non-normality, so name segments only after checking them against behaviour.</p>
+<div class="f">p(x) = Σₖ wₖ N(x | μₖ, Σₖ)  ·  E step: rᵢₖ ∝ wₖ N(xᵢ | μₖ, Σₖ)  ·  M step: weighted means and covariances</div>
+<div class="card"><h4>Lab 6 · How many clusters are really there?</h4>
+ <p class="sub">Points come from a chosen number of Gaussian clusters. Left: the clusters found by the best-BIC mixture with their fitted ellipses. Right: BIC against the number of components.</p>
+ <div class="ctl"><label>separation of neighbouring centres (sd units) <input type="range" id="c6s" min="20" max="80" step="2" value="40"><output id="c6sv"></output></label><label>sample size <input type="range" id="c6n" min="100" max="2000" step="50" value="400"><output id="c6nv"></output></label><label>true number of clusters <input type="range" id="c6k" min="1" max="4" step="1" value="3"><output id="c6kv"></output></label><button id="c6go">New sample</button></div>
+ <div class="two"><canvas class="sm" id="c6cv"></canvas><canvas class="sm" id="c6cv2"></canvas></div><div class="stats" id="c6st"></div><div class="read" id="c6rd"></div></div>
+</section>
+
+<section class="ch" id="c7">
+<h2><span class="num">7</span>Covariance when there are many variables <span class="lvl a">Advanced</span></h2>
+<p>The sample covariance matrix is only reliable when the number of cases is much larger than the number of variables. When p/n is not small it is noisy: eigenvalues spread far beyond the true ones (the Marchenko–Pastur law quantifies this for uncorrelated data), the smallest approach zero, and with p ≥ n the matrix cannot be inverted. All of the tools above that invert Σ then fail: Mahalanobis distance, Gaussian discriminant analysis and minimum-variance portfolios. <b>Shrinkage</b> estimators blend the sample matrix with a simple target (a scaled identity, or a diagonal) using an intensity estimated from the data (Ledoit–Wolf). They are always invertible, well conditioned, and usually closer to the truth, at the cost of some bias. Structured alternatives (factor models, banded or sparse precision matrices) are used when something is known about the structure. A p/n above 0.1 is the signal to move off the plain sample covariance.</p>
+<div class="card"><h4>Lab 7 · The sample covariance fails first</h4>
+ <p class="sub">Variables follow an autoregressive correlation. Left: true, sample and shrunk eigenvalues for one dataset. Right: average relative error of the sample covariance, the shrinkage estimate and the diagonal alone.</p>
+ <div class="ctl"><label>number of variables <input type="range" id="c7p" min="5" max="60" step="1" value="30"><output id="c7pv"></output></label><label>sample size <input type="range" id="c7n" min="20" max="1000" step="10" value="60"><output id="c7nv"></output></label><label>autocorrelation of neighbouring variables <input type="range" id="c7r" min="0" max="90" step="5" value="50"><output id="c7rv"></output></label><button id="c7go">New sample</button></div>
+ <div class="two"><canvas class="sm" id="c7cv"></canvas><canvas class="sm" id="c7cv2"></canvas></div><div class="stats" id="c7st"></div><div class="read" id="c7rd"></div></div>
+</section>
+
+<div class="part">Part III · Robustness and limits</div>
+
+<section class="ch" id="c8">
+<h2><span class="num">8</span>Robust covariance and masking <span class="lvl e">Expert</span></h2>
+<p>A classical mean and covariance are fitted to <em>all</em> the data, including the points one wants to find. A cluster of outliers shifts the mean, and above all inflates the variance in its own direction, so their Mahalanobis distances shrink: this is <b>masking</b>, and it grows with the share of contamination and with the outliers’ coherence (a tight cluster of mule accounts hides itself better than scattered ones). <b>Robust estimators</b> fit the bulk of the data and ignore the rest. The minimum covariance determinant (MCD) searches for the half of the points whose covariance matrix has the smallest determinant (the tightest cloud), fits the mean and covariance to them, and rescales for consistency. It tolerates contamination up to almost half of the data. Always compare classical and robust distances: points that the robust distance flags and the classical one does not are the masked ones. Robust estimators are slower and lose a little efficiency, which is a reasonable price for screening.</p>
+<div class="card"><h4>Lab 8 · A hiding cluster</h4>
+ <p class="sub">A tight cluster of anomalies far from the main population. Left: the first two variables with the true, classical and robust 97.5% ellipses. Right: share of the anomalies and of the normal points flagged by each (average of 25 datasets).</p>
+ <div class="ctl"><label>share of anomalies <input type="range" id="c8e" min="0" max="45" step="5" value="25"><output id="c8ev"></output></label><label>distance of the cluster (sd units) <input type="range" id="c8d" min="2" max="12" step="1" value="6"><output id="c8dv"></output></label><label>number of variables <input type="range" id="c8p" min="2" max="6" step="1" value="2"><output id="c8pv"></output></label><label>sample size <input type="range" id="c8n" min="100" max="1000" step="50" value="300"><output id="c8nv"></output></label><button id="c8go">New sample</button></div>
+ <div class="two"><canvas class="sm" id="c8cv"></canvas><canvas class="sm" id="c8cv2"></canvas></div><div class="stats" id="c8st"></div><div class="read" id="c8rd"></div></div>
+</section>
+
+<section class="ch" id="c9">
+<h2><span class="num">9</span>The trap in principal components regression <span class="lvl e">Expert</span></h2>
+<p>Principal components regression regresses the outcome on the first few components, which removes collinearity and reduces the number of parameters. The hidden assumption is that the components with the largest variance are the ones that predict the outcome. Nothing guarantees that: the outcome can depend on a low-variance direction (a contrast between two highly correlated variables, for instance a spread between two similar rates), and then the leading components miss it entirely, an old result known as Jolliffe’s warning. The number of components should be picked for predictive accuracy (cross-validation) and not for variance explained. Supervised alternatives avoid the problem: partial least squares chooses directions using the outcome, and ridge regression shrinks the low-variance directions only gently. Unsupervised compression before modelling is fine for input hygiene and risky as a hidden feature filter.</p>
+<div class="card"><h4>Lab 9 · Which component carries the signal?</h4>
+ <p class="sub">Eight correlated predictors with component variances 6, 3, 1.8, 1, 0.6, 0.35, 0.2 and 0.1. The outcome depends on the component you pick. Left: test R² of regression on the first k components. Right: each component’s share of predictor variance against its share of the explained outcome.</p>
+ <div class="ctl"><label>component that drives the outcome <input type="range" id="c9j" min="1" max="8" step="1" value="6"><output id="c9jv"></output></label><label>noise sd of the outcome <input type="range" id="c9s" min="2" max="30" step="1" value="10"><output id="c9sv"></output></label><label>sample size <input type="range" id="c9n" min="50" max="1000" step="10" value="200"><output id="c9nv"></output></label><button id="c9go">Re-simulate</button></div>
+ <div class="two"><canvas class="sm" id="c9cv"></canvas><canvas class="sm" id="c9cv2"></canvas></div><div class="stats" id="c9st"></div><div class="read" id="c9rd"></div></div>
+</section>
+
+<section class="ch" id="c10">
+<h2><span class="num">10</span>High dimension dilutes distance <span class="lvl e">Expert</span></h2>
+<p>In many dimensions intuition about distance fails. Points in a cloud become almost equally far from each other, the nearest neighbour is hardly nearer than a typical point, and the volume of a ball is concentrated near its surface. For anomaly detection the consequence is practical: an anomaly that is unusual in a few variables is hidden by the ordinary noise in the others when the distance sums all of them, so adding irrelevant variables reduces detection power even when the noise is perfectly known. Estimating the covariance makes it worse. Defences: select or build features with a reason (typologies, domain features) instead of feeding every available column; reduce dimension with a method that keeps the relevant directions; use shrunk or robust covariance; run detectors on subsets of variables and combine them; and evaluate every detector on planted anomalies of realistic size, as here, before trusting its alerts.</p>
+<div class="card"><h4>Lab 10 · Power against the number of variables</h4>
+ <p class="sub">Anomalies are shifted in a few informative variables; all other variables are noise; the detector must flag only 1% of normal cases. Left: detection power against the number of variables for three detectors. Right: the three at the value you pick.</p>
+ <div class="ctl"><label>informative variables <input type="range" id="c10k" min="1" max="10" step="1" value="3"><output id="c10kv"></output></label><label>shift in each informative variable (sd units) <input type="range" id="c10d" min="5" max="40" step="1" value="20"><output id="c10dv"></output></label><label>highlight p <input type="range" id="c10i" min="0" max="6" step="1" value="4"><output id="c10iv"></output></label><button id="c10go">Re-simulate</button></div>
+ <div class="two"><canvas class="sm" id="c10cv"></canvas><canvas class="sm" id="c10cv2"></canvas></div><div class="stats" id="c10st"></div><div class="read" id="c10rd"></div></div>
+</section>
+
+<section class="ch" id="c11">
+<h2><span class="num">11</span>Are the components stable? <span class="lvl e">Expert</span></h2>
+<p>A principal component is an estimate, and when two eigenvalues are close its direction is poorly determined even though the plane they span is not. The sampling sd of the angle of component j is about √(λⱼλₖ/(n(λⱼ − λₖ)²)) radians for the nearest neighbouring eigenvalue λₖ, so what matters is the eigenvalue <em>gap</em> relative to the sampling error (North’s rule of thumb: λⱼ − λₖ should exceed λⱼ√(2/n)). Interpretations such as “the first component is size and the second is shape”, or an index built from one component, can flip between samples or periods when the gap is small. A bootstrap on the dataset in hand reveals the instability without knowing the truth. Report the stability of any component that is named or used as a score, keep the rotation fixed over time in production, and treat groups of near-equal components as a single subspace.</p>
+<div class="card"><h4>Lab 11 · Gap, sample size and the angle error</h4>
+ <p class="sub">Two real components with variances 4 and 4 × ratio, plus three weak ones. Left: angles between estimated and true axes over 300 new datasets. Right: the bootstrap of one dataset, which shows the same instability.</p>
+ <div class="ctl"><label>ratio of the second to the first variance <input type="range" id="c11g" min="10" max="98" step="2" value="90"><output id="c11gv"></output></label><label>sample size <input type="range" id="c11n" min="50" max="2000" step="10" value="200"><output id="c11nv"></output></label><button id="c11go">Re-simulate</button></div>
+ <div class="two"><canvas class="sm" id="c11cv"></canvas><canvas class="sm" id="c11cv2"></canvas></div><div class="stats" id="c11st"></div><div class="read" id="c11rd"></div></div>
+</section>
+
+<section class="ch" id="c12">
+<h2><span class="num">12</span>Final exam, mastery checklist, cheat sheet <span class="lvl e">Expert</span></h2>
+<h3>Exam (18 questions — click an answer)</h3>
+<div id="quiz"></div>
+<div class="card"><h4>Score</h4><div class="stats" id="qscore"></div><button class="alt" id="qreset">Reset exam</button></div>
+<h3>Mastery checklist — tick when you can do it without notes</h3>
+<div class="card chk" id="chk"></div>
+<h3>Cheat sheet</h3>
+<div class="tw"><table>
+<tr><th>Idea</th><th>One line</th></tr>
+<tr><td>Covariance matrix</td><td>Σ = VΛVᵀ: eigenvectors are the axes of the data cloud, eigenvalues the variances along them</td></tr>
+<tr><td>Sample eigenvalues</td><td>The largest is over-estimated and the smallest under-estimated; relative sd about √(2/n)</td></tr>
+<tr><td>Mahalanobis distance</td><td>d² = (x − m)ᵀS⁻¹(x − m) ~ χ²ₚ for normal data; sees unusual combinations that Euclidean distance misses</td></tr>
+<tr><td>PCA</td><td>Rotate to eigenvectors; keep k components; standardise first when units differ</td></tr>
+<tr><td>How many components</td><td>Parallel analysis beats Kaiser, the 80% rule and the elbow; combine with interpretability and stability</td></tr>
+<tr><td>PCA vs factor analysis</td><td>PCA explains total variance; FA models shared variance plus unique noise, Σ = ΛΛᵀ + Ψ; PCA loadings are biased up with few variables</td></tr>
+<tr><td>Rotation</td><td>Any orthogonal rotation fits equally well; varimax gives simple structure; oblique rotation for correlated factors</td></tr>
+<tr><td>Mixtures and EM</td><td>E step: soft memberships; M step: weighted parameters; use several starts and BIC; check stability</td></tr>
+<tr><td>High dimension</td><td>Sample covariance is unreliable when p/n is large; use shrinkage (Ledoit–Wolf) or structure</td></tr>
+<tr><td>Robust covariance</td><td>Outliers mask themselves in classical Mahalanobis distance; MCD fits the tightest half</td></tr>
+<tr><td>PCR trap</td><td>High variance does not mean predictive; choose k by cross-validation or use PLS or ridge</td></tr>
+<tr><td>Distance in high dimension</td><td>Irrelevant variables dilute anomaly signals; curate features, reduce, shrink and test on planted anomalies</td></tr>
+<tr><td>Stability</td><td>Axis error ≈ √(λⱼλₖ/(n(λⱼ−λₖ)²)); small eigenvalue gaps make single components unstable; bootstrap them</td></tr>
+</table></div>
+<div class="co tip"><b>Next in Stage 7</b>Item 31 covers extreme value theory and heavy tails: block maxima, peaks over threshold, tail-index estimation and the limits of extrapolating beyond the data.</div>
+</section>
+</main>
+<script>
+/*MATH*/
+function lgamma(x){const c=[76.18009172947146,-86.50532032941677,24.01409824083091,-1.231739572450155,0.1208650973866179e-2,-0.5395239384953e-5];let y=x,t=x+5.5;t-=(x+.5)*Math.log(t);let s=1.000000000190015;for(let j=0;j<6;j++)s+=c[j]/++y;return -t+Math.log(2.5066282746310005*s/x);}
+function gser(a,x){let ap=a,sum=1/a,del=sum;for(let n=0;n<1000;n++){ap++;del*=x/ap;sum+=del;if(Math.abs(del)<Math.abs(sum)*1e-15)break;}return sum*Math.exp(-x+a*Math.log(x)-lgamma(a));}
+function gcf(a,x){let b=x+1-a,c=1/1e-300,d=1/b,h=d;for(let i=1;i<1000;i++){const an=-i*(i-a);b+=2;d=an*d+b;if(Math.abs(d)<1e-300)d=1e-300;c=b+an/c;if(Math.abs(c)<1e-300)c=1e-300;d=1/d;const del=d*c;h*=del;if(Math.abs(del-1)<1e-15)break;}return Math.exp(-x+a*Math.log(x)-lgamma(a))*h;}
+function gammaQ(a,x){if(x<=0)return 1;return x<a+1?1-gser(a,x):gcf(a,x);}
+function betacf(a,b,x){const qab=a+b,qap=a+1,qam=a-1;let c=1,d=1-qab*x/qap;if(Math.abs(d)<1e-300)d=1e-300;d=1/d;let h=d;for(let m=1;m<=1000;m++){const m2=2*m;let aa=m*(b-m)*x/((qam+m2)*(a+m2));d=1+aa*d;if(Math.abs(d)<1e-300)d=1e-300;c=1+aa/c;if(Math.abs(c)<1e-300)c=1e-300;d=1/d;h*=d*c;aa=-(a+m)*(qab+m)*x/((a+m2)*(qap+m2));d=1+aa*d;if(Math.abs(d)<1e-300)d=1e-300;c=1+aa/c;if(Math.abs(c)<1e-300)c=1e-300;d=1/d;const del=d*c;h*=del;if(Math.abs(del-1)<1e-15)break;}return h;}
+function betai(a,b,x){if(x<=0)return 0;if(x>=1)return 1;const bt=Math.exp(lgamma(a+b)-lgamma(a)-lgamma(b)+a*Math.log(x)+b*Math.log(1-x));return x<(a+1)/(a+b+2)?bt*betacf(a,b,x)/a:1-bt*betacf(b,a,1-x)/b;}
+function normSf(z){const q=0.5*gammaQ(.5,z*z/2);return z>=0?q:1-q;}
+function normCdf(z){return normSf(-z);}
+function npdf(x){return Math.exp(-x*x/2)/2.5066282746310002;}
+function lbin(n,k){return lgamma(n+1)-lgamma(k+1)-lgamma(n-k+1);}
+function binom(n,k,p){return Math.exp(lbin(n,k)+k*Math.log(p)+(n-k)*Math.log(1-p));}
+function betapdf(x,a,b){return x<=0||x>=1?0:Math.exp(lgamma(a+b)-lgamma(a)-lgamma(b)+(a-1)*Math.log(x)+(b-1)*Math.log(1-x));}
+function betacdf(x,a,b){return betai(a,b,x);}
+function gampdf(x,a,r){return x<=0?0:Math.exp(a*Math.log(r)+(a-1)*Math.log(x)-r*x-lgamma(a));}
+function gamcdf(x,a,r){return x<=0?0:1-gammaQ(a,r*x);}
+function randn(){let u=0;while(!u)u=Math.random();return Math.sqrt(-2*Math.log(u))*Math.cos(2*Math.PI*Math.random());}
+function gammaS(a){if(a<1)return gammaS(a+1)*Math.pow(Math.random(),1/a);const d=a-1/3,c=1/Math.sqrt(9*d);for(;;){let x,v;do{x=randn();v=1+c*x}while(v<=0);v=v*v*v;const u=Math.random();if(Math.log(u)<.5*x*x+d-d*v+d*Math.log(v))return d*v;}}
+function betaS(a,b){const x=gammaS(a),y=gammaS(b);return x/(x+y);}
+function binS(n,p){let k=0;for(let i=0;i<n;i++)if(Math.random()<p)k++;return k;}
+function mean(a){let s=0;for(const v of a)s+=v;return s/a.length;}
+function qc(cdf,lo,hi,p,it){for(let i=0;i<(it||100);i++){const m=(lo+hi)/2;if(cdf(m)<p)lo=m;else hi=m}return(lo+hi)/2;}
+function qb(a,b,p){return qc(x=>betai(a,b,x),0,1,p,50);}
+function tcdf(x,v){const t=.5*betai(v/2,.5,v/(v+x*x));return x>0?1-t:t}
+function qn(p){return qc(normCdf,-9,9,p,70)}
+function pois(k,l){return Math.exp(-l+k*Math.log(l)-lgamma(k+1))}
+function binF(n,p){let k=0;for(;;){if(n<=0||p<=0)return k;if(p>=1)return k+n;if(n<=40){for(let i=0;i<n;i++)if(Math.random()<p)k++;return k}const a=1+(n>>1),bb=1+n-a,x=betaS(a,bb);if(x>=p){n=a-1;p=p/x}else{k+=a;n=bb-1;p=(p-x)/(1-x)}}}
+/*ENDMATH*/
+
+const $=id=>document.getElementById(id), val=id=>+$(id).value;
+const C={fg:'#e8ebf5',mu:'#8a93ab',gr:'#232a3d',a:'#6ea8ff',r:'#ff6b81',y:'#ffd166',g:'#4ade80',p:'#c084fc',t:'#5eead4'};
+const store={get(k,d){try{const v=JSON.parse(localStorage.getItem(k));return v==null?d:v}catch(e){return d}},set(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}};
+function stat(l,v,c){return `<div class="stat ${c||''}"><b>${v}</b><span>${l}</span></div>`}
+function f3(x){if(!isFinite(x))return String(x);const a=Math.abs(x);if(a!==0&&(a<1e-3||a>=1e6))return x.toExponential(2);return String(+x.toFixed(a<1?4:a<100?3:a<1000?2:0))}
+function pc(x){return f3(100*x)+'%'}
+const resizers=[];
+function reg(fn){fn();resizers.push(fn)}
+function on(ids,fn){ids.split(' ').forEach(i=>{const e=$(i);e.addEventListener('input',fn);e.addEventListener('change',fn)})}
+let rt;window.addEventListener('resize',()=>{clearTimeout(rt);rt=setTimeout(()=>resizers.forEach(f=>f()),150)});
+document.querySelectorAll('input[type=range]').forEach(i=>{const o=$(i.id+'v');if(!o)return;const f=()=>{o.textContent=i.value};i.addEventListener('input',f);f()});
+
+function nice(x){const e=Math.pow(10,Math.floor(Math.log10(x))),f=x/e;return (f<1.5?1:f<3?2:f<7?5:10)*e}
+function mk(cv,x0,x1,ymax,o){o=o||{};const y0=o.y0||0,dpr=window.devicePixelRatio||1,r=cv.getBoundingClientRect(),w=r.width||600,h=r.height||270;
+ cv.width=w*dpr;cv.height=h*dpr;const g=cv.getContext('2d');g.setTransform(dpr,0,0,dpr,0,0);g.clearRect(0,0,w,h);
+ const L=o.L||42,R=12,T=14,B=28,X=x=>L+(x-x0)/(x1-x0)*(w-L-R),Y=y=>h-B-(y-y0)/(ymax-y0)*(h-T-B);
+ g.font='11px system-ui';g.lineWidth=1;g.strokeStyle=C.gr;g.fillStyle=C.mu;
+ if(!o.noGrid){const sx=nice((x1-x0)/7);for(let x=Math.ceil(x0/sx-1e-9)*sx;!o.noX&&x<=x1+1e-9;x+=sx){g.beginPath();g.moveTo(X(x),T);g.lineTo(X(x),h-B);g.stroke();g.textAlign='center';g.fillText(String(+x.toFixed(6)),X(x),h-B+15)}
+ const sy=nice((ymax-y0)/4);for(let y=Math.ceil(y0/sy-1e-9)*sy;y<=ymax+1e-9;y+=sy){g.beginPath();g.moveTo(L,Y(y));g.lineTo(w-R,Y(y));g.stroke();g.textAlign='right';g.fillText(String(+y.toFixed(4)),L-5,Y(y)+3)}}
+ return{g,w,h,X,Y,L,R,T,B,
+  line(f,col,lw,a,b,n,dash){a=a==null?x0:a;b=b==null?x1:b;n=n||260;g.save();if(dash)g.setLineDash([5,4]);g.beginPath();g.strokeStyle=col;g.lineWidth=lw||2;let st=false;for(let i=0;i<=n;i++){const x=a+(b-a)*i/n,y=f(x);if(!isFinite(y)){st=false;continue}st?g.lineTo(X(x),Y(y)):g.moveTo(X(x),Y(y));st=true}g.stroke();g.restore()},
+  area(f,a,b,col,n){a=Math.max(a,x0);b=Math.min(b,x1);if(b<=a)return;n=n||200;g.beginPath();g.moveTo(X(a),Y(0));for(let i=0;i<=n;i++){const x=a+(b-a)*i/n;g.lineTo(X(x),Y(f(x)))}g.lineTo(X(b),Y(0));g.closePath();g.fillStyle=col;g.fill()},
+  vline(x,col,lab,dash){g.save();g.strokeStyle=col;g.lineWidth=1.6;if(dash)g.setLineDash([5,4]);g.beginPath();g.moveTo(X(x),T);g.lineTo(X(x),h-B);g.stroke();g.restore();if(lab){g.fillStyle=col;g.textAlign='center';g.fillText(lab,Math.min(Math.max(X(x),34),w-34),T+10)}},
+  hline(y,col,lab){g.save();g.strokeStyle=col;g.lineWidth=1.4;g.setLineDash([5,4]);g.beginPath();g.moveTo(L,Y(y));g.lineTo(w-R,Y(y));g.stroke();g.restore();if(lab){g.fillStyle=col;g.textAlign='right';g.fillText(lab,w-R-3,Y(y)-4)}},
+  text(s,x,y,col,al){g.fillStyle=col||C.fg;g.textAlign=al||'left';g.fillText(s,x,y)}};}
+
+/* ---------- shared helpers for this page ---------- */
+const D={
+ norm:{n:'Normal(0,1)',s:()=>randn(),mu:0,sd:1,sk:0},
+ unif:{n:'Uniform(0,1)',s:()=>Math.random(),mu:.5,sd:Math.sqrt(1/12),sk:0},
+ expo:{n:'Exponential(1)',s:()=>-Math.log(1-Math.random()),mu:1,sd:1,sk:2},
+ logn:{n:'Lognormal(0,1)',s:()=>Math.exp(randn()),mu:Math.exp(.5),sd:Math.sqrt((Math.E-1)*Math.E),sk:(Math.E+2)*Math.sqrt(Math.E-1),disc:0},
+ b05:{n:'Bernoulli(0.5)',s:()=>Math.random()<.5?1:0,mu:.5,sd:.5,sk:0,disc:1},
+ b05s:{n:'Bernoulli(0.05)',s:()=>Math.random()<.05?1:0,mu:.05,sd:Math.sqrt(.0475),sk:.9/Math.sqrt(.0475),disc:1},
+ bimo:{n:'Two humps',s:()=>(Math.random()<.5?-2:2)+.5*randn(),mu:0,sd:Math.sqrt(4.25),sk:0},
+ par5:{n:'Pareto(α=5)',s:()=>Math.pow(1-Math.random(),-.2),mu:1.25,sd:Math.sqrt(5/48),sk:6*Math.sqrt(.6)},
+ cauchy:{n:'Cauchy (no mean)',s:()=>Math.tan(Math.PI*(Math.random()-.5)),mu:NaN,sd:Infinity,sk:NaN}
+};
+function fillSel(id,keys,def){const e=$(id);e.innerHTML=keys.map(k=>`<option value="${k}">${D[k].n}</option>`).join('');e.value=def}
+const PAL=[C.a,C.r,C.y,C.g,C.p,C.t,'#ff9f43','#9aa4bf'];
+function tgrid(N,M){const T=[];let prev=0;for(let i=0;i<M;i++){let n=Math.round(Math.pow(10,Math.log10(N)*i/(M-1)));if(i===M-1)n=N;n=Math.max(prev+1,n);if(n>N)break;T.push(n);prev=n}if(T[T.length-1]!==N)T[T.length-1]=N;return T}
+function nlab(n){return n>=1e6?(n/1e6)+'M':n>=1000?(n/1000)+'k':String(n)}
+function customGrid(P,xt,yt){const g=P.g;g.save();g.strokeStyle=C.gr;g.fillStyle=C.mu;g.font='11px system-ui';g.lineWidth=1;
+ xt.forEach(([v,l])=>{g.beginPath();g.moveTo(P.X(v),P.T);g.lineTo(P.X(v),P.h-P.B);g.stroke();g.textAlign='center';g.fillText(l,P.X(v),P.h-P.B+15)});
+ yt.forEach(([v,l])=>{g.beginPath();g.moveTo(P.L,P.Y(v));g.lineTo(P.w-P.R,P.Y(v));g.stroke();g.textAlign='right';g.fillText(l,P.L-5,P.Y(v)+3)});g.restore()}
+function clip(P,fn){const g=P.g;g.save();g.beginPath();g.rect(P.L,P.T,P.w-P.L-P.R,P.h-P.T-P.B);g.clip();fn();g.restore()}
+function poly(P,pts,col,lw,dash){const g=P.g;g.save();if(dash)g.setLineDash([5,4]);g.strokeStyle=col;g.lineWidth=lw||2;g.beginPath();pts.forEach(([x,y],i)=>i?g.lineTo(P.X(x),P.Y(y)):g.moveTo(P.X(x),P.Y(y)));g.stroke();g.restore()}
+function dots(P,pts,col,r){const g=P.g;g.fillStyle=col;pts.forEach(([x,y])=>{g.beginPath();g.arc(P.X(x),P.Y(y),r||3,0,7);g.fill()})}
+function niceTicks(lo,hi,k){const st=nice((hi-lo)/(k||5)),a=[];for(let v=Math.ceil(lo/st-1e-9)*st;v<=hi+1e-9;v+=st)a.push([v,String(+v.toFixed(6))]);return a}
+function logTicks(lo,hi){const a=[];for(let e=Math.ceil(lo-1e-9);e<=hi+1e-9;e++)a.push([e,nlab(Math.pow(10,e))]);return a}
+function mom(a){const n=a.length;let m=0;for(const v of a)m+=v;m/=n;let v2=0,v3=0,v4=0;for(const v of a){const d=v-m;v2+=d*d;v3+=d*d*d;v4+=d*d*d*d}v2/=n;v3/=n;v4/=n;const sd=Math.sqrt(v2);return{n,m,sd,sk:sd>0?v3/(sd*sd*sd):0,ku:v2>0?v4/(v2*v2)-3:0}}
+function ksN(z){const a=Array.from(z).sort((x,y)=>x-y),n=a.length;let d=0;for(let i=0;i<n;i++){const F=normCdf(a[i]);d=Math.max(d,Math.abs((i+1)/n-F),Math.abs(i/n-F))}return d}
+/* histogram of data as density with optional overlay curves [{f,col,lw,dash}] */
+function hist(cv,data,lo,hi,bins,ov,col){const cnt=new Float64Array(bins),bw=(hi-lo)/bins;let n=0;for(const v of data){if(v<lo||v>=hi)continue;cnt[Math.floor((v-lo)/bw)]++;n++}
+ const N=data.length;let ym=0;for(let i=0;i<bins;i++){cnt[i]/=N*bw;ym=Math.max(ym,cnt[i])}
+ (ov||[]).forEach(o=>{for(let i=0;i<=80;i++)ym=Math.max(ym,o.f(lo+(hi-lo)*i/80)||0)});
+ const P=mk(cv,lo,hi,ym*1.12);
+ P.g.fillStyle=col||'rgba(110,168,255,.5)';for(let i=0;i<bins;i++){if(cnt[i]<=0)continue;const a=P.X(lo+i*bw),b=P.X(lo+(i+1)*bw);P.g.fillRect(a,P.Y(cnt[i]),Math.max(1,b-a-1),P.Y(0)-P.Y(cnt[i]))}
+ (ov||[]).forEach(o=>P.line(o.f,o.col,o.lw||2.4,lo,hi,200,o.dash));return P}
+const fmt=x=>f3(x);
+
+/* ---------- shared for this page ---------- */
+const POPS=['norm','unif','expo','logn','bimo','par5'];
+D.norm.med=0;D.norm.q90=1.2815516;D.unif.med=.5;D.unif.q90=.9;D.expo.med=Math.LN2;D.expo.q90=Math.log(10);D.logn.med=1;D.logn.q90=Math.exp(1.2815516);
+D.bimo.med=0;D.bimo.q90=qc(x=>.5*normCdf((x+2)/.5)+.5*normCdf((x-2)/.5),-10,10,.9,80);D.par5.med=Math.pow(2,.2);D.par5.q90=Math.pow(10,.2);
+const SF={mean:a=>mean(a),median:a=>{const b=Float64Array.from(a).sort(),n=b.length;return n%2?b[(n-1)/2]:(b[n/2-1]+b[n/2])/2},sd:a=>{const n=a.length,m=mean(a);let s=0;for(const v of a)s+=(v-m)*(v-m);return Math.sqrt(s/(n-1))},q90:a=>{const b=Float64Array.from(a).sort();return b[Math.round(.9*(b.length-1))]}};
+function truth(key,st){const d=D[key];return st==='mean'?d.mu:st==='median'?d.med:st==='sd'?d.sd:d.q90}
+const SNAME={mean:'sample mean',median:'sample median',sd:'sample SD',q90:'90th percentile'};
+const N10=[2,3,5,10,20,50,100,200,500,1000];
+function pct(a,p){const b=Float64Array.from(a).sort();return b[Math.min(b.length-1,Math.max(0,Math.floor(p*b.length)))]}
+function histLines(cv,arrs,cols,lo,hi,bins,vl){const bw=(hi-lo)/bins,dens=arrs.map(a=>{const c=new Float64Array(bins);for(const v of a){if(v<lo||v>=hi)continue;c[Math.floor((v-lo)/bw)]++}for(let i=0;i<bins;i++)c[i]/=a.length*bw;return c});let ym=0;dens.forEach(c=>c.forEach(v=>ym=Math.max(ym,v)));const P=mk(cv,lo,hi,ym*1.15||1);
+ dens.forEach((c,k)=>{const pts=[];for(let i=0;i<bins;i++){pts.push([lo+i*bw,c[i]]);pts.push([lo+(i+1)*bw,c[i]])}clip(P,()=>poly(P,pts,cols[k],2.2))});(vl||[]).forEach(v=>P.vline(v[0],v[1],v[2],v[3]));return P}
+function sdOf(a){return mom(a).sd}
+
+/* ---------- ML helpers ---------- */
+function digamma(x){let r=0;while(x<6){r-=1/x;x++}const f=1/(x*x);return r+Math.log(x)-.5/x-f*(1/12-f*(1/120-f/252))}
+function trigamma(x){let r=0;while(x<6){r+=1/(x*x);x++}const f=1/(x*x);return r+1/x+.5*f+f/x*(1/6-f*(1/30-f/42))}
+function poisS(l){if(l<=0)return 0;if(l<30){const L=Math.exp(-l);let k=0,p=1;do{k++;p*=Math.random()}while(p>L);return k-1}const m=Math.floor(.875*l),g=gammaS(m);return g<l?m+poisS(l-g):binF(m-1,l/g)}
+function llb(k,n,p){return(k?k*Math.log(p):0)+(n-k?(n-k)*Math.log(1-p):0)}
+function lrInt(k,n,cut){const ph=k/n,l0=llb(k,n,ph),g=p=>2*(l0-llb(k,n,p))-cut;let lo=0,hi=1;
+ if(k>0){let a=1e-12,b=ph;for(let i=0;i<70;i++){const m=(a+b)/2;if(g(m)>0)a=m;else b=m}lo=(a+b)/2}
+ if(k<n){let a=ph,b=1-1e-12;for(let i=0;i<70;i++){const m=(a+b)/2;if(g(m)>0)b=m;else a=m}hi=(a+b)/2}return[lo,hi]}
+function solveAlpha(s){if(!(s>1e-9))return 1e6;let a=(3-s+Math.sqrt((3-s)*(3-s)+24*s))/(12*s);for(let i=0;i<8;i++){const f=Math.log(a)-digamma(a)-s,fp=1/a-trigamma(a);let n=a-f/fp;if(!(n>0))n=a/2;a=n}return a}
+function normPdfAt(x,m,s){return Math.exp(-(x-m)*(x-m)/(2*s*s))/(s*2.5066282746)}
+/* ---------- Regression helpers ---------- */
+function idx(id,arr,ff){const e=$(id),o=$(id+'v'),f=()=>{o.textContent=ff?ff(arr[+e.value]):arr[+e.value]};e.addEventListener('input',f);f()}
+function scl(id,ff){const e=$(id),o=$(id+'v'),f=()=>{o.textContent=ff(+e.value)};e.addEventListener('input',f);f()}
+function pctTicks(a,b,st){const r=[];for(let v=a;v<=b+1e-9;v+=st)r.push([v,Math.round(v*100)+'%']);return r}
+const _tq={};function tq(v,p){const k=v+'_'+p;return _tq[k]||(_tq[k]=qc(x=>tcdf(x,v),0,500,p,80))}
+function simple(x,y){const n=x.length;let xm=0,ym=0;for(let i=0;i<n;i++){xm+=x[i];ym+=y[i]}xm/=n;ym/=n;let sxx=0,sxy=0,syy=0;for(let i=0;i<n;i++){const dx=x[i]-xm,dy=y[i]-ym;sxx+=dx*dx;sxy+=dx*dy;syy+=dy*dy}const b=sxy/sxx,a=ym-b*xm,res=new Float64Array(n);let sse=0;for(let i=0;i<n;i++){res[i]=y[i]-a-b*x[i];sse+=res[i]*res[i]}return{n,xm,ym,sxx,sxy,syy,b,a,res,sse,sst:syy,r2:1-sse/syy}}
+function gj(A,B){const p=A.length;const M=A.map((r,i)=>Array.from(r).concat(B?[B[i]]:[]));for(let c=0;c<p;c++){let m=c;for(let r=c+1;r<p;r++)if(Math.abs(M[r][c])>Math.abs(M[m][c]))m=r;[M[c],M[m]]=[M[m],M[c]];const d=M[c][c]||1e-12;for(let k=c;k<M[c].length;k++)M[c][k]/=d;for(let r=0;r<p;r++)if(r!==c){const f=M[r][c];if(f!==0)for(let k=c;k<M[c].length;k++)M[r][k]-=f*M[c][k]}}return M}
+function olsMulti(cols,y,needInv){const n=y.length,k=cols.length,p=k+1,A=[],B=new Float64Array(p);for(let i=0;i<p;i++)A.push(new Float64Array(p));
+ for(let r=0;r<n;r++){const row=[1];for(let j=0;j<k;j++)row.push(cols[j][r]);for(let i=0;i<p;i++){B[i]+=row[i]*y[r];for(let j=i;j<p;j++)A[i][j]+=row[i]*row[j]}}
+ for(let i=0;i<p;i++){for(let j=0;j<i;j++)A[i][j]=A[j][i];if(i>0)A[i][i]+=1e-9}
+ let beta,inv=null;if(needInv){const I=[];for(let i=0;i<p;i++){const e=new Float64Array(p);e[i]=1;I.push(e)}const M=gj(A,null);const aug=A.map((r,i)=>Array.from(r).concat(Array.from(I[i])));
+  const m=aug;for(let c=0;c<p;c++){let q=c;for(let r=c+1;r<p;r++)if(Math.abs(m[r][c])>Math.abs(m[q][c]))q=r;[m[c],m[q]]=[m[q],m[c]];const d=m[c][c]||1e-12;for(let kk=0;kk<2*p;kk++)m[c][kk]/=d;for(let r=0;r<p;r++)if(r!==c){const f=m[r][c];if(f!==0)for(let kk=0;kk<2*p;kk++)m[r][kk]-=f*m[c][kk]}}
+  inv=m.map(r=>r.slice(p));beta=inv.map(r=>{let s=0;for(let j=0;j<p;j++)s+=r[j]*B[j];return s})}
+ else{const M=gj(A,B);beta=M.map(r=>r[p])}
+ const res=new Float64Array(n);let sse=0;for(let r=0;r<n;r++){let f=beta[0];for(let j=0;j<k;j++)f+=beta[j+1]*cols[j][r];res[r]=y[r]-f;sse+=res[r]*res[r]}
+ const out={beta,res,sse,n,p,inv};if(inv){const s2=sse/(n-p);out.s2=s2;out.se=inv.map((r,i)=>Math.sqrt(s2*r[i]))}return out}
+function scatterAxes(cv,xs,ys,xlo,xhi,ylo,yhi,L){return mk(cv,xlo,xhi,yhi,{y0:ylo,L:L||44})}
+function range(a,pad){let lo=1e99,hi=-1e99;for(const v of a){if(v<lo)lo=v;if(v>hi)hi=v}const w=(hi-lo)||1;return[lo-(pad||.05)*w,hi+(pad||.05)*w]}
+
+
+function bars(P,groups,cols,yt){/* groups: array of arrays of values (0..1) */const g=P.g,G=groups.length,B=groups[0].length,W=(P.w-P.L-P.R)/G;groups.forEach((vals,gi)=>vals.forEach((v,bi)=>{const bw=W*.78/B,x=P.L+W*gi+W*.11+bw*bi;g.fillStyle=cols[bi];g.fillRect(x,P.Y(v),bw-2,P.Y(0)-P.Y(v));g.fillStyle=C.fg;g.textAlign='center';g.font='10px system-ui';g.fillText(Math.round(v*100)+'%',x+bw/2-1,P.Y(v)-3)}));g.font='11px system-ui'}
+function gridG(P,yt,labels){customGrid(P,[],yt);const G=labels.length,W=(P.w-P.L-P.R)/G;P.g.fillStyle=C.mu;P.g.textAlign='center';labels.forEach((l,i)=>P.g.fillText(l,P.L+W*(i+.5),P.h-P.B+15))}
+function legend(P,items,y){let x=P.L+8;items.forEach(([s,c])=>{P.text('■ '+s,x,y,c);x+=P.g.measureText('■ '+s).width+16})}
+
+/* ---------- GLM machinery ---------- */
+const LK={logit:{mu:e=>1/(1+Math.exp(-e)),d:e=>{const m=1/(1+Math.exp(-e));return m*(1-m)}},
+ probit:{mu:e=>normCdf(e),d:e=>npdf(e)},
+ cll:{mu:e=>1-Math.exp(-Math.exp(e)),d:e=>Math.exp(e-Math.exp(e))},
+ log:{mu:e=>Math.exp(e),d:e=>Math.exp(e)}};
+function minv(A){const p=A.length,m=A.map((r,i)=>{const row=Array.from(r);for(let j=0;j<p;j++)row.push(i===j?1:0);return row});
+ for(let c=0;c<p;c++){let q=c;for(let r=c+1;r<p;r++)if(Math.abs(m[r][c])>Math.abs(m[q][c]))q=r;[m[c],m[q]]=[m[q],m[c]];const d=m[c][c]||1e-12;for(let k=0;k<2*p;k++)m[c][k]/=d;for(let r=0;r<p;r++)if(r!==c){const f=m[r][c];if(f!==0)for(let k=0;k<2*p;k++)m[r][k]-=f*m[c][k]}}
+ return m.map(r=>r.slice(p))}
+function glm(cols,y,o){o=o||{};const n=y.length,k=cols.length,p=k+1,fam=o.fam||'binom',L=LK[o.link||(fam==='pois'?'log':'logit')],off=o.off,X=[new Float64Array(n).fill(1)].concat(cols),V=m=>fam==='pois'?m:m*(1-m);
+ let b=new Float64Array(p);if(o.init)b=Float64Array.from(o.init);else if(fam==='pois'){let m=0;for(const v of y)m+=v;b[0]=Math.log(Math.max(m/n,1e-3))-(off?mean(off):0)}
+ function ev(b){const eta=new Float64Array(n),mu=new Float64Array(n);let ll=0;for(let i=0;i<n;i++){let e=off?off[i]:0;for(let j=0;j<p;j++)e+=b[j]*X[j][i];e=Math.max(-30,Math.min(30,e));eta[i]=e;let m=L.mu(e);m=fam==='binom'?Math.min(1-1e-12,Math.max(1e-12,m)):Math.max(m,1e-12);mu[i]=m;ll+=fam==='pois'?y[i]*Math.log(m)-m-lgamma(y[i]+1):y[i]*Math.log(m)+(1-y[i])*Math.log(1-m)}return{eta,mu,ll}}
+ function info(c){const A=[];for(let i=0;i<p;i++)A.push(new Float64Array(p));const w=new Float64Array(n);for(let r=0;r<n;r++){const d=L.d(c.eta[r]),wi=d*d/V(c.mu[r]);w[r]=wi;for(let i=0;i<p;i++){const xi=X[i][r]*wi;for(let j=i;j<p;j++)A[i][j]+=xi*X[j][r]}}for(let i=0;i<p;i++)for(let j=0;j<i;j++)A[i][j]=A[j][i];return{A,w}}
+ let cur=ev(b),it=0,conv=false,maxit=o.maxit==null?40:o.maxit;
+ for(;it<maxit;it++){const{A,w}=info(cur),Ai=minv(A),g=new Float64Array(p);
+  for(let r=0;r<n;r++){const d=L.d(cur.eta[r]),v=V(cur.mu[r]);let s=(y[r]-cur.mu[r])*d/v;if(o.firth){let h=0;for(let i=0;i<p;i++)for(let j=0;j<p;j++)h+=X[i][r]*Ai[i][j]*X[j][r];h*=w[r];s+=h*(.5-cur.mu[r])}for(let i=0;i<p;i++)g[i]+=X[i][r]*s}
+  const st=new Float64Array(p);let mx=0;for(let i=0;i<p;i++){let s=0;for(let j=0;j<p;j++)s+=Ai[i][j]*g[j];st[i]=s}
+  if(o.firth){for(let i=0;i<p;i++){st[i]=Math.max(-1,Math.min(1,st[i]));mx=Math.max(mx,Math.abs(st[i]))}b=b.map((v,i)=>v+st[i]);cur=ev(b);if(mx<1e-8){conv=true;it++;break}}
+  else{let a=1,nb,nc;for(let h=0;h<25;h++){nb=b.map((v,i)=>v+a*st[i]);nc=ev(nb);if(nc.ll>=cur.ll-1e-10)break;a/=2}for(let i=0;i<p;i++)mx=Math.max(mx,Math.abs(a*st[i]));const dl=Math.abs(nc.ll-cur.ll);b=nb;cur=nc;if(mx<1e-8||dl<1e-11){conv=true;it++;break}}}
+ const{A,w}=info(cur),Ai=minv(A),se=Ai.map((r,i)=>Math.sqrt(Math.max(r[i],0)));let dev;
+ if(fam==='binom')dev=-2*cur.ll;else{dev=0;for(let i=0;i<n;i++){const yy=y[i],m=cur.mu[i];dev+=2*((yy>0?yy*Math.log(yy/m):0)-(yy-m))}}
+ return{beta:b,mu:cur.mu,eta:cur.eta,ll:cur.ll,dev,inv:Ai,se,iter:it,conv,X,w,p,n,A}}
+function auc(sc,y){const n=y.length,idx=Array.from({length:n},(_,i)=>i).sort((a,b)=>sc[a]-sc[b]);let rk=0,np=0,i=0;while(i<n){let j=i;while(j+1<n&&sc[idx[j+1]]===sc[idx[i]])j++;const r=(i+j)/2+1;for(let t=i;t<=j;t++)if(y[idx[t]]===1){rk+=r;np++}i=j+1}const nn=n-np;return np&&nn?(rk-np*(np+1)/2)/(np*nn):.5}
+function sepTest(x,y){let a1=1e99,b1=-1e99,a0=1e99,b0=-1e99,n1=0,n0=0;for(let i=0;i<x.length;i++){if(y[i]===1){n1++;a1=Math.min(a1,x[i]);b1=Math.max(b1,x[i])}else{n0++;a0=Math.min(a0,x[i]);b0=Math.max(b0,x[i])}}return n1>0&&n0>0&&(a1>b0||a0>b1)}
+const sig=e=>1/(1+Math.exp(-e));
+function lgt(p){return Math.log(p/(1-p))}
+function binaryData(n,a,b,sd){const x=new Float64Array(n),y=new Float64Array(n);for(let i=0;i<n;i++){x[i]=(sd||1)*randn();y[i]=Math.random()<sig(a+b*x[i])?1:0}return{x,y}}
+function heat(P,gx,gy,vals,x0,x1,y0,y1){const g=P.g,nx=gx,ny=gy;let mn=1e99,mx=-1e99;vals.forEach(v=>{if(isFinite(v)){mn=Math.min(mn,v);mx=Math.max(mx,v)}});mn=Math.max(mn,mx-30);for(let i=0;i<nx;i++)for(let j=0;j<ny;j++){const v=vals[i*ny+j],t=isFinite(v)?Math.max(0,Math.min(1,(v-mn)/(mx-mn))):0,tt=Math.pow(t,1.6),c=Math.round(40+190*tt);g.fillStyle=`rgb(${Math.round(20+60*tt)},${Math.round(30+100*tt)},${c})`;const xa=P.X(x0+(x1-x0)*i/nx),xb=P.X(x0+(x1-x0)*(i+1)/nx),ya=P.Y(y0+(y1-y0)*j/ny),yb=P.Y(y0+(y1-y0)*(j+1)/ny);g.fillRect(xa,Math.min(ya,yb),xb-xa+1,Math.abs(ya-yb)+1)}}
+/* ---------- confounding helpers ---------- */
+const U01=()=>1-Math.random();
+function sdv(a){const m=mean(a);let s=0;for(const v of a)s+=(v-m)*(v-m);return Math.sqrt(s/Math.max(a.length-1,1))}
+function barV(cv,vals,cols,labs,ymax,ff){const P=mk(cv,0,vals.length,ymax,{y0:0,noGrid:true,L:50});customGrid(P,[],niceTicks(0,ymax,5));const W=(P.w-P.L-P.R)/vals.length,g=P.g;vals.forEach((v,i)=>{const w=W*.5,x=P.L+W*i+W*.25;g.fillStyle=cols[i];g.fillRect(x,P.Y(v),w,P.Y(0)-P.Y(v));g.fillStyle=C.fg;g.textAlign='center';g.fillText((ff||fmt)(v),x+w/2,P.Y(v)-4);g.fillStyle=C.mu;g.fillText(labs[i],x+w/2,P.h-P.B+15)});return P}
+function barL(cv,vals,cols,labs,lo,hi,ff){const P=mk(cv,0,vals.length,hi,{y0:lo,noGrid:true,L:50});customGrid(P,[],niceTicks(lo,hi,5));const W=(P.w-P.L-P.R)/vals.length,g=P.g;vals.forEach((v,i)=>{const w=W*.5,x=P.L+W*i+W*.25;g.fillStyle=cols[i];g.fillRect(x,P.Y(v),w,P.Y(lo)-P.Y(v));g.fillStyle=C.fg;g.textAlign='center';g.fillText((ff||fmt)(v),x+w/2,P.Y(v)-4);g.fillStyle=C.mu;g.fillText(labs[i],x+w/2,P.h-P.B+15)});return P}
+const avg=a=>{let s=0;for(const v of a)s+=v;return s/a.length};
+function corr(a,b){const n=a.length;let ma=0,mb=0;for(let i=0;i<n;i++){ma+=a[i];mb+=b[i]}ma/=n;mb/=n;let sa=0,sb=0,sab=0;for(let i=0;i<n;i++){const x=a[i]-ma,y=b[i]-mb;sa+=x*x;sb+=y*y;sab+=x*y}return sab/Math.sqrt(sa*sb||1e-12)}
+const pcor=(x,y,z)=>corr(simple(z,x).res,simple(z,y).res);
+const lin=(n,f)=>{const a=new Float64Array(n);for(let i=0;i<n;i++)a[i]=f(i);return a};
+const rn=(n,s)=>lin(n,()=>(s||1)*randn());
+/* signed bars from zero */
+function barZ(cv,vals,cols,labs,lo,hi,ff){const P=mk(cv,0,vals.length,hi,{y0:lo,noGrid:true,L:50});customGrid(P,[],niceTicks(lo,hi,5));const W=(P.w-P.L-P.R)/vals.length,g=P.g;vals.forEach((v,i)=>{const w=W*.5,x=P.L+W*i+W*.25,y0=P.Y(0),y1=P.Y(v);g.fillStyle=cols[i];g.fillRect(x,Math.min(y0,y1),w,Math.abs(y0-y1));g.fillStyle=C.fg;g.textAlign='center';g.fillText((ff||fmt)(v),x+w/2,v>=0?y1-4:y1+13);g.fillStyle=C.mu;g.fillText(labs[i],x+w/2,P.h-P.B+15)});P.hline(0,C.mu,'');return P}
+/* grouped signed bars: groups[g][b] */
+function barG(cv,groups,cols,glabs,lo,hi,ff){const P=mk(cv,0,groups.length,hi,{y0:lo,noGrid:true,L:50});customGrid(P,[],niceTicks(lo,hi,5));const G=groups.length,B=groups[0].length,W=(P.w-P.L-P.R)/G,g=P.g;groups.forEach((vs,gi)=>vs.forEach((v,bi)=>{const bw=W*.7/B,x=P.L+W*gi+W*.15+bw*bi,y0=P.Y(0),y1=P.Y(v);g.fillStyle=cols[bi];g.fillRect(x,Math.min(y0,y1),bw-3,Math.abs(y0-y1));g.fillStyle=C.fg;g.textAlign='center';g.font='10px system-ui';g.fillText((ff||fmt)(v),x+bw/2-1,v>=0?y1-3:y1+11)}));g.font='11px system-ui';g.fillStyle=C.mu;g.textAlign='center';glabs.forEach((l,i)=>g.fillText(l,P.L+W*(i+.5),P.h-P.B+15));P.hline(0,C.mu,'');return P}
+/* scatter with optional per-point colours; draws at most nmax points */
+function scat(P,xs,ys,col,nmax,r,colf){const n=xs.length,st=Math.max(1,Math.floor(n/(nmax||500))),pts=[];clip(P,()=>{for(let i=0;i<n;i+=st){P.g.fillStyle=colf?colf(i):col;P.g.beginPath();P.g.arc(P.X(xs[i]),P.Y(ys[i]),r||2.2,0,7);P.g.fill()}})}
+function fitLine(P,s,col,lw,dash,x0,x1){clip(P,()=>P.line(x=>s.a+s.b*x,col,lw||2,x0,x1,2,dash))}
+const ordIdx=p=>Array.from({length:p.length},(_,i)=>i).sort((a,b)=>p[a]-p[b]);
+/* ---------- experiment helpers ---------- */
+const sgn=v=>(v>=0?'+':'−')+Math.abs(v).toFixed(3);
+const rng2=(a,b,pad)=>range(Array.from(a).concat(Array.from(b)),pad||.05);
+const pct0=x=>Math.round(x*100)+'%';
+const lgs=x=>1/(1+Math.exp(-x));
+function rgam(a){if(a<1)return rgam(a+1)*Math.pow(U01(),1/a);const d=a-1/3,c=1/Math.sqrt(9*d);for(;;){let x,v;do{x=randn();v=1+c*x}while(v<=0);v=v*v*v;const u=U01();if(u<1-.0331*x*x*x*x||Math.log(u)<.5*x*x+d*(1-v+Math.log(v)))return d*v}}
+const rbeta=(a,b)=>{const x=rgam(a),y=rgam(b);return x/(x+y)};
+function rbin(n,p){if(n<=30){let k=0;for(let i=0;i<n;i++)if(Math.random()<p)k++;return k}const m=n*p,s=Math.sqrt(n*p*(1-p)),k=Math.round(m+s*randn());return Math.max(0,Math.min(n,k))}
+function welch(a,b){const na=a.length,nb=b.length,ma=avg(a),mb=avg(b);let va=0,vb=0;for(const v of a)va+=(v-ma)*(v-ma);for(const v of b)vb+=(v-mb)*(v-mb);va/=na-1;vb/=nb-1;const se2=va/na+vb/nb,se=Math.sqrt(se2),t=(ma-mb)/se,df=se2*se2/((va/na)*(va/na)/(na-1)+(vb/nb)*(vb/nb)/(nb-1));return{d:ma-mb,se,t,df,p:2*(1-tcdf(Math.abs(t),df))}}
+const diffMeans=(Y,T)=>{let s1=0,s0=0,n1=0,n0=0;for(let i=0;i<Y.length;i++){if(T[i]){s1+=Y[i];n1++}else{s0+=Y[i];n0++}}return s1/n1-s0/n0};
+/* ---------- observational-causal helpers ---------- */
+function logitFit(cols,y){const n=y.length,k=cols.length,p=k+1,b=new Float64Array(p),lin_=i=>{let s=b[0];for(let j=0;j<k;j++)s+=b[j+1]*cols[j][i];return s};
+ for(let it=0;it<30;it++){const A=[];for(let i=0;i<p;i++)A.push(new Float64Array(p));const g=new Float64Array(p);
+  for(let i=0;i<n;i++){const m=lgs(lin_(i)),w=Math.max(m*(1-m),1e-8),r=y[i]-m,row=[1];for(let j=0;j<k;j++)row.push(cols[j][i]);for(let a=0;a<p;a++){g[a]+=row[a]*r;for(let c=a;c<p;c++)A[a][c]+=w*row[a]*row[c]}}
+  for(let a=0;a<p;a++){for(let c=0;c<a;c++)A[a][c]=A[c][a];A[a][a]+=1e-8}
+  const M=gj(A,Array.from(g)),d=M.map(r=>r[p]);let mx=0;for(let a=0;a<p;a++){b[a]+=d[a];mx=Math.max(mx,Math.abs(d[a]))}if(mx<1e-6)break}
+ const pr=new Float64Array(n),lo=new Float64Array(n);for(let i=0;i<n;i++){pr[i]=Math.min(.9999,Math.max(.0001,lgs(lin_(i))));lo[i]=Math.log(pr[i]/(1-pr[i]))}return{beta:b,pr,lo}}
+/* Hajek IPW estimate of the ATE; keep(i)=false drops a unit */
+function ipwATE(Y,T,e,keep){let a1=0,b1=0,a0=0,b0=0;for(let i=0;i<Y.length;i++){if(keep&&!keep(i))continue;if(T[i]){const w=1/e[i];a1+=w*Y[i];b1+=w}else{const w=1/(1-e[i]);a0+=w*Y[i];b0+=w}}return a1/b1-a0/b0}
+function smd(x,T,w){let m1=0,m0=0,w1=0,w0=0,n1=0,n0=0;for(let i=0;i<x.length;i++){const ww=w?w[i]:1;if(T[i]){m1+=ww*x[i];w1+=ww;n1++}else{m0+=ww*x[i];w0+=ww;n0++}}m1/=w1;m0/=w0;let v1=0,v0=0,a1=0,a0=0;for(let i=0;i<x.length;i++){if(T[i]){a1+=x[i]}else a0+=x[i]}a1/=n1;a0/=n0;for(let i=0;i<x.length;i++){if(T[i])v1+=(x[i]-a1)*(x[i]-a1);else v0+=(x[i]-a0)*(x[i]-a0)}v1/=n1-1;v0/=n0-1;return(m1-m0)/Math.sqrt((v1+v0)/2)}
+/* confounded data: X1,X2; treatment strength a; effect tau (function of x1 optional) */
+function confData(n,a,tauF,nl){const X1=rn(n),X2=rn(n),e=lin(n,i=>lgs(a*(.8*X1[i]+.5*X2[i]+(nl?.4*(X1[i]*X1[i]-1):0))/1.5)),T=new Uint8Array(n),Y=new Float64Array(n);
+ for(let i=0;i<n;i++){T[i]=Math.random()<e[i]?1:0;Y[i]=(T[i]?(tauF?tauF(X1[i]):1):0)+X1[i]+.8*X2[i]+(nl?.6*X1[i]*X1[i]:0)+randn()}return{X1,X2,T,Y,e}}
+/* one-to-one nearest-neighbour matching with replacement on a score; returns ATT and the matched control index per treated unit (-1 if dropped) */
+function matchATT(sc,T,Y,cal){const ctr=[];for(let i=0;i<T.length;i++)if(!T[i])ctr.push(i);ctr.sort((a,b)=>sc[a]-sc[b]);const cs=ctr.map(i=>sc[i]),m=new Int32Array(T.length).fill(-1);let sum=0,k=0;
+ for(let i=0;i<T.length;i++){if(!T[i])continue;let lo=0,hi=cs.length-1;while(lo<hi){const mid=(lo+hi)>>1;if(cs[mid]<sc[i])lo=mid+1;else hi=mid}let b=lo;if(lo>0&&Math.abs(cs[lo-1]-sc[i])<Math.abs(cs[lo]-sc[i]))b=lo-1;if(Math.abs(cs[b]-sc[i])>cal)continue;m[i]=ctr[b];sum+=Y[i]-Y[ctr[b]];k++}return{att:sum/k,m,kept:k}}
+const quant=(a,p)=>{const b=Float64Array.from(a).sort();return b[Math.min(b.length-1,Math.floor(p*b.length))]};
+/* ---------- MCMC helpers ---------- */
+function acfv(x,K){const n=x.length;let m=0;for(let i=0;i<n;i++)m+=x[i];m/=n;const c=new Float64Array(K+1);for(let k=0;k<=K;k++){let s=0;for(let i=0;i+k<n;i++)s+=(x[i]-m)*(x[i+k]-m);c[k]=s/n}const r=new Float64Array(K+1);for(let k=0;k<=K;k++)r[k]=c[0]>0?c[k]/c[0]:0;return r}
+/* effective sample size with Geyer's initial positive sequence */
+function essOf(x,K){K=Math.min(K||150,x.length-2);if(K<2)return x.length;const r=acfv(x,K);let sum=0;for(let t=0;2*t+1<=K;t++){const g=r[2*t]+r[2*t+1];if(g<=0)break;sum+=g}const tau=Math.max(2*sum-1,.2);return x.length/tau}
+/* random-walk Metropolis for a 1-d log density */
+function mhRW(logp,x0,step,n){const x=new Float64Array(n);let c=x0,lc=logp(c),acc=0;for(let i=0;i<n;i++){const y=c+step*randn(),ly=logp(y);if(Math.log(Math.random())<ly-lc){c=y;lc=ly;acc++}x[i]=c}return{x,acc:acc/n}}
+/* split R-hat of an array of chains (each an array of equal length) */
+function rhatOf(ch){const seq=[];ch.forEach(c=>{const h=Math.floor(c.length/2);if(h<2)return;seq.push(c.slice(0,h));seq.push(c.slice(h,2*h))});const m=seq.length,n=seq[0]?seq[0].length:0;if(m<2||n<2)return NaN;const mu=seq.map(s=>{let a=0;for(const v of s)a+=v;return a/n}),va=seq.map((s,i)=>{let a=0;for(const v of s)a+=(v-mu[i])*(v-mu[i]);return a/(n-1)});const W=va.reduce((a,b)=>a+b,0)/m,gm=mu.reduce((a,b)=>a+b,0)/m;let B=0;for(const v of mu)B+=(v-gm)*(v-gm);B*=n/(m-1);const vp=(n-1)/n*W+B/n;return Math.sqrt(vp/Math.max(W,1e-12))}
+/* grid posterior from an unnormalised log density */
+function gridPost(logf,lo,hi,N){N=N||900;const x=new Float64Array(N),f=new Float64Array(N);let mx=-1e300;for(let i=0;i<N;i++){x[i]=lo+(hi-lo)*i/(N-1);f[i]=logf(x[i]);if(f[i]>mx)mx=f[i]}let Z=0;const h=(hi-lo)/(N-1);for(let i=0;i<N;i++){f[i]=Math.exp(f[i]-mx);Z+=f[i]*h}const pdf=new Float64Array(N),cdf=new Float64Array(N);let c=0,m1=0,m2=0;for(let i=0;i<N;i++){pdf[i]=f[i]/Z;c+=pdf[i]*h;cdf[i]=c;m1+=x[i]*pdf[i]*h;m2+=x[i]*x[i]*pdf[i]*h}
+ const q=u=>{let a=0,b=N-1;while(b-a>1){const m=(a+b)>>1;if(cdf[m]<u)a=m;else b=m}const d=cdf[b]-cdf[a];return x[a]+(d>0?(u-cdf[a])/d:0)*(x[b]-x[a])};
+ const pd=v=>{if(v<=lo||v>=hi)return 0;const t=(v-lo)/(hi-lo)*(N-1),i=Math.floor(t);return pdf[i]+(t-i)*(pdf[Math.min(i+1,N-1)]-pdf[i])};
+ const cd=v=>{if(v<=lo)return 0;if(v>=hi)return 1;const t=(v-lo)/(hi-lo)*(N-1),i=Math.floor(t);return cdf[i]+(t-i)*(cdf[Math.min(i+1,N-1)]-cdf[i])};
+ return{x,pdf,cdf,mean:m1,sd:Math.sqrt(Math.max(m2-m1*m1,0)),q,pd,cd}}
+const tpdf=(x,v)=>Math.exp(lgamma((v+1)/2)-lgamma(v/2))/Math.sqrt(v*Math.PI)*Math.pow(1+x*x/v,-(v+1)/2);
+const rtv=v=>randn()/Math.sqrt(2*gammaS(v/2)/v);
+const expit=x=>1/(1+Math.exp(-x)),logit=p=>Math.log(p/(1-p));
+function invMat(A){const n=A.length,M=A.map((r,i)=>{const a=Array.from(r);for(let j=0;j<n;j++)a.push(i===j?1:0);return a});for(let c=0;c<n;c++){let m=c;for(let r=c+1;r<n;r++)if(Math.abs(M[r][c])>Math.abs(M[m][c]))m=r;[M[c],M[m]]=[M[m],M[c]];const d=M[c][c]||1e-12;for(let k=0;k<2*n;k++)M[c][k]/=d;for(let r=0;r<n;r++)if(r!==c){const f=M[r][c];if(f!==0)for(let k=0;k<2*n;k++)M[r][k]-=f*M[c][k]}}return M.map(r=>r.slice(n))}
+function cholL(S){const n=S.length,L=S.map(()=>new Float64Array(n));for(let i=0;i<n;i++)for(let j=0;j<=i;j++){let s=S[i][j];for(let k=0;k<j;k++)s-=L[i][k]*L[j][k];L[i][j]=i===j?Math.sqrt(Math.max(s,1e-12)):s/L[j][j]}return L}
+function logdetM(A){const n=A.length,M=A.map(r=>Array.from(r));let ld=0;for(let c=0;c<n;c++){let m=c;for(let r=c+1;r<n;r++)if(Math.abs(M[r][c])>Math.abs(M[m][c]))m=r;[M[c],M[m]]=[M[m],M[c]];ld+=Math.log(Math.abs(M[c][c])||1e-300);for(let r=c+1;r<n;r++){const f=M[r][c]/M[c][c];for(let k=c;k<n;k++)M[r][k]-=f*M[c][k]}}return ld}
+/* Gauss-Hermite nodes (21 points, probabilists' weights summing to 1) from the Golub-Welsch idea: computed numerically on a fine normal grid instead */
+const GH=(()=>{const z=[],w=[];let s=0;for(let i=0;i<41;i++){const v=-4+8*i/40,p=Math.exp(-v*v/2);z.push(v);w.push(p);s+=p}return{z,w:w.map(v=>v/s)}})();
+/* log-log tick helper for axes holding log10 values */
+const lg10=v=>Math.log10(Math.max(v,1e-12));
+const pc1=x=>(100*x).toFixed(1)+'%';
+/* density curves with optional fill: curves=[{f,col,fill,dash,lw}] ; returns P */
+function dcurves(cv,x0,x1,curves,vl,ref){let ym=0,yr=0;curves.forEach((c,k)=>{for(let i=0;i<=300;i++){const v=c.f(x0+(x1-x0)*i/300);if(isFinite(v)){ym=Math.max(ym,v);if(k===(ref==null?curves.length-1:ref))yr=Math.max(yr,v)}}});
+ const top=Math.min(ym,yr*2.5)||ym||1,P=mk(cv,x0,x1,top*1.12);clip(P,()=>curves.forEach(c=>{if(c.fill)P.area(c.f,x0,x1,c.fill,240);P.line(c.f,c.col,c.lw||2.4,x0,x1,300,c.dash)}));(vl||[]).forEach(v=>P.vline(v[0],v[1],null,v[3]));return P}
+/* solve (A + lam I) beta = b and return diag of the inverse (A symmetric p x p) */
+function ridgeSolve(A,b,lam){const p=b.length,M=[];for(let i=0;i<p;i++){const r=new Float64Array(2*p+1);for(let j=0;j<p;j++)r[j]=A[i][j]+(i===j?lam:0);r[p+i]=1;r[2*p]=b[i];M.push(r)}
+ for(let c=0;c<p;c++){let m=c;for(let r=c+1;r<p;r++)if(Math.abs(M[r][c])>Math.abs(M[m][c]))m=r;[M[c],M[m]]=[M[m],M[c]];const d=M[c][c]||1e-12;for(let k=0;k<=2*p;k++)M[c][k]/=d;for(let r=0;r<p;r++)if(r!==c){const f=M[r][c];if(f!==0)for(let k=0;k<=2*p;k++)M[r][k]-=f*M[c][k]}}
+ return{beta:M.map(r=>r[2*p]),dinv:M.map((r,i)=>r[p+i])}}
+/* ---------- Multivariate helpers ---------- */
+/* symmetric eigen-decomposition by Jacobi rotations; returns vals (descending) and vecs (vecs[i] is the i-th eigenvector) */
+function mvEig(A){const n=A.length,a=A.map(r=>Float64Array.from(r)),V=[];for(let i=0;i<n;i++){const r=new Float64Array(n);r[i]=1;V.push(r)}
+ for(let sw=0;sw<60;sw++){let off=0;for(let i=0;i<n;i++)for(let j=i+1;j<n;j++)off+=a[i][j]*a[i][j];if(off<1e-22)break;
+  for(let p=0;p<n-1;p++)for(let q=p+1;q<n;q++){if(Math.abs(a[p][q])<1e-300)continue;const th=(a[q][q]-a[p][p])/(2*a[p][q]),t=Math.sign(th||1)/(Math.abs(th)+Math.sqrt(th*th+1)),c=1/Math.sqrt(t*t+1),s=t*c;
+   for(let k=0;k<n;k++){const x=a[k][p],y=a[k][q];a[k][p]=c*x-s*y;a[k][q]=s*x+c*y}
+   for(let k=0;k<n;k++){const x=a[p][k],y=a[q][k];a[p][k]=c*x-s*y;a[q][k]=s*x+c*y}
+   for(let k=0;k<n;k++){const x=V[k][p],y=V[k][q];V[k][p]=c*x-s*y;V[k][q]=s*x+c*y}}}
+ const idx=Array.from({length:n},(_,i)=>i).sort((x,y)=>a[y][y]-a[x][x]);return{vals:idx.map(i=>a[i][i]),vecs:idx.map(i=>Float64Array.from(V.map(r=>r[i])))}}
+/* leading eigenpair by power iteration (warm start v0 optional) */
+function mvTop(A,v0,it){const n=A.length;let v=v0?Float64Array.from(v0):Float64Array.from({length:n},()=>1+.1*randn()),l=0;for(let k=0;k<(it||60);k++){const w=new Float64Array(n);for(let i=0;i<n;i++){let s=0;const r=A[i];for(let j=0;j<n;j++)s+=r[j]*v[j];w[i]=s}let nr=0;for(let i=0;i<n;i++)nr+=w[i]*w[i];nr=Math.sqrt(nr)||1e-300;for(let i=0;i<n;i++)v[i]=w[i]/nr;l=nr}return{val:l,vec:v}}
+/* mean vector and covariance matrix (divisor n-1) of rows */
+function mvCov(X){const n=X.length,p=X[0].length,m=new Float64Array(p);for(const x of X)for(let j=0;j<p;j++)m[j]+=x[j];for(let j=0;j<p;j++)m[j]/=n;const S=Array.from({length:p},()=>new Float64Array(p));for(const x of X)for(let a=0;a<p;a++){const da=x[a]-m[a];for(let b=0;b<=a;b++)S[a][b]+=da*(x[b]-m[b])}for(let a=0;a<p;a++)for(let b=0;b<=a;b++){S[a][b]/=(n-1);S[b][a]=S[a][b]}return{m,S}}
+/* equicorrelated normal sample: x_j = sqrt(rho) g + sqrt(1-rho) e_j */
+function mvEq(p,rho){const g=Math.sqrt(rho)*randn(),s=Math.sqrt(1-rho),x=new Float64Array(p);for(let j=0;j<p;j++)x[j]=g+s*randn();return x}
+const mvM2=(x,m,Si)=>{const p=x.length;let s=0;for(let a=0;a<p;a++){let t=0;for(let b=0;b<p;b++)t+=Si[a][b]*(x[b]-m[b]);s+=(x[a]-m[a])*t}return s};
+/* chi-square */
+function mvGammaP(a,x){if(x<=0)return 0;const gl=lgamma(a);if(x<a+1){let ap=a,sum=1/a,del=sum;for(let n=0;n<400;n++){ap++;del*=x/ap;sum+=del;if(Math.abs(del)<Math.abs(sum)*1e-14)break}return sum*Math.exp(-x+a*Math.log(x)-gl)}let b=x+1-a,c=1e300,d=1/b,h=d;for(let i=1;i<400;i++){const an=-i*(i-a);b+=2;d=an*d+b;if(Math.abs(d)<1e-300)d=1e-300;c=b+an/c;if(Math.abs(c)<1e-300)c=1e-300;d=1/d;const del=d*c;h*=del;if(Math.abs(del-1)<1e-14)break}return 1-Math.exp(-x+a*Math.log(x)-gl)*h}
+const mvChi2cdf=(x,p)=>mvGammaP(p/2,x/2);
+function mvChi2q(pr,p){let lo=0,hi=p+60*Math.sqrt(2*p)+60;for(let i=0;i<80;i++){const m=(lo+hi)/2;if(mvChi2cdf(m,p)<pr)lo=m;else hi=m}return(lo+hi)/2}
+/* ellipse {x: (x-m)' S^-1 (x-m) = k^2} for 2x2 covariance given as [sxx,sxy,syy] */
+function mvEll(P,m,c,k,col,lw,dash){const e=mvEig([[c[0],c[1]],[c[1],c[2]]]),pts=[];for(let i=0;i<=80;i++){const t=2*Math.PI*i/80,u=k*Math.sqrt(Math.max(e.vals[0],0))*Math.cos(t),v=k*Math.sqrt(Math.max(e.vals[1],0))*Math.sin(t);pts.push([m[0]+u*e.vecs[0][0]+v*e.vecs[1][0],m[1]+u*e.vecs[0][1]+v*e.vecs[1][1]])}clip(P,()=>poly(P,pts,col,lw||2,dash))}
+/* random orthogonal matrix (Gram-Schmidt); returns array of columns */
+function mvOrth(p){const cols=[];for(let j=0;j<p;j++){let v=Float64Array.from({length:p},()=>randn());for(const u of cols){let d=0;for(let i=0;i<p;i++)d+=v[i]*u[i];for(let i=0;i<p;i++)v[i]-=d*u[i]}let nr=0;for(let i=0;i<p;i++)nr+=v[i]*v[i];nr=Math.sqrt(nr);for(let i=0;i<p;i++)v[i]/=nr;cols.push(v)}return cols}
+/* two-factor varimax: exact optimal rotation angle; L is an array of [a,b] rows */
+function mvVarimax2(L){const p=L.length;let A=0,B=0,C2=0,D=0;for(const [a,b] of L){const u=a*a-b*b,v=2*a*b;A+=u;B+=v;C2+=u*u-v*v;D+=2*u*v}const phi=.25*Math.atan2(D-2*A*B/p,C2-(A*A-B*B)/p),c=Math.cos(phi),s=Math.sin(phi);return{phi,L:L.map(([a,b])=>[a*c+b*s,-a*s+b*c])}}
+const mvVmax=L=>{const p=L.length;let t=0;for(let f=0;f<2;f++){let s2=0,s4=0;for(const r of L){s2+=r[f]*r[f];s4+=Math.pow(r[f],4)}t+=s4/p-s2*s2/(p*p)}return t};
+/* Gaussian mixture by EM in 2-D with full covariances; X rows are [x,y] */
+function mvEM(X,K,its,starts){const n=X.length;let best=null,mx=0,my=0;for(const q of X){mx+=q[0];my+=q[1]}mx/=n;my/=n;let sxx=0,sxy=0,syy=0;for(const q of X){sxx+=(q[0]-mx)*(q[0]-mx);sxy+=(q[0]-mx)*(q[1]-my);syy+=(q[1]-my)*(q[1]-my)}sxx/=n;sxy/=n;syy/=n;
+ for(let rs=0;rs<(starts||4);rs++){const comp=[];for(let k=0;k<K;k++){const q=X[Math.floor(Math.random()*n)];comp.push({w:1/K,mx:q[0],my:q[1],xx:sxx/K+1e-3,xy:0,yy:syy/K+1e-3})}
+  let ll=-1e300;const resp=new Float64Array(n*K),lp=new Float64Array(K);
+  for(let it=0;it<its;it++){let L=0;for(let i=0;i<n;i++){let m0=-1e300;for(let k=0;k<K;k++){const c=comp[k],det=c.xx*c.yy-c.xy*c.xy,dx=X[i][0]-c.mx,dy=X[i][1]-c.my,q=(c.yy*dx*dx-2*c.xy*dx*dy+c.xx*dy*dy)/det,v=Math.log(c.w)-.5*Math.log(det)-q/2-Math.log(2*Math.PI);lp[k]=v;if(v>m0)m0=v}let s=0;for(let k=0;k<K;k++){lp[k]=Math.exp(lp[k]-m0);s+=lp[k]}for(let k=0;k<K;k++)resp[i*K+k]=lp[k]/s;L+=m0+Math.log(s)}
+   for(let k=0;k<K;k++){let nk=0,ax=0,ay=0;for(let i=0;i<n;i++){const r=resp[i*K+k];nk+=r;ax+=r*X[i][0];ay+=r*X[i][1]}nk=Math.max(nk,1e-8);const c=comp[k];c.mx=ax/nk;c.my=ay/nk;let xx=0,xy=0,yy=0;for(let i=0;i<n;i++){const r=resp[i*K+k],dx=X[i][0]-c.mx,dy=X[i][1]-c.my;xx+=r*dx*dx;xy+=r*dx*dy;yy+=r*dy*dy}c.xx=xx/nk+1e-3;c.xy=xy/nk;c.yy=yy/nk+1e-3;c.w=Math.max(nk/n,1e-6)}
+   const done=Math.abs(L-ll)<1e-7*Math.abs(L);ll=L;if(done)break}
+  if(!best||ll>best.ll)best={ll,comp:comp.map(c=>Object.assign({},c)),resp:Float64Array.from(resp),K}}
+ best.lab=Array.from({length:n},(_,i)=>{let b=0;for(let k=1;k<K;k++)if(best.resp[i*K+k]>best.resp[i*K+b])b=k;return b});return best}
+/* minimum covariance determinant (FAST-MCD style, few starts), with chi-square consistency rescaling */
+function mvMCD(X,starts,steps){const n=X.length,p=X[0].length,h=Math.floor((n+p+1)/2),fit=ix=>{const m=new Float64Array(p);for(const i of ix)for(let j=0;j<p;j++)m[j]+=X[i][j];for(let j=0;j<p;j++)m[j]/=ix.length;const S=Array.from({length:p},()=>new Float64Array(p));for(const i of ix)for(let a=0;a<p;a++){const da=X[i][a]-m[a];for(let b=0;b<=a;b++)S[a][b]+=da*(X[i][b]-m[b])}for(let a=0;a<p;a++){for(let b=0;b<=a;b++){S[a][b]/=(ix.length-1);S[b][a]=S[a][b]}S[a][a]+=1e-9}return{m,S}},d2=f=>{const Si=invMat(f.S);return X.map(x=>mvM2(x,f.m,Si))};let best=null;
+ for(let st=0;st<starts;st++){const pool=Array.from({length:n},(_,i)=>i);for(let i=0;i<p+1;i++){const j=i+Math.floor(Math.random()*(n-i));[pool[i],pool[j]]=[pool[j],pool[i]]}let f=fit(pool.slice(0,p+1));for(let s=0;s<steps;s++){const ix=ordIdx(d2(f)).slice(0,h);f=fit(ix)}const ld=logdetM(f.S);if(!best||ld<best.ld)best={ld,f}}
+ const dd=d2(best.f).slice().sort((a,b)=>a-b),med=dd[Math.floor(n/2)],c=med/mvChi2q(.5,p);return{m:best.f.m,S:best.f.S.map(r=>r.map(v=>v*c))}}
+/* ---------- Ch1 covariance matrix geometry ---------- */
+(function(){scl('c1r',v=>fmt(v/100));scl('c1a',v=>fmt(v/10));scl('c1n',v=>v);
+ const samp=(n,r,a)=>{const X=[];for(let i=0;i<n;i++){const u=randn(),w=randn();X.push([u,a*(r*u+Math.sqrt(1-r*r)*w)])}return X},ang=v=>{let t=Math.atan2(v[1],v[0])*180/Math.PI;if(t>90)t-=180;if(t<=-90)t+=180;return t};
+ function run(){const r=val('c1r')/100,a=val('c1a')/10,n=val('c1n'),X=samp(n,r,a),c=mvCov(X),e=mvEig(c.S),te=mvEig([[1,r*a],[r*a,a*a]]),L=3.4*Math.max(1,a),P=mk($('c1cv'),-L,L,L,{y0:-L,L:40});
+  scat(P,X.map(q=>q[0]),X.map(q=>q[1]),'rgba(147,197,253,.55)',600,2.2);mvEll(P,[0,0],[1,r*a,a*a],Math.sqrt(5.991),C.fg,2,true);mvEll(P,[c.m[0],c.m[1]],[c.S[0][0],c.S[0][1],c.S[1][1]],Math.sqrt(5.991),C.g,2.4);
+  const v1=e.vecs[0],v2=e.vecs[1],a1=Math.sqrt(5.991*e.vals[0]),a2=Math.sqrt(5.991*e.vals[1]);clip(P,()=>{poly(P,[[c.m[0]-a1*v1[0],c.m[1]-a1*v1[1]],[c.m[0]+a1*v1[0],c.m[1]+a1*v1[1]]],C.y,2);poly(P,[[c.m[0]-a2*v2[0],c.m[1]-a2*v2[1]],[c.m[0]+a2*v2[0],c.m[1]+a2*v2[1]]],C.r,2)});
+  P.text('white dashed: true 95% ellipse · green: sample · yellow, red: principal axes',P.L+8,P.T+12,C.mu);
+  const R=300,E1=[],E2=[];for(let i=0;i<R;i++){const o=mvEig(mvCov(samp(n,r,a)).S);E1.push(o.vals[0]);E2.push(o.vals[1])}
+  const hi=te.vals[0]*1.9,Q=histLines($('c1cv2'),[E1,E2],[C.a,C.g],0,hi,32,[[te.vals[0],C.fg,'λ₁',true],[te.vals[1],C.fg,'λ₂',true]]);Q.text('sample eigenvalues over 300 datasets →',Q.w-Q.R-4,Q.h-Q.B-6,C.mu,'right');
+  const sh=e.vals[0]/(e.vals[0]+e.vals[1]),tsh=te.vals[0]/(te.vals[0]+te.vals[1]),sA=sdv(E1)/te.vals[0];
+  $('c1st').innerHTML=stat('sample eigenvalues λ₁ · λ₂',fmt(e.vals[0])+' · '+fmt(e.vals[1]),'ok')+stat('true eigenvalues λ₁ · λ₂',fmt(te.vals[0])+' · '+fmt(te.vals[1]),'')+stat('first axis: sample angle · true angle',fmt(ang(v1))+'° · '+fmt(ang(te.vecs[0]))+'°','in')+stat('share of variance on axis 1: sample · true',pc1(sh)+' · '+pc1(tsh),'')+stat('sampling sd of λ₁ (relative) · theory √(2/n)',fmt(sA)+' · '+fmt(Math.sqrt(2/n)),'');
+  $('c1rd').innerHTML=`Two variables with standard deviations 1 and ${fmt(a)} and correlation ${fmt(r)} have the covariance matrix [[1, ${fmt(r*a)}], [${fmt(r*a)}, ${fmt(a*a)}]]. Its <b>eigenvectors</b> are the axes of the elliptical cloud and its <b>eigenvalues</b> (true ${fmt(te.vals[0])} and ${fmt(te.vals[1])}) are the variances along those axes, so correlation is simply a tilt of the cloud away from the coordinate axes. The sample matrix from ${n} points gives eigenvalues ${fmt(e.vals[0])} and ${fmt(e.vals[1])}: the larger one is over-estimated and the smaller one under-estimated on average, a bias that grows when the sample is small or the eigenvalues are close. The right panel shows the sampling spread (relative sd ${fmt(sA)}, the rule of thumb is √(2/n) = ${fmt(Math.sqrt(2/n))}). Everything in this page (Mahalanobis distance, PCA, factor analysis) is a statement about this matrix.`}
+ ['c1r','c1a','c1n'].forEach(i=>$(i).addEventListener('change',run));$('c1go').onclick=run;run();})();
+
+/* ---------- Ch2 Mahalanobis distance ---------- */
+(function(){scl('c2r',v=>fmt(v/100));scl('c2d',v=>v);scl('c2p',v=>v);const NO=10,NC=500;
+ function sim(p,rho,d){const X=[];for(let i=0;i<NC;i++)X.push(mvEq(p,rho));const sh=d*Math.sqrt(1-rho)/Math.SQRT2,out=[];for(let i=0;i<NO;i++){const x=mvEq(p,rho);x[0]+=sh;x[1]-=sh;out.push(x)}
+  const all=X.concat(out),c=mvCov(all),Si=invMat(c.S),dm=all.map(x=>mvM2(x,c.m,Si)),de=all.map(x=>{let s=0;for(let j=0;j<p;j++)s+=(x[j]-c.m[j])*(x[j]-c.m[j]);return s}),thr=mvChi2q(.99,p),cl=de.slice(0,NC).sort((a,b)=>a-b),te=cl[Math.floor(.99*NC)];let a=0,b=0,f=0;for(let i=NC;i<NC+NO;i++){if(dm[i]>thr)a++;if(de[i]>te)b++}for(let i=0;i<NC;i++)if(dm[i]>thr)f++;
+  return{X,out,dm,de,thr,te,dmo:a/NO,deo:b/NO,dmc:f/NC}}
+ function run(){const rho=val('c2r')/100,d=val('c2d'),p=val('c2p'),o=sim(p,rho,d);let A=0,B=0,F=0;const R=60;for(let r=0;r<R;r++){const s=sim(p,rho,d);A+=s.dmo/R;B+=s.deo/R;F+=s.dmc/R}
+  const L=4.2,P=mk($('c2cv'),-L,L,L,{y0:-L,L:40});scat(P,o.X.map(x=>x[0]),o.X.map(x=>x[1]),'rgba(147,197,253,.5)',500,2.2);dots(P,o.out.map(x=>[x[0],x[1]]),C.r,4);mvEll(P,[0,0],[1,rho,1],Math.sqrt(9.21),C.fg,2,true);P.text('first two coordinates · red: 10 planted outliers · dashed: 99% ellipse of this pair',P.L+8,P.T+12,C.mu);
+  const hi=Math.max(o.thr*2.4,Math.min(Math.max(...o.dm)*1.02,o.thr*6)),Q=histLines($('c2cv2'),[o.dm.slice(0,NC),o.dm.slice(NC)],[C.a,C.r],0,hi,36,[[o.thr,C.y,'χ² 99%',true]]);Q.text('squared Mahalanobis distance →',Q.w-Q.R-4,Q.h-Q.B-6,C.mu,'right');
+  $('c2st').innerHTML=stat('outliers flagged: Mahalanobis · Euclidean (60 runs)',pc1(A)+' · '+pc1(B),A>B?'ok':'')+stat('clean points flagged by Mahalanobis (target 1%)',pc1(F),'in')+stat('χ² 99% threshold (p = '+p+')',fmt(o.thr),'')+stat('true Mahalanobis distance of an outlier',fmt(d),'');
+  $('c2rd').innerHTML=`${p} variables with pairwise correlation ${fmt(rho)} and 10 planted outliers, each displaced by ${d} standard deviations along the <em>weakest</em> direction of the data (the contrast between two variables). The squared <b>Mahalanobis distance</b> (x − m)ᵀS⁻¹(x − m) rescales each direction by its own spread, so for normal data it follows a χ² distribution with p degrees of freedom and a 99% threshold (${fmt(o.thr)}) is justified. It flags ${pc1(A)} of the outliers. The plain Euclidean distance sees the cloud as round, treats a step along the long axis and a step along the short axis alike, and with even the strongest threshold (set to also flag 1% of clean points) it finds only ${pc1(B)}. The gap grows with the correlation. Mahalanobis distance is the right tool for multivariate outliers in correlated bank data, with two cautions that the next labs explore: the covariance must be estimated well, and the outliers must not distort the estimate.`}
+ ['c2r','c2d','c2p'].forEach(i=>$(i).addEventListener('change',run));$('c2go').onclick=run;run();})();
+
+/* ---------- Ch3 PCA and choosing the number of components ---------- */
+(function(){scl('c3k',v=>v);scl('c3n',v=>v);scl('c3s',v=>fmt(v/10));const P0=10;
+ const cEig=X=>{const c=mvCov(X),R=Array.from({length:P0},(_,i)=>Float64Array.from({length:P0},(_,j)=>c.S[i][j]/Math.sqrt(c.S[i][i]*c.S[j][j])));return mvEig(R).vals},gen=(n,k,s)=>{const X=[];for(let i=0;i<n;i++){const f=Array.from({length:k},()=>randn()),x=new Float64Array(P0);for(let j=0;j<P0;j++)x[j]=f[j%k]+s*randn();X.push(x)}return X};
+ function run(){const k=val('c3k'),n=val('c3n'),s=val('c3s')/10,X=gen(n,k,s),ev=cEig(X),pa=Array.from({length:P0},()=>[]);
+  for(let r=0;r<40;r++){const Y=[];for(let i=0;i<n;i++)Y.push(Float64Array.from({length:P0},()=>randn()));cEig(Y).forEach((v,j)=>pa[j].push(v))}
+  const pa95=pa.map(a=>{a.sort((x,y)=>x-y);return a[Math.floor(.95*a.length)]}),kai=ev.filter(v=>v>1).length;let paK=0;while(paK<P0&&ev[paK]>pa95[paK])paK++;let cum=0,v80=P0;for(let j=0;j<P0;j++){cum+=ev[j]/P0;if(cum>=.8){v80=j+1;break}}
+  const Sg=Array.from({length:P0},(_,i)=>Float64Array.from({length:P0},(_,j)=>((i%k===j%k)?1:0)+(i===j?s*s:0))),pe=mvEig(Sg.map((r,i)=>r.map((v,j)=>v/Math.sqrt(Sg[i][i]*Sg[j][j])))).vals,mx=Math.max(...ev,...pe)*1.1,xs=Array.from({length:P0},(_,j)=>j+1),P=mk($('c3cv'),.5,P0+.5,mx,{L:44});
+  P.hline(1,C.mu,'Kaiser: 1',true);poly(P,xs.map((x,j)=>[x,pe[j]]),C.g,1.8,true);poly(P,xs.map((x,j)=>[x,pa95[j]]),C.y,2,true);poly(P,xs.map((x,j)=>[x,ev[j]]),C.a,2.8);dots(P,xs.map((x,j)=>[x,ev[j]]),C.a,4);
+  legend(P,[['sample',C.a],['parallel analysis 95%',C.y],['population',C.g]],P.T+12);P.text('component →',P.w-P.R-4,P.h-P.B-6,C.mu,'right');P.text('eigenvalue (correlation matrix)',P.L+6,P.T+28,C.mu);
+  barV($('c3cv2'),[kai,paK,v80,k],[C.r,C.y,C.a,C.g],['Kaiser (λ>1)','parallel','80% variance','truth'],P0,v=>String(Math.round(v)));
+  $('c3st').innerHTML=stat('components kept: Kaiser · parallel · 80% · truth',kai+' · '+paK+' · '+v80+' · '+k,paK===k?'ok':'warn')+stat('variance explained by the first '+k,pc1(ev.slice(0,k).reduce((a,b)=>a+b,0)/P0),'in')+stat('largest noise eigenvalue (sample · parallel 95%)',fmt(ev[Math.min(k,P0-1)])+' · '+fmt(pa95[Math.min(k,P0-1)]),'')+stat('sample size · noise sd',n+' · '+fmt(s),'');
+  $('c3rd').innerHTML=`Ten variables are driven by ${k} latent factors (each variable follows one factor) plus noise of sd ${fmt(s)}. The scree plot shows the eigenvalues of the sample correlation matrix; the factors should stand above a flat floor. <b>Kaiser’s rule</b> (keep λ &gt; 1) keeps ${kai} and is known to over- or under-count; <b>parallel analysis</b> compares each eigenvalue with the 95th percentile from pure-noise data of the same size and keeps ${paK}; an <b>80% variance</b> rule keeps ${v80}, a rule that depends on the noise and not on the structure. The truth is ${k}. Even noise-only data have eigenvalues above 1 because sample eigenvalues spread out (the yellow line), which is why Kaiser tends to keep too many. Treat every rule as a guide, combine it with interpretability and stability (the last lab), and never report a number of components without saying how it was chosen.`}
+ ['c3k','c3n','c3s'].forEach(i=>$(i).addEventListener('change',run));$('c3go').onclick=run;run();})();
+
+/* ---------- Ch4 PCA against factor analysis ---------- */
+(function(){scl('c4p',v=>v);scl('c4h',v=>fmt(v/10));scl('c4n',v=>v);
+ function one(p,h,n){const lam=Array.from({length:p},()=>.4+.5*Math.random()),psi=Array.from({length:p},()=>.5*Math.exp(1.5*h*randn())),X=[];for(let i=0;i<n;i++){const f=randn(),x=new Float64Array(p);for(let j=0;j<p;j++)x[j]=lam[j]*f+Math.sqrt(psi[j])*randn();X.push(x)}
+  const S=mvCov(X).S,t=mvTop(S,null,120);let l1=Array.from(t.vec,v=>v*Math.sqrt(t.val));if(l1.reduce((a,b)=>a+b,0)<0)l1=l1.map(v=>-v);
+  const Ps=Array.from({length:p},(_,j)=>.5*S[j][j]);let v=t.vec,lf=l1.slice();for(let it=0;it<60;it++){const R=S.map((r,i)=>{const q=Float64Array.from(r);q[i]-=Ps[i];return q}),u=mvTop(R,v,10);v=u.vec;lf=Array.from(v,x=>x*Math.sqrt(Math.max(u.val,1e-9)));let mv=0;for(let j=0;j<p;j++){const np=Math.max(S[j][j]-lf[j]*lf[j],.01*S[j][j]);mv=Math.max(mv,Math.abs(np-Ps[j]));Ps[j]=np}if(mv<1e-7)break}
+  if(lf.reduce((a,b)=>a+b,0)<0)lf=lf.map(x=>-x);const err=l=>Math.sqrt(l.reduce((s,x,j)=>s+Math.pow(x-lam[j],2),0)/p);return{lam,l1,lf,pc:err(l1),fa:err(lf)}}
+ function run(){const p=val('c4p'),h=val('c4h')/10,n=val('c4n'),o=one(p,h,n),R=40;let a=0,b=0;for(let r=0;r<R;r++){const s=one(p,h,n);a+=s.pc/R;b+=s.fa/R}
+  const mx=Math.max(1.2,...o.l1)*1.05,P=mk($('c4cv'),0,mx,mx,{L:44});P.line(x=>x,C.mu,1.4,0,mx,2,true);dots(P,o.lam.map((l,j)=>[l,o.l1[j]]),C.r,3.6);dots(P,o.lam.map((l,j)=>[l,o.lf[j]]),C.g,3.6);legend(P,[['PCA loading',C.r],['factor analysis',C.g]],P.T+12);P.text('true loading →',P.w-P.R-4,P.h-P.B-6,C.mu,'right');P.text('estimated loading',P.L+6,P.T+28,C.mu);
+  const PS=[4,6,8,12,20,40],cv=PS.map(q=>{let x=0,y=0;const r=20;for(let i=0;i<r;i++){const s=one(q,h,n);x+=s.pc/r;y+=s.fa/r}return[x,y]}),my=Math.max(...cv.flat())*1.15,Q=mk($('c4cv2'),0,PS.length-1,my,{noGrid:true,L:44});customGrid(Q,PS.map((q,i)=>[i,String(q)]),niceTicks(0,my,5));poly(Q,PS.map((q,i)=>[i,cv[i][0]]),C.r,2.8);poly(Q,PS.map((q,i)=>[i,cv[i][1]]),C.g,2.8);legend(Q,[['PCA',C.r],['factor analysis',C.g]],Q.T+12);Q.text('number of variables p →',Q.w-Q.R-4,Q.h-Q.B-6,C.mu,'right');Q.text('RMSE of loadings',Q.L+6,Q.T+28,C.mu);
+  $('c4st').innerHTML=stat('loading RMSE at p = '+p+': PCA · FA (40 runs)',fmt(a)+' · '+fmt(b),b<a?'ok':'')+stat('FA error relative to PCA',pc1(b/a),'in')+stat('this dataset: PCA · FA',fmt(o.pc)+' · '+fmt(o.fa),'')+stat('spread of noise variances',fmt(h),'');
+  $('c4rd').innerHTML=`One latent factor drives ${p} variables with true loadings between 0.4 and 0.9; each variable also has its own noise variance (spread ${fmt(h)} on the log scale). <b>PCA</b> finds the direction of largest <em>total</em> variance, so the noise of each variable is folded into its “loading”: loadings are over-stated, most when p is small or the noise is large and uneven. <b>Factor analysis</b> models the noise separately for each variable (the uniquenesses) and fits only the shared variance, which removes most of that bias: the loading error is ${fmt(b)} against ${fmt(a)} for PCA at p = ${p}. The right-hand panel shows the two methods converging as p grows, because with many variables each variable’s own noise matters less. Use PCA to compress variables and FA to interpret shared structure; reporting PCA loadings as “factor loadings” is a common error, and it matters when a model-risk reviewer asks what a latent score means.`}
+ ['c4p','c4h','c4n'].forEach(i=>$(i).addEventListener('change',run));$('c4go').onclick=run;run();})();
+
+/* ---------- Ch5 rotation and identifiability ---------- */
+(function(){scl('c5n',v=>v);scl('c5x',v=>fmt(v/100));scl('c5g',v=>v+'°');const P0=12;
+ function run(){const n=val('c5n'),x=val('c5x')/100,phi=val('c5g')*Math.PI/180,lam=Array.from({length:P0},(_,j)=>j<6?[.8,x]:[x,.8]),X=[];for(let i=0;i<n;i++){const f1=randn(),f2=randn(),r=new Float64Array(P0);for(let j=0;j<P0;j++)r[j]=lam[j][0]*f1+lam[j][1]*f2+.6*randn();X.push(r)}
+  const S=mvCov(X).S,R=Array.from({length:P0},(_,i)=>Float64Array.from({length:P0},(_,j)=>S[i][j]/Math.sqrt(S[i][i]*S[j][j]))),e=mvEig(R),L0=Array.from({length:P0},(_,j)=>[Math.sqrt(e.vals[0])*e.vecs[0][j],Math.sqrt(e.vals[1])*e.vecs[1][j]]),c=Math.cos(phi),s=Math.sin(phi),L1=L0.map(([a,b])=>[a*c-b*s,a*s+b*c]),vm=mvVarimax2(L1),L2=vm.L;
+  const acc=L=>{let ok=0;L.forEach(([a,b],j)=>{const g=Math.abs(a)>Math.abs(b)?0:1;if(g===(j<6?0:1))ok++});return Math.max(ok,P0-ok)/P0},rec=L=>{let m=0;for(let i=0;i<P0;i++)for(let j=0;j<P0;j++)m=Math.max(m,Math.abs(L1[i][0]*L1[j][0]+L1[i][1]*L1[j][1]-(L[i][0]*L[j][0]+L[i][1]*L[j][1])));return m};
+  const draw=(cv,L,title)=>{const P=mk($(cv),-1.15,1.15,1.15,{y0:-1.15,L:40});P.hline(0,C.mu,'',true);P.vline(0,C.mu,null,true);dots(P,L.filter((_,j)=>j<6).map(q=>[q[0],q[1]]),C.g,5);dots(P,L.filter((_,j)=>j>=6).map(q=>[q[0],q[1]]),C.y,5);P.text(title,P.L+8,P.T+12,C.mu);P.text('factor 1 →',P.w-P.R-4,P.h-P.B-6,C.mu,'right')};
+  draw('c5cv',L1,'before rotation (green: first six variables, yellow: last six)');draw('c5cv2',L2,'after varimax rotation');
+  const cm=L=>L.map(([a,b])=>a*a+b*b),c1=cm(L1),c2=cm(L2);let dc=0;c1.forEach((v,j)=>dc=Math.max(dc,Math.abs(v-c2[j])));
+  $('c5st').innerHTML=stat('variables placed on the right factor: before · after',pc1(acc(L1))+' · '+pc1(acc(L2)),acc(L2)>acc(L1)+.01?'ok':'in')+stat('largest change in a communality',dc.toExponential(1),'')+stat('largest change in a fitted covariance',rec(L2).toExponential(1),'')+stat('simple-structure criterion: before · after',fmt(mvVmax(L1))+' · '+fmt(mvVmax(L2)),'in');
+  $('c5rd').innerHTML=`Two orthogonal factors drive twelve variables (six on each, with cross-loadings of ${fmt(x)}). A factor solution is only defined up to a <b>rotation</b>: turning the two axes by any angle leaves every communality and every fitted covariance unchanged (changes of ${dc.toExponential(1)} and ${rec(L2).toExponential(1)}, which is rounding error), so the data cannot say which orientation is “the” answer. The raw solution starts from the principal axes and then is turned by ${val('c5g')}°, here placing ${pc1(acc(L1))} of the variables on the correct factor. <b>Varimax</b> chooses the rotation that makes each variable load strongly on one factor and weakly on the other (simple structure), which gives ${pc1(acc(L2))} and the same picture whatever the starting angle (try the angle slider). The lesson is that the interpretation of a factor is a choice of rotation, justified by interpretability, and that loadings from two software packages can differ for this reason alone; an oblique rotation is needed if factors are correlated.`}
+ ['c5n','c5x','c5g'].forEach(i=>$(i).addEventListener('change',run));$('c5go').onclick=run;run();})();
+
+/* ---------- Ch6 Gaussian mixtures and EM ---------- */
+(function(){scl('c6s',v=>fmt(v/10));scl('c6n',v=>v);scl('c6k',v=>v);const COL=[C.a,C.g,C.y,C.r,C.p];
+ function gen(n,K,sep){const rad=K>1?sep/(2*Math.sin(Math.PI/K)):0,X=[],z=[];for(let i=0;i<n;i++){const k=Math.floor(Math.random()*K),ang=2*Math.PI*k/K,th=k*.7,u=randn(),w=.6*randn();X.push([rad*Math.cos(ang)+u*Math.cos(th)-w*Math.sin(th),rad*Math.sin(ang)+u*Math.sin(th)+w*Math.cos(th)]);z.push(k)}return{X,z}}
+ function perms(a){if(a.length<=1)return[a];const r=[];a.forEach((v,i)=>perms(a.filter((_,j)=>j!==i)).forEach(q=>r.push([v,...q])));return r}
+ function run(){const sep=val('c6s')/10,n=val('c6n'),K=val('c6k'),d=gen(n,K,sep),fits=[1,2,3,4,5].map(k=>mvEM(d.X,k,70,3)),bic=fits.map(f=>-2*f.ll+(6*f.K-1)*Math.log(n)),bi=bic.indexOf(Math.min(...bic)),bf=fits[bi];
+  const L=Math.max(...d.X.map(q=>Math.max(Math.abs(q[0]),Math.abs(q[1]))))*1.1,P=mk($('c6cv'),-L,L,L,{y0:-L,L:40});for(let k=0;k<bf.K;k++)dots(P,d.X.filter((_,i)=>bf.lab[i]===k).slice(0,500).map(q=>[q[0],q[1]]),COL[k%5],2.3);bf.comp.forEach((c,k)=>mvEll(P,[c.mx,c.my],[c.xx,c.xy,c.yy],Math.sqrt(5.991),C.fg,2));P.text('colours: fitted clusters (best BIC) · ellipses: fitted 95% regions',P.L+8,P.T+12,C.mu);
+  const mb=Math.min(...bic),rel=bic.map(v=>v-mb),my=Math.max(...rel)*1.1||1,Q=mk($('c6cv2'),.6,5.4,my,{L:50});poly(Q,rel.map((v,i)=>[i+1,v]),C.a,2.8);dots(Q,rel.map((v,i)=>[i+1,v]),C.a,4.2);Q.vline(K,C.g,null,true);Q.text('BIC − minimum (lower is better) · green dashed: true K',Q.L+8,Q.T+12,C.mu);Q.text('number of components K →',Q.w-Q.R-4,Q.h-Q.B-6,C.mu,'right');
+  let acc='n/a';if(bf.K===K){let b=0;perms([...Array(K).keys()]).forEach(pm=>{let ok=0;d.z.forEach((z,i)=>{if(pm[z]===bf.lab[i])ok++});b=Math.max(b,ok/n)});acc=pc1(b)}
+  $('c6st').innerHTML=stat('K chosen by BIC · true K',(bi+1)+' · '+K,bi+1===K?'ok':'warn')+stat('cluster membership correct (when K matches)',acc,'in')+stat('log-likelihood at K = 1 · chosen',fmt(fits[0].ll)+' · '+fmt(bf.ll),'')+stat('separation of neighbouring centres (sd units)',fmt(sep),'');
+  $('c6rd').innerHTML=`${n} points come from ${K} Gaussian clusters whose centres are ${fmt(sep)} spread units apart. A <b>Gaussian mixture</b> is fitted by <b>EM</b>: soft assignments of points to clusters (E step) alternate with weighted updates of each cluster’s weight, mean and covariance (M step), and the likelihood never decreases, though it can stop at a local optimum, so several random starts are used. The number of clusters is not estimated by the likelihood (it always rises with K) but by a penalised criterion: BIC picks ${bi+1}${bi+1===K?', the true number':', not the true number, because the clusters overlap too much to tell apart at this sample size'}. Mixtures are used for customer segments and for modelling multimodal risk factors; the cautions are label switching (cluster numbers are arbitrary), unequal covariances that merge or split real groups, and the fact that a “cluster” may be a skewed single population rather than a real segment. Check stability across seeds and samples before naming a segment.`}
+ ['c6s','c6n','c6k'].forEach(i=>$(i).addEventListener('change',run));$('c6go').onclick=run;run();})();
+/* ---------- Ch7 covariance in high dimension: shrinkage ---------- */
+(function(){scl('c7p',v=>v);scl('c7n',v=>v);scl('c7r',v=>fmt(v/100));
+ function lw(X,S){const n=X.length,p=S.length,m=mvCov(X).m;let tr=0;for(let i=0;i<p;i++)tr+=S[i][i];const mu=tr/p;let d2=0;for(let i=0;i<p;i++)for(let j=0;j<p;j++)d2+=Math.pow(S[i][j]-(i===j?mu:0),2);let b2=0;for(const x of X){let s=0;for(let i=0;i<p;i++)for(let j=0;j<p;j++){const v=(x[i]-m[i])*(x[j]-m[j])-S[i][j];s+=v*v}b2+=s}b2/=n*n;const dl=Math.min(b2/d2,1);return{dl,S2:S.map((r,i)=>Float64Array.from(r,(v,j)=>(1-dl)*v+(i===j?dl*mu:0)))}}
+ const fro=(A,B)=>{let s=0,t=0;for(let i=0;i<A.length;i++)for(let j=0;j<A.length;j++){s+=Math.pow(A[i][j]-B[i][j],2);t+=B[i][j]*B[i][j]}return Math.sqrt(s/t)};
+ function run(){const p=val('c7p'),n=val('c7n'),rho=val('c7r')/100,Sg=Array.from({length:p},(_,i)=>Float64Array.from({length:p},(_,j)=>Math.pow(rho,Math.abs(i-j)))),L=cholL(Sg),draw=()=>{const X=[];for(let i=0;i<n;i++){const z=Float64Array.from({length:p},()=>randn()),x=new Float64Array(p);for(let a=0;a<p;a++){let t=0;for(let b=0;b<=a;b++)t+=L[a][b]*z[b];x[a]=t}X.push(x)}const S=mvCov(X).S,o=lw(X,S);return{X,S,o}};
+  const d1=draw(),te=mvEig(Sg).vals,se=mvEig(d1.S).vals,le=mvEig(d1.o.S2).vals,xs=Array.from({length:p},(_,j)=>j+1),mx=Math.max(...se,...te)*1.08,P=mk($('c7cv'),.5,p+.5,mx,{L:44});
+  poly(P,xs.map((x,j)=>[x,te[j]]),C.fg,2.6);dots(P,xs.map((x,j)=>[x,se[j]]),C.r,3.4);poly(P,xs.map((x,j)=>[x,le[j]]),C.g,2.6);legend(P,[['true eigenvalues',C.fg],['sample',C.r],['shrunk',C.g]],P.T+12);P.text('eigenvalue rank →',P.w-P.R-4,P.h-P.B-6,C.mu,'right');
+  const R=15;let e1=0,e2=0,e3=0;for(let r=0;r<R;r++){const d=r===0?d1:draw();e1+=fro(d.S,Sg)/R;e2+=fro(d.o.S2,Sg)/R;e3+=fro(d.S.map((q,i)=>Float64Array.from(q,(v,j)=>i===j?v:0)),Sg)/R}
+  barV($('c7cv2'),[e1,e2,e3],[C.r,C.g,C.y],['sample covariance','shrinkage','diagonal only'],Math.max(e1,e2,e3)*1.2,fmt);
+  const cond=v=>v[v.length-1]>1e-9?(v[0]/v[v.length-1]):Infinity,cf=v=>isFinite(v)?(v>1e5?v.toExponential(1):fmt(v)):'∞ (singular)';
+  $('c7st').innerHTML=stat('relative error: sample · shrunk · diagonal',fmt(e1)+' · '+fmt(e2)+' · '+fmt(e3),e2<e1?'ok':'')+stat('shrinkage intensity (Ledoit–Wolf)',pc1(d1.o.dl),'in')+stat('condition number: true · sample · shrunk',cf(cond(te))+' · '+cf(cond(se))+' · '+cf(cond(le)),cond(se)>1e4?'hot':'')+stat('variables per observation p/n',fmt(p/n),p/n>.5?'warn':'');
+  $('c7rd').innerHTML=`${p} variables with an autoregressive correlation of ${fmt(rho)} are observed ${n} times. When p is not small against n, the sample covariance matrix is a poor estimate: its eigenvalues spread out well beyond the true ones (red dots against the white line), the smallest ones collapse towards zero, and with p ≥ n the matrix is singular. That is fatal for anything that inverts it, including Mahalanobis distance and the portfolio and regression formulae built on it. <b>Shrinkage</b> pulls the estimate towards a scaled identity matrix by an amount learned from the data (${pc1(d1.o.dl)} here), which compresses the eigenvalue spread and keeps the matrix invertible; its error is ${fmt(e2)} against ${fmt(e1)} for the sample matrix. Ignoring correlations altogether (the diagonal) is the other extreme and is best only when the true correlation is small. Use a shrunk or structured estimate whenever p/n is above about 0.1.`}
+ ['c7p','c7n','c7r'].forEach(i=>$(i).addEventListener('change',run));$('c7go').onclick=run;run();})();
+
+/* ---------- Ch8 robust covariance and masking ---------- */
+(function(){scl('c8e',v=>v+'%');scl('c8d',v=>v);scl('c8p',v=>v);scl('c8n',v=>v);const RHO=.6;
+ function gen(n,p,eps,d){const X=[],O=[],sh=d*Math.sqrt(1-RHO)/Math.SQRT2;for(let i=0;i<n;i++){const o=Math.random()<eps;let x=mvEq(p,RHO);if(o){x=x.map(v=>.3*v);x[0]+=sh;x[1]-=sh}X.push(x);O.push(o)}return{X,O}}
+ function fits(X){const c=mvCov(X),r=mvMCD(X,12,4);return{c:{m:c.m,S:c.S},r}}
+ function flag(X,f,thr){const Si=invMat(f.S);return X.map(x=>mvM2(x,f.m,Si)>thr)}
+ function rates(d,f,thr){const fc=flag(d.X,f.c,thr),fr=flag(d.X,f.r,thr);let oc=0,or=0,no=0,cc=0,cr=0,nc=0;d.O.forEach((o,i)=>{if(o){no++;if(fc[i])oc++;if(fr[i])or++}else{nc++;if(fc[i])cc++;if(fr[i])cr++}});return[oc/Math.max(no,1),or/Math.max(no,1),cc/nc,cr/nc]}
+ function run(){const eps=val('c8e')/100,d=val('c8d'),p=val('c8p'),n=val('c8n'),thr=mvChi2q(.975,p),D=gen(n,p,eps,d),f=fits(D.X),L=Math.max(5,d*.9),P=mk($('c8cv'),-L,L,L,{y0:-L,L:40});
+  dots(P,D.X.filter((_,i)=>!D.O[i]).slice(0,400).map(x=>[x[0],x[1]]),'rgba(147,197,253,.55)',2.2);dots(P,D.X.filter((_,i)=>D.O[i]).slice(0,200).map(x=>[x[0],x[1]]),C.r,2.6);const k=Math.sqrt(7.378);
+  mvEll(P,[0,0],[1,RHO,1],k,C.fg,2,true);mvEll(P,[f.c.m[0],f.c.m[1]],[f.c.S[0][0],f.c.S[0][1],f.c.S[1][1]],k,C.r,2.4);mvEll(P,[f.r.m[0],f.r.m[1]],[f.r.S[0][0],f.r.S[0][1],f.r.S[1][1]],k,C.g,2.4);P.text('white dashed: truth · red: classical · green: robust (97.5% ellipses)',P.L+8,P.T+12,C.mu);
+  const R=25;let a=[0,0,0,0];for(let r=0;r<R;r++){const dd=r===0?D:gen(n,p,eps,d),ff=r===0?f:fits(dd.X),q=rates(dd,ff,thr);for(let i=0;i<4;i++)a[i]+=q[i]/R}
+  const Q=barG($('c8cv2'),[[a[0],a[1]],[a[2],a[3]]],[C.r,C.g],['outliers flagged','clean points flagged'],0,1.3,pc1);legend(Q,[['classical',C.r],['robust (MCD)',C.g]],Q.T+12);
+  $('c8st').innerHTML=stat('outliers flagged: classical · robust (25 runs)',pc1(a[0])+' · '+pc1(a[1]),a[1]>a[0]+.1?'ok':'in')+stat('clean points flagged: classical · robust (target 2.5%)',pc1(a[2])+' · '+pc1(a[3]),'')+stat('contamination · distance of the cluster',pc1(eps)+' · '+d+' sd','')+stat('χ² 97.5% threshold (p = '+p+')',fmt(thr),'');
+  $('c8rd').innerHTML=`A fraction ${pc1(eps)} of the points form a tight cluster ${d} standard deviations away from the main population (${p} variables, correlation ${RHO}). The classical mean and covariance include those points, so the ellipse (red) is dragged towards the cluster and stretched along the line joining them: the outliers inflate the very scale used to judge them, and ${pc1(1-a[0])} of them escape detection. This is <b>masking</b>. The <b>minimum covariance determinant</b> (MCD) estimator fits the mean and covariance to the half of the data with the tightest cloud, rescaled for consistency, so contamination up to nearly 50% hardly moves it (green ellipse close to the truth) and it flags ${pc1(a[1])}. Robust estimates are what to use for Mahalanobis-based screening of transactions, KYC attributes and model inputs, since the data you are screening are the data that contain the problems. The price is some loss of efficiency on clean data and heavier computation.`}
+ ['c8e','c8d','c8p','c8n'].forEach(i=>$(i).addEventListener('change',run));$('c8go').onclick=run;run();})();
+
+/* ---------- Ch9 principal components regression ---------- */
+(function(){scl('c9j',v=>v);scl('c9s',v=>fmt(v/10));scl('c9n',v=>v);const P0=8,LAM=[6,3,1.8,1,.6,.35,.2,.1],NT=1500,tot=LAM.reduce((a,b)=>a+b,0);
+ function run(){const j0=val('c9j')-1,s=val('c9s')/10,n=val('c9n'),R=15,U=mvOrth(P0),gen=m=>{const X=[],y=[];for(let i=0;i<m;i++){const z=Array.from({length:P0},()=>randn()),x=new Float64Array(P0);for(let b=0;b<P0;b++){const w=Math.sqrt(LAM[b])*z[b],u=U[b];for(let a=0;a<P0;a++)x[a]+=w*u[a]}X.push(x);y.push(z[j0]+s*randn())}return{X,y}};
+  const curve=new Float64Array(P0);let cor2=new Float64Array(P0);for(let r=0;r<R;r++){const tr=gen(n),te=gen(NT),c=mvCov(tr.X),e=mvEig(c.S),my=avg(tr.y),mt=avg(te.y),sc=(x,b)=>{let t=0;for(let a=0;a<P0;a++)t+=e.vecs[b][a]*(x[a]-c.m[a]);return t},T=tr.X.map(x=>e.vecs.map((_,b)=>sc(x,b))),beta=e.vecs.map((_,b)=>{let sxy=0,sxx=0;for(let i=0;i<n;i++){sxy+=T[i][b]*(tr.y[i]-my);sxx+=T[i][b]*T[i][b]}return sxy/sxx}),Tt=te.X.map(x=>e.vecs.map((_,b)=>sc(x,b)));let sst=0;te.y.forEach(v=>sst+=Math.pow(v-mt,2));
+   for(let k=1;k<=P0;k++){let sse=0;for(let i=0;i<NT;i++){let yh=my;for(let b=0;b<k;b++)yh+=beta[b]*Tt[i][b];sse+=Math.pow(te.y[i]-yh,2)}curve[k-1]+=(1-sse/sst)/R}
+   if(r===R-1){let syy=0;tr.y.forEach(v=>syy+=Math.pow(v-my,2));for(let b=0;b<P0;b++){let sxy=0,sxx=0;for(let i=0;i<n;i++){sxy+=T[i][b]*(tr.y[i]-my);sxx+=T[i][b]*T[i][b]}cor2[b]=sxy*sxy/(sxx*syy)}}}
+  let cum=0,k80=P0;for(let b=0;b<P0;b++){cum+=LAM[b]/tot;if(cum>=.8){k80=b+1;break}}const mxR=1/(1+s*s),xs=Array.from({length:P0},(_,b)=>b+1),P=mk($('c9cv'),.5,P0+.5,Math.max(mxR*1.15,.1),{L:44});
+  P.hline(mxR,C.mu,'best possible '+pc1(mxR),true);poly(P,xs.map((x,b)=>[x,curve[b]]),C.a,2.8);dots(P,xs.map((x,b)=>[x,curve[b]]),C.a,4);P.vline(j0+1,C.g,null,true);P.vline(k80,C.r,null,true);P.text('green: component that drives y · red: 80%-variance rule',P.L+8,P.T+12,C.mu);P.text('components used k →',P.w-P.R-4,P.h-P.B-6,C.mu,'right');P.text('test R²',P.L+6,P.T+28,C.mu);
+  const Q=barG($('c9cv2'),xs.map((x,b)=>[LAM[b]/tot,cor2[b]]),[C.a,C.g],xs.map(String),0,Math.max(...LAM.map(v=>v/tot),...cor2)*1.15,pc1);legend(Q,[['share of predictor variance',C.a],['share of y explained',C.g]],Q.T+12);
+  const best=curve.indexOf(Math.max(...curve))+1;
+  $('c9st').innerHTML=stat('test R² keeping the 80%-variance components (k = '+k80+')',pc1(curve[k80-1]),curve[k80-1]<curve[P0-1]-.03?'hot':'in')+stat('test R² using all 8 (ordinary regression)',pc1(curve[P0-1]),'ok')+stat('best k · its test R²',best+' · '+pc1(curve[best-1]),'')+stat('the driving component carries',pc1(LAM[j0]/tot)+' of predictor variance','');
+  $('c9rd').innerHTML=`Eight correlated predictors, and the outcome depends on component ${j0+1}, which carries only ${pc1(LAM[j0]/tot)} of their variance (noise sd ${fmt(s)}, so the ceiling on test R² is ${pc1(mxR)}). <b>Principal components regression</b> keeps the first k components, on the argument that the directions with little variance are noise. Here ${k80<=j0?`keeping the ${k80} that explain 80% of the variance misses the one that matters and gets ${pc1(curve[k80-1])}`:`the rule happens to keep the driving component and gets ${pc1(curve[k80-1])}`}, while the curve only reaches its plateau at k = ${j0+1}. The right-hand bars show why: variance in the predictors and relevance to the outcome are different things. Choose k by cross-validated prediction (or use ridge, penalised regression of item 14, or partial least squares), and do not treat a low-variance component as unimportant because a scree plot says so.`}
+ ['c9j','c9s','c9n'].forEach(i=>$(i).addEventListener('change',run));$('c9go').onclick=run;run();})();
+
+/* ---------- Ch10 distances in high dimension ---------- */
+(function(){const PS=[2,5,10,20,40,80,150];idx('c10i',PS);scl('c10k',v=>v);scl('c10d',v=>fmt(v/10));let RES=null;
+ function sim(p,k,d,n){const kk=Math.min(k,p),reps=5,NCL=600,NOU=150;let a=0,b=0,c=0;for(let r=0;r<reps;r++){const X=Array.from({length:n},()=>Float64Array.from({length:p},()=>randn())),cv=mvCov(X),Si=invMat(cv.S),sc=[[],[],[]],so=[[],[],[]];
+   const score=(x,out)=>{const m=mvM2(x,cv.m,Si);let e=0,o=0;for(let j=0;j<p;j++)e+=x[j]*x[j];for(let j=0;j<kk;j++)o+=x[j]*x[j];const t=out?so:sc;t[0].push(m);t[1].push(e);t[2].push(o)};
+   for(let i=0;i<NCL;i++)score(Float64Array.from({length:p},()=>randn()),false);for(let i=0;i<NOU;i++){const x=Float64Array.from({length:p},()=>randn());for(let j=0;j<kk;j++)x[j]+=d;score(x,true)}
+   const pw=m=>{const t=sc[m].slice().sort((u,v)=>u-v)[Math.floor(.99*NCL)];return so[m].filter(v=>v>t).length/NOU};a+=pw(0)/reps;b+=pw(1)/reps;c+=pw(2)/reps}return[a,b,c]}
+ function draw(){if(!RES)return;const sel=+$('c10i').value,k=val('c10k'),d=val('c10d')/10,P=mk($('c10cv'),0,PS.length-1,1.05,{noGrid:true,L:44});customGrid(P,PS.map((q,i)=>[i,String(q)]),niceTicks(0,1,5));[[0,C.r],[1,C.y],[2,C.g]].forEach(([m,c])=>{poly(P,PS.map((q,i)=>[i,RES[i][m]]),c,2.6);dots(P,PS.map((q,i)=>[i,RES[i][m]]),c,3.6)});P.vline(sel,C.fg,null,true);legend(P,[['Mahalanobis (estimated Σ)',C.r],['Euclidean (known Σ = I)',C.y],['informative variables only',C.g]],P.T+12);P.text('number of variables p →',P.w-P.R-4,P.h-P.B-6,C.mu,'right');P.text('power at 1% false alarms',P.L+6,P.T+28,C.mu);
+  const q=RES[sel];barV($('c10cv2'),q,[C.r,C.y,C.g],['Mahalanobis','Euclidean','oracle'],1.1,pc1);
+  $('c10st').innerHTML=stat('power at p = '+PS[sel]+': Mahalanobis · Euclidean · oracle',pc1(q[0])+' · '+pc1(q[1])+' · '+pc1(q[2]),'')+stat('power lost to the many irrelevant variables (Euclidean)',pc1(q[2]-q[1]),q[2]-q[1]>.2?'hot':'in')+stat('power lost to estimating Σ (vs Euclidean)',pc1(q[1]-q[0]),q[1]-q[0]>.1?'warn':'in')+stat('informative variables · shift each',Math.min(k,PS[sel])+' · '+fmt(d),'');
+  $('c10rd').innerHTML=`An anomaly is shifted by ${fmt(d)} standard deviations in each of ${k} informative variables, hidden among p variables of pure noise, and a detector must flag it while raising a false alarm on only 1% of normal cases (300 training cases). The <b>oracle</b> that looks only at the informative variables keeps its power however large p becomes. A distance over all p variables adds up the noise in every variable, so the signal is diluted: the Euclidean detector with the true covariance loses power as p grows, and the Mahalanobis detector that must also <em>estimate</em> the covariance from 300 cases loses more, quickly once p approaches the sample size. In high dimension all distances between points also become similar to one another, which hurts nearest-neighbour methods in the same way. Remedies are variable selection or domain-based feature design, dimension reduction, shrunk or robust covariance (the previous labs), and detectors that look at subsets of variables; an unfiltered feature list of hundreds of columns is usually a worse anomaly detector than a curated one.`}
+ function run(){const k=val('c10k'),d=val('c10d')/10;RES=PS.map(p=>sim(p,k,d,300));draw()}
+ $('c10i').addEventListener('input',draw);['c10k','c10d'].forEach(i=>$(i).addEventListener('change',run));$('c10go').onclick=run;run();})();
+
+/* ---------- Ch11 stability of components ---------- */
+(function(){scl('c11g',v=>fmt(v/100));scl('c11n',v=>v);const P0=5;
+ function run(){const g=val('c11g')/100,n=val('c11n'),lam=[4,4*g,.8,.6,.4],gen=()=>Array.from({length:n},()=>Float64Array.from(lam,l=>Math.sqrt(l)*randn())),ang=(v,j)=>Math.acos(Math.min(1,Math.abs(v[j])))*180/Math.PI,plane=e=>{let s=0;for(let k=2;k<P0;k++)s+=(e.vecs[0][k]*e.vecs[0][k]+e.vecs[1][k]*e.vecs[1][k])/2;return Math.asin(Math.min(1,Math.sqrt(s)))*180/Math.PI};
+  const A1=[],A2=[],PL=[];for(let r=0;r<300;r++){const e=mvEig(mvCov(gen()).S);A1.push(ang(e.vecs[0],0));A2.push(ang(e.vecs[1],1));PL.push(plane(e))}
+  const X=gen(),e0=mvEig(mvCov(X).S),B1=[],B2=[];for(let b=0;b<200;b++){const Y=Array.from({length:n},()=>X[Math.floor(Math.random()*n)]),e=mvEig(mvCov(Y).S);B1.push(Math.acos(Math.min(1,Math.abs(e.vecs[0].reduce((s,v,i)=>s+v*e0.vecs[0][i],0))))*180/Math.PI);B2.push(Math.acos(Math.min(1,Math.abs(e.vecs[1].reduce((s,v,i)=>s+v*e0.vecs[1][i],0))))*180/Math.PI)}
+  const med=a=>a.slice().sort((x,y)=>x-y)[Math.floor(a.length/2)],th=Math.sqrt(lam[0]*lam[1]/(n*Math.pow(lam[0]-lam[1],2)))*180/Math.PI,north=(lam[0]-lam[1])>lam[0]*Math.sqrt(2/n);
+  const P=histLines($('c11cv'),[A1,A2],[C.a,C.g],0,90,30,[]);P.text('angle between estimated and true axis, 300 datasets · blue: PC1, green: PC2',P.L+8,P.T+12,C.mu);P.text('degrees →',P.w-P.R-4,P.h-P.B-6,C.mu,'right');
+  const Q=histLines($('c11cv2'),[B1,B2],[C.a,C.g],0,90,30,[]);Q.text('bootstrap: angle to this dataset’s own axis · blue: PC1, green: PC2',Q.L+8,Q.T+12,C.mu);Q.text('degrees →',Q.w-Q.R-4,Q.h-Q.B-6,C.mu,'right');
+  $('c11st').innerHTML=stat('median error of PC1 · PC2 (degrees)',fmt(med(A1))+' · '+fmt(med(A2)),med(A1)>15?'hot':'ok')+stat('theory: sd of PC1 angle (degrees)',fmt(th),'')+stat('median error of the PC1–PC2 plane',fmt(med(PL)),'in')+stat('bootstrap median angle: PC1 · PC2',fmt(med(B1))+' · '+fmt(med(B2)),med(B1)>15?'warn':'')+stat('North’s rule: λ₁ − λ₂ > λ₁√(2/n)?',north?'separated':'not separated',north?'ok':'hot');
+  $('c11rd').innerHTML=`Two real components with variances 4 and ${fmt(4*g)} (ratio ${fmt(g)}) and three weak ones, ${n} observations. When the two variances are far apart the estimated axes land within a few degrees of the true ones. As they approach each other the individual directions become unstable: the median error of PC1 is ${fmt(med(A1))}° (theory for the sd, ${fmt(th)}°), because any rotation inside the plane nearly equals the data’s covariance, and the bootstrap (right) shows the same instability using only the one dataset you would actually have. The <b>plane</b> spanned by the two components remains well determined (median error ${fmt(med(PL))}°). So “PC1 = size, PC2 = shape” interpretations are only safe when the eigenvalue gap exceeds the sampling error (North’s rule: ${north?'it does here':'it does not here'}). Report components with bootstrap stability, and interpret groups of nearly equal components together, not one at a time.`}
+ ['c11g','c11n'].forEach(i=>$(i).addEventListener('change',run));$('c11go').onclick=run;run();})();
+const QZ=[{"l":"Beginner","q":"What do the eigenvectors and eigenvalues of a covariance matrix describe?","o":["The number of clusters in the data","The axes of the data cloud and the variance along each axis","The mean and median of each variable","The correlation between each variable and the outcome"],"a":1,"e":"Σ = VΛVᵀ: the eigenvectors give the directions of the principal axes of the cloud, and the eigenvalues give the variances along them."},{"l":"Beginner","q":"Why standardise variables before PCA when they are measured in different units?","o":["Otherwise the variable with the largest scale dominates the components","To remove outliers","To make the components uncorrelated","To make the data normal"],"a":0,"e":"PCA maximises variance, which depends on units. Standardising (using the correlation matrix) puts every variable on the same footing."},{"l":"Intermediate","q":"Two variables are strongly positively correlated. A point is unusual because one is high and the other low. Which distance flags it most clearly?","o":["Manhattan distance","Euclidean distance","Distance of each variable from its own mean, taken separately","Mahalanobis distance"],"a":3,"e":"Mahalanobis distance accounts for the correlation, so a step against the correlation counts for far more than a step along it."},{"l":"Intermediate","q":"For p-variate normal data, the squared Mahalanobis distance of a new observation follows…","o":["A t distribution with n − 1 degrees of freedom","A normal distribution","A χ² distribution with p degrees of freedom","A uniform distribution"],"a":2,"e":"d² = zᵀz for a standardised vector of p independent standard normals, i.e. χ²ₚ (with estimated parameters it is approximately so for large n)."},{"l":"Intermediate","q":"Which rule for the number of principal components compares the eigenvalues with those from pure-noise data of the same size?","o":["Kaiser’s criterion","Parallel analysis","The 80% variance rule","The elbow of the scree plot"],"a":1,"e":"Parallel analysis keeps components whose eigenvalue exceeds the (say) 95th percentile of eigenvalues of random data of the same dimensions."},{"l":"Intermediate","q":"The sample covariance matrix, compared with the true one, tends to have…","o":["Largest eigenvalues too large and smallest too small","All eigenvalues unbiased","All eigenvalues too small","Eigenvalues exactly equal to the true ones"],"a":0,"e":"The sample eigenvalues are spread out more than the true ones; the effect is stronger when p/n is large."},{"l":"Advanced","q":"Why are PCA loadings often larger than factor-analysis loadings for the same data?","o":["PCA standardises the variables and FA does not","PCA uses the wrong rotation","FA ignores the first component","PCA treats the unique noise of each variable as part of the component"],"a":3,"e":"PCA explains total variance including each variable’s own noise; FA models Σ = ΛΛᵀ + Ψ and fits only the shared part, so its loadings are smaller, especially with few variables."},{"l":"Advanced","q":"Why does varimax rotation not change the fit of a factor model?","o":["It is applied only to the residuals","It re-estimates the factors with the same likelihood","Any orthogonal rotation of the loadings leaves ΛΛᵀ, and hence the fitted covariance, unchanged","It changes only the factor scores, not the loadings"],"a":2,"e":"ΛT(ΛT)ᵀ = ΛΛᵀ for any orthogonal T, so all rotations are equivalent in fit; varimax picks the most interpretable."},{"l":"Advanced","q":"EM for a Gaussian mixture is run with several random starts mainly because…","o":["The E step is random","It can converge to a local optimum of the likelihood","The M step has no closed form","The number of components is unknown"],"a":1,"e":"The mixture likelihood is multimodal; EM increases it monotonically but only to a local maximum, so different starts can end in different solutions."},{"l":"Advanced","q":"Why can’t the likelihood be used to choose the number of mixture components?","o":["It never decreases when components are added, so it needs a penalty such as BIC","It depends on the labels of the components","It is not defined for K > 2","It is the same for every K"],"a":0,"e":"More components always fit at least as well; BIC penalises the extra parameters and gives a usable choice."},{"l":"Advanced","q":"With p = 80 variables and n = 100 cases, which is the most sensible covariance estimate for Mahalanobis distance?","o":["The sample covariance with its smallest eigenvalue set to zero","The identity matrix","The sample covariance","A shrinkage estimate such as Ledoit–Wolf"],"a":3,"e":"The sample covariance is badly conditioned here (nearly singular). Shrinkage keeps it invertible and well conditioned with lower error."},{"l":"Expert","q":"A bank’s transaction screen computes Mahalanobis distances from a covariance fitted to all transactions, including a coherent group of suspicious ones. What can go wrong?","o":["The mean becomes undefined","The χ² threshold no longer applies for any data","The suspicious group inflates the covariance and hides itself (masking)","The distances become negative"],"a":2,"e":"A coherent cluster of outliers shifts the mean and inflates variance towards itself, reducing its own Mahalanobis distances; robust estimators avoid this."},{"l":"Expert","q":"How does the minimum covariance determinant estimator obtain a robust covariance?","o":["It weights every point equally but uses the median in place of the mean","It fits the mean and covariance to the subset of about half the data with the smallest covariance determinant, then rescales","It removes all points beyond 3 standard deviations and refits","It replaces each variable by its rank"],"a":1,"e":"MCD seeks the h-subset (h ≈ (n + p + 1)/2) whose covariance has the smallest determinant, so contamination up to nearly 50% has little effect."},{"l":"Expert","q":"In principal components regression, the outcome depends on a direction that has very low variance among the predictors. What happens if you keep only the components that explain 90% of the variance?","o":["The model misses most of the predictive signal","The model is unbiased and efficient","Test R² can only improve","The low-variance component is automatically included"],"a":0,"e":"Unsupervised truncation assumes the high-variance directions are the predictive ones. If they are not, the signal is discarded; choose k by cross-validation or use PLS or ridge."},{"l":"Expert","q":"You add many irrelevant noise variables to an anomaly detector based on a distance over all variables. What happens to its power to detect an anomaly that is unusual in only a few variables?","o":["It rises, because there is more information","It becomes exactly zero","It is unchanged if the covariance is known","It falls, because the noise in the other variables dilutes the signal"],"a":3,"e":"The distance sums noise from every variable, so the anomaly stands out less; power drops even when the covariance is known, and more so when it is estimated."},{"l":"Expert","q":"Two leading eigenvalues are 4.0 and 3.8 from 200 observations. Which statement is best supported?","o":["The first component is exactly twice as informative as the second","Both components are noise","The plane spanned by the two components is well determined, but each axis individually is unstable","Each component is individually well estimated"],"a":2,"e":"A small gap relative to the sampling error (about λ√(2/n)) leaves the rotation inside the plane poorly determined, while the subspace is stable."},{"l":"Expert","q":"Which statement about a factor called “credit appetite”, derived from a varimax solution, is correct?","o":["It is the first principal component","Its meaning belongs to the chosen rotation; another equally good rotation would label the loadings differently","It does not depend on the number of factors retained","It is uniquely determined by the data"],"a":1,"e":"Factor solutions are identified only up to rotation, so named factors are interpretations; scoring systems should freeze the rotation and its code."},{"l":"Expert","q":"A Gaussian mixture with BIC-selected K = 4 finds four “customer segments” in skewed spending data. What is the most careful reading?","o":["The components may only be approximating a skewed single distribution; validate the segments against behaviour and stability across samples","BIC cannot be used with skewed data at all","The four segments are real and stable","K = 4 proves there are four types of customer"],"a":0,"e":"Mixtures of normals can approximate non-normal shapes with several components, so a selected K does not by itself prove real subpopulations; check stability and external validity."}];
+(function(){const st=store.get('mv_quiz',{});
+ function render(){const box=$('quiz');box.innerHTML='';
+  QZ.forEach((q,i)=>{const d=document.createElement('div');d.className='q'+(st[i]!=null?' done':'');d.innerHTML=`<div class="qh">Q${i+1} · ${q.l}</div><div style="margin:4px 0 6px"><b>${q.q}</b></div>`;
+   q.o.forEach((o,j)=>{const b=document.createElement('button');b.className='opt';b.textContent=o;if(st[i]!=null){if(j===q.a)b.classList.add('good');else if(j===st[i])b.classList.add('bad')}b.onclick=()=>{if(st[i]!=null)return;st[i]=j;store.set('mv_quiz',st);render();meter()};d.appendChild(b)});
+   const e=document.createElement('div');e.className='ex';e.innerHTML=(st[i]===q.a?'✅ ':'❌ ')+q.e;d.appendChild(e);box.appendChild(d)});
+  const ans=Object.keys(st).length,ok=QZ.filter((q,i)=>st[i]===q.a).length;
+  $('qscore').innerHTML=stat('answered',ans+' / '+QZ.length,'in')+stat('correct',ok,'ok')+stat('score',ans?Math.round(100*ok/ans)+'%':'—',ok/Math.max(ans,1)>=.8?'ok':'warn')+stat('verdict',ans<QZ.length?'keep going':ok>=16?'multivariate master':ok>=13?'strong':'review ch. 1–11','')}
+ $('qreset').onclick=()=>{Object.keys(st).forEach(k=>delete st[k]);store.set('mv_quiz',st);render();meter()};
+ window.__qst=st;render();})();
+const CHK=["Explain eigenvectors and eigenvalues of a covariance matrix as the shape of a data cloud.","Compute and interpret Mahalanobis distance and use the χ² threshold.","Say why Euclidean distance misses unusual combinations in correlated data.","Run PCA on the correct matrix and choose the number of components by parallel analysis.","Explain why Kaiser’s rule and the variance-share rule are unreliable.","Distinguish PCA from factor analysis and explain the upward bias of PCA loadings.","Explain rotation indeterminacy and what varimax does.","Fit a Gaussian mixture by EM and choose K by BIC with several starts.","Explain why the sample covariance fails when p/n is large and use shrinkage.","Explain masking and use a robust covariance (MCD) for screening.","Describe the PCR trap and choose components by prediction.","Explain how irrelevant variables dilute distance-based anomaly detection.","Judge the stability of a component from the eigenvalue gap and the bootstrap.","Document the choices (matrix, number of components, rotation, covariance estimator) behind a multivariate model."];
+(function(){const st=store.get('mv_chk',{}),box=$('chk');CHK.forEach((t,i)=>{const l=document.createElement('label'),c=document.createElement('input');c.type='checkbox';c.checked=!!st[i];c.onchange=()=>{st[i]=c.checked;store.set('mv_chk',st);meter()};l.appendChild(c);const s=document.createElement('span');s.textContent=t;l.appendChild(s);box.appendChild(l)});window.__cst=st;})();
+function meter(){const q=window.__qst||{},c=window.__cst||{};const ok=QZ.filter((x,i)=>q[i]===x.a).length,ck=Object.values(c).filter(Boolean).length;const p=Math.round(100*(.6*ok/QZ.length+.4*ck/CHK.length));$('mtxt').textContent='Mastery: '+p+'%  (exam + checklist)';$('mbar').style.width=p+'%';store.set('mastery_mv',p)}
+meter();
+
+/* ---------- Navigation ---------- */
+(function(){const nav=$('nav');let html='';
+ document.querySelectorAll('main .part, main section.ch').forEach(el=>{if(el.classList.contains('part'))html+=`<div class="pt">${el.textContent}</div>`;else{const h=el.querySelector('h2'),num=h.querySelector('.num').textContent,t=Array.from(h.childNodes).filter(n=>n.nodeType===3).map(n=>n.textContent).join('').trim();html+=`<a href="#${el.id}" data-id="${el.id}">${num}. ${t}</a>`}});
+ nav.innerHTML=html;const links=nav.querySelectorAll('a'),io=new IntersectionObserver(es=>{es.forEach(e=>{if(e.isIntersecting)links.forEach(a=>a.classList.toggle('on',a.dataset.id===e.target.id))})},{rootMargin:'-20% 0px -70% 0px'});
+ document.querySelectorAll('section.ch').forEach(s=>io.observe(s));
+ $('menu').onclick=()=>$('side').classList.toggle('open');nav.addEventListener('click',e=>{if(e.target.tagName==='A')$('side').classList.remove('open')});
+ window.addEventListener('scroll',()=>{const h=document.documentElement;$('prog').style.width=(100*h.scrollTop/(h.scrollHeight-h.clientHeight))+'%'},{passive:true});})();
+</script>
+</body>
+</html>

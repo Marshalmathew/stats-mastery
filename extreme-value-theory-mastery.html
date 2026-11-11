@@ -1,0 +1,675 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Extreme Value Theory Mastery</title>
+<style>
+:root{--bg:#0b0e17;--panel:#121726;--panel2:#171d30;--line:#232a3d;--fg:#e8ebf5;--mu:#8a93ab;--a:#6ea8ff;--r:#ff6b81;--y:#ffd166;--g:#4ade80;--p:#c084fc;--t:#5eead4}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;background:var(--bg);color:var(--fg);font:16px/1.7 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+a{color:var(--a)}
+#prog{position:fixed;top:0;left:0;height:3px;background:linear-gradient(90deg,var(--a),var(--p),var(--r));width:0;z-index:50}
+.side{position:fixed;left:0;top:0;bottom:0;width:290px;background:#0e1220;border-right:1px solid var(--line);overflow:auto;padding:18px 14px 90px;z-index:40;transition:transform .25s}
+.side h1{font-size:15px;margin:0 0 2px}
+.side small{color:var(--mu)}
+.side .pt{margin:16px 0 4px;font-size:11px;text-transform:uppercase;letter-spacing:1.3px;color:var(--p)}
+.side a{display:block;color:var(--mu);text-decoration:none;padding:5px 9px;border-radius:7px;font-size:13.5px;line-height:1.35}
+.side a:hover{background:var(--panel);color:var(--fg)}
+.side a.on{background:var(--panel2);color:var(--fg);box-shadow:inset 3px 0 var(--a)}
+.side a.back{color:var(--t);padding-left:0;margin-bottom:6px}
+.meter{position:fixed;left:0;bottom:0;width:290px;background:#0e1220;border-top:1px solid var(--line);padding:10px 16px;z-index:41;font-size:12px;color:var(--mu)}
+.meter .bar{height:7px;background:var(--line);border-radius:6px;margin-top:5px;overflow:hidden}
+.meter .bar i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--g),var(--t));transition:width .4s}
+#menu{display:none;position:fixed;top:10px;left:10px;z-index:60;background:var(--panel2);color:var(--fg);border:1px solid var(--line);border-radius:9px;padding:7px 12px;font-size:14px;cursor:pointer}
+main{margin-left:290px;padding:0 34px 120px;max-width:1090px}
+.hero{padding:70px 0 30px}
+.hero h1{font-size:clamp(32px,5vw,56px);line-height:1.08;margin:0 0 14px;background:linear-gradient(100deg,#fff,var(--y) 40%,var(--r));-webkit-background-clip:text;background-clip:text;color:transparent}
+.hero p{font-size:19px;color:#c3c9dc;max-width:780px}
+.chips{display:flex;flex-wrap:wrap;gap:8px;margin:18px 0}
+.chip{border:1px solid var(--line);background:var(--panel);padding:5px 12px;border-radius:99px;font-size:13px;color:var(--mu)}
+.chip b{color:var(--fg)}
+.part{margin:90px 0 0;padding-top:22px;border-top:1px solid var(--line);font-size:12px;letter-spacing:2px;text-transform:uppercase;color:var(--p)}
+section.ch{padding-top:30px}
+h2{font-size:30px;line-height:1.2;margin:10px 0 8px;display:flex;gap:12px;align-items:center;flex-wrap:wrap}
+h2 .num{display:inline-grid;place-items:center;width:40px;height:40px;border-radius:12px;background:var(--panel2);border:1px solid var(--line);font-size:18px;color:var(--a)}
+.lvl{font-size:11px;font-weight:600;letter-spacing:.8px;text-transform:uppercase;padding:3px 9px;border-radius:99px;border:1px solid}
+.lvl.b{color:var(--g);border-color:#1f5c3a}.lvl.i{color:var(--a);border-color:#244a85}.lvl.a{color:var(--y);border-color:#6b5420}.lvl.e{color:var(--r);border-color:#7a2c3a}
+h3{font-size:19px;margin:30px 0 6px;color:#fff}
+p{margin:10px 0}li{margin:5px 0}
+code,.f{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace}
+code{background:var(--panel2);padding:1px 6px;border-radius:5px;font-size:.9em}
+.f{display:block;white-space:pre-wrap;background:#0e1322;border:1px solid var(--line);border-left:3px solid var(--a);padding:12px 16px;border-radius:9px;margin:14px 0;overflow-x:auto;font-size:15px;color:#dbe4ff;line-height:1.8}
+.co{border-radius:12px;padding:13px 17px;margin:16px 0;border:1px solid var(--line);background:var(--panel)}
+.co>b:first-child{display:block;margin-bottom:2px;font-size:12px;letter-spacing:1px;text-transform:uppercase}
+.co.def{border-left:4px solid var(--a)}.co.def>b:first-child{color:var(--a)}
+.co.warn{border-left:4px solid var(--r)}.co.warn>b:first-child{color:var(--r)}
+.co.tip{border-left:4px solid var(--g)}.co.tip>b:first-child{color:var(--g)}
+.co.key{border-left:4px solid var(--y);background:#171608}.co.key>b:first-child{color:var(--y)}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:18px 20px;margin:22px 0;box-shadow:0 8px 30px rgba(0,0,0,.25)}
+.card>h4{margin:0 0 3px;font-size:13px;letter-spacing:1.2px;text-transform:uppercase;color:var(--t)}
+.card>p.sub{margin:0 0 12px;color:var(--mu);font-size:14.5px}
+.ctl{display:flex;flex-wrap:wrap;gap:10px 22px;align-items:center;margin:8px 0 10px}
+.ctl label{display:flex;gap:8px;align-items:center;font-size:14px;color:#c3c9dc}
+.ctl output{min-width:38px;font-family:ui-monospace,monospace;color:var(--y);font-size:13px}
+input[type=range]{accent-color:var(--a);width:150px}
+input[type=checkbox]{accent-color:var(--a)}
+select,input[type=number],input[type=text]{background:#0e1322;color:var(--fg);border:1px solid var(--line);border-radius:8px;padding:6px 9px;font:inherit;font-size:14px}
+button{background:linear-gradient(180deg,#2c4a80,#233b68);color:#fff;border:1px solid #3a5a98;border-radius:9px;padding:7px 14px;font:inherit;font-size:14px;cursor:pointer}
+button:hover{filter:brightness(1.15)}
+button.alt{background:var(--panel2);border-color:var(--line);color:var(--fg)}
+canvas{width:100%;height:270px;display:block;background:#0e1322;border:1px solid var(--line);border-radius:10px;margin-top:6px}
+canvas.sm{height:210px}canvas.tl{height:330px}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(125px,1fr));gap:9px;margin:12px 0}
+.stat{background:#0e1322;border:1px solid var(--line);border-radius:10px;padding:8px 11px}
+.stat b{display:block;font-size:17px;font-family:ui-monospace,monospace}
+.stat span{font-size:11.5px;color:var(--mu);text-transform:uppercase;letter-spacing:.7px}
+.stat.hot b{color:var(--r)}.stat.ok b{color:var(--g)}.stat.warn b{color:var(--y)}.stat.in b{color:var(--a)}
+.read{margin:8px 0 0;padding:10px 14px;background:#0e1322;border:1px dashed #33406a;border-radius:10px;font-size:14.5px;color:#d3dbf3}
+table{border-collapse:collapse;width:100%;margin:12px 0;font-size:14px}
+th,td{border:1px solid var(--line);padding:7px 10px;text-align:left;vertical-align:top}
+th{background:var(--panel2);font-size:12px;text-transform:uppercase;letter-spacing:.6px;color:var(--mu)}
+td.n{font-family:ui-monospace,monospace;text-align:right}
+.tw{overflow-x:auto}
+.pill{display:inline-block;padding:1px 9px;border-radius:99px;font-size:12px;font-weight:600}
+.pill.r{background:#3a1520;color:var(--r)}.pill.g{background:#10321f;color:var(--g)}.pill.y{background:#3a2f0e;color:var(--y)}.pill.m{background:#202637;color:var(--mu)}
+details{background:var(--panel);border:1px solid var(--line);border-radius:11px;padding:9px 15px;margin:9px 0}
+details summary{cursor:pointer;font-weight:600}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.q{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:14px 18px;margin:14px 0}
+.q .qh{font-size:12px;letter-spacing:1px;text-transform:uppercase;color:var(--mu)}
+.q .opt{display:block;width:100%;text-align:left;margin:6px 0;background:#0e1322;border:1px solid var(--line);color:var(--fg);border-radius:9px;padding:9px 12px}
+.q .opt.good{border-color:var(--g);background:#0e2418}.q .opt.bad{border-color:var(--r);background:#2a1119}
+.q .ex{display:none;margin-top:8px;font-size:14.5px;color:#c3c9dc}
+.q.done .ex{display:block}
+.chk label{display:flex;gap:10px;align-items:flex-start;padding:6px 0;cursor:pointer}
+.chk input{margin-top:6px;accent-color:var(--g);width:17px;height:17px}
+.sigrow{display:grid;grid-template-columns:minmax(170px,2fr) 1fr 1fr auto;gap:8px 14px;align-items:center;padding:6px 0;border-top:1px dashed #1b2236}
+.sigrow:first-of-type{border-top:0}
+.sigrow label{display:flex;gap:6px;align-items:center;font-size:13.5px;color:#c3c9dc}
+@media(max-width:900px){
+ .side{transform:translateX(-100%)}.side.open{transform:none}.meter{display:none}
+ #menu{display:block}main{margin-left:0;padding:0 16px 100px}.two{grid-template-columns:1fr}.hero{padding-top:60px}
+ .sigrow{grid-template-columns:1fr 1fr}
+}
+</style>
+</head>
+<body>
+<div id="prog"></div>
+<button id="menu">☰ Contents</button>
+<nav class="side" id="side"><a class="back" href="index.html">← All courses</a><h1>Extreme Value Theory</h1><small>12 chapters · 11 labs · exam</small><div id="nav"></div></nav>
+<div class="meter"><div id="mtxt">Mastery: 0%</div><div class="bar"><i id="mbar"></i></div></div>
+
+<main>
+<header class="hero">
+ <h1>Extreme value theory: reasoning about the losses you have rarely or never seen.</h1>
+ <p>Bank capital, stress limits and fraud thresholds are set by <b>rare, large events</b>, and the statistics that serve the middle of the distribution (means, standard deviations, normal quantiles) serve them badly. This page covers the theory and practice of the tail: how to recognise heavy tails and why moments fail, the two classical approaches to extremes (block maxima with the GEV, and peaks over threshold with the generalised Pareto), return levels and the cost of extrapolation, the Hill estimator, clustering of extremes, VaR against expected shortfall, diversification when tails are heavy, uncertainty about the tail index, and the aggregation of operational losses. Every lab simulates from a known tail, so the estimators can be judged against the truth.</p>
+ <div class="chips"><span class="chip"><b>Part I</b> Heavy tails</span><span class="chip"><b>Part II</b> Fitting the tail</span><span class="chip"><b>Part III</b> Risk measures</span></div>
+ <div class="co tip"><b>How to use this</b>Sliders change the setting; heavier labs recompute when you release a slider or press the button. Prerequisites: core distributions (item 2), maximum likelihood (item 6) and the bootstrap (item 8).</div>
+</header>
+
+<div class="part">Part I · Heavy tails and their consequences</div>
+
+<section class="ch" id="c1">
+<h2><span class="num">1</span>Light tails and heavy tails <span class="lvl b">Beginner</span></h2>
+<p>The <b>tail</b> of a distribution is the probability of very large values, and how fast it falls decides what kind of data you have. <b>Thin tails</b> (normal, exponential) fall so quickly that extreme values are practically absent and no single observation matters in a large sample. <b>Heavy tails</b> follow a power law, P(X &gt; x) ≈ x<sup>−α</sup>: the <b>tail index</b> α measures how heavy (small α, heavier), a straight line on a log-log plot of the survival function. Between them sit the lognormal and similar distributions, which are not power laws but are heavy enough to behave like them over realistic ranges. In banking, losses from fraud, operational events, large exposures and market crashes are in the heavy-tailed family, and most standard statistics were designed for the thin-tailed one. A practical test is the <b>maximum-to-sum</b> ratio: if one observation accounts for a large share of the total, the tail is heavy.</p>
+<div class="f">Pareto: P(X &gt; x) = (x/xₘ)^(−α)  ·  log P(X &gt; x) = −α log x + const  ·  smaller α = heavier tail</div>
+<div class="card"><h4>Lab 1 · Four tails on a log-log plot</h4>
+ <p class="sub">Samples from four distributions. Left: the share of observations above each size, both axes logarithmic; the Pareto is a straight line. Right: the share of the total contributed by the single largest observation as the sample grows (average of 60 samples per point).</p>
+ <div class="ctl"><label>Pareto tail index α <input type="range" id="c1a" min="10" max="60" step="1" value="12"><output id="c1av"></output></label><label>observations in the left plot <input type="range" id="c1n" min="200" max="20000" step="200" value="5000"><output id="c1nv"></output></label><button id="c1go">New sample</button></div>
+ <div class="two"><canvas class="sm" id="c1cv"></canvas><canvas class="sm" id="c1cv2"></canvas></div><div class="stats" id="c1st"></div><div class="read" id="c1rd"></div></div>
+</section>
+
+<section class="ch" id="c2">
+<h2><span class="num">2</span>Moments and why averages fail <span class="lvl i">Intermediate</span></h2>
+<p>A distribution with tail index α has finite moments only of order below α. If α ≤ 1 the <b>mean is infinite</b>; if α ≤ 2 the <b>variance is infinite</b>; if α ≤ 4 the kurtosis (and so the standard error of the sample variance) is infinite. Everything built on those moments breaks down quietly: the law of large numbers needs a finite mean, the central limit theorem needs a finite variance (otherwise the sample mean converges to a stable law whose tails are themselves heavy), and correlation, regression and PCA need second moments. Sample versions still produce numbers (a sample always has a finite variance), but they do not converge, and they are driven by whichever huge values happened to be drawn. Before reporting a mean, standard deviation, correlation or confidence interval for loss data, estimate the tail index and check that the quantity exists.</p>
+<div class="f">E|X|ᵏ &lt; ∞ only if k &lt; α  ·  α ≤ 1: no mean  ·  α ≤ 2: no variance  ·  α ≤ 4: no kurtosis</div>
+<div class="card"><h4>Lab 2 · Five histories of the same average</h4>
+ <p class="sub">Five independent samples from a Pareto with the tail index you set. Left: the running sample mean. Right: the running sample standard deviation. Each is shown with its true value when that value exists.</p>
+ <div class="ctl"><label>tail index α <input type="range" id="c2a" min="10" max="60" step="1" value="15"><output id="c2av"></output></label><label>observations <input type="range" id="c2n" min="2000" max="50000" step="1000" value="20000"><output id="c2nv"></output></label><button id="c2go">New samples</button></div>
+ <div class="two"><canvas class="sm" id="c2cv"></canvas><canvas class="sm" id="c2cv2"></canvas></div><div class="stats" id="c2st"></div><div class="read" id="c2rd"></div></div>
+</section>
+
+<section class="ch" id="c3">
+<h2><span class="num">3</span>Block maxima and the extreme value distribution <span class="lvl i">Intermediate</span></h2>
+<p>The central limit theorem describes sums; <b>extreme value theory</b> describes maxima. The <b>Fisher–Tippett–Gnedenko theorem</b> says that if the maximum of a block of independent observations, suitably rescaled, converges to a non-degenerate limit, the limit is a <b>generalised extreme value</b> (GEV) distribution with three parameters: location μ, scale σ and shape ξ. The shape is the important one: ξ &gt; 0 (Fréchet) for heavy tails with tail index α = 1/ξ, ξ = 0 (Gumbel) for exponential-type tails such as the normal, and ξ &lt; 0 (Weibull) for a finite upper bound. The <b>block-maxima method</b> takes the maximum of each block (a year, a month), fits a GEV by maximum likelihood, and reads off return levels. It needs many blocks, it discards all but one value per block, and the convergence can be slow, so it is mostly used when only maxima are recorded.</p>
+<div class="f">G(x) = exp{ −[1 + ξ(x − μ)/σ]^(−1/ξ) }  ·  ξ &gt; 0 heavy tail (α = 1/ξ)  ·  ξ = 0 Gumbel  ·  ξ &lt; 0 bounded</div>
+<div class="card"><h4>Lab 3 · Fitting a GEV to block maxima</h4>
+ <p class="sub">Blocks of simulated observations; the maximum of each block is fitted by maximum likelihood. Left: the maxima and the fitted density. Right: the estimated shape over 40 repeats of the whole experiment against its true value.</p>
+ <div class="ctl"><label>distribution <select id="c3d"><option value="pareto">Pareto (ξ = 1/α)</option><option value="t">Student t (ξ = 1/ν)</option><option value="exp">exponential (ξ = 0)</option><option value="norm">half-normal (ξ = 0)</option></select></label><label>tail index α (or degrees of freedom ν) <input type="range" id="c3a" min="10" max="60" step="1" value="30"><output id="c3av"></output></label><label>observations per block <input type="range" id="c3b" min="10" max="1000" step="10" value="100"><output id="c3bv"></output></label><label>number of blocks <input type="range" id="c3m" min="20" max="500" step="10" value="100"><output id="c3mv"></output></label><button id="c3go">New data</button></div>
+ <div class="two"><canvas class="sm" id="c3cv"></canvas><canvas class="sm" id="c3cv2"></canvas></div><div class="stats" id="c3st"></div><div class="read" id="c3rd"></div></div>
+</section>
+
+<div class="part">Part II · Fitting the tail</div>
+
+<section class="ch" id="c4">
+<h2><span class="num">4</span>Peaks over threshold and the generalised Pareto <span class="lvl a">Advanced</span></h2>
+<p>Instead of one value per block, use every value above a high <b>threshold</b> u. The <b>Pickands–Balkema–de Haan theorem</b> says that for a wide class of distributions the <b>excesses</b> X − u over a high threshold follow a <b>generalised Pareto distribution</b> (GPD) with scale σ and shape ξ, the same ξ as in the GEV. This peaks-over-threshold (POT) method uses the data far more efficiently than block maxima. The choice of threshold is the main practical issue: too low and the GPD approximation is biased, too high and few points remain. Two diagnostics are standard. The <b>mean excess plot</b> E[X − u | X &gt; u] against u is roughly linear above a good threshold, with slope ξ/(1 − ξ). The <b>parameter stability plot</b> shows ξ̂ against the threshold and one looks for a region where it is flat within its error band. For a tail probability beyond the threshold, P(X &gt; x) ≈ (k/n)[1 + ξ(x − u)/σ]^(−1/ξ), with k exceedances out of n.</p>
+<div class="f">P(X − u &gt; y | X &gt; u) ≈ [1 + ξy/σ]^(−1/ξ)  ·  mean excess = (σ + ξu)/(1 − ξ)  ·  se(ξ̂) ≈ (1 + ξ̂)/√k</div>
+<div class="card"><h4>Lab 4 · Choosing the threshold</h4>
+ <p class="sub">Student t data with a known tail. Left: the mean excess plot with the chosen threshold. Right: the estimated shape against the threshold percentile, with its 95% band and the true value.</p>
+ <div class="ctl"><label>degrees of freedom (true tail index) <input type="range" id="c4v" min="2" max="10" step="1" value="4"><output id="c4vv"></output></label><label>observations <input type="range" id="c4n" min="1000" max="20000" step="500" value="5000"><output id="c4nv"></output></label><label>threshold percentile <input type="range" id="c4q" min="80" max="99" step="1" value="95"><output id="c4qv"></output></label><button id="c4go">New data</button></div>
+ <div class="two"><canvas class="sm" id="c4cv"></canvas><canvas class="sm" id="c4cv2"></canvas></div><div class="stats" id="c4st"></div><div class="read" id="c4rd"></div></div>
+</section>
+
+<section class="ch" id="c5">
+<h2><span class="num">5</span>Return levels and the cost of extrapolation <span class="lvl a">Advanced</span></h2>
+<p>The question a risk manager asks is rarely “what is ξ”, it is “what loss do we exceed once in 100 years”. The <b>return level</b> x_T is the value exceeded on average once every T years. Under POT it is x = u + (σ/ξ)[(n p/k)^(−ξ) − 1], where p is the per-observation exceedance probability 1/(T × observations per year). The GPD extrapolates beyond the data by assuming the tail has the fitted form. The alternatives fail in typical ways: a <b>normal fit</b> understates long-period losses badly for heavy-tailed data, and an <b>empirical quantile</b> cannot exceed the sample maximum. All estimates for periods beyond the length of the data are extrapolations, with uncertainty that grows with the ratio of the return period to the record length, and the interval, not the point estimate, is the honest result. Regulators’ 99.9% and 1-in-200-year standards sit exactly in this regime.</p>
+<div class="f">x_T = u + (σ/ξ) [ (n·p / k)^(−ξ) − 1 ],   p = 1 / (T × observations per year)</div>
+<div class="card"><h4>Lab 5 · Three estimates of a 1-in-T-year loss</h4>
+ <p class="sub">Daily data from a Student t; the true return level is exact. Left: median and 10–90% range of the ratio of each estimate to the truth against the return period. Right: the distribution of that ratio at the return period you pick.</p>
+ <div class="ctl"><label>degrees of freedom of the data <input type="range" id="c5v" min="2" max="8" step="1" value="3"><output id="c5vv"></output></label><label>years of data <input type="range" id="c5y" min="2" max="40" step="1" value="10"><output id="c5yv"></output></label><label>return period index (5 to 1000 years) <input type="range" id="c5i" min="0" max="7" step="1" value="4"><output id="c5iv"></output></label><button id="c5go">Re-simulate</button></div>
+ <div class="two"><canvas class="sm" id="c5cv"></canvas><canvas class="sm" id="c5cv2"></canvas></div><div class="stats" id="c5st"></div><div class="read" id="c5rd"></div></div>
+</section>
+
+<section class="ch" id="c6">
+<h2><span class="num">6</span>The Hill estimator and the tail index <span class="lvl a">Advanced</span></h2>
+<p>For Pareto-type tails the simplest estimator of the tail index is the <b>Hill estimator</b>, computed from the k largest observations: α̂ = [ (1/k) Σ ln(X₍ᵢ₎ / X₍ₖ₊₁₎) ]⁻¹. It is consistent and asymptotically normal, with relative standard deviation about 1/√k, but it assumes a pure power-law tail from the (k+1)-th largest value upward. Real distributions are only asymptotically Pareto, so the choice of k is a trade-off: small k means high variance, large k means bias from the non-Pareto body (a ‘slowly varying’ correction). The <b>Hill plot</b> of α̂ against k is the standard diagnostic and is notoriously hard to read. Reports should give a range of k, a bootstrap interval, and a comparison with the GPD-based estimate. Remember too that the Hill estimator is for positive tails and is badly affected by contamination from data errors in the largest values.</p>
+<div class="f">α̂ₖ = [ (1/k) Σᵢ₌₁ᵏ ln X₍ᵢ₎ − ln X₍ₖ₊₁₎ ]⁻¹  ·  relative sd ≈ 1/√k</div>
+<div class="card"><h4>Lab 6 · Bias and variance in the Hill plot</h4>
+ <p class="sub">Samples from a tail with a known index. Left: the Hill plot for one sample with the true value and the k you choose. Right: the distribution of the estimate at that k over 250 samples.</p>
+ <div class="ctl"><label>distribution <select id="c6d"><option value="pareto">exact Pareto</option><option value="burr">Burr (Pareto-like, slowly varying)</option><option value="t">Student t</option></select></label><label>true tail index α <input type="range" id="c6a" min="10" max="60" step="1" value="25"><output id="c6av"></output></label><label>observations <input type="range" id="c6n" min="200" max="10000" step="200" value="2000"><output id="c6nv"></output></label><label>number of largest values k <input type="range" id="c6k" min="10" max="1000" step="10" value="100"><output id="c6kv"></output></label><button id="c6go">New data</button></div>
+ <div class="two"><canvas class="sm" id="c6cv"></canvas><canvas class="sm" id="c6cv2"></canvas></div><div class="stats" id="c6st"></div><div class="read" id="c6rd"></div></div>
+</section>
+
+<section class="ch" id="c7">
+<h2><span class="num">7</span>Clustering of extremes <span class="lvl e">Expert</span></h2>
+<p>Extreme value theory for independent data counts exceedances as separate events. Real loss and return series have <b>serial dependence</b>: a volatile day is followed by volatile days, a fraud attack lasts hours, a credit event hits several accounts together. Extremes then occur in <b>clusters</b>. The <b>extremal index</b> θ ∈ (0, 1] summarises this: the mean cluster size is 1/θ, and θ = 1 means no clustering. The <b>runs estimator</b> splits exceedances into clusters (separated by more than r non-exceedances) and counts clusters per exceedance. Two practical consequences follow. First, return periods and risk measures should refer to clusters (events), not to single days. Second, applying the POT likelihood to all exceedances as if they were independent understates the uncertainty, because the effective sample is the number of clusters, so intervals are too narrow. The remedy is to <b>decluster</b> (fit to cluster maxima), or to use methods that account for the dependence.</p>
+<div class="card"><h4>Lab 7 · Extremes that come in bunches</h4>
+ <p class="sub">A heavy-tailed series with persistence φ (a max-autoregressive process, whose extremal index is exactly 1 − φ). Left: the series with exceedances coloured by cluster. Right: the estimated extremal index over 100 series.</p>
+ <div class="ctl"><label>persistence φ <input type="range" id="c7p" min="0" max="90" step="5" value="70"><output id="c7pv"></output></label><label>tail index α <input type="range" id="c7a" min="10" max="50" step="1" value="30"><output id="c7av"></output></label><label>days <input type="range" id="c7n" min="2000" max="20000" step="1000" value="5000"><output id="c7nv"></output></label><label>gap (days) that separates clusters <input type="range" id="c7r" min="1" max="20" step="1" value="5"><output id="c7rv"></output></label><button id="c7go">New series</button></div>
+ <div class="two"><canvas class="sm" id="c7cv"></canvas><canvas class="sm" id="c7cv2"></canvas></div><div class="stats" id="c7st"></div><div class="read" id="c7rd"></div></div>
+</section>
+
+<div class="part">Part III · Risk measures and aggregation</div>
+
+<section class="ch" id="c8">
+<h2><span class="num">8</span>Value at risk against expected shortfall <span class="lvl e">Expert</span></h2>
+<p><b>Value at risk</b> (VaR) at level q is the q-quantile of the loss; <b>expected shortfall</b> (ES) is the mean loss beyond it. ES sees how bad things are past the threshold and is coherent (sub-additive), which is why it replaced VaR for market risk in the Basel framework. For a Pareto tail ES = VaR × α/(α − 1), finite only for α &gt; 1. Estimating each from data is a different statistical problem: a quantile is estimated at a stable rate, but ES averages the few largest observations, whose variability is that of the tail itself (with infinite variance when α &lt; 2, the sample ES converges slowly and is typically biased downwards). Backtesting is also harder for ES, since it is not elicitable by itself. In practice, estimate ES from a fitted tail model (POT), not from the empirical average, report its uncertainty, and keep VaR for backtesting.</p>
+<div class="f">VaR_q = F⁻¹(q)  ·  ES_q = E[X | X &gt; VaR_q]  ·  Pareto: ES_q = VaR_q · α/(α − 1)</div>
+<div class="card"><h4>Lab 8 · Estimating two tail risk measures</h4>
+ <p class="sub">Pareto losses with the tail index you set; VaR and ES are estimated from the sample. Left: distribution of each estimate relative to the truth over 300 samples. Right: the relative error of each for different tail indices.</p>
+ <div class="ctl"><label>tail index α <input type="range" id="c8a" min="11" max="60" step="1" value="25"><output id="c8av"></output></label><label>observations <input type="range" id="c8n" min="250" max="10000" step="250" value="1000"><output id="c8nv"></output></label><label>confidence level <input type="range" id="c8q" min="900" max="999" step="1" value="990"><output id="c8qv"></output></label><button id="c8go">New samples</button></div>
+ <div class="two"><canvas class="sm" id="c8cv"></canvas><canvas class="sm" id="c8cv2"></canvas></div><div class="stats" id="c8st"></div><div class="read" id="c8rd"></div></div>
+</section>
+
+<section class="ch" id="c9">
+<h2><span class="num">9</span>Diversification with heavy tails <span class="lvl e">Expert</span></h2>
+<p>With thin tails, diversification works: the VaR of an equal-weight portfolio of m independent assets falls roughly as 1/√m. With heavy tails the sum is dominated by its largest term, a <b>one-big-jump</b> principle: P(S<sub>m</sub> &gt; x) ≈ m·P(X &gt; x). Then VaR of the sum scales like m^(1/α) and VaR of the average like m^(1/α − 1). For α &gt; 1 this still improves with m, though far more slowly than the thin-tailed 1/√m; for α &lt; 1 it grows, so the portfolio is <em>riskier</em> than a single asset by the VaR measure, which therefore fails subadditivity (ES does not, but is infinite for α ≤ 1). Real loss data may sit near these boundaries: operational risk events, cyber losses and some insurance lines have estimated tail indices around 1 to 2. Capital relief for diversification across such categories should be assessed with tail-aware models and not with correlations, and dependence in the extremes (copulas, item 32) matters even more.</p>
+<div class="card"><h4>Lab 9 · Does averaging reduce tail risk?</h4>
+ <p class="sub">Equal-weight averages of independent Pareto losses. Left: the VaR and ES of the average relative to one asset, with the asymptotic power law. Right: the VaR ratio for three tail indices (0.8, 1.5 and 3).</p>
+ <div class="ctl"><label>tail index α <input type="range" id="c9a" min="5" max="40" step="1" value="8"><output id="c9av"></output></label><label>confidence level <input type="range" id="c9q" min="900" max="999" step="1" value="990"><output id="c9qv"></output></label><button id="c9go">Re-simulate</button></div>
+ <div class="two"><canvas class="sm" id="c9cv"></canvas><canvas class="sm" id="c9cv2"></canvas></div><div class="stats" id="c9st"></div><div class="read" id="c9rd"></div></div>
+</section>
+
+<section class="ch" id="c10">
+<h2><span class="num">10</span>Uncertainty about the tail parameter <span class="lvl e">Expert</span></h2>
+<p>Tail parameters are estimated from few points by construction: a 99.9% VaR uses data in the top 0.1%. The sampling distribution of the shape estimate is skewed and its normal approximation is poor when k is small, so the ordinary Wald interval ξ̂ ± 1.96 se undercovers and can include implausible values. <b>Profile likelihood</b> intervals invert the likelihood-ratio test and follow the real shape of the likelihood; they behave better in small samples. Because return levels depend on ξ through a power, a modest interval for ξ becomes a large and asymmetric interval for a high quantile: the upper end can be many times the point estimate. The right response is to report intervals (profile or bootstrap), to run the analysis under a range of plausible tail indices (a scenario analysis), and to avoid statements such as “the 1-in-1000 loss is X” without that range. A Bayesian treatment with a sensible prior on ξ is a natural alternative, especially when external data can inform the prior.</p>
+<div class="card"><h4>Lab 10 · Wald against profile likelihood</h4>
+ <p class="sub">Excesses drawn exactly from a GPD with the shape you set. Left: the profile likelihood and its normal approximation for one sample. Right: coverage of 95% intervals over 80 samples.</p>
+ <div class="ctl"><label>exceedances k <input type="range" id="c10k" min="15" max="400" step="5" value="40"><output id="c10kv"></output></label><label>true shape ξ <input type="range" id="c10x" min="5" max="100" step="5" value="40"><output id="c10xv"></output></label><button id="c10go">New samples</button></div>
+ <div class="two"><canvas class="sm" id="c10cv"></canvas><canvas class="sm" id="c10cv2"></canvas></div><div class="stats" id="c10st"></div><div class="read" id="c10rd"></div></div>
+</section>
+
+<section class="ch" id="c11">
+<h2><span class="num">11</span>Operational losses: frequency and severity <span class="lvl e">Expert</span></h2>
+<p>Operational risk capital is classically computed by the <b>loss distribution approach</b>: a frequency distribution (Poisson) for the number of events per year and a heavy-tailed severity distribution for each loss; the annual aggregate loss is the compound sum, and capital is its 99.9% quantile. Closed forms are rare, so it is simulated, but the heavy tail means the capital number is dominated by whether, and how large, a few huge events occur. For subexponential severities the <b>single-loss approximation</b> says the aggregate quantile is about the severity quantile at 1 − (1 − q)/λ (plus the mean of the other losses), which gives a quick check on simulations and a clear view of what drives the result: the tail index. Pitfalls: severity data are collected above a reporting threshold, small samples give a wide interval for α, a few external events can dominate, and the simulated 99.9% figure has high Monte Carlo error unless many years are simulated. Reconcile every capital figure with the approximation and with sensitivity to α.</p>
+<div class="f">VaR_q(S) ≈ F⁻¹(1 − (1 − q)/λ) + (λ − 1)·E[X]  ·  the aggregate tail is the tail of the largest single loss</div>
+<div class="card"><h4>Lab 11 · Aggregating Pareto losses</h4>
+ <p class="sub">Events arrive as a Poisson process and have Pareto severities; the capital figure is the annual loss quantile. Left: the simulated annual loss distribution (log scale) with three estimates of the quantile. Right: the estimates side by side.</p>
+ <div class="ctl"><label>severity tail index α <input type="range" id="c11a" min="11" max="40" step="1" value="18"><output id="c11av"></output></label><label>events per year λ <input type="range" id="c11l" min="5" max="500" step="5" value="50"><output id="c11lv"></output></label><label>confidence level <input type="range" id="c11q" min="990" max="999" step="1" value="999"><output id="c11qv"></output></label><button id="c11go">Re-simulate</button></div>
+ <div class="two"><canvas class="sm" id="c11cv"></canvas><canvas class="sm" id="c11cv2"></canvas></div><div class="stats" id="c11st"></div><div class="read" id="c11rd"></div></div>
+</section>
+
+<section class="ch" id="c12">
+<h2><span class="num">12</span>Final exam, mastery checklist, cheat sheet <span class="lvl e">Expert</span></h2>
+<h3>Exam (18 questions — click an answer)</h3>
+<div id="quiz"></div>
+<div class="card"><h4>Score</h4><div class="stats" id="qscore"></div><button class="alt" id="qreset">Reset exam</button></div>
+<h3>Mastery checklist — tick when you can do it without notes</h3>
+<div class="card chk" id="chk"></div>
+<h3>Cheat sheet</h3>
+<div class="tw"><table>
+<tr><th>Idea</th><th>One line</th></tr>
+<tr><td>Heavy tail</td><td>P(X &gt; x) ≈ x^(−α): straight line on a log-log plot; the largest observation is a big share of the total</td></tr>
+<tr><td>Moments</td><td>Finite only below α: α ≤ 1 no mean, α ≤ 2 no variance; LLN, CLT, correlation and regression then fail</td></tr>
+<tr><td>Block maxima / GEV</td><td>Maxima converge to GEV(μ, σ, ξ); ξ &gt; 0 heavy (α = 1/ξ), ξ = 0 Gumbel, ξ &lt; 0 bounded; wasteful and slow to converge</td></tr>
+<tr><td>Peaks over threshold</td><td>Excesses over a high u follow GPD(σ, ξ); use mean excess and stability plots to choose u</td></tr>
+<tr><td>Return level</td><td>x_T = u + (σ/ξ)[(np/k)^(−ξ) − 1]; extrapolation beyond the record is a model, not data; give intervals</td></tr>
+<tr><td>Normal and empirical</td><td>A normal fit understates tail quantiles; an empirical quantile cannot exceed the sample maximum</td></tr>
+<tr><td>Hill estimator</td><td>α̂ = 1/mean of log-ratios of the k largest; relative sd 1/√k; bias grows with k; read the Hill plot</td></tr>
+<tr><td>Clustering</td><td>Extremal index θ = 1/mean cluster size; decluster and count events; raw exceedances understate uncertainty</td></tr>
+<tr><td>VaR and ES</td><td>ES = VaR · α/(α − 1) for Pareto, infinite if α ≤ 1; ES is harder to estimate and biased low from samples; use a tail model</td></tr>
+<tr><td>Diversification</td><td>One big jump: VaR of the average scales m^(1/α − 1); poor for α near 1, can reverse for α &lt; 1</td></tr>
+<tr><td>Parameter uncertainty</td><td>Wald intervals undercover for small k; use profile likelihood or bootstrap; return-level intervals are wide and skewed</td></tr>
+<tr><td>Operational losses</td><td>Compound Poisson-Pareto: VaR_q ≈ F⁻¹(1 − (1 − q)/λ) + (λ − 1)E[X]; the tail index drives capital</td></tr>
+</table></div>
+<div class="co tip"><b>Next in Stage 7</b>Item 32 covers copulas and dependence modelling: separating the margins from the dependence structure, tail dependence, and fitting and testing copulas.</div>
+</section>
+</main>
+<script>
+/*MATH*/
+function lgamma(x){const c=[76.18009172947146,-86.50532032941677,24.01409824083091,-1.231739572450155,0.1208650973866179e-2,-0.5395239384953e-5];let y=x,t=x+5.5;t-=(x+.5)*Math.log(t);let s=1.000000000190015;for(let j=0;j<6;j++)s+=c[j]/++y;return -t+Math.log(2.5066282746310005*s/x);}
+function gser(a,x){let ap=a,sum=1/a,del=sum;for(let n=0;n<1000;n++){ap++;del*=x/ap;sum+=del;if(Math.abs(del)<Math.abs(sum)*1e-15)break;}return sum*Math.exp(-x+a*Math.log(x)-lgamma(a));}
+function gcf(a,x){let b=x+1-a,c=1/1e-300,d=1/b,h=d;for(let i=1;i<1000;i++){const an=-i*(i-a);b+=2;d=an*d+b;if(Math.abs(d)<1e-300)d=1e-300;c=b+an/c;if(Math.abs(c)<1e-300)c=1e-300;d=1/d;const del=d*c;h*=del;if(Math.abs(del-1)<1e-15)break;}return Math.exp(-x+a*Math.log(x)-lgamma(a))*h;}
+function gammaQ(a,x){if(x<=0)return 1;return x<a+1?1-gser(a,x):gcf(a,x);}
+function betacf(a,b,x){const qab=a+b,qap=a+1,qam=a-1;let c=1,d=1-qab*x/qap;if(Math.abs(d)<1e-300)d=1e-300;d=1/d;let h=d;for(let m=1;m<=1000;m++){const m2=2*m;let aa=m*(b-m)*x/((qam+m2)*(a+m2));d=1+aa*d;if(Math.abs(d)<1e-300)d=1e-300;c=1+aa/c;if(Math.abs(c)<1e-300)c=1e-300;d=1/d;h*=d*c;aa=-(a+m)*(qab+m)*x/((a+m2)*(qap+m2));d=1+aa*d;if(Math.abs(d)<1e-300)d=1e-300;c=1+aa/c;if(Math.abs(c)<1e-300)c=1e-300;d=1/d;const del=d*c;h*=del;if(Math.abs(del-1)<1e-15)break;}return h;}
+function betai(a,b,x){if(x<=0)return 0;if(x>=1)return 1;const bt=Math.exp(lgamma(a+b)-lgamma(a)-lgamma(b)+a*Math.log(x)+b*Math.log(1-x));return x<(a+1)/(a+b+2)?bt*betacf(a,b,x)/a:1-bt*betacf(b,a,1-x)/b;}
+function normSf(z){const q=0.5*gammaQ(.5,z*z/2);return z>=0?q:1-q;}
+function normCdf(z){return normSf(-z);}
+function npdf(x){return Math.exp(-x*x/2)/2.5066282746310002;}
+function lbin(n,k){return lgamma(n+1)-lgamma(k+1)-lgamma(n-k+1);}
+function binom(n,k,p){return Math.exp(lbin(n,k)+k*Math.log(p)+(n-k)*Math.log(1-p));}
+function betapdf(x,a,b){return x<=0||x>=1?0:Math.exp(lgamma(a+b)-lgamma(a)-lgamma(b)+(a-1)*Math.log(x)+(b-1)*Math.log(1-x));}
+function betacdf(x,a,b){return betai(a,b,x);}
+function gampdf(x,a,r){return x<=0?0:Math.exp(a*Math.log(r)+(a-1)*Math.log(x)-r*x-lgamma(a));}
+function gamcdf(x,a,r){return x<=0?0:1-gammaQ(a,r*x);}
+function randn(){let u=0;while(!u)u=Math.random();return Math.sqrt(-2*Math.log(u))*Math.cos(2*Math.PI*Math.random());}
+function gammaS(a){if(a<1)return gammaS(a+1)*Math.pow(Math.random(),1/a);const d=a-1/3,c=1/Math.sqrt(9*d);for(;;){let x,v;do{x=randn();v=1+c*x}while(v<=0);v=v*v*v;const u=Math.random();if(Math.log(u)<.5*x*x+d-d*v+d*Math.log(v))return d*v;}}
+function betaS(a,b){const x=gammaS(a),y=gammaS(b);return x/(x+y);}
+function binS(n,p){let k=0;for(let i=0;i<n;i++)if(Math.random()<p)k++;return k;}
+function mean(a){let s=0;for(const v of a)s+=v;return s/a.length;}
+function qc(cdf,lo,hi,p,it){for(let i=0;i<(it||100);i++){const m=(lo+hi)/2;if(cdf(m)<p)lo=m;else hi=m}return(lo+hi)/2;}
+function qb(a,b,p){return qc(x=>betai(a,b,x),0,1,p,50);}
+function tcdf(x,v){const t=.5*betai(v/2,.5,v/(v+x*x));return x>0?1-t:t}
+function qn(p){return qc(normCdf,-9,9,p,70)}
+function pois(k,l){return Math.exp(-l+k*Math.log(l)-lgamma(k+1))}
+function binF(n,p){let k=0;for(;;){if(n<=0||p<=0)return k;if(p>=1)return k+n;if(n<=40){for(let i=0;i<n;i++)if(Math.random()<p)k++;return k}const a=1+(n>>1),bb=1+n-a,x=betaS(a,bb);if(x>=p){n=a-1;p=p/x}else{k+=a;n=bb-1;p=(p-x)/(1-x)}}}
+/*ENDMATH*/
+
+const $=id=>document.getElementById(id), val=id=>+$(id).value;
+const C={fg:'#e8ebf5',mu:'#8a93ab',gr:'#232a3d',a:'#6ea8ff',r:'#ff6b81',y:'#ffd166',g:'#4ade80',p:'#c084fc',t:'#5eead4'};
+const store={get(k,d){try{const v=JSON.parse(localStorage.getItem(k));return v==null?d:v}catch(e){return d}},set(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}};
+function stat(l,v,c){return `<div class="stat ${c||''}"><b>${v}</b><span>${l}</span></div>`}
+function f3(x){if(!isFinite(x))return String(x);const a=Math.abs(x);if(a!==0&&(a<1e-3||a>=1e6))return x.toExponential(2);return String(+x.toFixed(a<1?4:a<100?3:a<1000?2:0))}
+function pc(x){return f3(100*x)+'%'}
+const resizers=[];
+function reg(fn){fn();resizers.push(fn)}
+function on(ids,fn){ids.split(' ').forEach(i=>{const e=$(i);e.addEventListener('input',fn);e.addEventListener('change',fn)})}
+let rt;window.addEventListener('resize',()=>{clearTimeout(rt);rt=setTimeout(()=>resizers.forEach(f=>f()),150)});
+document.querySelectorAll('input[type=range]').forEach(i=>{const o=$(i.id+'v');if(!o)return;const f=()=>{o.textContent=i.value};i.addEventListener('input',f);f()});
+
+function nice(x){const e=Math.pow(10,Math.floor(Math.log10(x))),f=x/e;return (f<1.5?1:f<3?2:f<7?5:10)*e}
+function mk(cv,x0,x1,ymax,o){o=o||{};const y0=o.y0||0,dpr=window.devicePixelRatio||1,r=cv.getBoundingClientRect(),w=r.width||600,h=r.height||270;
+ cv.width=w*dpr;cv.height=h*dpr;const g=cv.getContext('2d');g.setTransform(dpr,0,0,dpr,0,0);g.clearRect(0,0,w,h);
+ const L=o.L||42,R=12,T=14,B=28,X=x=>L+(x-x0)/(x1-x0)*(w-L-R),Y=y=>h-B-(y-y0)/(ymax-y0)*(h-T-B);
+ g.font='11px system-ui';g.lineWidth=1;g.strokeStyle=C.gr;g.fillStyle=C.mu;
+ if(!o.noGrid){const sx=nice((x1-x0)/7);for(let x=Math.ceil(x0/sx-1e-9)*sx;!o.noX&&x<=x1+1e-9;x+=sx){g.beginPath();g.moveTo(X(x),T);g.lineTo(X(x),h-B);g.stroke();g.textAlign='center';g.fillText(String(+x.toFixed(6)),X(x),h-B+15)}
+ const sy=nice((ymax-y0)/4);for(let y=Math.ceil(y0/sy-1e-9)*sy;y<=ymax+1e-9;y+=sy){g.beginPath();g.moveTo(L,Y(y));g.lineTo(w-R,Y(y));g.stroke();g.textAlign='right';g.fillText(String(+y.toFixed(4)),L-5,Y(y)+3)}}
+ return{g,w,h,X,Y,L,R,T,B,
+  line(f,col,lw,a,b,n,dash){a=a==null?x0:a;b=b==null?x1:b;n=n||260;g.save();if(dash)g.setLineDash([5,4]);g.beginPath();g.strokeStyle=col;g.lineWidth=lw||2;let st=false;for(let i=0;i<=n;i++){const x=a+(b-a)*i/n,y=f(x);if(!isFinite(y)){st=false;continue}st?g.lineTo(X(x),Y(y)):g.moveTo(X(x),Y(y));st=true}g.stroke();g.restore()},
+  area(f,a,b,col,n){a=Math.max(a,x0);b=Math.min(b,x1);if(b<=a)return;n=n||200;g.beginPath();g.moveTo(X(a),Y(0));for(let i=0;i<=n;i++){const x=a+(b-a)*i/n;g.lineTo(X(x),Y(f(x)))}g.lineTo(X(b),Y(0));g.closePath();g.fillStyle=col;g.fill()},
+  vline(x,col,lab,dash){g.save();g.strokeStyle=col;g.lineWidth=1.6;if(dash)g.setLineDash([5,4]);g.beginPath();g.moveTo(X(x),T);g.lineTo(X(x),h-B);g.stroke();g.restore();if(lab){g.fillStyle=col;g.textAlign='center';g.fillText(lab,Math.min(Math.max(X(x),34),w-34),T+10)}},
+  hline(y,col,lab){g.save();g.strokeStyle=col;g.lineWidth=1.4;g.setLineDash([5,4]);g.beginPath();g.moveTo(L,Y(y));g.lineTo(w-R,Y(y));g.stroke();g.restore();if(lab){g.fillStyle=col;g.textAlign='right';g.fillText(lab,w-R-3,Y(y)-4)}},
+  text(s,x,y,col,al){g.fillStyle=col||C.fg;g.textAlign=al||'left';g.fillText(s,x,y)}};}
+
+/* ---------- shared helpers for this page ---------- */
+const D={
+ norm:{n:'Normal(0,1)',s:()=>randn(),mu:0,sd:1,sk:0},
+ unif:{n:'Uniform(0,1)',s:()=>Math.random(),mu:.5,sd:Math.sqrt(1/12),sk:0},
+ expo:{n:'Exponential(1)',s:()=>-Math.log(1-Math.random()),mu:1,sd:1,sk:2},
+ logn:{n:'Lognormal(0,1)',s:()=>Math.exp(randn()),mu:Math.exp(.5),sd:Math.sqrt((Math.E-1)*Math.E),sk:(Math.E+2)*Math.sqrt(Math.E-1),disc:0},
+ b05:{n:'Bernoulli(0.5)',s:()=>Math.random()<.5?1:0,mu:.5,sd:.5,sk:0,disc:1},
+ b05s:{n:'Bernoulli(0.05)',s:()=>Math.random()<.05?1:0,mu:.05,sd:Math.sqrt(.0475),sk:.9/Math.sqrt(.0475),disc:1},
+ bimo:{n:'Two humps',s:()=>(Math.random()<.5?-2:2)+.5*randn(),mu:0,sd:Math.sqrt(4.25),sk:0},
+ par5:{n:'Pareto(α=5)',s:()=>Math.pow(1-Math.random(),-.2),mu:1.25,sd:Math.sqrt(5/48),sk:6*Math.sqrt(.6)},
+ cauchy:{n:'Cauchy (no mean)',s:()=>Math.tan(Math.PI*(Math.random()-.5)),mu:NaN,sd:Infinity,sk:NaN}
+};
+function fillSel(id,keys,def){const e=$(id);e.innerHTML=keys.map(k=>`<option value="${k}">${D[k].n}</option>`).join('');e.value=def}
+const PAL=[C.a,C.r,C.y,C.g,C.p,C.t,'#ff9f43','#9aa4bf'];
+function tgrid(N,M){const T=[];let prev=0;for(let i=0;i<M;i++){let n=Math.round(Math.pow(10,Math.log10(N)*i/(M-1)));if(i===M-1)n=N;n=Math.max(prev+1,n);if(n>N)break;T.push(n);prev=n}if(T[T.length-1]!==N)T[T.length-1]=N;return T}
+function nlab(n){return n>=1e6?(n/1e6)+'M':n>=1000?(n/1000)+'k':String(n)}
+function customGrid(P,xt,yt){const g=P.g;g.save();g.strokeStyle=C.gr;g.fillStyle=C.mu;g.font='11px system-ui';g.lineWidth=1;
+ xt.forEach(([v,l])=>{g.beginPath();g.moveTo(P.X(v),P.T);g.lineTo(P.X(v),P.h-P.B);g.stroke();g.textAlign='center';g.fillText(l,P.X(v),P.h-P.B+15)});
+ yt.forEach(([v,l])=>{g.beginPath();g.moveTo(P.L,P.Y(v));g.lineTo(P.w-P.R,P.Y(v));g.stroke();g.textAlign='right';g.fillText(l,P.L-5,P.Y(v)+3)});g.restore()}
+function clip(P,fn){const g=P.g;g.save();g.beginPath();g.rect(P.L,P.T,P.w-P.L-P.R,P.h-P.T-P.B);g.clip();fn();g.restore()}
+function poly(P,pts,col,lw,dash){const g=P.g;g.save();if(dash)g.setLineDash([5,4]);g.strokeStyle=col;g.lineWidth=lw||2;g.beginPath();pts.forEach(([x,y],i)=>i?g.lineTo(P.X(x),P.Y(y)):g.moveTo(P.X(x),P.Y(y)));g.stroke();g.restore()}
+function dots(P,pts,col,r){const g=P.g;g.fillStyle=col;pts.forEach(([x,y])=>{g.beginPath();g.arc(P.X(x),P.Y(y),r||3,0,7);g.fill()})}
+function niceTicks(lo,hi,k){const st=nice((hi-lo)/(k||5)),a=[];for(let v=Math.ceil(lo/st-1e-9)*st;v<=hi+1e-9;v+=st)a.push([v,String(+v.toFixed(6))]);return a}
+function logTicks(lo,hi){const a=[];for(let e=Math.ceil(lo-1e-9);e<=hi+1e-9;e++)a.push([e,nlab(Math.pow(10,e))]);return a}
+function mom(a){const n=a.length;let m=0;for(const v of a)m+=v;m/=n;let v2=0,v3=0,v4=0;for(const v of a){const d=v-m;v2+=d*d;v3+=d*d*d;v4+=d*d*d*d}v2/=n;v3/=n;v4/=n;const sd=Math.sqrt(v2);return{n,m,sd,sk:sd>0?v3/(sd*sd*sd):0,ku:v2>0?v4/(v2*v2)-3:0}}
+function ksN(z){const a=Array.from(z).sort((x,y)=>x-y),n=a.length;let d=0;for(let i=0;i<n;i++){const F=normCdf(a[i]);d=Math.max(d,Math.abs((i+1)/n-F),Math.abs(i/n-F))}return d}
+/* histogram of data as density with optional overlay curves [{f,col,lw,dash}] */
+function hist(cv,data,lo,hi,bins,ov,col){const cnt=new Float64Array(bins),bw=(hi-lo)/bins;let n=0;for(const v of data){if(v<lo||v>=hi)continue;cnt[Math.floor((v-lo)/bw)]++;n++}
+ const N=data.length;let ym=0;for(let i=0;i<bins;i++){cnt[i]/=N*bw;ym=Math.max(ym,cnt[i])}
+ (ov||[]).forEach(o=>{for(let i=0;i<=80;i++)ym=Math.max(ym,o.f(lo+(hi-lo)*i/80)||0)});
+ const P=mk(cv,lo,hi,ym*1.12);
+ P.g.fillStyle=col||'rgba(110,168,255,.5)';for(let i=0;i<bins;i++){if(cnt[i]<=0)continue;const a=P.X(lo+i*bw),b=P.X(lo+(i+1)*bw);P.g.fillRect(a,P.Y(cnt[i]),Math.max(1,b-a-1),P.Y(0)-P.Y(cnt[i]))}
+ (ov||[]).forEach(o=>P.line(o.f,o.col,o.lw||2.4,lo,hi,200,o.dash));return P}
+const fmt=x=>f3(x);
+
+/* ---------- shared for this page ---------- */
+const POPS=['norm','unif','expo','logn','bimo','par5'];
+D.norm.med=0;D.norm.q90=1.2815516;D.unif.med=.5;D.unif.q90=.9;D.expo.med=Math.LN2;D.expo.q90=Math.log(10);D.logn.med=1;D.logn.q90=Math.exp(1.2815516);
+D.bimo.med=0;D.bimo.q90=qc(x=>.5*normCdf((x+2)/.5)+.5*normCdf((x-2)/.5),-10,10,.9,80);D.par5.med=Math.pow(2,.2);D.par5.q90=Math.pow(10,.2);
+const SF={mean:a=>mean(a),median:a=>{const b=Float64Array.from(a).sort(),n=b.length;return n%2?b[(n-1)/2]:(b[n/2-1]+b[n/2])/2},sd:a=>{const n=a.length,m=mean(a);let s=0;for(const v of a)s+=(v-m)*(v-m);return Math.sqrt(s/(n-1))},q90:a=>{const b=Float64Array.from(a).sort();return b[Math.round(.9*(b.length-1))]}};
+function truth(key,st){const d=D[key];return st==='mean'?d.mu:st==='median'?d.med:st==='sd'?d.sd:d.q90}
+const SNAME={mean:'sample mean',median:'sample median',sd:'sample SD',q90:'90th percentile'};
+const N10=[2,3,5,10,20,50,100,200,500,1000];
+function pct(a,p){const b=Float64Array.from(a).sort();return b[Math.min(b.length-1,Math.max(0,Math.floor(p*b.length)))]}
+function histLines(cv,arrs,cols,lo,hi,bins,vl){const bw=(hi-lo)/bins,dens=arrs.map(a=>{const c=new Float64Array(bins);for(const v of a){if(v<lo||v>=hi)continue;c[Math.floor((v-lo)/bw)]++}for(let i=0;i<bins;i++)c[i]/=a.length*bw;return c});let ym=0;dens.forEach(c=>c.forEach(v=>ym=Math.max(ym,v)));const P=mk(cv,lo,hi,ym*1.15||1);
+ dens.forEach((c,k)=>{const pts=[];for(let i=0;i<bins;i++){pts.push([lo+i*bw,c[i]]);pts.push([lo+(i+1)*bw,c[i]])}clip(P,()=>poly(P,pts,cols[k],2.2))});(vl||[]).forEach(v=>P.vline(v[0],v[1],v[2],v[3]));return P}
+function sdOf(a){return mom(a).sd}
+
+/* ---------- ML helpers ---------- */
+function digamma(x){let r=0;while(x<6){r-=1/x;x++}const f=1/(x*x);return r+Math.log(x)-.5/x-f*(1/12-f*(1/120-f/252))}
+function trigamma(x){let r=0;while(x<6){r+=1/(x*x);x++}const f=1/(x*x);return r+1/x+.5*f+f/x*(1/6-f*(1/30-f/42))}
+function poisS(l){if(l<=0)return 0;if(l<30){const L=Math.exp(-l);let k=0,p=1;do{k++;p*=Math.random()}while(p>L);return k-1}const m=Math.floor(.875*l),g=gammaS(m);return g<l?m+poisS(l-g):binF(m-1,l/g)}
+function llb(k,n,p){return(k?k*Math.log(p):0)+(n-k?(n-k)*Math.log(1-p):0)}
+function lrInt(k,n,cut){const ph=k/n,l0=llb(k,n,ph),g=p=>2*(l0-llb(k,n,p))-cut;let lo=0,hi=1;
+ if(k>0){let a=1e-12,b=ph;for(let i=0;i<70;i++){const m=(a+b)/2;if(g(m)>0)a=m;else b=m}lo=(a+b)/2}
+ if(k<n){let a=ph,b=1-1e-12;for(let i=0;i<70;i++){const m=(a+b)/2;if(g(m)>0)b=m;else a=m}hi=(a+b)/2}return[lo,hi]}
+function solveAlpha(s){if(!(s>1e-9))return 1e6;let a=(3-s+Math.sqrt((3-s)*(3-s)+24*s))/(12*s);for(let i=0;i<8;i++){const f=Math.log(a)-digamma(a)-s,fp=1/a-trigamma(a);let n=a-f/fp;if(!(n>0))n=a/2;a=n}return a}
+function normPdfAt(x,m,s){return Math.exp(-(x-m)*(x-m)/(2*s*s))/(s*2.5066282746)}
+/* ---------- Regression helpers ---------- */
+function idx(id,arr,ff){const e=$(id),o=$(id+'v'),f=()=>{o.textContent=ff?ff(arr[+e.value]):arr[+e.value]};e.addEventListener('input',f);f()}
+function scl(id,ff){const e=$(id),o=$(id+'v'),f=()=>{o.textContent=ff(+e.value)};e.addEventListener('input',f);f()}
+function pctTicks(a,b,st){const r=[];for(let v=a;v<=b+1e-9;v+=st)r.push([v,Math.round(v*100)+'%']);return r}
+const _tq={};function tq(v,p){const k=v+'_'+p;return _tq[k]||(_tq[k]=qc(x=>tcdf(x,v),0,500,p,80))}
+function simple(x,y){const n=x.length;let xm=0,ym=0;for(let i=0;i<n;i++){xm+=x[i];ym+=y[i]}xm/=n;ym/=n;let sxx=0,sxy=0,syy=0;for(let i=0;i<n;i++){const dx=x[i]-xm,dy=y[i]-ym;sxx+=dx*dx;sxy+=dx*dy;syy+=dy*dy}const b=sxy/sxx,a=ym-b*xm,res=new Float64Array(n);let sse=0;for(let i=0;i<n;i++){res[i]=y[i]-a-b*x[i];sse+=res[i]*res[i]}return{n,xm,ym,sxx,sxy,syy,b,a,res,sse,sst:syy,r2:1-sse/syy}}
+function gj(A,B){const p=A.length;const M=A.map((r,i)=>Array.from(r).concat(B?[B[i]]:[]));for(let c=0;c<p;c++){let m=c;for(let r=c+1;r<p;r++)if(Math.abs(M[r][c])>Math.abs(M[m][c]))m=r;[M[c],M[m]]=[M[m],M[c]];const d=M[c][c]||1e-12;for(let k=c;k<M[c].length;k++)M[c][k]/=d;for(let r=0;r<p;r++)if(r!==c){const f=M[r][c];if(f!==0)for(let k=c;k<M[c].length;k++)M[r][k]-=f*M[c][k]}}return M}
+function olsMulti(cols,y,needInv){const n=y.length,k=cols.length,p=k+1,A=[],B=new Float64Array(p);for(let i=0;i<p;i++)A.push(new Float64Array(p));
+ for(let r=0;r<n;r++){const row=[1];for(let j=0;j<k;j++)row.push(cols[j][r]);for(let i=0;i<p;i++){B[i]+=row[i]*y[r];for(let j=i;j<p;j++)A[i][j]+=row[i]*row[j]}}
+ for(let i=0;i<p;i++){for(let j=0;j<i;j++)A[i][j]=A[j][i];if(i>0)A[i][i]+=1e-9}
+ let beta,inv=null;if(needInv){const I=[];for(let i=0;i<p;i++){const e=new Float64Array(p);e[i]=1;I.push(e)}const M=gj(A,null);const aug=A.map((r,i)=>Array.from(r).concat(Array.from(I[i])));
+  const m=aug;for(let c=0;c<p;c++){let q=c;for(let r=c+1;r<p;r++)if(Math.abs(m[r][c])>Math.abs(m[q][c]))q=r;[m[c],m[q]]=[m[q],m[c]];const d=m[c][c]||1e-12;for(let kk=0;kk<2*p;kk++)m[c][kk]/=d;for(let r=0;r<p;r++)if(r!==c){const f=m[r][c];if(f!==0)for(let kk=0;kk<2*p;kk++)m[r][kk]-=f*m[c][kk]}}
+  inv=m.map(r=>r.slice(p));beta=inv.map(r=>{let s=0;for(let j=0;j<p;j++)s+=r[j]*B[j];return s})}
+ else{const M=gj(A,B);beta=M.map(r=>r[p])}
+ const res=new Float64Array(n);let sse=0;for(let r=0;r<n;r++){let f=beta[0];for(let j=0;j<k;j++)f+=beta[j+1]*cols[j][r];res[r]=y[r]-f;sse+=res[r]*res[r]}
+ const out={beta,res,sse,n,p,inv};if(inv){const s2=sse/(n-p);out.s2=s2;out.se=inv.map((r,i)=>Math.sqrt(s2*r[i]))}return out}
+function scatterAxes(cv,xs,ys,xlo,xhi,ylo,yhi,L){return mk(cv,xlo,xhi,yhi,{y0:ylo,L:L||44})}
+function range(a,pad){let lo=1e99,hi=-1e99;for(const v of a){if(v<lo)lo=v;if(v>hi)hi=v}const w=(hi-lo)||1;return[lo-(pad||.05)*w,hi+(pad||.05)*w]}
+
+
+function bars(P,groups,cols,yt){/* groups: array of arrays of values (0..1) */const g=P.g,G=groups.length,B=groups[0].length,W=(P.w-P.L-P.R)/G;groups.forEach((vals,gi)=>vals.forEach((v,bi)=>{const bw=W*.78/B,x=P.L+W*gi+W*.11+bw*bi;g.fillStyle=cols[bi];g.fillRect(x,P.Y(v),bw-2,P.Y(0)-P.Y(v));g.fillStyle=C.fg;g.textAlign='center';g.font='10px system-ui';g.fillText(Math.round(v*100)+'%',x+bw/2-1,P.Y(v)-3)}));g.font='11px system-ui'}
+function gridG(P,yt,labels){customGrid(P,[],yt);const G=labels.length,W=(P.w-P.L-P.R)/G;P.g.fillStyle=C.mu;P.g.textAlign='center';labels.forEach((l,i)=>P.g.fillText(l,P.L+W*(i+.5),P.h-P.B+15))}
+function legend(P,items,y){let x=P.L+8;items.forEach(([s,c])=>{P.text('■ '+s,x,y,c);x+=P.g.measureText('■ '+s).width+16})}
+
+/* ---------- GLM machinery ---------- */
+const LK={logit:{mu:e=>1/(1+Math.exp(-e)),d:e=>{const m=1/(1+Math.exp(-e));return m*(1-m)}},
+ probit:{mu:e=>normCdf(e),d:e=>npdf(e)},
+ cll:{mu:e=>1-Math.exp(-Math.exp(e)),d:e=>Math.exp(e-Math.exp(e))},
+ log:{mu:e=>Math.exp(e),d:e=>Math.exp(e)}};
+function minv(A){const p=A.length,m=A.map((r,i)=>{const row=Array.from(r);for(let j=0;j<p;j++)row.push(i===j?1:0);return row});
+ for(let c=0;c<p;c++){let q=c;for(let r=c+1;r<p;r++)if(Math.abs(m[r][c])>Math.abs(m[q][c]))q=r;[m[c],m[q]]=[m[q],m[c]];const d=m[c][c]||1e-12;for(let k=0;k<2*p;k++)m[c][k]/=d;for(let r=0;r<p;r++)if(r!==c){const f=m[r][c];if(f!==0)for(let k=0;k<2*p;k++)m[r][k]-=f*m[c][k]}}
+ return m.map(r=>r.slice(p))}
+function glm(cols,y,o){o=o||{};const n=y.length,k=cols.length,p=k+1,fam=o.fam||'binom',L=LK[o.link||(fam==='pois'?'log':'logit')],off=o.off,X=[new Float64Array(n).fill(1)].concat(cols),V=m=>fam==='pois'?m:m*(1-m);
+ let b=new Float64Array(p);if(o.init)b=Float64Array.from(o.init);else if(fam==='pois'){let m=0;for(const v of y)m+=v;b[0]=Math.log(Math.max(m/n,1e-3))-(off?mean(off):0)}
+ function ev(b){const eta=new Float64Array(n),mu=new Float64Array(n);let ll=0;for(let i=0;i<n;i++){let e=off?off[i]:0;for(let j=0;j<p;j++)e+=b[j]*X[j][i];e=Math.max(-30,Math.min(30,e));eta[i]=e;let m=L.mu(e);m=fam==='binom'?Math.min(1-1e-12,Math.max(1e-12,m)):Math.max(m,1e-12);mu[i]=m;ll+=fam==='pois'?y[i]*Math.log(m)-m-lgamma(y[i]+1):y[i]*Math.log(m)+(1-y[i])*Math.log(1-m)}return{eta,mu,ll}}
+ function info(c){const A=[];for(let i=0;i<p;i++)A.push(new Float64Array(p));const w=new Float64Array(n);for(let r=0;r<n;r++){const d=L.d(c.eta[r]),wi=d*d/V(c.mu[r]);w[r]=wi;for(let i=0;i<p;i++){const xi=X[i][r]*wi;for(let j=i;j<p;j++)A[i][j]+=xi*X[j][r]}}for(let i=0;i<p;i++)for(let j=0;j<i;j++)A[i][j]=A[j][i];return{A,w}}
+ let cur=ev(b),it=0,conv=false,maxit=o.maxit==null?40:o.maxit;
+ for(;it<maxit;it++){const{A,w}=info(cur),Ai=minv(A),g=new Float64Array(p);
+  for(let r=0;r<n;r++){const d=L.d(cur.eta[r]),v=V(cur.mu[r]);let s=(y[r]-cur.mu[r])*d/v;if(o.firth){let h=0;for(let i=0;i<p;i++)for(let j=0;j<p;j++)h+=X[i][r]*Ai[i][j]*X[j][r];h*=w[r];s+=h*(.5-cur.mu[r])}for(let i=0;i<p;i++)g[i]+=X[i][r]*s}
+  const st=new Float64Array(p);let mx=0;for(let i=0;i<p;i++){let s=0;for(let j=0;j<p;j++)s+=Ai[i][j]*g[j];st[i]=s}
+  if(o.firth){for(let i=0;i<p;i++){st[i]=Math.max(-1,Math.min(1,st[i]));mx=Math.max(mx,Math.abs(st[i]))}b=b.map((v,i)=>v+st[i]);cur=ev(b);if(mx<1e-8){conv=true;it++;break}}
+  else{let a=1,nb,nc;for(let h=0;h<25;h++){nb=b.map((v,i)=>v+a*st[i]);nc=ev(nb);if(nc.ll>=cur.ll-1e-10)break;a/=2}for(let i=0;i<p;i++)mx=Math.max(mx,Math.abs(a*st[i]));const dl=Math.abs(nc.ll-cur.ll);b=nb;cur=nc;if(mx<1e-8||dl<1e-11){conv=true;it++;break}}}
+ const{A,w}=info(cur),Ai=minv(A),se=Ai.map((r,i)=>Math.sqrt(Math.max(r[i],0)));let dev;
+ if(fam==='binom')dev=-2*cur.ll;else{dev=0;for(let i=0;i<n;i++){const yy=y[i],m=cur.mu[i];dev+=2*((yy>0?yy*Math.log(yy/m):0)-(yy-m))}}
+ return{beta:b,mu:cur.mu,eta:cur.eta,ll:cur.ll,dev,inv:Ai,se,iter:it,conv,X,w,p,n,A}}
+function auc(sc,y){const n=y.length,idx=Array.from({length:n},(_,i)=>i).sort((a,b)=>sc[a]-sc[b]);let rk=0,np=0,i=0;while(i<n){let j=i;while(j+1<n&&sc[idx[j+1]]===sc[idx[i]])j++;const r=(i+j)/2+1;for(let t=i;t<=j;t++)if(y[idx[t]]===1){rk+=r;np++}i=j+1}const nn=n-np;return np&&nn?(rk-np*(np+1)/2)/(np*nn):.5}
+function sepTest(x,y){let a1=1e99,b1=-1e99,a0=1e99,b0=-1e99,n1=0,n0=0;for(let i=0;i<x.length;i++){if(y[i]===1){n1++;a1=Math.min(a1,x[i]);b1=Math.max(b1,x[i])}else{n0++;a0=Math.min(a0,x[i]);b0=Math.max(b0,x[i])}}return n1>0&&n0>0&&(a1>b0||a0>b1)}
+const sig=e=>1/(1+Math.exp(-e));
+function lgt(p){return Math.log(p/(1-p))}
+function binaryData(n,a,b,sd){const x=new Float64Array(n),y=new Float64Array(n);for(let i=0;i<n;i++){x[i]=(sd||1)*randn();y[i]=Math.random()<sig(a+b*x[i])?1:0}return{x,y}}
+function heat(P,gx,gy,vals,x0,x1,y0,y1){const g=P.g,nx=gx,ny=gy;let mn=1e99,mx=-1e99;vals.forEach(v=>{if(isFinite(v)){mn=Math.min(mn,v);mx=Math.max(mx,v)}});mn=Math.max(mn,mx-30);for(let i=0;i<nx;i++)for(let j=0;j<ny;j++){const v=vals[i*ny+j],t=isFinite(v)?Math.max(0,Math.min(1,(v-mn)/(mx-mn))):0,tt=Math.pow(t,1.6),c=Math.round(40+190*tt);g.fillStyle=`rgb(${Math.round(20+60*tt)},${Math.round(30+100*tt)},${c})`;const xa=P.X(x0+(x1-x0)*i/nx),xb=P.X(x0+(x1-x0)*(i+1)/nx),ya=P.Y(y0+(y1-y0)*j/ny),yb=P.Y(y0+(y1-y0)*(j+1)/ny);g.fillRect(xa,Math.min(ya,yb),xb-xa+1,Math.abs(ya-yb)+1)}}
+/* ---------- confounding helpers ---------- */
+const U01=()=>1-Math.random();
+function sdv(a){const m=mean(a);let s=0;for(const v of a)s+=(v-m)*(v-m);return Math.sqrt(s/Math.max(a.length-1,1))}
+function barV(cv,vals,cols,labs,ymax,ff){const P=mk(cv,0,vals.length,ymax,{y0:0,noGrid:true,L:50});customGrid(P,[],niceTicks(0,ymax,5));const W=(P.w-P.L-P.R)/vals.length,g=P.g;vals.forEach((v,i)=>{const w=W*.5,x=P.L+W*i+W*.25;g.fillStyle=cols[i];g.fillRect(x,P.Y(v),w,P.Y(0)-P.Y(v));g.fillStyle=C.fg;g.textAlign='center';g.fillText((ff||fmt)(v),x+w/2,P.Y(v)-4);g.fillStyle=C.mu;g.fillText(labs[i],x+w/2,P.h-P.B+15)});return P}
+function barL(cv,vals,cols,labs,lo,hi,ff){const P=mk(cv,0,vals.length,hi,{y0:lo,noGrid:true,L:50});customGrid(P,[],niceTicks(lo,hi,5));const W=(P.w-P.L-P.R)/vals.length,g=P.g;vals.forEach((v,i)=>{const w=W*.5,x=P.L+W*i+W*.25;g.fillStyle=cols[i];g.fillRect(x,P.Y(v),w,P.Y(lo)-P.Y(v));g.fillStyle=C.fg;g.textAlign='center';g.fillText((ff||fmt)(v),x+w/2,P.Y(v)-4);g.fillStyle=C.mu;g.fillText(labs[i],x+w/2,P.h-P.B+15)});return P}
+const avg=a=>{let s=0;for(const v of a)s+=v;return s/a.length};
+function corr(a,b){const n=a.length;let ma=0,mb=0;for(let i=0;i<n;i++){ma+=a[i];mb+=b[i]}ma/=n;mb/=n;let sa=0,sb=0,sab=0;for(let i=0;i<n;i++){const x=a[i]-ma,y=b[i]-mb;sa+=x*x;sb+=y*y;sab+=x*y}return sab/Math.sqrt(sa*sb||1e-12)}
+const pcor=(x,y,z)=>corr(simple(z,x).res,simple(z,y).res);
+const lin=(n,f)=>{const a=new Float64Array(n);for(let i=0;i<n;i++)a[i]=f(i);return a};
+const rn=(n,s)=>lin(n,()=>(s||1)*randn());
+/* signed bars from zero */
+function barZ(cv,vals,cols,labs,lo,hi,ff){const P=mk(cv,0,vals.length,hi,{y0:lo,noGrid:true,L:50});customGrid(P,[],niceTicks(lo,hi,5));const W=(P.w-P.L-P.R)/vals.length,g=P.g;vals.forEach((v,i)=>{const w=W*.5,x=P.L+W*i+W*.25,y0=P.Y(0),y1=P.Y(v);g.fillStyle=cols[i];g.fillRect(x,Math.min(y0,y1),w,Math.abs(y0-y1));g.fillStyle=C.fg;g.textAlign='center';g.fillText((ff||fmt)(v),x+w/2,v>=0?y1-4:y1+13);g.fillStyle=C.mu;g.fillText(labs[i],x+w/2,P.h-P.B+15)});P.hline(0,C.mu,'');return P}
+/* grouped signed bars: groups[g][b] */
+function barG(cv,groups,cols,glabs,lo,hi,ff){const P=mk(cv,0,groups.length,hi,{y0:lo,noGrid:true,L:50});customGrid(P,[],niceTicks(lo,hi,5));const G=groups.length,B=groups[0].length,W=(P.w-P.L-P.R)/G,g=P.g;groups.forEach((vs,gi)=>vs.forEach((v,bi)=>{const bw=W*.7/B,x=P.L+W*gi+W*.15+bw*bi,y0=P.Y(0),y1=P.Y(v);g.fillStyle=cols[bi];g.fillRect(x,Math.min(y0,y1),bw-3,Math.abs(y0-y1));g.fillStyle=C.fg;g.textAlign='center';g.font='10px system-ui';g.fillText((ff||fmt)(v),x+bw/2-1,v>=0?y1-3:y1+11)}));g.font='11px system-ui';g.fillStyle=C.mu;g.textAlign='center';glabs.forEach((l,i)=>g.fillText(l,P.L+W*(i+.5),P.h-P.B+15));P.hline(0,C.mu,'');return P}
+/* scatter with optional per-point colours; draws at most nmax points */
+function scat(P,xs,ys,col,nmax,r,colf){const n=xs.length,st=Math.max(1,Math.floor(n/(nmax||500))),pts=[];clip(P,()=>{for(let i=0;i<n;i+=st){P.g.fillStyle=colf?colf(i):col;P.g.beginPath();P.g.arc(P.X(xs[i]),P.Y(ys[i]),r||2.2,0,7);P.g.fill()}})}
+function fitLine(P,s,col,lw,dash,x0,x1){clip(P,()=>P.line(x=>s.a+s.b*x,col,lw||2,x0,x1,2,dash))}
+const ordIdx=p=>Array.from({length:p.length},(_,i)=>i).sort((a,b)=>p[a]-p[b]);
+/* ---------- experiment helpers ---------- */
+const sgn=v=>(v>=0?'+':'−')+Math.abs(v).toFixed(3);
+const rng2=(a,b,pad)=>range(Array.from(a).concat(Array.from(b)),pad||.05);
+const pct0=x=>Math.round(x*100)+'%';
+const lgs=x=>1/(1+Math.exp(-x));
+function rgam(a){if(a<1)return rgam(a+1)*Math.pow(U01(),1/a);const d=a-1/3,c=1/Math.sqrt(9*d);for(;;){let x,v;do{x=randn();v=1+c*x}while(v<=0);v=v*v*v;const u=U01();if(u<1-.0331*x*x*x*x||Math.log(u)<.5*x*x+d*(1-v+Math.log(v)))return d*v}}
+const rbeta=(a,b)=>{const x=rgam(a),y=rgam(b);return x/(x+y)};
+function rbin(n,p){if(n<=30){let k=0;for(let i=0;i<n;i++)if(Math.random()<p)k++;return k}const m=n*p,s=Math.sqrt(n*p*(1-p)),k=Math.round(m+s*randn());return Math.max(0,Math.min(n,k))}
+function welch(a,b){const na=a.length,nb=b.length,ma=avg(a),mb=avg(b);let va=0,vb=0;for(const v of a)va+=(v-ma)*(v-ma);for(const v of b)vb+=(v-mb)*(v-mb);va/=na-1;vb/=nb-1;const se2=va/na+vb/nb,se=Math.sqrt(se2),t=(ma-mb)/se,df=se2*se2/((va/na)*(va/na)/(na-1)+(vb/nb)*(vb/nb)/(nb-1));return{d:ma-mb,se,t,df,p:2*(1-tcdf(Math.abs(t),df))}}
+const diffMeans=(Y,T)=>{let s1=0,s0=0,n1=0,n0=0;for(let i=0;i<Y.length;i++){if(T[i]){s1+=Y[i];n1++}else{s0+=Y[i];n0++}}return s1/n1-s0/n0};
+/* ---------- observational-causal helpers ---------- */
+function logitFit(cols,y){const n=y.length,k=cols.length,p=k+1,b=new Float64Array(p),lin_=i=>{let s=b[0];for(let j=0;j<k;j++)s+=b[j+1]*cols[j][i];return s};
+ for(let it=0;it<30;it++){const A=[];for(let i=0;i<p;i++)A.push(new Float64Array(p));const g=new Float64Array(p);
+  for(let i=0;i<n;i++){const m=lgs(lin_(i)),w=Math.max(m*(1-m),1e-8),r=y[i]-m,row=[1];for(let j=0;j<k;j++)row.push(cols[j][i]);for(let a=0;a<p;a++){g[a]+=row[a]*r;for(let c=a;c<p;c++)A[a][c]+=w*row[a]*row[c]}}
+  for(let a=0;a<p;a++){for(let c=0;c<a;c++)A[a][c]=A[c][a];A[a][a]+=1e-8}
+  const M=gj(A,Array.from(g)),d=M.map(r=>r[p]);let mx=0;for(let a=0;a<p;a++){b[a]+=d[a];mx=Math.max(mx,Math.abs(d[a]))}if(mx<1e-6)break}
+ const pr=new Float64Array(n),lo=new Float64Array(n);for(let i=0;i<n;i++){pr[i]=Math.min(.9999,Math.max(.0001,lgs(lin_(i))));lo[i]=Math.log(pr[i]/(1-pr[i]))}return{beta:b,pr,lo}}
+/* Hajek IPW estimate of the ATE; keep(i)=false drops a unit */
+function ipwATE(Y,T,e,keep){let a1=0,b1=0,a0=0,b0=0;for(let i=0;i<Y.length;i++){if(keep&&!keep(i))continue;if(T[i]){const w=1/e[i];a1+=w*Y[i];b1+=w}else{const w=1/(1-e[i]);a0+=w*Y[i];b0+=w}}return a1/b1-a0/b0}
+function smd(x,T,w){let m1=0,m0=0,w1=0,w0=0,n1=0,n0=0;for(let i=0;i<x.length;i++){const ww=w?w[i]:1;if(T[i]){m1+=ww*x[i];w1+=ww;n1++}else{m0+=ww*x[i];w0+=ww;n0++}}m1/=w1;m0/=w0;let v1=0,v0=0,a1=0,a0=0;for(let i=0;i<x.length;i++){if(T[i]){a1+=x[i]}else a0+=x[i]}a1/=n1;a0/=n0;for(let i=0;i<x.length;i++){if(T[i])v1+=(x[i]-a1)*(x[i]-a1);else v0+=(x[i]-a0)*(x[i]-a0)}v1/=n1-1;v0/=n0-1;return(m1-m0)/Math.sqrt((v1+v0)/2)}
+/* confounded data: X1,X2; treatment strength a; effect tau (function of x1 optional) */
+function confData(n,a,tauF,nl){const X1=rn(n),X2=rn(n),e=lin(n,i=>lgs(a*(.8*X1[i]+.5*X2[i]+(nl?.4*(X1[i]*X1[i]-1):0))/1.5)),T=new Uint8Array(n),Y=new Float64Array(n);
+ for(let i=0;i<n;i++){T[i]=Math.random()<e[i]?1:0;Y[i]=(T[i]?(tauF?tauF(X1[i]):1):0)+X1[i]+.8*X2[i]+(nl?.6*X1[i]*X1[i]:0)+randn()}return{X1,X2,T,Y,e}}
+/* one-to-one nearest-neighbour matching with replacement on a score; returns ATT and the matched control index per treated unit (-1 if dropped) */
+function matchATT(sc,T,Y,cal){const ctr=[];for(let i=0;i<T.length;i++)if(!T[i])ctr.push(i);ctr.sort((a,b)=>sc[a]-sc[b]);const cs=ctr.map(i=>sc[i]),m=new Int32Array(T.length).fill(-1);let sum=0,k=0;
+ for(let i=0;i<T.length;i++){if(!T[i])continue;let lo=0,hi=cs.length-1;while(lo<hi){const mid=(lo+hi)>>1;if(cs[mid]<sc[i])lo=mid+1;else hi=mid}let b=lo;if(lo>0&&Math.abs(cs[lo-1]-sc[i])<Math.abs(cs[lo]-sc[i]))b=lo-1;if(Math.abs(cs[b]-sc[i])>cal)continue;m[i]=ctr[b];sum+=Y[i]-Y[ctr[b]];k++}return{att:sum/k,m,kept:k}}
+const quant=(a,p)=>{const b=Float64Array.from(a).sort();return b[Math.min(b.length-1,Math.floor(p*b.length))]};
+/* ---------- MCMC helpers ---------- */
+function acfv(x,K){const n=x.length;let m=0;for(let i=0;i<n;i++)m+=x[i];m/=n;const c=new Float64Array(K+1);for(let k=0;k<=K;k++){let s=0;for(let i=0;i+k<n;i++)s+=(x[i]-m)*(x[i+k]-m);c[k]=s/n}const r=new Float64Array(K+1);for(let k=0;k<=K;k++)r[k]=c[0]>0?c[k]/c[0]:0;return r}
+/* effective sample size with Geyer's initial positive sequence */
+function essOf(x,K){K=Math.min(K||150,x.length-2);if(K<2)return x.length;const r=acfv(x,K);let sum=0;for(let t=0;2*t+1<=K;t++){const g=r[2*t]+r[2*t+1];if(g<=0)break;sum+=g}const tau=Math.max(2*sum-1,.2);return x.length/tau}
+/* random-walk Metropolis for a 1-d log density */
+function mhRW(logp,x0,step,n){const x=new Float64Array(n);let c=x0,lc=logp(c),acc=0;for(let i=0;i<n;i++){const y=c+step*randn(),ly=logp(y);if(Math.log(Math.random())<ly-lc){c=y;lc=ly;acc++}x[i]=c}return{x,acc:acc/n}}
+/* split R-hat of an array of chains (each an array of equal length) */
+function rhatOf(ch){const seq=[];ch.forEach(c=>{const h=Math.floor(c.length/2);if(h<2)return;seq.push(c.slice(0,h));seq.push(c.slice(h,2*h))});const m=seq.length,n=seq[0]?seq[0].length:0;if(m<2||n<2)return NaN;const mu=seq.map(s=>{let a=0;for(const v of s)a+=v;return a/n}),va=seq.map((s,i)=>{let a=0;for(const v of s)a+=(v-mu[i])*(v-mu[i]);return a/(n-1)});const W=va.reduce((a,b)=>a+b,0)/m,gm=mu.reduce((a,b)=>a+b,0)/m;let B=0;for(const v of mu)B+=(v-gm)*(v-gm);B*=n/(m-1);const vp=(n-1)/n*W+B/n;return Math.sqrt(vp/Math.max(W,1e-12))}
+/* grid posterior from an unnormalised log density */
+function gridPost(logf,lo,hi,N){N=N||900;const x=new Float64Array(N),f=new Float64Array(N);let mx=-1e300;for(let i=0;i<N;i++){x[i]=lo+(hi-lo)*i/(N-1);f[i]=logf(x[i]);if(f[i]>mx)mx=f[i]}let Z=0;const h=(hi-lo)/(N-1);for(let i=0;i<N;i++){f[i]=Math.exp(f[i]-mx);Z+=f[i]*h}const pdf=new Float64Array(N),cdf=new Float64Array(N);let c=0,m1=0,m2=0;for(let i=0;i<N;i++){pdf[i]=f[i]/Z;c+=pdf[i]*h;cdf[i]=c;m1+=x[i]*pdf[i]*h;m2+=x[i]*x[i]*pdf[i]*h}
+ const q=u=>{let a=0,b=N-1;while(b-a>1){const m=(a+b)>>1;if(cdf[m]<u)a=m;else b=m}const d=cdf[b]-cdf[a];return x[a]+(d>0?(u-cdf[a])/d:0)*(x[b]-x[a])};
+ const pd=v=>{if(v<=lo||v>=hi)return 0;const t=(v-lo)/(hi-lo)*(N-1),i=Math.floor(t);return pdf[i]+(t-i)*(pdf[Math.min(i+1,N-1)]-pdf[i])};
+ const cd=v=>{if(v<=lo)return 0;if(v>=hi)return 1;const t=(v-lo)/(hi-lo)*(N-1),i=Math.floor(t);return cdf[i]+(t-i)*(cdf[Math.min(i+1,N-1)]-cdf[i])};
+ return{x,pdf,cdf,mean:m1,sd:Math.sqrt(Math.max(m2-m1*m1,0)),q,pd,cd}}
+const tpdf=(x,v)=>Math.exp(lgamma((v+1)/2)-lgamma(v/2))/Math.sqrt(v*Math.PI)*Math.pow(1+x*x/v,-(v+1)/2);
+const rtv=v=>randn()/Math.sqrt(2*gammaS(v/2)/v);
+const expit=x=>1/(1+Math.exp(-x)),logit=p=>Math.log(p/(1-p));
+function invMat(A){const n=A.length,M=A.map((r,i)=>{const a=Array.from(r);for(let j=0;j<n;j++)a.push(i===j?1:0);return a});for(let c=0;c<n;c++){let m=c;for(let r=c+1;r<n;r++)if(Math.abs(M[r][c])>Math.abs(M[m][c]))m=r;[M[c],M[m]]=[M[m],M[c]];const d=M[c][c]||1e-12;for(let k=0;k<2*n;k++)M[c][k]/=d;for(let r=0;r<n;r++)if(r!==c){const f=M[r][c];if(f!==0)for(let k=0;k<2*n;k++)M[r][k]-=f*M[c][k]}}return M.map(r=>r.slice(n))}
+function cholL(S){const n=S.length,L=S.map(()=>new Float64Array(n));for(let i=0;i<n;i++)for(let j=0;j<=i;j++){let s=S[i][j];for(let k=0;k<j;k++)s-=L[i][k]*L[j][k];L[i][j]=i===j?Math.sqrt(Math.max(s,1e-12)):s/L[j][j]}return L}
+function logdetM(A){const n=A.length,M=A.map(r=>Array.from(r));let ld=0;for(let c=0;c<n;c++){let m=c;for(let r=c+1;r<n;r++)if(Math.abs(M[r][c])>Math.abs(M[m][c]))m=r;[M[c],M[m]]=[M[m],M[c]];ld+=Math.log(Math.abs(M[c][c])||1e-300);for(let r=c+1;r<n;r++){const f=M[r][c]/M[c][c];for(let k=c;k<n;k++)M[r][k]-=f*M[c][k]}}return ld}
+/* Gauss-Hermite nodes (21 points, probabilists' weights summing to 1) from the Golub-Welsch idea: computed numerically on a fine normal grid instead */
+const GH=(()=>{const z=[],w=[];let s=0;for(let i=0;i<41;i++){const v=-4+8*i/40,p=Math.exp(-v*v/2);z.push(v);w.push(p);s+=p}return{z,w:w.map(v=>v/s)}})();
+/* log-log tick helper for axes holding log10 values */
+const lg10=v=>Math.log10(Math.max(v,1e-12));
+const pc1=x=>(100*x).toFixed(1)+'%';
+/* density curves with optional fill: curves=[{f,col,fill,dash,lw}] ; returns P */
+function dcurves(cv,x0,x1,curves,vl,ref){let ym=0,yr=0;curves.forEach((c,k)=>{for(let i=0;i<=300;i++){const v=c.f(x0+(x1-x0)*i/300);if(isFinite(v)){ym=Math.max(ym,v);if(k===(ref==null?curves.length-1:ref))yr=Math.max(yr,v)}}});
+ const top=Math.min(ym,yr*2.5)||ym||1,P=mk(cv,x0,x1,top*1.12);clip(P,()=>curves.forEach(c=>{if(c.fill)P.area(c.f,x0,x1,c.fill,240);P.line(c.f,c.col,c.lw||2.4,x0,x1,300,c.dash)}));(vl||[]).forEach(v=>P.vline(v[0],v[1],null,v[3]));return P}
+/* solve (A + lam I) beta = b and return diag of the inverse (A symmetric p x p) */
+function ridgeSolve(A,b,lam){const p=b.length,M=[];for(let i=0;i<p;i++){const r=new Float64Array(2*p+1);for(let j=0;j<p;j++)r[j]=A[i][j]+(i===j?lam:0);r[p+i]=1;r[2*p]=b[i];M.push(r)}
+ for(let c=0;c<p;c++){let m=c;for(let r=c+1;r<p;r++)if(Math.abs(M[r][c])>Math.abs(M[m][c]))m=r;[M[c],M[m]]=[M[m],M[c]];const d=M[c][c]||1e-12;for(let k=0;k<=2*p;k++)M[c][k]/=d;for(let r=0;r<p;r++)if(r!==c){const f=M[r][c];if(f!==0)for(let k=0;k<=2*p;k++)M[r][k]-=f*M[c][k]}}
+ return{beta:M.map(r=>r[2*p]),dinv:M.map((r,i)=>r[p+i])}}
+/* ---------- Extreme value helpers ---------- */
+const evU=()=>{let u=Math.random();while(u<=1e-300)u=Math.random();return u};
+const evPareto=a=>Math.pow(evU(),-1/a);
+const evT=v=>randn()/Math.sqrt(2*gammaS(v/2)/v);
+const evExp=()=>-Math.log(evU());
+const evLogN=s=>Math.exp((s||1)*randn());
+const evFrechet=()=>-1/Math.log(evU());
+const evQt=(p,v)=>{let lo=-1e4,hi=1e4;for(let i=0;i<90;i++){const m=(lo+hi)/2;if(tcdf(m,v)<p)lo=m;else hi=m}return(lo+hi)/2};
+/* Nelder-Mead minimiser */
+function evNM(f,x0,st,it){const n=x0.length;let S=[x0.slice()];for(let i=0;i<n;i++){const v=x0.slice();v[i]+=st;S.push(v)}let F=S.map(f);for(let k=0;k<(it||400);k++){const o=F.map((_,i)=>i).sort((a,b)=>F[a]-F[b]);S=o.map(i=>S[i]);F=o.map(i=>F[i]);if(Math.abs(F[n]-F[0])<1e-10)break;const c=Array(n).fill(0);for(let i=0;i<n;i++)for(let j=0;j<n;j++)c[j]+=S[i][j]/n;const ref=c.map((v,j)=>v+(v-S[n][j])),fr=f(ref);if(fr<F[0]){const ex=c.map((v,j)=>v+2*(v-S[n][j])),fe=f(ex);if(fe<fr){S[n]=ex;F[n]=fe}else{S[n]=ref;F[n]=fr}}else if(fr<F[n-1]){S[n]=ref;F[n]=fr}else{const co=c.map((v,j)=>v+.5*(S[n][j]-v)),fc=f(co);if(fc<F[n]){S[n]=co;F[n]=fc}else{for(let i=1;i<=n;i++){S[i]=S[i].map((v,j)=>S[0][j]+.5*(v-S[0][j]));F[i]=f(S[i])}}}}const o=F.map((_,i)=>i).sort((a,b)=>F[a]-F[b]);return{x:S[o[0]],f:F[o[0]]}}
+/* generalised Pareto: negative log-likelihood of excesses y with scale exp(ls) and shape xi */
+function evGpdNll(y,ls,xi){const n=y.length,s=Math.exp(ls);if(xi<-.45||xi>3)return 1e12;let a=n*ls;if(Math.abs(xi)<1e-7){for(let i=0;i<n;i++)a+=y[i]/s;return a}let b=0;for(let i=0;i<n;i++){const t=1+xi*y[i]/s;if(t<=0)return 1e12;b+=Math.log(t)}return a+(1+1/xi)*b}
+function evGpd(y){let m=0;for(const v of y)m+=v;m/=y.length;const r=evNM(p=>evGpdNll(y,p[0],p[1]),[Math.log(m),.1],.3,300);return{sig:Math.exp(r.x[0]),xi:r.x[1],nll:r.f}}
+/* GPD sample (sigma = 1) */
+const evGpdS=xi=>{const u=evU();return Math.abs(xi)<1e-8?-Math.log(u):(Math.pow(u,-xi)-1)/xi};
+/* generalised extreme value */
+function evGevNll(m,mu,ls,xi){const n=m.length,s=Math.exp(ls);if(xi<-.5||xi>2)return 1e12;let a=n*ls;if(Math.abs(xi)<1e-7){for(let i=0;i<n;i++){const z=(m[i]-mu)/s;a+=z+Math.exp(-z)}return a}let b=0,c=0;for(let i=0;i<n;i++){const t=1+xi*(m[i]-mu)/s;if(t<=0)return 1e12;b+=Math.log(t);c+=Math.pow(t,-1/xi)}return a+(1+1/xi)*b+c}
+function evGev(m){const n=m.length,mean=m.reduce((a,b)=>a+b,0)/n,sd=Math.sqrt(m.reduce((a,b)=>a+(b-mean)*(b-mean),0)/n)||1,s0=sd*Math.sqrt(6)/Math.PI,r=evNM(p=>evGevNll(m,p[0],p[1],p[2]),[mean-.5772*s0,Math.log(s0),.1],.3,500);return{mu:r.x[0],sig:Math.exp(r.x[1]),xi:r.x[2],nll:r.f}}
+function evGevPdf(x,mu,s,xi){const z=(x-mu)/s;if(Math.abs(xi)<1e-7)return Math.exp(-z-Math.exp(-z))/s;const t=1+xi*z;if(t<=0)return 0;const w=Math.pow(t,-1/xi);return Math.pow(t,-1/xi-1)*Math.exp(-w)/s}
+/* Hill estimator of the tail index from the k largest of a sorted-descending array */
+function evHill(desc,k){let s=0;const x0=desc[k];for(let i=0;i<k;i++)s+=Math.log(desc[i]/x0);return k/s}
+const evDesc=a=>Float64Array.from(a).sort().reverse();
+/* quantile of a sample (ascending array) */
+const evQ=(asc,p)=>asc[Math.min(asc.length-1,Math.max(0,Math.floor(p*asc.length)))];
+/* ---------- Ch1 light and heavy tails ---------- */
+(function(){scl('c1a',v=>fmt(v/10));scl('c1n',v=>v);
+ const gen={norm:()=>Math.abs(randn()),expo:evExp,logn:()=>evLogN(1)};
+ function surv(arr){const d=evDesc(arr),n=d.length,pts=[];let last=0;for(let i=1;i<=n;i*=1.12){const r=Math.floor(i);if(r===last)continue;last=r;pts.push([Math.log10(d[r-1]),Math.log10(r/n)])}return pts}
+ function run(){const a=val('c1a')/10,n=val('c1n'),mk1=f=>Array.from({length:n},f),S=[['half-normal',C.mu,surv(mk1(gen.norm))],['exponential',C.g,surv(mk1(gen.expo))],['lognormal',C.y,surv(mk1(gen.logn))],['Pareto α = '+fmt(a),C.r,surv(mk1(()=>evPareto(a)))]];
+  const xs=S.flatMap(s=>s[2].map(p=>p[0])),x1=Math.ceil(Math.max(...xs)+.3),yl=Math.log10(1/n)-.3,P=mk($('c1cv'),-1,x1,.15,{y0:yl,noGrid:true,L:52});
+  customGrid(P,[-1,0,1,2,3,4,5,6].filter(v=>v<=x1).map(v=>[v,v<3?String(Math.pow(10,v)):v===3?'1k':v===4?'10k':v===5?'100k':'1m']),[0,-1,-2,-3,-4,-5].filter(v=>v>=yl).map(v=>[v,Math.pow(10,v+2)>=1?(Math.pow(10,v+2)+'%'):((Math.pow(10,v+2)).toFixed(-v-2)+'%')]));
+  S.forEach(s=>poly(P,s[2],s[1],2.4));legend(P,S.map(s=>[s[0],s[1]]),P.T+12);P.text('loss size (log scale) →',P.w-P.R-4,P.h-P.B-6,C.mu,'right');P.text('share of observations above',P.L+6,P.T+28,C.mu);
+  const NS=[10,30,100,300,1000,3000,10000],R=60,fs=[[C.mu,gen.norm],[C.g,gen.expo],[C.y,gen.logn],[C.r,()=>evPareto(a)]],res=fs.map(([c,f])=>NS.map(m=>{let t=0;for(let r=0;r<R;r++){let s=0,mx=0;for(let i=0;i<m;i++){const v=f();s+=v;if(v>mx)mx=v}t+=mx/s}return t/R})),Q=mk($('c1cv2'),0,NS.length-1,1.05,{noGrid:true,L:44});
+  customGrid(Q,NS.map((m,i)=>[i,String(m)]),niceTicks(0,1,5));fs.forEach(([c],k)=>{poly(Q,NS.map((m,i)=>[i,res[k][i]]),c,2.6);dots(Q,NS.map((m,i)=>[i,res[k][i]]),c,3.4)});legend(Q,S.map(s=>[s[0],s[1]]),Q.T+12);Q.text('sample size n →',Q.w-Q.R-4,Q.h-Q.B-6,C.mu,'right');Q.text('largest observation ÷ total',Q.L+6,Q.T+28,C.mu);
+  const last=NS.length-1;
+  $('c1st').innerHTML=stat('largest ÷ total at n = 10,000: normal · lognormal · Pareto',pc1(res[0][last])+' · '+pc1(res[2][last])+' · '+pc1(res[3][last]),res[3][last]>.1?'hot':'in')+stat('Pareto tail index α',fmt(a),'')+stat('Pareto: odds an observation is 10× the typical size',pc1(Math.pow(10,-a)),'')+stat('log-log slope of the Pareto line','−'+fmt(a),'ok');
+  $('c1rd').innerHTML=`Four ways to be large. On a log-log plot of “share of observations above x”, the <b>Pareto</b> tail is a straight line whose slope is −α (here −${fmt(a)}): every tenfold increase in size cuts the frequency by a factor 10^${fmt(a)}, forever. The half-normal and exponential curves fall away faster and faster, and the lognormal bends down slowly but is not a line. Compare how much of the <em>total</em> a single observation can be: for the thin-tailed samples the largest of 10,000 is a negligible ${pc1(res[0][last])} of the sum; for the Pareto it is ${pc1(res[3][last])}${a<1?', and does not fall as n grows, because with α < 1 the sum itself is dominated by its biggest term':', and falls only slowly with n'}. That is what “heavy-tailed” means in practice: a handful of events decide the total (operational losses, large exposures, claim sizes), and sample averages and standard deviations from small samples are not a safe guide.`}
+ ['c1a','c1n'].forEach(i=>$(i).addEventListener('change',run));$('c1go').onclick=run;run();})();
+
+/* ---------- Ch2 moments and the failure of averages ---------- */
+(function(){scl('c2a',v=>fmt(v/10));scl('c2n',v=>v);
+ function run(){const a=val('c2a')/10,N=val('c2n'),K=5,step=Math.max(1,Math.floor(N/200)),pm=[],ps=[];for(let k=0;k<K;k++){let s=0,s2=0;const m=[],sd=[];for(let i=1;i<=N;i++){const v=evPareto(a);s+=v;s2+=v*v;if(i%step===0&&i>=20){m.push([i,s/i]);sd.push([i,Math.sqrt(Math.max(s2/i-(s/i)*(s/i),0))])}}pm.push(m);ps.push(sd)}
+  const tm=a>1?a/(a-1):null,tsd=a>2?Math.sqrt(a/((a-1)*(a-1)*(a-2))):null,col=[C.a,C.g,C.y,C.r,C.p];
+  const draw=(cv,paths,tv,lab)=>{const mx=Math.max(...paths.flat().map(p=>p[1])),cap=tv?Math.min(mx,tv*4):mx,P=mk($(cv),0,N,cap*1.05,{L:46});if(tv)P.hline(tv,C.fg,'true '+lab+' '+fmt(tv),true);paths.forEach((p,k)=>clip(P,()=>poly(P,p,col[k],2)));P.text('observations →',P.w-P.R-4,P.h-P.B-6,C.mu,'right');P.text(tv?'(clipped at 4× the true value)':'no finite '+lab,P.L+8,P.T+12,C.mu);return P};
+  draw('c2cv',pm,tm,'mean');draw('c2cv2',ps,tsd,'sd');
+  const fm=pm.map(p=>p[p.length-1][1]),fs=ps.map(p=>p[p.length-1][1]);
+  $('c2st').innerHTML=stat('true mean · true sd',(tm?fmt(tm):'infinite')+' · '+(tsd?fmt(tsd):'infinite'),tm?'ok':'hot')+stat('final sample means (5 paths)',fm.map(fmt).join(' · '),'in')+stat('final sample sds',fs.map(fmt).join(' · '),a>2?'':'warn')+stat('moments that exist',a>1?'orders below '+fmt(a):'none','');
+  $('c2rd').innerHTML=`Five independent samples of ${N} observations from a Pareto with tail index α = ${fmt(a)}. A Pareto distribution has finite moments only of order below α. ${a<=1?'With α ≤ 1 even the <b>mean is infinite</b>: the running average has nothing to converge to and keeps jumping upwards whenever a huge value arrives.':a<=2?'With 1 &lt; α ≤ 2 the mean exists (' +fmt(tm)+') and the law of large numbers holds, but the <b>variance is infinite</b>: the running standard deviation never settles, it jumps with each large observation and tends to grow with the sample.':'With α &gt; 2 both mean and variance are finite, but with α below 4 the convergence is slow and erratic because the fourth moment (which governs the error of the sample variance) is infinite.'} The usual tools lean on those moments: standard errors, t intervals, correlation, regression and the CLT all need a finite variance, and fail quietly otherwise (the paths look “stable” for long stretches and then jump). For loss data the practical message is to estimate the tail index first and check that the statistic you are about to report actually exists.`}
+ ['c2a','c2n'].forEach(i=>$(i).addEventListener('change',run));$('c2go').onclick=run;run();})();
+
+/* ---------- Ch3 block maxima and the GEV ---------- */
+(function(){scl('c3a',v=>fmt(v/10));scl('c3b',v=>v);scl('c3m',v=>v);
+ const DG={pareto:a=>()=>evPareto(a),t:a=>()=>Math.abs(evT(a)),exp:()=>evExp,norm:()=>()=>Math.abs(randn())};
+ function bm(f,b,m){const out=new Float64Array(m);for(let j=0;j<m;j++){let mx=0;for(let i=0;i<b;i++){const v=f();if(v>mx)mx=v}out[j]=mx}return out}
+ function run(){const d=$('c3d').value,a=val('c3a')/10,b=val('c3b'),m=val('c3m'),f=DG[d](a),txi=d==='pareto'||d==='t'?1/a:0,mx=bm(f,b,m),g=evGev(mx),R=40,xs=[];for(let r=0;r<R;r++)xs.push(evGev(bm(f,b,m)).xi);
+  const srt=Array.from(mx).sort((p,q)=>p-q),hi=Math.min(srt[srt.length-1],srt[Math.floor(.97*m)]*2.2),lo=srt[0]*.9,P=histLines($('c3cv'),[Array.from(mx)],[C.a],lo,hi,32,[]);P.line(x=>evGevPdf(x,g.mu,g.sig,g.xi),C.g,2.8,lo,hi,200);P.text('block maxima and fitted GEV (green)',P.L+8,P.T+12,C.mu);P.text('block maximum →',P.w-P.R-4,P.h-P.B-6,C.mu,'right');
+  const Q=histLines($('c3cv2'),[xs],[C.a],-.6,1.4,28,[[txi,C.fg,'true ξ',true]]);Q.text('shape ξ̂ over '+R+' repeats of the experiment',Q.L+8,Q.T+12,C.mu);Q.text('ξ̂ →',Q.w-Q.R-4,Q.h-Q.B-6,C.mu,'right');
+  const me=avg(xs),sd=sdv(xs),nm={pareto:'Pareto',t:'Student t',exp:'exponential',norm:'half-normal'}[d];
+  $('c3st').innerHTML=stat('ξ̂ (this dataset) · true ξ',fmt(g.xi)+' · '+fmt(txi),Math.abs(g.xi-txi)<.2?'ok':'warn')+stat('mean · sd of ξ̂ over repeats',fmt(me)+' · '+fmt(sd),'in')+stat('location · scale',fmt(g.mu)+' · '+fmt(g.sig),'')+stat('blocks · observations per block',m+' · '+b,'');
+  $('c3rd').innerHTML=`${m} blocks of ${b} ${nm} observations each (think: ${m} years of ${b} days). The <b>Fisher–Tippett theorem</b> says that if block maxima converge to anything they converge to a <b>generalised extreme value</b> (GEV) distribution with shape ξ: ξ &gt; 0 for heavy (Pareto-like, with tail index 1/ξ) tails, ξ = 0 for exponential-like (Gumbel) tails, ξ &lt; 0 for a finite upper limit. The fit above gives ξ̂ = ${fmt(g.xi)} against the true ${fmt(txi)}. The right-hand panel repeats the whole experiment: the mean estimate is ${fmt(me)} with a standard deviation ${fmt(sd)}${sd>.15?', so with this few blocks the shape is only roughly determined':''}. ${d==='norm'?'For the normal the convergence to the Gumbel limit is notoriously slow, so ξ̂ tends to come out negative at moderate block sizes: asymptotic theory is not the same as finite-sample behaviour.':'Block maxima waste data (only one value per block is used), which is why the peaks-over-threshold method of the next chapter is usually preferred when the full series is available.'}`}
+ ['c3d','c3a','c3b','c3m'].forEach(i=>$(i).addEventListener('change',run));$('c3go').onclick=run;run();})();
+
+/* ---------- Ch4 peaks over threshold and the GPD ---------- */
+(function(){scl('c4v',v=>v);scl('c4n',v=>v);scl('c4q',v=>v+'%');
+ function run(){const nu=val('c4v'),n=val('c4n'),qq=val('c4q')/100,X=Array.from({length:n},()=>evT(nu)).filter(v=>v>0).sort((p,q)=>p-q),N=X.length,txi=1/nu,fit=q=>{const u=evQ(X,q),y=X.filter(v=>v>u).map(v=>v-u),g=evGpd(y);return{u,k:y.length,sig:g.sig,xi:g.xi,se:(1+g.xi)/Math.sqrt(y.length)}};
+  const qs=Array.from({length:16},(_,i)=>.5+i*.03),me=qs.map(q=>{const u=evQ(X,q);let s=0,c=0;for(const v of X)if(v>u){s+=v-u;c++}return[u,s/c]}),cur=fit(qq),P=mk($('c4cv'),me[0][0],me[me.length-1][0],Math.max(...me.map(p=>p[1]))*1.15,{L:46});
+  poly(P,me,C.a,2.8);dots(P,me,C.a,3.4);P.vline(cur.u,C.y,null,true);P.text('mean excess over the threshold u (yellow: chosen u)',P.L+8,P.T+12,C.mu);P.text('threshold u →',P.w-P.R-4,P.h-P.B-6,C.mu,'right');
+  const grid=[.8,.84,.88,.9,.92,.94,.95,.96,.97,.98,.985,.99,.995].filter(q=>N*(1-q)>=8),fits=grid.map(fit),lo=Math.min(-.2,...fits.map(f=>f.xi-1.96*f.se)),hi=Math.max(1.2,...fits.map(f=>f.xi+1.96*f.se)),Q=mk($('c4cv2'),grid[0]*100,grid[grid.length-1]*100,Math.min(hi,2),{y0:Math.max(lo,-.5),L:44});
+  Q.hline(txi,C.fg,'true ξ = '+fmt(txi),true);clip(Q,()=>{poly(Q,grid.map((q,i)=>[q*100,fits[i].xi+1.96*fits[i].se]),C.mu,1.4,true);poly(Q,grid.map((q,i)=>[q*100,fits[i].xi-1.96*fits[i].se]),C.mu,1.4,true);poly(Q,grid.map((q,i)=>[q*100,fits[i].xi]),C.a,2.8)});dots(Q,grid.map((q,i)=>[q*100,fits[i].xi]),C.a,3.2);Q.vline(qq*100,C.y,null,true);Q.text('ξ̂ with 95% band against the threshold percentile',Q.L+8,Q.T+12,C.mu);Q.text('threshold percentile →',Q.w-Q.R-4,Q.h-Q.B-6,C.mu,'right');
+  $('c4st').innerHTML=stat('threshold · exceedances',fmt(cur.u)+' · '+cur.k,cur.k<30?'warn':'in')+stat('ξ̂ ± 1.96 se · true ξ',fmt(cur.xi)+' ± '+fmt(1.96*cur.se)+' · '+fmt(txi),Math.abs(cur.xi-txi)<1.96*cur.se?'ok':'hot')+stat('scale σ̂',fmt(cur.sig),'')+stat('observations (positive part)',N,'');
+  $('c4rd').innerHTML=`${n} Student t observations with ${nu} degrees of freedom, so the true tail index is ${nu} and the GPD shape is ξ = 1/${nu} = ${fmt(txi)}. The <b>Pickands–Balkema–de Haan theorem</b> says that excesses over a high enough threshold u follow a <b>generalised Pareto distribution</b> (GPD), with shape ξ equal to the GEV shape. For a GPD with ξ &lt; 1 the <b>mean excess function</b> is linear in u (left): a rising line means a heavy tail, a flat one an exponential tail. Choosing the threshold is the central compromise: too low and the GPD is not yet a good approximation (bias), too high and few points remain (variance, ${cur.k} exceedances here). The right-hand <b>stability plot</b> shows ξ̂ against the threshold percentile: look for a range where it is flat inside the band, and report the sensitivity to the choice. POT uses every exceedance, so it needs far fewer data than block maxima for the same accuracy.`}
+ ['c4v','c4n','c4q'].forEach(i=>$(i).addEventListener('change',run));$('c4go').onclick=run;run();})();
+
+/* ---------- Ch5 return levels and extrapolation ---------- */
+(function(){const TS=[5,10,25,50,100,250,500,1000];idx('c5i',TS);scl('c5v',v=>v);scl('c5y',v=>v);let RES=null;
+ function sim(nu,yrs,R){const n=250*yrs,out=[],TR=TS.map(T=>evQt(1-1/(T*250),nu));for(let r=0;r<R;r++){const X=Float64Array.from({length:n},()=>evT(nu)),asc=Float64Array.from(X).sort(),m=avg(X),s=sdv(X),u=evQ(asc,.95),y=Array.from(X).filter(v=>v>u).map(v=>v-u),g=evGpd(y),k=y.length,row=[];for(const T of TS){const p=1/(T*250),tr=TR[TS.indexOf(T)],en=m+qn(1-p)*s,ee=evQ(asc,1-p),eg=Math.abs(g.xi)<1e-6?u+g.sig*Math.log(k/(n*p)):u+g.sig/g.xi*(Math.pow(n*p/k,-g.xi)-1);row.push([Math.log10(en/tr),Math.log10(ee/tr),Math.log10(Math.max(eg,1e-9)/tr)])}out.push(row)}return out}
+ const qtl=(a,p)=>a.slice().sort((x,y)=>x-y)[Math.min(a.length-1,Math.floor(p*a.length))];
+ function draw(){if(!RES)return;const sel=+$('c5i').value,yrs=val('c5y'),nu=val('c5v'),cols=[C.r,C.y,C.g],nm=['normal fit','empirical','GPD (POT)'],P=mk($('c5cv'),0,TS.length-1,1,{y0:-1,noGrid:true,L:46});customGrid(P,TS.map((t,i)=>[i,String(t)]),[[-1,'0.1×'],[-.5,'0.3×'],[0,'exact'],[.5,'3×'],[1,'10×']]);P.hline(0,C.fg,'',true);
+  for(let m=0;m<3;m++){const med=TS.map((t,i)=>[i,qtl(RES.map(r=>r[i][m]),.5)]),lo=TS.map((t,i)=>[i,qtl(RES.map(r=>r[i][m]),.1)]),hi=TS.map((t,i)=>[i,qtl(RES.map(r=>r[i][m]),.9)]);clip(P,()=>{poly(P,med,cols[m],2.8);poly(P,lo,cols[m],1.2,true);poly(P,hi,cols[m],1.2,true)})}
+  legend(P,nm.map((s,m)=>[s,cols[m]]),P.T+12);P.vline(sel,C.fg,null,true);P.text('return period (years) →',P.w-P.R-4,P.h-P.B-6,C.mu,'right');P.text('estimate ÷ truth (median, 10–90%)',P.L+6,P.T+28,C.mu);
+  const arr=m=>RES.map(r=>Math.max(-1.5,Math.min(1.5,r[sel][m]))),Q=histLines($('c5cv2'),[arr(0),arr(1),arr(2)],cols,-1.5,1.5,30,[[0,C.fg,'truth',true]]);Q.text('log10(estimate ÷ truth) at T = '+TS[sel]+' years',Q.L+8,Q.T+12,C.mu);Q.text('← too low · too high →',Q.w-Q.R-4,Q.h-Q.B-6,C.mu,'right');
+  const med=m=>Math.pow(10,qtl(RES.map(r=>r[sel][m]),.5)),under=m=>RES.filter(r=>r[sel][m]<0).length/RES.length;
+  $('c5st').innerHTML=stat('median estimate ÷ truth: normal · empirical · GPD',fmt(med(0))+' · '+fmt(med(1))+' · '+fmt(med(2)),'')+stat('share of runs that understate: normal · empirical · GPD',pc1(under(0))+' · '+pc1(under(1))+' · '+pc1(under(2)),under(0)>.8?'hot':'in')+stat('data · return period',yrs+' years · '+TS[sel]+' years','')+stat('tail index of the data',nu,'');
+  $('c5rd').innerHTML=`${yrs} years of daily data (250 per year) from a Student t with ${nu} degrees of freedom; three estimates of the loss that is exceeded once every ${TS[sel]} years, each compared with the exact value. The <b>normal fit</b> from the mean and sd understates it more and more as the return period lengthens (median ${fmt(med(0))} of the truth at ${TS[sel]} years), because a normal tail falls far faster than a t tail. The <b>empirical</b> quantile cannot go beyond the largest observation, so it is capped at the sample maximum and is too low for any return period longer than the data (${TS[sel]>yrs?'the case here':'not the case here'}). The <b>GPD</b> fitted to the excesses over the 95th percentile extrapolates the tail by a model and has median ${fmt(med(2))} of the truth, with a wide spread: extrapolation is possible, but its uncertainty grows quickly with the return period. State the return level together with a confidence interval, and never describe the estimate beyond the length of the data as more than a model-based extrapolation.`}
+ function run(){RES=sim(val('c5v'),val('c5y'),100);draw()}
+ $('c5i').addEventListener('input',draw);['c5v','c5y'].forEach(i=>$(i).addEventListener('change',run));$('c5go').onclick=run;run();})();
+
+/* ---------- Ch6 Hill estimator ---------- */
+(function(){scl('c6a',v=>fmt(v/10));scl('c6n',v=>v);scl('c6k',v=>v);
+ const DG={pareto:a=>()=>evPareto(a),burr:a=>()=>Math.pow(evU(),-1/a)-1+1e-12,t:a=>()=>Math.abs(evT(a))};
+ function run(){const d=$('c6d').value,a=val('c6a')/10,n=val('c6n'),kc=Math.min(val('c6k'),Math.floor(n/2)-1),f=DG[d](a),d1=evDesc(Array.from({length:n},f)),L=Array.from(d1,v=>Math.log(Math.max(v,1e-300))),pre=new Float64Array(n+1);for(let i=0;i<n;i++)pre[i+1]=pre[i]+L[i];
+  const hill=k=>k/(pre[k]-k*L[k]),kmax=Math.min(Math.floor(n/2),1000),ks=[];for(let k=5;k<=kmax;k=Math.max(k+1,Math.floor(k*1.05)))ks.push(k);const hs=ks.map(hill),mx=Math.min(Math.max(...hs),a*3.2),P=mk($('c6cv'),ks[0],kmax,mx,{y0:0,L:44});
+  P.hline(a,C.fg,'true α = '+fmt(a),true);clip(P,()=>poly(P,ks.map((k,i)=>[k,hs[i]]),C.a,2.6));P.vline(kc,C.y,null,true);P.text('Hill estimate against the number k of largest values used',P.L+8,P.T+12,C.mu);P.text('k →',P.w-P.R-4,P.h-P.B-6,C.mu,'right');
+  const R=250,est=[];for(let r=0;r<R;r++){const e=evDesc(Array.from({length:n},f));let s=0;const x0=e[kc];for(let i=0;i<kc;i++)s+=Math.log(e[i]/x0);est.push(kc/s)}
+  const Q=histLines($('c6cv2'),[est.map(v=>Math.min(v,a*3))],[C.a],0,a*3,30,[[a,C.fg,'true α',true]]);Q.text('Hill estimates at k = '+kc+' over '+R+' samples',Q.L+8,Q.T+12,C.mu);Q.text('α̂ →',Q.w-Q.R-4,Q.h-Q.B-6,C.mu,'right');
+  const me=avg(est),sd=sdv(est),nm={pareto:'exact Pareto',burr:'Burr (Pareto-like with slowly fading bias)',t:'Student t'}[d];
+  $('c6st').innerHTML=stat('α̂ at k = '+kc+' (this sample) · true α',fmt(hill(kc))+' · '+fmt(a),Math.abs(hill(kc)-a)<.25*a?'ok':'warn')+stat('mean · sd of α̂ over samples',fmt(me)+' · '+fmt(sd),'in')+stat('bias',pc1(me/a-1),Math.abs(me/a-1)>.15?'hot':'')+stat('relative sd (theory 1/√k)',fmt(sd/a)+' ('+fmt(1/Math.sqrt(kc))+')','');
+  $('c6rd').innerHTML=`${n} observations from a ${nm} distribution with tail index ${fmt(a)}. The <b>Hill estimator</b> averages the log-ratios of the k largest observations to the (k+1)-th: α̂ = k / Σ ln(X₍ᵢ₎/X₍ₖ₊₁₎). Using few observations gives a noisy estimate (relative sd about 1/√k = ${fmt(1/Math.sqrt(kc))}); using many mixes in the body of the distribution, where it is no longer Pareto, and biases it (${d==='pareto'?'there is no such bias for an exact Pareto, so the curve is flat':'visible in the left plot as drift away from the true value as k grows'}). The <b>Hill plot</b> on the left is the standard diagnostic: choose k in a stable region, and report a range. At k = ${kc} the bias is ${pc1(me/a-1)} and the spread ${fmt(sd)}. Try the three families: the Pareto is easy, the Burr and Student t show the bias–variance trade-off that makes tail estimation hard in real data.`}
+ ['c6d','c6a','c6n','c6k'].forEach(i=>$(i).addEventListener('change',run));$('c6go').onclick=run;run();})();
+/* ---------- Ch7 clustering of extremes ---------- */
+(function(){scl('c7p',v=>fmt(v/100));scl('c7a',v=>fmt(v/10));scl('c7n',v=>v);scl('c7r',v=>v);
+ function series(n,phi,a){const x=new Float64Array(n);let w=evFrechet();for(let t=0;t<n;t++){w=Math.max(phi*w,(1-phi)*evFrechet());x[t]=Math.pow(w,1/a)}return x}
+ function clusters(x,u,r){const ex=[];for(let t=0;t<x.length;t++)if(x[t]>u)ex.push(t);const cl=[];let cur=null;for(const t of ex){if(cur&&t-cur.last<=r){cur.last=t;if(x[t]>cur.max)cur.max=x[t]}else{cur={first:t,last:t,max:x[t]};cl.push(cur)}}return{ex,cl}}
+ function run(){const phi=val('c7p')/100,a=val('c7a')/10,n=val('c7n'),r=val('c7r'),th=1-phi,xi=1/a,x=series(n,phi,a),asc=Float64Array.from(x).sort(),u=evQ(asc,.95),o=clusters(x,u,r),T=Math.min(n,600),cap=evQ(asc,.998)*1.1,P=mk($('c7cv'),0,T,cap,{L:40}),COL=[C.r,C.y,C.g,C.p];
+  clip(P,()=>{poly(P,Array.from(x.slice(0,T),(v,i)=>[i,v]),C.mu,1.2);o.cl.forEach((c,k)=>{for(let t=c.first;t<=c.last&&t<T;t++)if(x[t]>u)dots(P,[[t,x[t]]],COL[k%4],3.2)})});P.hline(u,C.fg,'threshold (95%)',true);P.text('first '+T+' days · colours: separate clusters of exceedances',P.L+8,P.T+12,C.mu);P.text('time →',P.w-P.R-4,P.h-P.B-6,C.mu,'right');
+  const R=100,ths=[];let cr=0,cd=0,wr=0,wd=0;for(let q=0;q<R;q++){const xx=q===0?x:series(n,phi,a),as=Float64Array.from(xx).sort(),uu=evQ(as,.95),oo=clusters(xx,uu,r);ths.push(oo.cl.length/Math.max(oo.ex.length,1));
+   const g1=evGpd(oo.ex.map(t=>xx[t]-uu)),w1=1.96*(1+g1.xi)/Math.sqrt(oo.ex.length);if(Math.abs(g1.xi-xi)<=w1)cr++;wr+=2*w1/R;
+   if(oo.cl.length>=8){const g2=evGpd(oo.cl.map(c=>c.max-uu)),w2=1.96*(1+g2.xi)/Math.sqrt(oo.cl.length);if(Math.abs(g2.xi-xi)<=w2)cd++;wd+=2*w2/R}}
+  const Q=histLines($('c7cv2'),[ths],[C.a],0,1.05,30,[[th,C.fg,'true θ',true],[1,C.r,'no clustering',true]]);Q.text('runs estimate of the extremal index θ, '+R+' series',Q.L+8,Q.T+12,C.mu);Q.text('θ̂ →',Q.w-Q.R-4,Q.h-Q.B-6,C.mu,'right');
+  const me=avg(ths);
+  $('c7st').innerHTML=stat('θ̂ (mean over series) · true θ',fmt(me)+' · '+fmt(th),Math.abs(me-th)<.1?'ok':'warn')+stat('mean cluster size (1/θ)',fmt(1/Math.max(me,.01)),'in')+stat('95% interval for ξ covers the truth: all exceedances · cluster maxima',pc1(cr/R)+' · '+pc1(cd/R),cr/R<.85?'hot':'ok')+stat('exceedances · clusters (this series)',o.ex.length+' · '+o.cl.length,'');
+  $('c7rd').innerHTML=`A heavy-tailed daily series (tail index ${fmt(a)}) in which a large value tends to be followed by more large values: <b>max-autoregressive</b> with persistence ${fmt(phi)}, whose <b>extremal index</b> is θ = 1 − φ = ${fmt(th)}, meaning extremes arrive in clusters of about ${fmt(1/th)} days. Exceedances of a high threshold are then not independent: the left plot colours clusters (exceedances separated by at most ${r} days belong together). The runs estimator (number of clusters ÷ number of exceedances) gives θ̂ = ${fmt(me)}. This matters twice. Return periods must be computed for <em>clusters</em>, since a stress that lasts a week is one event, not seven. And the likelihood treats every exceedance as independent, so the confidence interval for ξ is too narrow: the nominal 95% interval covers the true ξ in only ${pc1(cr/R)} of the series when all exceedances are used, against ${pc1(cd/R)} when only cluster maxima are used (at the price of fewer points and wider intervals, ${fmt(wr)} against ${fmt(wd)}). Volatility clustering in returns and bursts of fraud losses behave the same way.`}
+ ['c7p','c7a','c7n','c7r'].forEach(i=>$(i).addEventListener('change',run));$('c7go').onclick=run;run();})();
+
+/* ---------- Ch8 VaR and expected shortfall ---------- */
+(function(){scl('c8a',v=>fmt(v/10));scl('c8n',v=>v);scl('c8q',v=>fmt(v/10)+'%');
+ function est(a,n,q){const x=Float64Array.from({length:n},()=>evPareto(a)).sort(),i=Math.min(n-1,Math.floor(q*n)),v=x[i],k=Math.max(1,n-i);let s=0;for(let j=n-k;j<n;j++)s+=x[j];return[v,s/k]}
+ function run(){const a=val('c8a')/10,n=val('c8n'),q=val('c8q')/1000,tv=Math.pow(1-q,-1/a),te=tv*a/(a-1),R=300,V=[],E=[];for(let r=0;r<R;r++){const e=est(a,n,q);V.push(e[0]/tv);E.push(e[1]/te)}
+  const cl=v=>Math.min(v,3),Pq=histLines($('c8cv'),[V.map(cl),E.map(cl)],[C.a,C.r],0,3,36,[[1,C.fg,'truth',true]]);Pq.text('estimate ÷ truth · blue: VaR · red: expected shortfall',Pq.L+8,Pq.T+12,C.mu);Pq.text('ratio →',Pq.w-Pq.R-4,Pq.h-Pq.B-6,C.mu,'right');
+  const AG=[1.2,1.5,2,2.5,3,4,6],sdl=AG.map(g=>{const t1=Math.pow(1-q,-1/g),t2=t1*g/(g-1),lv=[],le=[];for(let r=0;r<150;r++){const e=est(g,Math.min(n,2000),q);lv.push(Math.log(e[0]/t1));le.push(Math.log(e[1]/t2))}return[sdv(lv),sdv(le)]}),mx=Math.max(...sdl.flat())*1.1,Q=mk($('c8cv2'),0,AG.length-1,mx,{noGrid:true,L:44});
+  customGrid(Q,AG.map((g,i)=>[i,String(g)]),niceTicks(0,mx,5));poly(Q,AG.map((g,i)=>[i,sdl[i][0]]),C.a,2.8);poly(Q,AG.map((g,i)=>[i,sdl[i][1]]),C.r,2.8);dots(Q,AG.map((g,i)=>[i,sdl[i][0]]),C.a,3.4);dots(Q,AG.map((g,i)=>[i,sdl[i][1]]),C.r,3.4);legend(Q,[['VaR',C.a],['expected shortfall',C.r]],Q.T+12);Q.text('tail index α (n = '+Math.min(n,2000)+') →',Q.w-Q.R-4,Q.h-Q.B-6,C.mu,'right');Q.text('sd of log(estimate ÷ truth)',Q.L+6,Q.T+28,C.mu);
+  const md=v=>v.slice().sort((x,y)=>x-y)[Math.floor(v.length/2)];
+  $('c8st').innerHTML=stat('true VaR · true ES at '+fmt(q*100)+'%',fmt(tv)+' · '+fmt(te),'')+stat('ES ÷ VaR (theory α/(α−1))',fmt(a/(a-1)),a<1.5?'hot':'in')+stat('median estimate ÷ truth: VaR · ES',fmt(md(V))+' · '+fmt(md(E)),md(E)<.9?'warn':'ok')+stat('spread (sd of ratio): VaR · ES',fmt(sdv(V))+' · '+fmt(sdv(E)),sdv(E)>sdv(V)*1.5?'warn':'');
+  $('c8rd').innerHTML=`Losses are Pareto with tail index ${fmt(a)}; the risk measure is the ${fmt(q*100)}% <b>value-at-risk</b> (a quantile) or the <b>expected shortfall</b> (the mean loss beyond it, true value ${fmt(te)}, which is ${fmt(a/(a-1))} times the VaR and is infinite when α ≤ 1). Both are estimated from ${n} observations, ${Math.max(1,Math.round(n*(1-q)))} of which lie in the tail. The VaR estimate is a quantile and its error is moderate; the ES estimate is an average of the few largest values, and with a heavy tail it is both biased downwards (the median is ${fmt(md(E))} of the truth, because most samples miss the rare huge values) and much more variable (spread ${fmt(sdv(E))} against ${fmt(sdv(V))}). The right-hand panel shows that the penalty is worst as α approaches 1–2. The regulatory move from VaR to ES in the trading book therefore buys better tail sensitivity at the price of a harder estimation problem: tail-index uncertainty should be shown beside any ES figure, and ES should preferably be estimated by fitting a tail model and not by averaging the sample.`}
+ ['c8a','c8n','c8q'].forEach(i=>$(i).addEventListener('change',run));$('c8go').onclick=run;run();})();
+
+/* ---------- Ch9 diversification with heavy tails ---------- */
+(function(){scl('c9a',v=>fmt(v/10));scl('c9q',v=>fmt(v/10)+'%');const MS=[1,2,5,10,20,50],N=20000;
+ function avgs(a,m){const out=new Float64Array(N);for(let i=0;i<N;i++){let s=0;for(let j=0;j<m;j++)s+=evPareto(a);out[i]=s/m}return out.sort()}
+ function run(){const a=val('c9a')/10,q=val('c9q')/1000,vq=x=>x[Math.min(N-1,Math.floor(q*N))],es=x=>{const i=Math.min(N-1,Math.floor(q*N));let s=0;for(let j=i;j<N;j++)s+=x[j];return s/(N-i)},S=MS.map(m=>avgs(a,m)),v1=vq(S[0]),e1=es(S[0]),rv=S.map(x=>vq(x)/v1),re=S.map(x=>es(x)/e1);
+  const mx=Math.max(1.3,...rv,...(a>1?re.map(v=>Math.min(v,6)):[]))*1.08,P=mk($('c9cv'),0,MS.length-1,mx,{noGrid:true,L:44});customGrid(P,MS.map((m,i)=>[i,String(m)]),niceTicks(0,mx,5));P.hline(1,C.fg,'one asset',true);poly(P,MS.map((m,i)=>[i,rv[i]]),C.a,2.8);dots(P,MS.map((m,i)=>[i,rv[i]]),C.a,3.6);clip(P,()=>{if(a>1){poly(P,MS.map((m,i)=>[i,re[i]]),C.r,2.8);dots(P,MS.map((m,i)=>[i,re[i]]),C.r,3.6)}poly(P,MS.map((m,i)=>[i,Math.pow(m,1/a-1)]),C.g,1.8,true)});legend(P,[['VaR of the average ÷ VaR of one',C.a],[a>1?'ES ratio':'ES infinite (not drawn)',C.r],['m^(1/α − 1)',C.g]],P.T+12);P.text('number of assets m →',P.w-P.R-4,P.h-P.B-6,C.mu,'right');
+  const AL=[[.8,C.r],[1.5,C.y],[3,C.g]],mv=AL.map(([g])=>{const s=MS.map(m=>m===1?null:avgs(g,m));const base=avgs(g,1),b=vq(base);return MS.map((m,i)=>m===1?1:vq(s[i])/b)}),my=Math.max(1.3,...mv.flat())*1.08,Q=mk($('c9cv2'),0,MS.length-1,my,{noGrid:true,L:44});customGrid(Q,MS.map((m,i)=>[i,String(m)]),niceTicks(0,my,5));Q.hline(1,C.fg,'',true);AL.forEach(([g,c],k)=>{poly(Q,MS.map((m,i)=>[i,mv[k][i]]),c,2.6);dots(Q,MS.map((m,i)=>[i,mv[k][i]]),c,3.4)});legend(Q,AL.map(([g,c])=>['α = '+g,c]),Q.T+12);Q.text('number of assets m →',Q.w-Q.R-4,Q.h-Q.B-6,C.mu,'right');Q.text('VaR ratio at '+fmt(q*100)+'%',Q.L+6,Q.T+28,C.mu);
+  const l=MS.length-1;
+  $('c9st').innerHTML=stat('VaR of the average of 50 ÷ one asset',fmt(rv[l]),rv[l]>1?'hot':'ok')+stat('ES of the average of 50 ÷ one asset',a>1?fmt(re[l]):'infinite in theory',a<=1?'hot':'in')+stat('asymptotic ratio m^(1/α−1) at m = 50',fmt(Math.pow(50,1/a-1)),'')+stat('diversification helps (VaR ratio < 1)?',rv[l]<1?'yes':'no',rv[l]<1?'ok':'hot');
+  $('c9rd').innerHTML=`Equal-weight portfolios of m independent Pareto losses with tail index ${fmt(a)}, with the VaR of the average compared with the VaR of a single asset at the ${fmt(q*100)}% level. For light tails averaging reduces risk (the ratio falls like 1/√m). For heavy tails the sum is governed by its single largest term, so the VaR of the sum behaves like m^{1/α} times that of one asset and the VaR of the <em>average</em> like m^{1/α − 1} (green dashed): ${a<1?`with α = ${fmt(a)} &lt; 1 the exponent is positive, so the average is <b>riskier</b> than a single asset (ratio ${fmt(rv[l])} at m = 50), which means that VaR violates subadditivity and diversification is penalised`:a<2?`with α = ${fmt(a)} the exponent is negative but small, so diversification helps only slowly (ratio ${fmt(rv[l])} at m = 50) compared with the 1/√m of thin tails`:`with α = ${fmt(a)} diversification works but more slowly than the 1/√m of thin tails (ratio ${fmt(rv[l])} at m = 50)`}. The three curves on the right compare α = 0.8, 1.5 and 3 at the same level. The practical lesson: the benefit of diversification in a portfolio of fat-tailed risks is much smaller than a variance-based calculation suggests, and for very heavy tails it can reverse; assess it on tail measures with a tail model.`}
+ ['c9a','c9q'].forEach(i=>$(i).addEventListener('change',run));$('c9go').onclick=run;run();})();
+
+/* ---------- Ch10 uncertainty about the tail parameter ---------- */
+(function(){scl('c10k',v=>v);scl('c10x',v=>fmt(v/100));
+ function profile(y,fit,grid){const n=y.length;return grid.map(xi=>{let lo=fit.sig>0?Math.log(fit.sig)-2.5:-2,hi=Math.log(fit.sig)+2.5;const g=(Math.sqrt(5)-1)/2;let a=hi-g*(hi-lo),b=lo+g*(hi-lo),fa=evGpdNll(y,a,xi),fb=evGpdNll(y,b,xi);for(let i=0;i<32;i++){if(fa<fb){hi=b;b=a;fb=fa;a=hi-g*(hi-lo);fa=evGpdNll(y,a,xi)}else{lo=a;a=b;fa=fb;b=lo+g*(hi-lo);fb=evGpdNll(y,b,xi)}}return 2*(Math.min(fa,fb)-fit.nll)})}
+ function ci(y,fit){const se=(1+fit.xi)/Math.sqrt(y.length),grid=Array.from({length:61},(_,i)=>Math.max(-.45,fit.xi-6*se)+i*(12*se)/60),pr=profile(y,fit,grid);let lo=null,hi=null;grid.forEach((x,i)=>{if(pr[i]<=3.84){if(lo===null)lo=x;hi=x}});return{lo:lo===null?fit.xi:lo,hi:hi===null?fit.xi:hi,grid,pr,se}}
+ function run(){const k=val('c10k'),xi=val('c10x')/100,R=80;let cw=0,cp=0,ww=0,wp=0,one=null;for(let r=0;r<R;r++){const y=Array.from({length:k},()=>evGpdS(xi)),f=evGpd(y),c=ci(y,f);if(r===0)one={y,f,c};if(Math.abs(f.xi-xi)<=1.96*c.se)cw++;ww+=2*1.96*c.se/R;if(xi>=c.lo&&xi<=c.hi)cp++;wp+=(c.hi-c.lo)/R}
+  const g=one.c.grid,mxp=Math.min(12,Math.max(...one.c.pr)),P=mk($('c10cv'),g[0],g[g.length-1],Math.max(mxp,5),{L:44});P.hline(3.84,C.fg,'95% cut-off',true);clip(P,()=>{poly(P,g.map((x,i)=>[x,one.c.pr[i]]),C.g,2.8);poly(P,g.map(x=>[x,Math.pow((x-one.f.xi)/one.c.se,2)]),C.r,2.2,true)});P.vline(xi,C.fg,null,true);P.text('green: profile likelihood · red dashed: Wald (normal) approximation',P.L+8,P.T+12,C.mu);P.text('shape ξ →',P.w-P.R-4,P.h-P.B-6,C.mu,'right');P.text('2 × log-likelihood drop',P.L+6,P.T+28,C.mu);
+  barV($('c10cv2'),[cw/R,cp/R],[C.r,C.g],['Wald interval','profile likelihood'],1.1,pc1);
+  $('c10st').innerHTML=stat('coverage of the 95% interval: Wald · profile ('+R+' samples)',pc1(cw/R)+' · '+pc1(cp/R),cp>cw?'ok':'in')+stat('mean width: Wald · profile',fmt(ww)+' · '+fmt(wp),'')+stat('this sample: ξ̂ · true ξ',fmt(one.f.xi)+' · '+fmt(xi),'')+stat('exceedances k',k,k<50?'warn':'in');
+  $('c10rd').innerHTML=`${k} excesses drawn exactly from a generalised Pareto distribution with ξ = ${fmt(xi)}, so the only uncertainty is statistical. The tail parameters are estimated by maximum likelihood, and the usual <b>Wald interval</b> ξ̂ ± 1.96(1 + ξ̂)/√k assumes the likelihood is a symmetric parabola; with few exceedances it is skewed (red against green on the left), because large values of ξ are much harder to rule out than small ones. The <b>profile-likelihood interval</b> follows the actual shape of the likelihood and covers ${pc1(cp/R)} of the time against ${pc1(cw/R)} for the Wald interval, with width ${fmt(wp)} against ${fmt(ww)}. Since a tail quantile such as a 1-in-1000 loss depends on ξ through a power, even a modest interval for ξ makes the interval for the loss very wide (and strongly skewed upwards). Report the interval for the tail parameter and for the quantity used, preferably by profile likelihood or bootstrap, and treat a model point estimate as one possibility among several.`}
+ ['c10k','c10x'].forEach(i=>$(i).addEventListener('change',run));$('c10go').onclick=run;run();})();
+
+/* ---------- Ch11 operational losses: aggregation ---------- */
+(function(){scl('c11a',v=>fmt(v/10));scl('c11l',v=>v);scl('c11q',v=>fmt(v/10)+'%');const N=30000;
+ function run(){const a=val('c11a')/10,lam=val('c11l'),q=val('c11q')/1000,S=new Float64Array(N);for(let i=0;i<N;i++){const k=poisS(lam);let s=0;for(let j=0;j<k;j++)s+=evPareto(a);S[i]=s}
+  const asc=Float64Array.from(S).sort(),sim=evQ(asc,q),mu=a>1?a/(a-1):1e9,sla=Math.pow(lam/(1-q),1/a),slm=Math.pow(lam/(1-q),1/a)+(a>1?(lam-1)*mu:0),m=avg(S),sd=sdv(S),nrm=m+qn(q)*sd,lg=v=>Math.log10(Math.max(v,1e-9));
+  const lo=lg(asc[Math.floor(.002*N)])-.1,hi=Math.max(lg(asc[N-1]),lg(sim),lg(nrm))*.999+.2,P=histLines($('c11cv'),[Array.from(S,v=>lg(v))],[C.a],lo,hi,40,[[lg(sim),C.g,'simulated',false],[lg(sla),C.y,'single-loss',true],[lg(nrm),C.r,'normal',true]]);P.text('log10 of the annual loss · lines: '+fmt(q*100)+'% quantile by method',P.L+8,P.T+12,C.mu);P.text('annual loss (log10) →',P.w-P.R-4,P.h-P.B-6,C.mu,'right');
+  const vals=[sim,slm,sla,nrm],mx=Math.max(...vals)*1.15;barV($('c11cv2'),vals,[C.g,C.y,C.p,C.r],['simulated','single-loss + mean','single-loss','normal approx.'],mx,fmt);
+  const er=v=>pc1(v/sim-1);
+  $('c11st').innerHTML=stat('simulated '+fmt(q*100)+'% quantile',fmt(sim),'ok')+stat('single-loss approximation: plain · with mean correction',er(sla)+' · '+er(slm),Math.abs(slm/sim-1)<.15?'ok':'warn')+stat('normal approximation error',er(nrm),nrm<sim*.8?'hot':'warn')+stat('mean annual loss · simulated years',fmt(m)+' · '+N,'');
+  $('c11rd').innerHTML=`An operational-loss model of the kind used for capital: about ${lam} loss events a year (Poisson), each with a Pareto severity of tail index ${fmt(a)}; the annual aggregate loss S is the sum. The capital figure is its ${fmt(q*100)}% quantile, ${fmt(sim)} by simulation of ${N} years (at this level only about ${Math.max(1,Math.round(N*(1-q)))} simulated years lie beyond it, so even the simulated figure is noisy). For subexponential severities the tail of the sum is the tail of the largest loss, which yields the <b>single-loss approximation</b> F⁻¹(1 − (1 − q)/λ) = ${fmt(sla)} (${er(sla)}) and, adding the mean of the other losses, ${fmt(slm)} (${er(slm)}). A <b>normal approximation</b> from the mean and standard deviation gives ${fmt(nrm)} (${er(nrm)}): the standard deviation of a heavy-tailed sum is itself unstable, and a normal distribution has no mechanism for one giant event. The quantity that drives capital is the tail index of the severity, not the average loss, so the first modelling effort should go to the tail (chapters 4, 6 and 10), with interval estimates, and the results should be tested for sensitivity to α.`}
+ ['c11a','c11l','c11q'].forEach(i=>$(i).addEventListener('change',run));$('c11go').onclick=run;run();})();
+const QZ=[{"l":"Beginner","q":"A Pareto tail P(X > x) ∝ x^(−α) appears as what on a log-log plot of the survival function?","o":["A parabola","A straight line with slope −α","A curve that falls faster and faster","A horizontal line"],"a":1,"e":"Taking logs, log P(X > x) = −α log x + const, so the Pareto tail is linear on a log-log plot; thin tails curve downwards."},{"l":"Beginner","q":"Which sign of the GEV shape parameter ξ corresponds to a heavy, power-law tail?","o":["ξ > 0","The sign does not matter","ξ = 0","ξ < 0"],"a":0,"e":"ξ > 0 is the Fréchet domain, with tail index α = 1/ξ; ξ = 0 is Gumbel (exponential-type tails) and ξ < 0 has a finite upper bound."},{"l":"Intermediate","q":"A loss distribution has tail index α = 1.5. Which statement is correct?","o":["Both mean and variance are finite","All moments are finite","The mean is infinite","The mean is finite but the variance is infinite"],"a":3,"e":"Moments of order k exist only for k < α, so with α = 1.5 the mean exists and the variance does not."},{"l":"Intermediate","q":"Why is peaks over threshold usually preferred to block maxima when the full series is available?","o":["It does not require a model","It needs no threshold","It uses every large observation instead of one per block","It always has a smaller bias"],"a":2,"e":"POT uses all exceedances over a high threshold, so it makes much better use of the data; its price is the threshold choice."},{"l":"Intermediate","q":"In a mean excess plot, what does a clearly rising, roughly linear trend above some threshold suggest?","o":["A bounded tail","A heavy tail, with a GPD shape ξ > 0","A normal distribution","An exponential tail"],"a":1,"e":"For a GPD the mean excess is linear in u with slope ξ/(1 − ξ); a positive slope means ξ > 0, a heavy tail. A flat plot means ξ ≈ 0."},{"l":"Intermediate","q":"What happens if the threshold in POT is chosen too low?","o":["The GPD approximation is biased because the excesses are not yet in the tail regime","The shape parameter is exactly zero","The variance of ξ̂ becomes very large","The model has no solution"],"a":0,"e":"A low threshold includes the body of the distribution, which is not GPD, causing bias; a high threshold leaves few points and high variance."},{"l":"Advanced","q":"You fit a normal distribution to 10 years of daily data from a heavy-tailed process and compute the 1-in-100-year loss. Compared with the truth, the estimate is typically…","o":["Equal to the sample maximum","Too high","Unbiased, since the sample is large","Too low, increasingly so for longer return periods"],"a":3,"e":"A normal tail falls far faster than a power-law tail, so its extreme quantiles are too low, and increasingly so as the return period grows."},{"l":"Advanced","q":"An empirical quantile estimate of the 1-in-1000-year loss from 10 years of data is bounded by…","o":["The sample mean","Nothing, it can be arbitrarily large","The largest observation in the sample","The 99th percentile"],"a":2,"e":"Empirical quantiles cannot exceed the sample maximum, so they systematically understate return levels beyond the length of the record."},{"l":"Advanced","q":"The Hill estimator is computed from the k largest values. Increasing k generally…","o":["Reduces both variance and bias","Reduces variance but increases bias when the tail is only asymptotically Pareto","Has no effect","Increases variance and reduces bias"],"a":1,"e":"The relative sd is about 1/√k, but larger k brings in values from the body where the power law no longer holds, adding bias."},{"l":"Advanced","q":"For a Pareto distribution with α = 2, how does ES at the 99% level compare with VaR at the same level?","o":["ES is twice VaR (α/(α − 1) = 2)","ES is half of VaR","ES equals VaR","ES is infinite"],"a":0,"e":"For Pareto losses ES_q = VaR_q · α/(α − 1); with α = 2 this is 2."},{"l":"Advanced","q":"Why is the empirical ES from a sample typically biased downwards for heavy tails?","o":["Sample quantiles are biased upwards","It is computed with the wrong threshold","It uses too many observations","Most samples miss the rare very large values that dominate the true tail mean"],"a":3,"e":"The tail mean is dominated by rare huge values; in most samples these are absent, so the sample ES is usually below the truth (with occasional large overshoots)."},{"l":"Expert","q":"Which of the following is a sign of a heavy tail in a sample of losses?","o":["The sample variance is small","The histogram is symmetric","A single observation accounts for a large share of the total, and the share does not fall as n grows","The median equals the mean"],"a":2,"e":"In a heavy-tailed sample the maximum remains a sizeable fraction of the sum; in thin-tailed samples it shrinks as n grows."},{"l":"Expert","q":"Exceedances over a high threshold arrive in clusters (extremal index θ = 0.3). If you apply the POT likelihood to all exceedances as if independent, what happens?","o":["Confidence intervals are too wide","Confidence intervals are too narrow, because the effective sample is the number of clusters","The GPD no longer applies","The point estimate becomes biased upwards"],"a":1,"e":"The effective number of independent observations is about θ times the number of exceedances; treating all as independent overstates the information."},{"l":"Expert","q":"A daily loss series has extremal index 0.25. A stress that exceeds the threshold lasts, on average…","o":["About 4 consecutive days, which counts as one event","25 days","1 day","0.25 days"],"a":0,"e":"The mean cluster size is 1/θ = 4; return periods should refer to clusters, i.e. events, not individual days."},{"l":"Expert","q":"Independent losses have tail index 0.8. How does the VaR of an equal-weight average of m of them compare with the VaR of one loss, for very high confidence levels?","o":["It is exactly the same","It falls like 1/m","It falls like 1/√m","It is larger: it grows like m^(1/α − 1), so diversification increases VaR"],"a":3,"e":"With α < 1 the exponent 1/α − 1 is positive: the average of m heavy-tailed losses is riskier than one, so VaR is not subadditive."},{"l":"Expert","q":"With 30 exceedances, why might a profile-likelihood interval for ξ be preferred to ξ̂ ± 1.96·se?","o":["Profile intervals are always narrower","Profile intervals avoid choosing a threshold","The likelihood is skewed in small samples, so the symmetric Wald interval undercovers","The Wald interval needs no distribution"],"a":2,"e":"Profile intervals follow the actual shape of the likelihood, which is skewed for small k, and typically have better coverage than the symmetric normal approximation."},{"l":"Expert","q":"A 99.9% annual operational-loss quantile is simulated from a compound Poisson model with Pareto severities. Which approximation checks it, and what drives the result?","o":["The mean annual loss times a multiplier","The single-loss approximation F⁻¹(1 − (1 − q)/λ): the severity tail index drives it","The median of the severity distribution","A normal approximation using the mean and standard deviation of annual losses"],"a":1,"e":"For subexponential severities the aggregate tail is the tail of the largest single loss, so the capital figure is set by the severity tail index (and λ), not by the mean."},{"l":"Expert","q":"You estimate a 1-in-1000-year loss with a GPD fitted to 40 exceedances and find the interval for ξ is [0.1, 0.9]. What is the best way to report the return level?","o":["As an interval or range under plausible tail indices, since the upper end may be many times the point estimate","As the sample maximum","As the value from a normal fit, for stability","As the point estimate only"],"a":0,"e":"Return levels depend on ξ through a power, so a modest interval for ξ yields a very wide, upward-skewed interval for the loss; report it with a sensitivity range."}];
+(function(){const st=store.get('ev_quiz',{});
+ function render(){const box=$('quiz');box.innerHTML='';
+  QZ.forEach((q,i)=>{const d=document.createElement('div');d.className='q'+(st[i]!=null?' done':'');d.innerHTML=`<div class="qh">Q${i+1} · ${q.l}</div><div style="margin:4px 0 6px"><b>${q.q}</b></div>`;
+   q.o.forEach((o,j)=>{const b=document.createElement('button');b.className='opt';b.textContent=o;if(st[i]!=null){if(j===q.a)b.classList.add('good');else if(j===st[i])b.classList.add('bad')}b.onclick=()=>{if(st[i]!=null)return;st[i]=j;store.set('ev_quiz',st);render();meter()};d.appendChild(b)});
+   const e=document.createElement('div');e.className='ex';e.innerHTML=(st[i]===q.a?'✅ ':'❌ ')+q.e;d.appendChild(e);box.appendChild(d)});
+  const ans=Object.keys(st).length,ok=QZ.filter((q,i)=>st[i]===q.a).length;
+  $('qscore').innerHTML=stat('answered',ans+' / '+QZ.length,'in')+stat('correct',ok,'ok')+stat('score',ans?Math.round(100*ok/ans)+'%':'—',ok/Math.max(ans,1)>=.8?'ok':'warn')+stat('verdict',ans<QZ.length?'keep going':ok>=16?'extreme-value master':ok>=13?'strong':'review ch. 1–11','')}
+ $('qreset').onclick=()=>{Object.keys(st).forEach(k=>delete st[k]);store.set('ev_quiz',st);render();meter()};
+ window.__qst=st;render();})();
+const CHK=["Recognise heavy tails from a log-log survival plot and the maximum-to-sum ratio.","State which moments exist for a given tail index and what fails without them.","Describe the GEV, the meaning of ξ and the block-maxima method.","Describe peaks over threshold and the generalised Pareto, and choose a threshold with the mean excess and stability plots.","Compute a return level and explain why it is an extrapolation.","Explain why normal and empirical quantiles understate long return periods.","Compute and interpret the Hill estimator and the Hill plot.","Explain extremal clustering and decluster before fitting.","Compare VaR and expected shortfall and their estimation difficulty for heavy tails.","Explain why diversification works poorly, or reverses, with heavy tails.","Give interval estimates for ξ by profile likelihood or bootstrap.","Propagate parameter uncertainty to a high quantile and report a range.","Aggregate frequency and severity and check the result with the single-loss approximation.","Document the threshold, tail model, diagnostics and sensitivity behind a tail-risk figure."];
+(function(){const st=store.get('ev_chk',{}),box=$('chk');CHK.forEach((t,i)=>{const l=document.createElement('label'),c=document.createElement('input');c.type='checkbox';c.checked=!!st[i];c.onchange=()=>{st[i]=c.checked;store.set('ev_chk',st);meter()};l.appendChild(c);const s=document.createElement('span');s.textContent=t;l.appendChild(s);box.appendChild(l)});window.__cst=st;})();
+function meter(){const q=window.__qst||{},c=window.__cst||{};const ok=QZ.filter((x,i)=>q[i]===x.a).length,ck=Object.values(c).filter(Boolean).length;const p=Math.round(100*(.6*ok/QZ.length+.4*ck/CHK.length));$('mtxt').textContent='Mastery: '+p+'%  (exam + checklist)';$('mbar').style.width=p+'%';store.set('mastery_ev',p)}
+meter();
+
+/* ---------- Navigation ---------- */
+(function(){const nav=$('nav');let html='';
+ document.querySelectorAll('main .part, main section.ch').forEach(el=>{if(el.classList.contains('part'))html+=`<div class="pt">${el.textContent}</div>`;else{const h=el.querySelector('h2'),num=h.querySelector('.num').textContent,t=Array.from(h.childNodes).filter(n=>n.nodeType===3).map(n=>n.textContent).join('').trim();html+=`<a href="#${el.id}" data-id="${el.id}">${num}. ${t}</a>`}});
+ nav.innerHTML=html;const links=nav.querySelectorAll('a'),io=new IntersectionObserver(es=>{es.forEach(e=>{if(e.isIntersecting)links.forEach(a=>a.classList.toggle('on',a.dataset.id===e.target.id))})},{rootMargin:'-20% 0px -70% 0px'});
+ document.querySelectorAll('section.ch').forEach(s=>io.observe(s));
+ $('menu').onclick=()=>$('side').classList.toggle('open');nav.addEventListener('click',e=>{if(e.target.tagName==='A')$('side').classList.remove('open')});
+ window.addEventListener('scroll',()=>{const h=document.documentElement;$('prog').style.width=(100*h.scrollTop/(h.scrollHeight-h.clientHeight))+'%'},{passive:true});})();
+</script>
+</body>
+</html>
