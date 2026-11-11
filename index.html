@@ -116,6 +116,8 @@ const ST=[
   ['Multivariate methods (PCA, factor analysis, mixtures, Mahalanobis)',{f:'multivariate-methods-mastery.html'}],['Extreme value theory and heavy tails',{f:'extreme-value-theory-mastery.html'}],['Copulas and dependence modelling',{}],['Anomaly and drift detection theory',{}],['Graph and network statistics',{}],['Uncertainty quantification for ML (conformal prediction)',{}],['Interpretability and its statistical limits',{}]]]
 ];
 function pct(k){try{const v=JSON.parse(localStorage.getItem(k));return typeof v==='number'?v:null}catch(e){return null}}
+function itemKey(tag){const m=tag.match(/Stage\s*(\d+)\s*·\s*items?\s*([\d–-]+)/i);if(!m)return 9999;const s=parseInt(m[1],10),p=m[2].split(/[–-]/);return s*1000+parseFloat(p[0])+(p.length>1?0.5:0)}
+COURSES.sort((a,b)=>itemKey(a.tag)-itemKey(b.tag));
 document.getElementById('courses').innerHTML=COURSES.map(c=>{const p=pct(c.key);return `<a class="course" href="${c.f}"><div class="tag">${c.tag}</div><h3>${c.t}</h3><p>${c.d}</p><div class="meta">${c.m.map(x=>`<span>${x}</span>`).join('')}</div><div class="bar"><i style="width:${p||0}%"></i></div><div class="prog">${p===null?'Mastery: open the page to start':'Mastery: '+p+'%'}</div></a>`}).join('');
 let n=0,html='';
 ST.forEach(([title,items])=>{html+=`<div class="stage"><h4>${title}</h4>`;items.forEach(([t,o])=>{n++;const pill=o.f?`<a class="pill done" href="${o.f}">ready →</a>`:o.p?`<a class="pill part" href="${o.p}">partial: ${o.note}</a>`:'<span class="pill plan">planned</span>';html+=`<div class="item"><span class="n">${n}</span><span class="t">${t}</span>${pill}</div>`});html+='</div>'});

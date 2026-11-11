@@ -2,7 +2,7 @@
 
 > **The complete interactive visual curriculum for statistical mastery.**
 >
-> 31 comprehensive, self-contained interactive modules covering probability, classical inference, regression, causal inference, Bayesian modeling, and specialist depth — with interactive simulations, formula proofs, and self-assessment exams.
+> 30 comprehensive, self-contained interactive modules covering probability, classical inference, regression, causal inference, Bayesian modeling, and specialist depth — with interactive simulations, formula proofs, and self-assessment exams.
 
 ---
 
@@ -34,7 +34,7 @@ Then navigate to `http://localhost:8000`.
 
 ## 📊 Curriculum Overview
 
-The curriculum is structured across 7 progressive stages comprising **31 modules**, **386 chapters**, **364 interactive simulation labs**, and **552 exam questions**.
+The curriculum is structured across 7 progressive stages comprising **30 modules**, **374 chapters**, **353 interactive simulation labs**, and **534 exam questions**.
 
 ### Stage 1 · Foundations & Probability Theory
 1. [`random-variables-mastery.html`](random-variables-mastery.html) — **Random Variables, Expectation, Variance & Covariance** (15 chapters, 14 labs, 16 exam questions)
