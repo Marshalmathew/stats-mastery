@@ -85,17 +85,23 @@ def update_readme(workspace):
     with open(index_path, 'r', encoding='utf-8') as f:
         idx_content = f.read()
 
-    cards = re.findall(r"\{f:'([^']+)',key:'([^']+)',tag:'([^']+)',t:'([^']+)',d:'([^']+)',m:\[([^\]]+)\]\}", idx_content)
+    courses_m = re.search(r'const COURSES=\[\s*(.*?)\s*\];', idx_content, re.DOTALL)
+    if not courses_m:
+        return
+    entries = [l.strip() for l in courses_m.group(1).splitlines() if l.strip()]
+
     total_chapters = 0
     total_labs = 0
     total_questions = 0
-    for f, k, tag, t, d, m in cards:
-        ch = re.search(r'(\d+)\s*chapters?', m)
-        lb = re.search(r'(\d+)\s*labs?', m)
-        qu = re.search(r'(\d+)\s*(-question|\s*questions?)', m)
+    for line in entries:
+        ch = re.search(r'(\d+)\s*chapters?', line)
+        lb = re.search(r'(\d+)\s*labs?', line)
+        qu = re.search(r'(\d+)\s*(-question|\s*questions?)', line)
         if ch: total_chapters += int(ch.group(1))
         if lb: total_labs += int(lb.group(1))
         if qu: total_questions += int(qu.group(1))
+
+    total_modules = len(entries)
 
     readme_path = os.path.join(workspace, "README.md")
     if os.path.exists(readme_path):
@@ -104,12 +110,12 @@ def update_readme(workspace):
 
         # Update numbers in overview
         pattern = r"comprising \*\*\d+ modules\*\*, \*\*\d+ chapters\*\*, \*\*\d+ interactive simulation labs\*\*, and \*\*\d+ exam questions\*\*"
-        repl = f"comprising **{len(cards)} modules**, **{total_chapters} chapters**, **{total_labs} interactive simulation labs**, and **{total_questions} exam questions**"
+        repl = f"comprising **{total_modules} modules**, **{total_chapters} chapters**, **{total_labs} interactive simulation labs**, and **{total_questions} exam questions**"
         readme = re.sub(pattern, repl, readme)
 
         # Update top badge
         top_pattern = r">\s*\d+ comprehensive, self-contained interactive modules"
-        top_repl = f"> {len(cards)} comprehensive, self-contained interactive modules"
+        top_repl = f"> {total_modules} comprehensive, self-contained interactive modules"
         readme = re.sub(top_pattern, top_repl, readme)
 
         with open(readme_path, 'w', encoding='utf-8') as f:
