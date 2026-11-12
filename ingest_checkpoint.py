@@ -67,10 +67,11 @@ def fix_and_sort_index_html(index_path):
 
     # 3. Ensure Multiple Testing is in Stage 5, not Stage 4 in roadmap ST
     content = re.sub(
-        r",\s*\[\s*'Multiple testing and selective inference',\s*\{f:'multiple-testing-mastery\.html'\}\s*\]\s*\]\s*\]\s*,",
-        r"]]],",
+        r",\s*\[\s*'Multiple testing and selective inference',\s*\{f:'multiple-testing-mastery\.html'\}\s*\](?=\s*\]\s*\])",
+        "",
         content
     )
+    content = re.sub(r"\]{4,},", "]]],", content)
     stage5_marker = "['Stage 5 · Causal thinking',[\n"
     if stage5_marker in content and "['Multiple testing" not in content.split(stage5_marker)[1]:
         content = content.replace(stage5_marker, stage5_marker + "  ['Multiple testing and selective inference',{f:'multiple-testing-mastery.html'}],")
