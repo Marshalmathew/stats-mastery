@@ -129,15 +129,15 @@ details summary{cursor:pointer;font-weight:600}
 
  <!-- Chapter 1 -->
  <section class="ch" id="c1">
-  <h2><span class="num">1</span>The Interpretability Illusion: Explaining $f(x)$ vs Explaining Reality <span class="lvl b">Beginner</span></h2>
-  <p>A machine learning explanation is almost universally an explanation of the <b>prediction function $f(x)$</b>, not the <b>data-generating physical process $P(Y \mid X)$</b>. When practitioners say "Feature $X_1$ is the most important driver of patient mortality," they usually mean that the model's output changes substantially when $X_1$ varies. If the model was trained on observational data with unobserved confounding, selection bias, or reverse causality, $f(x)$ will faithfully exploit these spurious statistical associations.</p>
+  <h2><span class="num">1</span>The Interpretability Illusion: Explaining <i>f</i>(<i>x</i>) vs Explaining Reality <span class="lvl b">Beginner</span></h2>
+  <p>A machine learning explanation is almost universally an explanation of the <b>prediction function <i>f</i>(<i>x</i>)</b>, not the <b>data-generating physical process P(Y | X)</b>. When practitioners say "Feature X₁ is the most important driver of patient mortality," they usually mean that the model's output changes substantially when X₁ varies. If the model was trained on observational data with unobserved confounding, selection bias, or reverse causality, <i>f</i>(<i>x</i>) will faithfully exploit these spurious statistical associations.</p>
   <p>Consider an automated triage model predicting pneumonia mortality. In raw hospital records, asthmatic patients diagnosed with pneumonia have a <i>lower</i> observed mortality rate than non-asthmatics. Why? Because asthmatics are immediately escalated to intensive care units and receive aggressive early steroid therapy. A machine learning model learns: <code>Asthma = True → Risk = -0.42</code>. A post-hoc explainer (like SHAP or LIME) will correctly report that asthma has a large negative attribution. But advising a doctor to withhold ICU admission because "the explanation proves asthma protects the patient" is fatal.</p>
   
   <div class="card">
    <h4>Lab 1 · The Confounder Trap: Spurious Attributions</h4>
-   <p>In this simulation, true treatment $T$ has a harmful effect on outcome $Y$ ($\beta_{\text{true}} = +1.5$), but severe unobserved illness $U$ causes doctors to treat ($U \to T$) and independently increases survival effort ($U \to -Y$). Drag the confounding strength to observe how the model's feature attribution flips signs and contradicts reality.</p>
+   <p>In this simulation, true treatment T has a harmful effect on outcome Y (β_true = +1.5), but severe unobserved illness U causes doctors to treat (U → T) and independently increases survival effort (U → −Y). Drag the confounding strength to observe how the model's feature attribution flips signs and contradicts reality.</p>
    <div class="ctrl">
-    <label>Confounding Strength ($U \to T, Y$): <span id="r1v">0.8</span></label>
+    <label>Confounding Strength (U → T, Y): <span id="r1v">0.8</span></label>
     <input type="range" id="r1" min="-1.5" max="1.5" step="0.1" value="0.8">
    </div>
    <div class="sim"><canvas id="cv1" height="260"></canvas></div>
@@ -149,16 +149,16 @@ details summary{cursor:pointer;font-weight:600}
  <!-- Chapter 2 -->
  <section class="ch" id="c2">
   <h2><span class="num">2</span>Permutation Feature Importance &amp; Correlation Breakage <span class="lvl i">Intermediate</span></h2>
-  <p>Permutation Feature Importance (PFI), introduced by Leo Breiman for Random Forests, measures the increase in prediction error after randomly shuffling the values of feature $X_j$ across the validation set:
-  $$\text{PFI}(j) = L(y, f(X^{\pi_j})) - L(y, f(X))$$
+  <p>Permutation Feature Importance (PFI), introduced by Leo Breiman for Random Forests, measures the increase in prediction error after randomly shuffling the values of feature Xⱼ across the validation set:
+  <div class="f">PFI(j) = L(y, f(X^πⱼ)) − L(y, f(X))  ·  shuffles feature j  ·  assumes independence Xⱼ ⊥ X₋ⱼ</div>
   While conceptually intuitive and model-agnostic, PFI relies on a lethal hidden assumption: that features are <b>statistically independent</b>.</p>
-  <p>When features $X_1$ and $X_2$ are strongly correlated (e.g. $X_1 = \text{Annual Income}$ and $X_2 = \text{Monthly Savings}$), shuffling $X_1$ while holding $X_2$ fixed creates synthetic data points that lie far off the data manifold—such as an annual income of $15,000 paired with monthly savings of $20,000. Evaluating $f(x)$ on these impossible feature combinations forces the model to extrapolate into regions where it was never trained, producing wild prediction artifacts. Furthermore, when two collinear features jointly carry signal, each individual feature can be shuffled with minimal loss of accuracy because the other feature acts as a redundant backup, causing both to appear deceptively unimportant.</p>
+  <p>When features X₁ and X₂ are strongly correlated (e.g. X₁ = Annual Income and X₂ = Monthly Savings), shuffling X₁ while holding X₂ fixed creates synthetic data points that lie far off the data manifold—such as an annual income of 15,000 USD paired with monthly savings of 20,000 USD. Evaluating <i>f</i>(<i>x</i>) on these impossible feature combinations forces the model to extrapolate into regions where it was never trained, producing wild prediction artifacts. Furthermore, when two collinear features jointly carry signal, each individual feature can be shuffled with minimal loss of accuracy because the other feature acts as a redundant backup, causing both to appear deceptively unimportant.</p>
 
   <div class="card">
    <h4>Lab 2 · Permutation Importance under Collinearity: The Masking Dilemma</h4>
-   <p>Simulate two correlated predictors $X_1$ and $X_2$ with correlation $\rho$. Observe how as $\rho \to 1$, the permutation importance of each individual feature plummets even though their joint predictive power remains high.</p>
+   <p>Simulate two correlated predictors X₁ and X₂ with correlation ρ. Observe how as ρ → 1, the permutation importance of each individual feature plummets even though their joint predictive power remains high.</p>
    <div class="ctrl">
-    <label>Feature Correlation ($\rho$): <span id="r2v">0.85</span></label>
+    <label>Feature Correlation (ρ): <span id="r2v">0.85</span></label>
     <input type="range" id="r2" min="0.0" max="0.98" step="0.02" value="0.85">
    </div>
    <div class="sim"><canvas id="cv2" height="260"></canvas></div>
@@ -170,18 +170,18 @@ details summary{cursor:pointer;font-weight:600}
  <!-- Chapter 3 -->
  <section class="ch" id="c3">
   <h2><span class="num">3</span>Partial Dependence vs Accumulated Local Effects (ALE) <span class="lvl i">Intermediate</span></h2>
-  <p>Partial Dependence Plots (PDP) attempt to visualize the marginal effect of feature $X_j$ on $f(X)$ by averaging the model's predictions over the empirical marginal distribution of all other features $X_{\setminus j}$:
-  $$\hat{f}_{PDP}(x_j) = \frac{1}{n}\sum_{i=1}^n f(x_j, x_{i,\setminus j})$$
-  Like PFI, PDP computes predictions on rectangular grid combinations $(x_j, x_{i,\setminus j})$. When features are correlated, PDP evaluates points in empty regions where $P(X_j, X_{\setminus j}) \approx 0$, creating severe visual distortions.</p>
-  <p><b>Accumulated Local Effects (ALE)</b> plots, introduced by Apley &amp; Zhu (2020), solve this fundamental flaw. Instead of replacing $X_j$ globally, ALE calculates local differences in small intervals around $x_j$, conditioning on the actual local conditional distribution $P(X_{\setminus j} \mid X_j)$, and then integrates (accumulates) those local derivatives:
-  $$\hat{f}_{ALE}(x_j) = \int_{z_0}^{x_j} \mathbb{E}\left[\frac{\partial f(X_j, X_{\setminus j})}{\partial X_j} \,\middle|\, X_j = z\right] dz - \text{constant}$$
+  <p>Partial Dependence Plots (PDP) attempt to visualize the marginal effect of feature Xⱼ on <i>f</i>(<i>X</i>) by averaging the model's predictions over the empirical marginal distribution of all other features X₋ⱼ:
+  <div class="f">PDP: f̂_PDP(xⱼ) = (1/n) Σᵢ f(xⱼ, x_{i,−j})  ·  marginal average  ·  extrapolates into empty space</div>
+  Like PFI, PDP computes predictions on rectangular grid combinations (xⱼ, x_{i,−j}). When features are correlated, PDP evaluates points in empty regions where P(Xⱼ, X₋ⱼ) ≈ 0, creating severe visual distortions.</p>
+  <p><b>Accumulated Local Effects (ALE)</b> plots, introduced by Apley &amp; Zhu (2020), solve this fundamental flaw. Instead of replacing Xⱼ globally, ALE calculates local differences in small intervals around xⱼ, conditioning on the actual local conditional distribution P(X₋ⱼ | Xⱼ), and then integrates (accumulates) those local derivatives:
+  <div class="f">ALE: f̂_ALE(xⱼ) = ∫ E[∂f(Xⱼ, X₋ⱼ)/∂Xⱼ | Xⱼ = z] dz − constant  ·  accumulated local derivatives  ·  stays on data manifold</div>
   ALE never evaluates the model in empty feature space, isolates main effects from interactions, and remains statistically rigorous under severe correlation.</p>
 
   <div class="card">
    <h4>Lab 3 · PDP Extrapolation vs ALE Real-Manifold Tracking</h4>
-   <p>Toggle correlation $\rho$ between $X_1$ and $X_2$ where true model $f(x) = x_1 + 2 x_2^2$. Watch how PDP hallucinates non-existent curvature into empty space while ALE faithfully tracks the local gradient.</p>
+   <p>Toggle correlation ρ between X₁ and X₂ where true model f(x) = x₁ + 2x₂². Watch how PDP hallucinates non-existent curvature into empty space while ALE faithfully tracks the local gradient.</p>
    <div class="ctrl">
-    <label>Correlation ($\rho$): <span id="r3v">0.90</span></label>
+    <label>Correlation (ρ): <span id="r3v">0.90</span></label>
     <input type="range" id="r3" min="0.0" max="0.95" step="0.05" value="0.90">
    </div>
    <div class="sim"><canvas id="cv3" height="260"></canvas></div>
@@ -195,44 +195,44 @@ details summary{cursor:pointer;font-weight:600}
  <!-- Chapter 4 -->
  <section class="ch" id="c4">
   <h2><span class="num">4</span>Shapley Values &amp; Cooperative Game Axioms <span class="lvl i">Intermediate</span></h2>
-  <p>Originating in cooperative game theory (Lloyd Shapley, 1953), Shapley values answer the question: if $p$ players collaborate to achieve a total payout $v(S)$, how should the payout be fairly distributed? In machine learning, the players are the features, the game is the model prediction $f(x)$, and the payout is the deviation from the baseline expectation $\mathbb{E}[f(X)]$.</p>
-  <p>The Shapley value $\phi_j$ is the unique attribution method that simultaneously satisfies four essential axioms:
+  <p>Originating in cooperative game theory (Lloyd Shapley, 1953), Shapley values answer the question: if p players collaborate to achieve a total payout v(S), how should the payout be fairly distributed? In machine learning, the players are the features, the game is the model prediction <i>f</i>(<i>x</i>), and the payout is the deviation from the baseline expectation E[f(X)].</p>
+  <p>The Shapley value φⱼ is the unique attribution method that simultaneously satisfies four essential axioms:
   <ol>
-   <li><b>Efficiency:</b> $\sum_{j=1}^p \phi_j = f(x) - \mathbb{E}[f(X)]$ (all attribution sums to the prediction difference).</li>
-   <li><b>Symmetry:</b> If $v(S \cup \{j\}) = v(S \cup \{k\})$ for all subsets $S$, then $\phi_j = \phi_k$.</li>
-   <li><b>Dummy (Null Player):</b> If feature $j$ contributes nothing to any subset ($v(S \cup \{j\}) = v(S)$), then $\phi_j = 0$.</li>
-   <li><b>Additivity:</b> For combined games $u + v$, $\phi_j(u + v) = \phi_j(u) + \phi_j(v)$.</li>
+   <li><b>Efficiency:</b> Σ φⱼ = f(x) − E[f(X)] (all attribution sums to the prediction difference).</li>
+   <li><b>Symmetry:</b> If v(S ∪ {j}) = v(S ∪ {k}) for all subsets <i>S</i>, then φⱼ = φₖ.</li>
+   <li><b>Dummy (Null Player):</b> If feature <i>j</i> contributes nothing to any subset (v(S ∪ {j}) = v(S)), then φⱼ = 0.</li>
+   <li><b>Additivity:</b> For combined games u + v, φⱼ(u + v) = φⱼ(u) + φⱼ(v).</li>
   </ol>
-  The exact formula weights the marginal contribution over all $2^p$ possible coalitions:
-  $$\phi_j = \sum_{S \subseteq \{1,\dots,p\}\setminus\{j\}} \frac{|S|!(p - |S| - 1)!}{p!} \Big( v(S \cup \{j\}) - v(S) \Big)$$</p>
+  The exact formula weights the marginal contribution over all 2ᵖ possible coalitions:
+  <div class="f">Shapley value: φⱼ = Σ_{S ⊆ {1..p}\setminus{j}} [|S|!(p − |S| − 1)! / p!] · [v(S ∪ {j}) − v(S)]  ·  unique fair attribution across 2ᵖ coalitions</div></p>
 
   <div class="card">
    <h4>Lab 4 · Interactive 3-Feature Shapley Decomposition</h4>
-   <p>Explore an interactive 3-player cooperative credit model. Adjust the synergy parameter $\gamma$ to see how non-linear feature interactions are split equally across all contributing coalitions.</p>
+   <p>Explore an interactive 3-player cooperative credit model. Adjust the synergy parameter γ to see how non-linear feature interactions are split equally across all contributing coalitions.</p>
    <div class="ctrl">
-    <label>Interaction Synergy ($\gamma$): <span id="r4v">1.5</span></label>
+    <label>Interaction Synergy (γ): <span id="r4v">1.5</span></label>
     <input type="range" id="r4" min="-2.0" max="3.0" step="0.2" value="1.5">
    </div>
    <div class="sim"><canvas id="cv4" height="260"></canvas></div>
    <div class="stats" id="t4"></div>
-   <p class="takeaway"><b>Key Takeaway:</b> Shapley values provide the only mathematically unique attribution that satisfies the 4 fairness axioms. However, calculating exact values requires evaluating all $2^p$ subsets, necessitating approximations (TreeSHAP, KernelSHAP) in practice.</p>
+   <p class="takeaway"><b>Key Takeaway:</b> Shapley values provide the only mathematically unique attribution that satisfies the 4 fairness axioms. However, calculating exact values requires evaluating all 2ᵖ subsets, necessitating approximations (TreeSHAP, KernelSHAP) in practice.</p>
   </div>
  </section>
 
  <!-- Chapter 5 -->
  <section class="ch" id="c5">
   <h2><span class="num">5</span>Marginal vs Conditional SHAP: The Off-Manifold Dilemma <span class="lvl a">Advanced</span></h2>
-  <p>To evaluate a feature subset $S$, what is the value function $v(S)$? How do we "remove" features $\bar{S}$ from a trained model that expects a complete vector $x \in \mathbb{R}^p$? There are two fundamentally conflicting philosophies:
+  <p>To evaluate a feature subset <i>S</i>, what is the value function v(S)? How do we "remove" features −S from a trained model that expects a complete vector x ∈ ℝᵖ? There are two fundamentally conflicting philosophies:
   <ul>
-   <li><b>Interventional / Marginal SHAP:</b> Replaces absent features with random samples from their marginal distribution: $v_{\text{int}}(S) = \int f(x_S, x_{\bar{S}}) dP(X_{\bar{S}})$. This enforces <i>true to the model</i>. A feature with zero weight in $f(x)$ receives exactly $\phi_j = 0$ (Dummy axiom holds). But like PFI and PDP, it synthesizes off-manifold points by pairing $x_S$ with unrealistic $x_{\bar{S}}$.</li>
-   <li><b>Observational / Conditional SHAP:</b> Conditions on the present features: $v_{\text{obs}}(S) = \mathbb{E}[f(X) \mid X_S = x_S]$. This enforces <i>true to the data</i>. It never evaluates off-manifold points. But it violates the Dummy axiom: if $X_1$ has true model weight 0, but is correlated with $X_2$, $X_1$ will receive non-zero attribution because observing $X_1$ updates our expectation of $X_2$!</li>
+   <li><b>Interventional / Marginal SHAP:</b> Replaces absent features with random samples from their marginal distribution: v_int(S) = ∫ f(x_S, x_{−S}) dP(X_{−S}). This enforces <i>true to the model</i>. A feature with zero weight in <i>f</i>(<i>x</i>) receives exactly φⱼ = 0 (Dummy axiom holds). But like PFI and PDP, it synthesizes off-manifold points by pairing x_S with unrealistic x_{−S}.</li>
+   <li><b>Observational / Conditional SHAP:</b> Conditions on the present features: v_obs(S) = E[f(X) | X_S = x_S]. This enforces <i>true to the data</i>. It never evaluates off-manifold points. But it violates the Dummy axiom: if X₁ has true model weight 0, but is correlated with X₂, X₁ will receive non-zero attribution because observing X₁ updates our expectation of X₂!</li>
   </ul></p>
 
   <div class="card">
    <h4>Lab 5 · Marginal vs Conditional SHAP under Correlation</h4>
-   <p>Set true model $f(x) = 2.0 X_1 + 0.0 X_2$. $X_2$ has zero weight in the model! Adjust correlation $\rho(X_1, X_2)$ and observe how Conditional SHAP falsely attributes credit to the dummy variable $X_2$ while Marginal SHAP keeps $X_2 = 0$ but hallucinates off-manifold.</p>
+   <p>Set true model f(x) = 2.0X₁ + 0.0X₂. X₂ has zero weight in the model! Adjust correlation ρ(X₁, X₂) and observe how Conditional SHAP falsely attributes credit to the dummy variable X₂ while Marginal SHAP keeps X₂ = 0 but hallucinates off-manifold.</p>
    <div class="ctrl">
-    <label>Correlation $\rho(X_1, X_2)$: <span id="r5v">0.80</span></label>
+    <label>Correlation ρ(X₁, X₂): <span id="r5v">0.80</span></label>
     <input type="range" id="r5" min="-0.95" max="0.95" step="0.05" value="0.80">
    </div>
    <div class="sim"><canvas id="cv5" height="260"></canvas></div>
@@ -244,20 +244,20 @@ details summary{cursor:pointer;font-weight:600}
  <!-- Chapter 6 -->
  <section class="ch" id="c6">
   <h2><span class="num">6</span>LIME: Local Surrogates &amp; Sampling Radius Instabilities <span class="lvl a">Advanced</span></h2>
-  <p>LIME (Local Interpretable Model-agnostic Explanations, Ribeiro et al. 2016) builds a local linear surrogate model $g(z) = w^T z$ to approximate complex black-box $f(x)$ around an instance $x$:
-  $$\xi(x) = \arg\min_{g \in G} \sum_{z \in Z} \pi_x(z) \big(f(z) - g(z)\big)^2 + \Omega(g)$$
-  where $\pi_x(z) = \exp\left(-\frac{D(x, z)^2}{\sigma^2}\right)$ is an exponential proximity kernel with kernel bandwidth $\sigma$.</p>
+  <p>LIME (Local Interpretable Model-agnostic Explanations, Ribeiro et al. 2016) builds a local linear surrogate model g(z) = wᵀz to approximate complex black-box <i>f</i>(<i>x</i>) around an instance <i>x</i>:
+  <div class="f">LIME surrogate: ξ(x) = argmin_{g ∈ G} Σ_{z ∈ Z} πₓ(z) [f(z) − g(z)]² + Ω(g)  ·  local linear approximation</div>
+  where πₓ(z) = exp(−D(x, z)² / σ²) is an exponential proximity kernel with kernel bandwidth σ.</p>
   <p>LIME suffers from two acute statistical vulnerabilities:
   <ol>
-   <li><b>Sampling Variance:</b> Perturbations $z$ are drawn randomly from Gaussian noise. Different random seeds on the same instance can produce completely conflicting explanation weights.</li>
-   <li><b>Hyperparameter Sensitivity ($\sigma$):</b> If $\sigma$ is too small, the sample contains virtually no variance and the fit is ill-conditioned. If $\sigma$ is too large, the surrogate spans multiple non-linear curvature regions, causing local feature weights to flip signs.</li>
+   <li><b>Sampling Variance:</b> Perturbations z are drawn randomly from Gaussian noise. Different random seeds on the same instance can produce completely conflicting explanation weights.</li>
+   <li><b>Hyperparameter Sensitivity (σ):</b> If σ is too small, the sample contains virtually no variance and the fit is ill-conditioned. If σ is too large, the surrogate spans multiple non-linear curvature regions, causing local feature weights to flip signs.</li>
   </ol></p>
 
   <div class="card">
    <h4>Lab 6 · LIME Kernel Bandwidth &amp; Surrogate Instability</h4>
-   <p>Drag the kernel width $\sigma$ on a non-linear decision boundary. Observe how changing the arbitrary neighborhood radius flips the local surrogate slope from positive to negative.</p>
+   <p>Drag the kernel width σ on a non-linear decision boundary. Observe how changing the arbitrary neighborhood radius flips the local surrogate slope from positive to negative.</p>
    <div class="ctrl">
-    <label>Kernel Bandwidth ($\sigma$): <span id="r6v">0.45</span></label>
+    <label>Kernel Bandwidth (σ): <span id="r6v">0.45</span></label>
     <input type="range" id="r6" min="0.1" max="1.5" step="0.05" value="0.45">
    </div>
    <div class="sim"><canvas id="cv6" height="260"></canvas></div>
@@ -269,16 +269,16 @@ details summary{cursor:pointer;font-weight:600}
  <!-- Chapter 7 -->
  <section class="ch" id="c7">
   <h2><span class="num">7</span>The Rashomon Effect &amp; Model Multiplicity <span class="lvl a">Advanced</span></h2>
-  <p>Named after Akira Kurosawa’s film where witnesses describe the same event in contradictory ways, Leo Breiman (2001) coined the <b>Rashomon Effect</b> for machine learning: in almost any empirical dataset, there exists a vast <b>Rashomon set</b> $\mathcal{R}(\epsilon)$ of models that achieve virtually identical predictive loss:
-  $$\mathcal{R}(\epsilon) = \left\{ f \in \mathcal{F} \;\middle|\; L(f) \le L(f^*) + \epsilon \right\}$$
+  <p>Named after Akira Kurosawa’s film where witnesses describe the same event in contradictory ways, Leo Breiman (2001) coined the <b>Rashomon Effect</b> for machine learning: in almost any empirical dataset, there exists a vast <b>Rashomon set</b> R(ε) of models that achieve virtually identical predictive loss:
+  <div class="f">Rashomon Set: R(ε) = { f ∈ F | L(f) ≤ L(f*) + ε }  ·  competing models with near-identical loss and conflicting explanations</div>
   While these models predict equally well (e.g. all within 0.1% test AUC), their internal mechanisms, coefficient signs, and top-ranked feature importances can be diametrically opposed.</p>
   <p>When an organization trains a single model (say, gradient boosted trees with seed 101) and presents its SHAP plot as "the ground truth explanation of our data," they are ignoring thousands of equally accurate models that would assign zero importance to their top feature and high importance to an omitted variable. This phenomenon is known as <b>Predictive Multiplicity</b> (Marx et al., 2020).</p>
 
   <div class="card">
    <h4>Lab 7 · The Rashomon Multiplicity Explorer</h4>
-   <p>Inspect 5 distinct models from the Rashomon set of a collinear dataset ($\Delta \text{Loss} < 0.2\%$). Compare how their top feature rankings flip and contradict each other despite identical test performance.</p>
+   <p>Inspect 5 distinct models from the Rashomon set of a collinear dataset (ΔLoss &lt; 0.2%). Compare how their top feature rankings flip and contradict each other despite identical test performance.</p>
    <div class="ctrl">
-    <label>Loss Tolerance ($\epsilon$): <span id="r7v">0.02</span></label>
+    <label>Loss Tolerance (ε): <span id="r7v">0.02</span></label>
     <input type="range" id="r7" min="0.005" max="0.08" step="0.005" value="0.02">
    </div>
    <div class="sim"><canvas id="cv7" height="260"></canvas></div>
@@ -292,14 +292,14 @@ details summary{cursor:pointer;font-weight:600}
  <!-- Chapter 8 -->
  <section class="ch" id="c8">
   <h2><span class="num">8</span>Feature Attribution Is Not Causal Effect <span class="lvl a">Advanced</span></h2>
-  <p>Perhaps the most dangerous misuse of explainable AI is treating feature attribution $\phi_j$ as an estimate of causal intervention $\frac{\partial \mathbb{E}[Y \mid do(X)]}{\partial X_j}$. In business and policy settings, leaders routinely ask: <i>"SHAP says Marketing Spend has attribution +0.8 and Customer Age has +0.1; therefore, increasing marketing spend by \$10k will generate 8x more return than targeting older customers."</i></p>
+  <p>Perhaps the most dangerous misuse of explainable AI is treating feature attribution φⱼ as an estimate of causal intervention ∂E[Y | do(X)] / ∂Xⱼ. In business and policy settings, leaders routinely ask: <i>"SHAP says Marketing Spend has attribution +0.8 and Customer Age has +0.1; therefore, increasing marketing spend by \10,000 USD will generate 8x more return than targeting older customers."</i></p>
   <p>This inference is completely unjustified. Feature attributions measure associative model dependencies:
-  $$\text{Attribution} \approx \frac{\partial f(x)}{\partial x_j} \ne \frac{d \mathbb{E}[Y \mid do(X_j = x_j)]}{d x_j}$$
-  If $X_j$ is a mediator, a collider, or an effect of an unobserved common cause (e.g., website visits before buying), the attribution will be enormous while the true interventional effect of artificially forcing website visits is exactly zero. Valid causal effects require identification via DAGs, the backdoor criterion, and exogenous variation—things statistical explainers are mathematically incapable of providing.</p>
+  <div class="f">Attribution ∂f(x)/∂xⱼ ≠ Causal Effect dE[Y | do(Xⱼ = xⱼ)]/dxⱼ  ·  associative gradient ≠ physical intervention</div>
+  If Xⱼ is a mediator, a collider, or an effect of an unobserved common cause (e.g., website visits before buying), the attribution will be enormous while the true interventional effect of artificially forcing website visits is exactly zero. Valid causal effects require identification via DAGs, the backdoor criterion, and exogenous variation—things statistical explainers are mathematically incapable of providing.</p>
 
   <div class="card">
    <h4>Lab 8 · Attribution vs Causal DAG Interventions</h4>
-   <p>Compare the SHAP attribution of feature $X_1$ with its true causal effect $\frac{d\mathbb{E}[Y \mid do(X_1)]}{dX_1}$ across different causal structures (Confounder, Mediator, Collider).</p>
+   <p>Compare the SHAP attribution of feature X₁ with its true causal effect dE[Y | do(X₁)] / dX₁ across different causal structures (Confounder, Mediator, Collider).</p>
    <div class="ctrl">
     <label>Collider Correlation / Bias: <span id="r8v">0.75</span></label>
     <input type="range" id="r8" min="-1.0" max="1.0" step="0.1" value="0.75">
@@ -314,16 +314,13 @@ details summary{cursor:pointer;font-weight:600}
  <section class="ch" id="c9">
   <h2><span class="num">9</span>Adversarial Fooling of Post-Hoc Explainers <span class="lvl e">Expert</span></h2>
   <p>Can a model lie about its own internal reasoning? In landmark work, Slack et al. (2020) demonstrated that post-hoc explainers like LIME and SHAP can be systematically fooled using <b>adversarial scaffolding</b>.</p>
-  <p>Explainers draw perturbation samples $z$ from synthetic distributions (e.g. isotropic Gaussians or marginal permutations). Because real data lies on a lower-dimensional manifold, off-manifold synthetic perturbations are easily distinguishable from real on-manifold instances by a simple binary classifier:
-  $$f_{\text{adv}}(x) = \begin{cases} 
-  f_{\text{biased}}(x) & \text{if } x \text{ is on-manifold (Real Customer: discriminate on Protected Attribute)} \\ 
-  f_{\text{innocuous}}(x) & \text{if } x \text{ is off-manifold (Explainer Perturbation: predict using benign features)}
-  \end{cases}$$
+  <p>Explainers draw perturbation samples z from synthetic distributions (e.g. isotropic Gaussians or marginal permutations). Because real data lies on a lower-dimensional manifold, off-manifold synthetic perturbations are easily distinguishable from real on-manifold instances by a simple binary classifier:
+  <div class="f">Adversarial Scaffolding: f_adv(x) = f_biased(x) on real data manifold, but switches to f_innocuous(x) on explainer perturbation points</div>
   When queried by an auditor or regulator using LIME or SHAP, the model detects the perturbation distribution and switches to a harmless explanation! The auditor concludes the model is 100% fair and blind to protected attributes, while in production it actively discriminates.</p>
 
   <div class="card">
    <h4>Lab 9 · The Scaffolding Exploit Simulator</h4>
-   <p>Test an adversarial model that discriminates on protected feature $Z$ on real data, but detects perturbation points generated by SHAP/LIME and feigns neutrality.</p>
+   <p>Test an adversarial model that discriminates on protected feature Z on real data, but detects perturbation points generated by SHAP/LIME and feigns neutrality.</p>
    <div class="ctrl">
     <label>Manifold Detector Sensitivity: <span id="r9v">0.90</span></label>
     <input type="range" id="r9" min="0.5" max="0.99" step="0.01" value="0.90">
@@ -337,18 +334,18 @@ details summary{cursor:pointer;font-weight:600}
  <!-- Chapter 10 -->
  <section class="ch" id="c10">
   <h2><span class="num">10</span>High Dimensions, Non-Linearities &amp; Feature Dilution <span class="lvl e">Expert</span></h2>
-  <p>In high dimensions ($p \gg 100$), explainability encounters the geometric curse of dimensionality:
+  <p>In high dimensions (p ≫ 100), explainability encounters the geometric curse of dimensionality:
   <ul>
    <li><b>Feature Dilution:</b> If a credit bureau includes 50 correlated credit inquiries instead of 1 aggregate score, tree models split across all 50 features arbitrarily. The individual attribution of each inquiry drops by a factor of 50, disguising an overwhelming risk factor as negligible background noise.</li>
-   <li><b>Distance Dilution in LIME:</b> In high dimensions, all pairwise Euclidean distances converge to the same value ($D_{\max} / D_{\min} \to 1$). Exponential kernels $\pi_x(z)$ lose discriminative power, assigning nearly equal weights to all perturbed points.</li>
-   <li><b>High-Order Interactions:</b> When models contain complex multi-way interactions (e.g. $X_1 \cdot X_2 \cdot X_3 \cdot X_4$), splitting the interaction evenly across main-effect attributions hides the non-linear trigger conditions.</li>
+   <li><b>Distance Dilution in LIME:</b> In high dimensions, all pairwise Euclidean distances converge to the same value (D_max / D_min → 1). Exponential kernels πₓ(z) lose discriminative power, assigning nearly equal weights to all perturbed points.</li>
+   <li><b>High-Order Interactions:</b> When models contain complex multi-way interactions (e.g. X₁ · X₂ · X₃ · X₄), splitting the interaction evenly across main-effect attributions hides the non-linear trigger conditions.</li>
   </ul></p>
 
   <div class="card">
    <h4>Lab 10 · Collinear Dilution &amp; Importance Dispersal</h4>
    <p>Add redundant collinear copies of a primary risk signal. Watch how individual feature importances vanish below the significance floor while the true total group importance remains invariant.</p>
    <div class="ctrl">
-    <label>Number of Collinear Copies ($k$): <span id="r10v">8</span></label>
+    <label>Number of Collinear Copies (k): <span id="r10v">8</span></label>
     <input type="range" id="r10" min="1" max="20" step="1" value="8">
    </div>
    <div class="sim"><canvas id="cv10" height="260"></canvas></div>
@@ -366,15 +363,15 @@ details summary{cursor:pointer;font-weight:600}
    <li><b>Actionable (Recourse):</b> Guiding individuals on what realistic, feasible changes will alter the decision.</li>
    <li><b>Robust:</b> Stable under minor input perturbations and sample re-runs.</li>
   </ol></p>
-  <p><b>Counterfactual Explanations &amp; Actionable Recourse:</b> A counterfactual explanation finds the minimum cost change $\delta$ such that $f(x + \delta) = y^*$:
-  $$\delta^* = \arg\min_{\delta} \text{dist}(x, x+\delta) + \lambda \ell(f(x+\delta), y^*) + \text{Plausibility}(x+\delta)$$
+  <p><b>Counterfactual Explanations &amp; Actionable Recourse:</b> A counterfactual explanation finds the minimum cost change δ such that f(x + δ) = y*:
+  <div class="f">Counterfactual Recourse: δ* = argmin_δ [ dist(x, x+δ) + λ ℓ(f(x+δ), y*) + Plausibility(x+δ) ]  ·  must respect causal constraints</div>
   Crucially, mathematical nearest-counterfactuals often prescribe absurd actions (e.g., "reduce your age by 5 years" or "decrease debt while keeping income at zero"). Actionable recourse requires causal constraints and immutable feature protections.</p>
 
   <div class="card">
    <h4>Lab 11 · Nearest Counterfactual vs Feasible Causal Recourse</h4>
    <p>Compare unconstrained mathematical counterfactuals (which extrapolate off the data manifold) with feasible causal recourse that respects feature correlations and immutable constraints.</p>
    <div class="ctrl">
-    <label>Manifold Constraint Weight ($\lambda$): <span id="r11v">1.2</span></label>
+    <label>Manifold Constraint Weight (λ): <span id="r11v">1.2</span></label>
     <input type="range" id="r11" min="0.0" max="3.0" step="0.2" value="1.2">
    </div>
    <div class="sim"><canvas id="cv11" height="260"></canvas></div>
@@ -447,7 +444,7 @@ details summary{cursor:pointer;font-weight:600}
       <td style="padding:8px">Efficiency, Symmetry, Dummy, Additivity</td>
       <td style="padding:8px">Dummy features stay zero; off-manifold sampling</td>
       <td style="padding:8px"><span style="color:var(--r)">High</span></td>
-      <td style="padding:8px">Feature attribution $\ne$ do-calculus</td>
+      <td style="padding:8px">Feature attribution ≠ do-calculus</td>
      </tr>
      <tr style="border-bottom:1px solid var(--line)">
       <td style="padding:8px"><b>Conditional SHAP</b></td>
@@ -461,7 +458,7 @@ details summary{cursor:pointer;font-weight:600}
       <td style="padding:8px"><b>LIME</b></td>
       <td style="padding:8px">Local</td>
       <td style="padding:8px">None (local surrogate fit)</td>
-      <td style="padding:8px">Sensitive to kernel width $\sigma$ and random seed</td>
+      <td style="padding:8px">Sensitive to kernel width σ and random seed</td>
       <td style="padding:8px"><span style="color:var(--y)">Medium</span> (Gaussian)</td>
       <td style="padding:8px">Linear surrogate gradient</td>
      </tr>
@@ -801,24 +798,24 @@ reg(()=>{
 
 /* ---------- EXAM QUESTIONS (18 Qs) ---------- */
 const QZ=[
- {"l":"Beginner","q":"What is the fundamental difference between explaining a machine learning model $f(x)$ and explaining the real-world system $P(Y \\mid X)$?","o":["Explaining $f(x)$ describes how the algorithm combines inputs; it reflects real-world causality only if all causal assumptions hold","There is no difference; high accuracy guarantees causal explanations","Explaining $f(x)$ is always parametric, while explaining nature is non-parametric","Explaining $f(x)$ accounts for unobserved confounders automatically"],"a":0,"e":"A post-hoc explanation describes the mathematical mapping learned by the model. If the model learned confounded, selected, or reverse-causal correlations, the explanation reflects those flaws."},
+ {"l":"Beginner","q":"What is the fundamental difference between explaining a machine learning model <i>f</i>(<i>x</i>) and explaining the real-world system $P(Y \\mid X)$?","o":["Explaining <i>f</i>(<i>x</i>) describes how the algorithm combines inputs; it reflects real-world causality only if all causal assumptions hold","There is no difference; high accuracy guarantees causal explanations","Explaining <i>f</i>(<i>x</i>) is always parametric, while explaining nature is non-parametric","Explaining <i>f</i>(<i>x</i>) accounts for unobserved confounders automatically"],"a":0,"e":"A post-hoc explanation describes the mathematical mapping learned by the model. If the model learned confounded, selected, or reverse-causal correlations, the explanation reflects those flaws."},
  {"l":"Beginner","q":"Why did an ML model trained on pneumonia records predict that asthmatics have lower risk of death?","o":["Asthma biologically cures pneumonia complications","Asthmatic patients were immediately escalated to intensive care, introducing confounding by treatment indication","Asthmatics were filtered out of the test set","The model suffered from severe overfitting"],"a":1,"e":"Confounding by indication: patients with high-risk pre-existing conditions receive aggressive treatment, creating a negative observational correlation between the risk factor and mortality."},
  {"l":"Intermediate","q":"Why does Permutation Feature Importance (PFI) produce misleading results when predictors are highly correlated?","o":["It increases computational complexity exponentially","Shuffling one feature pairs it with improbable values of correlated features, forcing the model to extrapolate into empty off-manifold space","PFI violates the Efficiency axiom of game theory","PFI can only be computed on linear models"],"a":1,"e":"Permuting feature j independently breaks the joint correlation structure, evaluating the model on impossible combinations (e.g. 5-year-old with 30 years of credit history)."},
- {"l":"Intermediate","q":"How does Accumulated Local Effects (ALE) solve the extrapolation flaw of Partial Dependence Plots (PDP)?","o":["ALE uses cross-validation instead of held-out data","ALE calculates local differences within conditional slices and accumulates them, avoiding off-manifold evaluation","ALE converts the model into a linear surrogate","ALE evaluates all $2^p$ feature coalitions"],"a":1,"e":"ALE computes expected local derivatives conditional on the present feature values, accumulating them without ever querying points far from the data manifold."},
+ {"l":"Intermediate","q":"How does Accumulated Local Effects (ALE) solve the extrapolation flaw of Partial Dependence Plots (PDP)?","o":["ALE uses cross-validation instead of held-out data","ALE calculates local differences within conditional slices and accumulates them, avoiding off-manifold evaluation","ALE converts the model into a linear surrogate","ALE evaluates all 2ᵖ feature coalitions"],"a":1,"e":"ALE computes expected local derivatives conditional on the present feature values, accumulating them without ever querying points far from the data manifold."},
  {"l":"Intermediate","q":"Which set of axioms uniquely characterizes the Shapley value in cooperative game theory?","o":["Completeness, Transitivity, Reflexivity, Homogeneity","Efficiency, Symmetry, Dummy (Null Player), Additivity","Convexity, Monotonicity, Continuity, Duality","Consistency, Unbiasedness, Sufficiency, Efficiency"],"a":1,"e":"Lloyd Shapley (1953) proved that Efficiency, Symmetry, Dummy, and Additivity uniquely determine the Shapley attribution formula."},
- {"l":"Advanced","q":"What happens when you apply Marginal (Interventional) SHAP to a model where features $X_1$ and $X_2$ are strongly correlated?","o":["It violates the Efficiency axiom","It evaluates the model on off-manifold, impossible feature combinations","It assigns non-zero credit to dummy features","It produces negative variances"],"a":1,"e":"Marginal SHAP integrates absent features over their marginal empirical distribution, breaking the dependency structure and querying the model in empty regions."},
+ {"l":"Advanced","q":"What happens when you apply Marginal (Interventional) SHAP to a model where features X₁ and X₂ are strongly correlated?","o":["It violates the Efficiency axiom","It evaluates the model on off-manifold, impossible feature combinations","It assigns non-zero credit to dummy features","It produces negative variances"],"a":1,"e":"Marginal SHAP integrates absent features over their marginal empirical distribution, breaking the dependency structure and querying the model in empty regions."},
  {"l":"Advanced","q":"What is the primary drawback of Conditional (Observational) SHAP?","o":["It cannot be computed for tree models","It violates the Dummy axiom by attributing importance to features with zero weight in the model if they correlate with active features","It violates the Efficiency axiom","It produces infinite Shapley values"],"a":1,"e":"Conditional SHAP computes E[f(X) | X_S]. If X_dummy has weight 0 but correlates with X_active, conditioning on X_dummy updates the expectation, giving X_dummy non-zero attribution."},
- {"l":"Advanced","q":"Why is LIME notoriously unstable across repeated runs on the same data point?","o":["It relies on random Gaussian perturbations and is highly sensitive to the chosen kernel bandwidth $\\sigma$","It requires solving a non-convex NP-hard matrix inversion","It does not support classification problems","It requires identical training and test distributions"],"a":0,"e":"LIME draws random local perturbations and weights them by an exponential distance kernel. Small changes in kernel width or random seed can drastically shift surrogate weights."},
+ {"l":"Advanced","q":"Why is LIME notoriously unstable across repeated runs on the same data point?","o":["It relies on random Gaussian perturbations and is highly sensitive to the chosen kernel bandwidth $\σ$","It requires solving a non-convex NP-hard matrix inversion","It does not support classification problems","It requires identical training and test distributions"],"a":0,"e":"LIME draws random local perturbations and weights them by an exponential distance kernel. Small changes in kernel width or random seed can drastically shift surrogate weights."},
  {"l":"Advanced","q":"What is the Rashomon Effect in machine learning?","o":["The tendency of neural networks to memorize training labels","The existence of many distinct models that achieve virtually identical predictive accuracy but have conflicting internal mechanisms and feature rankings","The phenomenon where models perform worse on minority demographics","The failure of cross-validation under covariate shift"],"a":1,"e":"Named by Leo Breiman, the Rashomon effect demonstrates that many models achieve near-optimal loss with completely different, equally plausible feature attributions."},
- {"l":"Advanced","q":"If feature $X_1$ has the highest positive SHAP value in a churn model, what can an executive soundly conclude?","o":["Increasing $X_1$ by 1 unit will directly reduce churn by the SHAP amount","Feature $X_1$ is the model's strongest statistical discriminator; causal impact requires an experiment or causal identification","The model has proven that $X_1$ causes customer retention","Features with lower SHAP values have zero business value"],"a":1,"e":"Attributions reflect internal model reliance, not causal effect. Acting on attributions without causal identification frequently leads to wasted investment or perverse outcomes."},
+ {"l":"Advanced","q":"If feature X₁ has the highest positive SHAP value in a churn model, what can an executive soundly conclude?","o":["Increasing X₁ by 1 unit will directly reduce churn by the SHAP amount","Feature X₁ is the model's strongest statistical discriminator; causal impact requires an experiment or causal identification","The model has proven that X₁ causes customer retention","Features with lower SHAP values have zero business value"],"a":1,"e":"Attributions reflect internal model reliance, not causal effect. Acting on attributions without causal identification frequently leads to wasted investment or perverse outcomes."},
  {"l":"Expert","q":"How does the Slack et al. (2020) adversarial scaffolding exploit bypass SHAP and LIME audits?","o":["By modifying the test set labels directly","By training a classifier to detect whether an input is on-manifold (real user) or off-manifold (explainer perturbation), switching behavior to feign neutrality during audits","By corrupting the gradient computation in backpropagation","By setting all feature weights to zero during inference"],"a":1,"e":"Because post-hoc explainers draw perturbations from off-manifold synthetic distributions, an adversarial model easily detects when it is being audited and hides discriminatory logic."},
- {"l":"Expert","q":"What occurs when a primary risk signal is duplicated into $k$ collinear features in a tree ensemble?","o":["The ensemble error increases by a factor of $k$","Feature dilution: the splits are shared among the $k$ features, causing each individual feature's importance to drop by $\\sim 1/k$","The Shapley values of all other features become zero","TreeSHAP fails to converge"],"a":1,"e":"Collinear feature dilution disperses the split importance across all redundant copies, making critical risk drivers appear statistically insignificant."},
- {"l":"Expert","q":"What is a fundamental requirement for a counterfactual explanation to provide 'actionable recourse' under credit regulations (ECOA)?","o":["It must be the absolute Euclidean nearest point, regardless of real-world feasibility","It must only recommend changes to mutable, causally feasible features along the plausible data manifold","It must recommend changing at least 10 features simultaneously","It must guarantee 100% accuracy on future applicants"],"a":1,"e":"Actionable recourse requires realistic guidance (e.g. 'increase savings by $500', not 'decrease your age by 10 years') that respects causal relationships and plausibility."},
- {"l":"Expert","q":"Under the Additivity axiom of Shapley values, if model $f(x) = g(x) + h(x)$, what is the attribution $\\phi_j(f)$?","o":["$\\phi_j(f) = \\phi_j(g) \\cdot \\phi_j(h)$","$\\phi_j(f) = \\phi_j(g) + \\phi_j(h)$","$\\phi_j(f) = \\max(\\phi_j(g), \\phi_j(h))$","$\\phi_j(f) = \\sqrt{\\phi_j(g)^2 + \\phi_j(h)^2}$"],"a":1,"e":"Additivity guarantees that the Shapley values of a sum of games equals the sum of the individual Shapley values."},
- {"l":"Expert","q":"Why does Breiman's PFI violate the principle of evaluating models on the true data distribution?","o":["Permuting breaks the marginal distribution of $X_j$","Permuting preserves the marginal of $X_j$ but destroys the joint distribution $P(X_j, X_{-j})$, generating impossible synthetic instances","PFI assumes all features follow a Gaussian distribution","PFI requires retraining the model for every feature"],"a":1,"e":"Permuting preserves marginal frequencies of $X_j$ while completely destroying conditional correlations, forcing evaluation in empty probability space."},
+ {"l":"Expert","q":"What occurs when a primary risk signal is duplicated into k collinear features in a tree ensemble?","o":["The ensemble error increases by a factor of k","Feature dilution: the splits are shared among the k features, causing each individual feature's importance to drop by $\\sim 1/k$","The Shapley values of all other features become zero","TreeSHAP fails to converge"],"a":1,"e":"Collinear feature dilution disperses the split importance across all redundant copies, making critical risk drivers appear statistically insignificant."},
+ {"l":"Expert","q":"What is a fundamental requirement for a counterfactual explanation to provide 'actionable recourse' under credit regulations (ECOA)?","o":["It must be the absolute Euclidean nearest point, regardless of real-world feasibility","It must only recommend changes to mutable, causally feasible features along the plausible data manifold","It must recommend changing at least 10 features simultaneously","It must guarantee 100% accuracy on future applicants"],"a":1,"e":"Actionable recourse requires realistic guidance (e.g. 'increase savings by 500 USD', not 'decrease your age by 10 years') that respects causal relationships and plausibility."},
+ {"l":"Expert","q":"Under the Additivity axiom of Shapley values, if model $f(x) = g(x) + h(x)$, what is the attribution $\φⱼ(f)$?","o":["$\φⱼ(f) = \φⱼ(g) \\cdot \φⱼ(h)$","$\φⱼ(f) = \φⱼ(g) + \φⱼ(h)$","$\φⱼ(f) = \\max(\φⱼ(g), \φⱼ(h))$","$\φⱼ(f) = \\sqrt{\φⱼ(g)^2 + \φⱼ(h)^2}$"],"a":1,"e":"Additivity guarantees that the Shapley values of a sum of games equals the sum of the individual Shapley values."},
+ {"l":"Expert","q":"Why does Breiman's PFI violate the principle of evaluating models on the true data distribution?","o":["Permuting breaks the marginal distribution of Xⱼ","Permuting preserves the marginal of Xⱼ but destroys the joint distribution P(Xⱼ, X₋ⱼ), generating impossible synthetic instances","PFI assumes all features follow a Gaussian distribution","PFI requires retraining the model for every feature"],"a":1,"e":"Permuting preserves marginal frequencies of Xⱼ while completely destroying conditional correlations, forcing evaluation in empty probability space."},
  {"l":"Expert","q":"Which method should be preferred when evaluating the global marginal effect of a continuous feature with strong non-linear interactions and correlation?","o":["Partial Dependence Plot (PDP)","Accumulated Local Effects (ALE)","Permutation Feature Importance (PFI)","Standardized regression coefficients"],"a":1,"e":"ALE isolates main effects by computing local derivatives within conditional slices, making it the robust choice under correlation and non-linear interactions."},
  {"l":"Expert","q":"In financial model risk management (SR 11-7), why is an explanation from a single tree model considered insufficient evidence of data truth?","o":["Because decision trees cannot output continuous probabilities","Because of the Rashomon effect: multiple distinct model architectures can achieve equivalent risk with inverted feature attributions","Because tree models cannot be audited by regulators","Because tree depth cannot exceed 4 in banking models"],"a":1,"e":"SR 11-7 model risk guidance recognizes predictive multiplicity: relying on one model's internal feature attributions as physical reality is a severe governance flaw."},
- {"l":"Expert","q":"What mathematical property ensures that TreeSHAP computes exact marginal expectations in polynomial time $O(T L D^2)$ instead of exponential $O(2^p)$?","o":["It assumes all features are statistically independent and projects onto tree decision paths recursively","It uses Monte Carlo sampling with rejection bounds","It approximates the tree with a linear regression surrogate","It prunes all trees to depth 2 before computing Shapley values"],"a":0,"e":"TreeSHAP achieves polynomial complexity by leveraging tree structures and assuming feature independence to compute conditional expectations recursively."}
+ {"l":"Expert","q":"What mathematical property ensures that TreeSHAP computes exact marginal expectations in polynomial time O(T · L · D²) instead of exponential O(2ᵖ)?","o":["It assumes all features are statistically independent and projects onto tree decision paths recursively","It uses Monte Carlo sampling with rejection bounds","It approximates the tree with a linear regression surrogate","It prunes all trees to depth 2 before computing Shapley values"],"a":0,"e":"TreeSHAP achieves polynomial complexity by leveraging tree structures and assuming feature independence to compute conditional expectations recursively."}
 ];
 
 (function(){const st=store.get('il_quiz',{});
