@@ -87,6 +87,12 @@ The curriculum is structured across 7 progressive stages comprising **36 modules
 36. [`interpretability-limits-mastery.html`](interpretability-limits-mastery.html) — **Interpretability and its statistical limits** (12 chapters,11 labs,18-question exam)
 
 
+### Quick Navigation & Bonus Resources
+
+- **Main Dashboard**: [`index.html`](index.html)
+- **Cheat-Sheet Pack (HTML)**: [`cheat-sheet-pack.html`](cheat-sheet-pack.html) — One comprehensive reference table per course page across all 36 topics.
+- **Cheat-Sheet Pack (PDF)**: [`cheat-sheet-pack.pdf`](cheat-sheet-pack.pdf) — Ready-to-print 2-column A4 reference cheat sheets.
+
 ---
 
 ## 📥 Ingesting New Checkpoints
@@ -112,7 +118,8 @@ The tool will automatically:
 ```
 stats-mastery/
 ├── index.html                           # Main entry point and curriculum dashboard
-├── *.html                               # 31 interactive mastery learning modules
+├── cheat-sheet-pack.html / .pdf          # 36-topic quick-reference cheat sheet pack & printable PDF
+├── *.html                               # 36 interactive mastery learning modules (Items 1 to 36)
 ├── ingest_checkpoint.py                 # Automated checkpoint ingestion and sorting script
 ├── README.md                            # Project documentation
 ├── .gitignore                           # Repository exclusions
