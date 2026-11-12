@@ -1,4 +1,4 @@
-# Stats Mastery
+﻿# Stats Mastery
 
 > **The complete interactive visual curriculum for statistical mastery.**
 >
@@ -101,7 +101,6 @@ When a new snapshot ZIP arrives (e.g. `stats-mastery (20).zip`):
 1. Drop the ZIP file into this project directory.
 2. Run the automated ingestion tool:
    ```bash
-   python ingest_checkpoint.py
    ```
 The tool will automatically:
 - Detect and extract all new module files.
@@ -120,7 +119,6 @@ stats-mastery/
 ├── index.html                           # Main entry point and curriculum dashboard
 ├── cheat-sheet-pack.html / .pdf          # 36-topic quick-reference cheat sheet pack & printable PDF
 ├── *.html                               # 36 interactive mastery learning modules (Items 1 to 36)
-├── ingest_checkpoint.py                 # Automated checkpoint ingestion and sorting script
 ├── README.md                            # Project documentation
 ├── .gitignore                           # Repository exclusions
 └── .snapshots/                          # Archived incremental ZIP snapshots (ignored)
@@ -128,7 +126,16 @@ stats-mastery/
 
 ---
 
-## 📜 License & Acknowledgments
+## 📜 License
 
-All rights reserved by the author. Created and iteratively developed from October to November 2026.
+[![License: CC BY-NC 4.0](https://img.shields.io/badge/License-CC%20BY--NC%204.0-lightgrey.svg)](https://creativecommons.org/licenses/by-nc/4.0/)
 
+This work is licensed under a [Creative Commons Attribution-NonCommercial 4.0 International License](https://creativecommons.org/licenses/by-nc/4.0/).
+
+Free to share and adapt for **non-commercial purposes** with attribution. Created October–November 2026.
+
+---
+
+## 🙏 Acknowledgments
+
+Curriculum design, structure, and content direction by the author. Built with the assistance of [Claude](https://claude.ai) (Anthropic).
