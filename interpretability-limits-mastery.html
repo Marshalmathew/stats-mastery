@@ -3,9 +3,8 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Interpretability and its Statistical Limits Mastery</title>
+<title>Interpretability and Its Statistical Limits Mastery</title>
 <style>
-
 :root{--bg:#0b0e17;--panel:#121726;--panel2:#171d30;--line:#232a3d;--fg:#e8ebf5;--mu:#8a93ab;--a:#6ea8ff;--r:#ff6b81;--y:#ffd166;--g:#4ade80;--p:#c084fc;--t:#5eead4}
 *{box-sizing:border-box}
 html{scroll-behavior:smooth}
@@ -94,761 +93,574 @@ details summary{cursor:pointer;font-weight:600}
  #menu{display:block}main{margin-left:0;padding:0 16px 100px}.two{grid-template-columns:1fr}.hero{padding-top:60px}
  .sigrow{grid-template-columns:1fr 1fr}
 }
-
 </style>
 </head>
 <body>
 <div id="prog"></div>
-<button id="menu">☰ Menu</button>
-<nav class="side" id="side">
- <a class="back" href="index.html">← All courses</a>
- <h1>Interpretability &amp; Its Limits</h1>
- <small>12 chapters · 11 labs · 18 exam questions</small>
- <div id="nav"></div>
-</nav>
-<div class="meter">
- <div id="mtxt">Mastery: 0%</div>
- <div class="bar"><i id="mbar"></i></div>
-</div>
+<button id="menu">☰ Contents</button>
+<nav class="side" id="side"><a class="back" href="index.html">← All courses</a><h1>Interpretability and Its Limits</h1><small>12 chapters · 11 labs · exam</small><div id="nav"></div></nav>
+<div class="meter"><div id="mtxt">Mastery: 0%</div><div class="bar"><i id="mbar"></i></div></div>
 
 <main>
- <div class="hero">
-  <h1>Interpretability and Its Statistical Limits</h1>
-  <p>Post-hoc attributions against true mechanisms: why explaining the model is not explaining reality. From SHAP axioms, correlation leakage, and off-manifold extrapolation to Rashomon multiplicity, adversarial scaffolding, and actionable causal recourse.</p>
-  <div class="chips">
-   <span class="chip">Stage <b>7</b></span>
-   <span class="chip">Item <b>36</b></span>
-   <span class="chip">Chapters <b>12</b></span>
-   <span class="chip">Interactive Labs <b>11</b></span>
-   <span class="chip">Exam <b>18 Questions</b></span>
-   <span class="chip">Est. Time <b>3.5 Hours</b></span>
-  </div>
- </div>
+<header class="hero">
+ <h1>Interpretability and its statistical limits: what feature importance, partial dependence, Shapley values and counterfactuals can and cannot tell you.</h1>
+ <p>A model that predicts well is not yet a model that can be defended. Regulators, auditors and the CEO ask which features drive a score, why this customer was declined and what they could do about it. The standard tools (permutation importance, partial dependence, Shapley values, local surrogates, counterfactual explanations, reason codes) are estimates computed from a fitted model on a finite sample, and they inherit every weakness of estimation: sampling error, instability under correlated features, dependence on arbitrary choices (baseline, perturbation scheme) and, above all, a gap between describing the model and describing the world. This page treats each tool as a statistic: what it estimates, how noisy it is, what biases it, and what must be reported alongside it.</p>
+ <div class="chips"><span class="chip"><b>Part I</b> Importance and effects</span><span class="chip"><b>Part II</b> Attribution and local explanations</span><span class="chip"><b>Part III</b> What explanations cannot say</span></div>
+ <div class="co tip"><b>How to use this</b>Sliders change the setting; heavier labs recompute when you release a slider or press the button. Prerequisites: regression and multicollinearity (items 11 and 12), model selection (item 15), the bootstrap (item 8), confounding and causal methods (items 22 to 24).</div>
+</header>
 
- <div class="part">Part I · Post-Hoc Attributions vs True Mechanisms</div>
+<div class="part">Part I · Importance and effects</div>
 
- <!-- Chapter 1 -->
- <section class="ch" id="c1">
-  <h2><span class="num">1</span>The Interpretability Illusion: Explaining f(x) vs Explaining Reality <span class="lvl b">Beginner</span></h2>
-  <p>A machine learning explanation is almost universally an explanation of the <b>prediction function <i>f</i>(<i>x</i>)</b>, not the <b>data-generating physical process P(Y | X)</b>. When practitioners say "Feature X₁ is the most important driver of patient mortality," they usually mean that the model's output changes substantially when X₁ varies. If the model was trained on observational data with unobserved confounding, selection bias, or reverse causality, <i>f</i>(<i>x</i>) will faithfully exploit these spurious statistical associations.</p>
-  <p>Consider an automated triage model predicting pneumonia mortality. In raw hospital records, asthmatic patients diagnosed with pneumonia have a <i>lower</i> observed mortality rate than non-asthmatics. Why? Because asthmatics are immediately escalated to intensive care units and receive aggressive early steroid therapy. A machine learning model learns: <code>Asthma = True → Risk = -0.42</code>. A post-hoc explainer (like SHAP or LIME) will correctly report that asthma has a large negative attribution. But advising a doctor to withhold ICU admission because "the explanation proves asthma protects the patient" is fatal.</p>
-  
-  <div class="card">
-   <h4>Lab 1 · The Confounder Trap: Spurious Attributions</h4>
-   <p>In this simulation, true treatment T has a harmful effect on outcome Y (β_true = +1.5), but severe unobserved illness U causes doctors to treat (U → T) and independently increases survival effort (U → −Y). Drag the confounding strength to observe how the model's feature attribution flips signs and contradicts reality.</p>
-   <div class="ctrl">
-    <label>Confounding Strength (U → T, Y): <span id="r1v">0.8</span></label>
-    <input type="range" id="r1" min="-1.5" max="1.5" step="0.1" value="0.8">
-   </div>
-   <div class="sim"><canvas id="cv1" height="260"></canvas></div>
-   <div class="stats" id="t1"></div>
-   <p class="takeaway"><b>Key Takeaway:</b> Post-hoc explainers have zero awareness of causal structures. They explain why the algorithm made a decision given its trained parameters, not what will happen if you intervene on the feature in the physical world.</p>
-  </div>
- </section>
+<section class="ch" id="c1">
+<h2><span class="num">1</span>Importance is a property of a fit, not of the world <span class="lvl b">Beginner</span></h2>
+<p>The simplest importance measures read the model directly: coefficients, standardised coefficients, split counts in a tree. They share a problem. When features are correlated, a model can shift weight between them at almost no cost to its fit, so the coefficient of each one is unstable from sample to sample, while their combined effect is stable. A ranking read off one fit is then largely arbitrary. The variance of a coefficient is inflated by 1/(1 − ρ²) for two features with correlation ρ (more generally by the variance inflation factor), and what is stable is the prediction, not its allocation among features. Report importance with a measure of its variability over refits, and group highly correlated features.</p>
+<div class="f">Var(b̂<sub>A</sub>) ≈ σ² / (n (1 − ρ²))   ·   Var(b̂<sub>A</sub> + b̂<sub>B</sub>) stays small</div>
+ <div class="card"><h4>Lab 1 · Two equal features, one coin toss</h4>
+ <p class="sub">Two features of equal true effect, refitted many times. Left: the coefficients from each refit. Right: the spread of one coefficient against the spread of the sum, as correlation grows.</p>
+ <div class="ctl"><label>correlation between the features (%) <input type="range" id="c1r" min="0" max="99" step="1" value="90"><output id="c1rv"></output></label><label>training cases <input type="range" id="c1n" min="30" max="1000" step="10" value="200"><output id="c1nv"></output></label><button id="c1go">New refits</button></div>
+ <div class="two"><canvas class="sm" id="c1cv"></canvas><canvas class="sm" id="c1cv2"></canvas></div><div class="stats" id="c1st"></div><div class="read" id="c1rd"></div></div>
+</section>
 
- <!-- Chapter 2 -->
- <section class="ch" id="c2">
-  <h2><span class="num">2</span>Permutation Feature Importance &amp; Correlation Breakage <span class="lvl i">Intermediate</span></h2>
-  <p>Permutation Feature Importance (PFI), introduced by Leo Breiman for Random Forests, measures the increase in prediction error after randomly shuffling the values of feature Xⱼ across the validation set:
-  <div class="f">PFI(j) = L(y, f(X^πⱼ)) − L(y, f(X))  ·  shuffles feature j  ·  assumes independence Xⱼ ⊥ X₋ⱼ</div>
-  While conceptually intuitive and model-agnostic, PFI relies on a lethal hidden assumption: that features are <b>statistically independent</b>.</p>
-  <p>When features X₁ and X₂ are strongly correlated (e.g. X₁ = Annual Income and X₂ = Monthly Savings), shuffling X₁ while holding X₂ fixed creates synthetic data points that lie far off the data manifold—such as an annual income of 15,000 USD paired with monthly savings of 20,000 USD. Evaluating <i>f</i>(<i>x</i>) on these impossible feature combinations forces the model to extrapolate into regions where it was never trained, producing wild prediction artifacts. Furthermore, when two collinear features jointly carry signal, each individual feature can be shuffled with minimal loss of accuracy because the other feature acts as a redundant backup, causing both to appear deceptively unimportant.</p>
+<section class="ch" id="c2">
+<h2><span class="num">2</span>Permutation, conditional and drop-column importance <span class="lvl b">Beginner</span></h2>
+<p><b>Permutation importance</b> shuffles one feature in held-out data and records how much the error rises: it measures how much the fitted model relies on the feature. With correlated features the shuffle creates combinations that never occur in the data, which penalises the model for inputs it was never meant to handle and inflates the importance of any feature that shares information with another. <b>Conditional permutation</b> shuffles only among similar cases and respects the correlation. <b>Drop-column</b> importance refits the model without the feature and measures the loss: it measures the information the feature adds, but hides the importance of a feature that has a near-copy. The methods answer different questions and are not interchangeable.</p>
+<div class="f">Importance<sub>j</sub> = Err(permute x<sub>j</sub>) − Err(original)   ·   drop-column: Err(model without x<sub>j</sub>) − Err(full model)</div>
+ <div class="card"><h4>Lab 2 · A feature with no effect, ranked three ways</h4>
+ <p class="sub">B is a noisy copy of A with no effect of its own. Left: importance of the three features by the three methods. Right: importance given to B as its correlation with A grows.</p>
+ <div class="ctl"><label>correlation of B with A (%) <input type="range" id="c2r" min="0" max="99" step="1" value="90"><output id="c2rv"></output></label><label>training cases <input type="range" id="c2n" min="50" max="600" step="50" value="100"><output id="c2nv"></output></label><button id="c2go">New data</button></div>
+ <div class="two"><canvas class="sm" id="c2cv"></canvas><canvas class="sm" id="c2cv2"></canvas></div><div class="stats" id="c2st"></div><div class="read" id="c2rd"></div></div>
+</section>
 
-  <div class="card">
-   <h4>Lab 2 · Permutation Importance under Collinearity: The Masking Dilemma</h4>
-   <p>Simulate two correlated predictors X₁ and X₂ with correlation ρ. Observe how as ρ → 1, the permutation importance of each individual feature plummets even though their joint predictive power remains high.</p>
-   <div class="ctrl">
-    <label>Feature Correlation (ρ): <span id="r2v">0.85</span></label>
-    <input type="range" id="r2" min="0.0" max="0.98" step="0.02" value="0.85">
-   </div>
-   <div class="sim"><canvas id="cv2" height="260"></canvas></div>
-   <div class="stats" id="t2"></div>
-   <p class="takeaway"><b>Key Takeaway:</b> PFI systematically underestimates the importance of correlated feature groups through redundant substitution and simultaneously pollutes validation loss by extrapolating into impossible off-manifold spaces.</p>
-  </div>
- </section>
+<section class="ch" id="c3">
+<h2><span class="num">3</span>Partial dependence, ICE and interactions <span class="lvl i">Intermediate</span></h2>
+<p>The <b>partial dependence</b> of a feature averages the model’s prediction over the other features while the chosen feature is set to each value in turn; <b>individual conditional expectation</b> (ICE) curves show the same for each case. The average can be flat or monotone while individual curves are not: an interaction (the effect of A depends on B) disappears from the average, and a policy conclusion drawn from the mean is wrong for a large share of customers. Partial dependence also evaluates the model at combinations of features that may not occur (the problem of chapter 2); accumulated local effects are the usual remedy. Plot ICE curves, report the spread of the individual effects, and say which population the average is over.</p>
+<div class="f">PD(a) = (1/n) Σ<sub>i</sub> f(a, x<sub>i,−A</sub>)   ·   ICE<sub>i</sub>(a) = f(a, x<sub>i,−A</sub>)</div>
+ <div class="card"><h4>Lab 3 · The average hides the people</h4>
+ <p class="sub">A model with an interaction. Left: individual curves and their average. Right: the share of cases whose own effect has the opposite sign to the average, as the interaction grows.</p>
+ <div class="ctl"><label>strength of the interaction <input type="range" id="c3k" min="0" max="30" step="1" value="15"><output id="c3kv"></output></label><label>curves drawn <input type="range" id="c3m" min="10" max="100" step="10" value="40"><output id="c3mv"></output></label><button id="c3go">Redraw</button></div>
+ <div class="two"><canvas class="sm" id="c3cv"></canvas><canvas class="sm" id="c3cv2"></canvas></div><div class="stats" id="c3st"></div><div class="read" id="c3rd"></div></div>
+</section>
 
- <!-- Chapter 3 -->
- <section class="ch" id="c3">
-  <h2><span class="num">3</span>Partial Dependence vs Accumulated Local Effects (ALE) <span class="lvl i">Intermediate</span></h2>
-  <p>Partial Dependence Plots (PDP) attempt to visualize the marginal effect of feature Xⱼ on <i>f</i>(<i>X</i>) by averaging the model's predictions over the empirical marginal distribution of all other features X₋ⱼ:
-  <div class="f">PDP: f̂_PDP(xⱼ) = (1/n) Σᵢ f(xⱼ, x_{i,−j})  ·  marginal average  ·  extrapolates into empty space</div>
-  Like PFI, PDP computes predictions on rectangular grid combinations (xⱼ, x_{i,−j}). When features are correlated, PDP evaluates points in empty regions where P(Xⱼ, X₋ⱼ) ≈ 0, creating severe visual distortions.</p>
-  <p><b>Accumulated Local Effects (ALE)</b> plots, introduced by Apley &amp; Zhu (2020), solve this fundamental flaw. Instead of replacing Xⱼ globally, ALE calculates local differences in small intervals around xⱼ, conditioning on the actual local conditional distribution P(X₋ⱼ | Xⱼ), and then integrates (accumulates) those local derivatives:
-  <div class="f">ALE: f̂_ALE(xⱼ) = ∫ E[∂f(Xⱼ, X₋ⱼ)/∂Xⱼ | Xⱼ = z] dz − constant  ·  accumulated local derivatives  ·  stays on data manifold</div>
-  ALE never evaluates the model in empty feature space, isolates main effects from interactions, and remains statistically rigorous under severe correlation.</p>
+<div class="part">Part II · Attribution and local explanations</div>
 
-  <div class="card">
-   <h4>Lab 3 · PDP Extrapolation vs ALE Real-Manifold Tracking</h4>
-   <p>Toggle correlation ρ between X₁ and X₂ where true model f(x) = x₁ + 2x₂². Watch how PDP hallucinates non-existent curvature into empty space while ALE faithfully tracks the local gradient.</p>
-   <div class="ctrl">
-    <label>Correlation (ρ): <span id="r3v">0.90</span></label>
-    <input type="range" id="r3" min="0.0" max="0.95" step="0.05" value="0.90">
-   </div>
-   <div class="sim"><canvas id="cv3" height="260"></canvas></div>
-   <div class="stats" id="t3"></div>
-   <p class="takeaway"><b>Key Takeaway:</b> Always prefer ALE over PDP for observational datasets with correlated features. PDP averages across impossible feature combinations; ALE integrates genuine local conditional derivatives.</p>
-  </div>
- </section>
+<section class="ch" id="c4">
+<h2><span class="num">4</span>Shapley values: baselines, variants and correlated features <span class="lvl i">Intermediate</span></h2>
+<p>The <b>Shapley value</b> of feature j for one case is its marginal contribution to the prediction averaged over all orders of adding features; the credits add up to the difference between the prediction and a baseline prediction. It is the unique split satisfying efficiency, symmetry, dummy and additivity. The method needs a value function for “feature absent”. The <b>interventional</b> version fills absent features from a background sample, so that a feature the model ignores gets zero. The <b>conditional</b> version fills them with what is expected given the present ones, so that a correlated stand-in receives credit. The baseline (which background cases, what average) changes every number. A Shapley value is neither the effect of changing the feature nor a measure of its causal role.</p>
+<div class="f">φ<sub>j</sub> = Σ<sub>S⊆N∖{j}</sub> [ |S|!(n − |S| − 1)!/n! ] · [ v(S ∪ {j}) − v(S) ]</div>
+ <div class="card"><h4>Lab 4 · Same customer, different credit</h4>
+ <p class="sub">A linear model with a customer. Left: credit to each feature under the interventional and the conditional definitions. Right: credit to B (which the model may or may not use) as the correlation with A grows.</p>
+ <div class="ctl"><label>correlation of B with A (%) <input type="range" id="c4r" min="0" max="95" step="1" value="80"><output id="c4rv"></output></label><label>weight the model puts on B <input type="range" id="c4b" min="0" max="10" step="1" value="0"><output id="c4bv"></output></label><label>shift of the baseline mean <input type="range" id="c4s" min="0" max="20" step="1" value="0"><output id="c4sv"></output></label><button id="c4go">Recompute</button></div>
+ <div class="two"><canvas class="sm" id="c4cv"></canvas><canvas class="sm" id="c4cv2"></canvas></div><div class="stats" id="c4st"></div><div class="read" id="c4rd"></div></div>
+</section>
 
- <div class="part">Part II · Shapley Values &amp; Local Explanations</div>
+<section class="ch" id="c5">
+<h2><span class="num">5</span>The sampling error of an explanation <span class="lvl a">Advanced</span></h2>
+<p>Importance and Shapley values are averages over a finite sample of cases (and, for sampling-based algorithms, over random permutations and background draws), so they carry sampling error like any other estimate. When two features differ in importance by less than the noise, their order is not resolved, though a report ranks them on page one. The sampling error is of the same order as the differences that are read into the tables, unless the test sample is large. Bootstrap the test cases (and, for stability, the training sample) to give an interval for each importance, report the rank intervals and do not rank features whose intervals overlap. The same applies to approximations: the number of Monte Carlo permutations and background samples used by an approximate Shapley algorithm is a source of error that should be measured.</p>
+<div class="f">P(rank correct) = P(Î<sub>A</sub> > Î<sub>B</sub>)   with   sd(Î) ≈ s / √n</div>
+ <div class="card"><h4>Lab 5 · Is A really ahead of B?</h4>
+ <p class="sub">Two features with a known gap in true importance. Left: the distribution of the estimated importance of each. Right: probability of a correct ranking against the number of test cases, for three gaps.</p>
+ <div class="ctl"><label>how much smaller B’s weight is (%) <input type="range" id="c5g" min="5" max="60" step="5" value="5"><output id="c5gv"></output></label><label>test cases <input type="range" id="c5n" min="50" max="2000" step="50" value="100"><output id="c5nv"></output></label><label>noise in the outcome <input type="range" id="c5s" min="5" max="30" step="1" value="20"><output id="c5sv"></output></label><button id="c5go">New samples</button></div>
+ <div class="two"><canvas class="sm" id="c5cv"></canvas><canvas class="sm" id="c5cv2"></canvas></div><div class="stats" id="c5st"></div><div class="read" id="c5rd"></div></div>
+</section>
 
- <!-- Chapter 4 -->
- <section class="ch" id="c4">
-  <h2><span class="num">4</span>Shapley Values &amp; Cooperative Game Axioms <span class="lvl i">Intermediate</span></h2>
-  <p>Originating in cooperative game theory (Lloyd Shapley, 1953), Shapley values answer the question: if p players collaborate to achieve a total payout v(S), how should the payout be fairly distributed? In machine learning, the players are the features, the game is the model prediction <i>f</i>(<i>x</i>), and the payout is the deviation from the baseline expectation E[f(X)].</p>
-  <p>The Shapley value φⱼ is the unique attribution method that simultaneously satisfies four essential axioms:
-  <ol>
-   <li><b>Efficiency:</b> Σ φⱼ = f(x) − E[f(X)] (all attribution sums to the prediction difference).</li>
-   <li><b>Symmetry:</b> If v(S ∪ {j}) = v(S ∪ {k}) for all subsets <i>S</i>, then φⱼ = φₖ.</li>
-   <li><b>Dummy (Null Player):</b> If feature <i>j</i> contributes nothing to any subset (v(S ∪ {j}) = v(S)), then φⱼ = 0.</li>
-   <li><b>Additivity:</b> For combined games u + v, φⱼ(u + v) = φⱼ(u) + φⱼ(v).</li>
-  </ol>
-  The exact formula weights the marginal contribution over all 2ᵖ possible coalitions:
-  <div class="f">Shapley value: φⱼ = Σ_{S ⊆ {1..p}\setminus{j}} [|S|!(p − |S| − 1)! / p!] · [v(S ∪ {j}) − v(S)]  ·  unique fair attribution across 2ᵖ coalitions</div></p>
+<section class="ch" id="c6">
+<h2><span class="num">6</span>Local surrogate explanations (LIME) <span class="lvl a">Advanced</span></h2>
+<p>A local surrogate explains one prediction by fitting a simple model (a sparse linear model) to the black box’s outputs on perturbed points around the case, weighted by their closeness. The reported coefficients are those of the surrogate, not of the black box. Their quality depends on choices the user rarely sees: how the perturbations are generated (which also decides whether they are realistic), the kernel width, the number of samples and the surrogate’s fidelity in the neighbourhood. A wide kernel biases the explanation towards a global average, a narrow one makes it noisy, and different random seeds give different explanations. Check fidelity, repeat the explanation and report its variability; when the model is differentiable, compare with its gradient.</p>
+<div class="f">Minimise Σ<sub>i</sub> π<sub>x</sub>(z<sub>i</sub>) (f(z<sub>i</sub>) − g(z<sub>i</sub>))² + penalty(g)</div>
+ <div class="card"><h4>Lab 6 · A line fitted to a curve</h4>
+ <p class="sub">A curved model and local linear explanations of one case. Left: the model and seven runs of the explanation. Right: its mean slope and spread against the kernel width, with the true slope.</p>
+ <div class="ctl"><label>the case (value of the feature) <input type="range" id="c6x" min="-20" max="20" step="1" value="3"><output id="c6xv"></output></label><label>kernel width <input type="range" id="c6w" min="1" max="30" step="1" value="4"><output id="c6wv"></output></label><label>perturbed points <input type="range" id="c6n" min="20" max="400" step="20" value="100"><output id="c6nv"></output></label><button id="c6go">New runs</button></div>
+ <div class="two"><canvas class="sm" id="c6cv"></canvas><canvas class="sm" id="c6cv2"></canvas></div><div class="stats" id="c6st"></div><div class="read" id="c6rd"></div></div>
+</section>
 
-  <div class="card">
-   <h4>Lab 4 · Interactive 3-Feature Shapley Decomposition</h4>
-   <p>Explore an interactive 3-player cooperative credit model. Adjust the synergy parameter γ to see how non-linear feature interactions are split equally across all contributing coalitions.</p>
-   <div class="ctrl">
-    <label>Interaction Synergy (γ): <span id="r4v">1.5</span></label>
-    <input type="range" id="r4" min="-2.0" max="3.0" step="0.2" value="1.5">
-   </div>
-   <div class="sim"><canvas id="cv4" height="260"></canvas></div>
-   <div class="stats" id="t4"></div>
-   <p class="takeaway"><b>Key Takeaway:</b> Shapley values provide the only mathematically unique attribution that satisfies the 4 fairness axioms. However, calculating exact values requires evaluating all 2ᵖ subsets, necessitating approximations (TreeSHAP, KernelSHAP) in practice.</p>
-  </div>
- </section>
+<div class="part">Part III · What explanations cannot say</div>
 
- <!-- Chapter 5 -->
- <section class="ch" id="c5">
-  <h2><span class="num">5</span>Marginal vs Conditional SHAP: The Off-Manifold Dilemma <span class="lvl a">Advanced</span></h2>
-  <p>To evaluate a feature subset <i>S</i>, what is the value function v(S)? How do we "remove" features −S from a trained model that expects a complete vector x ∈ ℝᵖ? There are two fundamentally conflicting philosophies:
-  <ul>
-   <li><b>Interventional / Marginal SHAP:</b> Replaces absent features with random samples from their marginal distribution: v_int(S) = ∫ f(x_S, x_{−S}) dP(X_{−S}). This enforces <i>true to the model</i>. A feature with zero weight in <i>f</i>(<i>x</i>) receives exactly φⱼ = 0 (Dummy axiom holds). But like PFI and PDP, it synthesizes off-manifold points by pairing x_S with unrealistic x_{−S}.</li>
-   <li><b>Observational / Conditional SHAP:</b> Conditions on the present features: v_obs(S) = E[f(X) | X_S = x_S]. This enforces <i>true to the data</i>. It never evaluates off-manifold points. But it violates the Dummy axiom: if X₁ has true model weight 0, but is correlated with X₂, X₁ will receive non-zero attribution because observing X₁ updates our expectation of X₂!</li>
-  </ul></p>
+<section class="ch" id="c7">
+<h2><span class="num">7</span>The Rashomon effect and the choice of the model <span class="lvl a">Advanced</span></h2>
+<p>With correlated features and finite data many different models fit about equally well: the <b>Rashomon set</b> of near-optimal models. Their explanations can differ completely (one uses feature A, another leaves it out), and the single model chosen by a validation score is an arbitrary member whose explanation should not be read as a finding about the data. The size of the set grows with the tolerance for accuracy and with the correlation, and shrinks with sample size. Responsible practice is to report what is common to the whole near-optimal set (features that all use are robust) and what is not, and to say that the choice among near-ties was made on other grounds (stability, simplicity, cost, monotonicity constraints).</p>
+<div class="f">Rashomon set = { f : Err(f) ≤ Err(f*) (1 + ε) }</div>
+ <div class="card"><h4>Lab 7 · Thirty-one models, one story each</h4>
+ <p class="sub">All subsets of five correlated features, scored on new data. Left: test error against the weight each model gives to feature A. Right: how often each feature appears among the near-best models.</p>
+ <div class="ctl"><label>tolerance for “about as good” (%) <input type="range" id="c7e" min="0" max="10" step="1" value="5"><output id="c7ev"></output></label><label>correlation among the features (%) <input type="range" id="c7r" min="0" max="95" step="1" value="80"><output id="c7rv"></output></label><label>training cases <input type="range" id="c7n" min="50" max="1000" step="50" value="100"><output id="c7nv"></output></label><button id="c7go">New data</button></div>
+ <div class="two"><canvas class="sm" id="c7cv"></canvas><canvas class="sm" id="c7cv2"></canvas></div><div class="stats" id="c7st"></div><div class="read" id="c7rd"></div></div>
+</section>
 
-  <div class="card">
-   <h4>Lab 5 · Marginal vs Conditional SHAP under Correlation</h4>
-   <p>Set true model f(x) = 2.0X₁ + 0.0X₂. X₂ has zero weight in the model! Adjust correlation ρ(X₁, X₂) and observe how Conditional SHAP falsely attributes credit to the dummy variable X₂ while Marginal SHAP keeps X₂ = 0 but hallucinates off-manifold.</p>
-   <div class="ctrl">
-    <label>Correlation ρ(X₁, X₂): <span id="r5v">0.80</span></label>
-    <input type="range" id="r5" min="-0.95" max="0.95" step="0.05" value="0.80">
-   </div>
-   <div class="sim"><canvas id="cv5" height="260"></canvas></div>
-   <div class="stats" id="t5"></div>
-   <p class="takeaway"><b>Key Takeaway:</b> There is no free lunch in feature attribution: you must choose between evaluating the model on impossible data points (Marginal SHAP) or attributing importance to features the model never actually used (Conditional SHAP).</p>
-  </div>
- </section>
+<section class="ch" id="c8">
+<h2><span class="num">8</span>Explaining the model is not explaining the world <span class="lvl e">Expert</span></h2>
+<p>Every tool so far describes how the model turns inputs into outputs. Whether changing an input changes the real outcome is a causal question. A feature that stands in for a hidden cause gets credit in every explanation although intervening on it does nothing, and a feature with a real effect can get little credit if it is correlated with others. Using a Shapley plot or a partial-dependence curve to advise a customer (“reduce your balance and your risk falls”) or to design a policy requires identification of the causal effect by the methods of items 22 to 25. The explanation of a predictive model is the right object for auditing the model, and the wrong object for deciding what to do to the world.</p>
+<div class="f">Model slope = β + γ·Cov(U, X)/Var(X)   (β: causal effect, U: hidden cause)</div>
+ <div class="card"><h4>Lab 8 · A hidden cause borrowed by a feature</h4>
+ <p class="sub">A hidden factor drives both a feature and the outcome. Left: the outcome against the feature, with the model’s slope and the true effect. Right: slope attributed to the feature against the strength of the hidden cause.</p>
+ <div class="ctl"><label>strength of the hidden cause <input type="range" id="c8k" min="0" max="30" step="1" value="15"><output id="c8kv"></output></label><label>cases <input type="range" id="c8n" min="200" max="3000" step="100" value="1000"><output id="c8nv"></output></label><button id="c8go">New data</button></div>
+ <div class="two"><canvas class="sm" id="c8cv"></canvas><canvas class="sm" id="c8cv2"></canvas></div><div class="stats" id="c8st"></div><div class="read" id="c8rd"></div></div>
+</section>
 
- <!-- Chapter 6 -->
- <section class="ch" id="c6">
-  <h2><span class="num">6</span>LIME: Local Surrogates &amp; Sampling Radius Instabilities <span class="lvl a">Advanced</span></h2>
-  <p>LIME (Local Interpretable Model-agnostic Explanations, Ribeiro et al. 2016) builds a local linear surrogate model g(z) = wᵀz to approximate complex black-box <i>f</i>(<i>x</i>) around an instance <i>x</i>:
-  <div class="f">LIME surrogate: ξ(x) = argmin_{g ∈ G} Σ_{z ∈ Z} πₓ(z) [f(z) − g(z)]² + Ω(g)  ·  local linear approximation</div>
-  where πₓ(z) = exp(−D(x, z)² / σ²) is an exponential proximity kernel with kernel bandwidth σ.</p>
-  <p>LIME suffers from two acute statistical vulnerabilities:
-  <ol>
-   <li><b>Sampling Variance:</b> Perturbations z are drawn randomly from Gaussian noise. Different random seeds on the same instance can produce completely conflicting explanation weights.</li>
-   <li><b>Hyperparameter Sensitivity (σ):</b> If σ is too small, the sample contains virtually no variance and the fit is ill-conditioned. If σ is too large, the surrogate spans multiple non-linear curvature regions, causing local feature weights to flip signs.</li>
-  </ol></p>
+<section class="ch" id="c9">
+<h2><span class="num">9</span>Counterfactual explanations and recourse <span class="lvl e">Expert</span></h2>
+<p>A <b>counterfactual explanation</b> gives the smallest change in the features that would flip the decision. It is intuitive and requires no model internals, but three issues limit it. It is computed against an estimated boundary, which moves when the model is refitted or the population changes, so that advice valid today may not be valid when the customer acts on it. The change must be feasible and actionable (income cannot be changed on request, age cannot be reduced), and must not change the outcome through other features. And many different counterfactuals exist, so the one shown reflects a choice of distance. Add a margin, report the cost and the share that would remain valid under refits, and treat recourse as a commitment that can be tested.</p>
+<div class="f">x* = argmin d(x, x′) subject to f(x′) ≥ threshold + margin</div>
+ <div class="card"><h4>Lab 9 · Advice that expires</h4>
+ <p class="sub">A logistic score and declined customers. Left: the fitted boundary, boundaries after refits and a counterfactual. Right: how often the advice still works, and how far the customer must move, against the margin.</p>
+ <div class="ctl"><label>margin beyond the boundary (log-odds) <input type="range" id="c9m" min="0" max="100" step="5" value="5"><output id="c9mv"></output></label><label>training cases <input type="range" id="c9n" min="100" max="2000" step="100" value="200"><output id="c9nv"></output></label><label>drift of the population (log-odds) <input type="range" id="c9d" min="0" max="10" step="1" value="0"><output id="c9dv"></output></label><button id="c9go">New data</button></div>
+ <div class="two"><canvas class="sm" id="c9cv"></canvas><canvas class="sm" id="c9cv2"></canvas></div><div class="stats" id="c9st"></div><div class="read" id="c9rd"></div></div>
+</section>
 
-  <div class="card">
-   <h4>Lab 6 · LIME Kernel Bandwidth &amp; Surrogate Instability</h4>
-   <p>Drag the kernel width σ on a non-linear decision boundary. Observe how changing the arbitrary neighborhood radius flips the local surrogate slope from positive to negative.</p>
-   <div class="ctrl">
-    <label>Kernel Bandwidth (σ): <span id="r6v">0.45</span></label>
-    <input type="range" id="r6" min="0.1" max="1.5" step="0.05" value="0.45">
-   </div>
-   <div class="sim"><canvas id="cv6" height="260"></canvas></div>
-   <div class="stats" id="t6"></div>
-   <p class="takeaway"><b>Key Takeaway:</b> LIME explanations are highly sensitive to user-chosen sampling radii and random seeds. A model explanation that changes when you re-run the script with seed 43 instead of seed 42 cannot be used for high-stakes regulatory decisions.</p>
-  </div>
- </section>
+<section class="ch" id="c10">
+<h2><span class="num">10</span>Explanations of overfitted models, and null references <span class="lvl e">Expert</span></h2>
+<p>Explanations are computed from the fitted model, so an overfitted model yields explanations of its overfit. Importance measured on the training data credits noise features, because the flexible model has used them to memorise noise, whereas on held-out data the same features receive about zero. Two safeguards follow: compute explanations on data not used for fitting, and calibrate against a null reference: the importance the method assigns to features known to be irrelevant, such as shuffled copies of the real ones or random columns added on purpose, or to a model trained on shuffled outcomes. An importance that does not exceed the null distribution has not been shown to be different from noise, which is the same logic as a hypothesis test, applied to an explanation.</p>
+<div class="f">Null importance distribution: refit with permuted outcome, record Î<sub>j</sub><sup>(0)</sup>; compare Î<sub>j</sub> with it</div>
+ <div class="card"><h4>Lab 10 · Credit for pure noise</h4>
+ <p class="sub">Six features, four of which are noise, and a flexible additive model. Left: importance measured on training cases and on new cases. Right: average importance of the noise features against model flexibility.</p>
+ <div class="ctl"><label>model flexibility (degree) <input type="range" id="c10d" min="1" max="12" step="1" value="8"><output id="c10dv"></output></label><label>training cases <input type="range" id="c10n" min="30" max="400" step="10" value="80"><output id="c10nv"></output></label><button id="c10go">New data</button></div>
+ <div class="two"><canvas class="sm" id="c10cv"></canvas><canvas class="sm" id="c10cv2"></canvas></div><div class="stats" id="c10st"></div><div class="read" id="c10rd"></div></div>
+</section>
 
- <!-- Chapter 7 -->
- <section class="ch" id="c7">
-  <h2><span class="num">7</span>The Rashomon Effect &amp; Model Multiplicity <span class="lvl a">Advanced</span></h2>
-  <p>Named after Akira Kurosawa’s film where witnesses describe the same event in contradictory ways, Leo Breiman (2001) coined the <b>Rashomon Effect</b> for machine learning: in almost any empirical dataset, there exists a vast <b>Rashomon set</b> R(ε) of models that achieve virtually identical predictive loss:
-  <div class="f">Rashomon Set: R(ε) = { f ∈ F | L(f) ≤ L(f*) + ε }  ·  competing models with near-identical loss and conflicting explanations</div>
-  While these models predict equally well (e.g. all within 0.1% test AUC), their internal mechanisms, coefficient signs, and top-ranked feature importances can be diametrically opposed.</p>
-  <p>When an organization trains a single model (say, gradient boosted trees with seed 101) and presents its SHAP plot as "the ground truth explanation of our data," they are ignoring thousands of equally accurate models that would assign zero importance to their top feature and high importance to an omitted variable. This phenomenon is known as <b>Predictive Multiplicity</b> (Marx et al., 2020).</p>
+<section class="ch" id="c11">
+<h2><span class="num">11</span>Reason codes, stability and governance <span class="lvl e">Expert</span></h2>
+<p>Reason codes on adverse-action notices and in model-risk reports are the most consequential use of explanations. Each code is a statistic of the fitted model and the case, and its stability under refits and resampling can be measured: how often two models trained on different samples of the same population give the same top reason for the same customer. With correlated features it can be low, even with a model that predicts identically. A defensible practice documents the method (variant, baseline), reports stability, groups correlated features into reasons that the customer can understand, tests that the stated reason is actionable, and keeps the explanation under the same monitoring and validation as the score itself (SR 11-7, item 15 and item 33).</p>
+<div class="f">Stability = P(top reason from model 1 = top reason from model 2 | same case)</div>
+ <div class="card"><h4>Lab 11 · Would a second model give the same reason?</h4>
+ <p class="sub">Linear score with six correlated features, refitted many times. Left: how often each feature is the top reason for one declined customer. Right: agreement between two refits against correlation, for three training sizes.</p>
+ <div class="ctl"><label>correlation among the features (%) <input type="range" id="c11r" min="0" max="95" step="1" value="70"><output id="c11rv"></output></label><label>training cases <input type="range" id="c11n" min="100" max="2000" step="100" value="500"><output id="c11nv"></output></label><button id="c11go">New refits</button></div>
+ <div class="two"><canvas class="sm" id="c11cv"></canvas><canvas class="sm" id="c11cv2"></canvas></div><div class="stats" id="c11st"></div><div class="read" id="c11rd"></div></div>
+</section>
 
-  <div class="card">
-   <h4>Lab 7 · The Rashomon Multiplicity Explorer</h4>
-   <p>Inspect 5 distinct models from the Rashomon set of a collinear dataset (ΔLoss &lt; 0.2%). Compare how their top feature rankings flip and contradict each other despite identical test performance.</p>
-   <div class="ctrl">
-    <label>Loss Tolerance (ε): <span id="r7v">0.02</span></label>
-    <input type="range" id="r7" min="0.005" max="0.08" step="0.005" value="0.02">
-   </div>
-   <div class="sim"><canvas id="cv7" height="260"></canvas></div>
-   <div class="stats" id="t7"></div>
-   <p class="takeaway"><b>Key Takeaway:</b> Never confuse model explanation with domain truth. If two models achieve the same empirical risk with contradictory feature attributions, the explanation is a property of the model's arbitrary inductive bias, not nature.</p>
-  </div>
- </section>
-
- <div class="part">Part III · Causal Limits &amp; Adversarial Vulnerabilities</div>
-
- <!-- Chapter 8 -->
- <section class="ch" id="c8">
-  <h2><span class="num">8</span>Feature Attribution Is Not Causal Effect <span class="lvl a">Advanced</span></h2>
-  <p>Perhaps the most dangerous misuse of explainable AI is treating feature attribution φⱼ as an estimate of causal intervention ∂E[Y | do(X)] / ∂Xⱼ. In business and policy settings, leaders routinely ask: <i>"SHAP says Marketing Spend has attribution +0.8 and Customer Age has +0.1; therefore, increasing marketing spend by \10,000 USD will generate 8x more return than targeting older customers."</i></p>
-  <p>This inference is completely unjustified. Feature attributions measure associative model dependencies:
-  <div class="f">Attribution ∂f(x)/∂xⱼ ≠ Causal Effect dE[Y | do(Xⱼ = xⱼ)]/dxⱼ  ·  associative gradient ≠ physical intervention</div>
-  If Xⱼ is a mediator, a collider, or an effect of an unobserved common cause (e.g., website visits before buying), the attribution will be enormous while the true interventional effect of artificially forcing website visits is exactly zero. Valid causal effects require identification via DAGs, the backdoor criterion, and exogenous variation—things statistical explainers are mathematically incapable of providing.</p>
-
-  <div class="card">
-   <h4>Lab 8 · Attribution vs Causal DAG Interventions</h4>
-   <p>Compare the SHAP attribution of feature X₁ with its true causal effect dE[Y | do(X₁)] / dX₁ across different causal structures (Confounder, Mediator, Collider).</p>
-   <div class="ctrl">
-    <label>Collider Correlation / Bias: <span id="r8v">0.75</span></label>
-    <input type="range" id="r8" min="-1.0" max="1.0" step="0.1" value="0.75">
-   </div>
-   <div class="sim"><canvas id="cv8" height="260"></canvas></div>
-   <div class="stats" id="t8"></div>
-   <p class="takeaway"><b>Key Takeaway:</b> Feature attribution tells you how the model processes information; causal inference tells you how the world responds to action. Never prescribe real-world interventions based solely on SHAP or LIME attributions.</p>
-  </div>
- </section>
-
- <!-- Chapter 9 -->
- <section class="ch" id="c9">
-  <h2><span class="num">9</span>Adversarial Fooling of Post-Hoc Explainers <span class="lvl e">Expert</span></h2>
-  <p>Can a model lie about its own internal reasoning? In landmark work, Slack et al. (2020) demonstrated that post-hoc explainers like LIME and SHAP can be systematically fooled using <b>adversarial scaffolding</b>.</p>
-  <p>Explainers draw perturbation samples z from synthetic distributions (e.g. isotropic Gaussians or marginal permutations). Because real data lies on a lower-dimensional manifold, off-manifold synthetic perturbations are easily distinguishable from real on-manifold instances by a simple binary classifier:
-  <div class="f">Adversarial Scaffolding: f_adv(x) = f_biased(x) on real data manifold, but switches to f_innocuous(x) on explainer perturbation points</div>
-  When queried by an auditor or regulator using LIME or SHAP, the model detects the perturbation distribution and switches to a harmless explanation! The auditor concludes the model is 100% fair and blind to protected attributes, while in production it actively discriminates.</p>
-
-  <div class="card">
-   <h4>Lab 9 · The Scaffolding Exploit Simulator</h4>
-   <p>Test an adversarial model that discriminates on protected feature Z on real data, but detects perturbation points generated by SHAP/LIME and feigns neutrality.</p>
-   <div class="ctrl">
-    <label>Manifold Detector Sensitivity: <span id="r9v">0.90</span></label>
-    <input type="range" id="r9" min="0.5" max="0.99" step="0.01" value="0.90">
-   </div>
-   <div class="sim"><canvas id="cv9" height="260"></canvas></div>
-   <div class="stats" id="t9"></div>
-   <p class="takeaway"><b>Key Takeaway:</b> Post-hoc explainers are not security or audit guarantees. Because they sample off-manifold, any adversary can construct a dual-personality model that hides biased decisions from explainers.</p>
-  </div>
- </section>
-
- <!-- Chapter 10 -->
- <section class="ch" id="c10">
-  <h2><span class="num">10</span>High Dimensions, Non-Linearities &amp; Feature Dilution <span class="lvl e">Expert</span></h2>
-  <p>In high dimensions (p ≫ 100), explainability encounters the geometric curse of dimensionality:
-  <ul>
-   <li><b>Feature Dilution:</b> If a credit bureau includes 50 correlated credit inquiries instead of 1 aggregate score, tree models split across all 50 features arbitrarily. The individual attribution of each inquiry drops by a factor of 50, disguising an overwhelming risk factor as negligible background noise.</li>
-   <li><b>Distance Dilution in LIME:</b> In high dimensions, all pairwise Euclidean distances converge to the same value (D_max / D_min → 1). Exponential kernels πₓ(z) lose discriminative power, assigning nearly equal weights to all perturbed points.</li>
-   <li><b>High-Order Interactions:</b> When models contain complex multi-way interactions (e.g. X₁ · X₂ · X₃ · X₄), splitting the interaction evenly across main-effect attributions hides the non-linear trigger conditions.</li>
-  </ul></p>
-
-  <div class="card">
-   <h4>Lab 10 · Collinear Dilution &amp; Importance Dispersal</h4>
-   <p>Add redundant collinear copies of a primary risk signal. Watch how individual feature importances vanish below the significance floor while the true total group importance remains invariant.</p>
-   <div class="ctrl">
-    <label>Number of Collinear Copies (k): <span id="r10v">8</span></label>
-    <input type="range" id="r10" min="1" max="20" step="1" value="8">
-   </div>
-   <div class="sim"><canvas id="cv10" height="260"></canvas></div>
-   <div class="stats" id="t10"></div>
-   <p class="takeaway"><b>Key Takeaway:</b> Always group correlated features before computing attributions. Group-SHAP and hierarchical clustering prevent signal dilution from blinding stakeholders to critical risk factors.</p>
-  </div>
- </section>
-
- <!-- Chapter 11 -->
- <section class="ch" id="c11">
-  <h2><span class="num">11</span>Regulator-Grade Explanations &amp; Statistical Standards <span class="lvl e">Expert</span></h2>
-  <p>Regulatory frameworks such as the **EU AI Act (Article 13)**, **US Equal Credit Opportunity Act (ECOA - Adverse Action Notices)**, and **Federal Reserve SR 11-7 (Model Risk Management)** require explanations that are:
-  <ol>
-   <li><b>Faithful:</b> Reflective of actual model mechanics rather than post-hoc rationalization.</li>
-   <li><b>Actionable (Recourse):</b> Guiding individuals on what realistic, feasible changes will alter the decision.</li>
-   <li><b>Robust:</b> Stable under minor input perturbations and sample re-runs.</li>
-  </ol></p>
-  <p><b>Counterfactual Explanations &amp; Actionable Recourse:</b> A counterfactual explanation finds the minimum cost change δ such that f(x + δ) = y*:
-  <div class="f">Counterfactual Recourse: δ* = argmin_δ [ dist(x, x+δ) + λ ℓ(f(x+δ), y*) + Plausibility(x+δ) ]  ·  must respect causal constraints</div>
-  Crucially, mathematical nearest-counterfactuals often prescribe absurd actions (e.g., "reduce your age by 5 years" or "decrease debt while keeping income at zero"). Actionable recourse requires causal constraints and immutable feature protections.</p>
-
-  <div class="card">
-   <h4>Lab 11 · Nearest Counterfactual vs Feasible Causal Recourse</h4>
-   <p>Compare unconstrained mathematical counterfactuals (which extrapolate off the data manifold) with feasible causal recourse that respects feature correlations and immutable constraints.</p>
-   <div class="ctrl">
-    <label>Manifold Constraint Weight (λ): <span id="r11v">1.2</span></label>
-    <input type="range" id="r11" min="0.0" max="3.0" step="0.2" value="1.2">
-   </div>
-   <div class="sim"><canvas id="cv11" height="260"></canvas></div>
-   <div class="stats" id="t11"></div>
-   <p class="takeaway"><b>Key Takeaway:</b> Adverse action notices and counterfactual explanations must restrict recourse recommendations to realistic paths along the data manifold that respect causal constraints.</p>
-  </div>
- </section>
-
- <div class="part">Part IV · Synthesis, Checklist &amp; Exam</div>
-
- <!-- Chapter 12 -->
- <section class="ch" id="c12">
-  <h2><span class="num">12</span>Final Exam, Mastery Checklist, Cheat Sheet <span class="lvl e">Expert</span></h2>
-  <p>Verify your mastery of interpretability theory, Shapley axioms, off-manifold dilemmas, Rashomon sets, and causal limits across 18 comprehensive exam questions.</p>
-
-  <h3>Exam (18 questions — click an answer)</h3>
-  <div id="quiz"></div>
-  <div class="card">
-   <h4>Exam Score &amp; Verification</h4>
-   <div class="stats" id="qscore"></div>
-   <button class="alt" id="qreset">Reset exam</button>
-  </div>
-
-  <h3>Mastery Checklist</h3>
-  <div class="card">
-   <div id="chk" class="chk-grid"></div>
-  </div>
-
-  <h3>Interpretability Methods Comparison Cheat Sheet</h3>
-  <div class="card">
-   <table style="width:100%;border-collapse:collapse;font-size:13px;text-align:left">
-    <thead>
-     <tr style="border-bottom:1px solid var(--line);color:var(--mu)">
-      <th style="padding:8px">Method</th>
-      <th style="padding:8px">Scope</th>
-      <th style="padding:8px">Axiomatic Guarantee</th>
-      <th style="padding:8px">Collinearity Behavior</th>
-      <th style="padding:8px">Off-Manifold Risk</th>
-      <th style="padding:8px">Causal Meaning</th>
-     </tr>
-    </thead>
-    <tbody>
-     <tr style="border-bottom:1px solid var(--line)">
-      <td style="padding:8px"><b>PFI</b></td>
-      <td style="padding:8px">Global</td>
-      <td style="padding:8px">None (heuristic)</td>
-      <td style="padding:8px">Masks redundant features; inflates variance</td>
-      <td style="padding:8px"><span style="color:var(--r)">High</span> (pairs broken)</td>
-      <td style="padding:8px">Associative only</td>
-     </tr>
-     <tr style="border-bottom:1px solid var(--line)">
-      <td style="padding:8px"><b>PDP</b></td>
-      <td style="padding:8px">Global</td>
-      <td style="padding:8px">None</td>
-      <td style="padding:8px">Extrapolates into zero-density rectangular grid</td>
-      <td style="padding:8px"><span style="color:var(--r)">Very High</span></td>
-      <td style="padding:8px">Associative only</td>
-     </tr>
-     <tr style="border-bottom:1px solid var(--line)">
-      <td style="padding:8px"><b>ALE</b></td>
-      <td style="padding:8px">Global</td>
-      <td style="padding:8px">Integrates local gradients</td>
-      <td style="padding:8px">Robust; tracks conditional distribution</td>
-      <td style="padding:8px"><span style="color:var(--g)">Zero</span> (on-manifold)</td>
-      <td style="padding:8px">Local model sensitivity</td>
-     </tr>
-     <tr style="border-bottom:1px solid var(--line)">
-      <td style="padding:8px"><b>Marginal SHAP</b></td>
-      <td style="padding:8px">Local</td>
-      <td style="padding:8px">Efficiency, Symmetry, Dummy, Additivity</td>
-      <td style="padding:8px">Dummy features stay zero; off-manifold sampling</td>
-      <td style="padding:8px"><span style="color:var(--r)">High</span></td>
-      <td style="padding:8px">Feature attribution ≠ do-calculus</td>
-     </tr>
-     <tr style="border-bottom:1px solid var(--line)">
-      <td style="padding:8px"><b>Conditional SHAP</b></td>
-      <td style="padding:8px">Local</td>
-      <td style="padding:8px">Efficiency, Symmetry, Additivity (violates Dummy)</td>
-      <td style="padding:8px">Leaks attribution to correlated zero-weight variables</td>
-      <td style="padding:8px"><span style="color:var(--g)">Zero</span> (on-manifold)</td>
-      <td style="padding:8px">Observational expectation</td>
-     </tr>
-     <tr style="border-bottom:1px solid var(--line)">
-      <td style="padding:8px"><b>LIME</b></td>
-      <td style="padding:8px">Local</td>
-      <td style="padding:8px">None (local surrogate fit)</td>
-      <td style="padding:8px">Sensitive to kernel width σ and random seed</td>
-      <td style="padding:8px"><span style="color:var(--y)">Medium</span> (Gaussian)</td>
-      <td style="padding:8px">Linear surrogate gradient</td>
-     </tr>
-     <tr>
-      <td style="padding:8px"><b>Causal Recourse</b></td>
-      <td style="padding:8px">Instance</td>
-      <td style="padding:8px">Bounded cost along structural causal equations</td>
-      <td style="padding:8px">Propagates downstream shifts via DAG</td>
-      <td style="padding:8px"><span style="color:var(--g)">Zero</span> (feasible path)</td>
-      <td style="padding:8px"><span style="color:var(--g)">True interventional effect</span></td>
-     </tr>
-    </tbody>
-   </table>
-  </div>
- </section>
+<section class="ch" id="c12">
+<h2><span class="num">12</span>Final exam, mastery checklist, cheat sheet <span class="lvl e">Expert</span></h2>
+<h3>Exam (18 questions — click an answer)</h3>
+<div id="quiz"></div>
+<div class="card"><h4>Score</h4><div class="stats" id="qscore"></div><button class="alt" id="qreset">Reset exam</button></div>
+<h3>Mastery checklist — tick when you can do it without notes</h3>
+<div class="card chk" id="chk"></div>
+<h3>Cheat sheet</h3>
+<div class="tw"><table>
+<tr><th>Idea</th><th>One line</th></tr>
+<tr><td>Importance</td><td>A property of the fitted model; unstable under correlated features; report variability over refits and group correlated features</td></tr>
+<tr><td>Permutation importance</td><td>Reliance of the model; inflated for correlated features by off-distribution shuffles; conditional permutation and drop-column answer other questions</td></tr>
+<tr><td>PD and ICE</td><td>The average hides interactions; plot ICE curves and the spread of individual effects; ALE for correlated features</td></tr>
+<tr><td>Shapley values</td><td>Credits sum to prediction − baseline; interventional vs conditional differ; the baseline changes everything; not an effect</td></tr>
+<tr><td>Sampling error</td><td>Importance estimates have intervals; do not rank features whose intervals overlap</td></tr>
+<tr><td>LIME</td><td>Kernel width trades bias against variance; repeat and report variability; check local fidelity</td></tr>
+<tr><td>Rashomon set</td><td>Many near-equal models, different stories; report what is common to the set</td></tr>
+<tr><td>Causality</td><td>Explanations describe the model, not the effect of intervening; use causal methods for advice and policy</td></tr>
+<tr><td>Counterfactuals</td><td>Valid against the current boundary only; add a margin, report cost and validity under refits; actionability</td></tr>
+<tr><td>Overfitting</td><td>Explain on held-out data; compare with null importance of noise features</td></tr>
+<tr><td>Reason codes</td><td>Measure agreement between refits; document variant and baseline; group correlated features</td></tr>
+<tr><td>Governance</td><td>Explanations are statistics: report method, baseline, sampling error, stability and the question they answer</td></tr>
+</table></div>
+<div class="co tip"><b>The roadmap is complete</b>All 36 items are built. A good next step is to apply them: pick a live model (an AML alert score or a churn model) and write its validation note using the checklists on these pages: calibration, coverage, drift, explanation stability and the causal limits of what it can claim.</div>
+</section>
 </main>
-
 <script>
 /*MATH*/
+function lgamma(x){const c=[76.18009172947146,-86.50532032941677,24.01409824083091,-1.231739572450155,0.1208650973866179e-2,-0.5395239384953e-5];let y=x,t=x+5.5;t-=(x+.5)*Math.log(t);let s=1.000000000190015;for(let j=0;j<6;j++)s+=c[j]/++y;return -t+Math.log(2.5066282746310005*s/x);}
+function gser(a,x){let ap=a,sum=1/a,del=sum;for(let n=0;n<1000;n++){ap++;del*=x/ap;sum+=del;if(Math.abs(del)<Math.abs(sum)*1e-15)break;}return sum*Math.exp(-x+a*Math.log(x)-lgamma(a));}
+function gcf(a,x){let b=x+1-a,c=1/1e-300,d=1/b,h=d;for(let i=1;i<1000;i++){const an=-i*(i-a);b+=2;d=an*d+b;if(Math.abs(d)<1e-300)d=1e-300;c=b+an/c;if(Math.abs(c)<1e-300)c=1e-300;d=1/d;const del=d*c;h*=del;if(Math.abs(del-1)<1e-15)break;}return Math.exp(-x+a*Math.log(x)-lgamma(a))*h;}
+function gammaQ(a,x){if(x<=0)return 1;return x<a+1?1-gser(a,x):gcf(a,x);}
+function betacf(a,b,x){const qab=a+b,qap=a+1,qam=a-1;let c=1,d=1-qab*x/qap;if(Math.abs(d)<1e-300)d=1e-300;d=1/d;let h=d;for(let m=1;m<=1000;m++){const m2=2*m;let aa=m*(b-m)*x/((qam+m2)*(a+m2));d=1+aa*d;if(Math.abs(d)<1e-300)d=1e-300;c=1+aa/c;if(Math.abs(c)<1e-300)c=1e-300;d=1/d;h*=d*c;aa=-(a+m)*(qab+m)*x/((a+m2)*(qap+m2));d=1+aa*d;if(Math.abs(d)<1e-300)d=1e-300;c=1+aa/c;if(Math.abs(c)<1e-300)c=1e-300;d=1/d;const del=d*c;h*=del;if(Math.abs(del-1)<1e-15)break;}return h;}
+function betai(a,b,x){if(x<=0)return 0;if(x>=1)return 1;const bt=Math.exp(lgamma(a+b)-lgamma(a)-lgamma(b)+a*Math.log(x)+b*Math.log(1-x));return x<(a+1)/(a+b+2)?bt*betacf(a,b,x)/a:1-bt*betacf(b,a,1-x)/b;}
+function normSf(z){const q=0.5*gammaQ(.5,z*z/2);return z>=0?q:1-q;}
+function normCdf(z){return normSf(-z);}
+function npdf(x){return Math.exp(-x*x/2)/2.5066282746310002;}
+function lbin(n,k){return lgamma(n+1)-lgamma(k+1)-lgamma(n-k+1);}
+function binom(n,k,p){return Math.exp(lbin(n,k)+k*Math.log(p)+(n-k)*Math.log(1-p));}
+function betapdf(x,a,b){return x<=0||x>=1?0:Math.exp(lgamma(a+b)-lgamma(a)-lgamma(b)+(a-1)*Math.log(x)+(b-1)*Math.log(1-x));}
+function betacdf(x,a,b){return betai(a,b,x);}
+function gampdf(x,a,r){return x<=0?0:Math.exp(a*Math.log(r)+(a-1)*Math.log(x)-r*x-lgamma(a));}
+function gamcdf(x,a,r){return x<=0?0:1-gammaQ(a,r*x);}
 function randn(){let u=0;while(!u)u=Math.random();return Math.sqrt(-2*Math.log(u))*Math.cos(2*Math.PI*Math.random());}
-function normCdf(z){let t=1/(1+0.2316419*Math.abs(z));let d=0.3989423*Math.exp(-z*z/2);let p=d*t*(0.3193815+t*(-0.3565638+t*(1.781478+t*(-1.821256+t*1.330274))));return z>0?1-p:p;}
+function gammaS(a){if(a<1)return gammaS(a+1)*Math.pow(Math.random(),1/a);const d=a-1/3,c=1/Math.sqrt(9*d);for(;;){let x,v;do{x=randn();v=1+c*x}while(v<=0);v=v*v*v;const u=Math.random();if(Math.log(u)<.5*x*x+d-d*v+d*Math.log(v))return d*v;}}
+function betaS(a,b){const x=gammaS(a),y=gammaS(b);return x/(x+y);}
+function binS(n,p){let k=0;for(let i=0;i<n;i++)if(Math.random()<p)k++;return k;}
 function mean(a){let s=0;for(const v of a)s+=v;return s/a.length;}
+function qc(cdf,lo,hi,p,it){for(let i=0;i<(it||100);i++){const m=(lo+hi)/2;if(cdf(m)<p)lo=m;else hi=m}return(lo+hi)/2;}
+function qb(a,b,p){return qc(x=>betai(a,b,x),0,1,p,50);}
+function tcdf(x,v){const t=.5*betai(v/2,.5,v/(v+x*x));return x>0?1-t:t}
+function qn(p){return qc(normCdf,-9,9,p,70)}
+function pois(k,l){return Math.exp(-l+k*Math.log(l)-lgamma(k+1))}
+function binF(n,p){let k=0;for(;;){if(n<=0||p<=0)return k;if(p>=1)return k+n;if(n<=40){for(let i=0;i<n;i++)if(Math.random()<p)k++;return k}const a=1+(n>>1),bb=1+n-a,x=betaS(a,bb);if(x>=p){n=a-1;p=p/x}else{k+=a;n=bb-1;p=(p-x)/(1-x)}}}
 /*ENDMATH*/
 
 const $=id=>document.getElementById(id), val=id=>+$(id).value;
 const C={fg:'#e8ebf5',mu:'#8a93ab',gr:'#232a3d',a:'#6ea8ff',r:'#ff6b81',y:'#ffd166',g:'#4ade80',p:'#c084fc',t:'#5eead4'};
 const store={get(k,d){try{const v=JSON.parse(localStorage.getItem(k));return v==null?d:v}catch(e){return d}},set(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}};
 function stat(l,v,c){return `<div class="stat ${c||''}"><b>${v}</b><span>${l}</span></div>`}
-function pc(x){return f3(100*x)+'%'}
 function f3(x){if(!isFinite(x))return String(x);const a=Math.abs(x);if(a!==0&&(a<1e-3||a>=1e6))return x.toExponential(2);return String(+x.toFixed(a<1?4:a<100?3:a<1000?2:0))}
-
+function pc(x){return f3(100*x)+'%'}
 const resizers=[];
 function reg(fn){fn();resizers.push(fn)}
-function on(ids,fn){ids.split(' ').forEach(i=>{const e=$(i);if(e){e.addEventListener('input',fn);e.addEventListener('change',fn)}})}
+function on(ids,fn){ids.split(' ').forEach(i=>{const e=$(i);e.addEventListener('input',fn);e.addEventListener('change',fn)})}
 let rt;window.addEventListener('resize',()=>{clearTimeout(rt);rt=setTimeout(()=>resizers.forEach(f=>f()),150)});
 document.querySelectorAll('input[type=range]').forEach(i=>{const o=$(i.id+'v');if(!o)return;const f=()=>{o.textContent=i.value};i.addEventListener('input',f);f()});
 
 function nice(x){const e=Math.pow(10,Math.floor(Math.log10(x))),f=x/e;return (f<1.5?1:f<3?2:f<7?5:10)*e}
-function mk(cv,x0,x1,ymax,o){o=o||{};const y0=o.y0||0,dpr=window.devicePixelRatio||1,r=cv.getBoundingClientRect(),w=r.width||600,h=r.height||260;
+function mk(cv,x0,x1,ymax,o){o=o||{};const y0=o.y0||0,dpr=window.devicePixelRatio||1,r=cv.getBoundingClientRect(),w=r.width||600,h=r.height||270;
  cv.width=w*dpr;cv.height=h*dpr;const g=cv.getContext('2d');g.setTransform(dpr,0,0,dpr,0,0);g.clearRect(0,0,w,h);
  const L=o.L||42,R=12,T=14,B=28,X=x=>L+(x-x0)/(x1-x0)*(w-L-R),Y=y=>h-B-(y-y0)/(ymax-y0)*(h-T-B);
  g.font='11px system-ui';g.lineWidth=1;g.strokeStyle=C.gr;g.fillStyle=C.mu;
- if(!o.noGrid){const sx=nice((x1-x0)/7);for(let x=Math.ceil(x0/sx-1e-9)*sx;!o.noX&&x<=x1+1e-9;x+=sx){g.beginPath();g.moveTo(X(x),T);g.lineTo(X(x),h-B);g.stroke();g.textAlign='center';g.fillText(String(+x.toFixed(4)),X(x),h-B+15)}
+ if(!o.noGrid){const sx=nice((x1-x0)/7);for(let x=Math.ceil(x0/sx-1e-9)*sx;!o.noX&&x<=x1+1e-9;x+=sx){g.beginPath();g.moveTo(X(x),T);g.lineTo(X(x),h-B);g.stroke();g.textAlign='center';g.fillText(String(+x.toFixed(6)),X(x),h-B+15)}
  const sy=nice((ymax-y0)/4);for(let y=Math.ceil(y0/sy-1e-9)*sy;y<=ymax+1e-9;y+=sy){g.beginPath();g.moveTo(L,Y(y));g.lineTo(w-R,Y(y));g.stroke();g.textAlign='right';g.fillText(String(+y.toFixed(4)),L-5,Y(y)+3)}}
  return{g,w,h,X,Y,L,R,T,B,
   line(f,col,lw,a,b,n,dash){a=a==null?x0:a;b=b==null?x1:b;n=n||260;g.save();if(dash)g.setLineDash([5,4]);g.beginPath();g.strokeStyle=col;g.lineWidth=lw||2;let st=false;for(let i=0;i<=n;i++){const x=a+(b-a)*i/n,y=f(x);if(!isFinite(y)){st=false;continue}st?g.lineTo(X(x),Y(y)):g.moveTo(X(x),Y(y));st=true}g.stroke();g.restore()},
-  bar(x,y,wBar,col){g.fillStyle=col;g.fillRect(X(x)-wBar/2,Y(Math.max(0,y)),wBar,Math.abs(Y(y)-Y(0)))},
-  circle(x,y,r,col){g.beginPath();g.arc(X(x),Y(y),r,0,Math.PI*2);g.fillStyle=col;g.fill()},
+  area(f,a,b,col,n){a=Math.max(a,x0);b=Math.min(b,x1);if(b<=a)return;n=n||200;g.beginPath();g.moveTo(X(a),Y(0));for(let i=0;i<=n;i++){const x=a+(b-a)*i/n;g.lineTo(X(x),Y(f(x)))}g.lineTo(X(b),Y(0));g.closePath();g.fillStyle=col;g.fill()},
   vline(x,col,lab,dash){g.save();g.strokeStyle=col;g.lineWidth=1.6;if(dash)g.setLineDash([5,4]);g.beginPath();g.moveTo(X(x),T);g.lineTo(X(x),h-B);g.stroke();g.restore();if(lab){g.fillStyle=col;g.textAlign='center';g.fillText(lab,Math.min(Math.max(X(x),34),w-34),T+10)}},
   hline(y,col,lab){g.save();g.strokeStyle=col;g.lineWidth=1.4;g.setLineDash([5,4]);g.beginPath();g.moveTo(L,Y(y));g.lineTo(w-R,Y(y));g.stroke();g.restore();if(lab){g.fillStyle=col;g.textAlign='right';g.fillText(lab,w-R-3,Y(y)-4)}},
   text(s,x,y,col,al){g.fillStyle=col||C.fg;g.textAlign=al||'left';g.fillText(s,x,y)}};}
 
-/* ---------- LAB 1: Confounder Trap ---------- */
-reg(()=>{
- function run(){
-  const conf=val('r1');
-  const cv=$('cv1'), m=mk(cv,-3,3,4,{y0:-4});
-  m.hline(0,C.gr);
-  // Plot simulated data points and true vs estimated model line
-  // True effect: beta_true = +1.5, Observed regression slope: beta_obs = 1.5 - 2.5 * conf
-  const beta_true = 1.5;
-  const beta_obs = 1.5 - 2.8 * conf;
-  m.line(x=>beta_true*x, C.g, 2.5, -3, 3, 100, true);
-  m.line(x=>beta_obs*x, C.r, 2.5, -3, 3, 100);
-  m.text('True Causal Effect (+1.5)', m.X(1.5), m.Y(3.2), C.g);
-  m.text(`Model / Attribution Slope (${f3(beta_obs)})`, m.X(1.5), m.Y(beta_obs*1.5 - 0.4), C.r);
+/* ---------- shared helpers for this page ---------- */
+const D={
+ norm:{n:'Normal(0,1)',s:()=>randn(),mu:0,sd:1,sk:0},
+ unif:{n:'Uniform(0,1)',s:()=>Math.random(),mu:.5,sd:Math.sqrt(1/12),sk:0},
+ expo:{n:'Exponential(1)',s:()=>-Math.log(1-Math.random()),mu:1,sd:1,sk:2},
+ logn:{n:'Lognormal(0,1)',s:()=>Math.exp(randn()),mu:Math.exp(.5),sd:Math.sqrt((Math.E-1)*Math.E),sk:(Math.E+2)*Math.sqrt(Math.E-1),disc:0},
+ b05:{n:'Bernoulli(0.5)',s:()=>Math.random()<.5?1:0,mu:.5,sd:.5,sk:0,disc:1},
+ b05s:{n:'Bernoulli(0.05)',s:()=>Math.random()<.05?1:0,mu:.05,sd:Math.sqrt(.0475),sk:.9/Math.sqrt(.0475),disc:1},
+ bimo:{n:'Two humps',s:()=>(Math.random()<.5?-2:2)+.5*randn(),mu:0,sd:Math.sqrt(4.25),sk:0},
+ par5:{n:'Pareto(α=5)',s:()=>Math.pow(1-Math.random(),-.2),mu:1.25,sd:Math.sqrt(5/48),sk:6*Math.sqrt(.6)},
+ cauchy:{n:'Cauchy (no mean)',s:()=>Math.tan(Math.PI*(Math.random()-.5)),mu:NaN,sd:Infinity,sk:NaN}
+};
+function fillSel(id,keys,def){const e=$(id);e.innerHTML=keys.map(k=>`<option value="${k}">${D[k].n}</option>`).join('');e.value=def}
+const PAL=[C.a,C.r,C.y,C.g,C.p,C.t,'#ff9f43','#9aa4bf'];
+function tgrid(N,M){const T=[];let prev=0;for(let i=0;i<M;i++){let n=Math.round(Math.pow(10,Math.log10(N)*i/(M-1)));if(i===M-1)n=N;n=Math.max(prev+1,n);if(n>N)break;T.push(n);prev=n}if(T[T.length-1]!==N)T[T.length-1]=N;return T}
+function nlab(n){return n>=1e6?(n/1e6)+'M':n>=1000?(n/1000)+'k':String(n)}
+function customGrid(P,xt,yt){const g=P.g;g.save();g.strokeStyle=C.gr;g.fillStyle=C.mu;g.font='11px system-ui';g.lineWidth=1;
+ xt.forEach(([v,l])=>{g.beginPath();g.moveTo(P.X(v),P.T);g.lineTo(P.X(v),P.h-P.B);g.stroke();g.textAlign='center';g.fillText(l,P.X(v),P.h-P.B+15)});
+ yt.forEach(([v,l])=>{g.beginPath();g.moveTo(P.L,P.Y(v));g.lineTo(P.w-P.R,P.Y(v));g.stroke();g.textAlign='right';g.fillText(l,P.L-5,P.Y(v)+3)});g.restore()}
+function clip(P,fn){const g=P.g;g.save();g.beginPath();g.rect(P.L,P.T,P.w-P.L-P.R,P.h-P.T-P.B);g.clip();fn();g.restore()}
+function poly(P,pts,col,lw,dash){const g=P.g;g.save();if(dash)g.setLineDash([5,4]);g.strokeStyle=col;g.lineWidth=lw||2;g.beginPath();pts.forEach(([x,y],i)=>i?g.lineTo(P.X(x),P.Y(y)):g.moveTo(P.X(x),P.Y(y)));g.stroke();g.restore()}
+function dots(P,pts,col,r){const g=P.g;g.fillStyle=col;pts.forEach(([x,y])=>{g.beginPath();g.arc(P.X(x),P.Y(y),r||3,0,7);g.fill()})}
+function niceTicks(lo,hi,k){const st=nice((hi-lo)/(k||5)),a=[];for(let v=Math.ceil(lo/st-1e-9)*st;v<=hi+1e-9;v+=st)a.push([v,String(+v.toFixed(6))]);return a}
+function logTicks(lo,hi){const a=[];for(let e=Math.ceil(lo-1e-9);e<=hi+1e-9;e++)a.push([e,nlab(Math.pow(10,e))]);return a}
+function mom(a){const n=a.length;let m=0;for(const v of a)m+=v;m/=n;let v2=0,v3=0,v4=0;for(const v of a){const d=v-m;v2+=d*d;v3+=d*d*d;v4+=d*d*d*d}v2/=n;v3/=n;v4/=n;const sd=Math.sqrt(v2);return{n,m,sd,sk:sd>0?v3/(sd*sd*sd):0,ku:v2>0?v4/(v2*v2)-3:0}}
+function ksN(z){const a=Array.from(z).sort((x,y)=>x-y),n=a.length;let d=0;for(let i=0;i<n;i++){const F=normCdf(a[i]);d=Math.max(d,Math.abs((i+1)/n-F),Math.abs(i/n-F))}return d}
+/* histogram of data as density with optional overlay curves [{f,col,lw,dash}] */
+function hist(cv,data,lo,hi,bins,ov,col){const cnt=new Float64Array(bins),bw=(hi-lo)/bins;let n=0;for(const v of data){if(v<lo||v>=hi)continue;cnt[Math.floor((v-lo)/bw)]++;n++}
+ const N=data.length;let ym=0;for(let i=0;i<bins;i++){cnt[i]/=N*bw;ym=Math.max(ym,cnt[i])}
+ (ov||[]).forEach(o=>{for(let i=0;i<=80;i++)ym=Math.max(ym,o.f(lo+(hi-lo)*i/80)||0)});
+ const P=mk(cv,lo,hi,ym*1.12);
+ P.g.fillStyle=col||'rgba(110,168,255,.5)';for(let i=0;i<bins;i++){if(cnt[i]<=0)continue;const a=P.X(lo+i*bw),b=P.X(lo+(i+1)*bw);P.g.fillRect(a,P.Y(cnt[i]),Math.max(1,b-a-1),P.Y(0)-P.Y(cnt[i]))}
+ (ov||[]).forEach(o=>P.line(o.f,o.col,o.lw||2.4,lo,hi,200,o.dash));return P}
+const fmt=x=>f3(x);
 
-  $('t1').innerHTML = stat('True Causal Effect','+1.50','ok')+
-                      stat('Model Attribution',f3(beta_obs),beta_obs<0?'err':'in')+
-                      stat('Confounding Bias',f3(beta_obs - beta_true),'warn')+
-                      stat('Status',beta_obs<0?'FATAL INVERSION: Model rewards harmful action!':'Biased but aligned sign','');
- }
- on('r1', run); run();
-});
+/* ---------- shared for this page ---------- */
+const POPS=['norm','unif','expo','logn','bimo','par5'];
+D.norm.med=0;D.norm.q90=1.2815516;D.unif.med=.5;D.unif.q90=.9;D.expo.med=Math.LN2;D.expo.q90=Math.log(10);D.logn.med=1;D.logn.q90=Math.exp(1.2815516);
+D.bimo.med=0;D.bimo.q90=qc(x=>.5*normCdf((x+2)/.5)+.5*normCdf((x-2)/.5),-10,10,.9,80);D.par5.med=Math.pow(2,.2);D.par5.q90=Math.pow(10,.2);
+const SF={mean:a=>mean(a),median:a=>{const b=Float64Array.from(a).sort(),n=b.length;return n%2?b[(n-1)/2]:(b[n/2-1]+b[n/2])/2},sd:a=>{const n=a.length,m=mean(a);let s=0;for(const v of a)s+=(v-m)*(v-m);return Math.sqrt(s/(n-1))},q90:a=>{const b=Float64Array.from(a).sort();return b[Math.round(.9*(b.length-1))]}};
+function truth(key,st){const d=D[key];return st==='mean'?d.mu:st==='median'?d.med:st==='sd'?d.sd:d.q90}
+const SNAME={mean:'sample mean',median:'sample median',sd:'sample SD',q90:'90th percentile'};
+const N10=[2,3,5,10,20,50,100,200,500,1000];
+function pct(a,p){const b=Float64Array.from(a).sort();return b[Math.min(b.length-1,Math.max(0,Math.floor(p*b.length)))]}
+function histLines(cv,arrs,cols,lo,hi,bins,vl){const bw=(hi-lo)/bins,dens=arrs.map(a=>{const c=new Float64Array(bins);for(const v of a){if(v<lo||v>=hi)continue;c[Math.floor((v-lo)/bw)]++}for(let i=0;i<bins;i++)c[i]/=a.length*bw;return c});let ym=0;dens.forEach(c=>c.forEach(v=>ym=Math.max(ym,v)));const P=mk(cv,lo,hi,ym*1.15||1);
+ dens.forEach((c,k)=>{const pts=[];for(let i=0;i<bins;i++){pts.push([lo+i*bw,c[i]]);pts.push([lo+(i+1)*bw,c[i]])}clip(P,()=>poly(P,pts,cols[k],2.2))});(vl||[]).forEach(v=>P.vline(v[0],v[1],v[2],v[3]));return P}
+function sdOf(a){return mom(a).sd}
 
-/* ---------- LAB 2: PFI under Collinearity ---------- */
-reg(()=>{
- function run(){
-  const rho=val('r2');
-  const cv=$('cv2'), m=mk(cv,-0.5,2.5,1.2,{y0:0,noX:true});
-  m.hline(0,C.gr);
-  // As rho -> 1, PFI of X1 and X2 drops from 0.5 to (1-rho^2)*0.5
-  const true_joint = 1.0;
-  const pfi_x1 = Math.max(0.04, 0.5 * (1 - rho*rho));
-  const pfi_x2 = Math.max(0.04, 0.5 * (1 - rho*rho));
-  m.bar(0.2, true_joint, 36, C.g);
-  m.bar(1.0, pfi_x1, 36, C.a);
-  m.bar(1.8, pfi_x2, 36, C.y);
+/* ---------- ML helpers ---------- */
+function digamma(x){let r=0;while(x<6){r-=1/x;x++}const f=1/(x*x);return r+Math.log(x)-.5/x-f*(1/12-f*(1/120-f/252))}
+function trigamma(x){let r=0;while(x<6){r+=1/(x*x);x++}const f=1/(x*x);return r+1/x+.5*f+f/x*(1/6-f*(1/30-f/42))}
+function poisS(l){if(l<=0)return 0;if(l<30){const L=Math.exp(-l);let k=0,p=1;do{k++;p*=Math.random()}while(p>L);return k-1}const m=Math.floor(.875*l),g=gammaS(m);return g<l?m+poisS(l-g):binF(m-1,l/g)}
+function llb(k,n,p){return(k?k*Math.log(p):0)+(n-k?(n-k)*Math.log(1-p):0)}
+function lrInt(k,n,cut){const ph=k/n,l0=llb(k,n,ph),g=p=>2*(l0-llb(k,n,p))-cut;let lo=0,hi=1;
+ if(k>0){let a=1e-12,b=ph;for(let i=0;i<70;i++){const m=(a+b)/2;if(g(m)>0)a=m;else b=m}lo=(a+b)/2}
+ if(k<n){let a=ph,b=1-1e-12;for(let i=0;i<70;i++){const m=(a+b)/2;if(g(m)>0)b=m;else a=m}hi=(a+b)/2}return[lo,hi]}
+function solveAlpha(s){if(!(s>1e-9))return 1e6;let a=(3-s+Math.sqrt((3-s)*(3-s)+24*s))/(12*s);for(let i=0;i<8;i++){const f=Math.log(a)-digamma(a)-s,fp=1/a-trigamma(a);let n=a-f/fp;if(!(n>0))n=a/2;a=n}return a}
+function normPdfAt(x,m,s){return Math.exp(-(x-m)*(x-m)/(2*s*s))/(s*2.5066282746)}
+/* ---------- Regression helpers ---------- */
+function idx(id,arr,ff){const e=$(id),o=$(id+'v'),f=()=>{o.textContent=ff?ff(arr[+e.value]):arr[+e.value]};e.addEventListener('input',f);f()}
+function scl(id,ff){const e=$(id),o=$(id+'v'),f=()=>{o.textContent=ff(+e.value)};e.addEventListener('input',f);f()}
+function pctTicks(a,b,st){const r=[];for(let v=a;v<=b+1e-9;v+=st)r.push([v,Math.round(v*100)+'%']);return r}
+const _tq={};function tq(v,p){const k=v+'_'+p;return _tq[k]||(_tq[k]=qc(x=>tcdf(x,v),0,500,p,80))}
+function simple(x,y){const n=x.length;let xm=0,ym=0;for(let i=0;i<n;i++){xm+=x[i];ym+=y[i]}xm/=n;ym/=n;let sxx=0,sxy=0,syy=0;for(let i=0;i<n;i++){const dx=x[i]-xm,dy=y[i]-ym;sxx+=dx*dx;sxy+=dx*dy;syy+=dy*dy}const b=sxy/sxx,a=ym-b*xm,res=new Float64Array(n);let sse=0;for(let i=0;i<n;i++){res[i]=y[i]-a-b*x[i];sse+=res[i]*res[i]}return{n,xm,ym,sxx,sxy,syy,b,a,res,sse,sst:syy,r2:1-sse/syy}}
+function gj(A,B){const p=A.length;const M=A.map((r,i)=>Array.from(r).concat(B?[B[i]]:[]));for(let c=0;c<p;c++){let m=c;for(let r=c+1;r<p;r++)if(Math.abs(M[r][c])>Math.abs(M[m][c]))m=r;[M[c],M[m]]=[M[m],M[c]];const d=M[c][c]||1e-12;for(let k=c;k<M[c].length;k++)M[c][k]/=d;for(let r=0;r<p;r++)if(r!==c){const f=M[r][c];if(f!==0)for(let k=c;k<M[c].length;k++)M[r][k]-=f*M[c][k]}}return M}
+function olsMulti(cols,y,needInv){const n=y.length,k=cols.length,p=k+1,A=[],B=new Float64Array(p);for(let i=0;i<p;i++)A.push(new Float64Array(p));
+ for(let r=0;r<n;r++){const row=[1];for(let j=0;j<k;j++)row.push(cols[j][r]);for(let i=0;i<p;i++){B[i]+=row[i]*y[r];for(let j=i;j<p;j++)A[i][j]+=row[i]*row[j]}}
+ for(let i=0;i<p;i++){for(let j=0;j<i;j++)A[i][j]=A[j][i];if(i>0)A[i][i]+=1e-9}
+ let beta,inv=null;if(needInv){const I=[];for(let i=0;i<p;i++){const e=new Float64Array(p);e[i]=1;I.push(e)}const M=gj(A,null);const aug=A.map((r,i)=>Array.from(r).concat(Array.from(I[i])));
+  const m=aug;for(let c=0;c<p;c++){let q=c;for(let r=c+1;r<p;r++)if(Math.abs(m[r][c])>Math.abs(m[q][c]))q=r;[m[c],m[q]]=[m[q],m[c]];const d=m[c][c]||1e-12;for(let kk=0;kk<2*p;kk++)m[c][kk]/=d;for(let r=0;r<p;r++)if(r!==c){const f=m[r][c];if(f!==0)for(let kk=0;kk<2*p;kk++)m[r][kk]-=f*m[c][kk]}}
+  inv=m.map(r=>r.slice(p));beta=inv.map(r=>{let s=0;for(let j=0;j<p;j++)s+=r[j]*B[j];return s})}
+ else{const M=gj(A,B);beta=M.map(r=>r[p])}
+ const res=new Float64Array(n);let sse=0;for(let r=0;r<n;r++){let f=beta[0];for(let j=0;j<k;j++)f+=beta[j+1]*cols[j][r];res[r]=y[r]-f;sse+=res[r]*res[r]}
+ const out={beta,res,sse,n,p,inv};if(inv){const s2=sse/(n-p);out.s2=s2;out.se=inv.map((r,i)=>Math.sqrt(s2*r[i]))}return out}
+function scatterAxes(cv,xs,ys,xlo,xhi,ylo,yhi,L){return mk(cv,xlo,xhi,yhi,{y0:ylo,L:L||44})}
+function range(a,pad){let lo=1e99,hi=-1e99;for(const v of a){if(v<lo)lo=v;if(v>hi)hi=v}const w=(hi-lo)||1;return[lo-(pad||.05)*w,hi+(pad||.05)*w]}
 
-  m.text('Joint Signal (1.0)', m.X(0.2), m.Y(true_joint)+15, C.fg, 'center');
-  m.text(`PFI(X1): ${f3(pfi_x1)}`, m.X(1.0), m.Y(pfi_x1)+15, C.a, 'center');
-  m.text(`PFI(X2): ${f3(pfi_x2)}`, m.X(1.8), m.Y(pfi_x2)+15, C.y, 'center');
 
-  $('t2').innerHTML = stat('Correlation (ρ)',f3(rho),'in')+
-                      stat('PFI(X1)',f3(pfi_x1),pfi_x1<0.15?'err':'ok')+
-                      stat('PFI(X2)',f3(pfi_x2),pfi_x2<0.15?'err':'ok')+
-                      stat('Dilution Factor',f3(true_joint/(pfi_x1+pfi_x2)),'warn');
- }
- on('r2', run); run();
-});
+function bars(P,groups,cols,yt){/* groups: array of arrays of values (0..1) */const g=P.g,G=groups.length,B=groups[0].length,W=(P.w-P.L-P.R)/G;groups.forEach((vals,gi)=>vals.forEach((v,bi)=>{const bw=W*.78/B,x=P.L+W*gi+W*.11+bw*bi;g.fillStyle=cols[bi];g.fillRect(x,P.Y(v),bw-2,P.Y(0)-P.Y(v));g.fillStyle=C.fg;g.textAlign='center';g.font='10px system-ui';g.fillText(Math.round(v*100)+'%',x+bw/2-1,P.Y(v)-3)}));g.font='11px system-ui'}
+function gridG(P,yt,labels){customGrid(P,[],yt);const G=labels.length,W=(P.w-P.L-P.R)/G;P.g.fillStyle=C.mu;P.g.textAlign='center';labels.forEach((l,i)=>P.g.fillText(l,P.L+W*(i+.5),P.h-P.B+15))}
+function legend(P,items,y){let x=P.L+8;items.forEach(([s,c])=>{P.text('■ '+s,x,y,c);x+=P.g.measureText('■ '+s).width+16})}
 
-/* ---------- LAB 3: PDP vs ALE ---------- */
-reg(()=>{
- function run(){
-  const rho=val('r3');
-  const cv=$('cv3'), m=mk(cv,-2.5,2.5,4,{y0:-1});
-  m.hline(0,C.gr);
-  // f(x1, x2) = x1 + 2 x2^2.
-  // When correlated x2 = rho*x1 + noise
-  // True ALE tracks isolated x1 effect: ALE(x1) = x1
-  // PDP averages over marginal x2: PDP(x1) = x1 + 2*E[x2^2] + extrapolation error
-  m.line(x=>x, C.t, 2.5, -2.5, 2.5); // ALE
-  m.line(x=>x + 2.0*rho*rho*(x*x - 1), C.r, 2.5, -2.5, 2.5, 100, true); // PDP with off-manifold curvature
-  m.text('ALE: True isolated effect f(x1)=x1', m.X(-2.0), m.Y(-0.5), C.t);
-  m.text(`PDP: Extrapolated Curvature (ρ=${f3(rho)})`, m.X(-2.0), m.Y(3.2), C.r);
+/* ---------- GLM machinery ---------- */
+const LK={logit:{mu:e=>1/(1+Math.exp(-e)),d:e=>{const m=1/(1+Math.exp(-e));return m*(1-m)}},
+ probit:{mu:e=>normCdf(e),d:e=>npdf(e)},
+ cll:{mu:e=>1-Math.exp(-Math.exp(e)),d:e=>Math.exp(e-Math.exp(e))},
+ log:{mu:e=>Math.exp(e),d:e=>Math.exp(e)}};
+function minv(A){const p=A.length,m=A.map((r,i)=>{const row=Array.from(r);for(let j=0;j<p;j++)row.push(i===j?1:0);return row});
+ for(let c=0;c<p;c++){let q=c;for(let r=c+1;r<p;r++)if(Math.abs(m[r][c])>Math.abs(m[q][c]))q=r;[m[c],m[q]]=[m[q],m[c]];const d=m[c][c]||1e-12;for(let k=0;k<2*p;k++)m[c][k]/=d;for(let r=0;r<p;r++)if(r!==c){const f=m[r][c];if(f!==0)for(let k=0;k<2*p;k++)m[r][k]-=f*m[c][k]}}
+ return m.map(r=>r.slice(p))}
+function glm(cols,y,o){o=o||{};const n=y.length,k=cols.length,p=k+1,fam=o.fam||'binom',L=LK[o.link||(fam==='pois'?'log':'logit')],off=o.off,X=[new Float64Array(n).fill(1)].concat(cols),V=m=>fam==='pois'?m:m*(1-m);
+ let b=new Float64Array(p);if(o.init)b=Float64Array.from(o.init);else if(fam==='pois'){let m=0;for(const v of y)m+=v;b[0]=Math.log(Math.max(m/n,1e-3))-(off?mean(off):0)}
+ function ev(b){const eta=new Float64Array(n),mu=new Float64Array(n);let ll=0;for(let i=0;i<n;i++){let e=off?off[i]:0;for(let j=0;j<p;j++)e+=b[j]*X[j][i];e=Math.max(-30,Math.min(30,e));eta[i]=e;let m=L.mu(e);m=fam==='binom'?Math.min(1-1e-12,Math.max(1e-12,m)):Math.max(m,1e-12);mu[i]=m;ll+=fam==='pois'?y[i]*Math.log(m)-m-lgamma(y[i]+1):y[i]*Math.log(m)+(1-y[i])*Math.log(1-m)}return{eta,mu,ll}}
+ function info(c){const A=[];for(let i=0;i<p;i++)A.push(new Float64Array(p));const w=new Float64Array(n);for(let r=0;r<n;r++){const d=L.d(c.eta[r]),wi=d*d/V(c.mu[r]);w[r]=wi;for(let i=0;i<p;i++){const xi=X[i][r]*wi;for(let j=i;j<p;j++)A[i][j]+=xi*X[j][r]}}for(let i=0;i<p;i++)for(let j=0;j<i;j++)A[i][j]=A[j][i];return{A,w}}
+ let cur=ev(b),it=0,conv=false,maxit=o.maxit==null?40:o.maxit;
+ for(;it<maxit;it++){const{A,w}=info(cur),Ai=minv(A),g=new Float64Array(p);
+  for(let r=0;r<n;r++){const d=L.d(cur.eta[r]),v=V(cur.mu[r]);let s=(y[r]-cur.mu[r])*d/v;if(o.firth){let h=0;for(let i=0;i<p;i++)for(let j=0;j<p;j++)h+=X[i][r]*Ai[i][j]*X[j][r];h*=w[r];s+=h*(.5-cur.mu[r])}for(let i=0;i<p;i++)g[i]+=X[i][r]*s}
+  const st=new Float64Array(p);let mx=0;for(let i=0;i<p;i++){let s=0;for(let j=0;j<p;j++)s+=Ai[i][j]*g[j];st[i]=s}
+  if(o.firth){for(let i=0;i<p;i++){st[i]=Math.max(-1,Math.min(1,st[i]));mx=Math.max(mx,Math.abs(st[i]))}b=b.map((v,i)=>v+st[i]);cur=ev(b);if(mx<1e-8){conv=true;it++;break}}
+  else{let a=1,nb,nc;for(let h=0;h<25;h++){nb=b.map((v,i)=>v+a*st[i]);nc=ev(nb);if(nc.ll>=cur.ll-1e-10)break;a/=2}for(let i=0;i<p;i++)mx=Math.max(mx,Math.abs(a*st[i]));const dl=Math.abs(nc.ll-cur.ll);b=nb;cur=nc;if(mx<1e-8||dl<1e-11){conv=true;it++;break}}}
+ const{A,w}=info(cur),Ai=minv(A),se=Ai.map((r,i)=>Math.sqrt(Math.max(r[i],0)));let dev;
+ if(fam==='binom')dev=-2*cur.ll;else{dev=0;for(let i=0;i<n;i++){const yy=y[i],m=cur.mu[i];dev+=2*((yy>0?yy*Math.log(yy/m):0)-(yy-m))}}
+ return{beta:b,mu:cur.mu,eta:cur.eta,ll:cur.ll,dev,inv:Ai,se,iter:it,conv,X,w,p,n,A}}
+function auc(sc,y){const n=y.length,idx=Array.from({length:n},(_,i)=>i).sort((a,b)=>sc[a]-sc[b]);let rk=0,np=0,i=0;while(i<n){let j=i;while(j+1<n&&sc[idx[j+1]]===sc[idx[i]])j++;const r=(i+j)/2+1;for(let t=i;t<=j;t++)if(y[idx[t]]===1){rk+=r;np++}i=j+1}const nn=n-np;return np&&nn?(rk-np*(np+1)/2)/(np*nn):.5}
+function sepTest(x,y){let a1=1e99,b1=-1e99,a0=1e99,b0=-1e99,n1=0,n0=0;for(let i=0;i<x.length;i++){if(y[i]===1){n1++;a1=Math.min(a1,x[i]);b1=Math.max(b1,x[i])}else{n0++;a0=Math.min(a0,x[i]);b0=Math.max(b0,x[i])}}return n1>0&&n0>0&&(a1>b0||a0>b1)}
+const sig=e=>1/(1+Math.exp(-e));
+function lgt(p){return Math.log(p/(1-p))}
+function binaryData(n,a,b,sd){const x=new Float64Array(n),y=new Float64Array(n);for(let i=0;i<n;i++){x[i]=(sd||1)*randn();y[i]=Math.random()<sig(a+b*x[i])?1:0}return{x,y}}
+function heat(P,gx,gy,vals,x0,x1,y0,y1){const g=P.g,nx=gx,ny=gy;let mn=1e99,mx=-1e99;vals.forEach(v=>{if(isFinite(v)){mn=Math.min(mn,v);mx=Math.max(mx,v)}});mn=Math.max(mn,mx-30);for(let i=0;i<nx;i++)for(let j=0;j<ny;j++){const v=vals[i*ny+j],t=isFinite(v)?Math.max(0,Math.min(1,(v-mn)/(mx-mn))):0,tt=Math.pow(t,1.6),c=Math.round(40+190*tt);g.fillStyle=`rgb(${Math.round(20+60*tt)},${Math.round(30+100*tt)},${c})`;const xa=P.X(x0+(x1-x0)*i/nx),xb=P.X(x0+(x1-x0)*(i+1)/nx),ya=P.Y(y0+(y1-y0)*j/ny),yb=P.Y(y0+(y1-y0)*(j+1)/ny);g.fillRect(xa,Math.min(ya,yb),xb-xa+1,Math.abs(ya-yb)+1)}}
+/* ---------- confounding helpers ---------- */
+const U01=()=>1-Math.random();
+function sdv(a){const m=mean(a);let s=0;for(const v of a)s+=(v-m)*(v-m);return Math.sqrt(s/Math.max(a.length-1,1))}
+function barV(cv,vals,cols,labs,ymax,ff){const P=mk(cv,0,vals.length,ymax,{y0:0,noGrid:true,L:50});customGrid(P,[],niceTicks(0,ymax,5));const W=(P.w-P.L-P.R)/vals.length,g=P.g;vals.forEach((v,i)=>{const w=W*.5,x=P.L+W*i+W*.25;g.fillStyle=cols[i];g.fillRect(x,P.Y(v),w,P.Y(0)-P.Y(v));g.fillStyle=C.fg;g.textAlign='center';g.fillText((ff||fmt)(v),x+w/2,P.Y(v)-4);g.fillStyle=C.mu;g.fillText(labs[i],x+w/2,P.h-P.B+15)});return P}
+function barL(cv,vals,cols,labs,lo,hi,ff){const P=mk(cv,0,vals.length,hi,{y0:lo,noGrid:true,L:50});customGrid(P,[],niceTicks(lo,hi,5));const W=(P.w-P.L-P.R)/vals.length,g=P.g;vals.forEach((v,i)=>{const w=W*.5,x=P.L+W*i+W*.25;g.fillStyle=cols[i];g.fillRect(x,P.Y(v),w,P.Y(lo)-P.Y(v));g.fillStyle=C.fg;g.textAlign='center';g.fillText((ff||fmt)(v),x+w/2,P.Y(v)-4);g.fillStyle=C.mu;g.fillText(labs[i],x+w/2,P.h-P.B+15)});return P}
+const avg=a=>{let s=0;for(const v of a)s+=v;return s/a.length};
+function corr(a,b){const n=a.length;let ma=0,mb=0;for(let i=0;i<n;i++){ma+=a[i];mb+=b[i]}ma/=n;mb/=n;let sa=0,sb=0,sab=0;for(let i=0;i<n;i++){const x=a[i]-ma,y=b[i]-mb;sa+=x*x;sb+=y*y;sab+=x*y}return sab/Math.sqrt(sa*sb||1e-12)}
+const pcor=(x,y,z)=>corr(simple(z,x).res,simple(z,y).res);
+const lin=(n,f)=>{const a=new Float64Array(n);for(let i=0;i<n;i++)a[i]=f(i);return a};
+const rn=(n,s)=>lin(n,()=>(s||1)*randn());
+/* signed bars from zero */
+function barZ(cv,vals,cols,labs,lo,hi,ff){const P=mk(cv,0,vals.length,hi,{y0:lo,noGrid:true,L:50});customGrid(P,[],niceTicks(lo,hi,5));const W=(P.w-P.L-P.R)/vals.length,g=P.g;vals.forEach((v,i)=>{const w=W*.5,x=P.L+W*i+W*.25,y0=P.Y(0),y1=P.Y(v);g.fillStyle=cols[i];g.fillRect(x,Math.min(y0,y1),w,Math.abs(y0-y1));g.fillStyle=C.fg;g.textAlign='center';g.fillText((ff||fmt)(v),x+w/2,v>=0?y1-4:y1+13);g.fillStyle=C.mu;g.fillText(labs[i],x+w/2,P.h-P.B+15)});P.hline(0,C.mu,'');return P}
+/* grouped signed bars: groups[g][b] */
+function barG(cv,groups,cols,glabs,lo,hi,ff){const P=mk(cv,0,groups.length,hi,{y0:lo,noGrid:true,L:50});customGrid(P,[],niceTicks(lo,hi,5));const G=groups.length,B=groups[0].length,W=(P.w-P.L-P.R)/G,g=P.g;groups.forEach((vs,gi)=>vs.forEach((v,bi)=>{const bw=W*.7/B,x=P.L+W*gi+W*.15+bw*bi,y0=P.Y(0),y1=P.Y(v);g.fillStyle=cols[bi];g.fillRect(x,Math.min(y0,y1),bw-3,Math.abs(y0-y1));g.fillStyle=C.fg;g.textAlign='center';g.font='10px system-ui';g.fillText((ff||fmt)(v),x+bw/2-1,v>=0?y1-3:y1+11)}));g.font='11px system-ui';g.fillStyle=C.mu;g.textAlign='center';glabs.forEach((l,i)=>g.fillText(l,P.L+W*(i+.5),P.h-P.B+15));P.hline(0,C.mu,'');return P}
+/* scatter with optional per-point colours; draws at most nmax points */
+function scat(P,xs,ys,col,nmax,r,colf){const n=xs.length,st=Math.max(1,Math.floor(n/(nmax||500))),pts=[];clip(P,()=>{for(let i=0;i<n;i+=st){P.g.fillStyle=colf?colf(i):col;P.g.beginPath();P.g.arc(P.X(xs[i]),P.Y(ys[i]),r||2.2,0,7);P.g.fill()}})}
+function fitLine(P,s,col,lw,dash,x0,x1){clip(P,()=>P.line(x=>s.a+s.b*x,col,lw||2,x0,x1,2,dash))}
+const ordIdx=p=>Array.from({length:p.length},(_,i)=>i).sort((a,b)=>p[a]-p[b]);
+/* ---------- experiment helpers ---------- */
+const sgn=v=>(v>=0?'+':'−')+Math.abs(v).toFixed(3);
+const rng2=(a,b,pad)=>range(Array.from(a).concat(Array.from(b)),pad||.05);
+const pct0=x=>Math.round(x*100)+'%';
+const lgs=x=>1/(1+Math.exp(-x));
+function rgam(a){if(a<1)return rgam(a+1)*Math.pow(U01(),1/a);const d=a-1/3,c=1/Math.sqrt(9*d);for(;;){let x,v;do{x=randn();v=1+c*x}while(v<=0);v=v*v*v;const u=U01();if(u<1-.0331*x*x*x*x||Math.log(u)<.5*x*x+d*(1-v+Math.log(v)))return d*v}}
+const rbeta=(a,b)=>{const x=rgam(a),y=rgam(b);return x/(x+y)};
+function rbin(n,p){if(n<=30){let k=0;for(let i=0;i<n;i++)if(Math.random()<p)k++;return k}const m=n*p,s=Math.sqrt(n*p*(1-p)),k=Math.round(m+s*randn());return Math.max(0,Math.min(n,k))}
+function welch(a,b){const na=a.length,nb=b.length,ma=avg(a),mb=avg(b);let va=0,vb=0;for(const v of a)va+=(v-ma)*(v-ma);for(const v of b)vb+=(v-mb)*(v-mb);va/=na-1;vb/=nb-1;const se2=va/na+vb/nb,se=Math.sqrt(se2),t=(ma-mb)/se,df=se2*se2/((va/na)*(va/na)/(na-1)+(vb/nb)*(vb/nb)/(nb-1));return{d:ma-mb,se,t,df,p:2*(1-tcdf(Math.abs(t),df))}}
+const diffMeans=(Y,T)=>{let s1=0,s0=0,n1=0,n0=0;for(let i=0;i<Y.length;i++){if(T[i]){s1+=Y[i];n1++}else{s0+=Y[i];n0++}}return s1/n1-s0/n0};
+/* ---------- observational-causal helpers ---------- */
+function logitFit(cols,y){const n=y.length,k=cols.length,p=k+1,b=new Float64Array(p),lin_=i=>{let s=b[0];for(let j=0;j<k;j++)s+=b[j+1]*cols[j][i];return s};
+ for(let it=0;it<30;it++){const A=[];for(let i=0;i<p;i++)A.push(new Float64Array(p));const g=new Float64Array(p);
+  for(let i=0;i<n;i++){const m=lgs(lin_(i)),w=Math.max(m*(1-m),1e-8),r=y[i]-m,row=[1];for(let j=0;j<k;j++)row.push(cols[j][i]);for(let a=0;a<p;a++){g[a]+=row[a]*r;for(let c=a;c<p;c++)A[a][c]+=w*row[a]*row[c]}}
+  for(let a=0;a<p;a++){for(let c=0;c<a;c++)A[a][c]=A[c][a];A[a][a]+=1e-8}
+  const M=gj(A,Array.from(g)),d=M.map(r=>r[p]);let mx=0;for(let a=0;a<p;a++){b[a]+=d[a];mx=Math.max(mx,Math.abs(d[a]))}if(mx<1e-6)break}
+ const pr=new Float64Array(n),lo=new Float64Array(n);for(let i=0;i<n;i++){pr[i]=Math.min(.9999,Math.max(.0001,lgs(lin_(i))));lo[i]=Math.log(pr[i]/(1-pr[i]))}return{beta:b,pr,lo}}
+/* Hajek IPW estimate of the ATE; keep(i)=false drops a unit */
+function ipwATE(Y,T,e,keep){let a1=0,b1=0,a0=0,b0=0;for(let i=0;i<Y.length;i++){if(keep&&!keep(i))continue;if(T[i]){const w=1/e[i];a1+=w*Y[i];b1+=w}else{const w=1/(1-e[i]);a0+=w*Y[i];b0+=w}}return a1/b1-a0/b0}
+function smd(x,T,w){let m1=0,m0=0,w1=0,w0=0,n1=0,n0=0;for(let i=0;i<x.length;i++){const ww=w?w[i]:1;if(T[i]){m1+=ww*x[i];w1+=ww;n1++}else{m0+=ww*x[i];w0+=ww;n0++}}m1/=w1;m0/=w0;let v1=0,v0=0,a1=0,a0=0;for(let i=0;i<x.length;i++){if(T[i]){a1+=x[i]}else a0+=x[i]}a1/=n1;a0/=n0;for(let i=0;i<x.length;i++){if(T[i])v1+=(x[i]-a1)*(x[i]-a1);else v0+=(x[i]-a0)*(x[i]-a0)}v1/=n1-1;v0/=n0-1;return(m1-m0)/Math.sqrt((v1+v0)/2)}
+/* confounded data: X1,X2; treatment strength a; effect tau (function of x1 optional) */
+function confData(n,a,tauF,nl){const X1=rn(n),X2=rn(n),e=lin(n,i=>lgs(a*(.8*X1[i]+.5*X2[i]+(nl?.4*(X1[i]*X1[i]-1):0))/1.5)),T=new Uint8Array(n),Y=new Float64Array(n);
+ for(let i=0;i<n;i++){T[i]=Math.random()<e[i]?1:0;Y[i]=(T[i]?(tauF?tauF(X1[i]):1):0)+X1[i]+.8*X2[i]+(nl?.6*X1[i]*X1[i]:0)+randn()}return{X1,X2,T,Y,e}}
+/* one-to-one nearest-neighbour matching with replacement on a score; returns ATT and the matched control index per treated unit (-1 if dropped) */
+function matchATT(sc,T,Y,cal){const ctr=[];for(let i=0;i<T.length;i++)if(!T[i])ctr.push(i);ctr.sort((a,b)=>sc[a]-sc[b]);const cs=ctr.map(i=>sc[i]),m=new Int32Array(T.length).fill(-1);let sum=0,k=0;
+ for(let i=0;i<T.length;i++){if(!T[i])continue;let lo=0,hi=cs.length-1;while(lo<hi){const mid=(lo+hi)>>1;if(cs[mid]<sc[i])lo=mid+1;else hi=mid}let b=lo;if(lo>0&&Math.abs(cs[lo-1]-sc[i])<Math.abs(cs[lo]-sc[i]))b=lo-1;if(Math.abs(cs[b]-sc[i])>cal)continue;m[i]=ctr[b];sum+=Y[i]-Y[ctr[b]];k++}return{att:sum/k,m,kept:k}}
+const quant=(a,p)=>{const b=Float64Array.from(a).sort();return b[Math.min(b.length-1,Math.floor(p*b.length))]};
+/* ---------- MCMC helpers ---------- */
+function acfv(x,K){const n=x.length;let m=0;for(let i=0;i<n;i++)m+=x[i];m/=n;const c=new Float64Array(K+1);for(let k=0;k<=K;k++){let s=0;for(let i=0;i+k<n;i++)s+=(x[i]-m)*(x[i+k]-m);c[k]=s/n}const r=new Float64Array(K+1);for(let k=0;k<=K;k++)r[k]=c[0]>0?c[k]/c[0]:0;return r}
+/* effective sample size with Geyer's initial positive sequence */
+function essOf(x,K){K=Math.min(K||150,x.length-2);if(K<2)return x.length;const r=acfv(x,K);let sum=0;for(let t=0;2*t+1<=K;t++){const g=r[2*t]+r[2*t+1];if(g<=0)break;sum+=g}const tau=Math.max(2*sum-1,.2);return x.length/tau}
+/* random-walk Metropolis for a 1-d log density */
+function mhRW(logp,x0,step,n){const x=new Float64Array(n);let c=x0,lc=logp(c),acc=0;for(let i=0;i<n;i++){const y=c+step*randn(),ly=logp(y);if(Math.log(Math.random())<ly-lc){c=y;lc=ly;acc++}x[i]=c}return{x,acc:acc/n}}
+/* split R-hat of an array of chains (each an array of equal length) */
+function rhatOf(ch){const seq=[];ch.forEach(c=>{const h=Math.floor(c.length/2);if(h<2)return;seq.push(c.slice(0,h));seq.push(c.slice(h,2*h))});const m=seq.length,n=seq[0]?seq[0].length:0;if(m<2||n<2)return NaN;const mu=seq.map(s=>{let a=0;for(const v of s)a+=v;return a/n}),va=seq.map((s,i)=>{let a=0;for(const v of s)a+=(v-mu[i])*(v-mu[i]);return a/(n-1)});const W=va.reduce((a,b)=>a+b,0)/m,gm=mu.reduce((a,b)=>a+b,0)/m;let B=0;for(const v of mu)B+=(v-gm)*(v-gm);B*=n/(m-1);const vp=(n-1)/n*W+B/n;return Math.sqrt(vp/Math.max(W,1e-12))}
+/* grid posterior from an unnormalised log density */
+function gridPost(logf,lo,hi,N){N=N||900;const x=new Float64Array(N),f=new Float64Array(N);let mx=-1e300;for(let i=0;i<N;i++){x[i]=lo+(hi-lo)*i/(N-1);f[i]=logf(x[i]);if(f[i]>mx)mx=f[i]}let Z=0;const h=(hi-lo)/(N-1);for(let i=0;i<N;i++){f[i]=Math.exp(f[i]-mx);Z+=f[i]*h}const pdf=new Float64Array(N),cdf=new Float64Array(N);let c=0,m1=0,m2=0;for(let i=0;i<N;i++){pdf[i]=f[i]/Z;c+=pdf[i]*h;cdf[i]=c;m1+=x[i]*pdf[i]*h;m2+=x[i]*x[i]*pdf[i]*h}
+ const q=u=>{let a=0,b=N-1;while(b-a>1){const m=(a+b)>>1;if(cdf[m]<u)a=m;else b=m}const d=cdf[b]-cdf[a];return x[a]+(d>0?(u-cdf[a])/d:0)*(x[b]-x[a])};
+ const pd=v=>{if(v<=lo||v>=hi)return 0;const t=(v-lo)/(hi-lo)*(N-1),i=Math.floor(t);return pdf[i]+(t-i)*(pdf[Math.min(i+1,N-1)]-pdf[i])};
+ const cd=v=>{if(v<=lo)return 0;if(v>=hi)return 1;const t=(v-lo)/(hi-lo)*(N-1),i=Math.floor(t);return cdf[i]+(t-i)*(cdf[Math.min(i+1,N-1)]-cdf[i])};
+ return{x,pdf,cdf,mean:m1,sd:Math.sqrt(Math.max(m2-m1*m1,0)),q,pd,cd}}
+const tpdf=(x,v)=>Math.exp(lgamma((v+1)/2)-lgamma(v/2))/Math.sqrt(v*Math.PI)*Math.pow(1+x*x/v,-(v+1)/2);
+const rtv=v=>randn()/Math.sqrt(2*gammaS(v/2)/v);
+const expit=x=>1/(1+Math.exp(-x)),logit=p=>Math.log(p/(1-p));
+function invMat(A){const n=A.length,M=A.map((r,i)=>{const a=Array.from(r);for(let j=0;j<n;j++)a.push(i===j?1:0);return a});for(let c=0;c<n;c++){let m=c;for(let r=c+1;r<n;r++)if(Math.abs(M[r][c])>Math.abs(M[m][c]))m=r;[M[c],M[m]]=[M[m],M[c]];const d=M[c][c]||1e-12;for(let k=0;k<2*n;k++)M[c][k]/=d;for(let r=0;r<n;r++)if(r!==c){const f=M[r][c];if(f!==0)for(let k=0;k<2*n;k++)M[r][k]-=f*M[c][k]}}return M.map(r=>r.slice(n))}
+function cholL(S){const n=S.length,L=S.map(()=>new Float64Array(n));for(let i=0;i<n;i++)for(let j=0;j<=i;j++){let s=S[i][j];for(let k=0;k<j;k++)s-=L[i][k]*L[j][k];L[i][j]=i===j?Math.sqrt(Math.max(s,1e-12)):s/L[j][j]}return L}
+function logdetM(A){const n=A.length,M=A.map(r=>Array.from(r));let ld=0;for(let c=0;c<n;c++){let m=c;for(let r=c+1;r<n;r++)if(Math.abs(M[r][c])>Math.abs(M[m][c]))m=r;[M[c],M[m]]=[M[m],M[c]];ld+=Math.log(Math.abs(M[c][c])||1e-300);for(let r=c+1;r<n;r++){const f=M[r][c]/M[c][c];for(let k=c;k<n;k++)M[r][k]-=f*M[c][k]}}return ld}
+/* Gauss-Hermite nodes (21 points, probabilists' weights summing to 1) from the Golub-Welsch idea: computed numerically on a fine normal grid instead */
+const GH=(()=>{const z=[],w=[];let s=0;for(let i=0;i<41;i++){const v=-4+8*i/40,p=Math.exp(-v*v/2);z.push(v);w.push(p);s+=p}return{z,w:w.map(v=>v/s)}})();
+/* log-log tick helper for axes holding log10 values */
+const lg10=v=>Math.log10(Math.max(v,1e-12));
+const pc1=x=>(100*x).toFixed(1)+'%';
+/* density curves with optional fill: curves=[{f,col,fill,dash,lw}] ; returns P */
+function dcurves(cv,x0,x1,curves,vl,ref){let ym=0,yr=0;curves.forEach((c,k)=>{for(let i=0;i<=300;i++){const v=c.f(x0+(x1-x0)*i/300);if(isFinite(v)){ym=Math.max(ym,v);if(k===(ref==null?curves.length-1:ref))yr=Math.max(yr,v)}}});
+ const top=Math.min(ym,yr*2.5)||ym||1,P=mk(cv,x0,x1,top*1.12);clip(P,()=>curves.forEach(c=>{if(c.fill)P.area(c.f,x0,x1,c.fill,240);P.line(c.f,c.col,c.lw||2.4,x0,x1,300,c.dash)}));(vl||[]).forEach(v=>P.vline(v[0],v[1],null,v[3]));return P}
+/* solve (A + lam I) beta = b and return diag of the inverse (A symmetric p x p) */
+function ridgeSolve(A,b,lam){const p=b.length,M=[];for(let i=0;i<p;i++){const r=new Float64Array(2*p+1);for(let j=0;j<p;j++)r[j]=A[i][j]+(i===j?lam:0);r[p+i]=1;r[2*p]=b[i];M.push(r)}
+ for(let c=0;c<p;c++){let m=c;for(let r=c+1;r<p;r++)if(Math.abs(M[r][c])>Math.abs(M[m][c]))m=r;[M[c],M[m]]=[M[m],M[c]];const d=M[c][c]||1e-12;for(let k=0;k<=2*p;k++)M[c][k]/=d;for(let r=0;r<p;r++)if(r!==c){const f=M[r][c];if(f!==0)for(let k=0;k<=2*p;k++)M[r][k]-=f*M[c][k]}}
+ return{beta:M.map(r=>r[2*p]),dinv:M.map((r,i)=>r[p+i])}}
+/* ---------- Uncertainty quantification helpers ---------- */
+const uqQ=(a,al)=>{const s=Float64Array.from(a).sort(),n=s.length,k=Math.ceil((n+1)*(1-al));return k>n?Infinity:s[k-1]};
+const uqTq=(p,df)=>{let lo=-80,hi=80;for(let i=0;i<60;i++){const m=(lo+hi)/2;if(tcdf(m,df)<p)lo=m;else hi=m}return(lo+hi)/2};
+function uqOls(x,y){const n=x.length;let mx=0,my=0;for(let i=0;i<n;i++){mx+=x[i];my+=y[i]}mx/=n;my/=n;let sxx=0,sxy=0;for(let i=0;i<n;i++){sxx+=(x[i]-mx)*(x[i]-mx);sxy+=(x[i]-mx)*(y[i]-my)}const b=sxy/sxx,a=my-b*mx;let rss=0;for(let i=0;i<n;i++){const r=y[i]-a-b*x[i];rss+=r*r}return{a,b,n,mx,sxx,s:Math.sqrt(rss/Math.max(1,n-2))}}
+function uqNM(f,x0,st,it){const n=x0.length;let S=[x0.slice()];for(let i=0;i<n;i++){const v=x0.slice();v[i]+=st;S.push(v)}let F=S.map(f);for(let k=0;k<(it||200);k++){const o=F.map((_,i)=>i).sort((a,b)=>F[a]-F[b]);S=o.map(i=>S[i]);F=o.map(i=>F[i]);if(Math.abs(F[n]-F[0])<1e-9)break;const c=Array(n).fill(0);for(let i=0;i<n;i++)for(let j=0;j<n;j++)c[j]+=S[i][j]/n;const ref=c.map((v,j)=>v+(v-S[n][j])),fr=f(ref);if(fr<F[0]){const ex=c.map((v,j)=>v+2*(v-S[n][j])),fe=f(ex);if(fe<fr){S[n]=ex;F[n]=fe}else{S[n]=ref;F[n]=fr}}else if(fr<F[n-1]){S[n]=ref;F[n]=fr}else{const co=c.map((v,j)=>v+.5*(S[n][j]-v)),fc=f(co);if(fc<F[n]){S[n]=co;F[n]=fc}else{for(let i=1;i<=n;i++){S[i]=S[i].map((v,j)=>S[0][j]+.5*(v-S[0][j]));F[i]=f(S[i])}}}}const o=F.map((_,i)=>i).sort((a,b)=>F[a]-F[b]);return S[o[0]]}
+/* linear quantile regression by pinball-loss minimisation */
+function uqQR(x,y,tau){const o=uqOls(x,y),n=x.length,f=p=>{let s=0;for(let i=0;i<n;i++){const r=y[i]-p[0]-p[1]*x[i];s+=r>=0?tau*r:(tau-1)*r}return s/n},sd=Math.sqrt(Array.from(y,v=>v*v).reduce((a,b)=>a+b,0)/n)||1,r0=Array.from(y,(v,i)=>v-o.a-o.b*x[i]).sort((a,b)=>a-b);const p=uqNM(f,[o.a+r0[Math.floor(tau*(n-1))],o.b],.3*sd,160);return{a:p[0],b:p[1]}}
+function uqSolve(A,b){const n=b.length;A=A.map(r=>r.slice());b=b.slice();for(let i=0;i<n;i++){let p=i;for(let k=i+1;k<n;k++)if(Math.abs(A[k][i])>Math.abs(A[p][i]))p=k;[A[i],A[p]]=[A[p],A[i]];[b[i],b[p]]=[b[p],b[i]];for(let k=i+1;k<n;k++){const f=A[k][i]/A[i][i];for(let j=i;j<n;j++)A[k][j]-=f*A[i][j];b[k]-=f*b[i]}}const x=new Array(n).fill(0);for(let i=n-1;i>=0;i--){let s=b[i];for(let j=i+1;j<n;j++)s-=A[i][j]*x[j];x[i]=s/A[i][i]}return x}
+function uqPoly(x,y,d,lam){const n=x.length,m=d+1,A=Array.from({length:m},()=>new Array(m).fill(0)),b=new Array(m).fill(0);for(let i=0;i<n;i++){const pw=[1];for(let k=1;k<m;k++)pw.push(pw[k-1]*x[i]);for(let r=0;r<m;r++){b[r]+=pw[r]*y[i];for(let c=0;c<m;c++)A[r][c]+=pw[r]*pw[c]}}for(let r=0;r<m;r++)A[r][r]+=lam||1e-6;return uqSolve(A,b)}
+const uqEval=(c,x)=>{let s=0,p=1;for(const k of c){s+=k*p;p*=x}return s};
+function uqWq(res,w,al){const o=Array.from(res,(_,i)=>i).sort((a,b)=>res[a]-res[b]);let tot=0;for(const v of w)tot+=v;let c=0;for(const i of o){c+=w[i];if(c/(tot+tot/res.length)>=1-al)return res[i]}return Infinity}
+const uqBetaPdf=(x,a,b)=>x<=0||x>=1?0:Math.exp(lgamma(a+b)-lgamma(a)-lgamma(b)+(a-1)*Math.log(x)+(b-1)*Math.log(1-x));
+const uqPct=(a,p)=>{const s=Float64Array.from(a).sort();return s[Math.min(s.length-1,Math.max(0,Math.floor(p*s.length)))]};
+function uqHet(n,h){const x=Array.from({length:n},()=>Math.random()*2-1);return[x,x.map(v=>v+.4*Math.exp(h*v)*randn())]}
+/* ---------- Interpretability helpers ---------- */
+function ixOls(X,y,lam){const n=X.length,p=X[0].length,m=p+1,A=Array.from({length:m},()=>new Array(m).fill(0)),b=new Array(m).fill(0);for(let i=0;i<n;i++){const r=[1,...X[i]];for(let a=0;a<m;a++){b[a]+=r[a]*y[i];for(let c=0;c<m;c++)A[a][c]+=r[a]*r[c]}}for(let a=1;a<m;a++)A[a][a]+=lam||1e-8;A[0][0]+=1e-10;return uqSolve(A,b)}
+const ixPred=(b,x)=>{let s=b[0];for(let j=0;j<x.length;j++)s+=b[j+1]*x[j];return s};
+function ixDraw(n,p,r){const X=[];for(let i=0;i<n;i++){const f=randn(),row=[];for(let j=0;j<p;j++)row.push(Math.sqrt(r)*f+Math.sqrt(1-r)*randn());X.push(row)}return X}
+function ixRank(a){const o=Array.from(a,(_,i)=>i).sort((x,y)=>a[x]-a[y]),r=new Float64Array(a.length);o.forEach((i,j)=>r[i]=j);return r}
+function ixLogit(X,y,it){const p=X[0].length+1;let w=new Array(p).fill(0);for(let k=0;k<(it||12);k++){const g=new Array(p).fill(0),H=Array.from({length:p},()=>new Array(p).fill(0));for(let i=0;i<X.length;i++){const r=[1,...X[i]];let z=0;for(let a=0;a<p;a++)z+=w[a]*r[a];const q=1/(1+Math.exp(-z)),d=q-y[i],v=q*(1-q)+1e-6;for(let a=0;a<p;a++){g[a]+=d*r[a];for(let c=0;c<p;c++)H[a][c]+=v*r[a]*r[c]}}for(let a=1;a<p;a++){g[a]+=1e-3*w[a];H[a][a]+=1e-3}H[0][0]+=1e-8;const s=uqSolve(H,g);for(let a=0;a<p;a++)w[a]-=s[a]}return w}
+function ixCheb(x,d){const t=Math.max(-1,Math.min(1,x/2.5)),o=[];let a=1,b=t;for(let k=1;k<=d;k++){o.push(b);const c=2*t*b-a;a=b;b=c}return o}
+const ixSd=a=>{const m=avg(a);return Math.sqrt(avg(a.map(v=>(v-m)*(v-m))))};
+const ixCor=(a,b)=>{const ma=avg(a),mb=avg(b);let s=0,x=0,y=0;for(let i=0;i<a.length;i++){s+=(a[i]-ma)*(b[i]-mb);x+=(a[i]-ma)**2;y+=(b[i]-mb)**2}return s/Math.sqrt(x*y)};
+/* ---------- Ch1 correlated features and unstable coefficients ---------- */
+(function(){scl('c1r',v=>fmt(v/100));scl('c1n',v=>v);const RG=[0,.5,.8,.9,.95,.99];
+ function fit(n,r){const X=ixDraw(n,2,r),y=X.map(x=>x[0]+x[1]+randn()),b=ixOls(X,y,1e-8);return[b[1],b[2]]}
+ function run(){const r=val('c1r')/100,n=val('c1n'),R=300,B=Array.from({length:R},()=>fit(n,r)),b1=B.map(b=>b[0]),b2=B.map(b=>b[1]),lim=Math.max(.6,1.05*Math.max(...B.map(b=>Math.max(Math.abs(b[0]-1),Math.abs(b[1]-1))))),P=mk($('c1cv'),1-lim,1+lim,1+lim,{y0:1-lim,L:40});
+  scat(P,b1,b2,C.a,300,2.6,()=> 'rgba(110,168,255,.55)');P.vline(1,C.fg,null,true);P.hline(1,C.fg);P.text('coefficient of feature A →',P.w-P.R-4,P.h-P.B-6,C.mu,'right');P.text('coefficient of feature B (each dot is a refit)',P.L+6,P.T+12,C.mu);
+  const res=RG.map(rr=>{const bb=Array.from({length:150},()=>fit(n,rr));return[ixSd(bb.map(b=>b[0])),ixSd(bb.map(b=>b[0]+b[1])),bb.filter(b=>b[0]>b[1]).length/150]}),mx=Math.max(...res.map(v=>v[0]))*1.1,Q=mk($('c1cv2'),0,RG.length-1,mx,{y0:0,noGrid:true,L:44});customGrid(Q,RG.map((x,i)=>[i,String(x)]),niceTicks(0,mx,5));poly(Q,res.map((v,i)=>[i,v[0]]),C.r,2.6);dots(Q,res.map((v,i)=>[i,v[0]]),C.r,3.4);poly(Q,res.map((v,i)=>[i,v[1]]),C.g,2.6);dots(Q,res.map((v,i)=>[i,v[1]]),C.g,3.4);legend(Q,[['sd of the coefficient of A',C.r],['sd of the sum A + B',C.g]],Q.T+12);Q.text('correlation between A and B →',Q.w-Q.R-4,Q.h-Q.B-6,C.mu,'right');
+  const flip=b1.filter((v,i)=>v>b2[i]).length/R;
+  $('c1st').innerHTML=stat('sd of the coefficient of A (truth 1)',fmt(ixSd(b1)),ixSd(b1)>.5?'hot':'in')+stat('sd of the sum A + B',fmt(ixSd(b1.map((v,i)=>v+b2[i]))),'ok')+stat('refits ranking A above B (truth: equal)',pc1(flip),'')+stat('correlation of the two coefficients across refits',fmt(ixCor(b1,b2)),'');
+  $('c1rd').innerHTML=`The outcome is y = A + B + noise: two features of <b>equal true importance</b>, with correlation ${fmt(r)} between them, and a linear model is refitted on ${n} fresh cases 300 times. Each dot is one refit. As the correlation grows the cloud stretches along the anti-diagonal: the model can trade weight between A and B at almost no cost to its fit, so the individual coefficients become unstable (sd ${fmt(ixSd(b1))} against ${fmt(1/Math.sqrt(n))} at zero correlation, roughly 1/√(n(1 − ρ²))) while their sum, which is what the predictions depend on, stays stable (sd ${fmt(ixSd(b1.map((v,i)=>v+b2[i])))}). The practical consequence is for any importance ranking built on coefficients, or on anything that attributes the prediction to individual features: A is ranked above B in ${pc1(flip)} of the refits, though they are exactly equal, and a ranking reported from a single fit is close to a coin toss when features are strongly correlated. <b>Importance is a property of the fitted model, not of the world</b>, and for correlated features it is a property of this particular fit. Report groups of correlated features together, report the variation over refits, and do not tell a CEO that “feature A matters twice as much as B” without that check.`}
+ ['c1r','c1n'].forEach(i=>$(i).addEventListener('change',run));$('c1go').onclick=run;run();})();
 
-  $('t3').innerHTML = stat('Correlation (ρ)',f3(rho),'in')+
-                      stat('ALE Error','0.00 (Pure)','ok')+
-                      stat('PDP Extrapolation Bias',f3(2.0*rho*rho),'err')+
-                      stat('Verdict',rho>0.7?'PDP completely distorts curve':'Mild distortion','warn');
- }
- on('r3', run); run();
-});
+/* ---------- Ch2 permutation importance, conditional permutation, drop-column ---------- */
+(function(){scl('c2r',v=>fmt(v/100));scl('c2n',v=>v);const NT=1500;
+ function gen(n,r){const o=[];for(let i=0;i<n;i++){const a=randn(),b=r*a+Math.sqrt(1-r*r)*randn(),c=randn();o.push([a,b,c])}return o}
+ const yf=X=>X.map(x=>x[0]+x[2]+randn()),mse=(b,X,y)=>{let s=0;for(let i=0;i<X.length;i++){const e=y[i]-ixPred(b,X[i]);s+=e*e}return s/X.length};
+ function trial(n,r){const Xt=gen(n,r),yt=yf(Xt),b=ixOls(Xt,yt,1e-8),Xs=gen(NT,r),ys=yf(Xs),base=mse(b,Xs,ys),pm=[0,0,0],cd=[0,0,0],dc=[0,0,0],cv=[1,0,null];
+  for(let j=0;j<3;j++){let Z=Xs.map(x=>x.slice());const col=Xs.map(x=>x[j]);for(let i=NT-1;i>0;i--){const k=Math.floor(Math.random()*(i+1));[col[i],col[k]]=[col[k],col[i]]}Z.forEach((z,i)=>z[j]=col[i]);pm[j]=mse(b,Z,ys)-base;
+   if(cv[j]===null)cd[j]=pm[j];else{const o=Array.from({length:NT},(_,i)=>i).sort((p,q)=>Xs[p][cv[j]]-Xs[q][cv[j]]);Z=Xs.map(x=>x.slice());for(let s=0;s<NT;s+=15){const blk=o.slice(s,s+15),v=blk.map(i=>Xs[i][j]);for(let i=v.length-1;i>0;i--){const k=Math.floor(Math.random()*(i+1));[v[i],v[k]]=[v[k],v[i]]}blk.forEach((idx,t)=>Z[idx][j]=v[t])}cd[j]=mse(b,Z,ys)-base}
+   const keep=[0,1,2].filter(q=>q!==j),b2=ixOls(Xt.map(x=>keep.map(q=>x[q])),yt,1e-8);dc[j]=mse(b2,Xs.map(x=>keep.map(q=>x[q])),ys)-mse(b2.length?b:b,Xs,ys)*0-base}
+  return[pm,cd,dc]}
+ const avgT=(n,r,R)=>{const a=[[0,0,0],[0,0,0],[0,0,0]];for(let k=0;k<R;k++)trial(n,r).forEach((m,i)=>m.forEach((v,j)=>a[i][j]+=v/R));return a};
+ function run(){const r=val('c2r')/100,n=val('c2n'),A=avgT(n,r,60),mx=Math.max(...A.map(m=>Math.max(...m)))*1.15,mn=Math.min(0,...A.map(m=>Math.min(...m)))*1.3,P=barG($('c2cv'),[0,1,2].map(j=>[A[0][j],A[1][j],A[2][j]]),[C.r,C.y,C.g],['A (real)','B (no effect, copy of A)','C (real)'],mn,mx,fmt);P.text('red permutation · yellow conditional permutation · green drop-column',P.L+6,P.T+12,C.mu);
+  const RG=[0,.3,.6,.8,.9,.95,.99],res=RG.map(rr=>avgT(n,rr,25).map(m=>m[1])),my=Math.max(...res.map(v=>Math.max(...v)))*1.15,Q=mk($('c2cv2'),0,RG.length-1,my,{y0:Math.min(0,...res.map(v=>Math.min(...v)))*1.3,noGrid:true,L:44});customGrid(Q,RG.map((x,i)=>[i,String(x)]),niceTicks(Math.min(0,...res.map(v=>Math.min(...v)))*1.3,my,5));Q.hline(0,C.fg,null);[[0,C.r],[1,C.y],[2,C.g]].forEach(([k,c])=>{poly(Q,res.map((v,i)=>[i,v[k]]),c,2.6);dots(Q,res.map((v,i)=>[i,v[k]]),c,3.4)});Q.text('correlation of B with A →',Q.w-Q.R-4,Q.h-Q.B-6,C.mu,'right');Q.text('importance given to B, which has no effect',Q.L+6,Q.T+12,C.mu);
+  $('c2st').innerHTML=stat('importance of B: permutation · conditional · drop-column',A.map(m=>fmt(m[1])).join(' · '),A[0][1]>.1?'hot':'ok')+stat('importance of A: permutation · conditional · drop-column',A.map(m=>fmt(m[0])).join(' · '),'')+stat('importance of C (independent): the three methods',A.map(m=>fmt(m[2])).join(' · '),'')+stat('training cases · test cases',n+' · '+NT,'');
+  $('c2rd').innerHTML=`The truth is y = A + C + noise. Feature B is a noisy copy of A (correlation ${fmt(r)}) with <b>no effect of its own</b>. A linear model is fitted on ${n} cases, which gives B a small non-zero coefficient, and importance is measured on fresh data as the increase in squared error. <b>Permutation importance</b> shuffles a feature freely, creating cases that combine a large A with a small B that never occur in the data: the model, which has partly leaned on B, is penalised for them, and the importance of B is ${fmt(A[0][1])} against a true effect of zero (and it grows with the correlation, right panel, red). <b>Conditional permutation</b> shuffles B only among cases with similar A, which respects the correlation and removes most of the artefact (${fmt(A[1][1])}). <b>Drop-column</b> importance refits the model without the feature: B has none (${fmt(A[2][1])}), but dropping A is ${fmt(A[2][0])}, smaller than its permutation importance ${fmt(A[0][0])} because B takes over its role: the importance of one of two redundant features is hidden by the other. No method is right in every case; they answer different questions (how much does <em>this fitted model</em> rely on the feature, against how much information the feature adds). Name the question before choosing the method, and treat permutation importance with correlated features as a statement about off-distribution inputs.`}
+ ['c2r','c2n'].forEach(i=>$(i).addEventListener('change',run));$('c2go').onclick=run;run();})();
 
-/* ---------- LAB 4: Shapley Values 3-Player ---------- */
-reg(()=>{
- function run(){
-  const g=val('r4');
-  const cv=$('cv4'), m=mk(cv,-0.5,3.5,4.5,{y0:0,noX:true});
-  m.hline(0,C.gr);
-  // Base players v1=1.0, v2=1.5, v3=0.8, interaction between 1 & 2 adds gamma
-  const phi1 = 1.0 + g/2;
-  const phi2 = 1.5 + g/2;
-  const phi3 = 0.8;
-  const total = phi1 + phi2 + phi3;
-  m.bar(0.4, phi1, 40, C.a);
-  m.bar(1.4, phi2, 40, C.p);
-  m.bar(2.4, phi3, 40, C.y);
+/* ---------- Ch3 partial dependence and ICE ---------- */
+(function(){scl('c3k',v=>fmt(v/10));scl('c3m',v=>v);const GR=[];for(let g=-2;g<=2.001;g+=.1)GR.push(g);
+ function run(){const k=val('c3k')/10,m=val('c3m'),N=500,x2=Array.from({length:N},()=>randn()),f=(a,b)=>a+k*a*b,pd=GR.map(g=>avg(x2.map(b=>f(g,b)))),P=mk($('c3cv'),-2,2,4,{y0:-4,L:40});
+  for(let i=0;i<m;i++)poly(P,GR.map(g=>[g,f(g,x2[i])]),1+k*x2[i]<0?'rgba(255,107,107,.45)':'rgba(110,168,255,.4)',1.2);poly(P,GR.map((g,i)=>[g,pd[i]]),C.fg,3.2);legend(P,[['individual with a rising curve',C.a],['individual with a falling curve',C.r],['partial dependence (average)',C.fg]],P.T+12);P.text('feature value →',P.w-P.R-4,P.h-P.B-6,C.mu,'right');P.text('model output',P.L+6,P.T+28,C.mu);
+  const KG=[0,.25,.5,.75,1,1.25,1.5,2,2.5,3],neg=KG.map(c=>x2.filter(b=>1+c*b<0).length/N),Q=mk($('c3cv2'),0,3,.5,{y0:0,L:44});poly(Q,KG.map((c,i)=>[c,neg[i]]),C.r,2.6);dots(Q,KG.map((c,i)=>[c,neg[i]]),C.r,3.4);Q.vline(k,C.fg,null,true);Q.text('strength of the interaction →',Q.w-Q.R-4,Q.h-Q.B-6,C.mu,'right');Q.text('share of cases whose curve falls while the average rises',Q.L+6,Q.T+12,C.mu);
+  const sl=x2.map(b=>1+k*b),neg0=sl.filter(v=>v<0).length/N;
+  $('c3st').innerHTML=stat('average effect (slope of the partial dependence)',fmt((pd[pd.length-1]-pd[0])/4),'')+stat('sd of the individual slopes',fmt(ixSd(sl)),ixSd(sl)>1?'hot':'in')+stat('cases whose own effect has the opposite sign',pc1(neg0),neg0>.15?'hot':'ok')+stat('individual curves drawn',m+' of '+N,'');
+  $('c3rd').innerHTML=`The model is f(A, B) = A + ${fmt(k)}·A·B, where B varies between customers. The <b>partial dependence</b> of A (thick white line) averages the model over B: its slope is 1, “the output rises with A”. The <b>individual conditional expectation</b> (ICE) curves show what happens to each customer when A alone is changed: the slope is 1 + ${fmt(k)}·B, so it differs between customers (sd ${fmt(ixSd(sl))}), and for ${pc1(neg0)} of them (red) the output <em>falls</em> as A rises. The average hides the heterogeneity completely, which is the reason for plotting ICE curves, or for reporting the spread of the individual effects next to the partial dependence. Two further cautions. The curves are properties of the model, not of the world (chapter 8): a feature that moves with others in reality cannot be moved alone. And the partial dependence is evaluated at combinations of A and B that may not occur in the data (chapter 2); accumulated local effects, which average local differences inside narrow bands of A, avoid this at the cost of being harder to explain. When a regulator is shown a single monotone partial-dependence plot, the first question to ask is what the individual curves look like.`}
+ ['c3k','c3m'].forEach(i=>$(i).addEventListener('change',run));$('c3go').onclick=run;run();})();
 
-  m.text(`φ1: ${f3(phi1)}`, m.X(0.4), m.Y(phi1)+15, C.a, 'center');
-  m.text(`φ2: ${f3(phi2)}`, m.X(1.4), m.Y(phi2)+15, C.p, 'center');
-  m.text(`φ3: ${f3(phi3)}`, m.X(2.4), m.Y(phi3)+15, C.y, 'center');
+/* ---------- Ch4 Shapley values: baselines and correlated features ---------- */
+(function(){scl('c4r',v=>fmt(v/100));scl('c4b',v=>fmt(v/10));scl('c4s',v=>fmt(v/10));
+ const PERMS=[[0,1,2],[0,2,1],[1,0,2],[1,2,0],[2,0,1],[2,1,0]];
+ const ev=(S,b,x0,mu,rho,cond)=>{let s=0;for(let j=0;j<3;j++){if(S.includes(j))s+=b[j]*x0[j];else{let e=mu[j];if(cond){if(j===1&&S.includes(0))e=mu[1]+rho*(x0[0]-mu[0]);if(j===0&&S.includes(1))e=mu[0]+rho*(x0[1]-mu[1])}s+=b[j]*e}}return s};
+ function shap(b,x0,mu,rho,cond){const phi=[0,0,0];for(const p of PERMS){let S=[];for(const j of p){phi[j]+=(ev(S.concat(j),b,x0,mu,rho,cond)-ev(S,b,x0,mu,rho,cond))/6;S=S.concat(j)}}return phi}
+ function run(){const rho=val('c4r')/100,b2=val('c4b')/10,sh=val('c4s')/10,b=[1,b2,1],x0=[1.5,1.5*rho,1],mu=[sh,sh,0],I=shap(b,x0,mu,rho,false),Cn=shap(b,x0,mu,rho,true),all=I.concat(Cn),lo=Math.min(-.2,Math.min(...all)*1.2),hi=Math.max(.3,Math.max(...all)*1.2),
+  P=barG($('c4cv'),[0,1,2].map(j=>[I[j],Cn[j]]),[C.r,C.g],['A','B','C'],lo,hi,fmt);P.text('red interventional · green conditional (correlated)',P.L+6,P.T+12,C.mu);
+  const RG=[0,.2,.4,.6,.8,.9,.95],pr=RG.map(r=>[shap(b,[1.5,1.5*r,1],mu,r,false)[1],shap(b,[1.5,1.5*r,1],mu,r,true)[1]]),mn=Math.min(0,...pr.map(v=>Math.min(...v)))*1.2,mxq=Math.max(.1,...pr.map(v=>Math.max(...v)))*1.2,Q=mk($('c4cv2'),0,RG.length-1,mxq,{y0:mn,noGrid:true,L:44});customGrid(Q,RG.map((x,i)=>[i,String(x)]),niceTicks(mn,mxq,5));Q.hline(0,C.fg,null);poly(Q,pr.map((v,i)=>[i,v[0]]),C.r,2.6);poly(Q,pr.map((v,i)=>[i,v[1]]),C.g,2.6);dots(Q,pr.map((v,i)=>[i,v[0]]),C.r,3.4);dots(Q,pr.map((v,i)=>[i,v[1]]),C.g,3.4);Q.text('correlation of B with A →',Q.w-Q.R-4,Q.h-Q.B-6,C.mu,'right');Q.text('credit given to B for this customer',Q.L+6,Q.T+12,C.mu);
+  const tot=b[0]*x0[0]+b[1]*x0[1]+b[2]*x0[2]-(b[0]*mu[0]+b[1]*mu[1]+b[2]*mu[2]);
+  $('c4st').innerHTML=stat('credit to A · B · C, interventional',I.map(fmt).join(' · '),'')+stat('credit to A · B · C, conditional',Cn.map(fmt).join(' · '),b2<.05&&Cn[1]>.1?'hot':'')+stat('prediction minus baseline prediction (what both split)',fmt(tot),'')+stat('model weight on B (A and C: 1)',fmt(b2),'');
+  $('c4rd').innerHTML=`A <b>Shapley value</b> splits the difference between one customer’s prediction and a baseline prediction among the features, by averaging each feature’s marginal contribution over all orders in which features could be added. The split is unique under four fairness axioms, but it needs a rule for what “a feature is absent” means, and the rules give different answers. In the <b>interventional</b> version (red) absent features are replaced by values from the baseline, so credit goes only to features the model actually uses: B receives ${fmt(I[1])} (its weight is ${fmt(b2)}). In the <b>conditional</b> version (green) absent features are replaced by what is expected given the features present, so a feature the model does not use but which is correlated (${fmt(rho)}) with one it does use receives credit (${fmt(Cn[1])} here, and A’s credit falls from ${fmt(I[0])} to ${fmt(Cn[0])}). Neither is wrong: interventional answers “how does the model use its inputs?”, conditional answers “which features carry information about the prediction?”. The baseline matters as much: with baseline means shifted by ${fmt(sh)} the same customer’s credits change, although the model and customer do not. When a Shapley value appears on an adverse-action notice it must be accompanied by the baseline and the variant used, and a reader should not take it as the effect of changing the feature.`}
+ ['c4r','c4b','c4s'].forEach(i=>$(i).addEventListener('change',run));$('c4go').onclick=run;run();})();
 
-  $('t4').innerHTML = stat('Synergy (γ)',f3(g),'in')+
-                      stat('Total Payout v(1,2,3)',f3(total),'ok')+
-                      stat('Efficiency Check',`${f3(phi1+phi2+phi3)} = ${f3(total)}`,'ok')+
-                      stat('Interaction Split',`γ/2 = +${f3(g/2)} to P1 & P2`,'warn');
- }
- on('r4', run); run();
-});
+/* ---------- Ch5 sampling error of importance ---------- */
+(function(){scl('c5g',v=>v+'%');scl('c5n',v=>v);scl('c5s',v=>fmt(v/10));const NG=[50,100,200,500,1000,2000];
+ function imp(n,gap,s,K){const a=1,b=1-gap,X=[],y=[];for(let i=0;i<n;i++){const x1=randn(),x2=randn();X.push([x1,x2]);y.push(a*x1+b*x2+s*randn())}let ia=0,ib=0;for(let i=0;i<n;i++){const e0=y[i]-a*X[i][0]-b*X[i][1];for(let k=0;k<K;k++){const j=Math.floor(Math.random()*n),e1=y[i]-a*X[j][0]-b*X[i][1],e2=y[i]-a*X[i][0]-b*X[j][1];ia+=(e1*e1-e0*e0)/K/n;ib+=(e2*e2-e0*e0)/K/n}}return[ia,ib]}
+ function run(){const gap=val('c5g')/100,n=val('c5n'),s=val('c5s')/10,R=250,T=Array.from({length:R},()=>imp(n,gap,s,5)),A=T.map(t=>t[0]),B=T.map(t=>t[1]),lo=0,hi=Math.max(...A,...B)*1.05,P=histLines($('c5cv'),[A,B],[C.g,C.r],lo,hi,30,[[2,C.g,null,true],[2*(1-gap)**2,C.r,null,true]]);P.text('importance estimates over '+R+' samples: green A · red B (dashed: truth)',P.L+8,P.T+12,C.mu);
+  const GP=[gap/2,gap,Math.min(.9,gap*2)],cols=[C.y,C.a,C.g],res=GP.map(g=>NG.map(m=>{let c=0;for(let r=0;r<80;r++){const t=imp(m,g,s,3);if(t[0]>t[1])c++}return c/80})),Q=mk($('c5cv2'),0,NG.length-1,1.03,{y0:.4,noGrid:true,L:44});customGrid(Q,NG.map((x,i)=>[i,String(x)]),niceTicks(.4,1,5));Q.hline(.5,C.mu,'coin toss',true);GP.forEach((g,k)=>{poly(Q,res[k].map((v,i)=>[i,v]),cols[k],2.6);dots(Q,res[k].map((v,i)=>[i,v]),cols[k],3.4)});legend(Q,GP.map((g,k)=>['gap '+Math.round(g*100)+'%',cols[k]]),Q.T+12);Q.text('test cases →',Q.w-Q.R-4,Q.h-Q.B-6,C.mu,'right');Q.text('probability A is ranked above B',Q.L+6,Q.T+28,C.mu);
+  const ok=T.filter(t=>t[0]>t[1]).length/R,sdA=ixSd(A);
+  $('c5st').innerHTML=stat('A ranked above B (truth: A more important)',pc1(ok),ok<.9?'warn':'ok')+stat('importance of A: mean · sd (truth '+fmt(2)+')',fmt(avg(A))+' · '+fmt(sdA),'')+stat('importance of B: mean · sd (truth '+fmt(2*(1-gap)**2)+')',fmt(avg(B))+' · '+fmt(ixSd(B)),'')+stat('relative uncertainty of A (sd ÷ mean)',pc1(sdA/avg(A)),'');
+  $('c5rd').innerHTML=`Two features with true weights 1 and ${fmt(1-gap)} (so A is more important by a margin of ${val('c5g')}% in weight), a fixed model, and noise sd ${fmt(s)}. Permutation importance is computed on ${n} test cases, and the whole exercise is repeated ${R} times. The two histograms ${ok<.95?'overlap':'are mostly separate'}: A is ranked above B in ${pc1(ok)} of the samples. The importance numbers shown in a model report are <b>estimates with sampling error</b>, and the error is the same order as the differences people read into them: the relative uncertainty of A’s importance is ${pc1(sdA/avg(A))} at this sample size. The right panel shows how the probability of a correct ranking depends on the gap and on the number of cases: a small gap needs thousands of test cases before the ordering is reliable, and with correlated features (chapter 1) the problem is worse because the model itself changes with the training sample. Standard practice should be the one used everywhere else in the course: a confidence interval for each importance (bootstrap over the test cases and, if affordable, over refits), a statement of which orderings are resolved and which are not, and no ranking of features whose intervals overlap. The same applies to Shapley values, which are averages over cases and carry the sampling error of that average.`}
+ ['c5g','c5n','c5s'].forEach(i=>$(i).addEventListener('change',run));$('c5go').onclick=run;run();})();
 
-/* ---------- LAB 5: Marginal vs Conditional SHAP ---------- */
-reg(()=>{
- function run(){
-  const rho=val('r5');
-  const cv=$('cv5'), m=mk(cv,-0.5,2.5,2.5,{y0:-0.5,noX:true});
-  m.hline(0,C.gr);
-  // Model f(x) = 2.0*x1 + 0*x2.
-  // Marginal SHAP: phi1 = 2.0, phi2 = 0.0 (exact dummy)
-  // Conditional SHAP: phi1 = 2.0 - 2.0*rho^2/2, phi2 = 2.0*rho / 2
-  const m_phi1 = 2.0, m_phi2 = 0.0;
-  const c_phi1 = 2.0 * (1 - 0.5 * rho * rho);
-  const c_phi2 = 2.0 * 0.5 * rho;
+/* ---------- Ch6 local surrogate explanations ---------- */
+(function(){scl('c6x',v=>fmt(v/10));scl('c6w',v=>fmt(v/10));scl('c6n',v=>v);
+ const F=x=>Math.sin(2*x)+.3*x,dF=x=>2*Math.cos(2*x)+.3,WG=[.1,.2,.4,.7,1,1.5,2.5];
+ function lime(x0,w,n){let sw=0,mx=0,my=0;const xs=[],ws=[],ys=[];for(let i=0;i<n;i++){const x=x0+1.2*randn(),wt=Math.exp(-((x-x0)**2)/(w*w));xs.push(x);ws.push(wt);ys.push(F(x));sw+=wt;mx+=wt*x;my+=wt*F(x)}if(sw<1e-9)return[NaN,0,0];mx/=sw;my/=sw;let sxy=0,sxx=0,s2=0;for(let i=0;i<n;i++){sxy+=ws[i]*(xs[i]-mx)*(ys[i]-my);sxx+=ws[i]*(xs[i]-mx)**2;s2+=ws[i]*ws[i]}return[sxx>1e-12?sxy/sxx:NaN,my-(sxx>1e-12?sxy/sxx:0)*mx,sw*sw/s2,mx]}
+ function stats(x0,w,n,R){const s=[];let ne=0;for(let r=0;r<R;r++){const o=lime(x0,w,n);if(isFinite(o[0])){s.push(o[0]);ne+=o[2]}}return{m:avg(s),sd:ixSd(s),ne:ne/s.length}}
+ function run(){const x0=val('c6x')/10,w=val('c6w')/10,n=val('c6n'),P=mk($('c6cv'),-3,3,2.6,{y0:-2.6,L:40});P.line(F,C.fg,2.4,-3,3,200);for(let k=0;k<7;k++){const o=lime(x0,w,n);if(isFinite(o[0]))poly(P,[[x0-1,o[1]+o[0]*(x0-1)],[x0+1,o[1]+o[0]*(x0+1)]],'rgba(255,200,87,.8)',1.6)}P.vline(x0,C.g,null,true);legend(P,[['model',C.fg],['local linear explanations (7 runs)',C.y]],P.T+12);
+  const res=WG.map(ww=>stats(x0,ww,n,60)),d=dF(x0),my=Math.max(...res.map(r=>Math.abs(r.m)+2*r.sd),Math.abs(d))*1.2,Q=mk($('c6cv2'),0,WG.length-1,my,{y0:-my,noGrid:true,L:44});customGrid(Q,WG.map((x,i)=>[i,String(x)]),niceTicks(-my,my,5));Q.hline(d,C.g,'true local slope',true);poly(Q,res.map((r,i)=>[i,r.m]),C.a,2.6);dots(Q,res.map((r,i)=>[i,r.m]),C.a,3.4);poly(Q,res.map((r,i)=>[i,r.m+2*r.sd]),C.mu,1.6,true);poly(Q,res.map((r,i)=>[i,r.m-2*r.sd]),C.mu,1.6,true);Q.text('kernel width →',Q.w-Q.R-4,Q.h-Q.B-6,C.mu,'right');Q.text('estimated slope: mean ± 2 sd',Q.L+6,Q.T+12,C.mu);
+  const cur=stats(x0,w,n,120);
+  $('c6st').innerHTML=stat('true slope of the model at the point',fmt(d),'')+stat('explanation: mean slope · sd across runs',fmt(cur.m)+' · '+fmt(cur.sd),cur.sd>.4?'hot':'in')+stat('bias (mean − true)',fmt(cur.m-d),Math.abs(cur.m-d)>.4?'warn':'ok')+stat('effective number of weighted samples',fmt(cur.ne),cur.ne<15?'warn':'');
+  $('c6rd').innerHTML=`A <b>local surrogate</b> (the idea behind LIME) explains one prediction by fitting a simple model, here a straight line, to the black box’s outputs on perturbed points around the case, weighted by closeness (kernel width ${fmt(w)}); the slope is reported as “the effect of the feature”. The true slope of the model at x = ${fmt(x0)} is ${fmt(d)}. The surrogate’s slope has two kinds of error. <b>Bias</b> when the neighbourhood is wide: the line averages over a curved region and misses the local slope (mean ${fmt(cur.m)}, bias ${fmt(cur.m-d)}). <b>Variance</b> when it is narrow: few perturbed points get any weight (effective number ${fmt(cur.ne)}), so each run gives a different slope (sd ${fmt(cur.sd)}), and the seven yellow lines in the left panel differ visibly. The width that balances the two depends on the model’s curvature, and is a free parameter of the method: the explanation is a function of it. Run the explanation several times, report its variability, check the fidelity of the surrogate in the neighbourhood, and treat any explanation that changes with the random seed as unreliable. Compare also with the model’s own gradient where it exists: when it is available and cheap, it is a more stable local explanation than a sampled one.`}
+ ['c6x','c6w','c6n'].forEach(i=>$(i).addEventListener('change',run));$('c6go').onclick=run;run();})();
+/* ---------- Ch7 the Rashomon effect ---------- */
+(function(){scl('c7e',v=>v+'%');scl('c7r',v=>fmt(v/100));scl('c7n',v=>v);const P5=5,SUBS=[];for(let m=1;m<32;m++)SUBS.push([0,1,2,3,4].filter(j=>m>>j&1));
+ const yf=X=>X.map(x=>x[0]+.8*x[1]+.5*x[2]+1.5*randn());
+ function run(){const tol=val('c7e')/100,r=val('c7r')/100,n=val('c7n'),X=ixDraw(n,P5,r),y=yf(X),Xs=ixDraw(3000,P5,r),ys=yf(Xs),M=SUBS.map(S=>{const b=ixOls(X.map(x=>S.map(j=>x[j])),y,1e-6);let e=0;for(let i=0;i<Xs.length;i++){const d=ys[i]-ixPred(b,S.map(j=>Xs[i][j]));e+=d*d}const c=new Array(P5).fill(0);S.forEach((j,k)=>c[j]=b[k+1]);return{S,rmse:Math.sqrt(e/Xs.length),c}}),best=Math.min(...M.map(m=>m.rmse)),near=M.filter(m=>m.rmse<=best*(1+tol)),isN=new Set(near);
+  const xs=M.map(m=>m.rmse),ys1=M.map(m=>Math.abs(m.c[0])),P=mk($('c7cv'),Math.min(...xs)*.995,Math.max(...xs)*1.005,Math.max(1.4,...ys1)*1.1,{y0:0,L:44});scat(P,xs,ys1,C.mu,100,4,i=>isN.has(M[i])?C.g:'rgba(150,150,170,.55)');P.vline(best*(1+tol),C.fg,null,true);P.text('test error of the model →',P.w-P.R-4,P.h-P.B-6,C.mu,'right');P.text('weight on feature A (0 = not used); green = within tolerance of the best',P.L+6,P.T+12,C.mu);
+  const share=[0,1,2,3,4].map(j=>near.filter(m=>m.S.includes(j)).length/near.length),Q=barV($('c7cv2'),share,[C.a,C.a,C.a,C.mu,C.mu],['A (real)','B (real)','C (real)','D (noise)','E (noise)'],1.1,pc1);Q.text('share of near-best models that use each feature',Q.L+6,Q.T+12,C.mu);
+  const ca=near.map(m=>m.c[0]),bm=M.find(m=>m.rmse===best);
+  $('c7st').innerHTML=stat('models within '+val('c7e')+'% of the best (of 31)',String(near.length),near.length>6?'warn':'in')+stat('weight on A among them: min · max',fmt(Math.min(...ca))+' · '+fmt(Math.max(...ca)),'')+stat('share of them that leave A out entirely',pc1(ca.filter(v=>v===0).length/near.length),ca.some(v=>v===0)?'hot':'ok')+stat('features of the single best model',bm.S.map(j=>'ABCDE'[j]).join(''),'');
+  $('c7rd').innerHTML=`Five correlated features (correlation ${fmt(r)}), three of which truly affect the outcome and two of which do not. All 31 linear models using a subset of the features are fitted on ${n} cases and scored on fresh data. Each dot is a model. Many models are almost equally accurate: ${near.length} of them are within ${val('c7e')}% of the best, and they tell different stories: the weight on feature A ranges from ${fmt(Math.min(...ca))} to ${fmt(Math.max(...ca))} among them, and ${pc1(ca.filter(v=>v===0).length/near.length)} of them do not use A at all. This is the <b>Rashomon effect</b>: when features are correlated and data are limited, accuracy does not identify one model, so any explanation of “the” model is an explanation of one arbitrary member of a set of equally good ones. The set grows with the tolerance and the correlation, and shrinks with sample size. In practice: pick the single best-scoring model only after the choice has been shown to be stable; summarise importance over the near-best set (a feature used by all of them is robust, one used by some is not); and when a regulator asks why feature A was or was not in the model, the honest answer may be that several specifications fitted equally well and the choice among them was a judgement.`}
+ ['c7e','c7r','c7n'].forEach(i=>$(i).addEventListener('change',run));$('c7go').onclick=run;run();})();
 
-  m.bar(0.3, m_phi1, 30, C.g);
-  m.bar(0.7, m_phi2, 30, C.g);
-  m.bar(1.5, c_phi1, 30, C.r);
-  m.bar(1.9, c_phi2, 30, C.r);
+/* ---------- Ch8 explanations are not effects ---------- */
+(function(){scl('c8k',v=>fmt(v/10));scl('c8n',v=>v);const BETA=.3,KG=[0,.5,1,1.5,2,2.5,3];
+ function gen(n,k){const U=[],X=[],Y=[];for(let i=0;i<n;i++){const u=randn(),x=u+.5*randn();U.push(u);X.push(x);Y.push(k*u+BETA*x+randn())}return[U,X,Y]}
+ function slopes(n,k){const[U,X,Y]=gen(n,k),a=ixOls(X.map(x=>[x]),Y,1e-8)[1],b=ixOls(X.map((x,i)=>[x,U[i]]),Y,1e-8)[1];return[a,b]}
+ function run(){const k=val('c8k')/10,n=val('c8n'),[U,X,Y]=gen(n,k),f=ixOls(X.map(x=>[x]),Y,1e-8),P=mk($('c8cv'),-4,4,Math.max(6,...Y.map(Math.abs))*1.05,{y0:-Math.max(6,...Y.map(Math.abs))*1.05,L:40});scat(P,X,Y,C.a,500,2.4,()=> 'rgba(110,168,255,.4)');P.line(x=>f[0]+f[1]*x,C.r,2.8,-4,4,2);P.line(x=>BETA*x,C.g,2.8,-4,4,2);legend(P,[['model’s fitted slope (what a PD plot shows)',C.r],['true causal effect',C.g]],P.T+12);
+  const res=KG.map(kk=>{const o=[0,0];const R=30;for(let r=0;r<R;r++){const s=slopes(n,kk);o[0]+=s[0]/R;o[1]+=s[1]/R}return o}),Q=mk($('c8cv2'),0,3,Math.max(1.2,...res.map(v=>v[0]))*1.1,{y0:-.2,L:44});Q.hline(BETA,C.g,'true effect',true);poly(Q,res.map((v,i)=>[KG[i],v[0]]),C.r,2.6);dots(Q,res.map((v,i)=>[KG[i],v[0]]),C.r,3.4);poly(Q,res.map((v,i)=>[KG[i],v[1]]),C.y,2.6);dots(Q,res.map((v,i)=>[KG[i],v[1]]),C.y,3.4);legend(Q,[['model without the confounder',C.r],['model with the confounder',C.y]],Q.T+12);Q.vline(k,C.fg,null,true);Q.text('strength of the hidden common cause →',Q.w-Q.R-4,Q.h-Q.B-6,C.mu,'right');Q.text('slope attributed to the feature',Q.L+6,Q.T+28,C.mu);
+  const s0=slopes(n,k);
+  $('c8st').innerHTML=stat('slope the model attributes to the feature · true effect',fmt(f[1])+' · '+fmt(BETA),Math.abs(f[1]-BETA)>.3?'hot':'ok')+stat('slope if the confounder is in the model',fmt(s0[1]),'ok')+stat('predictive R² of the model without the confounder',fmt(1-avg(Y.map((y,i)=>(y-f[0]-f[1]*X[i])**2))/ (avg(Y.map(y=>y*y))-avg(Y)**2)),'')+stat('cases',String(n),'');
+  $('c8rd').innerHTML=`A hidden factor U (say financial stress) raises both a feature X (say a utilisation measure, X = U + noise) and the outcome (y = ${fmt(k)}·U + ${fmt(BETA)}·X + noise). The true causal effect of X is ${fmt(BETA)}: lowering X by one unit lowers the outcome by that much. A model fitted on X alone predicts well, and every explanation tool (coefficients, partial dependence, Shapley values) will report a slope of ${fmt(f[1])}, because X also stands in for U. The explanation is <em>correct about the model</em>, and the model is correct about the data, but neither is correct about what would happen if X were changed. The slope moves with the strength of the hidden cause (right panel, red) and falls to the truth when the confounder is measured and included (yellow). This is the distinction that matters for any use of an explanation to advise a customer (“reduce your utilisation and your score will improve”), to justify a policy, or to claim that a feature “drives” defaults: <b>an explanation describes how the model maps inputs to outputs, not how the world maps actions to outcomes</b>. Using it for the second purpose needs the tools of items 22 to 25: a causal model, an experiment, or an identification strategy.`}
+ ['c8k','c8n'].forEach(i=>$(i).addEventListener('change',run));$('c8go').onclick=run;run();})();
 
-  m.text('Marginal SHAP', m.X(0.5), m.Y(2.2), C.g, 'center');
-  m.text('Conditional SHAP', m.X(1.7), m.Y(2.2), C.r, 'center');
-  m.text(`φ2=0`, m.X(0.7), m.Y(0.2), C.g, 'center');
-  m.text(`Leak φ2=${f3(c_phi2)}`, m.X(1.9), m.Y(Math.max(0.2, c_phi2+0.15)), C.r, 'center');
+/* ---------- Ch9 counterfactual explanations and recourse ---------- */
+(function(){scl('c9m',v=>fmt(v/50));scl('c9n',v=>v);scl('c9d',v=>fmt(v/10));const MG=[0,.25,.5,.75,1,1.5,2];
+ const mkd=n=>{const X=[],y=[];for(let i=0;i<n;i++){const x=[randn(),randn()],z=1.2*x[0]+.8*x[1]-.2;X.push(x);y.push(Math.random()<1/(1+Math.exp(-z))?1:0)}return[X,y]};
+ const sc=(w,x)=>w[0]+w[1]*x[0]+w[2]*x[1];
+ function run(){const m0=val('c9m')/50,n=val('c9n'),dr=val('c9d')/10,[X,y]=mkd(n),w=ixLogit(X,y),rej=X.filter(x=>sc(w,x)<0).slice(0,150),nw=w[1]*w[1]+w[2]*w[2],cf=(x,m)=>{const t=(m-sc(w,x))/nw;return[x[0]+t*w[1],x[1]+t*w[2]]},
+  B=Array.from({length:60},()=>{const xb=[],yb=[];for(let i=0;i<n;i++){const j=Math.floor(Math.random()*n);xb.push(X[j]);yb.push(y[j])}const wb=ixLogit(xb,yb);wb[0]-=dr;return wb});
+  const line=(ww)=>[[-3,-(ww[0]+ww[1]*-3)/ww[2]],[3,-(ww[0]+ww[1]*3)/ww[2]]],P=mk($('c9cv'),-3,3,3,{y0:-3,L:40});scat(P,X.map(x=>x[0]),X.map(x=>x[1]),C.a,400,2.2,i=>y[i]?'rgba(255,107,107,.35)':'rgba(110,168,255,.35)');B.slice(0,25).forEach(wb=>clip(P,()=>poly(P,line(wb),'rgba(255,200,87,.35)',1.2)));clip(P,()=>poly(P,line(w),C.fg,2.4));const e=rej[0];if(e){const c=cf(e,m0);dots(P,[[e[0],e[1]]],C.r,5);dots(P,[[c[0],c[1]]],C.g,5);poly(P,[[e[0],e[1]],[c[0],c[1]]],C.g,2)}P.text('white: fitted · yellow: refits',P.L+6,P.T+12,C.mu);
+  const val_=(m)=>{let ok=0,cnt=0,cost=0;for(const x of rej){const c=cf(x,m);cost+=Math.hypot(c[0]-x[0],c[1]-x[1]);for(const wb of B){cnt++;if(sc(wb,c)>0)ok++}}return[ok/cnt,cost/rej.length]},res=MG.map(val_),mx=Math.max(...res.map(r=>r[1]))*1.1,Q=mk($('c9cv2'),0,2,Math.max(1.05,mx),{y0:0,L:44});poly(Q,MG.map((m,i)=>[m,res[i][0]]),C.r,2.6);dots(Q,MG.map((m,i)=>[m,res[i][0]]),C.r,3.4);poly(Q,MG.map((m,i)=>[m,res[i][1]]),C.y,2.6);dots(Q,MG.map((m,i)=>[m,res[i][1]]),C.y,3.4);Q.vline(m0,C.fg,null,true);legend(Q,[['share still approved after a refit',C.r],['average distance to move',C.y]],Q.T+12);Q.text('margin beyond the boundary (log-odds) →',Q.w-Q.R-4,Q.h-Q.B-6,C.mu,'right');
+  const cur=val_(m0),dz=Math.hypot(...[0,0]);
+  $('c9st').innerHTML=stat('counterfactuals still approved after a refit',pc1(cur[0]),cur[0]<.7?'hot':'ok')+stat('average distance the customer must move',fmt(cur[1]),'')+stat('declined cases tested · refits',rej.length+' · 60','')+stat('training cases · model drift (log-odds)',n+' · '+fmt(dr),'');
+  $('c9rd').innerHTML=`A <b>counterfactual explanation</b> answers a declined customer with the smallest change that would have flipped the decision (“had your income been X higher you would have been approved”). Here the model is a logistic score on two features; the counterfactual moves the case straight to the boundary plus a margin of ${fmt(m0)} log-odds. Two things go wrong when the advice is followed later. The boundary is an estimate: after refitting the model on resampled data${dr?' and shifting it by '+fmt(dr)+' log-odds as if the portfolio had changed':''}, ${pc1(cur[0])} of the counterfactual points are still approved (yellow lines in the left panel show how far the boundary moves, more with fewer cases: try 100). With no margin the share is about a half by construction, since the case sits on the boundary. A larger margin raises the share but also the distance the customer has to travel (right panel). And, as chapter 8 said, the counterfactual is a statement about the model: it is valid advice only for features the customer can actually change, which change the outcome causally, and which do not move other features with them. A recourse promise of this kind is a commitment by the bank; its probability of being honoured can be measured, as here, and should be reported with the explanation.`}
+ ['c9m','c9n','c9d'].forEach(i=>$(i).addEventListener('change',run));$('c9go').onclick=run;run();})();
 
-  $('t5').innerHTML = stat('Correlation (ρ)',f3(rho),'in')+
-                      stat('Marginal φ2 (True Dummy)',f3(m_phi2),'ok')+
-                      stat('Conditional φ2 (Leaked)',f3(c_phi2),Math.abs(c_phi2)>0.2?'err':'ok')+
-                      stat('Dilemma',Math.abs(rho)>0.5?'Conditional SHAP credits zero-weight variable!':'Low correlation','warn');
- }
- on('r5', run); run();
-});
+/* ---------- Ch10 importance on training data against held-out data ---------- */
+(function(){scl('c10d',v=>v);scl('c10n',v=>v);const NP=6,DG=[1,2,3,5,8,12],NT=800;
+ const gen=n=>{const X=[],y=[];for(let i=0;i<n;i++){const x=Array.from({length:NP},()=>randn());X.push(x);y.push(x[0]+.7*x[1]+randn())}return[X,y]};
+ const ex=(x,d)=>{const r=[];for(let j=0;j<NP;j++)r.push(...ixCheb(x[j],d));return r},mse=(b,E,y)=>{let s=0;for(let i=0;i<E.length;i++){const d=y[i]-ixPred(b,E[i]);s+=d*d}return s/E.length};
+ function imp(b,X,y,d,rep){const base=mse(b,X.map(x=>ex(x,d)),y),o=[];for(let j=0;j<NP;j++){let s=0;for(let k=0;k<rep;k++){const col=X.map(x=>x[j]);for(let i=col.length-1;i>0;i--){const q=Math.floor(Math.random()*(i+1));[col[i],col[q]]=[col[q],col[i]]}const Z=X.map((x,i)=>{const z=x.slice();z[j]=col[i];return ex(z,d)});s+=mse(b,Z,y)-base}o.push(s/rep)}return o}
+ function trial(n,d){const[X,y]=gen(n),b=ixOls(X.map(x=>ex(x,d)),y,.02),[Xs,ys]=gen(NT),tr=imp(b,X,y,d,2),te=imp(b,Xs,ys,d,2),trn=ixOls(X.map(x=>ex(x,d)),y,.02);let e=0;for(let i=0;i<X.length;i++){const q=y[i]-ixPred(trn,ex(X[i],d));e+=q*q}const te2=mse(b,Xs.map(x=>ex(x,d)),ys);return{tr,te,trE:e/X.length,teE:te2}}
+ function run(){const d=val('c10d'),n=val('c10n'),R=6,T=Array.from({length:R},()=>trial(n,d)),tr=[0,1,2,3,4,5].map(j=>avg(T.map(t=>t.tr[j]))),te=[0,1,2,3,4,5].map(j=>avg(T.map(t=>t.te[j]))),mx=Math.max(...tr,...te)*1.15,mn=Math.min(0,...tr,...te)*1.3,P=barG($('c10cv'),[0,1,2,3,4,5].map(j=>[tr[j],te[j]]),[C.r,C.g],['A (real)','B (real)','N1','N2','N3','N4'],mn,mx,fmt);P.text('red: importance measured on the training cases · green: on new cases',P.L+6,P.T+12,C.mu);
+  const res=DG.map(dd=>{const a=[0,0];for(let r=0;r<4;r++){const t=trial(n,dd);a[0]+=avg(t.tr.slice(2))/4;a[1]+=avg(t.te.slice(2))/4}return a}),my=Math.max(.05,...res.map(v=>Math.max(...v)))*1.15,my0=Math.min(0,...res.map(v=>Math.min(...v)))*1.3,Q=mk($('c10cv2'),0,DG.length-1,my,{y0:my0,noGrid:true,L:44});customGrid(Q,DG.map((x,i)=>[i,String(x)]),niceTicks(my0,my,5));Q.hline(0,C.fg,null);poly(Q,res.map((v,i)=>[i,v[0]]),C.r,2.6);dots(Q,res.map((v,i)=>[i,v[0]]),C.r,3.4);poly(Q,res.map((v,i)=>[i,v[1]]),C.g,2.6);dots(Q,res.map((v,i)=>[i,v[1]]),C.g,3.4);Q.text('model flexibility (polynomial degree per feature) →',Q.w-Q.R-4,Q.h-Q.B-6,C.mu,'right');Q.text('average importance of the four pure-noise features',Q.L+6,Q.T+12,C.mu);
+  const noiseTr=avg(tr.slice(2)),noiseTe=avg(te.slice(2));
+  $('c10st').innerHTML=stat('noise features: importance on training · on new cases',fmt(noiseTr)+' · '+fmt(noiseTe),noiseTr>.05?'hot':'ok')+stat('real features A · B on new cases (truth: A larger)',fmt(te[0])+' · '+fmt(te[1]),'')+stat('training error · error on new cases',fmt(avg(T.map(t=>t.trE)))+' · '+fmt(avg(T.map(t=>t.teE))),'')+stat('training cases · degree',n+' · '+d,'');
+  $('c10rd').innerHTML=`Six features: two real (A and B), four pure noise. An additive model with a polynomial of the chosen degree per feature is fitted on ${n} cases, and permutation importance is measured two ways. On the <b>training cases</b> (red) the noise features receive importance ${fmt(noiseTr)} on average, because a flexible model has used them to memorise the noise of the training sample; on <b>new cases</b> (green) it is ${fmt(noiseTe)}, which is what it should be, close to zero or slightly negative. The right panel shows the gap opening as the model gets more flexible. This matters because it is common to explain a model on the data it was trained on, and because importance (and Shapley values, and partial-dependence plots) of an overfitted model can attribute weight to features that carry no information at all. Two safeguards: compute explanations on data held out from training, and compare with a <b>null reference</b>, the importance the same method assigns to features known to be noise (for instance a shuffled copy of each real feature, or the same model trained on shuffled outcomes), so that “feature N2 has importance 0.03” can be read against a noise floor. An explanation that has not been checked against such a floor has not been shown to explain anything beyond the training sample.`}
+ ['c10d','c10n'].forEach(i=>$(i).addEventListener('change',run));$('c10go').onclick=run;run();})();
 
-/* ---------- LAB 6: LIME Kernel Bandwidth ---------- */
-reg(()=>{
- function run(){
-  const s=val('r6');
-  const cv=$('cv6'), m=mk(cv,-2,2,3,{y0:-3});
-  m.hline(0,C.gr);
-  // True non-linear boundary: f(x) = x^3 - x
-  // Local tangent at x=0.5 with kernel radius s
-  // Slope changes from negative to positive as s expands
-  const local_slope = -0.25 + 1.8 * (s - 0.45);
-  m.line(x=>x*x*x - x, C.p, 2.5, -2, 2);
-  m.line(x=>(0.125 - 0.5) + local_slope*(x - 0.5), C.y, 2, -2, 2, 100, true);
-  m.circle(0.5, 0.125-0.5, 5, C.a);
-  m.text('True Model f(x)=x³-x', m.X(-1.5), m.Y(2.2), C.p);
-  m.text(`LIME Local Surrogate Slope: ${f3(local_slope)}`, m.X(-1.5), m.Y(-2.5), C.y);
-
-  $('t6').innerHTML = stat('Bandwidth (σ)',f3(s),'in')+
-                      stat('LIME Surrogate Slope',f3(local_slope),local_slope*(-0.25)<0?'err':'ok')+
-                      stat('Instability Warning',s>0.8?'Surrogate spans opposite curvature!':'Local enough','warn');
- }
- on('r6', run); run();
-});
-
-/* ---------- LAB 7: Rashomon Effect ---------- */
-reg(()=>{
- function run(){
-  const eps=val('r7');
-  const cv=$('cv7'), m=mk(cv,-0.5,4.5,2.5,{y0:-0.5,noX:true});
-  m.hline(0,C.gr);
-  // 5 models with loss within eps, having wildly different feature weights w1 vs w2
-  const w1_base = 1.5, w2_base = 0.2;
-  const spread = eps * 25;
-  const models = [
-   {name:'M1 (GBCD)', w1: w1_base + spread*0.8, w2: w2_base - spread*0.8},
-   {name:'M2 (RF)', w1: w1_base - spread*0.5, w2: w2_base + spread*0.5},
-   {name:'M3 (NN)', w1: w1_base - spread*1.2, w2: w2_base + spread*1.2},
-   {name:'M4 (Ridge)', w1: w1_base * 0.5, w2: w1_base * 0.5},
-   {name:'M5 (Lasso)', w1: w1_base + spread*1.5, w2: 0.0}
-  ];
-  models.forEach((mod, idx)=>{
-   m.bar(idx, mod.w1, 24, C.a);
-   m.bar(idx+0.28, mod.w2, 24, C.r);
-   m.text(mod.name, m.X(idx+0.14), m.Y(-0.35), C.fg, 'center');
-  });
-  m.text('Blue = Weight X1, Red = Weight X2 (All models have loss < L* + ε)', m.X(2.0), m.Y(2.3), C.mu, 'center');
-
-  $('t7').innerHTML = stat('Rashomon Tolerance (ε)',f3(eps),'in')+
-                      stat('Models in Set','5 Evaluated','ok')+
-                      stat('Weight Spread Δw1',f3(spread*2.7),'warn')+
-                      stat('Takeaway','Identical loss, completely conflicting explanations!','err');
- }
- on('r7', run); run();
-});
-
-/* ---------- LAB 8: Attribution vs Causal Effect ---------- */
-reg(()=>{
- function run(){
-  const collider_bias=val('r8');
-  const cv=$('cv8'), m=mk(cv,-0.5,2.5,2.5,{y0:-0.5,noX:true});
-  m.hline(0,C.gr);
-  const causal_effect = 0.0; // True effect is 0
-  const shap_attribution = collider_bias * 1.6;
-
-  m.bar(0.5, causal_effect + 0.04, 50, C.g);
-  m.bar(1.5, shap_attribution, 50, C.r);
-
-  m.text(`Causal Effect do(X1): ${f3(causal_effect)}`, m.X(0.5), m.Y(0.3), C.g, 'center');
-  m.text(`SHAP Attribution: ${f3(shap_attribution)}`, m.X(1.5), m.Y(Math.max(0.3, shap_attribution+0.15)), C.r, 'center');
-
-  $('t8').innerHTML = stat('True Causal Effect do(X)','0.00 (Zero Effect)','ok')+
-                      stat('SHAP Attribution',f3(shap_attribution),Math.abs(shap_attribution)>0.2?'err':'ok')+
-                      stat('Collider Distortion',f3(shap_attribution - causal_effect),'warn')+
-                      stat('Danger',Math.abs(collider_bias)>0.4?'Management will invest in a zero-impact feature!':'Low bias','');
- }
- on('r8', run); run();
-});
-
-/* ---------- LAB 9: Adversarial Scaffolding ---------- */
-reg(()=>{
- function run(){
-  const sens=val('r9');
-  const cv=$('cv9'), m=mk(cv,-0.5,2.5,2.5,{y0:0,noX:true});
-  m.hline(0,C.gr);
-  // Production behavior vs Auditor SHAP view
-  const prod_protected_use = 1.8;
-  const audited_shap_view = Math.max(0.02, 1.8 * (1 - sens));
-
-  m.bar(0.5, prod_protected_use, 50, C.r);
-  m.bar(1.5, audited_shap_view, 50, C.g);
-
-  m.text(`Production Model: Uses Race/Gender (${f3(prod_protected_use)})`, m.X(0.5), m.Y(prod_protected_use)+15, C.r, 'center');
-  m.text(`Auditor SHAP Report: (${f3(audited_shap_view)})`, m.X(1.5), m.Y(audited_shap_view)+15, C.g, 'center');
-
-  $('t9').innerHTML = stat('Adversarial Detection',pc(sens),'warn')+
-                      stat('Real Discrimination',f3(prod_protected_use),'err')+
-                      stat('Reported to Auditor',f3(audited_shap_view),'ok')+
-                      stat('Audit Bypass',sens>0.8?'EXPLOITED: Auditor completely fooled!':'Partial detection','err');
- }
- on('r9', run); run();
-});
-
-/* ---------- LAB 10: Collinear Feature Dilution ---------- */
-reg(()=>{
- function run(){
-  const k=val('r10');
-  const cv=$('cv10'), m=mk(cv,0,k+1,1.2,{y0:0});
-  m.hline(0,C.gr);
-  const total_signal = 1.0;
-  const per_feature = total_signal / k;
-
-  for(let i=1;i<=k;i++){
-   m.bar(i, per_feature, Math.max(6, 240/k), C.a);
-  }
-  m.hline(0.1, C.r, 'Significance Threshold (0.10)');
-
-  $('t10').innerHTML = stat('Copies (k)',k,'in')+
-                       stat('Group Importance',f3(total_signal),'ok')+
-                       stat('Single Feature PFI',f3(per_feature),per_feature<0.1?'err':'ok')+
-                       stat('Status',per_feature<0.1?'DILUTED: Individual features appear insignificant!':'Detectable','warn');
- }
- on('r10', run); run();
-});
-
-/* ---------- LAB 11: Counterfactual Recourse ---------- */
-reg(()=>{
- function run(){
-  const lam=val('r11');
-  const cv=$('cv11'), m=mk(cv,-2,2,3,{y0:-1});
-  m.hline(0,C.gr);
-  // Ellipse data manifold
-  m.line(x=>-Math.sqrt(Math.max(0, 1 - x*x/4)), C.gr, 1, -2, 2);
-  m.line(x=>Math.sqrt(Math.max(0, 1 - x*x/4)), C.gr, 1, -2, 2);
-
-  // Unconstrained counterfactual (jumps off manifold) vs Feasible recourse
-  const off_x = 0.2, off_y = 2.4;
-  const feas_x = 1.5, feas_y = 0.6;
-
-  m.circle(-1.2, -0.4, 6, C.r); // Applicant
-  m.circle(off_x, off_y, 6, C.y); // Unconstrained
-  m.circle(feas_x, feas_y, 6, C.g); // Feasible Recourse
-
-  m.line(x=>-0.4 + (off_y+0.4)/(off_x+1.2)*(x+1.2), C.y, 1.5, -1.2, off_x, 50, true);
-  m.line(x=>-0.4 + (feas_y+0.4)/(feas_x+1.2)*(x+1.2), C.g, 2, -1.2, feas_x);
-
-  m.text('Applicant', m.X(-1.2), m.Y(-0.7), C.r);
-  m.text('Unconstrained Jump (Impossible)', m.X(off_x), m.Y(off_y+0.2), C.y);
-  m.text('Feasible Causal Recourse', m.X(feas_x), m.Y(feas_y+0.2), C.g);
-
-  $('t11').innerHTML = stat('Constraint Weight (λ)',f3(lam),'in')+
-                       stat('Unconstrained Off-Manifold Distance','High (Plausibility = 0%)','err')+
-                       stat('Causal Feasibility','High (On Data Manifold)','ok')+
-                       stat('Regulatory Status','Compliant with ECOA / EU AI Act','ok');
- }
- on('r11', run); run();
-});
-
-/* ---------- EXAM QUESTIONS (18 Qs) ---------- */
-const QZ=[
- {"l":"Beginner","q":"What is the fundamental difference between explaining a machine learning model f(x) and explaining the real-world system P(Y | X)?","o":["Explaining f(x) describes how the algorithm combines inputs; it reflects real-world causality only if all causal assumptions hold","There is no difference; high accuracy guarantees causal explanations","Explaining f(x) is always parametric, while explaining nature is non-parametric","Explaining f(x) accounts for unobserved confounders automatically"],"a":0,"e":"A post-hoc explanation describes the mathematical mapping learned by the model. If the model learned confounded, selected, or reverse-causal correlations, the explanation reflects those flaws."},
- {"l":"Beginner","q":"Why did an ML model trained on pneumonia records predict that asthmatics have lower risk of death?","o":["Asthma biologically cures pneumonia complications","Asthmatic patients were immediately escalated to intensive care, introducing confounding by treatment indication","Asthmatics were filtered out of the test set","The model suffered from severe overfitting"],"a":1,"e":"Confounding by indication: patients with high-risk pre-existing conditions receive aggressive treatment, creating a negative observational correlation between the risk factor and mortality."},
- {"l":"Intermediate","q":"Why does Permutation Feature Importance (PFI) produce misleading results when predictors are highly correlated?","o":["It increases computational complexity exponentially","Shuffling one feature pairs it with improbable values of correlated features, forcing the model to extrapolate into empty off-manifold space","PFI violates the Efficiency axiom of game theory","PFI can only be computed on linear models"],"a":1,"e":"Permuting feature j independently breaks the joint correlation structure, evaluating the model on impossible combinations (e.g. 5-year-old with 30 years of credit history)."},
- {"l":"Intermediate","q":"How does Accumulated Local Effects (ALE) solve the extrapolation flaw of Partial Dependence Plots (PDP)?","o":["ALE uses cross-validation instead of held-out data","ALE calculates local differences within conditional slices and accumulates them, avoiding off-manifold evaluation","ALE converts the model into a linear surrogate","ALE evaluates all 2ᵖ feature coalitions"],"a":1,"e":"ALE computes expected local derivatives conditional on the present feature values, accumulating them without ever querying points far from the data manifold."},
- {"l":"Intermediate","q":"Which set of axioms uniquely characterizes the Shapley value in cooperative game theory?","o":["Completeness, Transitivity, Reflexivity, Homogeneity","Efficiency, Symmetry, Dummy (Null Player), Additivity","Convexity, Monotonicity, Continuity, Duality","Consistency, Unbiasedness, Sufficiency, Efficiency"],"a":1,"e":"Lloyd Shapley (1953) proved that Efficiency, Symmetry, Dummy, and Additivity uniquely determine the Shapley attribution formula."},
- {"l":"Advanced","q":"What happens when you apply Marginal (Interventional) SHAP to a model where features X₁ and X₂ are strongly correlated?","o":["It violates the Efficiency axiom","It evaluates the model on off-manifold, impossible feature combinations","It assigns non-zero credit to dummy features","It produces negative variances"],"a":1,"e":"Marginal SHAP integrates absent features over their marginal empirical distribution, breaking the dependency structure and querying the model in empty regions."},
- {"l":"Advanced","q":"What is the primary drawback of Conditional (Observational) SHAP?","o":["It cannot be computed for tree models","It violates the Dummy axiom by attributing importance to features with zero weight in the model if they correlate with active features","It violates the Efficiency axiom","It produces infinite Shapley values"],"a":1,"e":"Conditional SHAP computes E[f(X) | X_S]. If X_dummy has weight 0 but correlates with X_active, conditioning on X_dummy updates the expectation, giving X_dummy non-zero attribution."},
- {"l":"Advanced","q":"Why is LIME notoriously unstable across repeated runs on the same data point?","o":["It relies on random Gaussian perturbations and is highly sensitive to the chosen kernel bandwidth σ","It requires solving a non-convex NP-hard matrix inversion","It does not support classification problems","It requires identical training and test distributions"],"a":0,"e":"LIME draws random local perturbations and weights them by an exponential distance kernel. Small changes in kernel width or random seed can drastically shift surrogate weights."},
- {"l":"Advanced","q":"What is the Rashomon Effect in machine learning?","o":["The tendency of neural networks to memorize training labels","The existence of many distinct models that achieve virtually identical predictive accuracy but have conflicting internal mechanisms and feature rankings","The phenomenon where models perform worse on minority demographics","The failure of cross-validation under covariate shift"],"a":1,"e":"Named by Leo Breiman, the Rashomon effect demonstrates that many models achieve near-optimal loss with completely different, equally plausible feature attributions."},
- {"l":"Advanced","q":"If feature X₁ has the highest positive SHAP value in a churn model, what can an executive soundly conclude?","o":["Increasing X₁ by 1 unit will directly reduce churn by the SHAP amount","Feature X₁ is the model's strongest statistical discriminator; causal impact requires an experiment or causal identification","The model has proven that X₁ causes customer retention","Features with lower SHAP values have zero business value"],"a":1,"e":"Attributions reflect internal model reliance, not causal effect. Acting on attributions without causal identification frequently leads to wasted investment or perverse outcomes."},
- {"l":"Expert","q":"How does the Slack et al. (2020) adversarial scaffolding exploit bypass SHAP and LIME audits?","o":["By modifying the test set labels directly","By training a classifier to detect whether an input is on-manifold (real user) or off-manifold (explainer perturbation), switching behavior to feign neutrality during audits","By corrupting the gradient computation in backpropagation","By setting all feature weights to zero during inference"],"a":1,"e":"Because post-hoc explainers draw perturbations from off-manifold synthetic distributions, an adversarial model easily detects when it is being audited and hides discriminatory logic."},
- {"l":"Expert","q":"What occurs when a primary risk signal is duplicated into k collinear features in a tree ensemble?","o":["The ensemble error increases by a factor of k","Feature dilution: the splits are shared among the k features, causing each individual feature's importance to drop by ~1/k","The Shapley values of all other features become zero","TreeSHAP fails to converge"],"a":1,"e":"Collinear feature dilution disperses the split importance across all redundant copies, making critical risk drivers appear statistically insignificant."},
- {"l":"Expert","q":"What is a fundamental requirement for a counterfactual explanation to provide 'actionable recourse' under credit regulations (ECOA)?","o":["It must be the absolute Euclidean nearest point, regardless of real-world feasibility","It must only recommend changes to mutable, causally feasible features along the plausible data manifold","It must recommend changing at least 10 features simultaneously","It must guarantee 100% accuracy on future applicants"],"a":1,"e":"Actionable recourse requires realistic guidance (e.g. 'increase savings by 500 USD', not 'decrease your age by 10 years') that respects causal relationships and plausibility."},
- {"l":"Expert","q":"Under the Additivity axiom of Shapley values, if model f(x) = g(x) + h(x), what is the attribution φⱼ(f)?","o":["φⱼ(f) = φⱼ(g) · φⱼ(h)","φⱼ(f) = φⱼ(g) + φⱼ(h)","φⱼ(f) = max(φⱼ(g), φⱼ(h))","φⱼ(f) = √(φⱼ(g)² + φⱼ(h)²)"],"a":1,"e":"Additivity guarantees that the Shapley values of a sum of games equals the sum of the individual Shapley values."},
- {"l":"Expert","q":"Why does Breiman's PFI violate the principle of evaluating models on the true data distribution?","o":["Permuting breaks the marginal distribution of Xⱼ","Permuting preserves the marginal of Xⱼ but destroys the joint distribution P(Xⱼ, X₋ⱼ), generating impossible synthetic instances","PFI assumes all features follow a Gaussian distribution","PFI requires retraining the model for every feature"],"a":1,"e":"Permuting preserves marginal frequencies of Xⱼ while completely destroying conditional correlations, forcing evaluation in empty probability space."},
- {"l":"Expert","q":"Which method should be preferred when evaluating the global marginal effect of a continuous feature with strong non-linear interactions and correlation?","o":["Partial Dependence Plot (PDP)","Accumulated Local Effects (ALE)","Permutation Feature Importance (PFI)","Standardized regression coefficients"],"a":1,"e":"ALE isolates main effects by computing local derivatives within conditional slices, making it the robust choice under correlation and non-linear interactions."},
- {"l":"Expert","q":"In financial model risk management (SR 11-7), why is an explanation from a single tree model considered insufficient evidence of data truth?","o":["Because decision trees cannot output continuous probabilities","Because of the Rashomon effect: multiple distinct model architectures can achieve equivalent risk with inverted feature attributions","Because tree models cannot be audited by regulators","Because tree depth cannot exceed 4 in banking models"],"a":1,"e":"SR 11-7 model risk guidance recognizes predictive multiplicity: relying on one model's internal feature attributions as physical reality is a severe governance flaw."},
- {"l":"Expert","q":"What mathematical property ensures that TreeSHAP computes exact marginal expectations in polynomial time O(T · L · D²) instead of exponential O(2ᵖ)?","o":["It assumes all features are statistically independent and projects onto tree decision paths recursively","It uses Monte Carlo sampling with rejection bounds","It approximates the tree with a linear regression surrogate","It prunes all trees to depth 2 before computing Shapley values"],"a":0,"e":"TreeSHAP achieves polynomial complexity by leveraging tree structures and assuming feature independence to compute conditional expectations recursively."}
-];
-
-(function(){const st=store.get('il_quiz',{});
+/* ---------- Ch11 stability of reason codes ---------- */
+(function(){scl('c11r',v=>fmt(v/100));scl('c11n',v=>v);const P6=6,BW=[1,1,.8,.8,.5,.5],NM=['A','B','C','D','E','F'],RG=[0,.3,.5,.7,.85,.95];
+ const gen=(n,r)=>{const X=ixDraw(n,P6,r);return[X,X.map(x=>x.reduce((s,v,j)=>s+BW[j]*v,0)+2*randn())]};
+ const top=(b,x)=>{let bi=0,bv=-1e9;for(let j=0;j<P6;j++){const c=b[j+1]*x[j];if(c>bv){bv=c;bi=j}}return bi};
+ function refits(n,r,K){const B=[];for(let k=0;k<K;k++){const[X,y]=gen(n,r);B.push(ixOls(X,y,1e-6))}return B}
+ function agree(n,r,K,inst){const B=refits(n,r,K);let a=0,t=0;for(const x of inst){const c=B.map(b=>top(b,x));for(let i=0;i<K;i+=2){if(i+1<K){t++;if(c[i]===c[i+1])a++}}}return a/t}
+ function run(){const r=val('c11r')/100,n=val('c11n'),inst0=ixDraw(300,P6,r),sc=inst0.map(x=>x.reduce((s,v,j)=>s+BW[j]*v,0)),ord=Array.from(sc,(_,i)=>i).sort((a,b)=>sc[b]-sc[a]),inst=ord.slice(0,60).map(i=>inst0[i]),ex=inst[0],B=refits(n,r,150),cnt=new Array(P6).fill(0);B.forEach(b=>cnt[top(b,ex)]++);
+  const truthTop=top([0,...BW],ex),P=barV($('c11cv'),cnt.map(c=>c/150),NM.map((_,j)=>j===truthTop?C.g:C.a),NM.map(v=>v),1.1,pc1);P.text('how often each feature is the top reason for one declined case, over 150 refits (green: with the true weights)',P.L+6,P.T+12,C.mu);
+  const NG=[100,500,2000],cols=[C.r,C.y,C.g],res=NG.map(m=>RG.map(rr=>agree(m,rr,12,ixDraw(300,P6,rr).map(x=>x).sort((a,b)=>b.reduce((s,v,j)=>s+BW[j]*v,0)-a.reduce((s,v,j)=>s+BW[j]*v,0)).slice(0,40)))),Q=mk($('c11cv2'),0,RG.length-1,1.05,{y0:0,noGrid:true,L:44});customGrid(Q,RG.map((x,i)=>[i,String(x)]),niceTicks(0,1,5));NG.forEach((m,k)=>{poly(Q,res[k].map((v,i)=>[i,v]),cols[k],2.6);dots(Q,res[k].map((v,i)=>[i,v]),cols[k],3.4)});legend(Q,NG.map((m,k)=>[m+' cases',cols[k]]),Q.T+12);Q.text('correlation between features →',Q.w-Q.R-4,Q.h-Q.B-6,C.mu,'right');Q.text('two refits give the same top reason',Q.L+6,Q.T+28,C.mu);
+  const ag=agree(n,r,20,inst),modal=cnt.indexOf(Math.max(...cnt));
+  $('c11st').innerHTML=stat('two refits give the same top reason (60 declined cases)',pc1(ag),ag<.7?'hot':'ok')+stat('most frequent top reason for the example case · its share',NM[modal]+' · '+pc1(cnt[modal]/150),'')+stat('top reason with the true weights',NM[truthTop],'')+stat('number of different top reasons seen for it',String(cnt.filter(c=>c>0).length),'');
+  $('c11rd').innerHTML=`Adverse-action notices and internal reviews often give the “top reasons” for a decline: the features contributing most to the case’s score. Here the score is linear in six features with correlation ${fmt(r)} between them, the model is refitted on ${n} cases, and the reason is the feature with the largest contribution (weight × value) for a declined case. Across 150 refits the top reason for the example case is ${NM[modal]} in ${pc1(cnt[modal]/150)} of them, and ${cnt.filter(c=>c>0).length} different features appear as the top reason (left; green marks the answer under the true weights). For the 60 declined cases tested, two independent refits agree on the top reason only ${pc1(ag)} of the time. The right panel shows that agreement falls with correlation and rises with the number of cases. The consequence is that a reason code is not a fixed fact about the customer: it depends on which sample the model was trained on and, for correlated features, on arbitrary choices. For governance, measure the stability of reason codes under refits and resampling, prefer reporting groups of correlated features, document the baseline and variant used, and do not let a notice assert more precision than the model can reproduce. This is also the natural closing check for the whole course: an explanation, like any other estimate, needs its sampling distribution.`}
+ ['c11r','c11n'].forEach(i=>$(i).addEventListener('change',run));$('c11go').onclick=run;run();})();
+const QZ=[{"l":"Beginner","q":"Two features with equal true effects are highly correlated (ρ = 0.95). Refitting a linear model on new samples, the coefficient of each feature will…","o":["Stay the same in every refit","Vary widely between refits while their sum stays stable","Be biased towards zero in every refit","Always be larger for the first feature"],"a":1,"e":"Weight can be traded between correlated features at almost no cost to fit, so individual coefficients are unstable while the combined effect is stable."},{"l":"Beginner","q":"Permutation importance of a feature is measured as…","o":["The increase in error on held-out data when the feature’s values are shuffled","Its correlation with the outcome","The size of its coefficient","The number of times a tree splits on it"],"a":0,"e":"It shuffles one feature to break its link with the outcome and records how much the model’s error rises."},{"l":"Intermediate","q":"B is a noisy copy of A and has no effect of its own, but the fitted model gives it a small weight. Compared with the truth, permutation importance of B will typically be…","o":["Negative","Exactly zero","Too low","Too high, because shuffling creates unrealistic combinations the model penalises"],"a":3,"e":"Shuffling B alone breaks its relationship with A, producing inputs the model never saw and penalising its reliance on B."},{"l":"Intermediate","q":"Drop-column importance of A (refit without A) is small even though A is the true driver, because a near-copy B is available. This shows that drop-column importance…","o":["Is always larger than permutation importance","Is unbiased with correlated features","Measures added information and hides the importance of redundant features","Measures reliance of the fitted model on the feature"],"a":2,"e":"When another feature carries the same information the refit substitutes it, so the loss from dropping A is small."},{"l":"Intermediate","q":"A partial-dependence plot shows output rising with age. The ICE curves show that for 25% of customers output falls with age. The likely explanation is…","o":["The partial dependence is wrong","An interaction: the effect of age depends on other features","The model is linear","Sampling error in the plot"],"a":1,"e":"Averaging over the other features can hide an interaction; individual curves show the heterogeneity."},{"l":"Intermediate","q":"In an interventional Shapley explanation of a linear model, a feature the model does not use (weight zero) but which is correlated with a used feature receives…","o":["Zero credit","Negative credit","The same credit as the used feature","Credit proportional to its correlation"],"a":0,"e":"The interventional value function replaces absent features from the background, so only features entering the model get credit; the conditional version would give the correlated stand-in some."},{"l":"Advanced","q":"The Shapley values of a customer are reported on a notice. Which additional information is essential to interpret them?","o":["The number of trees in the model","The learning rate","The customer’s postal code","The baseline (background data) and the variant (interventional or conditional)"],"a":3,"e":"The credits are differences from a baseline prediction and depend on how absent features are filled."},{"l":"Advanced","q":"Two features have estimated permutation importances of 0.31 and 0.28, each with a bootstrap standard error of 0.05. The proper conclusion is…","o":["The second is more important","The first is more important","Their ranking is not resolved by the data","Both are unimportant"],"a":2,"e":"The difference is much smaller than the sampling error, so the order should not be reported as a finding."},{"l":"Advanced","q":"A local surrogate (LIME) explanation of one prediction changes noticeably between runs with different random seeds. A sensible response is…","o":["Average the coefficients without checking anything","Increase the number of perturbed points, check kernel width and fidelity, and report the variability","Remove the surrogate and report the model’s AUC","Report the first run"],"a":1,"e":"Variance from sampling few perturbations or too narrow a kernel is an estimation problem to be diagnosed and reported."},{"l":"Advanced","q":"Widening the kernel in a local surrogate explanation of a curved model mostly…","o":["Reduces variance and increases bias towards a global average","Makes the explanation exact","Leaves both unchanged","Increases variance and reduces bias"],"a":0,"e":"A wider neighbourhood gives more effective samples but averages over curvature, so the slope drifts away from the local one."},{"l":"Advanced","q":"Many models of nearly equal accuracy use different features. This is called the Rashomon effect, and its main implication is that…","o":["The best model is always the simplest","Ensembling removes the problem","Accuracy identifies the true features","The explanation of the chosen model is one of several equally good stories, so only what is common across the set is robust"],"a":3,"e":"Near-ties in accuracy do not identify a unique model, so the chosen model’s explanation is partly arbitrary."},{"l":"Expert","q":"A model uses card utilisation, which proxies for hidden financial stress. A Shapley plot says utilisation is the strongest driver of default. Advising customers to lower utilisation to reduce default risk is…","o":["Supported if the Shapley values add up","Supported if the AUC exceeds 0.8","Unsupported by the explanation, which describes the model, not the effect of intervening","Supported, since the model is accurate"],"a":2,"e":"Explanations show how the model uses inputs; whether changing the input changes the outcome needs a causal analysis."},{"l":"Expert","q":"A counterfactual explanation puts a declined customer exactly on the decision boundary. After the model is refitted on new data, the chance that the customer is approved is roughly…","o":["100%","One half, so a margin beyond the boundary is needed","Equal to the model’s accuracy","0%"],"a":1,"e":"A point on an estimated boundary falls on either side after the boundary moves; a margin raises the probability that the advice still works."},{"l":"Expert","q":"Why are accumulated local effects (ALE) often preferred to partial dependence when features are correlated?","o":["They average local differences within narrow bands of the feature, so the model is not evaluated at combinations that do not occur","They ignore interactions entirely and so are always exact","They give causal effects","They remove the need for a fitted model"],"a":0,"e":"Partial dependence evaluates the model at feature combinations that may never occur; ALE uses only local changes within the data’s support."},{"l":"Expert","q":"Permutation importance computed on the training data of an overfitted flexible model will typically…","o":["Be identical to the importance on test data","Give zero importance to noise features","Be undefined","Give noticeable importance to pure-noise features that the model has memorised"],"a":3,"e":"The model has used noise features to fit training noise, so shuffling them hurts training error, but not held-out error."},{"l":"Expert","q":"What is a null reference for feature importance?","o":["The importance at zero correlation","The importance of the first feature","The importance the method assigns to features known to be irrelevant, such as shuffled columns or a model trained on shuffled outcomes","The average of all importances"],"a":2,"e":"It provides a noise floor against which an estimated importance can be judged, like a null distribution in a test."},{"l":"Expert","q":"Two models trained on different samples of the same population agree on the top reason code for the same customer only 55% of the time. The best interpretation is…","o":["Shapley values do not apply","The reason code is unstable and should be reported with its stability, perhaps grouped across correlated features","The reason code is accurate","The model must be overfitted to the test set"],"a":1,"e":"Instability of explanations under refitting is a measurable property; with correlated features it can be large without any loss of predictive accuracy."},{"l":"Expert","q":"Which is the most defensible statement in a model-validation report about explanations?","o":["Explanations are estimates: report the method, the baseline, sampling intervals and stability under refits, and the question they answer","Partial dependence plots are sufficient for regulators","Feature importance is exact because it is computed on the whole data","Shapley values prove causation"],"a":0,"e":"Treating an explanation as a statistic, with its assumptions and uncertainty, is the standard the rest of validation uses."}];
+(function(){const st=store.get('ix_quiz',{});
  function render(){const box=$('quiz');box.innerHTML='';
   QZ.forEach((q,i)=>{const d=document.createElement('div');d.className='q'+(st[i]!=null?' done':'');d.innerHTML=`<div class="qh">Q${i+1} · ${q.l}</div><div style="margin:4px 0 6px"><b>${q.q}</b></div>`;
-   q.o.forEach((o,j)=>{const b=document.createElement('button');b.className='opt';b.textContent=o;if(st[i]!=null){if(j===q.a)b.classList.add('good');else if(j===st[i])b.classList.add('bad')}b.onclick=()=>{if(st[i]!=null)return;st[i]=j;store.set('il_quiz',st);render();meter()};d.appendChild(b)});
+   q.o.forEach((o,j)=>{const b=document.createElement('button');b.className='opt';b.textContent=o;if(st[i]!=null){if(j===q.a)b.classList.add('good');else if(j===st[i])b.classList.add('bad')}b.onclick=()=>{if(st[i]!=null)return;st[i]=j;store.set('ix_quiz',st);render();meter()};d.appendChild(b)});
    const e=document.createElement('div');e.className='ex';e.innerHTML=(st[i]===q.a?'✅ ':'❌ ')+q.e;d.appendChild(e);box.appendChild(d)});
   const ans=Object.keys(st).length,ok=QZ.filter((q,i)=>st[i]===q.a).length;
   $('qscore').innerHTML=stat('answered',ans+' / '+QZ.length,'in')+stat('correct',ok,'ok')+stat('score',ans?Math.round(100*ok/ans)+'%':'—',ok/Math.max(ans,1)>=.8?'ok':'warn')+stat('verdict',ans<QZ.length?'keep going':ok>=16?'interpretability master':ok>=13?'strong':'review ch. 1–11','')}
- $('qreset').onclick=()=>{Object.keys(st).forEach(k=>delete st[k]);store.set('il_quiz',st);render();meter()};
+ $('qreset').onclick=()=>{Object.keys(st).forEach(k=>delete st[k]);store.set('ix_quiz',st);render();meter()};
  window.__qst=st;render();})();
-
-const CHK=[
- "Distinguish explaining the prediction function f(x) from explaining the real-world process P(Y|X).",
- "Identify confounding by indication and explain why ML models reward harmful treatments in observational data.",
- "Explain how Permutation Feature Importance breaks correlation structures and evaluates off-manifold points.",
- "Explain why Accumulated Local Effects (ALE) avoids the extrapolation traps of Partial Dependence Plots (PDP).",
- "State and define the 4 Shapley value axioms: Efficiency, Symmetry, Dummy (Null Player), and Additivity.",
- "Explain the fundamental trade-off between Marginal SHAP (off-manifold sampling) and Conditional SHAP (dummy leakage).",
- "Explain LIME sampling variance and surrogate slope sensitivity to the exponential kernel bandwidth sigma.",
- "Define the Rashomon effect and explain why predictive multiplicity invalidates treating one model's SHAP values as truth.",
- "Explain why feature attribution cannot be equated with causal intervention do(X) without DAG identification.",
- "Explain the Slack et al. adversarial scaffolding attack and how models detect off-manifold explainer queries.",
- "Demonstrate how collinear feature dilution disperses importance across redundant variables in tree ensembles.",
- "Distinguish mathematical nearest counterfactuals from actionable causal recourse.",
- "Design a regulator-compliant explanation audit for adverse action notices (ECOA) and EU AI Act Article 13.",
- "Apply Group-SHAP and hierarchical clustering to guard against collinear importance dilution."
-];
-
-(function(){const st=store.get('il_chk',{}),box=$('chk');CHK.forEach((t,i)=>{const l=document.createElement('label'),c=document.createElement('input');c.type='checkbox';c.checked=!!st[i];c.onchange=()=>{st[i]=c.checked;store.set('il_chk',st);meter()};l.appendChild(c);const s=document.createElement('span');s.textContent=t;l.appendChild(s);box.appendChild(l)});window.__cst=st;})();
-
-function meter(){const q=window.__qst||{},c=window.__cst||{};const ok=QZ.filter((x,i)=>q[i]===x.a).length,ck=Object.values(c).filter(Boolean).length;const p=Math.round(100*(.6*ok/QZ.length+.4*ck/CHK.length));$('mtxt').textContent='Mastery: '+p+'%  (exam + checklist)';$('mbar').style.width=p+'%';store.set('mastery_il',p)}
+const CHK=["Explain why importance is a property of a fitted model and unstable under correlated features.","Choose among permutation, conditional permutation and drop-column importance for a stated question.","Read partial dependence and ICE together and report the spread of individual effects.","Compute and interpret Shapley values, naming the baseline and the variant.","Attach a sampling interval to an importance and decide which rankings are resolved.","Describe the bias and variance of a local surrogate and its dependence on kernel width.","Explain the Rashomon effect and summarise importance over the near-optimal set.","Explain why an explanation of a model is not an effect, with a confounding example.","Describe counterfactual explanations, their validity under refits and the role of a margin.","Explain why explanations should be computed on held-out data and compared with a null reference.","Measure the stability of reason codes under refits and decide how to report them.","Document method, baseline, sampling error and stability for a regulator.","Decide when a causal analysis is needed instead of an explanation.","Write the explanation section of a model-validation note for an AML or credit model."];
+(function(){const st=store.get('ix_chk',{}),box=$('chk');CHK.forEach((t,i)=>{const l=document.createElement('label'),c=document.createElement('input');c.type='checkbox';c.checked=!!st[i];c.onchange=()=>{st[i]=c.checked;store.set('ix_chk',st);meter()};l.appendChild(c);const s=document.createElement('span');s.textContent=t;l.appendChild(s);box.appendChild(l)});window.__cst=st;})();
+function meter(){const q=window.__qst||{},c=window.__cst||{};const ok=QZ.filter((x,i)=>q[i]===x.a).length,ck=Object.values(c).filter(Boolean).length;const p=Math.round(100*(.6*ok/QZ.length+.4*ck/CHK.length));$('mtxt').textContent='Mastery: '+p+'%  (exam + checklist)';$('mbar').style.width=p+'%';store.set('mastery_ix',p)}
 meter();
 
 /* ---------- Navigation ---------- */

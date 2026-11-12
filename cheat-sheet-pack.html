@@ -1,0 +1,543 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Statistics Mastery Cheat-Sheet Pack</title>
+<style>
+:root{--bg:#fff;--fg:#1c2230;--mu:#5b6578;--ln:#d5d9e2;--ac:#2f5fd0;--hd:#eef2fb}
+@media(prefers-color-scheme:dark){:root:not([data-print]){--bg:#0f1420;--fg:#e6e9f2;--mu:#98a2b8;--ln:#2a3248;--ac:#7aa5ff;--hd:#182035}}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--fg);font:13px/1.45 system-ui,-apple-system,"Segoe UI",sans-serif}
+main{max-width:1100px;margin:0 auto;padding:24px 16px 60px}
+h1{font-size:26px;margin:0 0 4px}p.sub{color:var(--mu);margin:0 0 18px}
+.bar{display:flex;gap:10px;align-items:center;margin:0 0 20px;flex-wrap:wrap}button{font:inherit;padding:8px 14px;border-radius:8px;border:1px solid var(--ln);background:var(--hd);color:var(--fg);cursor:pointer}
+h2.stage{font-size:15px;letter-spacing:.08em;text-transform:uppercase;color:var(--ac);border-bottom:2px solid var(--ac);padding-bottom:4px;margin:28px 0 12px;break-after:avoid}
+.grid{columns:2 460px;column-gap:22px}
+section{break-inside:avoid;margin:0 0 16px;border:1px solid var(--ln);border-radius:8px;padding:10px 12px}
+section h3{font-size:14px;margin:0 0 6px}section h3 span{display:inline-block;background:var(--ac);color:#fff;border-radius:4px;padding:0 6px;margin-right:6px;font-size:11px;font-weight:600}
+table{width:100%;border-collapse:collapse;font-size:12px}th,td{text-align:left;vertical-align:top;border-top:1px solid var(--ln);padding:4px 6px}th{background:var(--hd);border-top:0}td:first-child{font-weight:600;width:30%;white-space:normal}
+@media print{@page{size:A4;margin:12mm}:root{--bg:#fff;--fg:#000;--hd:#f0f0f0;--ln:#bbb;--ac:#1a3f9c}body{font-size:10.5px}.bar,p.sub.no{display:none}main{max-width:none;padding:0}.grid{columns:2;column-gap:10mm}h2.stage{break-before:auto}section{padding:6px 8px;margin-bottom:8px}table{font-size:9.6px}th,td{padding:2px 4px}}
+</style></head><body><main data-x>
+<h1>Statistics Mastery: Cheat-Sheet Pack</h1>
+<p class="sub">One reference table per course page, in roadmap order (36 items, 7 stages).</p>
+<div class="bar"><button onclick="window.print()">Print or save as PDF</button><span style="color:var(--mu)">Prints two columns on A4.</span></div>
+<div class="grid-wrap"><h2 class="stage">Stage 1</h2><div class="grid"><section><h3><span>item 1</span> Random variables, expectation, variance & covariance</h3><table>
+<tr><th>Concept</th><th>Formula / one-liner</th></tr>
+<tr><td>Random variable</td><td>A function X: outcomes → numbers</td></tr>
+<tr><td>CDF</td><td>F(x) = P(X ≤ x); P(a &lt; X ≤ b) = F(b) − F(a)</td></tr>
+<tr><td>Expectation</td><td>E[X] = Σ x p(x) = ∫ x f(x) dx; linear always: E[aX+bY+c] = aE[X] + bE[Y] + c</td></tr>
+<tr><td>Indicator trick</td><td>E[1_A] = P(A); expected count = sum of probabilities</td></tr>
+<tr><td>Variance</td><td>E[X²] − (E X)²; Var(aX+b) = a²Var(X)</td></tr>
+<tr><td>Covariance</td><td>E[XY] − E[X]E[Y]; Corr = Cov/(σₓσ_y) ∈ [−1,1] (linear only)</td></tr>
+<tr><td>Var of a sum</td><td>Var X + Var Y + 2Cov(X,Y); wᵀΣw in general</td></tr>
+<tr><td>Independent ⇒ ?</td><td>Cov = 0, Var(X±Y) = VarX + VarY; but Cov = 0 ⇏ independent</td></tr>
+<tr><td>Total expectation / variance</td><td>E[Y] = E[E[Y|X]]; Var Y = E[Var(Y|X)] + Var(E[Y|X])</td></tr>
+<tr><td>Standard error of the mean</td><td>σ/√n</td></tr>
+<tr><td>Unbiased variance</td><td>s² with divisor n − 1 (s itself still biased)</td></tr>
+<tr><td>Chebyshev / Markov</td><td>P(|X−μ| ≥ kσ) ≤ 1/k²; P(X ≥ t) ≤ E[X]/t</td></tr>
+<tr><td>Jensen</td><td>convex g: E[g(X)] ≥ g(E[X])</td></tr>
+<tr><td>Mahalanobis</td><td>d² = (x−μ)ᵀΣ⁻¹(x−μ) ~ χ²ₚ for normal data</td></tr>
+<tr><td>Correlated Bernoulli sum</td><td>Var(D) = nPD(1−PD)[1 + (n−1)ρ]</td></tr>
+<tr><td>CLT</td><td>(X̄−μ)/(σ/√n) → N(0,1); slow for skewed data and rare events</td></tr>
+</table></section><section><h3><span>item 2</span> Core distributions and how they relate</h3><table>
+<tr><th>Distribution</th><th>One line to remember</th></tr>
+<tr><td>Binomial(n,p)</td><td>Successes in n independent trials; mean np, var np(1−p); normal-ish if np and n(1−p) ≥ 10</td></tr>
+<tr><td>Poisson(λ)</td><td>Rare events in a window; mean = var = λ; limit of Binomial; sums of Poissons are Poisson</td></tr>
+<tr><td>Exponential(λ)</td><td>Gap between Poisson events; memoryless; constant hazard; mean 1/λ</td></tr>
+<tr><td>Gamma(a, β)</td><td>Sum of a exponentials; mean a/β; CV = 1/√a; χ²(k) = Gamma(k/2, ½)</td></tr>
+<tr><td>Normal</td><td>Sum of many small effects; closed under linear combinations; 95% within 1.96σ</td></tr>
+<tr><td>Lognormal</td><td>exp of a normal; product of many factors; mean e^(μ+σ²/2) &gt; median e^μ</td></tr>
+<tr><td>χ²(k)</td><td>Σ Z²; mean k, var 2k; (n−1)s²/σ² ~ χ²(n−1)</td></tr>
+<tr><td>t(ν)</td><td>Z/√(χ²/ν); fat tails; moments exist only below ν; → Normal as ν → ∞</td></tr>
+<tr><td>F(d₁,d₂)</td><td>Ratio of scaled χ²s; compares variances; t² = F(1,ν)</td></tr>
+<tr><td>Beta(a,b)</td><td>Distribution on [0,1]; posterior Beta(a+k, b+n−k); pseudo-counts</td></tr>
+</table></section><section><h3><span>item 3</span> Conditional probability and Bayes’ theorem</h3><table>
+<tr><th>Idea</th><th>One line</th></tr>
+<tr><td>Conditional probability</td><td>P(A|B) = P(A∩B)/P(B): restrict to B, renormalise</td></tr>
+<tr><td>Chain rule</td><td>P(A∩B∩C) = P(A)·P(B|A)·P(C|A∩B)</td></tr>
+<tr><td>Total probability</td><td>P(B) = Σ P(B|Aᵢ)P(Aᵢ) over a partition</td></tr>
+<tr><td>Independence</td><td>P(A∩B) = P(A)P(B); lift = 1</td></tr>
+<tr><td>Bayes</td><td>P(A|B) = P(B|A)P(A)/P(B)</td></tr>
+<tr><td>Odds form</td><td>posterior odds = prior odds × LR; LR⁺ = sens/FPR; LR⁻ = (1−sens)/(1−FPR)</td></tr>
+<tr><td>Precision</td><td>πTPR / (πTPR + (1−π)FPR): driven by prevalence π as much as by the model</td></tr>
+<tr><td>Decision threshold</td><td>Act when P(event | data) &gt; c_FP / (c_FP + c_FN)</td></tr>
+<tr><td>Beta–Binomial</td><td>Beta(a,b) + k of n → Beta(a+k, b+n−k)</td></tr>
+<tr><td>Gamma–Poisson</td><td>Gamma(a,b) + k events in n periods → Gamma(a+k, b+n)</td></tr>
+<tr><td>Normal–Normal</td><td>Precisions add; posterior mean is precision-weighted</td></tr>
+<tr><td>Shrinkage</td><td>(a+k)/(a+b+n): small segments pulled toward the book mean</td></tr>
+<tr><td>Prosecutor's fallacy</td><td>P(match|innocent) ≠ P(innocent|match); expect (N−1)/X other matches</td></tr>
+<tr><td>Credible vs confidence interval</td><td>Credible: probability statement about θ. Confidence: statement about the procedure.</td></tr>
+</table></section><section><h3><span>item 4</span> Law of large numbers and the central limit theorem</h3><table>
+<tr><th>Idea</th><th>One line</th></tr>
+<tr><td>LLN</td><td>X̄ₙ → μ if E|X| &lt; ∞ (weak: in probability; strong: almost surely)</td></tr>
+<tr><td>Gambler's fallacy</td><td>No compensation: surplus stays ~√n, proportion converges by dilution</td></tr>
+<tr><td>Chebyshev</td><td>P(|X̄ − μ| ≥ ε) ≤ σ²/(nε²): always true, usually loose</td></tr>
+<tr><td>Standard error</td><td>σ/√n: 4× data halves it; 100× data gains a digit</td></tr>
+<tr><td>Required n</td><td>n ≈ (1.96σ/m)² for margin m</td></tr>
+<tr><td>CLT</td><td>(X̄ − μ)/(σ/√n) → N(0,1); needs finite variance</td></tr>
+<tr><td>Speed</td><td>skew(X̄) = skew(X)/√n; Berry–Esseen error ≤ 0.4748·E|X−μ|³/(σ³√n)</td></tr>
+<tr><td>Heavy tails</td><td>α ≤ 1: no LLN; 1 &lt; α ≤ 2: LLN but no √n CLT; Cauchy mean is Cauchy</td></tr>
+<tr><td>Dependence</td><td>n_eff = n/[1 + 2Σρₖ]; AR(1): n(1−ρ)/(1+ρ)</td></tr>
+<tr><td>Binomial → normal</td><td>N(np, npq) with continuity correction k ± ½; use Poisson for rare events</td></tr>
+<tr><td>Delta method</td><td>SE[g(X̄)] ≈ |g′(μ)|σ/√n; breaks when g′(μ) = 0</td></tr>
+<tr><td>Slutsky</td><td>Replace σ by s and the CLT still holds (s → σ)</td></tr>
+<tr><td>Rare proportions</td><td>Precision is set by events: ±10% needs about 384(1−p) events; prefer Wilson</td></tr>
+<tr><td>Correlated portfolio</td><td>Loss-rate spread does not vanish as N grows; independent-normal understates tails</td></tr>
+</table></section></div><h2 class="stage">Stage 2</h2><div class="grid"><section><h3><span>item 5</span> Sampling distributions, standard errors and estimators</h3><table>
+<tr><th>Idea</th><th>One line</th></tr>
+<tr><td>Sampling distribution</td><td>Distribution of a statistic over repeated samples; you see one draw</td></tr>
+<tr><td>SD vs SE</td><td>SD: spread of data (σ). SE: spread of an estimate (σ/√n for a mean)</td></tr>
+<tr><td>FPC</td><td>× √((N−n)/(N−1)) when sampling without replacement from a finite population</td></tr>
+<tr><td>Common SEs</td><td>√(pq/n); √(σ₁²/n₁+σ₂²/n₂); median 1.2533σ/√n; (1−ρ²)/√n</td></tr>
+<tr><td>MSE</td><td>Bias² + Variance</td></tr>
+<tr><td>Variance divisors</td><td>n−1 unbiased; n+1 minimises MSE for normal data</td></tr>
+<tr><td>Jensen</td><td>Unbiasedness does not survive nonlinear maps (s is low for σ, 1/X̄ is high for λ)</td></tr>
+<tr><td>UMVU</td><td>Best unbiased estimator uses the sufficient statistic (German tank: (1+1/n)max − 1)</td></tr>
+<tr><td>Efficiency</td><td>Relative to the data: mean for normal, median/trimmed for heavy tails; CRLB gives the floor</td></tr>
+<tr><td>Shrinkage</td><td>c* = μ²/(μ² + σ²/n): trade a little bias for a lot of variance</td></tr>
+<tr><td>Normal sampling</td><td>X̄ ⟂ s; (n−1)s²/σ² ~ χ²ₙ₋₁; t = (X̄−μ)/(s/√n) ~ tₙ₋₁</td></tr>
+<tr><td>Bootstrap</td><td>SD of statistic over resamples with replacement; jackknife leaves one out</td></tr>
+<tr><td>Design effect</td><td>DEFF = 1 + (m−1)ρ; n_eff = rows/DEFF; use cluster-robust SEs</td></tr>
+</table></section><section><h3><span>item 6</span> Maximum likelihood estimation</h3><table>
+<tr><th>Idea</th><th>One line</th></tr>
+<tr><td>Likelihood</td><td>L(θ) = P(data | θ), as a function of θ; not a distribution over θ</td></tr>
+<tr><td>Score and MLE</td><td>S(θ) = ℓ′(θ); the MLE solves S(θ̂) = 0</td></tr>
+<tr><td>Fisher information</td><td>I(θ) = −E[ℓ″] per observation; SE ≈ 1/√(nI(θ̂))</td></tr>
+<tr><td>Closed-form MLEs</td><td>Bernoulli k/n; Poisson x̄; exponential 1/x̄; normal μ = x̄, σ² = SS/n</td></tr>
+<tr><td>Invariance</td><td>MLE of g(θ) is g(θ̂)</td></tr>
+<tr><td>Large-n properties</td><td>Consistent, asymptotically normal and efficient; small-sample bias O(1/n)</td></tr>
+<tr><td>Wald / LR / score</td><td>LR and score are better near boundaries and are invariant (Wald is not)</td></tr>
+<tr><td>Wilks</td><td>2[ℓ(θ̂) − ℓ(θ̂₀)] → χ²_q; 3.84 for one restriction at 5%</td></tr>
+<tr><td>Newton</td><td>θ ← θ − S/ℓ″; needs a good start; may find local maxima or leave the parameter space</td></tr>
+<tr><td>Logistic regression</td><td>Concave log-likelihood, fitted by Newton/IRLS; Cov = (X′WX)⁻¹ with W = p(1−p)</td></tr>
+<tr><td>Separation</td><td>MLE at infinity; use penalty (ridge/MAP) or Firth</td></tr>
+<tr><td>Sandwich</td><td>A⁻¹BA⁻¹ gives valid SEs under misspecification; Poisson with overdispersion φ has SE too small by √φ</td></tr>
+<tr><td>Censoring</td><td>Events contribute f(t), censored contribute S(c); rate = events/exposure</td></tr>
+<tr><td>AIC</td><td>−2ℓ̂ + 2k: likelihood penalised for the number of parameters</td></tr>
+</table></section><section><h3><span>item 7</span> Confidence intervals</h3><table>
+<tr><th>Idea</th><th>One line</th></tr>
+<tr><td>Meaning</td><td>The procedure covers the truth in 95% of repeated samples; this one interval either does or does not</td></tr>
+<tr><td>Mean</td><td>x̄ ± t_{n−1}·s/√n; using z with estimated σ undercovers at small n</td></tr>
+<tr><td>Duality</td><td>The 95% interval = all θ₀ not rejected by the 5% test</td></tr>
+<tr><td>Planning</td><td>n = (zσ/m)²; proportion z²p(1−p)/m²; halve margin ⇒ 4× n</td></tr>
+<tr><td>Proportion</td><td>Prefer Wilson, Jeffreys or likelihood-ratio; Clopper–Pearson if a guarantee is needed; avoid Wald</td></tr>
+<tr><td>Zero events</td><td>Rule of three: upper 95% bound ≈ 3/n</td></tr>
+<tr><td>Poisson / correlation / SD</td><td>Garwood (χ²); Fisher z (atanh, SE 1/√(n−3)); χ² interval for σ</td></tr>
+<tr><td>Profile likelihood</td><td>Drop in the profile log-likelihood ≤ 1.92; asymmetric, invariant</td></tr>
+<tr><td>Bootstrap</td><td>Percentile, basic, normal; BCa or studentised for accuracy; still approximate at small n</td></tr>
+<tr><td>Comparing groups</td><td>Interval for the difference, not overlap of intervals (equal SE: significant beyond 2.77 SE, overlap until 3.92 SE)</td></tr>
+<tr><td>Many intervals</td><td>P(all cover) = 0.95ᵐ; Bonferroni uses level 1 − α/m</td></tr>
+<tr><td>CI vs PI</td><td>CI width → 0 as n → ∞; PI width → ±1.96σ</td></tr>
+</table></section><section><h3><span>item 8</span> Bootstrap and resampling</h3><table>
+<tr><th>Idea</th><th>One line</th></tr>
+<tr><td>Bootstrap</td><td>Resample n points with replacement from the data; recompute the statistic B times; its spread estimates the sampling spread</td></tr>
+<tr><td>Centre</td><td>The bootstrap distribution is centred at θ̂, not θ: it estimates spread and shape, not location</td></tr>
+<tr><td>SE / bias</td><td>SE = SD(θ*); bias = mean(θ*) − θ̂; bias-correct only when bias ≳ 0.25 SE</td></tr>
+<tr><td>Jackknife</td><td>Leave-one-out; fine for smooth statistics, fails for the median</td></tr>
+<tr><td>Failures</td><td>Maxima, infinite-variance tails, boundaries, tiny n, dependent data; use m-out-of-n, subsampling or a parametric bootstrap</td></tr>
+<tr><td>Intervals</td><td>BCa or bootstrap-t for second-order accuracy; percentile/basic/normal are first-order</td></tr>
+<tr><td>Regression</td><td>Pairs or wild bootstrap under heteroskedasticity; residual bootstrap needs constant variance</td></tr>
+<tr><td>Permutation test</td><td>Shuffle labels under H₀; p = (1 + #extreme)/(1 + B); exact for any statistic if labels are exchangeable</td></tr>
+<tr><td>Unequal variances</td><td>Raw permutation of the mean difference is invalid for equal-means H₀; studentise or use a bootstrap test that imposes H₀</td></tr>
+<tr><td>Monte Carlo p</td><td>SE ≈ √(p(1−p)/B); use B ≥ 999–9,999; never report p = 0</td></tr>
+<tr><td>Time series</td><td>Moving block bootstrap, ℓ ≈ n^{1/3}; iid bootstrap understates SE by ≈ √((1+φ)/(1−φ))</td></tr>
+<tr><td>Clusters</td><td>Resample whole clusters; design effect 1 + (k − 1)ρ</td></tr>
+<tr><td>Model metrics</td><td>Stratified bootstrap for one AUC; paired (same cases) bootstrap for AUC differences</td></tr>
+</table></section><section><h3><span>item 9</span> P-values from scratch to expert</h3><table>
+<tr><th>Concept</th><th>One line</th></tr>
+<tr><td>p-value</td><td>P(statistic at least this extreme | H₀ and all model assumptions true)</td></tr>
+<tr><td>Under H₀</td><td>p ~ Uniform(0,1) (continuous statistics); P(p ≤ α) = α</td></tr>
+<tr><td>Two-sided</td><td>2 × min(tail); decide direction before seeing data</td></tr>
+<tr><td>CI duality</td><td>95% CI excludes null value ⇔ two-sided p &lt; 0.05</td></tr>
+<tr><td>z ≈ effect / SE</td><td>Large n shrinks SE → tiny effects become significant</td></tr>
+<tr><td>Power</td><td>1 − β; ∝ effect·√n/σ; n ≈ 15.7/d² per group for 80% / α=.05</td></tr>
+<tr><td>m tests</td><td>P(≥1 false positive) = 1 − (1−α)<sup>m</sup>; Bonferroni α/m; Holm; BH for FDR</td></tr>
+<tr><td>False-positive risk</td><td>α(1−π) / [α(1−π) + power·π]</td></tr>
+<tr><td>Min Bayes factor</td><td>BF₀₁ ≥ −e·p·ln p; p = .05 → ≥ 0.41</td></tr>
+<tr><td>Surprisal</td><td>s = −log₂ p bits (p=.05 → 4.3 bits ≈ 4 heads in a row)</td></tr>
+<tr><td>Permutation p</td><td>(count + 1) / (B + 1)</td></tr>
+<tr><td>Equivalence</td><td>TOST: both one-sided tests reject ⇔ 90% CI inside ±Δ</td></tr>
+<tr><td>Fisher combine</td><td>−2 Σ ln pᵢ ~ χ²<sub>2k</sub></td></tr>
+<tr><td>Never</td><td>say “probability H₀ is true”, “accept H₀”, or report only “p &lt; 0.05”</td></tr>
+</table></section><section><h3><span>items 9–10</span> Hypothesis testing, power and experimental design</h3><table>
+<tr><th>Idea</th><th>One line</th></tr>
+<tr><td>Errors</td><td>α = P(reject | H₀); power = P(reject | H₁) = 1 − β</td></tr>
+<tr><td>Noncentrality</td><td>λ = effect / SE; power is the area of N(λ,1) beyond the critical value</td></tr>
+<tr><td>MDE</td><td>≈ 2.8 SE for 80% power at two-sided α = 0.05 (z₁₋α/₂ + z_power)</td></tr>
+<tr><td>Sample size</td><td>n = 2(z + z)²/d² per group; halve the effect ⇒ 4× n; 90% instead of 80% power ⇒ ×1.34</td></tr>
+<tr><td>Effect sizes</td><td>Report d, risk difference, OR/RR, NNT, AUC = Φ(d/√2); always with an interval</td></tr>
+<tr><td>Observed power</td><td>A function of p; p = 0.05 ⇒ ~50%; adds nothing. Use the CI and pre-specified MDE instead</td></tr>
+<tr><td>Type S / M</td><td>Low power + significance filter ⇒ exaggerated, occasionally wrong-signed estimates</td></tr>
+<tr><td>CUPED</td><td>Variance × (1 − ρ²); covariate must be pre-treatment</td></tr>
+<tr><td>Allocation</td><td>n₁:n₂ = (σ₁/σ₂)·√(c₂/c₁); 50/50 for equal variance and cost</td></tr>
+<tr><td>Clusters</td><td>DE = 1 + (m − 1)ρ; power limited by number of clusters; plateau as m grows</td></tr>
+<tr><td>Sequential</td><td>Peeking inflates α (5 looks ≈ 14%); Pocock = constant bound, O’Brien–Fleming = strict early, ~1.98 at the end</td></tr>
+<tr><td>Heavy tails</td><td>Raw-mean tests lose power; log, cap or rank change the estimand; plan power by simulation</td></tr>
+</table></section></div><h2 class="stage">Stage 3</h2><div class="grid"><section><h3><span>item 11</span> Linear regression done properly</h3><table>
+<tr><th>Idea</th><th>One line</th></tr>
+<tr><td>OLS</td><td>β̂ = (XᵀX)⁻¹Xᵀy; slope = Cov(x,y)/Var(x); residuals ⟂ columns of X</td></tr>
+<tr><td>FWL</td><td>A coefficient is the slope of residualised y on residualised x</td></tr>
+<tr><td>Omitted variable</td><td>Bias of the short regression = β₂ · δ; control for confounders, not mediators or colliders</td></tr>
+<tr><td>Precision</td><td>SE(β̂₁) = σ/(s_x√(n−1)): more n, less noise, more spread in x</td></tr>
+<tr><td>Assumptions</td><td>Linearity/exogeneity ⇒ unbiased; constant variance and independence ⇒ correct SEs; normality ⇒ exact small-n tests</td></tr>
+<tr><td>R²</td><td>Rises with every added predictor; use adjusted R² or out-of-sample R²</td></tr>
+<tr><td>Intervals</td><td>CI for the mean: √h₀; PI for a new point: √(1 + h₀); both widen away from x̄</td></tr>
+<tr><td>Diagnostics</td><td>Residuals vs fitted (curve, funnel), Q–Q (tails), leverage and Cook’s D (influence)</td></tr>
+<tr><td>Influence</td><td>Needs high leverage and a sizeable residual; Cook’s D &gt; 4/n looks, &gt; 1 alarms</td></tr>
+<tr><td>Robust SE</td><td>HC3 for small n; WLS if variance is modelled; cluster-robust for grouped data</td></tr>
+<tr><td>Measurement error</td><td>Slope on a noisy x shrinks by the reliability λ</td></tr>
+<tr><td>Regression to the mean</td><td>Units selected for an extreme first value regress toward the mean by (1 − ρ) with no intervention</td></tr>
+<tr><td>Log models</td><td>log y ⇒ ≈ 100β % per unit; exp(prediction) is the median: multiply by the smearing factor for means</td></tr>
+</table></section><section><h3><span>item 12</span> Multicollinearity, interactions and nonlinearity</h3><table>
+<tr><th>Idea</th><th>One line</th></tr>
+<tr><td>Collinearity</td><td>Inflates variance by 1/(1 − R²ⱼ) (VIF), not bias; leaves predictions in-sample and joint effects intact</td></tr>
+<tr><td>VIF</td><td>Regress xⱼ on the others; VIF = 1/(1 − R²); √VIF scales the SE; 10 is the old alarm level</td></tr>
+<tr><td>Perfect collinearity</td><td>XᵀX singular; coefficients unidentified (dummy trap)</td></tr>
+<tr><td>Remedies</td><td>Joint F-test, combine variables, more data or design, ridge/PCA for prediction; no stepwise deletion</td></tr>
+<tr><td>Interaction</td><td>Effect of x depends on d: β₁ is the slope at d = 0, β₃ the slope difference</td></tr>
+<tr><td>Centring</td><td>Makes main effects mean “at the average”; same fit, better-behaved coefficients</td></tr>
+<tr><td>Marginal effect</td><td>β₁ + β₃z with Var = V₁₁ + z²V₃₃ + 2zV₁₃; plot it with a band</td></tr>
+<tr><td>Interaction power</td><td>SE ≈ 2× that of a main effect; need ≈ 4× the sample for the same effect size</td></tr>
+<tr><td>Polynomials</td><td>Global, wild at the edges and outside the data; rarely above degree 3</td></tr>
+<tr><td>Splines</td><td>Local pieces joined at knots; hinge (linear) or truncated cubic basis; knots are the tuning parameter</td></tr>
+<tr><td>Cross-validation</td><td>Choose flexibility by held-out error; one-SE rule favours the smoother model</td></tr>
+<tr><td>Partial residuals</td><td>e + β̂ⱼxⱼ against xⱼ shows the shape of the effect of xⱼ</td></tr>
+<tr><td>Binning</td><td>Median split loses ≈ 36% of the information; prefer splines or the raw variable</td></tr>
+</table></section><section><h3><span>item 13</span> Generalised linear models</h3><table>
+<tr><th>Idea</th><th>One line</th></tr>
+<tr><td>GLM</td><td>y ~ exponential family, g(E[y]) = Xβ; fit by IRLS (Newton for canonical links)</td></tr>
+<tr><td>Logit</td><td>log(p/(1−p)) = Xβ; e^β = odds ratio (constant); Δp ≈ β p(1−p) (varies)</td></tr>
+<tr><td>OR vs RR</td><td>OR ≈ RR only when the event is rare (&lt; ~10%)</td></tr>
+<tr><td>Tests</td><td>Wald (SE), LR (two fits, best), score (null fit only); all χ²₁</td></tr>
+<tr><td>Separation</td><td>Perfect split ⇒ β → ∞; use Firth or a penalty; MLE is biased outward in small samples</td></tr>
+<tr><td>Metrics</td><td>AUC (rank), precision depends on base rate, calibration is separate from discrimination</td></tr>
+<tr><td>Poisson</td><td>log link, e^β = rate ratio, offset log(exposure) with coefficient 1</td></tr>
+<tr><td>Overdispersion</td><td>φ̂ = Pearson/df &gt; 1: quasi-Poisson, sandwich or negative binomial (Var = μ + αμ²)</td></tr>
+<tr><td>Deviance</td><td>D = 2(ℓ_sat − ℓ̂); drop in D between nested models ~ χ²(df); AIC = −2ℓ + 2p</td></tr>
+<tr><td>Pseudo-R²</td><td>McFadden 1 − ℓ̂/ℓ̂₀; 0.2–0.4 is already very good</td></tr>
+<tr><td>Links</td><td>Logit ≈ probit (÷1.7); cloglog is asymmetric; they differ in the tails</td></tr>
+<tr><td>Undersampling</td><td>Slopes unchanged, intercept pushed up by −log r; add log r back before using probabilities</td></tr>
+</table></section><section><h3><span>item 14</span> Regularisation: ridge, lasso and elastic net</h3><table>
+<tr><th>Idea</th><th>One line</th></tr>
+<tr><td>Why penalise</td><td>OLS variance ≈ σ²p/n; a little bias buys a large variance reduction</td></tr>
+<tr><td>Ridge</td><td>β̂ = (XᵀX + λI)⁻¹Xᵀy; shrinks along PCs by d²/(d²+λ); never exactly zero; df = Σd²/(d²+λ)</td></tr>
+<tr><td>Standardise</td><td>Always scale predictors before penalising; leave the intercept unpenalised; do it inside CV folds</td></tr>
+<tr><td>Lasso</td><td>L1 penalty ⇒ exact zeros; orthonormal case = soft-threshold sign(z)(|z|−λ)₊</td></tr>
+<tr><td>Algorithm</td><td>Coordinate descent with warm starts along a decreasing λ path; λ_max = max|xⱼᵀy|/n</td></tr>
+<tr><td>Elastic net</td><td>α‖β‖₁ + (1−α)½‖β‖²; grouping effect for correlated predictors; can select &gt; n</td></tr>
+<tr><td>Choosing λ</td><td>K-fold CV: λ_min (best) or λ_1se (sparser); λ itself is noisy</td></tr>
+<tr><td>Inference</td><td>Coefficients are biased; post-selection p-values and CIs are invalid; use splitting or debiasing</td></tr>
+<tr><td>Penalised GLMs</td><td>Penalised IRLS; cures separation; choose λ by CV log-loss or deviance</td></tr>
+<tr><td>Adaptive lasso</td><td>Weights 1/|β̂|^γ give the oracle property; lasso alone over-selects</td></tr>
+<tr><td>Stability selection</td><td>Selection frequency across half-samples; keep variables above ~60–80%</td></tr>
+<tr><td>Bayesian view</td><td>Ridge = Gaussian prior, lasso = Laplace prior, penalised estimate = posterior mode</td></tr>
+</table></section><section><h3><span>item 15</span> Model selection</h3><table>
+<tr><th>Idea</th><th>One line</th></tr>
+<tr><td>Error decomposition</td><td>E[error] = σ² + bias² + variance; U-shaped in flexibility</td></tr>
+<tr><td>Optimism</td><td>Test error ≈ training error + 2kσ²/n (Cp); training error always prefers the biggest model</td></tr>
+<tr><td>AIC</td><td>−2ℓ + 2k; aims at prediction (efficient); AICc for small n/k</td></tr>
+<tr><td>BIC</td><td>−2ℓ + k log n; approximates marginal likelihood; consistent; prefers smaller models</td></tr>
+<tr><td>Akaike weights</td><td>w ∝ exp(−Δ/2); Δ &lt; 2 means essentially tied; average predictions across models</td></tr>
+<tr><td>K-fold CV</td><td>K = 5–10; LOO nearly unbiased but high variance; LOO shortcut e/(1 − h) for linear models</td></tr>
+<tr><td>Leakage</td><td>Repeat every data-dependent step (screening, scaling, imputation) inside each fold</td></tr>
+<tr><td>Winner’s curse</td><td>Best-of-M CV score is optimistic; use a test set or nested CV for the whole procedure</td></tr>
+<tr><td>Stepwise</td><td>Invalid p-values, inflated R², unstable; prefer shrinkage or pre-specification</td></tr>
+<tr><td>Time-ordered data</td><td>Out-of-time and rolling-origin validation; random CV leaks neighbours</td></tr>
+<tr><td>Metrics</td><td>AUC for ranking; log-loss/Brier for probabilities; match the decision</td></tr>
+<tr><td>Instability</td><td>Bagging, model averaging or shrinkage reduce the variance of selection</td></tr>
+</table></section></div><h2 class="stage">Stage 4</h2><div class="grid"><section><h3><span>item 16</span> Calibration and proper scoring rules</h3><table>
+<tr><th>Idea</th><th>One line</th></tr>
+<tr><td>Calibration</td><td>P(Y = 1 | forecast q) = q; separate from discrimination (AUC)</td></tr>
+<tr><td>Reliability diagram</td><td>Binned mean forecast vs observed rate; below the diagonal = over-prediction; flat curve = over-confident</td></tr>
+<tr><td>Proper rule</td><td>Expected loss minimised by reporting the true p; Brier, log-loss, spherical are strictly proper; accuracy and |q − y| are not</td></tr>
+<tr><td>Brier decomposition</td><td>BS = REL − RES + UNC; BSS = 1 − BS/UNC</td></tr>
+<tr><td>Calibration slope / intercept</td><td>logit P(Y) = α + β logit q; ideal 0 and 1; β &lt; 1 over-fit, β &gt; 1 under-confident</td></tr>
+<tr><td>ECE</td><td>Bin-weighted |f − o|; depends on bins and is upward-biased in small samples</td></tr>
+<tr><td>Causes</td><td>Overfitting (slope &lt; 1), shrinkage (slope &gt; 1), resampling or class weights (intercept), model family, dataset shift</td></tr>
+<tr><td>Recalibration</td><td>Platt / temperature (logistic), isotonic (monotone steps, needs data), fit on separate data</td></tr>
+<tr><td>Base-rate shift</td><td>Add log[(π′/(1 − π′))/(π/(1 − π))] to the logit when only the prior moved</td></tr>
+<tr><td>Log-loss vs Brier</td><td>Log-loss punishes confident errors without limit; Brier is bounded; AUC cannot see calibration</td></tr>
+<tr><td>Segments</td><td>Average calibration can hide opposite errors; check by segment</td></tr>
+<tr><td>Decisions</td><td>t* = c_FP/(c_FP + c_FN) needs calibrated q; NB(t) = TP/n − FP/n · t/(1 − t)</td></tr>
+<tr><td>Tests</td><td>HL, Spiegelhalter, binomial by grade: reject too often at large n, too rarely at small n; report slope with CI</td></tr>
+</table></section><section><h3><span>item 17</span> Imbalanced data and rare events</h3><table>
+<tr><th>Idea</th><th>One line</th></tr>
+<tr><td>Accuracy paradox</td><td>Predicting “no event” is 99.5% accurate at 0.5% prevalence; use recall, precision, PR curves, MCC</td></tr>
+<tr><td>ROC vs PR</td><td>ROC-AUC is prevalence-free; precision falls with prevalence; PR baseline = prevalence</td></tr>
+<tr><td>PPV</td><td>sens·π / [sens·π + (1 − spec)(1 − π)]; tiny π means most alerts are false</td></tr>
+<tr><td>Operating point</td><td>F1 (threshold ≈ F*/2 for calibrated p), cost t* = c_FP/(c_FP + c_FN), or capacity top-m</td></tr>
+<tr><td>Information</td><td>Comes from events; ≥ 10 events per parameter is a minimum, check Riley-type criteria</td></tr>
+<tr><td>Resampling</td><td>No new information; shifts probabilities; do only inside training folds</td></tr>
+<tr><td>Prior correction</td><td>Undersample non-events with fraction r: add ln r to the intercept; slope variance × ≈ (1 + π/r)</td></tr>
+<tr><td>Rare-event bias</td><td>ML under-predicts event probability, can separate; use Firth, ridge or Bayesian priors</td></tr>
+<tr><td>Cost-sensitive</td><td>Weight w on events ≡ threshold 1/(1 + w) for a correct model; weighting costs variance and calibration</td></tr>
+<tr><td>Evaluation</td><td>Stratify, repeat, report intervals; out-of-time test; don’t tune the threshold on the test set</td></tr>
+<tr><td>Rare rates</td><td>Wald fails; Clopper–Pearson (conservative), Wilson, Jeffreys; 0 events → upper bound ≈ 3/n</td></tr>
+</table></section><section><h3><span>item 18</span> Survival and time-to-event analysis</h3><table>
+<tr><th>Idea</th><th>One line</th></tr>
+<tr><td>Censoring</td><td>Right-censored: we know T &gt; c; assume non-informative; never drop or recode as non-events</td></tr>
+<tr><td>S, h, H</td><td>S = exp(−H); h = f/S; mean = ∫S; RMST(τ) = ∫₀^τ S</td></tr>
+<tr><td>Kaplan–Meier</td><td>Ŝ = ∏(1 − d/n); Greenwood variance; log-log CI; show numbers at risk</td></tr>
+<tr><td>Log-rank</td><td>Observed − expected events by group; best under PH; weights G(ρ, γ) for early/late effects; crossing curves need other tests or RMST</td></tr>
+<tr><td>Cox</td><td>h = h₀(t)exp(xβ); partial likelihood; HR = exp(β); information is the number of events</td></tr>
+<tr><td>Prediction</td><td>Ĥ₀ by Breslow; Ŝ(t|x) = exp(−Ĥ₀ e^{xβ}); HR ≠ absolute risk; C-index for ranking</td></tr>
+<tr><td>PH check</td><td>Schoenfeld residuals, log-log plots, time interactions; if violated the HR is a follow-up-dependent average</td></tr>
+<tr><td>Competing risks</td><td>1 − KM overstates; use cumulative incidence (Aalen–Johansen); cause-specific vs Fine–Gray</td></tr>
+<tr><td>Discrete time</td><td>Person-period logistic hazards; Ŝ = ∏(1 − ĥ); time-varying covariates; lifetime PD term structure</td></tr>
+<tr><td>Evaluation</td><td>Horizon AUC, Brier and calibration with IPCW or KM; Harrell’s C depends on censoring</td></tr>
+<tr><td>Parametric</td><td>Likelihood: events log f, censored log S; AFT time ratios; extrapolation is assumption-driven</td></tr>
+</table></section><section><h3><span>item 19</span> Missing data</h3><table>
+<tr><th>Idea</th><th>One line</th></tr>
+<tr><td>MCAR / MAR / MNAR</td><td>Missingness independent of data / depends on observed data / depends on the missing value itself; an assumption, not testable from the data alone</td></tr>
+<tr><td>Complete cases</td><td>Unbiased for regression if missingness depends on covariates, not the outcome; biased if it depends on the outcome; always loses precision</td></tr>
+<tr><td>Single imputation</td><td>Mean fill shrinks variance and correlation; regression fill inflates correlation; even stochastic fill gives SEs that are too small</td></tr>
+<tr><td>Multiple imputation</td><td>Draw M completions from the posterior predictive (parameters too), analyse each, pool with Rubin: T = W̄ + (1 + 1/M)B</td></tr>
+<tr><td>Fraction missing info</td><td>γ = (1 + 1/M)B/T; efficiency (1 + γ/M)⁻¹; use M of at least the percentage of incomplete cases</td></tr>
+<tr><td>Imputation model</td><td>Include the outcome, all analysis variables (and interactions) and predictors of missingness; chained equations for many incomplete variables; check convergence</td></tr>
+<tr><td>Skewed variables</td><td>Transform or use predictive mean matching, which imputes real observed donor values</td></tr>
+<tr><td>MNAR</td><td>Not identifiable; do delta-adjusted or reference-based sensitivity analysis and report the tipping point</td></tr>
+<tr><td>Weighting</td><td>IPW = 1/P(observed | x), needs positivity; AIPW is doubly robust (either the outcome or the selection model right)</td></tr>
+<tr><td>Reject inference</td><td>Outcome missing for rejected applicants; MAR if the policy used recorded variables; manual overrides make it MNAR</td></tr>
+<tr><td>Prediction models</td><td>Imputation rule fixed on training data; indicator helps if missingness is informative but is fragile under deployment shift; monitor missing rates</td></tr>
+<tr><td>Reporting</td><td>Amount and patterns, mechanism argument, imputation model, M and seed, pooled results with γ, sensitivity analysis</td></tr>
+</table></section><section><h3><span>item 20</span> Dependent data: time series, panels, mixed models</h3><table>
+<tr><th>Idea</th><th>One line</th></tr>
+<tr><td>Effective sample size</td><td>Positive dependence repeats information: AR(1) n_eff ≈ n(1 − ρ)/(1 + ρ); clusters: n/(1 + (m − 1)ICC)</td></tr>
+<tr><td>ACF / PACF</td><td>AR(p): ACF decays, PACF cuts off at p. MA(q): ACF cuts off at q, PACF decays. Bars within ±1.96/√n are noise</td></tr>
+<tr><td>Stationarity</td><td>Constant mean, variance, lag-covariance; AR roots outside the unit circle; random walk is not stationary</td></tr>
+<tr><td>HAC</td><td>Newey–West with Bartlett weights and L growing with n; repairs the SE, not the efficiency or the model</td></tr>
+<tr><td>Spurious regression</td><td>Independent random walks look related; R² &gt; Durbin–Watson is a warning; difference or test for cointegration</td></tr>
+<tr><td>Cointegration</td><td>Integrated series with a stationary combination: use level relation plus error-correction; differencing loses it</td></tr>
+<tr><td>Forecast evaluation</td><td>Walk-forward, never random k-fold; benchmarks (naive, seasonal naive, mean); error vs horizon; interval coverage</td></tr>
+<tr><td>Clustered data</td><td>Design effect 1 + (m − 1)ICC; cluster-robust SEs need many clusters; cluster where treatment or dependence lives</td></tr>
+<tr><td>FE vs RE</td><td>FE: consistent, within variation only. RE: efficient but needs α_i uncorrelated with x. Hausman and Mundlak help choose</td></tr>
+<tr><td>Mixed models</td><td>REML variance components; BLUP shrinks by λ = σ²_u/(σ²_u + σ²_e/n_j): partial pooling beats no and complete pooling</td></tr>
+<tr><td>Binary clusters</td><td>Conditional (GLMM) ≠ marginal (GEE, pooled logit with robust SE); marginal ≈ β/√(1 + 0.346σ²_u)</td></tr>
+<tr><td>GARCH / VaR</td><td>σ²_t = ω + αr²_{t−1} + βσ²_{t−1}; backtest rate and independence; constant-σ VaR clusters its exceedances</td></tr>
+<tr><td>Breaks</td><td>Ignored level shifts mimic unit roots; Chow (known date), sup-F/CUSUM (unknown), model or window the break</td></tr>
+</table></section></div><h2 class="stage">Stage 5</h2><div class="grid"><section><h3><span>item 21</span> Multiple testing and selective inference</h3><table>
+<tr><th>Idea</th><th>One line</th></tr>
+<tr><td>Multiplicity</td><td>P(≥ 1 false positive) = 1 − (1 − α)^m; the family includes hidden choices (subgroups, outcomes, cut-offs, models)</td></tr>
+<tr><td>FWER vs FDR</td><td>FWER = P(V ≥ 1), for confirmatory claims. FDR = E[V/R], for screening; neither is controlled by testing each at α</td></tr>
+<tr><td>Bonferroni / Holm</td><td>α/m; Holm is step-down with α/(m − k + 1) and dominates Bonferroni under any dependence</td></tr>
+<tr><td>Benjamini–Hochberg</td><td>Largest k with p₍ₖ₎ ≤ kq/m; FDR = π₀q under independence or PRDS; BY divides q by Σ1/i for arbitrary dependence</td></tr>
+<tr><td>Storey / q-value</td><td>π̂₀ = #{p &gt; λ}/((1 − λ)m); BH at q/π̂₀; more power when many effects are real</td></tr>
+<tr><td>FDR is an average</td><td>The FDP of one list varies, more so with correlated tests</td></tr>
+<tr><td>Winner’s curse</td><td>Selected estimates are biased up; confirm on new data, shrink (empirical Bayes), use hierarchical models</td></tr>
+<tr><td>Subgroups</td><td>Test the interaction once; “significant here, not there” is not evidence of heterogeneity; pre-specify and adjust</td></tr>
+<tr><td>Selective inference</td><td>Naive intervals fail after selection; use simultaneous, conditional (truncated), split or replication intervals</td></tr>
+<tr><td>Backtest overfitting</td><td>Best of K noise strategies has Sharpe ≈ SE·√(2 ln K) in sample and 0 out of sample; deflate by the number of trials</td></tr>
+<tr><td>Local fdr, empirical null</td><td>fdr(z) = π₀f₀/f; estimate the null from the bulk when the theoretical N(0,1) is too narrow</td></tr>
+<tr><td>Peeking</td><td>Repeated looks inflate α; use Pocock, O’Brien–Fleming or alpha-spending boundaries, fixed in advance</td></tr>
+<tr><td>PPV</td><td>PPV = π·power/(π·power + (1 − π)α); low priors and flexibility make many significant results false; replicate</td></tr>
+</table></section><section><h3><span>item 22</span> Confounding, selection bias, colliders, Simpson’s paradox</h3><table>
+<tr><th>Idea</th><th>One line</th></tr>
+<tr><td>Confounder</td><td>Common cause of treatment and outcome; naive slope = β + κγ/(1 + γ²) in the linear case; does not shrink with n</td></tr>
+<tr><td>Simpson’s paradox</td><td>A trend reverses on pooling; which table is right depends on the diagram (confounder: stratify; mediator or collider: do not)</td></tr>
+<tr><td>Chain, fork, collider</td><td>Chain and fork: conditioning blocks. Collider: conditioning (or on its descendant) opens the path</td></tr>
+<tr><td>Backdoor criterion</td><td>Adjust for a set with no descendant of X that blocks all backdoor paths; include confounders, exclude mediators and colliders</td></tr>
+<tr><td>Precision variables</td><td>Causes of Y only help variance; causes of X only hurt it</td></tr>
+<tr><td>Collider / selection bias</td><td>Filtering on a common effect makes causes dependent (Berkson); worst when selection is tight and driven by the variables studied</td></tr>
+<tr><td>Over-adjustment</td><td>Do not control for post-treatment variables for the total effect; controlling for a mediator with an unmeasured mediator–outcome cause biases even a randomised effect</td></tr>
+<tr><td>Reject inference</td><td>Selection on observables is harmless if the model is right, but extrapolation fails; selection on unobservables biases; only exploration is assumption-free</td></tr>
+<tr><td>Proxies and M-bias</td><td>A noisy control removes only part of the confounding; adjusting for a pre-treatment collider creates bias</td></tr>
+<tr><td>Regression to the mean</td><td>Expected change of the selected = −(1 − r) × their standardised time-1 mean; use a randomised control from the same selection</td></tr>
+<tr><td>Sensitivity</td><td>OVB = κγ/(1 + γ²); E-value = RR + √(RR(RR − 1)): the strength a hidden confounder needs with both X and Y</td></tr>
+<tr><td>Negative controls</td><td>An outcome the treatment cannot affect should show no effect; a non-zero estimate exposes confounding; calibrate only under a defended proportionality</td></tr>
+</table></section><section><h3><span>item 23</span> Potential outcomes, A/B testing, CUPED, sequential testing</h3><table>
+<tr><th>Idea</th><th>One line</th></tr>
+<tr><td>Potential outcomes</td><td>τᵢ = Yᵢ(1) − Yᵢ(0) is never observed; naive difference = ATT + selection bias; randomisation sets the selection term to zero</td></tr>
+<tr><td>SUTVA</td><td>No interference between units and a single version of treatment; fails with spillovers, shared capacity, networks</td></tr>
+<tr><td>Analysis</td><td>Difference in means with the unpooled (Neyman) SE; randomisation test for exact, assumption-light inference</td></tr>
+<tr><td>Sample size</td><td>n per arm = 2(z₁₋α/₂ + z₁₋β)²σ²/δ²; halving the MDE costs 4× the sample; set the MDE from the decision</td></tr>
+<tr><td>Clustering</td><td>DEFF = 1 + (m − 1)ρ; analyse at the cluster level; more clusters beat more customers per cluster</td></tr>
+<tr><td>Interference</td><td>Individual randomisation estimates a partial-exposure effect; randomise clusters or use switchbacks for the rollout effect</td></tr>
+<tr><td>Regression adjustment</td><td>Adjust for pre-treatment covariates: unbiased, variance × (1 − R²); never adjust for post-treatment variables</td></tr>
+<tr><td>CUPED</td><td>Ỹ = Y − θ(X − X̄), θ = Cov(X,Y)/Var(X); X from the pre-period; variance × (1 − ρ²); longer pre-periods help</td></tr>
+<tr><td>SRM and attrition</td><td>Chi-square on arm counts at p &lt; 0.001; unequal loss re-introduces selection bias inside an experiment; analyse by assignment</td></tr>
+<tr><td>Non-compliance</td><td>ITT for the offer; as-treated is biased; CACE = ITT / take-up difference is a local (complier) effect</td></tr>
+<tr><td>Sequential testing</td><td>Peeking inflates α; use group-sequential boundaries or always-valid mSPRT with Λₙ ≥ 1/α; early-stopped estimates are biased up</td></tr>
+<tr><td>Bandits</td><td>Thompson sampling lowers regret, sacrifices clean inference on weaker arms; use when the goal is reward, not estimation</td></tr>
+</table></section><section><h3><span>item 24</span> Observational causal methods (matching, IPW, DiD, IV, RDD)</h3><table>
+<tr><th>Idea</th><th>One line</th></tr>
+<tr><td>Ignorability + overlap</td><td>(Y(0),Y(1)) ⟂ T | X and 0 &lt; e(x) &lt; 1; the propensity score e(X) is a balancing score; check SMDs and the overlap plot</td></tr>
+<tr><td>Matching</td><td>Pair like with like (usually on the logit ps); caliper trades bias for a changed population; only observed confounders are handled</td></tr>
+<tr><td>IPW, AIPW</td><td>Weights 1/e, 1/(1 − e); AIPW is consistent if either the propensity or the outcome model is right; add cross-fitting with ML</td></tr>
+<tr><td>Overlap and trimming</td><td>Extreme weights ⇒ huge variance; trimming changes the estimand; effective sample size (Σw)²/Σw²</td></tr>
+<tr><td>Difference-in-differences</td><td>Change in treated − change in control; needs parallel trends, no anticipation, no spillover; pre-trends are a check, not a proof</td></tr>
+<tr><td>Staggered adoption</td><td>TWFE uses already-treated units as controls; with dynamic effects it can be biased or wrongly signed; use clean cohort-time estimators</td></tr>
+<tr><td>Instrumental variables</td><td>β = Cov(Z,Y)/Cov(Z,X); relevance, independence, exclusion; estimates the LATE for compliers</td></tr>
+<tr><td>Weak instruments</td><td>F &lt; ~10 ⇒ bias towards OLS and heavy tails; exclusion violation adds ζ/π; use Anderson–Rubin intervals</td></tr>
+<tr><td>Regression discontinuity</td><td>Jump of local linear fits at the cut-off; continuity assumption; bandwidth = bias–variance; effect holds at the threshold</td></tr>
+<tr><td>Fuzzy RD, manipulation</td><td>Wald ratio of the jumps for compliers; check density, covariates, donut, placebo cut-offs</td></tr>
+<tr><td>Synthetic control</td><td>Convex-combination of donors matching the pre-path; placebo permutation inference; fails outside the hull</td></tr>
+<tr><td>Method choice</td><td>Pick by what you can defend: randomisation &gt; RD/IV/DiD with diagnostics &gt; adjustment on observables; triangulate and report the assumption</td></tr>
+</table></section><section><h3><span>item 25</span> Uplift and heterogeneous treatment effects</h3><table>
+<tr><th>Idea</th><th>One line</th></tr>
+<tr><td>CATE and uplift</td><td>τ(x) = E[Y(1) − Y(0) | X = x]; uplift is the change in conversion probability caused by treatment</td></tr>
+<tr><td>Four types</td><td>Persuadables (+), sure things (0, waste), lost causes (0), sleeping dogs (−); response models rank sure things first</td></tr>
+<tr><td>Policy rule</td><td>Treat if V·τ̂(x) &gt; c; profit curve peaks where the marginal uplift equals c/V</td></tr>
+<tr><td>Subgroups</td><td>Difference in means within pre-specified subgroups; fine subgroups are noisy; shrink towards a common effect</td></tr>
+<tr><td>Meta-learners</td><td>S: one model with T as a feature (under-detects). T: separate models (noisy, doubles variance). X: imputed effects weighted by propensity (good with unbalanced arms)</td></tr>
+<tr><td>Causal trees and forests</td><td>Split on effect differences; adaptive leaf estimates are biased; honest splitting separates structure from estimation; forests give intervals</td></tr>
+<tr><td>Qini / AUUC</td><td>Cumulative incremental gain by targeted share on a randomised test set; area against the random line; a response model scores near random</td></tr>
+<tr><td>Winner’s curse in targeting</td><td>Top-ranked customers’ predicted uplift overstates the truth; validate with held-out randomised data or shrink</td></tr>
+<tr><td>DR-learner / R-learner</td><td>Orthogonal pseudo-outcome ψ regressed on X; needs ignorability and overlap; cross-fit ML nuisances</td></tr>
+<tr><td>Heterogeneity test</td><td>BLP on held-out data: coefficient on T·(τ̂ − mean) is 1 if calibrated, 0 if no signal; avoid hunting subgroups</td></tr>
+<tr><td>Off-policy evaluation</td><td>Direct (model), IPW (unbiased, noisy), doubly robust; needs randomised or known logging with exploration</td></tr>
+<tr><td>Pilot and holdout</td><td>Pilot size pays off with heterogeneity and margin; keep a permanent holdout and an exploration band</td></tr>
+<tr><td>Fairness constraints</td><td>Parity of treatment rates costs value; measure the price of fairness; monitor by group; document the causal basis</td></tr>
+</table></section></div><h2 class="stage">Stage 6</h2><div class="grid"><section><h3><span>item 26</span> Bayesian inference</h3><table>
+<tr><th>Idea</th><th>One line</th></tr>
+<tr><td>Bayes for parameters</td><td>p(θ | y) ∝ p(y | θ) p(θ); the posterior is the prior reweighted by the likelihood</td></tr>
+<tr><td>Beta–binomial</td><td>Beta(a, b) prior and k of n gives Beta(a + k, b + n − k); posterior mean is a weighted average with weight n/(n + a + b) on the data</td></tr>
+<tr><td>Normal–normal</td><td>Precisions add; posterior mean is precision-weighted; the prior is worth σ²/s₀² observations</td></tr>
+<tr><td>Gamma–Poisson</td><td>Gamma(a, b) prior gives Gamma(a + Σy, b + n); predictive distribution is negative binomial</td></tr>
+<tr><td>Sequential updating</td><td>Yesterday’s posterior is today’s prior; same result as one batch</td></tr>
+<tr><td>Priors</td><td>Flat is not neutral; Jeffreys is reparametrisation-invariant; prefer weakly informative or documented informative priors; check by simulation and report sensitivity</td></tr>
+<tr><td>Credible intervals</td><td>Equal-tailed or HPD; probability statement about θ given prior and data; coverage is exactly nominal on average over the prior only</td></tr>
+<tr><td>Predictive checks</td><td>Simulate replicate data from the fitted model, compare a failure-prone statistic; the mean is usually uninformative</td></tr>
+<tr><td>Bayesian regression</td><td>Normal prior gives the ridge estimate with λ = σ²/τ² plus a posterior covariance σ²(X′X + λI)⁻¹</td></tr>
+<tr><td>Asymptotics</td><td>Bernstein–von Mises: the prior washes out unless it gives zero (or negligible) mass to the truth; the likelihood principle: the stopping rule does not change the posterior</td></tr>
+<tr><td>Bayes factors</td><td>Ratio of marginal likelihoods; Occam effect; sensitive to the prior under the alternative; Jeffreys–Lindley: fixed p, growing n favours H₀</td></tr>
+<tr><td>Empirical Bayes</td><td>Estimate the prior from many units, shrink each estimate in proportion to its noise; cures the winner’s curse in rankings</td></tr>
+<tr><td>Bayesian A/B</td><td>P(B &gt; A), expected loss, ROPE; peeking at a threshold rule inflates false wins, so calibrate by simulation</td></tr>
+<tr><td>Low-default PD</td><td>External beta prior plus own data; report prior source, strength, sensitivity and the data-only upper bound</td></tr>
+</table></section><section><h3><span>item 27</span> MCMC and variational inference</h3><table>
+<tr><th>Idea</th><th>One line</th></tr>
+<tr><td>Why sample</td><td>Posterior summaries are integrals; Monte Carlo error is 1/√M in any dimension, whereas a grid needs 100^d points</td></tr>
+<tr><td>Importance sampling</td><td>Weights w = p/q; ESS = (Σw)²/Σw²; the proposal needs tails at least as heavy as the target, or the weights have infinite variance</td></tr>
+<tr><td>Metropolis–Hastings</td><td>Accept with min(1, p(θ*)/p(θ)): only a ratio, so the normalising constant cancels; step size tuned for about 44% (1-d) or 23% (many-d) acceptance</td></tr>
+<tr><td>Gibbs</td><td>Draw each parameter from its full conditional; no tuning, always accepted; slow when parameters are highly correlated (ESS fraction (1 − ρ²)/(1 + ρ²) for a bivariate normal)</td></tr>
+<tr><td>Warm-up and chains</td><td>Several chains from dispersed starts; discard warm-up; fix and record the seed</td></tr>
+<tr><td>R̂</td><td>Between- over within-chain variance on split chains; require below 1.01; blind to modes no chain visits</td></tr>
+<tr><td>ESS and MCSE</td><td>ESS = n/(1 + 2Σρ_k); MCSE = sd/√ESS; do not thin to gain precision; check bulk-ESS and tail-ESS</td></tr>
+<tr><td>HMC and NUTS</td><td>Gradient-guided long moves with a Metropolis correction; ε near the narrowest width; NUTS picks the trajectory length; divergences signal biased exploration</td></tr>
+<tr><td>Logistic regression</td><td>Standardise predictors; use the Laplace covariance to shape proposals; correlated predictors give correlated coefficients</td></tr>
+<tr><td>Laplace approximation</td><td>Normal at the mode with the inverse Hessian; exact for normal posteriors; poor for skewed, bounded or multimodal ones</td></tr>
+<tr><td>Variational inference</td><td>Maximise the ELBO (minimise KL(q ‖ p)) over a simple family; fast; mean-field underestimates variance and has thin tails</td></tr>
+<tr><td>Tail probabilities</td><td>Relative error ≈ √((1 − p)/(p · ESS)): rare events need many effective draws</td></tr>
+<tr><td>Workflow</td><td>Test on simulated data, several chains, R̂ and ESS and divergences, MCSE below the posterior sd, predictive checks, prior sensitivity</td></tr>
+</table></section><section><h3><span>item 28</span> Hierarchical (partial pooling) models</h3><table>
+<tr><th>Idea</th><th>One line</th></tr>
+<tr><td>Three pooling levels</td><td>No pooling: noisy, unbiased; complete pooling: stable, biased; partial pooling: estimates how different the groups are and weighs accordingly</td></tr>
+<tr><td>Normal hierarchical model</td><td>yⱼ ~ N(θⱼ, σ²/nⱼ), θⱼ ~ N(μ, τ²); posterior mean (1 − Bⱼ)ȳⱼ + Bⱼμ with Bⱼ = (σ²/nⱼ)/(σ²/nⱼ + τ²)</td></tr>
+<tr><td>Who is shrunk most</td><td>Small groups and similar groups (small τ); the posterior variance (1 − Bⱼ)σ²/nⱼ falls for every group</td></tr>
+<tr><td>Estimating τ</td><td>Learned from J group means: wide posterior with few groups; point estimates often hit zero; use the marginal posterior of τ</td></tr>
+<tr><td>Priors on τ</td><td>Weakly informative on the sd (half-Cauchy, half-normal, flat with enough groups); avoid inverse-gamma(ε, ε) on τ²; check sensitivity</td></tr>
+<tr><td>Funnel</td><td>Small τ forces the θⱼ together: samplers struggle; non-centre with θⱼ = μ + τηⱼ; divergences are the warning</td></tr>
+<tr><td>Full vs empirical Bayes</td><td>Empirical Bayes plugs in estimated hyperparameters and gives intervals that are too short; full Bayes integrates them out</td></tr>
+<tr><td>Varying slopes</td><td>Shrink the (intercept, slope) pair towards the population mean along their correlation; prior on Σ via scales and an LKJ correlation</td></tr>
+<tr><td>Group predictors</td><td>θⱼ = γ₀ + γ₁zⱼ + uⱼ: shrink towards a prediction, pay only for the residual spread; beware ecological fallacy</td></tr>
+<tr><td>New groups</td><td>Predict from the population distribution; calibrated and narrower than own-data-only intervals; back-test on held-out groups</td></tr>
+<tr><td>Rankings</td><td>Rank by posterior expected rank or probability of being in the worst k%; report rank intervals</td></tr>
+<tr><td>When pooling hurts</td><td>Exchangeability fails for unusual groups: add predictors, use a t or mixture population, check with predictive checks and leave-one-group-out CV</td></tr>
+</table></section><section><h3><span>item 29</span> Bayesian decision theory</h3><table>
+<tr><th>Idea</th><th>One line</th></tr>
+<tr><td>Bayes action</td><td>Choose the action with the smallest posterior expected loss, E[L(a, θ) | y]</td></tr>
+<tr><td>Loss and summary</td><td>Squared loss → mean; absolute loss → median; 0–1 loss → mode; linear asymmetric loss → quantile</td></tr>
+<tr><td>Quantile rule</td><td>Under-cost cᵤ, over-cost cₒ: act at the cᵤ/(cᵤ + cₒ) quantile of the predictive distribution</td></tr>
+<tr><td>Threshold</td><td>Act if p &gt; c_FP/(c_FP + c_FN) = 1/(1 + c), for calibrated p; independent of the base rate</td></tr>
+<tr><td>Calibration first</td><td>Recalibrate on held-out labels before applying a cost-based cut-off to a score</td></tr>
+<tr><td>EVPI and EVSI</td><td>EVPI = expected loss of deciding now; EVSI(n) rises towards EVPI; collect data while EVSI − cost increases</td></tr>
+<tr><td>Parameter uncertainty</td><td>Plug-in quantiles are too low; the posterior predictive (t for unknown mean and sd) is calibrated</td></tr>
+<tr><td>Utility</td><td>Exponential utility, normal outcome: maximise mean − (λ/2)·variance, including parameter uncertainty</td></tr>
+<tr><td>Sequential stopping</td><td>Stop when posterior expected loss of the leader is below the cost of waiting; check error rates by simulation</td></tr>
+<tr><td>Prior sensitivity</td><td>Map the decision over defensible priors; report whether it flips</td></tr>
+<tr><td>Risk and minimax</td><td>Risk is MSE at each θ; Bayes risk averages it over the prior; minimax guards the worst case; shrinkage bets on the prior</td></tr>
+<tr><td>Limited capacity</td><td>Rank by expected value per unit of capacity (p × exposure − cost); the oracle is the ceiling</td></tr>
+</table></section></div><h2 class="stage">Stage 7</h2><div class="grid"><section><h3><span>item 30</span> Multivariate methods</h3><table>
+<tr><th>Idea</th><th>One line</th></tr>
+<tr><td>Covariance matrix</td><td>Σ = VΛVᵀ: eigenvectors are the axes of the data cloud, eigenvalues the variances along them</td></tr>
+<tr><td>Sample eigenvalues</td><td>The largest is over-estimated and the smallest under-estimated; relative sd about √(2/n)</td></tr>
+<tr><td>Mahalanobis distance</td><td>d² = (x − m)ᵀS⁻¹(x − m) ~ χ²ₚ for normal data; sees unusual combinations that Euclidean distance misses</td></tr>
+<tr><td>PCA</td><td>Rotate to eigenvectors; keep k components; standardise first when units differ</td></tr>
+<tr><td>How many components</td><td>Parallel analysis beats Kaiser, the 80% rule and the elbow; combine with interpretability and stability</td></tr>
+<tr><td>PCA vs factor analysis</td><td>PCA explains total variance; FA models shared variance plus unique noise, Σ = ΛΛᵀ + Ψ; PCA loadings are biased up with few variables</td></tr>
+<tr><td>Rotation</td><td>Any orthogonal rotation fits equally well; varimax gives simple structure; oblique rotation for correlated factors</td></tr>
+<tr><td>Mixtures and EM</td><td>E step: soft memberships; M step: weighted parameters; use several starts and BIC; check stability</td></tr>
+<tr><td>High dimension</td><td>Sample covariance is unreliable when p/n is large; use shrinkage (Ledoit–Wolf) or structure</td></tr>
+<tr><td>Robust covariance</td><td>Outliers mask themselves in classical Mahalanobis distance; MCD fits the tightest half</td></tr>
+<tr><td>PCR trap</td><td>High variance does not mean predictive; choose k by cross-validation or use PLS or ridge</td></tr>
+<tr><td>Distance in high dimension</td><td>Irrelevant variables dilute anomaly signals; curate features, reduce, shrink and test on planted anomalies</td></tr>
+<tr><td>Stability</td><td>Axis error ≈ √(λⱼλₖ/(n(λⱼ−λₖ)²)); small eigenvalue gaps make single components unstable; bootstrap them</td></tr>
+</table></section><section><h3><span>item 31</span> Extreme value theory and heavy tails</h3><table>
+<tr><th>Idea</th><th>One line</th></tr>
+<tr><td>Heavy tail</td><td>P(X &gt; x) ≈ x^(−α): straight line on a log-log plot; the largest observation is a big share of the total</td></tr>
+<tr><td>Moments</td><td>Finite only below α: α ≤ 1 no mean, α ≤ 2 no variance; LLN, CLT, correlation and regression then fail</td></tr>
+<tr><td>Block maxima / GEV</td><td>Maxima converge to GEV(μ, σ, ξ); ξ &gt; 0 heavy (α = 1/ξ), ξ = 0 Gumbel, ξ &lt; 0 bounded; wasteful and slow to converge</td></tr>
+<tr><td>Peaks over threshold</td><td>Excesses over a high u follow GPD(σ, ξ); use mean excess and stability plots to choose u</td></tr>
+<tr><td>Return level</td><td>x_T = u + (σ/ξ)[(np/k)^(−ξ) − 1]; extrapolation beyond the record is a model, not data; give intervals</td></tr>
+<tr><td>Normal and empirical</td><td>A normal fit understates tail quantiles; an empirical quantile cannot exceed the sample maximum</td></tr>
+<tr><td>Hill estimator</td><td>α̂ = 1/mean of log-ratios of the k largest; relative sd 1/√k; bias grows with k; read the Hill plot</td></tr>
+<tr><td>Clustering</td><td>Extremal index θ = 1/mean cluster size; decluster and count events; raw exceedances understate uncertainty</td></tr>
+<tr><td>VaR and ES</td><td>ES = VaR · α/(α − 1) for Pareto, infinite if α ≤ 1; ES is harder to estimate and biased low from samples; use a tail model</td></tr>
+<tr><td>Diversification</td><td>One big jump: VaR of the average scales m^(1/α − 1); poor for α near 1, can reverse for α &lt; 1</td></tr>
+<tr><td>Parameter uncertainty</td><td>Wald intervals undercover for small k; use profile likelihood or bootstrap; return-level intervals are wide and skewed</td></tr>
+<tr><td>Operational losses</td><td>Compound Poisson-Pareto: VaR_q ≈ F⁻¹(1 − (1 − q)/λ) + (λ − 1)E[X]; the tail index drives capital</td></tr>
+</table></section><section><h3><span>item 32</span> Copulas and dependence modelling</h3><table>
+<tr><th>Idea</th><th>One line</th></tr>
+<tr><td>Why not correlation</td><td>Pearson depends on the margins and the bulk; the same ρ can hide very different joint tails; not defined without second moments</td></tr>
+<tr><td>Sklar’s theorem</td><td>H(x, y) = C(F(x), G(y)): model the margins and the copula separately; the copula is invariant to increasing transformations</td></tr>
+<tr><td>Rank correlation</td><td>Kendall τ and Spearman ρₛ belong to the copula, need no moments and resist outliers; Gaussian ρ = sin(πτ/2)</td></tr>
+<tr><td>Gaussian copula</td><td>Easy and scalable, but λ = 0 for ρ &lt; 1: joint extremes fade; understates clustering of defaults and crashes</td></tr>
+<tr><td>Archimedean</td><td>Clayton: lower-tail dependence 2^(−1/θ); Gumbel: upper-tail 2 − 2^(1/θ); Frank: none; exchangeable, one parameter</td></tr>
+<tr><td>t copula</td><td>Symmetric tail dependence rising as ν falls and ρ rises; ν → ∞ gives the Gaussian</td></tr>
+<tr><td>Tail dependence</td><td>λ = lim P(Y extreme | X extreme): a limit that is hard to estimate from few corner points</td></tr>
+<tr><td>Portfolio risk</td><td>Same margins and τ, different copula: different VaR and ES of the sum, more so at high q; diversification benefit depends on C</td></tr>
+<tr><td>Estimation</td><td>Pseudo-observations (ranks/(n + 1)) avoid margin misspecification; IFM needs correct margins; Kendall inversion is simple and robust</td></tr>
+<tr><td>Model choice</td><td>Compare with the empirical copula (Cramér–von Mises, parametric bootstrap); low power in the tails; report sensitivity</td></tr>
+<tr><td>Conditional correlation</td><td>Correlation in a subsample selected on a variable is biased (falls for a tail on X, rises for a volatile regime); use tail measures</td></tr>
+<tr><td>Credit factor model</td><td>Vasicek quantile Φ((Φ⁻¹(PD) + √ρ Φ⁻¹(q))/√(1 − ρ)); capital driven by ρ; a t factor fattens the tail</td></tr>
+</table></section><section><h3><span>item 33</span> Anomaly and drift detection theory</h3><table>
+<tr><th>Idea</th><th>One line</th></tr>
+<tr><td>Base rate</td><td>Precision = πTPR/(πTPR + (1 − π)FPR); rare anomalies make most alerts false even for a low false-alarm rate</td></tr>
+<tr><td>Robust limits</td><td>Median ± 3 × 1.4826·MAD resists contamination (breakdown 50%); mean ± 3 sd is masked by the outliers it should find</td></tr>
+<tr><td>Mahalanobis</td><td>d² = (x − μ)ᵀΣ⁻¹(x − μ), χ²ₚ under normality; finds combinations unusual across correlated variables; estimate Σ robustly</td></tr>
+<tr><td>Isolation and density</td><td>Isolation forest: short average path = anomaly; k-NN and LOF are local density scores; no method wins on all shapes</td></tr>
+<tr><td>Evaluation</td><td>AUC ignores prevalence; use precision–recall, average precision and precision at review capacity; labels are selected by the detector</td></tr>
+<tr><td>Control charts</td><td>Shewhart for big jumps, EWMA and CUSUM for small shifts; quote ARL₀ and detection delay together</td></tr>
+<tr><td>Many features</td><td>1 − (1 − α)ᵐ false alert chance; Bonferroni for any false alert, BH for the false discovery proportion; reduce the number of tests</td></tr>
+<tr><td>Drift measures</td><td>PSI is biased up in small samples (≈ (B − 1)(1/n₁ + 1/n₂)); KS rejects trivial shifts at large n; use effect sizes with thresholds</td></tr>
+<tr><td>Types of drift</td><td>Covariate: P(x) changes; concept: P(y|x) changes; prior: P(y) changes; label-free monitors cannot see concept drift</td></tr>
+<tr><td>Window design</td><td>Short windows: fast, noisy; long windows: smooth, late; the operating curve is false alarms against delay</td></tr>
+<tr><td>Cost-based thresholds</td><td>ARL₀ grows exponentially in h, delay linearly; best h rises with false-alarm cost and falls with drift frequency</td></tr>
+<tr><td>Governance</td><td>Document the reference period, metrics, thresholds, costs, base rates, outcome lag and the response for each type of drift</td></tr>
+</table></section><section><h3><span>item 34</span> Graph and network statistics</h3><table>
+<tr><th>Idea</th><th>One line</th></tr>
+<tr><td>Degree distribution</td><td>Random graphs: Poisson, no hubs; real networks: heavy tail from preferential attachment; the mean describes almost no node</td></tr>
+<tr><td>Small world</td><td>High clustering with short paths; short paths are normal, so “within k hops” needs a reference</td></tr>
+<tr><td>Centrality</td><td>Degree, closeness, betweenness (brokerage), eigenvector and PageRank answer different questions and can disagree strongly</td></tr>
+<tr><td>Communities</td><td>Modularity is optimistic (random graphs score &gt; 0); detectable only if (a − b)² &gt; 2(a + b); check stability</td></tr>
+<tr><td>Null models</td><td>Erdős–Rényi is usually the wrong null; configuration model keeps degrees; p = (1 + #≥)/(1 + B)</td></tr>
+<tr><td>Partial observation</td><td>Sampled networks give biased statistics (mean degree × f, clustering × f² or f³); no general bootstrap</td></tr>
+<tr><td>Neighbour features</td><td>Count and share of risky neighbours work only with homophily and known labels; beware leakage and hubs</td></tr>
+<tr><td>Rings</td><td>Densest subgraph needs a null distribution of the maximum density; small loose rings cannot be told from chance</td></tr>
+<tr><td>Homophily vs influence</td><td>Neighbour outcome regressions confound the two; designs and causal tools are needed; interference breaks SUTVA</td></tr>
+<tr><td>Personalised PageRank</td><td>Risk propagation from seeds; damping sets reach; tune on later periods; exclude seeds in evaluation</td></tr>
+<tr><td>Measurement error</td><td>All rankings degrade; hub-based measures hold up better than betweenness and paths; do a perturbation analysis and report stability</td></tr>
+<tr><td>Governance</td><td>Document link definitions, coverage, null models, stability and false-positive rates of any network-based alert</td></tr>
+</table></section><section><h3><span>item 35</span> Uncertainty quantification for ML</h3><table>
+<tr><th>Idea</th><th>One line</th></tr>
+<tr><td>Intervals</td><td>Confidence interval = where the mean is (width → 0); prediction interval = where a new case falls (width ≥ ±1.96σ)</td></tr>
+<tr><td>Coverage</td><td>Marginal is easy; conditional on x is not; always report coverage by segment</td></tr>
+<tr><td>Split conformal</td><td>q̂ = ⌈(n + 1)(1 − α)⌉-th smallest calibration score; coverage ≥ 1 − α on average; per calibration set ~ Beta(n + 1 − l, l)</td></tr>
+<tr><td>Scores</td><td>Absolute, normalised, CQR change shape and efficiency, not validity; never tune on the calibration set</td></tr>
+<tr><td>Classification</td><td>Sets from 1 − p̂<sub>y</sub>; valid for any model; use class-conditional thresholds for rare classes</td></tr>
+<tr><td>Covariate shift</td><td>Weight by p<sub>new</sub>/p<sub>old</sub>; watch (Σw)²/Σw²; concept drift is not repaired</td></tr>
+<tr><td>Drift</td><td>ACI: α<sub>t+1</sub> = α<sub>t</sub> + γ(α − err<sub>t</sub>); long-run coverage only; rolling coverage is a monitor</td></tr>
+<tr><td>Ensembles</td><td>Spread = epistemic only; understates a new case’s uncertainty; calibrate with conformal</td></tr>
+<tr><td>Small groups</td><td>Per-group calibration needs n<sub>g</sub> &gt; 1/α and is noisy; pool, normalise or merge groups</td></tr>
+<tr><td>Abstention</td><td>Abstain on wide intervals; value = gap to random abstention; monitor the decided subset</td></tr>
+<tr><td>Model-based intervals</td><td>Valid only if the model is right; check actual against nominal on held-out data</td></tr>
+<tr><td>Governance</td><td>Document the score, the calibration set, the exchangeability assumption, coverage by segment and drift monitoring</td></tr>
+</table></section><section><h3><span>item 36</span> Interpretability and its statistical limits</h3><table>
+<tr><th>Idea</th><th>One line</th></tr>
+<tr><td>Importance</td><td>A property of the fitted model; unstable under correlated features; report variability over refits and group correlated features</td></tr>
+<tr><td>Permutation importance</td><td>Reliance of the model; inflated for correlated features by off-distribution shuffles; conditional permutation and drop-column answer other questions</td></tr>
+<tr><td>PD and ICE</td><td>The average hides interactions; plot ICE curves and the spread of individual effects; ALE for correlated features</td></tr>
+<tr><td>Shapley values</td><td>Credits sum to prediction − baseline; interventional vs conditional differ; the baseline changes everything; not an effect</td></tr>
+<tr><td>Sampling error</td><td>Importance estimates have intervals; do not rank features whose intervals overlap</td></tr>
+<tr><td>LIME</td><td>Kernel width trades bias against variance; repeat and report variability; check local fidelity</td></tr>
+<tr><td>Rashomon set</td><td>Many near-equal models, different stories; report what is common to the set</td></tr>
+<tr><td>Causality</td><td>Explanations describe the model, not the effect of intervening; use causal methods for advice and policy</td></tr>
+<tr><td>Counterfactuals</td><td>Valid against the current boundary only; add a margin, report cost and validity under refits; actionability</td></tr>
+<tr><td>Overfitting</td><td>Explain on held-out data; compare with null importance of noise features</td></tr>
+<tr><td>Reason codes</td><td>Measure agreement between refits; document variant and baseline; group correlated features</td></tr>
+<tr><td>Governance</td><td>Explanations are statistics: report method, baseline, sampling error, stability and the question they answer</td></tr>
+</table></section></div></div></main><script>window.addEventListener("beforeprint",()=>document.documentElement.setAttribute("data-print",1));window.addEventListener("afterprint",()=>document.documentElement.removeAttribute("data-print"))</script></body></html>
