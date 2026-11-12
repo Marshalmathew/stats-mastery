@@ -1,0 +1,684 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Anomaly and Drift Detection Mastery</title>
+<style>
+:root{--bg:#0b0e17;--panel:#121726;--panel2:#171d30;--line:#232a3d;--fg:#e8ebf5;--mu:#8a93ab;--a:#6ea8ff;--r:#ff6b81;--y:#ffd166;--g:#4ade80;--p:#c084fc;--t:#5eead4}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;background:var(--bg);color:var(--fg);font:16px/1.7 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+a{color:var(--a)}
+#prog{position:fixed;top:0;left:0;height:3px;background:linear-gradient(90deg,var(--a),var(--p),var(--r));width:0;z-index:50}
+.side{position:fixed;left:0;top:0;bottom:0;width:290px;background:#0e1220;border-right:1px solid var(--line);overflow:auto;padding:18px 14px 90px;z-index:40;transition:transform .25s}
+.side h1{font-size:15px;margin:0 0 2px}
+.side small{color:var(--mu)}
+.side .pt{margin:16px 0 4px;font-size:11px;text-transform:uppercase;letter-spacing:1.3px;color:var(--p)}
+.side a{display:block;color:var(--mu);text-decoration:none;padding:5px 9px;border-radius:7px;font-size:13.5px;line-height:1.35}
+.side a:hover{background:var(--panel);color:var(--fg)}
+.side a.on{background:var(--panel2);color:var(--fg);box-shadow:inset 3px 0 var(--a)}
+.side a.back{color:var(--t);padding-left:0;margin-bottom:6px}
+.meter{position:fixed;left:0;bottom:0;width:290px;background:#0e1220;border-top:1px solid var(--line);padding:10px 16px;z-index:41;font-size:12px;color:var(--mu)}
+.meter .bar{height:7px;background:var(--line);border-radius:6px;margin-top:5px;overflow:hidden}
+.meter .bar i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--g),var(--t));transition:width .4s}
+#menu{display:none;position:fixed;top:10px;left:10px;z-index:60;background:var(--panel2);color:var(--fg);border:1px solid var(--line);border-radius:9px;padding:7px 12px;font-size:14px;cursor:pointer}
+main{margin-left:290px;padding:0 34px 120px;max-width:1090px}
+.hero{padding:70px 0 30px}
+.hero h1{font-size:clamp(32px,5vw,56px);line-height:1.08;margin:0 0 14px;background:linear-gradient(100deg,#fff,var(--y) 40%,var(--r));-webkit-background-clip:text;background-clip:text;color:transparent}
+.hero p{font-size:19px;color:#c3c9dc;max-width:780px}
+.chips{display:flex;flex-wrap:wrap;gap:8px;margin:18px 0}
+.chip{border:1px solid var(--line);background:var(--panel);padding:5px 12px;border-radius:99px;font-size:13px;color:var(--mu)}
+.chip b{color:var(--fg)}
+.part{margin:90px 0 0;padding-top:22px;border-top:1px solid var(--line);font-size:12px;letter-spacing:2px;text-transform:uppercase;color:var(--p)}
+section.ch{padding-top:30px}
+h2{font-size:30px;line-height:1.2;margin:10px 0 8px;display:flex;gap:12px;align-items:center;flex-wrap:wrap}
+h2 .num{display:inline-grid;place-items:center;width:40px;height:40px;border-radius:12px;background:var(--panel2);border:1px solid var(--line);font-size:18px;color:var(--a)}
+.lvl{font-size:11px;font-weight:600;letter-spacing:.8px;text-transform:uppercase;padding:3px 9px;border-radius:99px;border:1px solid}
+.lvl.b{color:var(--g);border-color:#1f5c3a}.lvl.i{color:var(--a);border-color:#244a85}.lvl.a{color:var(--y);border-color:#6b5420}.lvl.e{color:var(--r);border-color:#7a2c3a}
+h3{font-size:19px;margin:30px 0 6px;color:#fff}
+p{margin:10px 0}li{margin:5px 0}
+code,.f{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace}
+code{background:var(--panel2);padding:1px 6px;border-radius:5px;font-size:.9em}
+.f{display:block;white-space:pre-wrap;background:#0e1322;border:1px solid var(--line);border-left:3px solid var(--a);padding:12px 16px;border-radius:9px;margin:14px 0;overflow-x:auto;font-size:15px;color:#dbe4ff;line-height:1.8}
+.co{border-radius:12px;padding:13px 17px;margin:16px 0;border:1px solid var(--line);background:var(--panel)}
+.co>b:first-child{display:block;margin-bottom:2px;font-size:12px;letter-spacing:1px;text-transform:uppercase}
+.co.def{border-left:4px solid var(--a)}.co.def>b:first-child{color:var(--a)}
+.co.warn{border-left:4px solid var(--r)}.co.warn>b:first-child{color:var(--r)}
+.co.tip{border-left:4px solid var(--g)}.co.tip>b:first-child{color:var(--g)}
+.co.key{border-left:4px solid var(--y);background:#171608}.co.key>b:first-child{color:var(--y)}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:18px 20px;margin:22px 0;box-shadow:0 8px 30px rgba(0,0,0,.25)}
+.card>h4{margin:0 0 3px;font-size:13px;letter-spacing:1.2px;text-transform:uppercase;color:var(--t)}
+.card>p.sub{margin:0 0 12px;color:var(--mu);font-size:14.5px}
+.ctl{display:flex;flex-wrap:wrap;gap:10px 22px;align-items:center;margin:8px 0 10px}
+.ctl label{display:flex;gap:8px;align-items:center;font-size:14px;color:#c3c9dc}
+.ctl output{min-width:38px;font-family:ui-monospace,monospace;color:var(--y);font-size:13px}
+input[type=range]{accent-color:var(--a);width:150px}
+input[type=checkbox]{accent-color:var(--a)}
+select,input[type=number],input[type=text]{background:#0e1322;color:var(--fg);border:1px solid var(--line);border-radius:8px;padding:6px 9px;font:inherit;font-size:14px}
+button{background:linear-gradient(180deg,#2c4a80,#233b68);color:#fff;border:1px solid #3a5a98;border-radius:9px;padding:7px 14px;font:inherit;font-size:14px;cursor:pointer}
+button:hover{filter:brightness(1.15)}
+button.alt{background:var(--panel2);border-color:var(--line);color:var(--fg)}
+canvas{width:100%;height:270px;display:block;background:#0e1322;border:1px solid var(--line);border-radius:10px;margin-top:6px}
+canvas.sm{height:210px}canvas.tl{height:330px}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(125px,1fr));gap:9px;margin:12px 0}
+.stat{background:#0e1322;border:1px solid var(--line);border-radius:10px;padding:8px 11px}
+.stat b{display:block;font-size:17px;font-family:ui-monospace,monospace}
+.stat span{font-size:11.5px;color:var(--mu);text-transform:uppercase;letter-spacing:.7px}
+.stat.hot b{color:var(--r)}.stat.ok b{color:var(--g)}.stat.warn b{color:var(--y)}.stat.in b{color:var(--a)}
+.read{margin:8px 0 0;padding:10px 14px;background:#0e1322;border:1px dashed #33406a;border-radius:10px;font-size:14.5px;color:#d3dbf3}
+table{border-collapse:collapse;width:100%;margin:12px 0;font-size:14px}
+th,td{border:1px solid var(--line);padding:7px 10px;text-align:left;vertical-align:top}
+th{background:var(--panel2);font-size:12px;text-transform:uppercase;letter-spacing:.6px;color:var(--mu)}
+td.n{font-family:ui-monospace,monospace;text-align:right}
+.tw{overflow-x:auto}
+.pill{display:inline-block;padding:1px 9px;border-radius:99px;font-size:12px;font-weight:600}
+.pill.r{background:#3a1520;color:var(--r)}.pill.g{background:#10321f;color:var(--g)}.pill.y{background:#3a2f0e;color:var(--y)}.pill.m{background:#202637;color:var(--mu)}
+details{background:var(--panel);border:1px solid var(--line);border-radius:11px;padding:9px 15px;margin:9px 0}
+details summary{cursor:pointer;font-weight:600}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.q{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:14px 18px;margin:14px 0}
+.q .qh{font-size:12px;letter-spacing:1px;text-transform:uppercase;color:var(--mu)}
+.q .opt{display:block;width:100%;text-align:left;margin:6px 0;background:#0e1322;border:1px solid var(--line);color:var(--fg);border-radius:9px;padding:9px 12px}
+.q .opt.good{border-color:var(--g);background:#0e2418}.q .opt.bad{border-color:var(--r);background:#2a1119}
+.q .ex{display:none;margin-top:8px;font-size:14.5px;color:#c3c9dc}
+.q.done .ex{display:block}
+.chk label{display:flex;gap:10px;align-items:flex-start;padding:6px 0;cursor:pointer}
+.chk input{margin-top:6px;accent-color:var(--g);width:17px;height:17px}
+.sigrow{display:grid;grid-template-columns:minmax(170px,2fr) 1fr 1fr auto;gap:8px 14px;align-items:center;padding:6px 0;border-top:1px dashed #1b2236}
+.sigrow:first-of-type{border-top:0}
+.sigrow label{display:flex;gap:6px;align-items:center;font-size:13.5px;color:#c3c9dc}
+@media(max-width:900px){
+ .side{transform:translateX(-100%)}.side.open{transform:none}.meter{display:none}
+ #menu{display:block}main{margin-left:0;padding:0 16px 100px}.two{grid-template-columns:1fr}.hero{padding-top:60px}
+ .sigrow{grid-template-columns:1fr 1fr}
+}
+</style>
+</head>
+<body>
+<div id="prog"></div>
+<button id="menu">☰ Contents</button>
+<nav class="side" id="side"><a class="back" href="index.html">← All courses</a><h1>Anomaly and Drift Detection</h1><small>12 chapters · 11 labs · exam</small><div id="nav"></div></nav>
+<div class="meter"><div id="mtxt">Mastery: 0%</div><div class="bar"><i id="mbar"></i></div></div>
+
+<main>
+<header class="hero">
+ <h1>Anomaly and drift detection: deciding when something is unusual, and when the world has changed.</h1>
+ <p>Fraud and AML alerts, data-quality checks and model monitoring all rest on the same question: is this observation, or this stream, different from what we expect? The statistics of “different” are less simple than they look. This page covers what an anomaly is and why base rates decide how useful an alert is, robust and multivariate thresholds, distance, density and isolation methods, evaluating detectors when anomalies are rare, control charts and their run-length trade-offs, the multiple-testing problem of monitoring many features, drift measures (PSI, KS, Wasserstein) and their sample-size traps, the difference between covariate, concept and prior drift, window design, and the cost-based choice of thresholds. Every lab simulates a known truth so detectors can be judged against it.</p>
+ <div class="chips"><span class="chip"><b>Part I</b> What is unusual</span><span class="chip"><b>Part II</b> Detection and monitoring</span><span class="chip"><b>Part III</b> Drift in deployed models</span></div>
+ <div class="co tip"><b>How to use this</b>Sliders change the setting; heavier labs recompute when you release a slider or press the button. Prerequisites: hypothesis testing (item 9), multiple testing (item 21), imbalanced data (item 17), multivariate methods (item 30) and extreme value theory (item 31).</div>
+</header>
+
+<div class="part">Part I · What counts as unusual</div>
+
+<section class="ch" id="c1">
+<h2><span class="num">1</span>Anomalies, thresholds and base rates <span class="lvl b">Beginner</span></h2>
+<p>An <b>anomaly</b> is an observation that differs from what the process normally produces: a fraudulent transaction, a faulty sensor, a corrupted record, a customer whose behaviour has changed. Statistically, one defines normal (a model of the reference data), scores how far each case is from it, and raises an <b>alert</b> above a threshold. Two error rates describe the detector, the detection rate and the false-alarm rate, but neither tells the user how much to trust an alert. That is the <b>precision</b>, which also depends on the <b>base rate</b> of anomalies: when they are rare, even a very low false-alarm rate produces more false alerts than real ones, because there are so many ordinary cases to raise them on. This is Bayes’ theorem (item 3) applied to monitoring, and it is why the first calculation for any detector is the expected alert volume and the share of it that will be false.</p>
+<div class="f">precision = π·TPR / (π·TPR + (1 − π)·FPR)  ·  π = base rate of anomalies  ·  alerts = N[(1 − π)FPR + π·TPR]</div>
+ <div class="card"><h4>Lab 1 · Why most alerts are false when anomalies are rare</h4>
+ <p class="sub">Ordinary activity and anomalies as two score distributions. Left: counts per 100,000 transactions (log scale) and the threshold. Right: precision as the anomalies become rarer, for three thresholds.</p>
+ <div class="ctl"><label>separation of the anomalies <input type="range" id="c1d" min="10" max="60" step="1" value="30"><output id="c1dv"></output></label><label>share of anomalies <input type="range" id="c1p" min="5" max="500" step="5" value="10"><output id="c1pv"></output></label><label>alert threshold <input type="range" id="c1t" min="10" max="50" step="1" value="30"><output id="c1tv"></output></label></div>
+ <div class="two"><canvas class="sm" id="c1cv"></canvas><canvas class="sm" id="c1cv2"></canvas></div><div class="stats" id="c1st"></div><div class="read" id="c1rd"></div></div>
+</section>
+
+<section class="ch" id="c2">
+<h2><span class="num">2</span>Statistical thresholds and robustness <span class="lvl i">Intermediate</span></h2>
+<p>The classical rule flags observations beyond the mean ± 3 standard deviations. It rests on two assumptions that often fail: the normal distribution (for heavy-tailed data a fixed multiple of the sd gives many more false alarms than the 0.27% of normal theory) and uncontaminated data. If the sample used to compute the mean and sd already contains outliers, they inflate both, and the limits move outwards so that the outliers escape: <b>masking</b>. <b>Robust</b> estimates, the median and the median absolute deviation (MAD, scaled by 1.4826 to match the sd under normality), have a breakdown point of 50%: up to half of the data can be contaminated before they are ruined. For skewed or heavy-tailed data transform the data or use the empirical or fitted tail, and set limits from a clean reference period.</p>
+<div class="f">robust z = (x − median)/(1.4826·MAD)  ·  breakdown point: mean/sd 0%, median/MAD 50%  ·  3 sd = 0.27% only for a normal</div>
+ <div class="card"><h4>Lab 2 · Masking and the cost of normal assumptions</h4>
+ <p class="sub">Left: one sample with the two sets of limits. Right: over 100 samples, how many true outliers each rule catches and how many ordinary points it flags.</p>
+ <div class="ctl"><label>data <select id="c2d"><option value="cont">normal data with outliers</option><option value="t">heavy tails (Student t, 3 d.f.)</option></select></label><label>share of outliers <input type="range" id="c2k" min="0" max="30" step="1" value="10"><output id="c2kv"></output></label><label>observations <input type="range" id="c2n" min="100" max="2000" step="100" value="500"><output id="c2nv"></output></label><button id="c2go">New samples</button></div>
+ <div class="two"><canvas class="sm" id="c2cv"></canvas><canvas class="sm" id="c2cv2"></canvas></div><div class="stats" id="c2st"></div><div class="read" id="c2rd"></div></div>
+</section>
+
+<section class="ch" id="c3">
+<h2><span class="num">3</span>Multivariate anomalies and the Mahalanobis distance <span class="lvl i">Intermediate</span></h2>
+<p>A case can be unremarkable on every variable and still be an anomaly because the <b>combination</b> is unusual: a customer whose income and spending are each typical but are almost never seen together. Checking variables one at a time cannot find these. The <b>Mahalanobis distance</b> measures how far a point is from the centre in units of the data’s own covariance structure, d² = (x − μ)ᵀΣ⁻¹(x − μ); under a multivariate normal model d² follows a χ² distribution with p degrees of freedom, which gives a calibrated threshold. In practice μ and Σ must be estimated robustly (minimum covariance determinant, or from a clean period) or the contamination masks itself as in chapter 2; for many variables the covariance is poorly estimated and distances concentrate, so one usually works with principal components, an autoencoder’s reconstruction error, or another learned representation of normal.</p>
+<div class="f">d² = (x − μ)ᵀ Σ⁻¹ (x − μ) ~ χ²ₚ under normality  ·  99.9% limit for p = 2: 13.8  ·  robust μ and Σ (MCD) to avoid masking</div>
+ <div class="card"><h4>Lab 3 · Anomalies hidden by the correlation</h4>
+ <p class="sub">Correlated variables; anomalies lie across the direction of the data. Left: the sample with the Mahalanobis ellipse and the per-variable box. Right: AUC against the correlation for both rules.</p>
+ <div class="ctl"><label>correlation ρ <input type="range" id="c3r" min="0" max="95" step="5" value="85"><output id="c3rv"></output></label><label>distance of the anomalies across the data (sd) <input type="range" id="c3m" min="10" max="80" step="5" value="40"><output id="c3mv"></output></label><label>ordinary observations <input type="range" id="c3n" min="500" max="5000" step="500" value="1000"><output id="c3nv"></output></label><button id="c3go">New sample</button></div>
+ <div class="two"><canvas class="sm" id="c3cv"></canvas><canvas class="sm" id="c3cv2"></canvas></div><div class="stats" id="c3st"></div><div class="read" id="c3rd"></div></div>
+</section>
+
+<div class="part">Part II · Detection methods and monitoring</div>
+
+<section class="ch" id="c4">
+<h2><span class="num">4</span>Distance, density and isolation methods <span class="lvl a">Advanced</span></h2>
+<p>When normal is not one elliptical cloud, shape-free methods are used. <b>Distance-based</b> methods score a point by its distance to its k nearest neighbours (large means isolated); <b>density-based</b> ones, such as the local outlier factor, compare a point’s local density with that of its neighbours, which handles clusters of different densities. The <b>isolation forest</b> builds random trees by splitting at random on random variables; points that need few splits to be isolated are anomalies, and the average path length gives the score s = 2^(−E[h]/c(n)). It is fast (sub-sampling, linear in n), needs no distance computation and is the usual baseline. All of them rest on the premise that anomalies are few and different, so they fail for anomalies that form their own dense group, or that differ only on a variable that the model ignores, and every one needs a threshold, a contamination rate or a number of alerts chosen from capacity and cost.</p>
+<div class="f">isolation score s(x) = 2^(−E[h(x)]/c(ψ))  ·  k-NN score = mean distance to the k nearest  ·  Mahalanobis assumes one ellipse</div>
+ <div class="card"><h4>Lab 4 · Three scores on three shapes of normal</h4>
+ <p class="sub">500 ordinary points and 30 anomalies. Left: one data set, with the top 30 isolation scores marked. Right: mean AUC of the three methods over 12 data sets.</p>
+ <div class="ctl"><label>shape of the normal data <select id="c4s"><option value="clusters">two clusters</option><option value="ring">ring</option><option value="blob">one blob</option></select></label><label>neighbours k <input type="range" id="c4k" min="3" max="30" step="1" value="10"><output id="c4kv"></output></label><button id="c4go">New data</button></div>
+ <div class="two"><canvas class="sm" id="c4cv"></canvas><canvas class="sm" id="c4cv2"></canvas></div><div class="stats" id="c4st"></div><div class="read" id="c4rd"></div></div>
+</section>
+
+<section class="ch" id="c5">
+<h2><span class="num">5</span>Evaluating detectors with rare anomalies <span class="lvl a">Advanced</span></h2>
+<p>Evaluation is hard for three reasons. First, anomalies are rare, so every metric is estimated from few events and is noisy. Second, the choice of metric matters: the <b>AUC</b> ignores prevalence and can look excellent while the alert queue is mostly false; the <b>precision–recall curve</b> and <b>average precision</b> reflect what investigators experience, and <b>precision at k</b> (the top k alerts the team can review) is the operational figure. Third, labels are usually produced by investigating cases that were already alerted, so the labelled sample is selected by the detector (and by earlier detectors): precision of reviewed alerts can be estimated, but recall and AUC need a random audit sample, or inverse-probability weighting if the review probabilities are known. Also consider time: evaluate on future periods, not a random split, because fraud and attack patterns change.</p>
+<div class="f">AUC: independent of prevalence  ·  average precision: depends on prevalence  ·  precision@k at the review capacity</div>
+ <div class="card"><h4>Lab 5 · The same detector at three prevalences</h4>
+ <p class="sub">Anomaly scores N(d, 1) against ordinary scores N(0, 1). Left: precision–recall curves. Right: AUC, average precision and precision in the top 1% for each prevalence.</p>
+ <div class="ctl"><label>separation d <input type="range" id="c5d" min="10" max="40" step="1" value="25"><output id="c5dv"></output></label><label>cases in the sample <input type="range" id="c5n" min="5000" max="50000" step="5000" value="20000"><output id="c5nv"></output></label><button id="c5go">New sample</button></div>
+ <div class="two"><canvas class="sm" id="c5cv"></canvas><canvas class="sm" id="c5cv2"></canvas></div><div class="stats" id="c5st"></div><div class="read" id="c5rd"></div></div>
+</section>
+
+<section class="ch" id="c6">
+<h2><span class="num">6</span>Sequential detection: control charts and run lengths <span class="lvl a">Advanced</span></h2>
+<p>A stream is monitored case by case, so the question is when to stop and sound an alarm. Three charts are standard. The <b>Shewhart chart</b> alarms when one observation passes ±3 sd. The <b>EWMA</b> chart alarms when an exponentially weighted average zₜ = λxₜ + (1 − λ)zₜ₋₁ leaves its limits. The <b>CUSUM</b> accumulates S⁺ₜ = max(0, S⁺ₜ₋₁ + xₜ − k) and alarms when it passes h; it is the optimal detector for a given shift (Page, Lorden). Performance is two numbers: the <b>in-control average run length ARL₀</b> (time between false alarms) and the <b>detection delay</b> after a change. At equal ARL₀ the Shewhart chart is best for large jumps and poor for small shifts, while EWMA and CUSUM accumulate evidence and detect small persistent shifts several times faster. Fixing a false-alarm rate per observation is the wrong question for a stream: even 0.27% per case means an alarm every 370 cases.</p>
+<div class="f">Shewhart: |x| &gt; 3 (ARL₀ ≈ 370)  ·  EWMA: zₜ = λxₜ + (1 − λ)zₜ₋₁  ·  CUSUM: Sₜ = max(0, Sₜ₋₁ + xₜ − k), alarm if Sₜ &gt; h  ·  ARL₀ and delay trade off</div>
+ <div class="card"><h4>Lab 6 · Three charts at the same false-alarm rate</h4>
+ <p class="sub">A series whose mean shifts at the time you choose. Left: the series, the EWMA and the alarms. Right: average steps to detect shifts of five sizes, over 300 runs each.</p>
+ <div class="ctl"><label>shift in the mean <input type="range" id="c6d" min="0" max="30" step="1" value="10"><output id="c6dv"></output></label><label>time of the shift <input type="range" id="c6x" min="50" max="250" step="10" value="150"><output id="c6xv"></output></label><button id="c6go">New run</button></div>
+ <div class="two"><canvas class="sm" id="c6cv"></canvas><canvas class="sm" id="c6cv2"></canvas></div><div class="stats" id="c6st"></div><div class="read" id="c6rd"></div></div>
+</section>
+
+<section class="ch" id="c7">
+<h2><span class="num">7</span>Monitoring many features at once <span class="lvl e">Expert</span></h2>
+<p>Production monitoring tracks hundreds of features, scores and segments, each tested daily. With m independent tests at level α, the expected number of false alerts per day is mα and the chance of at least one is 1 − (1 − α)ᵐ, which is near 1 for realistic m: the dashboard is permanently lit. This is the multiple-testing problem (item 21) and the remedies carry over. <b>Bonferroni</b> (test each at α/m) controls the chance of any false alert but has little power when many features exist; <b>Benjamini–Hochberg</b> controls the false discovery proportion among the alerts, which is the quantity that matters when every alert is investigated. Beyond correction, reduce the number of tests: monitor the model score and a few summary statistics, group features, weight by importance, and track alert volumes. Remember that features are correlated, so a single root cause (a data feed change) can trigger dozens of alerts that are one event.</p>
+<div class="f">P(at least one false alert) = 1 − (1 − α)ᵐ  ·  Bonferroni: α/m  ·  BH: largest k with p₍ₖ₎ ≤ kα/m  ·  control the false discovery proportion</div>
+ <div class="card"><h4>Lab 7 · Fifty features, one false alarm a day</h4>
+ <p class="sub">m features tested daily, some truly drifted. Left: the chance of at least one false alert per day. Right: share of real drifts detected and share of alerts that are false, for three rules.</p>
+ <div class="ctl"><label>features monitored <input type="range" id="c7m" min="10" max="500" step="10" value="100"><output id="c7mv"></output></label><label>features that have truly drifted <input type="range" id="c7s" min="0" max="20" step="1" value="5"><output id="c7sv"></output></label><label>size of the drift <input type="range" id="c7d" min="10" max="50" step="1" value="35"><output id="c7dv"></output></label><label>significance level <input type="range" id="c7a" min="1" max="10" step="1" value="5"><output id="c7av"></output></label><button id="c7go">Re-simulate</button></div>
+ <div class="two"><canvas class="sm" id="c7cv"></canvas><canvas class="sm" id="c7cv2"></canvas></div><div class="stats" id="c7st"></div><div class="read" id="c7rd"></div></div>
+</section>
+
+<div class="part">Part III · Drift in deployed models</div>
+
+<section class="ch" id="c8">
+<h2><span class="num">8</span>Measuring distribution drift <span class="lvl e">Expert</span></h2>
+<p>Drift scores compare a current batch with a reference. The <b>population stability index</b>, PSI = Σ (c<sub>i</sub> − r<sub>i</sub>) ln(c<sub>i</sub>/r<sub>i</sub>) over bins fixed on the reference, is the banking standard, with the rules of thumb 0.1 (investigate) and 0.25 (significant). It is a symmetrised KL divergence, so it is sensitive to empty bins and, in small samples, positively biased: even with no drift its expectation is about (bins − 1)(1/n₁ + 1/n₂). The <b>Kolmogorov–Smirnov</b> statistic and test compare cumulative distributions; <b>Wasserstein</b> distance measures how much “mass” must move and has the units of the variable; <b>χ² tests</b> serve categorical variables. A significance test is not a drift measure: with enough data it rejects trivially small shifts. Use an effect size with limits grounded in the model’s sensitivity, and set the limits from the natural variability of the metric across stable periods.</p>
+<div class="f">PSI = Σ (cᵢ − rᵢ) ln(cᵢ/rᵢ)  ·  E[PSI | no drift] ≈ (B − 1)(1/n₁ + 1/n₂)  ·  KS = sup |F₁ − F₂|  ·  W₁ = ∫|F₁ − F₂|</div>
+ <div class="card"><h4>Lab 8 · PSI and KS against sample size</h4>
+ <p class="sub">Reference and current samples with a small shift in the mean, and the same with none. Left: PSI against the size of each sample. Right: how often the KS test rejects at 5%.</p>
+ <div class="ctl"><label>shift in the mean <input type="range" id="c8s" min="0" max="50" step="1" value="10"><output id="c8sv"></output></label><button id="c8go">Re-simulate</button></div>
+ <div class="two"><canvas class="sm" id="c8cv"></canvas><canvas class="sm" id="c8cv2"></canvas></div><div class="stats" id="c8st"></div><div class="read" id="c8rd"></div></div>
+</section>
+
+<section class="ch" id="c9">
+<h2><span class="num">9</span>Covariate, concept and prior drift <span class="lvl e">Expert</span></h2>
+<p><b>Data drift</b> is not one thing. <b>Covariate drift</b>: P(x) changes but P(y | x) does not; a well-specified model stays valid although inputs look different, and an input alarm does not by itself justify retraining. <b>Concept drift</b>: P(y | x) changes (customer behaviour, regulation, fraud tactics), inputs may look unchanged and the model is wrong; only outcomes reveal it. <b>Prior (label) drift</b>: P(y) changes, ranking may be preserved but calibration is lost, which a recalibration step can fix cheaply. Because outcomes arrive late (a default takes a year to observe), label-free proxies, the PSI of inputs and of the score, are used as early warnings, with the understanding that they cannot see concept drift. Good governance defines both layers of monitoring, the outcome lag, the diagnosis of drift type and the response matched to it (recalibrate, refit, redevelop).</p>
+<div class="f">covariate drift: P(x) ≠, P(y|x) =  ·  concept drift: P(y|x) ≠  ·  prior drift: P(y) ≠  ·  label-free monitors cannot see concept drift</div>
+ <div class="card"><h4>Lab 9 · Three kinds of drift, one deployed model</h4>
+ <p class="sub">A logistic model that was exactly right in the reference period. Left: the score distribution. Right: calibration by decile in the current period.</p>
+ <div class="ctl"><label>what changes <select id="c9t"><option value="cov">covariate drift (input distribution)</option><option value="concept">concept drift (effect of x₁)</option><option value="prior">prior drift (base rate)</option><option value="none">nothing</option></select></label><label>strength of the change <input type="range" id="c9m" min="0" max="100" step="5" value="60"><output id="c9mv"></output></label><button id="c9go">New samples</button></div>
+ <div class="two"><canvas class="sm" id="c9cv"></canvas><canvas class="sm" id="c9cv2"></canvas></div><div class="stats" id="c9st"></div><div class="read" id="c9rd"></div></div>
+</section>
+
+<section class="ch" id="c10">
+<h2><span class="num">10</span>Window size and the detection trade-off <span class="lvl e">Expert</span></h2>
+<p>Monitoring a model’s error rate requires comparing recent cases with a baseline, and the length of the recent window is the design parameter. A window of w cases has a standard error √(p(1 − p)/w) on the observed rate, so a short window is noisy and generates false alarms, while a long window averages the change with old data and responds late. The set of achievable (false-alarm rate, detection delay) pairs is the monitor’s operating curve; the window moves a monitor along it. Methods that adapt the window (ADWIN), accumulate evidence (Page–Hinkley, CUSUM on the errors) or use richer signals than a 0/1 error (the score, a proper scoring rule, item 16) can move the curve itself. A drift smaller than a few standard errors cannot be detected quickly by any method, which should be stated with the monitor’s specification.</p>
+<div class="f">standard error of the windowed rate √(p(1 − p)/w)  ·  delay ≈ w·(threshold ⁄ effect) for small windows  ·  operating curve: false alarms against delay</div>
+ <div class="card"><h4>Lab 10 · Short windows against long windows</h4>
+ <p class="sub">An error-rate stream with a jump at time 1,000. Left: the windowed estimate and the alarm limit. Right: false alarms against detection delay for five window sizes and yours.</p>
+ <div class="ctl"><label>window size <input type="range" id="c10w" min="20" max="500" step="10" value="100"><output id="c10wv"></output></label><label>increase in the error rate <input type="range" id="c10d" min="2" max="20" step="1" value="8"><output id="c10dv"></output></label><label>alarm limit (standard errors) <input type="range" id="c10h" min="20" max="50" step="1" value="30"><output id="c10hv"></output></label><button id="c10go">New runs</button></div>
+ <div class="two"><canvas class="sm" id="c10cv"></canvas><canvas class="sm" id="c10cv2"></canvas></div><div class="stats" id="c10st"></div><div class="read" id="c10rd"></div></div>
+</section>
+
+<section class="ch" id="c11">
+<h2><span class="num">11</span>The cost of monitoring and setting thresholds <span class="lvl e">Expert</span></h2>
+<p>A threshold is a decision, and decisions have costs. A false alarm costs analyst time or an unnecessary retrain; a late detection costs the loss incurred while the model is wrong; the base rate of real drift decides how many alarms will be false. With a CUSUM (limit h) the in-control run length ARL₀ grows roughly exponentially in h while the delay grows only linearly, so the cost-minimising h balances (1000/ARL₀)·c<sub>fa</sub> against (1000/T)·delay, where T is the average time between real drifts. Siegmund’s approximation gives ARL₀ and the delay in closed form for a normal stream. The conclusions are qualitative and robust: when false alarms are expensive or drift is rare, use a higher limit; when drift is frequent or damaging, a lower one. Record the costs and base rates that justified the thresholds in the model documentation (SR 11-7 style), and revisit them when the model’s importance or the data change.</p>
+<div class="f">ARL ≈ [e^(−2Δb) + 2Δb − 1]/(2Δ²), b = h + 1.166, Δ = μ − k  ·  cost = (1000/ARL₀)·c_fa + (1000/T)·delay</div>
+ <div class="card"><h4>Lab 11 · Choosing the alarm limit by cost</h4>
+ <p class="sub">CUSUM monitor with a drift of chosen size and frequency. Left: false-alarm cost, delay cost and total against the limit h. Right: the best h against drift frequency for three false-alarm costs.</p>
+ <div class="ctl"><label>size of the drift to detect <input type="range" id="c11d" min="10" max="30" step="1" value="15"><output id="c11dv"></output></label><label>average time between real drifts <input type="range" id="c11t" min="0" max="5" step="1" value="3"><output id="c11tv"></output></label><label>cost of a false alarm (in steps of delay) <input type="range" id="c11f" min="1" max="500" step="1" value="50"><output id="c11fv"></output></label><label>your alarm limit h <input type="range" id="c11h" min="10" max="100" step="1" value="40"><output id="c11hv"></output></label><button id="c11go">Re-simulate</button></div>
+ <div class="two"><canvas class="sm" id="c11cv"></canvas><canvas class="sm" id="c11cv2"></canvas></div><div class="stats" id="c11st"></div><div class="read" id="c11rd"></div></div>
+</section>
+
+<section class="ch" id="c12">
+<h2><span class="num">12</span>Final exam, mastery checklist, cheat sheet <span class="lvl e">Expert</span></h2>
+<h3>Exam (18 questions — click an answer)</h3>
+<div id="quiz"></div>
+<div class="card"><h4>Score</h4><div class="stats" id="qscore"></div><button class="alt" id="qreset">Reset exam</button></div>
+<h3>Mastery checklist — tick when you can do it without notes</h3>
+<div class="card chk" id="chk"></div>
+<h3>Cheat sheet</h3>
+<div class="tw"><table>
+<tr><th>Idea</th><th>One line</th></tr>
+<tr><td>Base rate</td><td>Precision = πTPR/(πTPR + (1 − π)FPR); rare anomalies make most alerts false even for a low false-alarm rate</td></tr>
+<tr><td>Robust limits</td><td>Median ± 3 × 1.4826·MAD resists contamination (breakdown 50%); mean ± 3 sd is masked by the outliers it should find</td></tr>
+<tr><td>Mahalanobis</td><td>d² = (x − μ)ᵀΣ⁻¹(x − μ), χ²ₚ under normality; finds combinations unusual across correlated variables; estimate Σ robustly</td></tr>
+<tr><td>Isolation and density</td><td>Isolation forest: short average path = anomaly; k-NN and LOF are local density scores; no method wins on all shapes</td></tr>
+<tr><td>Evaluation</td><td>AUC ignores prevalence; use precision–recall, average precision and precision at review capacity; labels are selected by the detector</td></tr>
+<tr><td>Control charts</td><td>Shewhart for big jumps, EWMA and CUSUM for small shifts; quote ARL₀ and detection delay together</td></tr>
+<tr><td>Many features</td><td>1 − (1 − α)ᵐ false alert chance; Bonferroni for any false alert, BH for the false discovery proportion; reduce the number of tests</td></tr>
+<tr><td>Drift measures</td><td>PSI is biased up in small samples (≈ (B − 1)(1/n₁ + 1/n₂)); KS rejects trivial shifts at large n; use effect sizes with thresholds</td></tr>
+<tr><td>Types of drift</td><td>Covariate: P(x) changes; concept: P(y|x) changes; prior: P(y) changes; label-free monitors cannot see concept drift</td></tr>
+<tr><td>Window design</td><td>Short windows: fast, noisy; long windows: smooth, late; the operating curve is false alarms against delay</td></tr>
+<tr><td>Cost-based thresholds</td><td>ARL₀ grows exponentially in h, delay linearly; best h rises with false-alarm cost and falls with drift frequency</td></tr>
+<tr><td>Governance</td><td>Document the reference period, metrics, thresholds, costs, base rates, outcome lag and the response for each type of drift</td></tr>
+</table></div>
+<div class="co tip"><b>Next in Stage 7</b>Item 34 covers graph and network statistics: centrality and communities, random-graph null models, and the inference problems of network data such as fraud rings and mule accounts.</div>
+</section>
+</main>
+<script>
+/*MATH*/
+function lgamma(x){const c=[76.18009172947146,-86.50532032941677,24.01409824083091,-1.231739572450155,0.1208650973866179e-2,-0.5395239384953e-5];let y=x,t=x+5.5;t-=(x+.5)*Math.log(t);let s=1.000000000190015;for(let j=0;j<6;j++)s+=c[j]/++y;return -t+Math.log(2.5066282746310005*s/x);}
+function gser(a,x){let ap=a,sum=1/a,del=sum;for(let n=0;n<1000;n++){ap++;del*=x/ap;sum+=del;if(Math.abs(del)<Math.abs(sum)*1e-15)break;}return sum*Math.exp(-x+a*Math.log(x)-lgamma(a));}
+function gcf(a,x){let b=x+1-a,c=1/1e-300,d=1/b,h=d;for(let i=1;i<1000;i++){const an=-i*(i-a);b+=2;d=an*d+b;if(Math.abs(d)<1e-300)d=1e-300;c=b+an/c;if(Math.abs(c)<1e-300)c=1e-300;d=1/d;const del=d*c;h*=del;if(Math.abs(del-1)<1e-15)break;}return Math.exp(-x+a*Math.log(x)-lgamma(a))*h;}
+function gammaQ(a,x){if(x<=0)return 1;return x<a+1?1-gser(a,x):gcf(a,x);}
+function betacf(a,b,x){const qab=a+b,qap=a+1,qam=a-1;let c=1,d=1-qab*x/qap;if(Math.abs(d)<1e-300)d=1e-300;d=1/d;let h=d;for(let m=1;m<=1000;m++){const m2=2*m;let aa=m*(b-m)*x/((qam+m2)*(a+m2));d=1+aa*d;if(Math.abs(d)<1e-300)d=1e-300;c=1+aa/c;if(Math.abs(c)<1e-300)c=1e-300;d=1/d;h*=d*c;aa=-(a+m)*(qab+m)*x/((a+m2)*(qap+m2));d=1+aa*d;if(Math.abs(d)<1e-300)d=1e-300;c=1+aa/c;if(Math.abs(c)<1e-300)c=1e-300;d=1/d;const del=d*c;h*=del;if(Math.abs(del-1)<1e-15)break;}return h;}
+function betai(a,b,x){if(x<=0)return 0;if(x>=1)return 1;const bt=Math.exp(lgamma(a+b)-lgamma(a)-lgamma(b)+a*Math.log(x)+b*Math.log(1-x));return x<(a+1)/(a+b+2)?bt*betacf(a,b,x)/a:1-bt*betacf(b,a,1-x)/b;}
+function normSf(z){const q=0.5*gammaQ(.5,z*z/2);return z>=0?q:1-q;}
+function normCdf(z){return normSf(-z);}
+function npdf(x){return Math.exp(-x*x/2)/2.5066282746310002;}
+function lbin(n,k){return lgamma(n+1)-lgamma(k+1)-lgamma(n-k+1);}
+function binom(n,k,p){return Math.exp(lbin(n,k)+k*Math.log(p)+(n-k)*Math.log(1-p));}
+function betapdf(x,a,b){return x<=0||x>=1?0:Math.exp(lgamma(a+b)-lgamma(a)-lgamma(b)+(a-1)*Math.log(x)+(b-1)*Math.log(1-x));}
+function betacdf(x,a,b){return betai(a,b,x);}
+function gampdf(x,a,r){return x<=0?0:Math.exp(a*Math.log(r)+(a-1)*Math.log(x)-r*x-lgamma(a));}
+function gamcdf(x,a,r){return x<=0?0:1-gammaQ(a,r*x);}
+function randn(){let u=0;while(!u)u=Math.random();return Math.sqrt(-2*Math.log(u))*Math.cos(2*Math.PI*Math.random());}
+function gammaS(a){if(a<1)return gammaS(a+1)*Math.pow(Math.random(),1/a);const d=a-1/3,c=1/Math.sqrt(9*d);for(;;){let x,v;do{x=randn();v=1+c*x}while(v<=0);v=v*v*v;const u=Math.random();if(Math.log(u)<.5*x*x+d-d*v+d*Math.log(v))return d*v;}}
+function betaS(a,b){const x=gammaS(a),y=gammaS(b);return x/(x+y);}
+function binS(n,p){let k=0;for(let i=0;i<n;i++)if(Math.random()<p)k++;return k;}
+function mean(a){let s=0;for(const v of a)s+=v;return s/a.length;}
+function qc(cdf,lo,hi,p,it){for(let i=0;i<(it||100);i++){const m=(lo+hi)/2;if(cdf(m)<p)lo=m;else hi=m}return(lo+hi)/2;}
+function qb(a,b,p){return qc(x=>betai(a,b,x),0,1,p,50);}
+function tcdf(x,v){const t=.5*betai(v/2,.5,v/(v+x*x));return x>0?1-t:t}
+function qn(p){return qc(normCdf,-9,9,p,70)}
+function pois(k,l){return Math.exp(-l+k*Math.log(l)-lgamma(k+1))}
+function binF(n,p){let k=0;for(;;){if(n<=0||p<=0)return k;if(p>=1)return k+n;if(n<=40){for(let i=0;i<n;i++)if(Math.random()<p)k++;return k}const a=1+(n>>1),bb=1+n-a,x=betaS(a,bb);if(x>=p){n=a-1;p=p/x}else{k+=a;n=bb-1;p=(p-x)/(1-x)}}}
+/*ENDMATH*/
+
+const $=id=>document.getElementById(id), val=id=>+$(id).value;
+const C={fg:'#e8ebf5',mu:'#8a93ab',gr:'#232a3d',a:'#6ea8ff',r:'#ff6b81',y:'#ffd166',g:'#4ade80',p:'#c084fc',t:'#5eead4'};
+const store={get(k,d){try{const v=JSON.parse(localStorage.getItem(k));return v==null?d:v}catch(e){return d}},set(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}};
+function stat(l,v,c){return `<div class="stat ${c||''}"><b>${v}</b><span>${l}</span></div>`}
+function f3(x){if(!isFinite(x))return String(x);const a=Math.abs(x);if(a!==0&&(a<1e-3||a>=1e6))return x.toExponential(2);return String(+x.toFixed(a<1?4:a<100?3:a<1000?2:0))}
+function pc(x){return f3(100*x)+'%'}
+const resizers=[];
+function reg(fn){fn();resizers.push(fn)}
+function on(ids,fn){ids.split(' ').forEach(i=>{const e=$(i);e.addEventListener('input',fn);e.addEventListener('change',fn)})}
+let rt;window.addEventListener('resize',()=>{clearTimeout(rt);rt=setTimeout(()=>resizers.forEach(f=>f()),150)});
+document.querySelectorAll('input[type=range]').forEach(i=>{const o=$(i.id+'v');if(!o)return;const f=()=>{o.textContent=i.value};i.addEventListener('input',f);f()});
+
+function nice(x){const e=Math.pow(10,Math.floor(Math.log10(x))),f=x/e;return (f<1.5?1:f<3?2:f<7?5:10)*e}
+function mk(cv,x0,x1,ymax,o){o=o||{};const y0=o.y0||0,dpr=window.devicePixelRatio||1,r=cv.getBoundingClientRect(),w=r.width||600,h=r.height||270;
+ cv.width=w*dpr;cv.height=h*dpr;const g=cv.getContext('2d');g.setTransform(dpr,0,0,dpr,0,0);g.clearRect(0,0,w,h);
+ const L=o.L||42,R=12,T=14,B=28,X=x=>L+(x-x0)/(x1-x0)*(w-L-R),Y=y=>h-B-(y-y0)/(ymax-y0)*(h-T-B);
+ g.font='11px system-ui';g.lineWidth=1;g.strokeStyle=C.gr;g.fillStyle=C.mu;
+ if(!o.noGrid){const sx=nice((x1-x0)/7);for(let x=Math.ceil(x0/sx-1e-9)*sx;!o.noX&&x<=x1+1e-9;x+=sx){g.beginPath();g.moveTo(X(x),T);g.lineTo(X(x),h-B);g.stroke();g.textAlign='center';g.fillText(String(+x.toFixed(6)),X(x),h-B+15)}
+ const sy=nice((ymax-y0)/4);for(let y=Math.ceil(y0/sy-1e-9)*sy;y<=ymax+1e-9;y+=sy){g.beginPath();g.moveTo(L,Y(y));g.lineTo(w-R,Y(y));g.stroke();g.textAlign='right';g.fillText(String(+y.toFixed(4)),L-5,Y(y)+3)}}
+ return{g,w,h,X,Y,L,R,T,B,
+  line(f,col,lw,a,b,n,dash){a=a==null?x0:a;b=b==null?x1:b;n=n||260;g.save();if(dash)g.setLineDash([5,4]);g.beginPath();g.strokeStyle=col;g.lineWidth=lw||2;let st=false;for(let i=0;i<=n;i++){const x=a+(b-a)*i/n,y=f(x);if(!isFinite(y)){st=false;continue}st?g.lineTo(X(x),Y(y)):g.moveTo(X(x),Y(y));st=true}g.stroke();g.restore()},
+  area(f,a,b,col,n){a=Math.max(a,x0);b=Math.min(b,x1);if(b<=a)return;n=n||200;g.beginPath();g.moveTo(X(a),Y(0));for(let i=0;i<=n;i++){const x=a+(b-a)*i/n;g.lineTo(X(x),Y(f(x)))}g.lineTo(X(b),Y(0));g.closePath();g.fillStyle=col;g.fill()},
+  vline(x,col,lab,dash){g.save();g.strokeStyle=col;g.lineWidth=1.6;if(dash)g.setLineDash([5,4]);g.beginPath();g.moveTo(X(x),T);g.lineTo(X(x),h-B);g.stroke();g.restore();if(lab){g.fillStyle=col;g.textAlign='center';g.fillText(lab,Math.min(Math.max(X(x),34),w-34),T+10)}},
+  hline(y,col,lab){g.save();g.strokeStyle=col;g.lineWidth=1.4;g.setLineDash([5,4]);g.beginPath();g.moveTo(L,Y(y));g.lineTo(w-R,Y(y));g.stroke();g.restore();if(lab){g.fillStyle=col;g.textAlign='right';g.fillText(lab,w-R-3,Y(y)-4)}},
+  text(s,x,y,col,al){g.fillStyle=col||C.fg;g.textAlign=al||'left';g.fillText(s,x,y)}};}
+
+/* ---------- shared helpers for this page ---------- */
+const D={
+ norm:{n:'Normal(0,1)',s:()=>randn(),mu:0,sd:1,sk:0},
+ unif:{n:'Uniform(0,1)',s:()=>Math.random(),mu:.5,sd:Math.sqrt(1/12),sk:0},
+ expo:{n:'Exponential(1)',s:()=>-Math.log(1-Math.random()),mu:1,sd:1,sk:2},
+ logn:{n:'Lognormal(0,1)',s:()=>Math.exp(randn()),mu:Math.exp(.5),sd:Math.sqrt((Math.E-1)*Math.E),sk:(Math.E+2)*Math.sqrt(Math.E-1),disc:0},
+ b05:{n:'Bernoulli(0.5)',s:()=>Math.random()<.5?1:0,mu:.5,sd:.5,sk:0,disc:1},
+ b05s:{n:'Bernoulli(0.05)',s:()=>Math.random()<.05?1:0,mu:.05,sd:Math.sqrt(.0475),sk:.9/Math.sqrt(.0475),disc:1},
+ bimo:{n:'Two humps',s:()=>(Math.random()<.5?-2:2)+.5*randn(),mu:0,sd:Math.sqrt(4.25),sk:0},
+ par5:{n:'Pareto(α=5)',s:()=>Math.pow(1-Math.random(),-.2),mu:1.25,sd:Math.sqrt(5/48),sk:6*Math.sqrt(.6)},
+ cauchy:{n:'Cauchy (no mean)',s:()=>Math.tan(Math.PI*(Math.random()-.5)),mu:NaN,sd:Infinity,sk:NaN}
+};
+function fillSel(id,keys,def){const e=$(id);e.innerHTML=keys.map(k=>`<option value="${k}">${D[k].n}</option>`).join('');e.value=def}
+const PAL=[C.a,C.r,C.y,C.g,C.p,C.t,'#ff9f43','#9aa4bf'];
+function tgrid(N,M){const T=[];let prev=0;for(let i=0;i<M;i++){let n=Math.round(Math.pow(10,Math.log10(N)*i/(M-1)));if(i===M-1)n=N;n=Math.max(prev+1,n);if(n>N)break;T.push(n);prev=n}if(T[T.length-1]!==N)T[T.length-1]=N;return T}
+function nlab(n){return n>=1e6?(n/1e6)+'M':n>=1000?(n/1000)+'k':String(n)}
+function customGrid(P,xt,yt){const g=P.g;g.save();g.strokeStyle=C.gr;g.fillStyle=C.mu;g.font='11px system-ui';g.lineWidth=1;
+ xt.forEach(([v,l])=>{g.beginPath();g.moveTo(P.X(v),P.T);g.lineTo(P.X(v),P.h-P.B);g.stroke();g.textAlign='center';g.fillText(l,P.X(v),P.h-P.B+15)});
+ yt.forEach(([v,l])=>{g.beginPath();g.moveTo(P.L,P.Y(v));g.lineTo(P.w-P.R,P.Y(v));g.stroke();g.textAlign='right';g.fillText(l,P.L-5,P.Y(v)+3)});g.restore()}
+function clip(P,fn){const g=P.g;g.save();g.beginPath();g.rect(P.L,P.T,P.w-P.L-P.R,P.h-P.T-P.B);g.clip();fn();g.restore()}
+function poly(P,pts,col,lw,dash){const g=P.g;g.save();if(dash)g.setLineDash([5,4]);g.strokeStyle=col;g.lineWidth=lw||2;g.beginPath();pts.forEach(([x,y],i)=>i?g.lineTo(P.X(x),P.Y(y)):g.moveTo(P.X(x),P.Y(y)));g.stroke();g.restore()}
+function dots(P,pts,col,r){const g=P.g;g.fillStyle=col;pts.forEach(([x,y])=>{g.beginPath();g.arc(P.X(x),P.Y(y),r||3,0,7);g.fill()})}
+function niceTicks(lo,hi,k){const st=nice((hi-lo)/(k||5)),a=[];for(let v=Math.ceil(lo/st-1e-9)*st;v<=hi+1e-9;v+=st)a.push([v,String(+v.toFixed(6))]);return a}
+function logTicks(lo,hi){const a=[];for(let e=Math.ceil(lo-1e-9);e<=hi+1e-9;e++)a.push([e,nlab(Math.pow(10,e))]);return a}
+function mom(a){const n=a.length;let m=0;for(const v of a)m+=v;m/=n;let v2=0,v3=0,v4=0;for(const v of a){const d=v-m;v2+=d*d;v3+=d*d*d;v4+=d*d*d*d}v2/=n;v3/=n;v4/=n;const sd=Math.sqrt(v2);return{n,m,sd,sk:sd>0?v3/(sd*sd*sd):0,ku:v2>0?v4/(v2*v2)-3:0}}
+function ksN(z){const a=Array.from(z).sort((x,y)=>x-y),n=a.length;let d=0;for(let i=0;i<n;i++){const F=normCdf(a[i]);d=Math.max(d,Math.abs((i+1)/n-F),Math.abs(i/n-F))}return d}
+/* histogram of data as density with optional overlay curves [{f,col,lw,dash}] */
+function hist(cv,data,lo,hi,bins,ov,col){const cnt=new Float64Array(bins),bw=(hi-lo)/bins;let n=0;for(const v of data){if(v<lo||v>=hi)continue;cnt[Math.floor((v-lo)/bw)]++;n++}
+ const N=data.length;let ym=0;for(let i=0;i<bins;i++){cnt[i]/=N*bw;ym=Math.max(ym,cnt[i])}
+ (ov||[]).forEach(o=>{for(let i=0;i<=80;i++)ym=Math.max(ym,o.f(lo+(hi-lo)*i/80)||0)});
+ const P=mk(cv,lo,hi,ym*1.12);
+ P.g.fillStyle=col||'rgba(110,168,255,.5)';for(let i=0;i<bins;i++){if(cnt[i]<=0)continue;const a=P.X(lo+i*bw),b=P.X(lo+(i+1)*bw);P.g.fillRect(a,P.Y(cnt[i]),Math.max(1,b-a-1),P.Y(0)-P.Y(cnt[i]))}
+ (ov||[]).forEach(o=>P.line(o.f,o.col,o.lw||2.4,lo,hi,200,o.dash));return P}
+const fmt=x=>f3(x);
+
+/* ---------- shared for this page ---------- */
+const POPS=['norm','unif','expo','logn','bimo','par5'];
+D.norm.med=0;D.norm.q90=1.2815516;D.unif.med=.5;D.unif.q90=.9;D.expo.med=Math.LN2;D.expo.q90=Math.log(10);D.logn.med=1;D.logn.q90=Math.exp(1.2815516);
+D.bimo.med=0;D.bimo.q90=qc(x=>.5*normCdf((x+2)/.5)+.5*normCdf((x-2)/.5),-10,10,.9,80);D.par5.med=Math.pow(2,.2);D.par5.q90=Math.pow(10,.2);
+const SF={mean:a=>mean(a),median:a=>{const b=Float64Array.from(a).sort(),n=b.length;return n%2?b[(n-1)/2]:(b[n/2-1]+b[n/2])/2},sd:a=>{const n=a.length,m=mean(a);let s=0;for(const v of a)s+=(v-m)*(v-m);return Math.sqrt(s/(n-1))},q90:a=>{const b=Float64Array.from(a).sort();return b[Math.round(.9*(b.length-1))]}};
+function truth(key,st){const d=D[key];return st==='mean'?d.mu:st==='median'?d.med:st==='sd'?d.sd:d.q90}
+const SNAME={mean:'sample mean',median:'sample median',sd:'sample SD',q90:'90th percentile'};
+const N10=[2,3,5,10,20,50,100,200,500,1000];
+function pct(a,p){const b=Float64Array.from(a).sort();return b[Math.min(b.length-1,Math.max(0,Math.floor(p*b.length)))]}
+function histLines(cv,arrs,cols,lo,hi,bins,vl){const bw=(hi-lo)/bins,dens=arrs.map(a=>{const c=new Float64Array(bins);for(const v of a){if(v<lo||v>=hi)continue;c[Math.floor((v-lo)/bw)]++}for(let i=0;i<bins;i++)c[i]/=a.length*bw;return c});let ym=0;dens.forEach(c=>c.forEach(v=>ym=Math.max(ym,v)));const P=mk(cv,lo,hi,ym*1.15||1);
+ dens.forEach((c,k)=>{const pts=[];for(let i=0;i<bins;i++){pts.push([lo+i*bw,c[i]]);pts.push([lo+(i+1)*bw,c[i]])}clip(P,()=>poly(P,pts,cols[k],2.2))});(vl||[]).forEach(v=>P.vline(v[0],v[1],v[2],v[3]));return P}
+function sdOf(a){return mom(a).sd}
+
+/* ---------- ML helpers ---------- */
+function digamma(x){let r=0;while(x<6){r-=1/x;x++}const f=1/(x*x);return r+Math.log(x)-.5/x-f*(1/12-f*(1/120-f/252))}
+function trigamma(x){let r=0;while(x<6){r+=1/(x*x);x++}const f=1/(x*x);return r+1/x+.5*f+f/x*(1/6-f*(1/30-f/42))}
+function poisS(l){if(l<=0)return 0;if(l<30){const L=Math.exp(-l);let k=0,p=1;do{k++;p*=Math.random()}while(p>L);return k-1}const m=Math.floor(.875*l),g=gammaS(m);return g<l?m+poisS(l-g):binF(m-1,l/g)}
+function llb(k,n,p){return(k?k*Math.log(p):0)+(n-k?(n-k)*Math.log(1-p):0)}
+function lrInt(k,n,cut){const ph=k/n,l0=llb(k,n,ph),g=p=>2*(l0-llb(k,n,p))-cut;let lo=0,hi=1;
+ if(k>0){let a=1e-12,b=ph;for(let i=0;i<70;i++){const m=(a+b)/2;if(g(m)>0)a=m;else b=m}lo=(a+b)/2}
+ if(k<n){let a=ph,b=1-1e-12;for(let i=0;i<70;i++){const m=(a+b)/2;if(g(m)>0)b=m;else a=m}hi=(a+b)/2}return[lo,hi]}
+function solveAlpha(s){if(!(s>1e-9))return 1e6;let a=(3-s+Math.sqrt((3-s)*(3-s)+24*s))/(12*s);for(let i=0;i<8;i++){const f=Math.log(a)-digamma(a)-s,fp=1/a-trigamma(a);let n=a-f/fp;if(!(n>0))n=a/2;a=n}return a}
+function normPdfAt(x,m,s){return Math.exp(-(x-m)*(x-m)/(2*s*s))/(s*2.5066282746)}
+/* ---------- Regression helpers ---------- */
+function idx(id,arr,ff){const e=$(id),o=$(id+'v'),f=()=>{o.textContent=ff?ff(arr[+e.value]):arr[+e.value]};e.addEventListener('input',f);f()}
+function scl(id,ff){const e=$(id),o=$(id+'v'),f=()=>{o.textContent=ff(+e.value)};e.addEventListener('input',f);f()}
+function pctTicks(a,b,st){const r=[];for(let v=a;v<=b+1e-9;v+=st)r.push([v,Math.round(v*100)+'%']);return r}
+const _tq={};function tq(v,p){const k=v+'_'+p;return _tq[k]||(_tq[k]=qc(x=>tcdf(x,v),0,500,p,80))}
+function simple(x,y){const n=x.length;let xm=0,ym=0;for(let i=0;i<n;i++){xm+=x[i];ym+=y[i]}xm/=n;ym/=n;let sxx=0,sxy=0,syy=0;for(let i=0;i<n;i++){const dx=x[i]-xm,dy=y[i]-ym;sxx+=dx*dx;sxy+=dx*dy;syy+=dy*dy}const b=sxy/sxx,a=ym-b*xm,res=new Float64Array(n);let sse=0;for(let i=0;i<n;i++){res[i]=y[i]-a-b*x[i];sse+=res[i]*res[i]}return{n,xm,ym,sxx,sxy,syy,b,a,res,sse,sst:syy,r2:1-sse/syy}}
+function gj(A,B){const p=A.length;const M=A.map((r,i)=>Array.from(r).concat(B?[B[i]]:[]));for(let c=0;c<p;c++){let m=c;for(let r=c+1;r<p;r++)if(Math.abs(M[r][c])>Math.abs(M[m][c]))m=r;[M[c],M[m]]=[M[m],M[c]];const d=M[c][c]||1e-12;for(let k=c;k<M[c].length;k++)M[c][k]/=d;for(let r=0;r<p;r++)if(r!==c){const f=M[r][c];if(f!==0)for(let k=c;k<M[c].length;k++)M[r][k]-=f*M[c][k]}}return M}
+function olsMulti(cols,y,needInv){const n=y.length,k=cols.length,p=k+1,A=[],B=new Float64Array(p);for(let i=0;i<p;i++)A.push(new Float64Array(p));
+ for(let r=0;r<n;r++){const row=[1];for(let j=0;j<k;j++)row.push(cols[j][r]);for(let i=0;i<p;i++){B[i]+=row[i]*y[r];for(let j=i;j<p;j++)A[i][j]+=row[i]*row[j]}}
+ for(let i=0;i<p;i++){for(let j=0;j<i;j++)A[i][j]=A[j][i];if(i>0)A[i][i]+=1e-9}
+ let beta,inv=null;if(needInv){const I=[];for(let i=0;i<p;i++){const e=new Float64Array(p);e[i]=1;I.push(e)}const M=gj(A,null);const aug=A.map((r,i)=>Array.from(r).concat(Array.from(I[i])));
+  const m=aug;for(let c=0;c<p;c++){let q=c;for(let r=c+1;r<p;r++)if(Math.abs(m[r][c])>Math.abs(m[q][c]))q=r;[m[c],m[q]]=[m[q],m[c]];const d=m[c][c]||1e-12;for(let kk=0;kk<2*p;kk++)m[c][kk]/=d;for(let r=0;r<p;r++)if(r!==c){const f=m[r][c];if(f!==0)for(let kk=0;kk<2*p;kk++)m[r][kk]-=f*m[c][kk]}}
+  inv=m.map(r=>r.slice(p));beta=inv.map(r=>{let s=0;for(let j=0;j<p;j++)s+=r[j]*B[j];return s})}
+ else{const M=gj(A,B);beta=M.map(r=>r[p])}
+ const res=new Float64Array(n);let sse=0;for(let r=0;r<n;r++){let f=beta[0];for(let j=0;j<k;j++)f+=beta[j+1]*cols[j][r];res[r]=y[r]-f;sse+=res[r]*res[r]}
+ const out={beta,res,sse,n,p,inv};if(inv){const s2=sse/(n-p);out.s2=s2;out.se=inv.map((r,i)=>Math.sqrt(s2*r[i]))}return out}
+function scatterAxes(cv,xs,ys,xlo,xhi,ylo,yhi,L){return mk(cv,xlo,xhi,yhi,{y0:ylo,L:L||44})}
+function range(a,pad){let lo=1e99,hi=-1e99;for(const v of a){if(v<lo)lo=v;if(v>hi)hi=v}const w=(hi-lo)||1;return[lo-(pad||.05)*w,hi+(pad||.05)*w]}
+
+
+function bars(P,groups,cols,yt){/* groups: array of arrays of values (0..1) */const g=P.g,G=groups.length,B=groups[0].length,W=(P.w-P.L-P.R)/G;groups.forEach((vals,gi)=>vals.forEach((v,bi)=>{const bw=W*.78/B,x=P.L+W*gi+W*.11+bw*bi;g.fillStyle=cols[bi];g.fillRect(x,P.Y(v),bw-2,P.Y(0)-P.Y(v));g.fillStyle=C.fg;g.textAlign='center';g.font='10px system-ui';g.fillText(Math.round(v*100)+'%',x+bw/2-1,P.Y(v)-3)}));g.font='11px system-ui'}
+function gridG(P,yt,labels){customGrid(P,[],yt);const G=labels.length,W=(P.w-P.L-P.R)/G;P.g.fillStyle=C.mu;P.g.textAlign='center';labels.forEach((l,i)=>P.g.fillText(l,P.L+W*(i+.5),P.h-P.B+15))}
+function legend(P,items,y){let x=P.L+8;items.forEach(([s,c])=>{P.text('■ '+s,x,y,c);x+=P.g.measureText('■ '+s).width+16})}
+
+/* ---------- GLM machinery ---------- */
+const LK={logit:{mu:e=>1/(1+Math.exp(-e)),d:e=>{const m=1/(1+Math.exp(-e));return m*(1-m)}},
+ probit:{mu:e=>normCdf(e),d:e=>npdf(e)},
+ cll:{mu:e=>1-Math.exp(-Math.exp(e)),d:e=>Math.exp(e-Math.exp(e))},
+ log:{mu:e=>Math.exp(e),d:e=>Math.exp(e)}};
+function minv(A){const p=A.length,m=A.map((r,i)=>{const row=Array.from(r);for(let j=0;j<p;j++)row.push(i===j?1:0);return row});
+ for(let c=0;c<p;c++){let q=c;for(let r=c+1;r<p;r++)if(Math.abs(m[r][c])>Math.abs(m[q][c]))q=r;[m[c],m[q]]=[m[q],m[c]];const d=m[c][c]||1e-12;for(let k=0;k<2*p;k++)m[c][k]/=d;for(let r=0;r<p;r++)if(r!==c){const f=m[r][c];if(f!==0)for(let k=0;k<2*p;k++)m[r][k]-=f*m[c][k]}}
+ return m.map(r=>r.slice(p))}
+function glm(cols,y,o){o=o||{};const n=y.length,k=cols.length,p=k+1,fam=o.fam||'binom',L=LK[o.link||(fam==='pois'?'log':'logit')],off=o.off,X=[new Float64Array(n).fill(1)].concat(cols),V=m=>fam==='pois'?m:m*(1-m);
+ let b=new Float64Array(p);if(o.init)b=Float64Array.from(o.init);else if(fam==='pois'){let m=0;for(const v of y)m+=v;b[0]=Math.log(Math.max(m/n,1e-3))-(off?mean(off):0)}
+ function ev(b){const eta=new Float64Array(n),mu=new Float64Array(n);let ll=0;for(let i=0;i<n;i++){let e=off?off[i]:0;for(let j=0;j<p;j++)e+=b[j]*X[j][i];e=Math.max(-30,Math.min(30,e));eta[i]=e;let m=L.mu(e);m=fam==='binom'?Math.min(1-1e-12,Math.max(1e-12,m)):Math.max(m,1e-12);mu[i]=m;ll+=fam==='pois'?y[i]*Math.log(m)-m-lgamma(y[i]+1):y[i]*Math.log(m)+(1-y[i])*Math.log(1-m)}return{eta,mu,ll}}
+ function info(c){const A=[];for(let i=0;i<p;i++)A.push(new Float64Array(p));const w=new Float64Array(n);for(let r=0;r<n;r++){const d=L.d(c.eta[r]),wi=d*d/V(c.mu[r]);w[r]=wi;for(let i=0;i<p;i++){const xi=X[i][r]*wi;for(let j=i;j<p;j++)A[i][j]+=xi*X[j][r]}}for(let i=0;i<p;i++)for(let j=0;j<i;j++)A[i][j]=A[j][i];return{A,w}}
+ let cur=ev(b),it=0,conv=false,maxit=o.maxit==null?40:o.maxit;
+ for(;it<maxit;it++){const{A,w}=info(cur),Ai=minv(A),g=new Float64Array(p);
+  for(let r=0;r<n;r++){const d=L.d(cur.eta[r]),v=V(cur.mu[r]);let s=(y[r]-cur.mu[r])*d/v;if(o.firth){let h=0;for(let i=0;i<p;i++)for(let j=0;j<p;j++)h+=X[i][r]*Ai[i][j]*X[j][r];h*=w[r];s+=h*(.5-cur.mu[r])}for(let i=0;i<p;i++)g[i]+=X[i][r]*s}
+  const st=new Float64Array(p);let mx=0;for(let i=0;i<p;i++){let s=0;for(let j=0;j<p;j++)s+=Ai[i][j]*g[j];st[i]=s}
+  if(o.firth){for(let i=0;i<p;i++){st[i]=Math.max(-1,Math.min(1,st[i]));mx=Math.max(mx,Math.abs(st[i]))}b=b.map((v,i)=>v+st[i]);cur=ev(b);if(mx<1e-8){conv=true;it++;break}}
+  else{let a=1,nb,nc;for(let h=0;h<25;h++){nb=b.map((v,i)=>v+a*st[i]);nc=ev(nb);if(nc.ll>=cur.ll-1e-10)break;a/=2}for(let i=0;i<p;i++)mx=Math.max(mx,Math.abs(a*st[i]));const dl=Math.abs(nc.ll-cur.ll);b=nb;cur=nc;if(mx<1e-8||dl<1e-11){conv=true;it++;break}}}
+ const{A,w}=info(cur),Ai=minv(A),se=Ai.map((r,i)=>Math.sqrt(Math.max(r[i],0)));let dev;
+ if(fam==='binom')dev=-2*cur.ll;else{dev=0;for(let i=0;i<n;i++){const yy=y[i],m=cur.mu[i];dev+=2*((yy>0?yy*Math.log(yy/m):0)-(yy-m))}}
+ return{beta:b,mu:cur.mu,eta:cur.eta,ll:cur.ll,dev,inv:Ai,se,iter:it,conv,X,w,p,n,A}}
+function auc(sc,y){const n=y.length,idx=Array.from({length:n},(_,i)=>i).sort((a,b)=>sc[a]-sc[b]);let rk=0,np=0,i=0;while(i<n){let j=i;while(j+1<n&&sc[idx[j+1]]===sc[idx[i]])j++;const r=(i+j)/2+1;for(let t=i;t<=j;t++)if(y[idx[t]]===1){rk+=r;np++}i=j+1}const nn=n-np;return np&&nn?(rk-np*(np+1)/2)/(np*nn):.5}
+function sepTest(x,y){let a1=1e99,b1=-1e99,a0=1e99,b0=-1e99,n1=0,n0=0;for(let i=0;i<x.length;i++){if(y[i]===1){n1++;a1=Math.min(a1,x[i]);b1=Math.max(b1,x[i])}else{n0++;a0=Math.min(a0,x[i]);b0=Math.max(b0,x[i])}}return n1>0&&n0>0&&(a1>b0||a0>b1)}
+const sig=e=>1/(1+Math.exp(-e));
+function lgt(p){return Math.log(p/(1-p))}
+function binaryData(n,a,b,sd){const x=new Float64Array(n),y=new Float64Array(n);for(let i=0;i<n;i++){x[i]=(sd||1)*randn();y[i]=Math.random()<sig(a+b*x[i])?1:0}return{x,y}}
+function heat(P,gx,gy,vals,x0,x1,y0,y1){const g=P.g,nx=gx,ny=gy;let mn=1e99,mx=-1e99;vals.forEach(v=>{if(isFinite(v)){mn=Math.min(mn,v);mx=Math.max(mx,v)}});mn=Math.max(mn,mx-30);for(let i=0;i<nx;i++)for(let j=0;j<ny;j++){const v=vals[i*ny+j],t=isFinite(v)?Math.max(0,Math.min(1,(v-mn)/(mx-mn))):0,tt=Math.pow(t,1.6),c=Math.round(40+190*tt);g.fillStyle=`rgb(${Math.round(20+60*tt)},${Math.round(30+100*tt)},${c})`;const xa=P.X(x0+(x1-x0)*i/nx),xb=P.X(x0+(x1-x0)*(i+1)/nx),ya=P.Y(y0+(y1-y0)*j/ny),yb=P.Y(y0+(y1-y0)*(j+1)/ny);g.fillRect(xa,Math.min(ya,yb),xb-xa+1,Math.abs(ya-yb)+1)}}
+/* ---------- confounding helpers ---------- */
+const U01=()=>1-Math.random();
+function sdv(a){const m=mean(a);let s=0;for(const v of a)s+=(v-m)*(v-m);return Math.sqrt(s/Math.max(a.length-1,1))}
+function barV(cv,vals,cols,labs,ymax,ff){const P=mk(cv,0,vals.length,ymax,{y0:0,noGrid:true,L:50});customGrid(P,[],niceTicks(0,ymax,5));const W=(P.w-P.L-P.R)/vals.length,g=P.g;vals.forEach((v,i)=>{const w=W*.5,x=P.L+W*i+W*.25;g.fillStyle=cols[i];g.fillRect(x,P.Y(v),w,P.Y(0)-P.Y(v));g.fillStyle=C.fg;g.textAlign='center';g.fillText((ff||fmt)(v),x+w/2,P.Y(v)-4);g.fillStyle=C.mu;g.fillText(labs[i],x+w/2,P.h-P.B+15)});return P}
+function barL(cv,vals,cols,labs,lo,hi,ff){const P=mk(cv,0,vals.length,hi,{y0:lo,noGrid:true,L:50});customGrid(P,[],niceTicks(lo,hi,5));const W=(P.w-P.L-P.R)/vals.length,g=P.g;vals.forEach((v,i)=>{const w=W*.5,x=P.L+W*i+W*.25;g.fillStyle=cols[i];g.fillRect(x,P.Y(v),w,P.Y(lo)-P.Y(v));g.fillStyle=C.fg;g.textAlign='center';g.fillText((ff||fmt)(v),x+w/2,P.Y(v)-4);g.fillStyle=C.mu;g.fillText(labs[i],x+w/2,P.h-P.B+15)});return P}
+const avg=a=>{let s=0;for(const v of a)s+=v;return s/a.length};
+function corr(a,b){const n=a.length;let ma=0,mb=0;for(let i=0;i<n;i++){ma+=a[i];mb+=b[i]}ma/=n;mb/=n;let sa=0,sb=0,sab=0;for(let i=0;i<n;i++){const x=a[i]-ma,y=b[i]-mb;sa+=x*x;sb+=y*y;sab+=x*y}return sab/Math.sqrt(sa*sb||1e-12)}
+const pcor=(x,y,z)=>corr(simple(z,x).res,simple(z,y).res);
+const lin=(n,f)=>{const a=new Float64Array(n);for(let i=0;i<n;i++)a[i]=f(i);return a};
+const rn=(n,s)=>lin(n,()=>(s||1)*randn());
+/* signed bars from zero */
+function barZ(cv,vals,cols,labs,lo,hi,ff){const P=mk(cv,0,vals.length,hi,{y0:lo,noGrid:true,L:50});customGrid(P,[],niceTicks(lo,hi,5));const W=(P.w-P.L-P.R)/vals.length,g=P.g;vals.forEach((v,i)=>{const w=W*.5,x=P.L+W*i+W*.25,y0=P.Y(0),y1=P.Y(v);g.fillStyle=cols[i];g.fillRect(x,Math.min(y0,y1),w,Math.abs(y0-y1));g.fillStyle=C.fg;g.textAlign='center';g.fillText((ff||fmt)(v),x+w/2,v>=0?y1-4:y1+13);g.fillStyle=C.mu;g.fillText(labs[i],x+w/2,P.h-P.B+15)});P.hline(0,C.mu,'');return P}
+/* grouped signed bars: groups[g][b] */
+function barG(cv,groups,cols,glabs,lo,hi,ff){const P=mk(cv,0,groups.length,hi,{y0:lo,noGrid:true,L:50});customGrid(P,[],niceTicks(lo,hi,5));const G=groups.length,B=groups[0].length,W=(P.w-P.L-P.R)/G,g=P.g;groups.forEach((vs,gi)=>vs.forEach((v,bi)=>{const bw=W*.7/B,x=P.L+W*gi+W*.15+bw*bi,y0=P.Y(0),y1=P.Y(v);g.fillStyle=cols[bi];g.fillRect(x,Math.min(y0,y1),bw-3,Math.abs(y0-y1));g.fillStyle=C.fg;g.textAlign='center';g.font='10px system-ui';g.fillText((ff||fmt)(v),x+bw/2-1,v>=0?y1-3:y1+11)}));g.font='11px system-ui';g.fillStyle=C.mu;g.textAlign='center';glabs.forEach((l,i)=>g.fillText(l,P.L+W*(i+.5),P.h-P.B+15));P.hline(0,C.mu,'');return P}
+/* scatter with optional per-point colours; draws at most nmax points */
+function scat(P,xs,ys,col,nmax,r,colf){const n=xs.length,st=Math.max(1,Math.floor(n/(nmax||500))),pts=[];clip(P,()=>{for(let i=0;i<n;i+=st){P.g.fillStyle=colf?colf(i):col;P.g.beginPath();P.g.arc(P.X(xs[i]),P.Y(ys[i]),r||2.2,0,7);P.g.fill()}})}
+function fitLine(P,s,col,lw,dash,x0,x1){clip(P,()=>P.line(x=>s.a+s.b*x,col,lw||2,x0,x1,2,dash))}
+const ordIdx=p=>Array.from({length:p.length},(_,i)=>i).sort((a,b)=>p[a]-p[b]);
+/* ---------- experiment helpers ---------- */
+const sgn=v=>(v>=0?'+':'−')+Math.abs(v).toFixed(3);
+const rng2=(a,b,pad)=>range(Array.from(a).concat(Array.from(b)),pad||.05);
+const pct0=x=>Math.round(x*100)+'%';
+const lgs=x=>1/(1+Math.exp(-x));
+function rgam(a){if(a<1)return rgam(a+1)*Math.pow(U01(),1/a);const d=a-1/3,c=1/Math.sqrt(9*d);for(;;){let x,v;do{x=randn();v=1+c*x}while(v<=0);v=v*v*v;const u=U01();if(u<1-.0331*x*x*x*x||Math.log(u)<.5*x*x+d*(1-v+Math.log(v)))return d*v}}
+const rbeta=(a,b)=>{const x=rgam(a),y=rgam(b);return x/(x+y)};
+function rbin(n,p){if(n<=30){let k=0;for(let i=0;i<n;i++)if(Math.random()<p)k++;return k}const m=n*p,s=Math.sqrt(n*p*(1-p)),k=Math.round(m+s*randn());return Math.max(0,Math.min(n,k))}
+function welch(a,b){const na=a.length,nb=b.length,ma=avg(a),mb=avg(b);let va=0,vb=0;for(const v of a)va+=(v-ma)*(v-ma);for(const v of b)vb+=(v-mb)*(v-mb);va/=na-1;vb/=nb-1;const se2=va/na+vb/nb,se=Math.sqrt(se2),t=(ma-mb)/se,df=se2*se2/((va/na)*(va/na)/(na-1)+(vb/nb)*(vb/nb)/(nb-1));return{d:ma-mb,se,t,df,p:2*(1-tcdf(Math.abs(t),df))}}
+const diffMeans=(Y,T)=>{let s1=0,s0=0,n1=0,n0=0;for(let i=0;i<Y.length;i++){if(T[i]){s1+=Y[i];n1++}else{s0+=Y[i];n0++}}return s1/n1-s0/n0};
+/* ---------- observational-causal helpers ---------- */
+function logitFit(cols,y){const n=y.length,k=cols.length,p=k+1,b=new Float64Array(p),lin_=i=>{let s=b[0];for(let j=0;j<k;j++)s+=b[j+1]*cols[j][i];return s};
+ for(let it=0;it<30;it++){const A=[];for(let i=0;i<p;i++)A.push(new Float64Array(p));const g=new Float64Array(p);
+  for(let i=0;i<n;i++){const m=lgs(lin_(i)),w=Math.max(m*(1-m),1e-8),r=y[i]-m,row=[1];for(let j=0;j<k;j++)row.push(cols[j][i]);for(let a=0;a<p;a++){g[a]+=row[a]*r;for(let c=a;c<p;c++)A[a][c]+=w*row[a]*row[c]}}
+  for(let a=0;a<p;a++){for(let c=0;c<a;c++)A[a][c]=A[c][a];A[a][a]+=1e-8}
+  const M=gj(A,Array.from(g)),d=M.map(r=>r[p]);let mx=0;for(let a=0;a<p;a++){b[a]+=d[a];mx=Math.max(mx,Math.abs(d[a]))}if(mx<1e-6)break}
+ const pr=new Float64Array(n),lo=new Float64Array(n);for(let i=0;i<n;i++){pr[i]=Math.min(.9999,Math.max(.0001,lgs(lin_(i))));lo[i]=Math.log(pr[i]/(1-pr[i]))}return{beta:b,pr,lo}}
+/* Hajek IPW estimate of the ATE; keep(i)=false drops a unit */
+function ipwATE(Y,T,e,keep){let a1=0,b1=0,a0=0,b0=0;for(let i=0;i<Y.length;i++){if(keep&&!keep(i))continue;if(T[i]){const w=1/e[i];a1+=w*Y[i];b1+=w}else{const w=1/(1-e[i]);a0+=w*Y[i];b0+=w}}return a1/b1-a0/b0}
+function smd(x,T,w){let m1=0,m0=0,w1=0,w0=0,n1=0,n0=0;for(let i=0;i<x.length;i++){const ww=w?w[i]:1;if(T[i]){m1+=ww*x[i];w1+=ww;n1++}else{m0+=ww*x[i];w0+=ww;n0++}}m1/=w1;m0/=w0;let v1=0,v0=0,a1=0,a0=0;for(let i=0;i<x.length;i++){if(T[i]){a1+=x[i]}else a0+=x[i]}a1/=n1;a0/=n0;for(let i=0;i<x.length;i++){if(T[i])v1+=(x[i]-a1)*(x[i]-a1);else v0+=(x[i]-a0)*(x[i]-a0)}v1/=n1-1;v0/=n0-1;return(m1-m0)/Math.sqrt((v1+v0)/2)}
+/* confounded data: X1,X2; treatment strength a; effect tau (function of x1 optional) */
+function confData(n,a,tauF,nl){const X1=rn(n),X2=rn(n),e=lin(n,i=>lgs(a*(.8*X1[i]+.5*X2[i]+(nl?.4*(X1[i]*X1[i]-1):0))/1.5)),T=new Uint8Array(n),Y=new Float64Array(n);
+ for(let i=0;i<n;i++){T[i]=Math.random()<e[i]?1:0;Y[i]=(T[i]?(tauF?tauF(X1[i]):1):0)+X1[i]+.8*X2[i]+(nl?.6*X1[i]*X1[i]:0)+randn()}return{X1,X2,T,Y,e}}
+/* one-to-one nearest-neighbour matching with replacement on a score; returns ATT and the matched control index per treated unit (-1 if dropped) */
+function matchATT(sc,T,Y,cal){const ctr=[];for(let i=0;i<T.length;i++)if(!T[i])ctr.push(i);ctr.sort((a,b)=>sc[a]-sc[b]);const cs=ctr.map(i=>sc[i]),m=new Int32Array(T.length).fill(-1);let sum=0,k=0;
+ for(let i=0;i<T.length;i++){if(!T[i])continue;let lo=0,hi=cs.length-1;while(lo<hi){const mid=(lo+hi)>>1;if(cs[mid]<sc[i])lo=mid+1;else hi=mid}let b=lo;if(lo>0&&Math.abs(cs[lo-1]-sc[i])<Math.abs(cs[lo]-sc[i]))b=lo-1;if(Math.abs(cs[b]-sc[i])>cal)continue;m[i]=ctr[b];sum+=Y[i]-Y[ctr[b]];k++}return{att:sum/k,m,kept:k}}
+const quant=(a,p)=>{const b=Float64Array.from(a).sort();return b[Math.min(b.length-1,Math.floor(p*b.length))]};
+/* ---------- MCMC helpers ---------- */
+function acfv(x,K){const n=x.length;let m=0;for(let i=0;i<n;i++)m+=x[i];m/=n;const c=new Float64Array(K+1);for(let k=0;k<=K;k++){let s=0;for(let i=0;i+k<n;i++)s+=(x[i]-m)*(x[i+k]-m);c[k]=s/n}const r=new Float64Array(K+1);for(let k=0;k<=K;k++)r[k]=c[0]>0?c[k]/c[0]:0;return r}
+/* effective sample size with Geyer's initial positive sequence */
+function essOf(x,K){K=Math.min(K||150,x.length-2);if(K<2)return x.length;const r=acfv(x,K);let sum=0;for(let t=0;2*t+1<=K;t++){const g=r[2*t]+r[2*t+1];if(g<=0)break;sum+=g}const tau=Math.max(2*sum-1,.2);return x.length/tau}
+/* random-walk Metropolis for a 1-d log density */
+function mhRW(logp,x0,step,n){const x=new Float64Array(n);let c=x0,lc=logp(c),acc=0;for(let i=0;i<n;i++){const y=c+step*randn(),ly=logp(y);if(Math.log(Math.random())<ly-lc){c=y;lc=ly;acc++}x[i]=c}return{x,acc:acc/n}}
+/* split R-hat of an array of chains (each an array of equal length) */
+function rhatOf(ch){const seq=[];ch.forEach(c=>{const h=Math.floor(c.length/2);if(h<2)return;seq.push(c.slice(0,h));seq.push(c.slice(h,2*h))});const m=seq.length,n=seq[0]?seq[0].length:0;if(m<2||n<2)return NaN;const mu=seq.map(s=>{let a=0;for(const v of s)a+=v;return a/n}),va=seq.map((s,i)=>{let a=0;for(const v of s)a+=(v-mu[i])*(v-mu[i]);return a/(n-1)});const W=va.reduce((a,b)=>a+b,0)/m,gm=mu.reduce((a,b)=>a+b,0)/m;let B=0;for(const v of mu)B+=(v-gm)*(v-gm);B*=n/(m-1);const vp=(n-1)/n*W+B/n;return Math.sqrt(vp/Math.max(W,1e-12))}
+/* grid posterior from an unnormalised log density */
+function gridPost(logf,lo,hi,N){N=N||900;const x=new Float64Array(N),f=new Float64Array(N);let mx=-1e300;for(let i=0;i<N;i++){x[i]=lo+(hi-lo)*i/(N-1);f[i]=logf(x[i]);if(f[i]>mx)mx=f[i]}let Z=0;const h=(hi-lo)/(N-1);for(let i=0;i<N;i++){f[i]=Math.exp(f[i]-mx);Z+=f[i]*h}const pdf=new Float64Array(N),cdf=new Float64Array(N);let c=0,m1=0,m2=0;for(let i=0;i<N;i++){pdf[i]=f[i]/Z;c+=pdf[i]*h;cdf[i]=c;m1+=x[i]*pdf[i]*h;m2+=x[i]*x[i]*pdf[i]*h}
+ const q=u=>{let a=0,b=N-1;while(b-a>1){const m=(a+b)>>1;if(cdf[m]<u)a=m;else b=m}const d=cdf[b]-cdf[a];return x[a]+(d>0?(u-cdf[a])/d:0)*(x[b]-x[a])};
+ const pd=v=>{if(v<=lo||v>=hi)return 0;const t=(v-lo)/(hi-lo)*(N-1),i=Math.floor(t);return pdf[i]+(t-i)*(pdf[Math.min(i+1,N-1)]-pdf[i])};
+ const cd=v=>{if(v<=lo)return 0;if(v>=hi)return 1;const t=(v-lo)/(hi-lo)*(N-1),i=Math.floor(t);return cdf[i]+(t-i)*(cdf[Math.min(i+1,N-1)]-cdf[i])};
+ return{x,pdf,cdf,mean:m1,sd:Math.sqrt(Math.max(m2-m1*m1,0)),q,pd,cd}}
+const tpdf=(x,v)=>Math.exp(lgamma((v+1)/2)-lgamma(v/2))/Math.sqrt(v*Math.PI)*Math.pow(1+x*x/v,-(v+1)/2);
+const rtv=v=>randn()/Math.sqrt(2*gammaS(v/2)/v);
+const expit=x=>1/(1+Math.exp(-x)),logit=p=>Math.log(p/(1-p));
+function invMat(A){const n=A.length,M=A.map((r,i)=>{const a=Array.from(r);for(let j=0;j<n;j++)a.push(i===j?1:0);return a});for(let c=0;c<n;c++){let m=c;for(let r=c+1;r<n;r++)if(Math.abs(M[r][c])>Math.abs(M[m][c]))m=r;[M[c],M[m]]=[M[m],M[c]];const d=M[c][c]||1e-12;for(let k=0;k<2*n;k++)M[c][k]/=d;for(let r=0;r<n;r++)if(r!==c){const f=M[r][c];if(f!==0)for(let k=0;k<2*n;k++)M[r][k]-=f*M[c][k]}}return M.map(r=>r.slice(n))}
+function cholL(S){const n=S.length,L=S.map(()=>new Float64Array(n));for(let i=0;i<n;i++)for(let j=0;j<=i;j++){let s=S[i][j];for(let k=0;k<j;k++)s-=L[i][k]*L[j][k];L[i][j]=i===j?Math.sqrt(Math.max(s,1e-12)):s/L[j][j]}return L}
+function logdetM(A){const n=A.length,M=A.map(r=>Array.from(r));let ld=0;for(let c=0;c<n;c++){let m=c;for(let r=c+1;r<n;r++)if(Math.abs(M[r][c])>Math.abs(M[m][c]))m=r;[M[c],M[m]]=[M[m],M[c]];ld+=Math.log(Math.abs(M[c][c])||1e-300);for(let r=c+1;r<n;r++){const f=M[r][c]/M[c][c];for(let k=c;k<n;k++)M[r][k]-=f*M[c][k]}}return ld}
+/* Gauss-Hermite nodes (21 points, probabilists' weights summing to 1) from the Golub-Welsch idea: computed numerically on a fine normal grid instead */
+const GH=(()=>{const z=[],w=[];let s=0;for(let i=0;i<41;i++){const v=-4+8*i/40,p=Math.exp(-v*v/2);z.push(v);w.push(p);s+=p}return{z,w:w.map(v=>v/s)}})();
+/* log-log tick helper for axes holding log10 values */
+const lg10=v=>Math.log10(Math.max(v,1e-12));
+const pc1=x=>(100*x).toFixed(1)+'%';
+/* density curves with optional fill: curves=[{f,col,fill,dash,lw}] ; returns P */
+function dcurves(cv,x0,x1,curves,vl,ref){let ym=0,yr=0;curves.forEach((c,k)=>{for(let i=0;i<=300;i++){const v=c.f(x0+(x1-x0)*i/300);if(isFinite(v)){ym=Math.max(ym,v);if(k===(ref==null?curves.length-1:ref))yr=Math.max(yr,v)}}});
+ const top=Math.min(ym,yr*2.5)||ym||1,P=mk(cv,x0,x1,top*1.12);clip(P,()=>curves.forEach(c=>{if(c.fill)P.area(c.f,x0,x1,c.fill,240);P.line(c.f,c.col,c.lw||2.4,x0,x1,300,c.dash)}));(vl||[]).forEach(v=>P.vline(v[0],v[1],null,v[3]));return P}
+/* solve (A + lam I) beta = b and return diag of the inverse (A symmetric p x p) */
+function ridgeSolve(A,b,lam){const p=b.length,M=[];for(let i=0;i<p;i++){const r=new Float64Array(2*p+1);for(let j=0;j<p;j++)r[j]=A[i][j]+(i===j?lam:0);r[p+i]=1;r[2*p]=b[i];M.push(r)}
+ for(let c=0;c<p;c++){let m=c;for(let r=c+1;r<p;r++)if(Math.abs(M[r][c])>Math.abs(M[m][c]))m=r;[M[c],M[m]]=[M[m],M[c]];const d=M[c][c]||1e-12;for(let k=0;k<=2*p;k++)M[c][k]/=d;for(let r=0;r<p;r++)if(r!==c){const f=M[r][c];if(f!==0)for(let k=0;k<=2*p;k++)M[r][k]-=f*M[c][k]}}
+ return{beta:M.map(r=>r[2*p]),dinv:M.map((r,i)=>r[p+i])}}
+/* ---------- Anomaly and drift helpers ---------- */
+const adT=v=>randn()/Math.sqrt(2*gammaS(v/2)/v);
+const adMed=a=>{const s=Float64Array.from(a).sort(),n=s.length;return n%2?s[(n-1)/2]:(s[n/2-1]+s[n/2])/2};
+const adMad=a=>{const m=adMed(a);return 1.4826*adMed(Array.from(a,v=>Math.abs(v-m)))};
+const adDesc=sc=>ordIdx(sc).reverse();
+function adAuc(sc,lab){const n=sc.length,o=ordIdx(sc),r=new Float64Array(n);for(let i=0;i<n;i++)r[o[i]]=i+1;let np=0,sr=0;for(let i=0;i<n;i++)if(lab[i]){np++;sr+=r[i]}const nn=n-np;return np&&nn?(sr-np*(np+1)/2)/(np*nn):.5}
+function adAP(sc,lab){const o=adDesc(sc);let tp=0,ap=0,np=0;for(let i=0;i<lab.length;i++)np+=lab[i]?1:0;for(let k=0;k<o.length;k++)if(lab[o[k]]){tp++;ap+=tp/(k+1)}return np?ap/np:0}
+function adPrecAt(sc,lab,k){const o=adDesc(sc);let t=0;for(let i=0;i<k;i++)t+=lab[o[i]]?1:0;return t/k}
+function adPR(sc,lab,npts){const o=adDesc(sc);let np=0;for(const l of lab)np+=l?1:0;let tp=0;const out=[],st=Math.max(1,Math.floor(o.length/npts));for(let k=0;k<o.length;k++){if(lab[o[k]])tp++;if(k%st===0||k===o.length-1)out.push([np?tp/np:0,tp/(k+1)])}return out}
+/* 2-D Mahalanobis squared distances from sample mean and covariance */
+function adMaha(P,rob){const fit=Q=>{const n=Q.length;let mx=0,my=0;for(const p of Q){mx+=p[0];my+=p[1]}mx/=n;my/=n;let sxx=0,syy=0,sxy=0;for(const p of Q){const a=p[0]-mx,b=p[1]-my;sxx+=a*a;syy+=b*b;sxy+=a*b}return{mx,my,sxx:sxx/(n-1),syy:syy/(n-1),sxy:sxy/(n-1)}},dist=(S,Q)=>Q.map(p=>{const a=p[0]-S.mx,b=p[1]-S.my;return(a*a*S.syy-2*a*b*S.sxy+b*b*S.sxx)/(S.sxx*S.syy-S.sxy*S.sxy)});let S=fit(P);if(rob){const o=ordIdx(dist(S,P)),keep=o.slice(0,Math.floor(.9*P.length)).map(i=>P[i]);S=fit(keep);const f=1.346;S.sxx*=f;S.syy*=f;S.sxy*=f}S.d2=dist(S,P);S.sdx=Math.sqrt(S.sxx);S.sdy=Math.sqrt(S.syy);return S}
+function adKnn(P,k){const n=P.length,out=new Float64Array(n);for(let i=0;i<n;i++){const d=new Float64Array(n-1);let j=0;for(let l=0;l<n;l++)if(l!==i){const a=P[i][0]-P[l][0],b=P[i][1]-P[l][1];d[j++]=Math.sqrt(a*a+b*b)}d.sort();let s=0;for(let q=0;q<k;q++)s+=d[q];out[i]=s/k}return out}
+/* isolation forest for 2-D points */
+function adIF(P,nt,psi){const n=P.length,hl=Math.ceil(Math.log2(psi)),cn=m=>m<=1?0:m===2?1:2*(Math.log(m-1)+.5772156649)-2*(m-1)/m;
+ function build(idx,d){if(d>=hl||idx.length<=1)return{n:idx.length};const f=Math.random()<.5?0:1;let lo=Infinity,hi=-Infinity;for(const i of idx){const v=P[i][f];if(v<lo)lo=v;if(v>hi)hi=v}if(hi<=lo)return{n:idx.length};const s=lo+Math.random()*(hi-lo),L=[],R=[];for(const i of idx)(P[i][f]<s?L:R).push(i);return{f,s,l:build(L,d+1),r:build(R,d+1)}}
+ const trees=[];for(let t=0;t<nt;t++){const ids=Array.from({length:n},(_,i)=>i);for(let i=0;i<Math.min(psi,n);i++){const j=i+Math.floor(Math.random()*(n-i));[ids[i],ids[j]]=[ids[j],ids[i]]}trees.push(build(ids.slice(0,Math.min(psi,n)),0))}
+ const path=(nd,p,d)=>nd.f===undefined?d+cn(nd.n):path(p[nd.f]<nd.s?nd.l:nd.r,p,d+1),c=cn(Math.min(psi,n));
+ return P.map(p=>{let s=0;for(const t of trees)s+=path(t,p,0);return Math.pow(2,-(s/nt)/c)})}
+/* drift measures */
+function adPsi(ref,cur,bins){const s=Float64Array.from(ref).sort(),n=s.length,cut=[];for(let i=1;i<bins;i++)cut.push(s[Math.floor(i*n/bins)]);const cr=new Float64Array(bins),cc=new Float64Array(bins),f=(a,c)=>{for(const v of a){let b=0;while(b<bins-1&&v>=cut[b])b++;c[b]++}};f(ref,cr);f(cur,cc);let p=0;for(let i=0;i<bins;i++){const r=Math.max(cr[i]/ref.length,1e-4),c=Math.max(cc[i]/cur.length,1e-4);p+=(c-r)*Math.log(c/r)}return p}
+function adKs(a,b){const x=Float64Array.from(a).sort(),y=Float64Array.from(b).sort();let i=0,j=0,d=0;const n=x.length,m=y.length;while(i<n&&j<m){const v=Math.min(x[i],y[j]);while(i<n&&x[i]<=v)i++;while(j<m&&y[j]<=v)j++;d=Math.max(d,Math.abs(i/n-j/m))}const ne=n*m/(n+m),l=(Math.sqrt(ne)+.12+.11/Math.sqrt(ne))*d;let q=0;for(let k=1;k<=100;k++){q+=2*(k%2?1:-1)*Math.exp(-2*k*k*l*l)}return{d,p:Math.min(1,Math.max(0,q))}}
+/* CUSUM average run length (Siegmund approximation), shift mu, reference k, limit h; one-sided */
+function adArl(mu,k,h){const b=h+1.166,D=mu-k;if(Math.abs(D)<1e-9)return b*b;return(Math.exp(-2*D*b)+2*D*b-1)/(2*D*D)}
+const adNorm=()=>randn();
+/* ---------- Ch1 anomalies, thresholds and base rates ---------- */
+(function(){scl('c1d',v=>fmt(v/10));scl('c1p',v=>fmt(v/100)+'%');scl('c1t',v=>fmt(v/10)+' σ');
+ const pdf=x=>Math.exp(-x*x/2)/2.5066282746,prec=(pi,tpr,fpr)=>{const a=pi*tpr,b=(1-pi)*fpr;return a+b>0?a/(a+b):0};
+ function run(){const d=val('c1d')/10,pi=val('c1p')/10000,t=val('c1t')/10,tpr=1-normCdf(t-d),fpr=1-normCdf(t),N=100000,al=N*((1-pi)*fpr+pi*tpr),ta=N*pi*tpr,pr=prec(pi,tpr,fpr),lg=v=>Math.log10(Math.max(v,1e-9));
+  const P=mk($('c1cv'),-4,Math.max(9,d+4),4.9,{y0:-1,noGrid:true,L:48});customGrid(P,[-4,-2,0,2,4,6,8].filter(v=>v<=Math.max(9,d+4)).map(v=>[v,String(v)]),[-1,0,1,2,3,4].map(v=>[v,v<0?'0.1':String(Math.pow(10,v))]));
+  clip(P,()=>{P.line(x=>lg(N*(1-pi)*pdf(x)),C.a,2.6,-4,Math.max(9,d+4),200);P.line(x=>lg(N*pi*pdf(x-d)),C.r,2.6,-4,Math.max(9,d+4),200)});P.vline(t,C.y,'threshold',true);legend(P,[['ordinary activity',C.a],['anomalies',C.r]],P.T+12);P.text('score (in standard deviations of ordinary activity) →',P.w-P.R-4,P.h-P.B-6,C.mu,'right');P.text('transactions per 100,000, per unit of score',P.L+6,P.T+28,C.mu);
+  const xs=[];for(let e=-4;e<=-.5;e+=.1)xs.push(e);const Q=mk($('c1cv2'),-4,-.5,1,{L:44,noGrid:true});customGrid(Q,[-4,-3,-2,-1].map(v=>[v,Math.pow(10,v)>=.01?pc1(Math.pow(10,v)):(Math.pow(10,v)*100).toFixed(2)+'%']),niceTicks(0,1,5));
+  [[t-1,C.g],[t,C.a],[t+1,C.p]].forEach(([tt,c])=>poly(Q,xs.map(e=>[e,prec(Math.pow(10,e),1-normCdf(tt-d),1-normCdf(tt))]),c,2.6));Q.vline(Math.log10(pi),C.fg,null,true);legend(Q,[['threshold '+fmt(t-1)+' σ',C.g],[fmt(t)+' σ',C.a],[fmt(t+1)+' σ',C.p]],Q.T+12);Q.text('share of anomalies in the population →',Q.w-Q.R-4,Q.h-Q.B-6,C.mu,'right');Q.text('precision: share of alerts that are real',Q.L+6,Q.T+28,C.mu);
+  $('c1st').innerHTML=stat('alerts per 100,000 transactions',String(Math.round(al)),al>500?'warn':'in')+stat('of which real anomalies',fmt(ta),'')+stat('precision of an alert',pc1(pr),pr<.2?'hot':'ok')+stat('detection rate · false-alarm rate',pc1(tpr)+' · '+pc(fpr),'in');
+  $('c1rd').innerHTML=`An <b>anomaly detector</b> turns each case into a score and raises an alert above a threshold. Two error rates govern it: the <b>detection rate</b> (${pc1(tpr)} here) and the <b>false-alarm rate</b> (${pc(fpr)}). What the analyst experiences, however, is the <b>precision</b>, the share of alerts that are real, and that depends on the <em>base rate</em> too: with ${pc(pi)} of cases anomalous, the ${fmt(al)} alerts per 100,000 cases contain only ${fmt(ta)} real ones, a precision of <b>${pc1(pr)}</b>. A detector with a 0.13% false-alarm rate sounds excellent until the number of ordinary cases is multiplied by it. The right-hand curves show how steeply precision falls as the anomalies get rarer, at three thresholds: raising the threshold trades detection for precision. Setting a threshold is therefore a decision about alert capacity and the cost of a miss against a false alarm (chapter 11 and the decision-theory item), and the first number to compute for any rare-event detector, such as AML or fraud alerts, is the expected number of alerts per day and the share that will be false.`}
+ ['c1d','c1p','c1t'].forEach(i=>$(i).addEventListener('change',run));run();})();
+
+/* ---------- Ch2 robust statistical thresholds ---------- */
+(function(){scl('c2k',v=>v+'%');scl('c2n',v=>v);
+ function gen(d,k,n){const x=[],lab=[];for(let i=0;i<n;i++){if(d==='cont'){if(Math.random()<k/100){x.push(8+randn());lab.push(1)}else{x.push(randn());lab.push(0)}}else{x.push(adT(3));lab.push(0)}}return[x,lab]}
+ function flags(x){const n=x.length,m=avg(x),s=sdv(x),md=adMed(x),mad=adMad(x);return[x.map(v=>Math.abs(v-m)>3*s),x.map(v=>Math.abs(v-md)>3*mad),m,s,md,mad]}
+ function run(){const d=$('c2d').value,k=val('c2k'),n=val('c2n'),R=100;let cz=0,cm=0,fz=0,fm=0,no=0,ng=0;
+  for(let r=0;r<R;r++){const [x,lab]=gen(d,k,n),[fz1,fm1]=flags(x);for(let i=0;i<n;i++){if(lab[i]){no++;if(fz1[i])cz++;if(fm1[i])cm++}else{ng++;if(fz1[i])fz++;if(fm1[i])fm++}}}
+  const [x,lab,]=gen(d,k,n),F=flags(x),m=F[2],s=F[3],md=F[4],mad=F[5],P=histLines($('c2cv'),[x],[C.a],-8,16,48,[[m-3*s,C.r,'',true],[m+3*s,C.r,'mean ± 3 sd',true],[md-3*mad,C.g,'',false],[md+3*mad,C.g,'median ± 3 MAD',false]]);P.text('one sample · red: mean ± 3 sd · green: median ± 3 MAD',P.L+8,P.T+12,C.mu);
+  const grp=d==='cont'?[[cz/Math.max(no,1),cm/Math.max(no,1)],[fz/ng,fm/ng]]:[[fz/ng,fm/ng]],Q=barG($('c2cv2'),grp,[C.r,C.g],d==='cont'?['outliers caught','ordinary points flagged']:['points flagged (no real outliers)'],0,d==='cont'?1.1:Math.max(.02,Math.max(fz,fm)/ng*1.4),v=>pc1(v));Q.text('red: mean ± 3 sd · green: median ± 3 MAD',Q.L+6,Q.T+12,C.mu);
+  $('c2st').innerHTML=(d==='cont'?stat('outliers caught: sd rule · MAD rule',pc1(cz/no)+' · '+pc1(cm/no),cz/no<.5?'hot':'in'):stat('normal-theory expectation for 3 sd','0.27%',''))+stat('ordinary points flagged: sd · MAD',pc(fz/ng)+' · '+pc(fm/ng),'in')+stat('this sample: mean · sd',fmt(m)+' · '+fmt(s),'')+stat('median · MAD',fmt(md)+' · '+fmt(mad),'');
+  $('c2rd').innerHTML=d==='cont'?`${n} observations, ${k}% of which are outliers centred at 8 (ordinary points are standard normal). The familiar rule “flag anything beyond the mean ± 3 standard deviations” has a flaw: <b>the outliers inflate the very mean and standard deviation</b> used to define normal, so the limit moves outwards and the outliers hide themselves (<b>masking</b>). Here the sd rule catches ${pc1(cz/no)} of them, against ${pc1(cm/no)} for the <b>median and MAD</b> rule, whose breakdown point is 50%: contamination up to nearly half of the data does not move it. Use robust location and scale (median, MAD, or Qn/Sn) to define the limits, and re-estimate them on a clean reference period rather than on data that may contain the events being sought.`:`${n} observations from a Student t with 3 degrees of freedom: there are no outliers to find, the data are simply heavy-tailed. A 3-sd rule built for the normal distribution flags ${pc(fz/ng)} of ordinary points (the normal-theory figure is 0.27%), and the MAD rule ${pc(fm/ng)}. In heavy-tailed data a fixed multiple-of-sd threshold produces a stream of false alarms that scales with the tail, so the threshold should be set from the empirical or fitted tail of the reference data (item 31), not from normal tables.`}
+ ['c2d','c2k','c2n'].forEach(i=>$(i).addEventListener('change',run));$('c2go').onclick=run;run();})();
+
+/* ---------- Ch3 multivariate anomalies: Mahalanobis ---------- */
+(function(){scl('c3r',v=>fmt(v/100));scl('c3m',v=>fmt(v/10));scl('c3n',v=>v);
+ function make(rho,m,n,na){const P=[],lab=[];for(let i=0;i<n;i++){const a=randn(),b=rho*a+Math.sqrt(1-rho*rho)*randn();P.push([a,b]);lab.push(0)}for(let i=0;i<na;i++){const sg=Math.random()<.5?1:-1,M=randn()*Math.sqrt(1+rho),N=sg*m*Math.sqrt(1-rho);P.push([(M+N)/Math.SQRT2,(M-N)/Math.SQRT2]);lab.push(1)}return[P,lab]}
+ function scores(P){const A=adMaha(P,true),mz=P.map(p=>Math.max(Math.abs(p[0]-A.mx)/A.sdx,Math.abs(p[1]-A.my)/A.sdy));return[A,mz]}
+ function run(){const rho=val('c3r')/100,m=val('c3m')/10,n=val('c3n'),na=Math.max(10,Math.round(n*.03)),[P,lab]=make(rho,m,n,na),[A,mz]=scores(P),thr=13.82;
+  const X=P.map(p=>p[0]),Y=P.map(p=>p[1]),lim=Math.max(5,...X.map(Math.abs),...Y.map(Math.abs))*1.02,S=mk($('c3cv'),-lim,lim,lim,{y0:-lim,L:40});scat(S,X,Y,C.a,3000,2.4,i=>lab[i]?'rgba(255,107,129,.95)':'rgba(110,168,255,.5)');
+  const sx=A.sdx,sy=A.sdy;clip(S,()=>{const L=[[Math.sqrt(A.sxx),0],[A.sxy/Math.sqrt(A.sxx),Math.sqrt(Math.max(A.syy-A.sxy*A.sxy/A.sxx,1e-9))]],pts=[];for(let k=0;k<=80;k++){const th=2*Math.PI*k/80,u=Math.cos(th)*Math.sqrt(thr),v=Math.sin(th)*Math.sqrt(thr);pts.push([A.mx+L[0][0]*u,A.my+L[1][0]*u+L[1][1]*v])}poly(S,pts,C.g,2.2);poly(S,[[A.mx-3*sx,A.my-3*sy],[A.mx+3*sx,A.my-3*sy],[A.mx+3*sx,A.my+3*sy],[A.mx-3*sx,A.my+3*sy],[A.mx-3*sx,A.my-3*sy]],C.y,2,true)});
+  S.text('red: anomalies · green ellipse: Mahalanobis 99.9% · yellow box: each variable within 3 sd',S.L+6,S.T+12,C.mu);
+  const rr=[0,20,40,60,80,90,95],A1=[],A2=[];rr.forEach(r=>{const [p,l]=make(r/100,m,1000,30),[a,z]=scores(p);A1.push(adAuc(z,l));A2.push(adAuc(a.d2,l))});
+  const Q=mk($('c3cv2'),0,rr.length-1,1.02,{y0:.4,noGrid:true,L:44});customGrid(Q,rr.map((r,i)=>[i,String(r/100)]),niceTicks(.4,1,6));Q.hline(.5,C.mu,'chance');poly(Q,A1.map((v,i)=>[i,v]),C.y,2.6);dots(Q,A1.map((v,i)=>[i,v]),C.y,3.4);poly(Q,A2.map((v,i)=>[i,v]),C.g,2.6);dots(Q,A2.map((v,i)=>[i,v]),C.g,3.4);legend(Q,[['largest z-score',C.y],['Mahalanobis',C.g]],Q.T+12);Q.text('correlation ρ between the two variables →',Q.w-Q.R-4,Q.h-Q.B-6,C.mu,'right');Q.text('AUC (1 = perfect)',Q.L+6,Q.T+28,C.mu);
+  let tz=0,tm=0,fz=0,fm=0;for(let i=0;i<P.length;i++){const a=mz[i]>3,b=A.d2[i]>thr;if(lab[i]){if(a)tz++;if(b)tm++}else{if(a)fz++;if(b)fm++}}
+  $('c3st').innerHTML=stat('anomalies caught: z-rule · Mahalanobis',pc1(tz/na)+' · '+pc1(tm/na),tm>tz?'ok':'in')+stat('ordinary points flagged: z-rule · Mahalanobis',pc(fz/n)+' · '+pc(fm/n),'in')+stat('anomaly distance along the minor axis',fmt(m)+' sd','')+stat('AUC at this ρ: z-score · Mahalanobis',fmt(adAuc(mz,lab))+' · '+fmt(adAuc(A.d2,lab)),'');
+  $('c3rd').innerHTML=`Two correlated variables (ρ = ${fmt(rho)}) and ${na} anomalies placed <b>${fmt(m)} standard deviations away along the direction in which the data hardly vary</b>. Each variable on its own looks ordinary: the anomalies are inside the yellow box of “3 sd on every variable”, so a rule applied variable by variable catches ${pc1(tz/na)} of them. The <b>Mahalanobis distance</b> d² = (x − μ)ᵀ Σ⁻¹ (x − μ) measures distance in units of the data’s own spread and correlation, and under a normal model d² follows a χ² distribution with p degrees of freedom, so the 99.9% limit (13.8 for p = 2, the green ellipse) is a principled threshold; it catches ${pc1(tm/na)}. The right panel repeats the experiment over ρ: with uncorrelated variables the two rules are equal, and the stronger the correlation the more univariate monitoring misses. The caveats: Σ must itself be estimated robustly (here by trimming the 10% most distant points and re-estimating, the first step of the minimum-covariance-determinant algorithm; with the ordinary covariance the ${na} anomalies inflate it along the minor axis and hide themselves, the multivariate form of the masking in chapter 2), the χ² limit assumes normality, and with many variables the distance concentrates (“curse of dimensionality”), so monitoring the principal-component scores or a learned model of normal is the usual route (item 30).`}
+ ['c3r','c3m','c3n'].forEach(i=>$(i).addEventListener('change',run));$('c3go').onclick=run;run();})();
+
+/* ---------- Ch4 distance, density and isolation ---------- */
+(function(){scl('c4k',v=>v);
+ function gen(shape){const P=[],lab=[],n=500,na=30;if(shape==='blob'){for(let i=0;i<n;i++){P.push([randn(),randn()]);lab.push(0)}for(let i=0;i<na;i++){let a,b;do{a=randn()*3;b=randn()*3}while(a*a+b*b<16);P.push([a,b]);lab.push(1)}}
+  else if(shape==='clusters'){for(let i=0;i<n;i++){const s=i%2?3:-3;P.push([s+.7*randn(),.7*randn()]);lab.push(0)}for(let i=0;i<na;i++){if(i<18)P.push([(Math.random()-.5)*2.2,(Math.random()-.5)*3]);else{const a=Math.random()*6.28;P.push([8*Math.cos(a),8*Math.sin(a)])}lab.push(1)}}
+  else{for(let i=0;i<n;i++){const a=Math.random()*6.283;P.push([3*Math.cos(a)+.25*randn(),3*Math.sin(a)+.25*randn()]);lab.push(0)}for(let i=0;i<na;i++){if(i<18)P.push([.7*randn(),.7*randn()]);else{const a=Math.random()*6.28;P.push([7*Math.cos(a),7*Math.sin(a)])}lab.push(1)}}
+  return[P,lab]}
+ function run(){const sh=$('c4s').value,k=val('c4k'),R=12,au=[[],[],[]];let first=null;
+  for(let r=0;r<R;r++){const [P,lab]=gen(sh),a=adMaha(P).d2,b=adKnn(P,k),c=adIF(P,80,128);au[0].push(adAuc(a,lab));au[1].push(adAuc(b,lab));au[2].push(adAuc(c,lab));if(!first)first={P,lab,c}}
+  const {P,lab,c}=first,o=adDesc(c),top=new Set(o.slice(0,30)),X=P.map(p=>p[0]),Y=P.map(p=>p[1]),lim=Math.max(6,...X.map(Math.abs),...Y.map(Math.abs))*1.05,S=mk($('c4cv'),-lim,lim,lim,{y0:-lim,L:40});
+  scat(S,X,Y,C.a,3000,2.6,i=>lab[i]?(top.has(i)?'rgba(74,222,128,1)':'rgba(255,209,102,1)'):(top.has(i)?'rgba(255,107,129,1)':'rgba(110,168,255,.45)'));S.text('top 30 isolation scores · green: real anomaly found · yellow: missed · red: false alarm',S.L+6,S.T+12,C.mu);
+  const m=au.map(avg),Q=barV($('c4cv2'),m,[C.y,C.a,C.g],['Mahalanobis','k-NN distance','isolation forest'],1.1,fmt);Q.text('mean AUC over '+R+' data sets',Q.L+6,Q.T+12,C.mu);
+  $('c4st').innerHTML=stat('AUC: Mahalanobis · k-NN · isolation forest',m.map(fmt).join(' · '),'in')+stat('best method',['Mahalanobis','k-NN distance','isolation forest'][m.indexOf(Math.max(...m))],'ok')+stat('AUC spread (min–max) of the isolation forest',fmt(Math.min(...au[2]))+' – '+fmt(Math.max(...au[2])),'')+stat('k for the k-NN distance',String(k),'');
+  $('c4rd').innerHTML=`500 ordinary points and 30 anomalies in the plane. Three scores are compared by AUC (the probability that a random anomaly scores above a random ordinary point). <b>Mahalanobis distance</b> assumes one elliptical cloud: it is excellent for ${sh==='blob'?'this blob (AUC '+fmt(m[0])+')':'a single blob, but here it scores '+fmt(m[0])+', because the middle of the data is empty (anomalies in the gap or at the centre of the ring sit at distance zero from the mean)'}. The <b>k-nearest-neighbour distance</b> (mean distance to the ${k} closest points) is a local density measure with no shape assumption (AUC ${fmt(m[1])}), but its cost grows with the square of the sample size and k must be chosen: too small and clusters of anomalies look normal, too large and it behaves globally. The <b>isolation forest</b> scores points by how few random axis-parallel cuts are needed to separate them (AUC ${fmt(m[2])}): anomalies are few and different, so they are isolated early; it is fast, assumes no shape, and is the usual first model in practice. No method wins everywhere (change the shape), none is validated without labels, and each needs the threshold or contamination rate chosen with care.`}
+ ['c4s','c4k'].forEach(i=>$(i).addEventListener('change',run));$('c4go').onclick=run;run();})();
+
+/* ---------- Ch5 evaluating detectors ---------- */
+(function(){scl('c5d',v=>fmt(v/10));scl('c5n',v=>v);
+ const PV=[.05,.005,.0005];
+ function sim(d,pi,n){const na=Math.max(5,Math.round(pi*n)),sc=new Float64Array(n),lab=new Uint8Array(n);for(let i=0;i<n;i++){const a=i<na;lab[i]=a?1:0;sc[i]=randn()+(a?d:0)}return[sc,lab,na]}
+ function run(){const d=val('c5d')/10,n=val('c5n'),res=PV.map(pi=>{const [sc,lab,na]=sim(d,pi,n),k=Math.max(1,Math.round(n*.01));return{auc:adAuc(sc,lab),ap:adAP(sc,lab),pk:adPrecAt(sc,lab,k),pr:adPR(sc,lab,150),na,k}}),cols=[C.g,C.y,C.r];
+  const P=mk($('c5cv'),0,1,1,{L:44});res.forEach((r,i)=>poly(P,r.pr,cols[i],2.4));legend(P,PV.map((p,i)=>['prevalence '+pc(p),cols[i]]),P.T+12);P.text('recall →',P.w-P.R-4,P.h-P.B-6,C.mu,'right');P.text('precision',P.L+6,P.T+28,C.mu);
+  const Q=barG($('c5cv2'),res.map(r=>[r.auc,r.ap,r.pk]),[C.a,C.y,C.g],PV.map(p=>pc(p)+' anomalies'),0,1.1,v=>fmt(v));Q.text('blue: AUC · yellow: average precision · green: precision in the top 1%',Q.L+6,Q.T+12,C.mu);
+  $('c5st').innerHTML=stat('AUC at 5% · 0.5% · 0.05% anomalies',res.map(r=>fmt(r.auc)).join(' · '),'ok')+stat('average precision',res.map(r=>fmt(r.ap)).join(' · '),'hot')+stat('precision in the top 1%',res.map(r=>fmt(r.pk)).join(' · '),'warn')+stat('anomalies in the sample',res.map(r=>r.na).join(' · '),'');
+  $('c5rd').innerHTML=`The same detector (ordinary scores N(0, 1), anomalies N(${fmt(d)}, 1)) on three populations of ${n} cases that differ only in how rare the anomalies are. The <b>AUC</b> is the same each time (${res.map(r=>fmt(r.auc)).join(', ')}) because it compares only the ranking of anomalies against ordinary points and ignores prevalence. What the investigators see is different: <b>average precision</b> (the area under the precision–recall curve) falls from ${fmt(res[0].ap)} to ${fmt(res[2].ap)} as anomalies move from 5% to 0.05%, and the precision of the top 1% of alerts from ${fmt(res[0].pk)} to ${fmt(res[2].pk)}. So report <b>precision at the capacity of the review team</b> (top k, or top x%) and the precision–recall curve, not AUC alone, and quote the prevalence behind any figure. Two further cautions. With very few anomalies every metric is noisy (the 0.05% case has only ${res[2].na} anomalies), so give intervals. And in most real settings labels come from investigations of the cases that were already alerted, so the evaluation sample is selected by the detector itself; precision can be estimated from reviewed alerts, but recall and AUC cannot without a random labelled audit sample.`}
+ ['c5d','c5n'].forEach(i=>$(i).addEventListener('change',run));$('c5go').onclick=run;run();})();
+
+/* ---------- Ch6 control charts ---------- */
+(function(){scl('c6d',v=>fmt(v/10)+' σ');scl('c6x',v=>v);
+ const lam=.2,LE=2.86,K=.5,H=4.77,SH=[.5,1,1.5,2,3],LEN=300;
+ function runChart(shift,ts,len,keep){let z=0,cp=0,cm=0,a=[-1,-1,-1];const xs=[],ew=[];for(let t=0;t<len;t++){const x=randn()+(t>=ts?shift:0);if(keep){xs.push(x);}z=lam*x+(1-lam)*z;const sg=Math.sqrt(lam/(2-lam)*(1-Math.pow(1-lam,2*(t+1))));if(keep)ew.push(z);cp=Math.max(0,cp+x-K);cm=Math.max(0,cm-x-K);if(a[0]<0&&Math.abs(x)>3)a[0]=t;if(a[1]<0&&Math.abs(z)>LE*sg)a[1]=t;if(a[2]<0&&(cp>H||cm>H))a[2]=t;if(!keep&&a[0]>=0&&a[1]>=0&&a[2]>=0)break}return keep?{a,xs,ew}:a}
+ function run(){const sh=val('c6d')/10,ts=val('c6x'),one=runChart(sh,ts,LEN,true),P=mk($('c6cv'),0,LEN,5,{y0:-5,L:40});poly(P,one.xs.map((v,i)=>[i,v]),'rgba(138,147,171,.7)',1.2);poly(P,one.ew.map((v,i)=>[i,v*2.5]),C.a,2.4);P.hline(3,C.r,'');P.hline(-3,C.r,'');P.vline(ts,C.fg,'shift',true);
+  const nm=['Shewhart','EWMA','CUSUM'],cl=[C.y,C.a,C.g];one.a.forEach((t,i)=>{if(t>=0){P.vline(t,cl[i],null,false)}});legend(P,[['Shewhart alarm',C.y],['EWMA alarm (line = EWMA × 2.5)',C.a],['CUSUM alarm',C.g]],P.T+12);P.text('time →',P.w-P.R-4,P.h-P.B-6,C.mu,'right');
+  const R=300,del=nm.map(()=>[]);SH.forEach((s,k)=>{const sums=[0,0,0];for(let r=0;r<R;r++){const a=runChart(s,0,500,false);a.forEach((t,i)=>sums[i]+=t<0?500:t+1)}sums.forEach((v,i)=>del[i].push(v/R))});
+  const mx=Math.max(...del.flat()),Q=mk($('c6cv2'),0,SH.length-1,mx*1.1,{noGrid:true,L:44});customGrid(Q,SH.map((s,i)=>[i,fmt(s)+' σ']),niceTicks(0,mx*1.1,5));del.forEach((d,i)=>{poly(Q,d.map((v,k)=>[k,v]),cl[i],2.6);dots(Q,d.map((v,k)=>[k,v]),cl[i],3.4)});legend(Q,nm.map((n,i)=>[n,cl[i]]),Q.T+12);Q.text('size of the shift in the mean →',Q.w-Q.R-4,Q.h-Q.B-6,C.mu,'right');Q.text('average steps until the alarm',Q.L+6,Q.T+28,C.mu);
+  const arl=[0,0,0],RA=120;for(let r=0;r<RA;r++){const a=runChart(0,1e9,6000,false);a.forEach((t,i)=>arl[i]+=t<0?6000:t+1)}
+  $('c6st').innerHTML=stat('first alarm (this run): Shewhart · EWMA · CUSUM',one.a.map(t=>t<0?'none':String(t+1)).join(' · '),'in')+stat('mean delay at a 1 σ shift',del.map(d=>fmt(d[1])).join(' · '),'ok')+stat('mean delay at a 0.5 σ shift',del.map(d=>fmt(d[0])).join(' · '),'warn')+stat('simulated false-alarm interval (steps): all three tuned to about 370',arl.map(v=>Math.round(v/RA)).join(' · '),'');
+  $('c6rd').innerHTML=`An ordinary process (grey, mean 0, sd 1) whose mean shifts by ${fmt(sh)} σ at time ${ts}. Three classical <b>control charts</b>, each tuned to the same false-alarm rate (about one alarm per 370 steps when nothing has changed), differ in how they use the history. The <b>Shewhart chart</b> looks at each point (alarm beyond ±3): it catches big jumps at once and is blind to small persistent shifts, needing dozens of steps at 1 σ. The <b>EWMA chart</b> (blue) averages with exponentially decaying weights and the <b>CUSUM</b> accumulates deviations beyond a reference value k = 0.5 σ; both accumulate small signals and detect a 1 σ shift in about ${fmt(del[1][1])} and ${fmt(del[2][1])} steps against ${fmt(del[0][1])} for Shewhart, at the price of being a little slower for very large shifts (right panel). The CUSUM is the optimal detector for a specified shift size (Page; Lorden). The two numbers that describe any monitor are the <b>average run length in control</b> (ARL₀, its false-alarm interval) and the <b>detection delay</b> after a change; improving one worsens the other, so always quote them together.`}
+ ['c6d','c6x'].forEach(i=>$(i).addEventListener('change',run));$('c6go').onclick=run;run();})();
+/* ---------- Ch7 monitoring many features ---------- */
+(function(){scl('c7m',v=>v);scl('c7s',v=>v);scl('c7d',v=>fmt(v/10)+' σ');scl('c7a',v=>v+'%');
+ function run(){const m=val('c7m'),s=Math.min(val('c7s'),m),d=val('c7d')/10,al=val('c7a')/100,R=300,M=['no correction','Bonferroni','Benjamini–Hochberg'],any=[0,0,0],fa=[0,0,0],tp=[0,0,0],al_=[0,0,0];
+  for(let r=0;r<R;r++){const p=[];for(let j=0;j<m;j++){const z=randn()+(j<s?d:0);p.push(2*(1-normCdf(Math.abs(z))))}
+   const f0=p.map(v=>v<al),f1=p.map(v=>v<al/m),o=p.map((v,j)=>[v,j]).sort((a,b)=>a[0]-b[0]);let kmax=-1;o.forEach(([v],k)=>{if(v<=(k+1)*al/m)kmax=k});const f2=new Array(m).fill(false);for(let k=0;k<=kmax;k++)f2[o[k][1]]=true;
+   [f0,f1,f2].forEach((f,i)=>{let a=0,b=0;for(let j=0;j<m;j++)if(f[j]){if(j<s)b++;else a++}fa[i]+=a;tp[i]+=b;al_[i]+=a+b;if(a>0)any[i]++})}
+  const pw=tp.map(v=>s?v/(R*s):0),fdp=al_.map((v,i)=>v?fa[i]/v:0);
+  const P=barV($('c7cv'),any.map(v=>v/R),[C.r,C.y,C.g],M,1.1,pc1);P.text('chance of at least one false alert on a day',P.L+6,P.T+12,C.mu);
+  const Q=barG($('c7cv2'),M.map((_,i)=>[pw[i],fdp[i]]),[C.a,C.r],M,0,1.1,pc1);Q.text('blue: share of real drifts detected · red: share of alerts that are false',Q.L+6,Q.T+12,C.mu);
+  $('c7st').innerHTML=stat('false alerts per day: none · Bonferroni · BH',fa.map(v=>fmt(v/R)).join(' · '),fa[0]/R>1?'hot':'in')+stat('chance of ≥ 1 false alert: none · Bonf. · BH',any.map(v=>pc1(v/R)).join(' · '),'')+stat('drifts detected: none · Bonf. · BH',pw.map(v=>pc1(v)).join(' · '),'ok')+stat('features monitored · truly drifted',m+' · '+s,'');
+  $('c7rd').innerHTML=`${m} features are tested every day at the ${pc(al)} level; ${s} have really drifted by ${fmt(d)} σ and the rest are fine. <b>Without any correction</b> about ${fmt(fa[0]/R)} false alerts arrive every day, and on ${pc1(any[0]/R)} of days at least one: with a large feature set a dashboard of independent tests is always lit (the multiple-testing problem of item 21 in monitoring clothes), and analysts learn to ignore it (<b>alert fatigue</b>). <b>Bonferroni</b> keeps the chance of any false alert near ${pc(al)} (${pc1(any[1]/R)} here) but detects only ${pc1(pw[1])} of the real drifts. <b>Benjamini–Hochberg</b> controls the <em>share</em> of false alerts (${pc1(fdp[2])} of alerts here) while detecting ${pc1(pw[2])}, which is usually the better trade when someone investigates every alert. Practical measures: choose the error rate to control (any false alert, or the share of false alerts), test summaries rather than all raw features, prioritise features by importance to the model, and track the alert volume itself as a monitored quantity.`}
+ ['c7m','c7s','c7d','c7a'].forEach(i=>$(i).addEventListener('change',run));$('c7go').onclick=run;run();})();
+
+/* ---------- Ch8 distribution drift measures ---------- */
+(function(){scl('c8s',v=>fmt(v/100)+' σ');
+ const NS=[200,500,1000,5000,20000,100000];
+ function run(){const sh=val('c8s')/100,PS=[],PN=[],KS=[],KN=[];
+  NS.forEach(n=>{const R=n<=5000?40:(n<=20000?16:8);let ps=0,pn=0,ks=0,kn=0;for(let r=0;r<R;r++){const a=Array.from({length:n},randn),b=Array.from({length:n},()=>randn()+sh),c=Array.from({length:n},randn);ps+=adPsi(a,b,10);pn+=adPsi(a,c,10);if(adKs(a,b).p<.05)ks++;if(adKs(a,c).p<.05)kn++}PS.push(ps/R);PN.push(pn/R);KS.push(ks/R);KN.push(kn/R)});
+  const mxp=Math.max(.3,...PS,...PN),P=mk($('c8cv'),0,NS.length-1,mxp*1.05,{noGrid:true,L:48});customGrid(P,NS.map((n,i)=>[i,nlab(n)]),niceTicks(0,mxp*1.05,5));P.hline(.1,C.y,'0.1: watch');P.hline(.25,C.r,'0.25: act');poly(P,PS.map((v,i)=>[i,v]),C.a,2.6);dots(P,PS.map((v,i)=>[i,v]),C.a,3.4);poly(P,PN.map((v,i)=>[i,v]),C.g,2.6,true);dots(P,PN.map((v,i)=>[i,v]),C.g,3.4);legend(P,[['with the shift',C.a],['no shift at all',C.g]],P.T+12);P.text('sample size in each period →',P.w-P.R-4,P.h-P.B-6,C.mu,'right');P.text('PSI (10 bins)',P.L+6,P.T+28,C.mu);
+  const Q=mk($('c8cv2'),0,NS.length-1,1.05,{noGrid:true,L:44});customGrid(Q,NS.map((n,i)=>[i,nlab(n)]),niceTicks(0,1,5));Q.hline(.05,C.mu,'');poly(Q,KS.map((v,i)=>[i,v]),C.a,2.6);dots(Q,KS.map((v,i)=>[i,v]),C.a,3.4);poly(Q,KN.map((v,i)=>[i,v]),C.g,2.6,true);dots(Q,KN.map((v,i)=>[i,v]),C.g,3.4);legend(Q,[['with the shift',C.a],['no shift at all',C.g]],Q.T+12);Q.text('sample size in each period →',Q.w-Q.R-4,Q.h-Q.B-6,C.mu,'right');Q.text('share of KS tests with p < 0.05',Q.L+6,Q.T+28,C.mu);
+  const a=Array.from({length:5000},randn),b=Array.from({length:5000},()=>randn()+sh),qa=Float64Array.from(a).sort(),qb=Float64Array.from(b).sort();let w=0;for(let i=0;i<5000;i++)w+=Math.abs(qa[i]-qb[i]);w/=5000;const k1=adKs(a,b);
+  $('c8st').innerHTML=stat('PSI with no drift: n = 200 · 1,000 · 100,000',fmt(PN[0])+' · '+fmt(PN[2])+' · '+fmt(PN[5]),PN[0]>.05?'warn':'in')+stat('PSI with the shift: n = 200 · 5,000 · 100,000',fmt(PS[0])+' · '+fmt(PS[3])+' · '+fmt(PS[5]),'')+stat('KS rejection rate at n = 100,000: with shift · none',pc1(KS[5])+' · '+pc1(KN[5]),KS[5]>.5&&sh<.15?'hot':'in')+stat('Wasserstein distance (5,000 vs 5,000) · KS statistic',fmt(w)+' · '+fmt(k1.d),'');
+  $('c8rd').innerHTML=`A reference sample and a current sample from distributions whose means differ by ${fmt(sh)} σ (the green curves: no difference at all). Two lessons about the standard drift scores. <b>PSI</b> (population stability index, Σ (current% − reference%) ln(current%/reference%) over 10 reference-decile bins, with the rules of thumb 0.1 and 0.25) is biased upwards in small samples: even with no drift it averages ${fmt(PN[0])} at n = 200 and ${fmt(PN[2])} at n = 1,000, because the bin shares are noisy (the expected value is about (bins − 1)(1/n₁ + 1/n₂)), so a fixed cut-off alarms on noise when the batches are small. The <b>KS test</b> has the opposite problem: it is a significance test, and at n = 100,000 it rejects ${pc1(KS[5])} of the time for a shift of ${fmt(sh)} σ that no model would notice, while keeping its 5% false-alarm rate under no drift. A test answers “is there any difference?”, which for large samples is always yes; monitoring needs an <b>effect size</b> (Wasserstein distance, PSI, the change in the model’s score or loss) compared with a threshold of practical importance, with the sampling noise in mind (bootstrap or permutation limits on a stable reference period).`}
+ ['c8s'].forEach(i=>$(i).addEventListener('change',run));$('c8go').onclick=run;run();})();
+
+/* ---------- Ch9 covariate, concept and prior drift ---------- */
+(function(){scl('c9m',v=>v+'%');
+ const B=[-2.5,1.5,1],sg=z=>1/(1+Math.exp(-z));
+ function gen(type,m,n){const X1=[],lg=[],y=[],b=B.slice();let mu=0;if(type==='cov')mu=1.5*m;if(type==='concept')b[1]=1.5*(1-2*m);if(type==='prior')b[0]=B[0]+1.5*m;
+  for(let i=0;i<n;i++){const x1=randn()+mu,x2=randn(),l0=B[0]+B[1]*x1+B[2]*x2,l=b[0]+b[1]*x1+b[2]*x2;X1.push(x1);lg.push(l0);y.push(Math.random()<sg(l)?1:0)}return{X1,lg,y}}
+ function run(){const type=$('c9t').value,m=val('c9m')/100,n=15000,ref=gen('none',0,n),cur=gen(type,m,n),pa=ref.lg.map(sg),pb=cur.lg.map(sg),mp=avg(pb),my=avg(cur.y),ll=(p,y)=>-avg(p.map((q,i)=>y[i]?Math.log(Math.max(q,1e-9)):Math.log(Math.max(1-q,1e-9))));
+  const P=histLines($('c9cv'),[ref.lg,cur.lg],[C.a,C.r],-9,5,40,[]);P.text('model score (log-odds) · blue: reference · red: current',P.L+8,P.T+12,C.mu);
+  const Q=mk($('c9cv2'),0,Math.max(.3,Math.max(...pb)),Math.max(.3,Math.max(...pb)),{L:44});Q.line(x=>x,C.mu,1.4,0,1,2,true);const o=ordIdx(pb),bins=10,pts=[],pr=[];for(let k=0;k<bins;k++){const sl=o.slice(Math.floor(k*n/bins),Math.floor((k+1)*n/bins));pts.push([avg(sl.map(i=>pb[i])),avg(sl.map(i=>cur.y[i]))])}poly(Q,pts,C.r,2.6);dots(Q,pts,C.r,3.6);
+  const o2=ordIdx(pa),p2=[];for(let k=0;k<bins;k++){const sl=o2.slice(Math.floor(k*n/bins),Math.floor((k+1)*n/bins));p2.push([avg(sl.map(i=>pa[i])),avg(sl.map(i=>ref.y[i]))])}poly(Q,p2,C.a,2.2,true);legend(Q,[['current period',C.r],['reference period',C.a]],Q.T+12);Q.text('predicted probability →',Q.w-Q.R-4,Q.h-Q.B-6,C.mu,'right');Q.text('observed rate (calibration by decile)',Q.L+6,Q.T+28,C.mu);
+  const psx=adPsi(ref.X1,cur.X1,10),pss=adPsi(ref.lg,cur.lg,10),a0=adAuc(pa,ref.y),a1=adAuc(pb,cur.y);
+  $('c9st').innerHTML=stat('PSI of the input x₁ · of the score',fmt(psx)+' · '+fmt(pss),psx>.25||pss>.25?'hot':'in')+stat('AUC: reference · current',fmt(a0)+' · '+fmt(a1),a1<a0-.05?'hot':'ok')+stat('mean prediction · observed rate',pc1(mp)+' · '+pc1(my),Math.abs(mp-my)>.02?'warn':'ok')+stat('log-loss: reference · current',fmt(ll(pa,ref.y))+' · '+fmt(ll(pb,cur.y)),'');
+  const nm={none:'no change',cov:'covariate drift',concept:'concept drift',prior:'prior (base-rate) drift'}[type];
+  $('c9rd').innerHTML=`A scoring model (a logistic model whose coefficients are exactly right in the reference period) is deployed and the world changes in one of three ways; the one shown is <b>${nm}</b> at ${val('c9m')}% strength. <b>Covariate drift</b> changes the distribution of the inputs but not the relationship P(y | x): PSI on x₁ and on the score rises (${fmt(psx)}, ${fmt(pss)}) while a correctly specified model stays calibrated and keeps its ranking quality${type==='cov'?` (AUC ${fmt(a1)}, mean prediction ${pc1(mp)} against ${pc1(my)} observed)`:''}: the alarm is real but not a reason to retrain by itself. <b>Concept drift</b> changes P(y | x) (here the effect of x₁ shrinks and can reverse): the inputs look identical (PSI of x₁ ${type==='concept'?fmt(psx):'near zero'}) yet the AUC falls to ${type==='concept'?fmt(a1):fmt(a0)} and the calibration curve leaves the diagonal; no unlabelled monitor can see it. <b>Prior drift</b> changes the base rate (observed ${pc1(my)} against predicted ${pc1(mp)}): ranking is preserved, calibration is not. The lesson for governance: input and score drift monitors are early, cheap and label-free but ambiguous, and performance monitoring (AUC, calibration, loss against outcomes, with the outcome delay in mind) is the only direct test; monitor both, and decide the response (recalibrate, retrain, rebuild) by the kind of drift diagnosed.`}
+ ['c9t','c9m'].forEach(i=>$(i).addEventListener('change',run));$('c9go').onclick=run;run();})();
+
+/* ---------- Ch10 window size trade-off ---------- */
+(function(){scl('c10w',v=>v);scl('c10d',v=>fmt(v)+' points');scl('c10h',v=>fmt(v/10));
+ const P0=.10,T=2000,TD=1000,WL=[20,50,100,200,500];
+ function sim(w,d,h,keep){const lim=h*Math.sqrt(P0*(1-P0)/w),buf=new Uint8Array(w);let sum=0,fa=0,prev=false,del=-1;const ser=[];for(let t=0;t<T;t++){const e=Math.random()<P0+(t>=TD?d/100:0)?1:0;sum-=buf[t%w];buf[t%w]=e;sum+=e;const est=sum/Math.min(t+1,w),al=t>=w&&est-P0>lim;if(keep)ser.push(est);if(t<TD){if(al&&!prev)fa++}else if(al&&del<0)del=t-TD+1;prev=al}return{fa,del:del<0?T-TD:del,ser,lim}}
+ function run(){const w=val('c10w'),d=val('c10d'),h=val('c10h')/10,one=sim(w,d,h,true),P=mk($('c10cv'),0,T,.3,{y0:0,L:44});poly(P,one.ser.map((v,i)=>[i,v]),C.a,1.8);P.hline(P0+one.lim,C.r,'alarm limit');P.hline(P0,C.mu,'');P.vline(TD,C.fg,'drift',true);P.text('error rate estimated in a window of '+w+' cases',P.L+8,P.T+12,C.mu);P.text('time →',P.w-P.R-4,P.h-P.B-6,C.mu,'right');
+  const R=60,res=WL.concat([w]).map(ww=>{let fa=0,de=0;for(let r=0;r<R;r++){const s=sim(ww,d,h,false);fa+=s.fa;de+=s.del}return[fa/R/(TD/1000),de/R]}),pts=res.slice(0,WL.length),cur=res[WL.length],mxx=Math.max(1,...res.map(r=>r[0]))*1.15,mxy=Math.max(...res.map(r=>r[1]))*1.15,Q=mk($('c10cv2'),0,mxx,mxy,{L:48});poly(Q,pts.map(p=>[p[0],p[1]]),C.mu,2,true);dots(Q,pts.map(p=>[p[0],p[1]]),C.a,4);pts.forEach((p,i)=>Q.text('w='+WL[i],Q.X(p[0])+6,Q.Y(p[1])-6,C.mu));dots(Q,[cur],C.r,6);Q.text('your window',Q.X(cur[0])+8,Q.Y(cur[1])+14,C.r);Q.text('false alarms per 1,000 steps →',Q.w-Q.R-4,Q.h-Q.B-6,C.mu,'right');Q.text('steps to detect the drift',Q.L+6,Q.T+12,C.mu);
+  $('c10st').innerHTML=stat('false alarms per 1,000 steps (your window)',fmt(cur[0]),cur[0]>3?'warn':'in')+stat('mean steps to detect the drift',fmt(cur[1]),cur[1]>400?'hot':'ok')+stat('error rate before · after the drift',pc1(P0)+' · '+pc1(P0+d/100),'')+stat('alarm threshold (z-score)',fmt(h),'');
+  $('c10rd').innerHTML=`A model’s error rate is 10% and then rises by ${fmt(d)} points at time ${TD}. The monitor compares the error rate in the last <b>${w}</b> cases with the baseline and alarms when it exceeds the baseline by ${fmt(h)} standard errors. The <b>window size</b> is the central design choice and it cuts both ways. A <b>short window</b> reacts quickly but is noisy: its standard error is √(p(1 − p)/w), so false alarms are frequent. A <b>long window</b> is smooth but dilutes the change with old data and detects late (left panel: the estimate climbs slowly after the drift). The right panel is the monitor’s operating curve, false alarms against delay, for five window sizes and yours (red): moving along it is the only free choice, and only a better statistic (a CUSUM on the error stream, ADWIN, which adapts its window, or a score that uses more information than the 0/1 error) moves the whole curve. State a monitor in these two numbers, and note that drifts smaller than about 3 standard errors of the window cannot be detected reliably however long you wait for the next alarm.`}
+ ['c10w','c10d','c10h'].forEach(i=>$(i).addEventListener('change',run));$('c10go').onclick=run;run();})();
+
+/* ---------- Ch11 the cost of monitoring ---------- */
+(function(){const TL=[250,500,1000,2000,5000,10000],K=.5;idx('c11t',TL,v=>nlab(v)+' steps');scl('c11d',v=>fmt(v/10)+' σ');scl('c11f',v=>v);scl('c11h',v=>fmt(v/10));
+ const hs=[];for(let h=1;h<=15;h+=.1)hs.push(+h.toFixed(1));
+ const a0=h=>adArl(0,K,h)/2,a1=(d,h)=>adArl(d,K,h),cost=(d,T,cf,h)=>[1000/a0(h)*cf,1000/T*a1(d,h)];
+ function opt(d,T,cf){let b=null,bh=0;hs.forEach(h=>{const [f,l]=cost(d,T,cf,h),t=f+l;if(b===null||t<b){b=t;bh=h}});return[bh,b]}
+ function sim(d,h,R){let a0s=0,a1s=0;for(let r=0;r<R;r++){let cp=0,cm=0,t=0;while(t<6000){const x=randn();cp=Math.max(0,cp+x-K);cm=Math.max(0,cm-x-K);t++;if(cp>h||cm>h)break}a0s+=t;cp=0;t=0;while(t<6000){const x=randn()+d;cp=Math.max(0,cp+x-K);t++;if(cp>h)break}a1s+=t}return[a0s/R,a1s/R]}
+ function run(){const d=val('c11d')/10,T=TL[val('c11t')],cf=val('c11f'),h0=val('c11h')/10,rows=hs.map(h=>{const [f,l]=cost(d,T,cf,h);return[h,f,l,f+l]}),[ho,bo]=opt(d,T,cf),cur=cost(d,T,cf,h0),mx=bo*4;
+  const P=mk($('c11cv'),1,15,mx,{L:48});clip(P,()=>{poly(P,rows.map(r=>[r[0],r[1]]),C.r,2.2);poly(P,rows.map(r=>[r[0],r[2]]),C.a,2.2);poly(P,rows.map(r=>[r[0],r[3]]),C.fg,3)});P.vline(ho,C.g,'best h = '+fmt(ho),false);P.vline(h0,C.y,null,true);legend(P,[['false-alarm cost',C.r],['delay cost',C.a],['total',C.fg]],P.T+12);P.text('alarm limit h of the CUSUM (in σ) →',P.w-P.R-4,P.h-P.B-6,C.mu,'right');P.text('cost per 1,000 steps',P.L+6,P.T+28,C.mu);
+  const CF=[10,50,250],cl=[C.g,C.a,C.r],Q=mk($('c11cv2'),0,TL.length-1,15,{y0:1,noGrid:true,L:44});customGrid(Q,TL.map((t,i)=>[i,nlab(t)]),niceTicks(1,15,5));CF.forEach((c,k)=>{const ys=TL.map(t=>opt(d,t,c)[0]);poly(Q,ys.map((v,i)=>[i,v]),cl[k],2.6);dots(Q,ys.map((v,i)=>[i,v]),cl[k],3.4)});legend(Q,CF.map((c,k)=>['false alarm costs '+c+' steps of delay',cl[k]]),Q.T+12);Q.text('average steps between real drifts →',Q.w-Q.R-4,Q.h-Q.B-6,C.mu,'right');Q.text('best limit h',Q.L+6,Q.T+28,C.mu);
+  const sm=sim(d,h0,200);
+  $('c11st').innerHTML=stat('best limit h · cost per 1,000 steps',fmt(ho)+' · '+fmt(bo),'ok')+stat('your limit h = '+fmt(h0)+': cost',fmt(cur[0]+cur[1])+(cur[0]+cur[1]>bo*1.2?' (above the best)':''),cur[0]+cur[1]>bo*1.5?'warn':'in')+stat('false-alarm interval · detection delay (approximation)',Math.round(a0(h0))+' · '+fmt(a1(d,h0))+' steps','')+stat('same, by simulation (200 runs)',Math.round(sm[0])+' · '+fmt(sm[1])+' steps','');
+  $('c11rd').innerHTML=`A CUSUM monitor (reference value 0.5 σ) watches for a drift of ${fmt(d)} σ that arrives about every ${nlab(T)} steps. Raising the alarm limit h lengthens the interval between false alarms (about ${Math.round(a0(h0))} steps at h = ${fmt(h0)}) but delays detection (${fmt(a1(d,h0))} steps), using Siegmund’s approximation, confirmed by simulation (${Math.round(sm[0])} and ${fmt(sm[1])}). Putting a price on both turns threshold-setting into a decision: a false alarm costs ${cf} steps’ worth of delay (an investigation, an unnecessary retrain), so the expected cost per 1,000 steps is (1,000/ARL₀)·${cf} + (1,000/${nlab(T)})·delay. The total (white) has a minimum at <b>h = ${fmt(ho)}</b> (cost ${fmt(bo)}), against ${fmt(cur[0]+cur[1])} at your limit. The right panel shows how the best limit moves: it is <b>higher</b> when false alarms are costly and when real drifts are rare (so most alarms would be false), and lower when drift is frequent or delay is expensive. This is the same logic as the alert threshold in chapter 1 and the decision theory of item 29: monitoring is statistics plus costs, and the thresholds should be documented with the costs and the base rate of drift that justified them, and reviewed when either changes.`}
+ ['c11t','c11d','c11f','c11h'].forEach(i=>$(i).addEventListener('change',run));$('c11go').onclick=run;run();})();
+const QZ=[{"l":"Beginner","q":"A fraud detector has a 99% detection rate and a 1% false-alarm rate, and 1 in 1,000 transactions is fraudulent. Roughly what share of its alerts are real frauds?","o":["About 99%","About 9%","About 1%","About 50%"],"a":1,"e":"Per 100,000 transactions: 99 true alerts and about 1,000 false ones, so precision is 99/1,099 ≈ 9%. The base rate decides precision."},{"l":"Beginner","q":"Which statement best defines an anomaly score threshold?","o":["The cut-off above which a case raises an alert, a decision that trades detection against false alarms","A property of the data that is estimated without choice","The proportion of anomalies in the data","The distance of the mean from the median"],"a":0,"e":"A threshold is chosen, and it moves the detector along its detection/false-alarm trade-off; it should reflect alert capacity and costs."},{"l":"Intermediate","q":"Why does the “mean ± 3 sd” rule fail when 10% of a sample are extreme outliers?","o":["The rule flags too many ordinary points","The mean and sd cannot be computed with outliers","The rule assumes at least 50% contamination","The outliers inflate the mean and sd, widening the limits so the outliers are not flagged (masking)"],"a":3,"e":"Contamination shifts and inflates the classical estimates; the median and MAD have a 50% breakdown point and resist it."},{"l":"Intermediate","q":"The scaling factor 1.4826 in a robust z-score (x − median)/(1.4826·MAD) is used so that…","o":["The median equals the mean","The rule flags exactly 5% of points","The MAD estimates the standard deviation when the data are normal","The result lies between −1 and 1"],"a":2,"e":"For a normal distribution the MAD is 0.6745 sd, so multiplying by 1.4826 makes it consistent with sd."},{"l":"Intermediate","q":"Two highly correlated variables are each within 3 sd for a case, yet the case is unusual. Which tool detects it?","o":["The mean of the two variables","The Mahalanobis distance","The range of each variable","A separate z-score for each variable"],"a":1,"e":"The case is unusual in the direction across the correlation; only a statistic that uses the covariance structure sees it."},{"l":"Intermediate","q":"Under a bivariate normal model, what is the distribution of the squared Mahalanobis distance?","o":["χ² with 2 degrees of freedom","Standard normal","Uniform on (0, 1)","Student t with 2 degrees of freedom"],"a":0,"e":"d² is a sum of squares of p independent standard normals after whitening, so it is χ² with p degrees of freedom."},{"l":"Advanced","q":"On data forming a ring, anomalies at the centre of the ring are missed by Mahalanobis distance because…","o":["The anomalies have too large a variance","Mahalanobis distance requires labels","The ring has no covariance","The centre of the ring is the mean, so it has distance near zero"],"a":3,"e":"The mean lies in the empty centre; a single-ellipse model sees these anomalies as typical. Isolation and local density scores handle it."},{"l":"Advanced","q":"In an isolation forest, an anomaly typically has…","o":["The same path length as ordinary points","A path length that depends only on the label","A short average path length, because it is isolated by few random splits","A long average path length"],"a":2,"e":"Anomalies are few and different, so random splits separate them early; the score is 2^(−E[h]/c(n))."},{"l":"Advanced","q":"Two detectors have the same AUC, but one is evaluated on a data set where anomalies are 10 times rarer. What happens to its average precision?","o":["It rises","It falls, because precision depends on prevalence while AUC does not","It is unchanged","It equals the AUC"],"a":1,"e":"AUC compares rankings only; with rarer anomalies the same false-alarm rate produces more false alerts per true alert."},{"l":"Advanced","q":"Labels for an AML model come only from investigations of cases the current system flagged. What can be estimated from them without further data?","o":["Precision among reviewed alerts, but not recall","Recall and AUC for the whole population","The base rate of the anomalies","Nothing at all"],"a":0,"e":"Unflagged cases were never reviewed, so recall and AUC need a random audit sample or known review probabilities."},{"l":"Advanced","q":"A Shewhart chart (±3 sd) and a CUSUM have the same in-control average run length. For a persistent shift of 1 sd, which detects it faster, and why?","o":["Neither, because 1 sd is too small","The Shewhart chart, since it reacts to each point","They are equal at equal ARL₀","The CUSUM, since it accumulates small deviations over time"],"a":3,"e":"A 1 sd shift rarely produces a single point beyond 3 sd; the CUSUM sums evidence and detects it in a fraction of the time."},{"l":"Expert","q":"A dashboard tests 200 independent features daily at the 5% level with no real drift. About how many false alerts arrive per day, and how likely is at least one?","o":["About 200 per day; 100%","About 0.05 per day; 5%","About 10 per day; near-certain","About 1 per day; 5%"],"a":2,"e":"Expected alerts are mα = 10, and 1 − 0.95²⁰⁰ is essentially 1."},{"l":"Expert","q":"When every alert will be investigated, which error rate is usually most appropriate to control in a monitoring dashboard with many features?","o":["The chance of at least one false alert (Bonferroni)","The false discovery proportion (Benjamini–Hochberg)","The per-test type I error only","The overall detection rate"],"a":1,"e":"Investigators care about the share of their alerts that are false; BH controls it and keeps more power than Bonferroni."},{"l":"Expert","q":"You compute PSI between two random samples of 200 observations from the same distribution, using 10 bins. What do you expect?","o":["Around 0.09, because PSI is biased upwards by sampling noise","A negative value","Around 0.5","Exactly 0"],"a":0,"e":"The expected PSI under no drift is about (B − 1)(1/n₁ + 1/n₂) = 9 × 0.01 = 0.09, close to the 0.1 “watch” threshold."},{"l":"Expert","q":"With two samples of 100,000 each, a KS test is significant for a tiny mean shift. What is the right conclusion?","o":["The model must be retrained","The data are corrupted","The KS test is invalid for large samples","The shift is statistically detectable but may be practically irrelevant; judge by an effect size and its impact on the model"],"a":3,"e":"Significance grows with n; decisions need effect sizes (PSI, Wasserstein, score or loss change) compared with a threshold of practical importance."},{"l":"Expert","q":"The inputs to a credit model look identical to the reference period (PSI ≈ 0), but defaults among high-scored customers have risen sharply. What kind of drift is this?","o":["Covariate drift","Prior drift only","Concept drift: P(y | x) has changed, which input monitoring cannot see","No drift"],"a":2,"e":"With the inputs stable, the change is in the relationship between inputs and outcome; only outcome-based monitoring detects it."},{"l":"Expert","q":"A monitor of a model’s error rate uses a very short window. What is the likely result?","o":["Detection delay unchanged","Fast detection but frequent false alarms","Fast detection and no false alarms","Slow detection and few false alarms"],"a":1,"e":"The standard error of the windowed rate is √(p(1 − p)/w); a short window reacts quickly but is noisy."},{"l":"Expert","q":"False alarms become much more costly and real drifts are rare. How should the optimal CUSUM alarm limit h change?","o":["Increase, accepting a longer detection delay","Stay the same, since h is fixed by theory","Decrease","Become negative"],"a":0,"e":"ARL₀ grows exponentially with h while delay grows roughly linearly; costly false alarms and rare drifts push the cost-minimising limit up."}];
+(function(){const st=store.get('ad_quiz',{});
+ function render(){const box=$('quiz');box.innerHTML='';
+  QZ.forEach((q,i)=>{const d=document.createElement('div');d.className='q'+(st[i]!=null?' done':'');d.innerHTML=`<div class="qh">Q${i+1} · ${q.l}</div><div style="margin:4px 0 6px"><b>${q.q}</b></div>`;
+   q.o.forEach((o,j)=>{const b=document.createElement('button');b.className='opt';b.textContent=o;if(st[i]!=null){if(j===q.a)b.classList.add('good');else if(j===st[i])b.classList.add('bad')}b.onclick=()=>{if(st[i]!=null)return;st[i]=j;store.set('ad_quiz',st);render();meter()};d.appendChild(b)});
+   const e=document.createElement('div');e.className='ex';e.innerHTML=(st[i]===q.a?'✅ ':'❌ ')+q.e;d.appendChild(e);box.appendChild(d)});
+  const ans=Object.keys(st).length,ok=QZ.filter((q,i)=>st[i]===q.a).length;
+  $('qscore').innerHTML=stat('answered',ans+' / '+QZ.length,'in')+stat('correct',ok,'ok')+stat('score',ans?Math.round(100*ok/ans)+'%':'—',ok/Math.max(ans,1)>=.8?'ok':'warn')+stat('verdict',ans<QZ.length?'keep going':ok>=16?'anomaly-detection master':ok>=13?'strong':'review ch. 1–11','')}
+ $('qreset').onclick=()=>{Object.keys(st).forEach(k=>delete st[k]);store.set('ad_quiz',st);render();meter()};
+ window.__qst=st;render();})();
+const CHK=["Compute the precision of an alert from the detection rate, false-alarm rate and base rate.","Set robust limits with the median and MAD and explain masking.","Use the Mahalanobis distance with a χ² threshold and explain why covariance must be estimated robustly.","Explain how isolation, k-NN and density scores work and where each fails.","Evaluate a detector with precision–recall and precision at review capacity, not AUC alone.","Explain how labels selected by past alerts limit the evaluation of recall.","Describe Shewhart, EWMA and CUSUM charts and compare them by ARL₀ and delay.","Compute the false-alert rate of a many-feature dashboard and choose a correction.","Compute and interpret PSI and explain its small-sample bias.","Explain why a significance test is not a drift measure at large n.","Distinguish covariate, concept and prior drift and say what each monitor can see.","Explain the window-size trade-off between false alarms and detection delay.","Choose an alarm limit by balancing false-alarm cost, drift frequency and delay.","Document the reference period, metrics, thresholds, costs and drift responses for a monitoring plan."];
+(function(){const st=store.get('ad_chk',{}),box=$('chk');CHK.forEach((t,i)=>{const l=document.createElement('label'),c=document.createElement('input');c.type='checkbox';c.checked=!!st[i];c.onchange=()=>{st[i]=c.checked;store.set('ad_chk',st);meter()};l.appendChild(c);const s=document.createElement('span');s.textContent=t;l.appendChild(s);box.appendChild(l)});window.__cst=st;})();
+function meter(){const q=window.__qst||{},c=window.__cst||{};const ok=QZ.filter((x,i)=>q[i]===x.a).length,ck=Object.values(c).filter(Boolean).length;const p=Math.round(100*(.6*ok/QZ.length+.4*ck/CHK.length));$('mtxt').textContent='Mastery: '+p+'%  (exam + checklist)';$('mbar').style.width=p+'%';store.set('mastery_ad',p)}
+meter();
+
+/* ---------- Navigation ---------- */
+(function(){const nav=$('nav');let html='';
+ document.querySelectorAll('main .part, main section.ch').forEach(el=>{if(el.classList.contains('part'))html+=`<div class="pt">${el.textContent}</div>`;else{const h=el.querySelector('h2'),num=h.querySelector('.num').textContent,t=Array.from(h.childNodes).filter(n=>n.nodeType===3).map(n=>n.textContent).join('').trim();html+=`<a href="#${el.id}" data-id="${el.id}">${num}. ${t}</a>`}});
+ nav.innerHTML=html;const links=nav.querySelectorAll('a'),io=new IntersectionObserver(es=>{es.forEach(e=>{if(e.isIntersecting)links.forEach(a=>a.classList.toggle('on',a.dataset.id===e.target.id))})},{rootMargin:'-20% 0px -70% 0px'});
+ document.querySelectorAll('section.ch').forEach(s=>io.observe(s));
+ $('menu').onclick=()=>$('side').classList.toggle('open');nav.addEventListener('click',e=>{if(e.target.tagName==='A')$('side').classList.remove('open')});
+ window.addEventListener('scroll',()=>{const h=document.documentElement;$('prog').style.width=(100*h.scrollTop/(h.scrollHeight-h.clientHeight))+'%'},{passive:true});})();
+</script>
+</body>
+</html>

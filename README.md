@@ -2,7 +2,7 @@
 
 > **The complete interactive visual curriculum for statistical mastery.**
 >
-> 31 comprehensive, self-contained interactive modules covering probability, classical inference, regression, causal inference, Bayesian modeling, and specialist depth — with interactive simulations, formula proofs, and self-assessment exams.
+> 35 comprehensive, self-contained interactive modules covering probability, classical inference, regression, causal inference, Bayesian modeling, and specialist depth — with interactive simulations, formula proofs, and self-assessment exams.
 
 ---
 
@@ -34,7 +34,7 @@ Then navigate to `http://localhost:8000`.
 
 ## 📊 Curriculum Overview
 
-The curriculum is structured across 7 progressive stages comprising **31 modules**, **386 chapters**, **364 interactive simulation labs**, and **552 exam questions**.
+The curriculum is structured across 7 progressive stages comprising **35 modules**, **434 chapters**, **408 interactive simulation labs**, and **624 exam questions**.
 
 ### Stage 1 · Foundations & Probability Theory
 1. [`random-variables-mastery.html`](random-variables-mastery.html) — **Random Variables, Expectation, Variance & Covariance** (15 chapters, 14 labs, 16 exam questions)
@@ -78,8 +78,13 @@ The curriculum is structured across 7 progressive stages comprising **31 modules
 29. [`bayesian-decision-theory-mastery.html`](bayesian-decision-theory-mastery.html) — **Bayesian Decision Theory & Utility** (12 chapters, 11 labs, 18 exam questions)
 
 ### Stage 7 · Specialist Depth
-30. [`multivariate-methods-mastery.html`](multivariate-methods-mastery.html) — **Multivariate Methods (PCA, Factor Analysis, Mixtures & Mahalanobis)** (12 chapters, 11 labs, 18 exam questions)
-31. [`extreme-value-theory-mastery.html`](extreme-value-theory-mastery.html) — **Extreme Value Theory and Heavy Tails** (12 chapters, 11 labs, 18 exam questions)
+30. [`multivariate-methods-mastery.html`](multivariate-methods-mastery.html) — **Multivariate methods** (12 chapters,11 labs,18-question exam)
+31. [`extreme-value-theory-mastery.html`](extreme-value-theory-mastery.html) — **Extreme value theory and heavy tails** (12 chapters,11 labs,18-question exam)
+32. [`copulas-mastery.html`](copulas-mastery.html) — **Copulas and dependence modelling** (12 chapters,11 labs,18-question exam)
+33. [`anomaly-drift-detection-mastery.html`](anomaly-drift-detection-mastery.html) — **Anomaly and drift detection theory** (12 chapters,11 labs,18-question exam)
+34. [`network-statistics-mastery.html`](network-statistics-mastery.html) — **Graph and network statistics** (12 chapters,11 labs,18-question exam)
+35. [`uncertainty-quantification-mastery.html`](uncertainty-quantification-mastery.html) — **Uncertainty quantification for ML** (12 chapters,11 labs,18-question exam)
+
 
 ---
 

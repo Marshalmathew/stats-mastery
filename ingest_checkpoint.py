@@ -66,13 +66,14 @@ def fix_and_sort_index_html(index_path):
         content = content.replace(render_target, sort_snippet)
 
     # 3. Ensure Multiple Testing is in Stage 5, not Stage 4 in roadmap ST
-    bad_st = "['Multiple testing and selective inference',{f:'multiple-testing-mastery.html'}]]],"
-    if bad_st in content:
-        # Move from Stage 4 to Stage 5
-        content = content.replace(bad_st, "]]],")
-        stage5_marker = "['Stage 5 · Causal thinking',[\n"
-        if stage5_marker in content and "['Multiple testing" not in content.split(stage5_marker)[1]:
-            content = content.replace(stage5_marker, stage5_marker + "  ['Multiple testing and selective inference',{f:'multiple-testing-mastery.html'}],")
+    content = re.sub(
+        r",\s*\[\s*'Multiple testing and selective inference',\s*\{f:'multiple-testing-mastery\.html'\}\s*\]\s*\]\s*\]\s*,",
+        r"]]],",
+        content
+    )
+    stage5_marker = "['Stage 5 · Causal thinking',[\n"
+    if stage5_marker in content and "['Multiple testing" not in content.split(stage5_marker)[1]:
+        content = content.replace(stage5_marker, stage5_marker + "  ['Multiple testing and selective inference',{f:'multiple-testing-mastery.html'}],")
 
     with open(index_path, 'w', encoding='utf-8') as f:
         f.write(content)
@@ -118,13 +119,51 @@ def update_readme(workspace):
         top_repl = f"> {total_modules} comprehensive, self-contained interactive modules"
         readme = re.sub(top_pattern, top_repl, readme)
 
+        # Update Stage 7 section if new modules exist
+        stage7_lines = ["### Stage 7 · Specialist Depth"]
+        for line in entries:
+            if "Stage 7" in line:
+                m_tag = re.search(r"item[s]?\s*(\d+)", line)
+                m_f = re.search(r"f:'([^']+)'", line)
+                m_t = re.search(r"t:'([^']+)'", line)
+                m_m = re.search(r"m:\[(.*?)\]", line)
+                if m_tag and m_f and m_t:
+                    inum = m_tag.group(1)
+                    fname = m_f.group(1)
+                    title = m_t.group(1)
+                    meta = m_m.group(1).replace("'", "") if m_m else ""
+                    stage7_lines.append(f"{inum}. [`{fname}`]({fname}) — **{title}** ({meta})")
+
+        stage7_block = "\n".join(stage7_lines)
+        readme = re.sub(r"### Stage 7 · Specialist Depth.*?(?=\n---\n|\n## )", stage7_block + "\n\n", readme, flags=re.DOTALL)
+
         with open(readme_path, 'w', encoding='utf-8') as f:
             f.write(readme)
 
 def find_unprocessed_zips():
-    # Any zip in workspace root is newly arrived
+    # 1. Any zip in workspace root is newly arrived
     root_zips = [os.path.join(WORKSPACE, f) for f in os.listdir(WORKSPACE) if f.endswith('.zip')]
-    return sorted(root_zips, key=os.path.getmtime)
+    if root_zips:
+        return sorted(root_zips, key=os.path.getmtime)
+
+    # 2. Check .snapshots for any zip that contains unextracted HTML modules
+    unprocessed = []
+    if os.path.exists(SNAPSHOTS_DIR):
+        for f in os.listdir(SNAPSHOTS_DIR):
+            if f.endswith('.zip'):
+                zpath = os.path.join(SNAPSHOTS_DIR, f)
+                try:
+                    with zipfile.ZipFile(zpath, 'r') as z:
+                        for m in z.namelist():
+                            if m.endswith('/') or not m.endswith('.html'):
+                                continue
+                            rel = m.replace('stats-mastery/', '')
+                            if not os.path.exists(os.path.join(WORKSPACE, rel)):
+                                unprocessed.append(zpath)
+                                break
+                except Exception:
+                    pass
+    return sorted(unprocessed, key=os.path.getmtime)
 
 def ingest_zip(zip_path):
     print(f"\n==========================================")

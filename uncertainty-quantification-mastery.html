@@ -1,0 +1,666 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Uncertainty Quantification for ML Mastery</title>
+<style>
+:root{--bg:#0b0e17;--panel:#121726;--panel2:#171d30;--line:#232a3d;--fg:#e8ebf5;--mu:#8a93ab;--a:#6ea8ff;--r:#ff6b81;--y:#ffd166;--g:#4ade80;--p:#c084fc;--t:#5eead4}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;background:var(--bg);color:var(--fg);font:16px/1.7 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+a{color:var(--a)}
+#prog{position:fixed;top:0;left:0;height:3px;background:linear-gradient(90deg,var(--a),var(--p),var(--r));width:0;z-index:50}
+.side{position:fixed;left:0;top:0;bottom:0;width:290px;background:#0e1220;border-right:1px solid var(--line);overflow:auto;padding:18px 14px 90px;z-index:40;transition:transform .25s}
+.side h1{font-size:15px;margin:0 0 2px}
+.side small{color:var(--mu)}
+.side .pt{margin:16px 0 4px;font-size:11px;text-transform:uppercase;letter-spacing:1.3px;color:var(--p)}
+.side a{display:block;color:var(--mu);text-decoration:none;padding:5px 9px;border-radius:7px;font-size:13.5px;line-height:1.35}
+.side a:hover{background:var(--panel);color:var(--fg)}
+.side a.on{background:var(--panel2);color:var(--fg);box-shadow:inset 3px 0 var(--a)}
+.side a.back{color:var(--t);padding-left:0;margin-bottom:6px}
+.meter{position:fixed;left:0;bottom:0;width:290px;background:#0e1220;border-top:1px solid var(--line);padding:10px 16px;z-index:41;font-size:12px;color:var(--mu)}
+.meter .bar{height:7px;background:var(--line);border-radius:6px;margin-top:5px;overflow:hidden}
+.meter .bar i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--g),var(--t));transition:width .4s}
+#menu{display:none;position:fixed;top:10px;left:10px;z-index:60;background:var(--panel2);color:var(--fg);border:1px solid var(--line);border-radius:9px;padding:7px 12px;font-size:14px;cursor:pointer}
+main{margin-left:290px;padding:0 34px 120px;max-width:1090px}
+.hero{padding:70px 0 30px}
+.hero h1{font-size:clamp(32px,5vw,56px);line-height:1.08;margin:0 0 14px;background:linear-gradient(100deg,#fff,var(--y) 40%,var(--r));-webkit-background-clip:text;background-clip:text;color:transparent}
+.hero p{font-size:19px;color:#c3c9dc;max-width:780px}
+.chips{display:flex;flex-wrap:wrap;gap:8px;margin:18px 0}
+.chip{border:1px solid var(--line);background:var(--panel);padding:5px 12px;border-radius:99px;font-size:13px;color:var(--mu)}
+.chip b{color:var(--fg)}
+.part{margin:90px 0 0;padding-top:22px;border-top:1px solid var(--line);font-size:12px;letter-spacing:2px;text-transform:uppercase;color:var(--p)}
+section.ch{padding-top:30px}
+h2{font-size:30px;line-height:1.2;margin:10px 0 8px;display:flex;gap:12px;align-items:center;flex-wrap:wrap}
+h2 .num{display:inline-grid;place-items:center;width:40px;height:40px;border-radius:12px;background:var(--panel2);border:1px solid var(--line);font-size:18px;color:var(--a)}
+.lvl{font-size:11px;font-weight:600;letter-spacing:.8px;text-transform:uppercase;padding:3px 9px;border-radius:99px;border:1px solid}
+.lvl.b{color:var(--g);border-color:#1f5c3a}.lvl.i{color:var(--a);border-color:#244a85}.lvl.a{color:var(--y);border-color:#6b5420}.lvl.e{color:var(--r);border-color:#7a2c3a}
+h3{font-size:19px;margin:30px 0 6px;color:#fff}
+p{margin:10px 0}li{margin:5px 0}
+code,.f{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace}
+code{background:var(--panel2);padding:1px 6px;border-radius:5px;font-size:.9em}
+.f{display:block;white-space:pre-wrap;background:#0e1322;border:1px solid var(--line);border-left:3px solid var(--a);padding:12px 16px;border-radius:9px;margin:14px 0;overflow-x:auto;font-size:15px;color:#dbe4ff;line-height:1.8}
+.co{border-radius:12px;padding:13px 17px;margin:16px 0;border:1px solid var(--line);background:var(--panel)}
+.co>b:first-child{display:block;margin-bottom:2px;font-size:12px;letter-spacing:1px;text-transform:uppercase}
+.co.def{border-left:4px solid var(--a)}.co.def>b:first-child{color:var(--a)}
+.co.warn{border-left:4px solid var(--r)}.co.warn>b:first-child{color:var(--r)}
+.co.tip{border-left:4px solid var(--g)}.co.tip>b:first-child{color:var(--g)}
+.co.key{border-left:4px solid var(--y);background:#171608}.co.key>b:first-child{color:var(--y)}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:18px 20px;margin:22px 0;box-shadow:0 8px 30px rgba(0,0,0,.25)}
+.card>h4{margin:0 0 3px;font-size:13px;letter-spacing:1.2px;text-transform:uppercase;color:var(--t)}
+.card>p.sub{margin:0 0 12px;color:var(--mu);font-size:14.5px}
+.ctl{display:flex;flex-wrap:wrap;gap:10px 22px;align-items:center;margin:8px 0 10px}
+.ctl label{display:flex;gap:8px;align-items:center;font-size:14px;color:#c3c9dc}
+.ctl output{min-width:38px;font-family:ui-monospace,monospace;color:var(--y);font-size:13px}
+input[type=range]{accent-color:var(--a);width:150px}
+input[type=checkbox]{accent-color:var(--a)}
+select,input[type=number],input[type=text]{background:#0e1322;color:var(--fg);border:1px solid var(--line);border-radius:8px;padding:6px 9px;font:inherit;font-size:14px}
+button{background:linear-gradient(180deg,#2c4a80,#233b68);color:#fff;border:1px solid #3a5a98;border-radius:9px;padding:7px 14px;font:inherit;font-size:14px;cursor:pointer}
+button:hover{filter:brightness(1.15)}
+button.alt{background:var(--panel2);border-color:var(--line);color:var(--fg)}
+canvas{width:100%;height:270px;display:block;background:#0e1322;border:1px solid var(--line);border-radius:10px;margin-top:6px}
+canvas.sm{height:210px}canvas.tl{height:330px}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(125px,1fr));gap:9px;margin:12px 0}
+.stat{background:#0e1322;border:1px solid var(--line);border-radius:10px;padding:8px 11px}
+.stat b{display:block;font-size:17px;font-family:ui-monospace,monospace}
+.stat span{font-size:11.5px;color:var(--mu);text-transform:uppercase;letter-spacing:.7px}
+.stat.hot b{color:var(--r)}.stat.ok b{color:var(--g)}.stat.warn b{color:var(--y)}.stat.in b{color:var(--a)}
+.read{margin:8px 0 0;padding:10px 14px;background:#0e1322;border:1px dashed #33406a;border-radius:10px;font-size:14.5px;color:#d3dbf3}
+table{border-collapse:collapse;width:100%;margin:12px 0;font-size:14px}
+th,td{border:1px solid var(--line);padding:7px 10px;text-align:left;vertical-align:top}
+th{background:var(--panel2);font-size:12px;text-transform:uppercase;letter-spacing:.6px;color:var(--mu)}
+td.n{font-family:ui-monospace,monospace;text-align:right}
+.tw{overflow-x:auto}
+.pill{display:inline-block;padding:1px 9px;border-radius:99px;font-size:12px;font-weight:600}
+.pill.r{background:#3a1520;color:var(--r)}.pill.g{background:#10321f;color:var(--g)}.pill.y{background:#3a2f0e;color:var(--y)}.pill.m{background:#202637;color:var(--mu)}
+details{background:var(--panel);border:1px solid var(--line);border-radius:11px;padding:9px 15px;margin:9px 0}
+details summary{cursor:pointer;font-weight:600}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.q{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:14px 18px;margin:14px 0}
+.q .qh{font-size:12px;letter-spacing:1px;text-transform:uppercase;color:var(--mu)}
+.q .opt{display:block;width:100%;text-align:left;margin:6px 0;background:#0e1322;border:1px solid var(--line);color:var(--fg);border-radius:9px;padding:9px 12px}
+.q .opt.good{border-color:var(--g);background:#0e2418}.q .opt.bad{border-color:var(--r);background:#2a1119}
+.q .ex{display:none;margin-top:8px;font-size:14.5px;color:#c3c9dc}
+.q.done .ex{display:block}
+.chk label{display:flex;gap:10px;align-items:flex-start;padding:6px 0;cursor:pointer}
+.chk input{margin-top:6px;accent-color:var(--g);width:17px;height:17px}
+.sigrow{display:grid;grid-template-columns:minmax(170px,2fr) 1fr 1fr auto;gap:8px 14px;align-items:center;padding:6px 0;border-top:1px dashed #1b2236}
+.sigrow:first-of-type{border-top:0}
+.sigrow label{display:flex;gap:6px;align-items:center;font-size:13.5px;color:#c3c9dc}
+@media(max-width:900px){
+ .side{transform:translateX(-100%)}.side.open{transform:none}.meter{display:none}
+ #menu{display:block}main{margin-left:0;padding:0 16px 100px}.two{grid-template-columns:1fr}.hero{padding-top:60px}
+ .sigrow{grid-template-columns:1fr 1fr}
+}
+</style>
+</head>
+<body>
+<div id="prog"></div>
+<button id="menu">☰ Contents</button>
+<nav class="side" id="side"><a class="back" href="index.html">← All courses</a><h1>Uncertainty Quantification for ML</h1><small>12 chapters · 11 labs · exam</small><div id="nav"></div></nav>
+<div class="meter"><div id="mtxt">Mastery: 0%</div><div class="bar"><i id="mbar"></i></div></div>
+
+<main>
+<header class="hero">
+ <h1>Uncertainty quantification for machine learning: prediction intervals and sets with guarantees, and honesty about when they fail.</h1>
+ <p>A score or a forecast without a statement of its uncertainty invites false precision: a probability of default of 4.2%, a churn score of 0.81, a loss forecast of 12.3 crore. Conformal prediction wraps any model, however complicated, in intervals or sets that contain the true outcome with a stated frequency, using only a held-out calibration set and the assumption that new cases resemble the calibration cases. This page teaches what that guarantee does and does not say (marginal against conditional coverage), how to build it for regression and classification, what breaks it (shift, drift, small groups) and how to repair it, how it differs from ensemble and model-based uncertainty, and how to use it to decide which cases a human should review.</p>
+ <div class="chips"><span class="chip"><b>Part I</b> Intervals and coverage</span><span class="chip"><b>Part II</b> Scores, sets and shift</span><span class="chip"><b>Part III</b> Uncertainty in practice</span></div>
+ <div class="co tip"><b>How to use this</b>Sliders change the setting; heavier labs recompute when you release a slider or press the button. Prerequisites: confidence intervals (item 6), regression (item 10), quantile regression and calibration of scores (items 11 and 28), and drift (item 33).</div>
+</header>
+
+<div class="part">Part I · Intervals and coverage</div>
+
+<section class="ch" id="c1">
+<h2><span class="num">1</span>Confidence interval or prediction interval? <span class="lvl b">Beginner</span></h2>
+<p>A <b>confidence interval</b> describes where a population quantity (the average outcome at x) lies; its width falls like 1/√n and vanishes with enough data. A <b>prediction interval</b> describes where one <em>new individual outcome</em> will fall; it contains the irreducible noise of individuals and cannot be narrower than about ±1.96σ however large the sample. Decisions (approve a loan, flag a transaction, price a policy) concern individuals, so the relevant uncertainty is the prediction interval. Confusing the two is the commonest error: regression output prints standard errors and confidence bands of the fitted curve, which understate the uncertainty of any single case, more so the larger the data.</p>
+<div class="f">Prediction interval: ŷ ± t<sub>n−2</sub> · s · √(1 + 1/n + (x − x̄)²/S<sub>xx</sub>)   ·   Confidence interval: drop the “1 +”</div>
+ <div class="card"><h4>Lab 1 · The mean interval against the individual interval</h4>
+ <p class="sub">A straight-line model with normal noise. Left: both intervals around the fit. Right: how often each covers a new case, as the training size grows.</p>
+ <div class="ctl"><label>training cases <input type="range" id="c1n" min="10" max="1000" step="10" value="100"><output id="c1nv"></output></label><button id="c1go">New data</button></div>
+ <div class="two"><canvas class="sm" id="c1cv"></canvas><canvas class="sm" id="c1cv2"></canvas></div><div class="stats" id="c1st"></div><div class="read" id="c1rd"></div></div>
+</section>
+
+<section class="ch" id="c2">
+<h2><span class="num">2</span>Marginal against conditional coverage <span class="lvl b">Beginner</span></h2>
+<p>“90% coverage” can mean two things. <b>Marginal</b> coverage: over the whole population, 90% of outcomes fall in their intervals. <b>Conditional</b> coverage: for each kind of case (each value of x, each segment), 90% fall in theirs. The first can hold while the second fails badly, whenever the noise level varies: a constant-width interval is too wide where the data are quiet and too narrow where they are noisy, and the cases in the noisy region are exactly those one most wants to be right about. Marginal coverage is attainable with weak assumptions; conditional coverage on every x is not (chapter 9). Always report coverage by segment.</p>
+<div class="f">Marginal: P(Y ∈ C(X)) ≥ 1 − α      Conditional: P(Y ∈ C(X) | X = x) ≥ 1 − α for every x</div>
+ <div class="card"><h4>Lab 2 · One width for everyone</h4>
+ <p class="sub">Noise that grows with x. Left: constant-width and noise-following bands. Right: coverage in eight slices of x.</p>
+ <div class="ctl"><label>how much noise grows with x <input type="range" id="c2h" min="0" max="15" step="1" value="10"><output id="c2hv"></output></label><label>cases <input type="range" id="c2n" min="100" max="2000" step="100" value="600"><output id="c2nv"></output></label><button id="c2go">New data</button></div>
+ <div class="two"><canvas class="sm" id="c2cv"></canvas><canvas class="sm" id="c2cv2"></canvas></div><div class="stats" id="c2st"></div><div class="read" id="c2rd"></div></div>
+</section>
+
+<section class="ch" id="c3">
+<h2><span class="num">3</span>Split conformal prediction and its guarantee <span class="lvl i">Intermediate</span></h2>
+<p>Fit any model on a training set. On a separate <b>calibration</b> set of n cases compute scores s<sub>i</sub> = |y<sub>i</sub> − ŷ<sub>i</sub>|. Let q̂ be the ⌈(n + 1)(1 − α)⌉-th smallest score and give every new case the interval ŷ ± q̂. If calibration and new cases are <b>exchangeable</b>, the coverage is at least 1 − α, for any model and any data distribution, in finite samples, with no assumption of normality. The coverage of one calibration set is random: it follows a Beta(n + 1 − l, l) distribution with l = ⌊(n + 1)α⌋, so with few calibration cases a given interval can miss the target noticeably even though the average is right. The guarantee says nothing about width: a bad model gives wide valid intervals.</p>
+<div class="f">P(Y<sub>new</sub> ∈ [ŷ − q̂, ŷ + q̂]) ≥ 1 − α      Coverage given calibration ~ Beta(n + 1 − l, l)</div>
+ <div class="card"><h4>Lab 3 · The guarantee and how noisy it is</h4>
+ <p class="sub">Repeat the whole procedure many times. Left: coverage of the conformal interval over calibration sets, with the theoretical Beta curve. Right: the mean and 5–95% range against the calibration size.</p>
+ <div class="ctl"><label>calibration cases <input type="range" id="c3n" min="10" max="1000" step="10" value="50"><output id="c3nv"></output></label><label>miscoverage α <input type="range" id="c3a" min="5" max="30" step="5" value="10"><output id="c3av"></output></label><button id="c3go">New calibration sets</button></div>
+ <div class="two"><canvas class="sm" id="c3cv"></canvas><canvas class="sm" id="c3cv2"></canvas></div><div class="stats" id="c3st"></div><div class="read" id="c3rd"></div></div>
+</section>
+
+<div class="part">Part II · Scores, sets and shift</div>
+
+<section class="ch" id="c4">
+<h2><span class="num">4</span>Conformity scores: shaping the interval <span class="lvl i">Intermediate</span></h2>
+<p>The recipe works for any score that measures how badly a case disagrees with the model. The <b>absolute residual</b> gives constant-width intervals. The <b>normalised residual</b> |y − ŷ|/σ̂(x) divides by an estimate of the local noise so intervals widen where errors are larger. <b>Conformalised quantile regression</b> (CQR) fits lower and upper quantile models and conformalises max(q̂<sub>lo</sub>(x) − y, y − q̂<sub>hi</sub>(x)). The score changes the shape and efficiency but never the marginal guarantee. Two rules: the calibration set must not be used for fitting or tuning (otherwise the scores are too small and coverage fails), and a better model of the spread gives conditional coverage closer to the target and narrower intervals.</p>
+<div class="f">s(x, y) = |y − ŷ(x)| / σ̂(x)      CQR: s = max(q̂<sub>lo</sub>(x) − y, y − q̂<sub>hi</sub>(x))</div>
+ <div class="card"><h4>Lab 4 · Three scores, same guarantee</h4>
+ <p class="sub">Data split into training, calibration and test. Left: the three bands. Right: coverage in five slices of x.</p>
+ <div class="ctl"><label>how much noise grows with x <input type="range" id="c4h" min="0" max="15" step="1" value="10"><output id="c4hv"></output></label><label>total cases <input type="range" id="c4n" min="400" max="4000" step="200" value="2000"><output id="c4nv"></output></label><label>miscoverage α <input type="range" id="c4a" min="5" max="30" step="5" value="10"><output id="c4av"></output></label><button id="c4go">New data</button></div>
+ <div class="two"><canvas class="sm" id="c4cv"></canvas><canvas class="sm" id="c4cv2"></canvas></div><div class="stats" id="c4st"></div><div class="read" id="c4rd"></div></div>
+</section>
+
+<section class="ch" id="c5">
+<h2><span class="num">5</span>Prediction sets for classification <span class="lvl a">Advanced</span></h2>
+<p>For classification the output is a <b>set</b> of classes: with score 1 − p̂<sub>y</sub> the set contains every class k with 1 − p̂<sub>k</sub> ≤ q̂, and the coverage guarantee is the same. Sets are informative: size one means the model can decide, larger sets flag ambiguous cases, an empty set (possible) flags a case that fits no class. Validity holds even for an overconfident or poorly calibrated model; it only affects the sizes. The marginal guarantee can hide a rare class that is covered far less than the others (its cases are few and harder), which for default, fraud or churn is the class of interest. <b>Class-conditional (Mondrian)</b> calibration, one threshold per class, restores coverage for each class at the cost of larger sets and noisier thresholds.</p>
+<div class="f">C(x) = {k : 1 − p̂<sub>k</sub>(x) ≤ q̂}      Class-conditional: q̂<sub>k</sub> from the calibration cases of class k</div>
+ <div class="card"><h4>Lab 5 · Sets, rare classes and overconfidence</h4>
+ <p class="sub">Three classes in the plane, one rare. Left: size of the prediction sets. Right: coverage by true class with one threshold and with a threshold per class.</p>
+ <div class="ctl"><label>miscoverage α <input type="range" id="c5a" min="5" max="30" step="5" value="10"><output id="c5av"></output></label><label>sharpness of the model (1 = calibrated) <input type="range" id="c5s" min="3" max="15" step="1" value="5"><output id="c5sv"></output></label><label>share of the rare class <input type="range" id="c5p" min="3" max="30" step="1" value="8"><output id="c5pv"></output></label><button id="c5go">New data</button></div>
+ <div class="two"><canvas class="sm" id="c5cv"></canvas><canvas class="sm" id="c5cv2"></canvas></div><div class="stats" id="c5st"></div><div class="read" id="c5rd"></div></div>
+</section>
+
+<section class="ch" id="c6">
+<h2><span class="num">6</span>Covariate shift and weighted conformal prediction <span class="lvl a">Advanced</span></h2>
+<p>Exchangeability fails when the new population differs from the calibration one: a new segment, a changed portfolio mix, a policy that selects different customers. If only the distribution of inputs changes (<b>covariate shift</b>) and the relationship between inputs and outcome is the same, coverage fails because the model’s errors depend on x. <b>Weighted conformal prediction</b> weights each calibration score by the density ratio w(x) = p<sub>new</sub>(x)/p<sub>old</sub>(x), which can be estimated with a classifier that tells old from new inputs, and recovers valid coverage. The cost is the <b>effective sample size</b> (Σw)²/Σw², which collapses under strong shift, and the density ratio is itself an estimate. A change in the relationship (concept drift) is not repaired by any reweighting.</p>
+<div class="f">Weighted quantile of the scores with weights w(x<sub>i</sub>), plus the test point’s own weight      n<sub>eff</sub> = (Σw)² / Σw²</div>
+ <div class="card"><h4>Lab 6 · Shifted inputs, same relationship</h4>
+ <p class="sub">A straight line fitted to a wavy truth; the new population has shifted inputs. Left: coverage against the shift for both methods. Right: interval width.</p>
+ <div class="ctl"><label>shift of the inputs (sd units) <input type="range" id="c6d" min="0" max="20" step="1" value="12"><output id="c6dv"></output></label><label>miscoverage α <input type="range" id="c6a" min="5" max="30" step="5" value="10"><output id="c6av"></output></label><button id="c6go">New data</button></div>
+ <div class="two"><canvas class="sm" id="c6cv"></canvas><canvas class="sm" id="c6cv2"></canvas></div><div class="stats" id="c6st"></div><div class="read" id="c6rd"></div></div>
+</section>
+
+<div class="part">Part III · Uncertainty in practice</div>
+
+<section class="ch" id="c7">
+<h2><span class="num">7</span>Drift and adaptive conformal inference <span class="lvl a">Advanced</span></h2>
+<p>On a live model the world drifts, errors grow, and a fixed threshold calibrated in the past stops covering. <b>Adaptive conformal inference</b> (ACI) treats the working miscoverage level as a quantity to be tracked: after each case, α<sub>t+1</sub> = α<sub>t</sub> + γ(α − err<sub>t</sub>). Misses widen the next intervals and hits narrow them. Long-run coverage converges to 1 − α under arbitrary drift, a frequency guarantee over time, not per case. The step γ trades reaction speed against jumpy widths. ACI keeps the statement true by widening, not by fixing the model: persistent widening is a retraining signal, and rolling coverage is itself a drift monitor.</p>
+<div class="f">α<sub>t+1</sub> = α<sub>t</sub> + γ (α − err<sub>t</sub>)      long-run miscoverage → α</div>
+ <div class="card"><h4>Lab 7 · Coverage under drifting noise</h4>
+ <p class="sub">The noise sd drifts upward after calibration. Left: rolling coverage for a fixed threshold and ACI. Right: long-run coverage against the step size γ.</p>
+ <div class="ctl"><label>step size γ <input type="range" id="c7g" min="5" max="100" step="5" value="20"><output id="c7gv"></output></label><label>total growth of the noise <input type="range" id="c7v" min="0" max="40" step="5" value="20"><output id="c7vv"></output></label><button id="c7go">New run</button></div>
+ <div class="two"><canvas class="sm" id="c7cv"></canvas><canvas class="sm" id="c7cv2"></canvas></div><div class="stats" id="c7st"></div><div class="read" id="c7rd"></div></div>
+</section>
+
+<section class="ch" id="c8">
+<h2><span class="num">8</span>Ensembles, epistemic uncertainty and conformal <span class="lvl e">Expert</span></h2>
+<p>Uncertainty has two parts. <b>Epistemic</b> uncertainty is lack of knowledge about the function (little data, an unexplored region) and shrinks with data; <b>aleatoric</b> uncertainty is the noise of the individual outcome and does not. Ensembles (bootstrap, deep ensembles, dropout) measure the epistemic part through disagreement among members. Used alone as an interval, the spread understates the uncertainty of a new outcome and gets worse with more data because it falls to zero while the noise does not. Combining it with a noise estimate repairs it only if the noise model is right. Conformal calibration around the ensemble mean needs no such assumption, and the ensemble spread is useful as a normaliser in the score (chapter 4).</p>
+<div class="f">Var(y<sub>new</sub> | x) = epistemic (ensemble spread²) + aleatoric (noise²)</div>
+ <div class="card"><h4>Lab 8 · Do ensemble bands cover?</h4>
+ <p class="sub">Bootstrap polynomial ensemble of sin(2x) with noise. Left: the three bands, including the range outside the training data. Right: coverage against the training size.</p>
+ <div class="ctl"><label>polynomial degree <input type="range" id="c8d" min="1" max="7" step="1" value="5"><output id="c8dv"></output></label><label>training cases <input type="range" id="c8n" min="30" max="600" step="30" value="100"><output id="c8nv"></output></label><button id="c8go">New data</button></div>
+ <div class="two"><canvas class="sm" id="c8cv"></canvas><canvas class="sm" id="c8cv2"></canvas></div><div class="stats" id="c8st"></div><div class="read" id="c8rd"></div></div>
+</section>
+
+<section class="ch" id="c9">
+<h2><span class="num">9</span>Conditional validity and small groups <span class="lvl e">Expert</span></h2>
+<p>Distribution-free guarantees conditional on every x are impossible in general: any method with finite-sample conditional coverage must give intervals of infinite expected length for non-atomic distributions. What is attainable is coverage conditional on <b>groups</b> with enough cases, by calibrating each group (Mondrian conformal) separately. With n cases in a group, the coverage in that group is again a Beta-distributed random variable with spread of order 1/√n, and with fewer than 1/α cases the interval is infinite. Pooling groups gives stable thresholds but coverage that varies by group; per-group calibration gives group validity but noisy results. Normalised scores, grouping of similar groups and honest group-level monitoring are the practical compromises.</p>
+<div class="f">Group g: q̂<sub>g</sub> = ⌈(n<sub>g</sub> + 1)(1 − α)⌉-th smallest score in g      coverage in g ~ Beta(n<sub>g</sub> + 1 − l, l)</div>
+ <div class="card"><h4>Lab 9 · Sixty groups, few cases each</h4>
+ <p class="sub">Groups with different noise levels. Left: distribution of coverage across groups, pooled and per-group thresholds. Right: the worst 5% of groups against the number of calibration cases.</p>
+ <div class="ctl"><label>calibration cases per group <input type="range" id="c9n" min="5" max="200" step="5" value="20"><output id="c9nv"></output></label><label>difference in noise between groups <input type="range" id="c9s" min="0" max="15" step="1" value="8"><output id="c9sv"></output></label><button id="c9go">New groups</button></div>
+ <div class="two"><canvas class="sm" id="c9cv"></canvas><canvas class="sm" id="c9cv2"></canvas></div><div class="stats" id="c9st"></div><div class="read" id="c9rd"></div></div>
+</section>
+
+<section class="ch" id="c10">
+<h2><span class="num">10</span>Selective prediction: when to abstain <span class="lvl e">Expert</span></h2>
+<p>An uncertainty measure earns its keep when it decides which cases to automate and which to send to a human. A <b>selective</b> system abstains on the cases with the widest intervals or largest sets. The value is the gap between the error on the decided cases when abstaining by uncertainty and when abstaining at random, which depends on how much the uncertainty varies between cases and on how well the score ranks them. The coverage guarantee covers the whole population, not the self-selected decided subset, whose accuracy must be measured directly. Capacity for manual review should set the abstention rate. In AML alert triage and credit decisioning, interval width or set size is a defensible triage criterion because it is a stated, auditable quantity.</p>
+<div class="f">Risk–coverage curve: error of decided cases against the share of cases decided</div>
+ <div class="card"><h4>Lab 10 · What abstaining buys</h4>
+ <p class="sub">Errors with unequal spread; abstain on the widest. Left: RMSE on the decided cases by abstention rate. Right: share of decided cases within a tolerance.</p>
+ <div class="ctl"><label>heterogeneity of the noise <input type="range" id="c10h" min="0" max="10" step="1" value="6"><output id="c10hv"></output></label><label>quality of the uncertainty score <input type="range" id="c10q" min="0" max="10" step="1" value="8"><output id="c10qv"></output></label><label>share sent to a human <input type="range" id="c10r" min="0" max="90" step="10" value="30"><output id="c10rv"></output></label><button id="c10go">New data</button></div>
+ <div class="two"><canvas class="sm" id="c10cv"></canvas><canvas class="sm" id="c10cv2"></canvas></div><div class="stats" id="c10st"></div><div class="read" id="c10rd"></div></div>
+</section>
+
+<section class="ch" id="c11">
+<h2><span class="num">11</span>Model-based against distribution-free intervals <span class="lvl e">Expert</span></h2>
+<p>Model-based intervals (Gaussian regression, Bayesian posteriors) are exact if the model is right and can be miscalibrated if it is not: heavy tails, curvature, heteroscedasticity or a wrong link make the stated 90% something else, usually in a level-dependent way. Conformal intervals need only exchangeability, are valid at every level (given enough calibration cases: 99% needs at least 100), and are often as narrow or narrower under heavy tails. Neither fixes a wrong model’s conditional behaviour. The practical rule is to check calibration on held-out data, the actual-against-nominal coverage plot, for whatever interval is reported, and to prefer a distribution-free wrapper around a model-based interval for regulatory use, since its validity does not depend on the model being right.</p>
+<div class="f">Calibration check: actual coverage against nominal coverage for levels from 50% to 99% on held-out cases</div>
+ <div class="card"><h4>Lab 11 · Heavy tails and a curved truth</h4>
+ <p class="sub">A straight line fitted to data with heavy-tailed noise and curvature. Left: actual against nominal coverage. Right: interval width at each level.</p>
+ <div class="ctl"><label>tail heaviness (small = heavy) <input type="range" id="c11d" min="4" max="30" step="2" value="6"><output id="c11dv"></output></label><label>curvature of the truth <input type="range" id="c11m" min="0" max="10" step="1" value="4"><output id="c11mv"></output></label><label>total cases <input type="range" id="c11n" min="100" max="1000" step="100" value="400"><output id="c11nv"></output></label><button id="c11go">New data</button></div>
+ <div class="two"><canvas class="sm" id="c11cv"></canvas><canvas class="sm" id="c11cv2"></canvas></div><div class="stats" id="c11st"></div><div class="read" id="c11rd"></div></div>
+</section>
+
+<section class="ch" id="c12">
+<h2><span class="num">12</span>Final exam, mastery checklist, cheat sheet <span class="lvl e">Expert</span></h2>
+<h3>Exam (18 questions — click an answer)</h3>
+<div id="quiz"></div>
+<div class="card"><h4>Score</h4><div class="stats" id="qscore"></div><button class="alt" id="qreset">Reset exam</button></div>
+<h3>Mastery checklist — tick when you can do it without notes</h3>
+<div class="card chk" id="chk"></div>
+<h3>Cheat sheet</h3>
+<div class="tw"><table>
+<tr><th>Idea</th><th>One line</th></tr>
+<tr><td>Intervals</td><td>Confidence interval = where the mean is (width → 0); prediction interval = where a new case falls (width ≥ ±1.96σ)</td></tr>
+<tr><td>Coverage</td><td>Marginal is easy; conditional on x is not; always report coverage by segment</td></tr>
+<tr><td>Split conformal</td><td>q̂ = ⌈(n + 1)(1 − α)⌉-th smallest calibration score; coverage ≥ 1 − α on average; per calibration set ~ Beta(n + 1 − l, l)</td></tr>
+<tr><td>Scores</td><td>Absolute, normalised, CQR change shape and efficiency, not validity; never tune on the calibration set</td></tr>
+<tr><td>Classification</td><td>Sets from 1 − p̂<sub>y</sub>; valid for any model; use class-conditional thresholds for rare classes</td></tr>
+<tr><td>Covariate shift</td><td>Weight by p<sub>new</sub>/p<sub>old</sub>; watch (Σw)²/Σw²; concept drift is not repaired</td></tr>
+<tr><td>Drift</td><td>ACI: α<sub>t+1</sub> = α<sub>t</sub> + γ(α − err<sub>t</sub>); long-run coverage only; rolling coverage is a monitor</td></tr>
+<tr><td>Ensembles</td><td>Spread = epistemic only; understates a new case’s uncertainty; calibrate with conformal</td></tr>
+<tr><td>Small groups</td><td>Per-group calibration needs n<sub>g</sub> &gt; 1/α and is noisy; pool, normalise or merge groups</td></tr>
+<tr><td>Abstention</td><td>Abstain on wide intervals; value = gap to random abstention; monitor the decided subset</td></tr>
+<tr><td>Model-based intervals</td><td>Valid only if the model is right; check actual against nominal on held-out data</td></tr>
+<tr><td>Governance</td><td>Document the score, the calibration set, the exchangeability assumption, coverage by segment and drift monitoring</td></tr>
+</table></div>
+<div class="co tip"><b>Next in Stage 7</b>Item 36, the last on the roadmap, covers interpretability and its statistical limits: feature importance, partial dependence, Shapley values, their instability under correlated features, and what an explanation can and cannot support in a regulatory setting.</div>
+</section>
+</main>
+<script>
+/*MATH*/
+function lgamma(x){const c=[76.18009172947146,-86.50532032941677,24.01409824083091,-1.231739572450155,0.1208650973866179e-2,-0.5395239384953e-5];let y=x,t=x+5.5;t-=(x+.5)*Math.log(t);let s=1.000000000190015;for(let j=0;j<6;j++)s+=c[j]/++y;return -t+Math.log(2.5066282746310005*s/x);}
+function gser(a,x){let ap=a,sum=1/a,del=sum;for(let n=0;n<1000;n++){ap++;del*=x/ap;sum+=del;if(Math.abs(del)<Math.abs(sum)*1e-15)break;}return sum*Math.exp(-x+a*Math.log(x)-lgamma(a));}
+function gcf(a,x){let b=x+1-a,c=1/1e-300,d=1/b,h=d;for(let i=1;i<1000;i++){const an=-i*(i-a);b+=2;d=an*d+b;if(Math.abs(d)<1e-300)d=1e-300;c=b+an/c;if(Math.abs(c)<1e-300)c=1e-300;d=1/d;const del=d*c;h*=del;if(Math.abs(del-1)<1e-15)break;}return Math.exp(-x+a*Math.log(x)-lgamma(a))*h;}
+function gammaQ(a,x){if(x<=0)return 1;return x<a+1?1-gser(a,x):gcf(a,x);}
+function betacf(a,b,x){const qab=a+b,qap=a+1,qam=a-1;let c=1,d=1-qab*x/qap;if(Math.abs(d)<1e-300)d=1e-300;d=1/d;let h=d;for(let m=1;m<=1000;m++){const m2=2*m;let aa=m*(b-m)*x/((qam+m2)*(a+m2));d=1+aa*d;if(Math.abs(d)<1e-300)d=1e-300;c=1+aa/c;if(Math.abs(c)<1e-300)c=1e-300;d=1/d;h*=d*c;aa=-(a+m)*(qab+m)*x/((a+m2)*(qap+m2));d=1+aa*d;if(Math.abs(d)<1e-300)d=1e-300;c=1+aa/c;if(Math.abs(c)<1e-300)c=1e-300;d=1/d;const del=d*c;h*=del;if(Math.abs(del-1)<1e-15)break;}return h;}
+function betai(a,b,x){if(x<=0)return 0;if(x>=1)return 1;const bt=Math.exp(lgamma(a+b)-lgamma(a)-lgamma(b)+a*Math.log(x)+b*Math.log(1-x));return x<(a+1)/(a+b+2)?bt*betacf(a,b,x)/a:1-bt*betacf(b,a,1-x)/b;}
+function normSf(z){const q=0.5*gammaQ(.5,z*z/2);return z>=0?q:1-q;}
+function normCdf(z){return normSf(-z);}
+function npdf(x){return Math.exp(-x*x/2)/2.5066282746310002;}
+function lbin(n,k){return lgamma(n+1)-lgamma(k+1)-lgamma(n-k+1);}
+function binom(n,k,p){return Math.exp(lbin(n,k)+k*Math.log(p)+(n-k)*Math.log(1-p));}
+function betapdf(x,a,b){return x<=0||x>=1?0:Math.exp(lgamma(a+b)-lgamma(a)-lgamma(b)+(a-1)*Math.log(x)+(b-1)*Math.log(1-x));}
+function betacdf(x,a,b){return betai(a,b,x);}
+function gampdf(x,a,r){return x<=0?0:Math.exp(a*Math.log(r)+(a-1)*Math.log(x)-r*x-lgamma(a));}
+function gamcdf(x,a,r){return x<=0?0:1-gammaQ(a,r*x);}
+function randn(){let u=0;while(!u)u=Math.random();return Math.sqrt(-2*Math.log(u))*Math.cos(2*Math.PI*Math.random());}
+function gammaS(a){if(a<1)return gammaS(a+1)*Math.pow(Math.random(),1/a);const d=a-1/3,c=1/Math.sqrt(9*d);for(;;){let x,v;do{x=randn();v=1+c*x}while(v<=0);v=v*v*v;const u=Math.random();if(Math.log(u)<.5*x*x+d-d*v+d*Math.log(v))return d*v;}}
+function betaS(a,b){const x=gammaS(a),y=gammaS(b);return x/(x+y);}
+function binS(n,p){let k=0;for(let i=0;i<n;i++)if(Math.random()<p)k++;return k;}
+function mean(a){let s=0;for(const v of a)s+=v;return s/a.length;}
+function qc(cdf,lo,hi,p,it){for(let i=0;i<(it||100);i++){const m=(lo+hi)/2;if(cdf(m)<p)lo=m;else hi=m}return(lo+hi)/2;}
+function qb(a,b,p){return qc(x=>betai(a,b,x),0,1,p,50);}
+function tcdf(x,v){const t=.5*betai(v/2,.5,v/(v+x*x));return x>0?1-t:t}
+function qn(p){return qc(normCdf,-9,9,p,70)}
+function pois(k,l){return Math.exp(-l+k*Math.log(l)-lgamma(k+1))}
+function binF(n,p){let k=0;for(;;){if(n<=0||p<=0)return k;if(p>=1)return k+n;if(n<=40){for(let i=0;i<n;i++)if(Math.random()<p)k++;return k}const a=1+(n>>1),bb=1+n-a,x=betaS(a,bb);if(x>=p){n=a-1;p=p/x}else{k+=a;n=bb-1;p=(p-x)/(1-x)}}}
+/*ENDMATH*/
+
+const $=id=>document.getElementById(id), val=id=>+$(id).value;
+const C={fg:'#e8ebf5',mu:'#8a93ab',gr:'#232a3d',a:'#6ea8ff',r:'#ff6b81',y:'#ffd166',g:'#4ade80',p:'#c084fc',t:'#5eead4'};
+const store={get(k,d){try{const v=JSON.parse(localStorage.getItem(k));return v==null?d:v}catch(e){return d}},set(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}};
+function stat(l,v,c){return `<div class="stat ${c||''}"><b>${v}</b><span>${l}</span></div>`}
+function f3(x){if(!isFinite(x))return String(x);const a=Math.abs(x);if(a!==0&&(a<1e-3||a>=1e6))return x.toExponential(2);return String(+x.toFixed(a<1?4:a<100?3:a<1000?2:0))}
+function pc(x){return f3(100*x)+'%'}
+const resizers=[];
+function reg(fn){fn();resizers.push(fn)}
+function on(ids,fn){ids.split(' ').forEach(i=>{const e=$(i);e.addEventListener('input',fn);e.addEventListener('change',fn)})}
+let rt;window.addEventListener('resize',()=>{clearTimeout(rt);rt=setTimeout(()=>resizers.forEach(f=>f()),150)});
+document.querySelectorAll('input[type=range]').forEach(i=>{const o=$(i.id+'v');if(!o)return;const f=()=>{o.textContent=i.value};i.addEventListener('input',f);f()});
+
+function nice(x){const e=Math.pow(10,Math.floor(Math.log10(x))),f=x/e;return (f<1.5?1:f<3?2:f<7?5:10)*e}
+function mk(cv,x0,x1,ymax,o){o=o||{};const y0=o.y0||0,dpr=window.devicePixelRatio||1,r=cv.getBoundingClientRect(),w=r.width||600,h=r.height||270;
+ cv.width=w*dpr;cv.height=h*dpr;const g=cv.getContext('2d');g.setTransform(dpr,0,0,dpr,0,0);g.clearRect(0,0,w,h);
+ const L=o.L||42,R=12,T=14,B=28,X=x=>L+(x-x0)/(x1-x0)*(w-L-R),Y=y=>h-B-(y-y0)/(ymax-y0)*(h-T-B);
+ g.font='11px system-ui';g.lineWidth=1;g.strokeStyle=C.gr;g.fillStyle=C.mu;
+ if(!o.noGrid){const sx=nice((x1-x0)/7);for(let x=Math.ceil(x0/sx-1e-9)*sx;!o.noX&&x<=x1+1e-9;x+=sx){g.beginPath();g.moveTo(X(x),T);g.lineTo(X(x),h-B);g.stroke();g.textAlign='center';g.fillText(String(+x.toFixed(6)),X(x),h-B+15)}
+ const sy=nice((ymax-y0)/4);for(let y=Math.ceil(y0/sy-1e-9)*sy;y<=ymax+1e-9;y+=sy){g.beginPath();g.moveTo(L,Y(y));g.lineTo(w-R,Y(y));g.stroke();g.textAlign='right';g.fillText(String(+y.toFixed(4)),L-5,Y(y)+3)}}
+ return{g,w,h,X,Y,L,R,T,B,
+  line(f,col,lw,a,b,n,dash){a=a==null?x0:a;b=b==null?x1:b;n=n||260;g.save();if(dash)g.setLineDash([5,4]);g.beginPath();g.strokeStyle=col;g.lineWidth=lw||2;let st=false;for(let i=0;i<=n;i++){const x=a+(b-a)*i/n,y=f(x);if(!isFinite(y)){st=false;continue}st?g.lineTo(X(x),Y(y)):g.moveTo(X(x),Y(y));st=true}g.stroke();g.restore()},
+  area(f,a,b,col,n){a=Math.max(a,x0);b=Math.min(b,x1);if(b<=a)return;n=n||200;g.beginPath();g.moveTo(X(a),Y(0));for(let i=0;i<=n;i++){const x=a+(b-a)*i/n;g.lineTo(X(x),Y(f(x)))}g.lineTo(X(b),Y(0));g.closePath();g.fillStyle=col;g.fill()},
+  vline(x,col,lab,dash){g.save();g.strokeStyle=col;g.lineWidth=1.6;if(dash)g.setLineDash([5,4]);g.beginPath();g.moveTo(X(x),T);g.lineTo(X(x),h-B);g.stroke();g.restore();if(lab){g.fillStyle=col;g.textAlign='center';g.fillText(lab,Math.min(Math.max(X(x),34),w-34),T+10)}},
+  hline(y,col,lab){g.save();g.strokeStyle=col;g.lineWidth=1.4;g.setLineDash([5,4]);g.beginPath();g.moveTo(L,Y(y));g.lineTo(w-R,Y(y));g.stroke();g.restore();if(lab){g.fillStyle=col;g.textAlign='right';g.fillText(lab,w-R-3,Y(y)-4)}},
+  text(s,x,y,col,al){g.fillStyle=col||C.fg;g.textAlign=al||'left';g.fillText(s,x,y)}};}
+
+/* ---------- shared helpers for this page ---------- */
+const D={
+ norm:{n:'Normal(0,1)',s:()=>randn(),mu:0,sd:1,sk:0},
+ unif:{n:'Uniform(0,1)',s:()=>Math.random(),mu:.5,sd:Math.sqrt(1/12),sk:0},
+ expo:{n:'Exponential(1)',s:()=>-Math.log(1-Math.random()),mu:1,sd:1,sk:2},
+ logn:{n:'Lognormal(0,1)',s:()=>Math.exp(randn()),mu:Math.exp(.5),sd:Math.sqrt((Math.E-1)*Math.E),sk:(Math.E+2)*Math.sqrt(Math.E-1),disc:0},
+ b05:{n:'Bernoulli(0.5)',s:()=>Math.random()<.5?1:0,mu:.5,sd:.5,sk:0,disc:1},
+ b05s:{n:'Bernoulli(0.05)',s:()=>Math.random()<.05?1:0,mu:.05,sd:Math.sqrt(.0475),sk:.9/Math.sqrt(.0475),disc:1},
+ bimo:{n:'Two humps',s:()=>(Math.random()<.5?-2:2)+.5*randn(),mu:0,sd:Math.sqrt(4.25),sk:0},
+ par5:{n:'Pareto(α=5)',s:()=>Math.pow(1-Math.random(),-.2),mu:1.25,sd:Math.sqrt(5/48),sk:6*Math.sqrt(.6)},
+ cauchy:{n:'Cauchy (no mean)',s:()=>Math.tan(Math.PI*(Math.random()-.5)),mu:NaN,sd:Infinity,sk:NaN}
+};
+function fillSel(id,keys,def){const e=$(id);e.innerHTML=keys.map(k=>`<option value="${k}">${D[k].n}</option>`).join('');e.value=def}
+const PAL=[C.a,C.r,C.y,C.g,C.p,C.t,'#ff9f43','#9aa4bf'];
+function tgrid(N,M){const T=[];let prev=0;for(let i=0;i<M;i++){let n=Math.round(Math.pow(10,Math.log10(N)*i/(M-1)));if(i===M-1)n=N;n=Math.max(prev+1,n);if(n>N)break;T.push(n);prev=n}if(T[T.length-1]!==N)T[T.length-1]=N;return T}
+function nlab(n){return n>=1e6?(n/1e6)+'M':n>=1000?(n/1000)+'k':String(n)}
+function customGrid(P,xt,yt){const g=P.g;g.save();g.strokeStyle=C.gr;g.fillStyle=C.mu;g.font='11px system-ui';g.lineWidth=1;
+ xt.forEach(([v,l])=>{g.beginPath();g.moveTo(P.X(v),P.T);g.lineTo(P.X(v),P.h-P.B);g.stroke();g.textAlign='center';g.fillText(l,P.X(v),P.h-P.B+15)});
+ yt.forEach(([v,l])=>{g.beginPath();g.moveTo(P.L,P.Y(v));g.lineTo(P.w-P.R,P.Y(v));g.stroke();g.textAlign='right';g.fillText(l,P.L-5,P.Y(v)+3)});g.restore()}
+function clip(P,fn){const g=P.g;g.save();g.beginPath();g.rect(P.L,P.T,P.w-P.L-P.R,P.h-P.T-P.B);g.clip();fn();g.restore()}
+function poly(P,pts,col,lw,dash){const g=P.g;g.save();if(dash)g.setLineDash([5,4]);g.strokeStyle=col;g.lineWidth=lw||2;g.beginPath();pts.forEach(([x,y],i)=>i?g.lineTo(P.X(x),P.Y(y)):g.moveTo(P.X(x),P.Y(y)));g.stroke();g.restore()}
+function dots(P,pts,col,r){const g=P.g;g.fillStyle=col;pts.forEach(([x,y])=>{g.beginPath();g.arc(P.X(x),P.Y(y),r||3,0,7);g.fill()})}
+function niceTicks(lo,hi,k){const st=nice((hi-lo)/(k||5)),a=[];for(let v=Math.ceil(lo/st-1e-9)*st;v<=hi+1e-9;v+=st)a.push([v,String(+v.toFixed(6))]);return a}
+function logTicks(lo,hi){const a=[];for(let e=Math.ceil(lo-1e-9);e<=hi+1e-9;e++)a.push([e,nlab(Math.pow(10,e))]);return a}
+function mom(a){const n=a.length;let m=0;for(const v of a)m+=v;m/=n;let v2=0,v3=0,v4=0;for(const v of a){const d=v-m;v2+=d*d;v3+=d*d*d;v4+=d*d*d*d}v2/=n;v3/=n;v4/=n;const sd=Math.sqrt(v2);return{n,m,sd,sk:sd>0?v3/(sd*sd*sd):0,ku:v2>0?v4/(v2*v2)-3:0}}
+function ksN(z){const a=Array.from(z).sort((x,y)=>x-y),n=a.length;let d=0;for(let i=0;i<n;i++){const F=normCdf(a[i]);d=Math.max(d,Math.abs((i+1)/n-F),Math.abs(i/n-F))}return d}
+/* histogram of data as density with optional overlay curves [{f,col,lw,dash}] */
+function hist(cv,data,lo,hi,bins,ov,col){const cnt=new Float64Array(bins),bw=(hi-lo)/bins;let n=0;for(const v of data){if(v<lo||v>=hi)continue;cnt[Math.floor((v-lo)/bw)]++;n++}
+ const N=data.length;let ym=0;for(let i=0;i<bins;i++){cnt[i]/=N*bw;ym=Math.max(ym,cnt[i])}
+ (ov||[]).forEach(o=>{for(let i=0;i<=80;i++)ym=Math.max(ym,o.f(lo+(hi-lo)*i/80)||0)});
+ const P=mk(cv,lo,hi,ym*1.12);
+ P.g.fillStyle=col||'rgba(110,168,255,.5)';for(let i=0;i<bins;i++){if(cnt[i]<=0)continue;const a=P.X(lo+i*bw),b=P.X(lo+(i+1)*bw);P.g.fillRect(a,P.Y(cnt[i]),Math.max(1,b-a-1),P.Y(0)-P.Y(cnt[i]))}
+ (ov||[]).forEach(o=>P.line(o.f,o.col,o.lw||2.4,lo,hi,200,o.dash));return P}
+const fmt=x=>f3(x);
+
+/* ---------- shared for this page ---------- */
+const POPS=['norm','unif','expo','logn','bimo','par5'];
+D.norm.med=0;D.norm.q90=1.2815516;D.unif.med=.5;D.unif.q90=.9;D.expo.med=Math.LN2;D.expo.q90=Math.log(10);D.logn.med=1;D.logn.q90=Math.exp(1.2815516);
+D.bimo.med=0;D.bimo.q90=qc(x=>.5*normCdf((x+2)/.5)+.5*normCdf((x-2)/.5),-10,10,.9,80);D.par5.med=Math.pow(2,.2);D.par5.q90=Math.pow(10,.2);
+const SF={mean:a=>mean(a),median:a=>{const b=Float64Array.from(a).sort(),n=b.length;return n%2?b[(n-1)/2]:(b[n/2-1]+b[n/2])/2},sd:a=>{const n=a.length,m=mean(a);let s=0;for(const v of a)s+=(v-m)*(v-m);return Math.sqrt(s/(n-1))},q90:a=>{const b=Float64Array.from(a).sort();return b[Math.round(.9*(b.length-1))]}};
+function truth(key,st){const d=D[key];return st==='mean'?d.mu:st==='median'?d.med:st==='sd'?d.sd:d.q90}
+const SNAME={mean:'sample mean',median:'sample median',sd:'sample SD',q90:'90th percentile'};
+const N10=[2,3,5,10,20,50,100,200,500,1000];
+function pct(a,p){const b=Float64Array.from(a).sort();return b[Math.min(b.length-1,Math.max(0,Math.floor(p*b.length)))]}
+function histLines(cv,arrs,cols,lo,hi,bins,vl){const bw=(hi-lo)/bins,dens=arrs.map(a=>{const c=new Float64Array(bins);for(const v of a){if(v<lo||v>=hi)continue;c[Math.floor((v-lo)/bw)]++}for(let i=0;i<bins;i++)c[i]/=a.length*bw;return c});let ym=0;dens.forEach(c=>c.forEach(v=>ym=Math.max(ym,v)));const P=mk(cv,lo,hi,ym*1.15||1);
+ dens.forEach((c,k)=>{const pts=[];for(let i=0;i<bins;i++){pts.push([lo+i*bw,c[i]]);pts.push([lo+(i+1)*bw,c[i]])}clip(P,()=>poly(P,pts,cols[k],2.2))});(vl||[]).forEach(v=>P.vline(v[0],v[1],v[2],v[3]));return P}
+function sdOf(a){return mom(a).sd}
+
+/* ---------- ML helpers ---------- */
+function digamma(x){let r=0;while(x<6){r-=1/x;x++}const f=1/(x*x);return r+Math.log(x)-.5/x-f*(1/12-f*(1/120-f/252))}
+function trigamma(x){let r=0;while(x<6){r+=1/(x*x);x++}const f=1/(x*x);return r+1/x+.5*f+f/x*(1/6-f*(1/30-f/42))}
+function poisS(l){if(l<=0)return 0;if(l<30){const L=Math.exp(-l);let k=0,p=1;do{k++;p*=Math.random()}while(p>L);return k-1}const m=Math.floor(.875*l),g=gammaS(m);return g<l?m+poisS(l-g):binF(m-1,l/g)}
+function llb(k,n,p){return(k?k*Math.log(p):0)+(n-k?(n-k)*Math.log(1-p):0)}
+function lrInt(k,n,cut){const ph=k/n,l0=llb(k,n,ph),g=p=>2*(l0-llb(k,n,p))-cut;let lo=0,hi=1;
+ if(k>0){let a=1e-12,b=ph;for(let i=0;i<70;i++){const m=(a+b)/2;if(g(m)>0)a=m;else b=m}lo=(a+b)/2}
+ if(k<n){let a=ph,b=1-1e-12;for(let i=0;i<70;i++){const m=(a+b)/2;if(g(m)>0)b=m;else a=m}hi=(a+b)/2}return[lo,hi]}
+function solveAlpha(s){if(!(s>1e-9))return 1e6;let a=(3-s+Math.sqrt((3-s)*(3-s)+24*s))/(12*s);for(let i=0;i<8;i++){const f=Math.log(a)-digamma(a)-s,fp=1/a-trigamma(a);let n=a-f/fp;if(!(n>0))n=a/2;a=n}return a}
+function normPdfAt(x,m,s){return Math.exp(-(x-m)*(x-m)/(2*s*s))/(s*2.5066282746)}
+/* ---------- Regression helpers ---------- */
+function idx(id,arr,ff){const e=$(id),o=$(id+'v'),f=()=>{o.textContent=ff?ff(arr[+e.value]):arr[+e.value]};e.addEventListener('input',f);f()}
+function scl(id,ff){const e=$(id),o=$(id+'v'),f=()=>{o.textContent=ff(+e.value)};e.addEventListener('input',f);f()}
+function pctTicks(a,b,st){const r=[];for(let v=a;v<=b+1e-9;v+=st)r.push([v,Math.round(v*100)+'%']);return r}
+const _tq={};function tq(v,p){const k=v+'_'+p;return _tq[k]||(_tq[k]=qc(x=>tcdf(x,v),0,500,p,80))}
+function simple(x,y){const n=x.length;let xm=0,ym=0;for(let i=0;i<n;i++){xm+=x[i];ym+=y[i]}xm/=n;ym/=n;let sxx=0,sxy=0,syy=0;for(let i=0;i<n;i++){const dx=x[i]-xm,dy=y[i]-ym;sxx+=dx*dx;sxy+=dx*dy;syy+=dy*dy}const b=sxy/sxx,a=ym-b*xm,res=new Float64Array(n);let sse=0;for(let i=0;i<n;i++){res[i]=y[i]-a-b*x[i];sse+=res[i]*res[i]}return{n,xm,ym,sxx,sxy,syy,b,a,res,sse,sst:syy,r2:1-sse/syy}}
+function gj(A,B){const p=A.length;const M=A.map((r,i)=>Array.from(r).concat(B?[B[i]]:[]));for(let c=0;c<p;c++){let m=c;for(let r=c+1;r<p;r++)if(Math.abs(M[r][c])>Math.abs(M[m][c]))m=r;[M[c],M[m]]=[M[m],M[c]];const d=M[c][c]||1e-12;for(let k=c;k<M[c].length;k++)M[c][k]/=d;for(let r=0;r<p;r++)if(r!==c){const f=M[r][c];if(f!==0)for(let k=c;k<M[c].length;k++)M[r][k]-=f*M[c][k]}}return M}
+function olsMulti(cols,y,needInv){const n=y.length,k=cols.length,p=k+1,A=[],B=new Float64Array(p);for(let i=0;i<p;i++)A.push(new Float64Array(p));
+ for(let r=0;r<n;r++){const row=[1];for(let j=0;j<k;j++)row.push(cols[j][r]);for(let i=0;i<p;i++){B[i]+=row[i]*y[r];for(let j=i;j<p;j++)A[i][j]+=row[i]*row[j]}}
+ for(let i=0;i<p;i++){for(let j=0;j<i;j++)A[i][j]=A[j][i];if(i>0)A[i][i]+=1e-9}
+ let beta,inv=null;if(needInv){const I=[];for(let i=0;i<p;i++){const e=new Float64Array(p);e[i]=1;I.push(e)}const M=gj(A,null);const aug=A.map((r,i)=>Array.from(r).concat(Array.from(I[i])));
+  const m=aug;for(let c=0;c<p;c++){let q=c;for(let r=c+1;r<p;r++)if(Math.abs(m[r][c])>Math.abs(m[q][c]))q=r;[m[c],m[q]]=[m[q],m[c]];const d=m[c][c]||1e-12;for(let kk=0;kk<2*p;kk++)m[c][kk]/=d;for(let r=0;r<p;r++)if(r!==c){const f=m[r][c];if(f!==0)for(let kk=0;kk<2*p;kk++)m[r][kk]-=f*m[c][kk]}}
+  inv=m.map(r=>r.slice(p));beta=inv.map(r=>{let s=0;for(let j=0;j<p;j++)s+=r[j]*B[j];return s})}
+ else{const M=gj(A,B);beta=M.map(r=>r[p])}
+ const res=new Float64Array(n);let sse=0;for(let r=0;r<n;r++){let f=beta[0];for(let j=0;j<k;j++)f+=beta[j+1]*cols[j][r];res[r]=y[r]-f;sse+=res[r]*res[r]}
+ const out={beta,res,sse,n,p,inv};if(inv){const s2=sse/(n-p);out.s2=s2;out.se=inv.map((r,i)=>Math.sqrt(s2*r[i]))}return out}
+function scatterAxes(cv,xs,ys,xlo,xhi,ylo,yhi,L){return mk(cv,xlo,xhi,yhi,{y0:ylo,L:L||44})}
+function range(a,pad){let lo=1e99,hi=-1e99;for(const v of a){if(v<lo)lo=v;if(v>hi)hi=v}const w=(hi-lo)||1;return[lo-(pad||.05)*w,hi+(pad||.05)*w]}
+
+
+function bars(P,groups,cols,yt){/* groups: array of arrays of values (0..1) */const g=P.g,G=groups.length,B=groups[0].length,W=(P.w-P.L-P.R)/G;groups.forEach((vals,gi)=>vals.forEach((v,bi)=>{const bw=W*.78/B,x=P.L+W*gi+W*.11+bw*bi;g.fillStyle=cols[bi];g.fillRect(x,P.Y(v),bw-2,P.Y(0)-P.Y(v));g.fillStyle=C.fg;g.textAlign='center';g.font='10px system-ui';g.fillText(Math.round(v*100)+'%',x+bw/2-1,P.Y(v)-3)}));g.font='11px system-ui'}
+function gridG(P,yt,labels){customGrid(P,[],yt);const G=labels.length,W=(P.w-P.L-P.R)/G;P.g.fillStyle=C.mu;P.g.textAlign='center';labels.forEach((l,i)=>P.g.fillText(l,P.L+W*(i+.5),P.h-P.B+15))}
+function legend(P,items,y){let x=P.L+8;items.forEach(([s,c])=>{P.text('■ '+s,x,y,c);x+=P.g.measureText('■ '+s).width+16})}
+
+/* ---------- GLM machinery ---------- */
+const LK={logit:{mu:e=>1/(1+Math.exp(-e)),d:e=>{const m=1/(1+Math.exp(-e));return m*(1-m)}},
+ probit:{mu:e=>normCdf(e),d:e=>npdf(e)},
+ cll:{mu:e=>1-Math.exp(-Math.exp(e)),d:e=>Math.exp(e-Math.exp(e))},
+ log:{mu:e=>Math.exp(e),d:e=>Math.exp(e)}};
+function minv(A){const p=A.length,m=A.map((r,i)=>{const row=Array.from(r);for(let j=0;j<p;j++)row.push(i===j?1:0);return row});
+ for(let c=0;c<p;c++){let q=c;for(let r=c+1;r<p;r++)if(Math.abs(m[r][c])>Math.abs(m[q][c]))q=r;[m[c],m[q]]=[m[q],m[c]];const d=m[c][c]||1e-12;for(let k=0;k<2*p;k++)m[c][k]/=d;for(let r=0;r<p;r++)if(r!==c){const f=m[r][c];if(f!==0)for(let k=0;k<2*p;k++)m[r][k]-=f*m[c][k]}}
+ return m.map(r=>r.slice(p))}
+function glm(cols,y,o){o=o||{};const n=y.length,k=cols.length,p=k+1,fam=o.fam||'binom',L=LK[o.link||(fam==='pois'?'log':'logit')],off=o.off,X=[new Float64Array(n).fill(1)].concat(cols),V=m=>fam==='pois'?m:m*(1-m);
+ let b=new Float64Array(p);if(o.init)b=Float64Array.from(o.init);else if(fam==='pois'){let m=0;for(const v of y)m+=v;b[0]=Math.log(Math.max(m/n,1e-3))-(off?mean(off):0)}
+ function ev(b){const eta=new Float64Array(n),mu=new Float64Array(n);let ll=0;for(let i=0;i<n;i++){let e=off?off[i]:0;for(let j=0;j<p;j++)e+=b[j]*X[j][i];e=Math.max(-30,Math.min(30,e));eta[i]=e;let m=L.mu(e);m=fam==='binom'?Math.min(1-1e-12,Math.max(1e-12,m)):Math.max(m,1e-12);mu[i]=m;ll+=fam==='pois'?y[i]*Math.log(m)-m-lgamma(y[i]+1):y[i]*Math.log(m)+(1-y[i])*Math.log(1-m)}return{eta,mu,ll}}
+ function info(c){const A=[];for(let i=0;i<p;i++)A.push(new Float64Array(p));const w=new Float64Array(n);for(let r=0;r<n;r++){const d=L.d(c.eta[r]),wi=d*d/V(c.mu[r]);w[r]=wi;for(let i=0;i<p;i++){const xi=X[i][r]*wi;for(let j=i;j<p;j++)A[i][j]+=xi*X[j][r]}}for(let i=0;i<p;i++)for(let j=0;j<i;j++)A[i][j]=A[j][i];return{A,w}}
+ let cur=ev(b),it=0,conv=false,maxit=o.maxit==null?40:o.maxit;
+ for(;it<maxit;it++){const{A,w}=info(cur),Ai=minv(A),g=new Float64Array(p);
+  for(let r=0;r<n;r++){const d=L.d(cur.eta[r]),v=V(cur.mu[r]);let s=(y[r]-cur.mu[r])*d/v;if(o.firth){let h=0;for(let i=0;i<p;i++)for(let j=0;j<p;j++)h+=X[i][r]*Ai[i][j]*X[j][r];h*=w[r];s+=h*(.5-cur.mu[r])}for(let i=0;i<p;i++)g[i]+=X[i][r]*s}
+  const st=new Float64Array(p);let mx=0;for(let i=0;i<p;i++){let s=0;for(let j=0;j<p;j++)s+=Ai[i][j]*g[j];st[i]=s}
+  if(o.firth){for(let i=0;i<p;i++){st[i]=Math.max(-1,Math.min(1,st[i]));mx=Math.max(mx,Math.abs(st[i]))}b=b.map((v,i)=>v+st[i]);cur=ev(b);if(mx<1e-8){conv=true;it++;break}}
+  else{let a=1,nb,nc;for(let h=0;h<25;h++){nb=b.map((v,i)=>v+a*st[i]);nc=ev(nb);if(nc.ll>=cur.ll-1e-10)break;a/=2}for(let i=0;i<p;i++)mx=Math.max(mx,Math.abs(a*st[i]));const dl=Math.abs(nc.ll-cur.ll);b=nb;cur=nc;if(mx<1e-8||dl<1e-11){conv=true;it++;break}}}
+ const{A,w}=info(cur),Ai=minv(A),se=Ai.map((r,i)=>Math.sqrt(Math.max(r[i],0)));let dev;
+ if(fam==='binom')dev=-2*cur.ll;else{dev=0;for(let i=0;i<n;i++){const yy=y[i],m=cur.mu[i];dev+=2*((yy>0?yy*Math.log(yy/m):0)-(yy-m))}}
+ return{beta:b,mu:cur.mu,eta:cur.eta,ll:cur.ll,dev,inv:Ai,se,iter:it,conv,X,w,p,n,A}}
+function auc(sc,y){const n=y.length,idx=Array.from({length:n},(_,i)=>i).sort((a,b)=>sc[a]-sc[b]);let rk=0,np=0,i=0;while(i<n){let j=i;while(j+1<n&&sc[idx[j+1]]===sc[idx[i]])j++;const r=(i+j)/2+1;for(let t=i;t<=j;t++)if(y[idx[t]]===1){rk+=r;np++}i=j+1}const nn=n-np;return np&&nn?(rk-np*(np+1)/2)/(np*nn):.5}
+function sepTest(x,y){let a1=1e99,b1=-1e99,a0=1e99,b0=-1e99,n1=0,n0=0;for(let i=0;i<x.length;i++){if(y[i]===1){n1++;a1=Math.min(a1,x[i]);b1=Math.max(b1,x[i])}else{n0++;a0=Math.min(a0,x[i]);b0=Math.max(b0,x[i])}}return n1>0&&n0>0&&(a1>b0||a0>b1)}
+const sig=e=>1/(1+Math.exp(-e));
+function lgt(p){return Math.log(p/(1-p))}
+function binaryData(n,a,b,sd){const x=new Float64Array(n),y=new Float64Array(n);for(let i=0;i<n;i++){x[i]=(sd||1)*randn();y[i]=Math.random()<sig(a+b*x[i])?1:0}return{x,y}}
+function heat(P,gx,gy,vals,x0,x1,y0,y1){const g=P.g,nx=gx,ny=gy;let mn=1e99,mx=-1e99;vals.forEach(v=>{if(isFinite(v)){mn=Math.min(mn,v);mx=Math.max(mx,v)}});mn=Math.max(mn,mx-30);for(let i=0;i<nx;i++)for(let j=0;j<ny;j++){const v=vals[i*ny+j],t=isFinite(v)?Math.max(0,Math.min(1,(v-mn)/(mx-mn))):0,tt=Math.pow(t,1.6),c=Math.round(40+190*tt);g.fillStyle=`rgb(${Math.round(20+60*tt)},${Math.round(30+100*tt)},${c})`;const xa=P.X(x0+(x1-x0)*i/nx),xb=P.X(x0+(x1-x0)*(i+1)/nx),ya=P.Y(y0+(y1-y0)*j/ny),yb=P.Y(y0+(y1-y0)*(j+1)/ny);g.fillRect(xa,Math.min(ya,yb),xb-xa+1,Math.abs(ya-yb)+1)}}
+/* ---------- confounding helpers ---------- */
+const U01=()=>1-Math.random();
+function sdv(a){const m=mean(a);let s=0;for(const v of a)s+=(v-m)*(v-m);return Math.sqrt(s/Math.max(a.length-1,1))}
+function barV(cv,vals,cols,labs,ymax,ff){const P=mk(cv,0,vals.length,ymax,{y0:0,noGrid:true,L:50});customGrid(P,[],niceTicks(0,ymax,5));const W=(P.w-P.L-P.R)/vals.length,g=P.g;vals.forEach((v,i)=>{const w=W*.5,x=P.L+W*i+W*.25;g.fillStyle=cols[i];g.fillRect(x,P.Y(v),w,P.Y(0)-P.Y(v));g.fillStyle=C.fg;g.textAlign='center';g.fillText((ff||fmt)(v),x+w/2,P.Y(v)-4);g.fillStyle=C.mu;g.fillText(labs[i],x+w/2,P.h-P.B+15)});return P}
+function barL(cv,vals,cols,labs,lo,hi,ff){const P=mk(cv,0,vals.length,hi,{y0:lo,noGrid:true,L:50});customGrid(P,[],niceTicks(lo,hi,5));const W=(P.w-P.L-P.R)/vals.length,g=P.g;vals.forEach((v,i)=>{const w=W*.5,x=P.L+W*i+W*.25;g.fillStyle=cols[i];g.fillRect(x,P.Y(v),w,P.Y(lo)-P.Y(v));g.fillStyle=C.fg;g.textAlign='center';g.fillText((ff||fmt)(v),x+w/2,P.Y(v)-4);g.fillStyle=C.mu;g.fillText(labs[i],x+w/2,P.h-P.B+15)});return P}
+const avg=a=>{let s=0;for(const v of a)s+=v;return s/a.length};
+function corr(a,b){const n=a.length;let ma=0,mb=0;for(let i=0;i<n;i++){ma+=a[i];mb+=b[i]}ma/=n;mb/=n;let sa=0,sb=0,sab=0;for(let i=0;i<n;i++){const x=a[i]-ma,y=b[i]-mb;sa+=x*x;sb+=y*y;sab+=x*y}return sab/Math.sqrt(sa*sb||1e-12)}
+const pcor=(x,y,z)=>corr(simple(z,x).res,simple(z,y).res);
+const lin=(n,f)=>{const a=new Float64Array(n);for(let i=0;i<n;i++)a[i]=f(i);return a};
+const rn=(n,s)=>lin(n,()=>(s||1)*randn());
+/* signed bars from zero */
+function barZ(cv,vals,cols,labs,lo,hi,ff){const P=mk(cv,0,vals.length,hi,{y0:lo,noGrid:true,L:50});customGrid(P,[],niceTicks(lo,hi,5));const W=(P.w-P.L-P.R)/vals.length,g=P.g;vals.forEach((v,i)=>{const w=W*.5,x=P.L+W*i+W*.25,y0=P.Y(0),y1=P.Y(v);g.fillStyle=cols[i];g.fillRect(x,Math.min(y0,y1),w,Math.abs(y0-y1));g.fillStyle=C.fg;g.textAlign='center';g.fillText((ff||fmt)(v),x+w/2,v>=0?y1-4:y1+13);g.fillStyle=C.mu;g.fillText(labs[i],x+w/2,P.h-P.B+15)});P.hline(0,C.mu,'');return P}
+/* grouped signed bars: groups[g][b] */
+function barG(cv,groups,cols,glabs,lo,hi,ff){const P=mk(cv,0,groups.length,hi,{y0:lo,noGrid:true,L:50});customGrid(P,[],niceTicks(lo,hi,5));const G=groups.length,B=groups[0].length,W=(P.w-P.L-P.R)/G,g=P.g;groups.forEach((vs,gi)=>vs.forEach((v,bi)=>{const bw=W*.7/B,x=P.L+W*gi+W*.15+bw*bi,y0=P.Y(0),y1=P.Y(v);g.fillStyle=cols[bi];g.fillRect(x,Math.min(y0,y1),bw-3,Math.abs(y0-y1));g.fillStyle=C.fg;g.textAlign='center';g.font='10px system-ui';g.fillText((ff||fmt)(v),x+bw/2-1,v>=0?y1-3:y1+11)}));g.font='11px system-ui';g.fillStyle=C.mu;g.textAlign='center';glabs.forEach((l,i)=>g.fillText(l,P.L+W*(i+.5),P.h-P.B+15));P.hline(0,C.mu,'');return P}
+/* scatter with optional per-point colours; draws at most nmax points */
+function scat(P,xs,ys,col,nmax,r,colf){const n=xs.length,st=Math.max(1,Math.floor(n/(nmax||500))),pts=[];clip(P,()=>{for(let i=0;i<n;i+=st){P.g.fillStyle=colf?colf(i):col;P.g.beginPath();P.g.arc(P.X(xs[i]),P.Y(ys[i]),r||2.2,0,7);P.g.fill()}})}
+function fitLine(P,s,col,lw,dash,x0,x1){clip(P,()=>P.line(x=>s.a+s.b*x,col,lw||2,x0,x1,2,dash))}
+const ordIdx=p=>Array.from({length:p.length},(_,i)=>i).sort((a,b)=>p[a]-p[b]);
+/* ---------- experiment helpers ---------- */
+const sgn=v=>(v>=0?'+':'−')+Math.abs(v).toFixed(3);
+const rng2=(a,b,pad)=>range(Array.from(a).concat(Array.from(b)),pad||.05);
+const pct0=x=>Math.round(x*100)+'%';
+const lgs=x=>1/(1+Math.exp(-x));
+function rgam(a){if(a<1)return rgam(a+1)*Math.pow(U01(),1/a);const d=a-1/3,c=1/Math.sqrt(9*d);for(;;){let x,v;do{x=randn();v=1+c*x}while(v<=0);v=v*v*v;const u=U01();if(u<1-.0331*x*x*x*x||Math.log(u)<.5*x*x+d*(1-v+Math.log(v)))return d*v}}
+const rbeta=(a,b)=>{const x=rgam(a),y=rgam(b);return x/(x+y)};
+function rbin(n,p){if(n<=30){let k=0;for(let i=0;i<n;i++)if(Math.random()<p)k++;return k}const m=n*p,s=Math.sqrt(n*p*(1-p)),k=Math.round(m+s*randn());return Math.max(0,Math.min(n,k))}
+function welch(a,b){const na=a.length,nb=b.length,ma=avg(a),mb=avg(b);let va=0,vb=0;for(const v of a)va+=(v-ma)*(v-ma);for(const v of b)vb+=(v-mb)*(v-mb);va/=na-1;vb/=nb-1;const se2=va/na+vb/nb,se=Math.sqrt(se2),t=(ma-mb)/se,df=se2*se2/((va/na)*(va/na)/(na-1)+(vb/nb)*(vb/nb)/(nb-1));return{d:ma-mb,se,t,df,p:2*(1-tcdf(Math.abs(t),df))}}
+const diffMeans=(Y,T)=>{let s1=0,s0=0,n1=0,n0=0;for(let i=0;i<Y.length;i++){if(T[i]){s1+=Y[i];n1++}else{s0+=Y[i];n0++}}return s1/n1-s0/n0};
+/* ---------- observational-causal helpers ---------- */
+function logitFit(cols,y){const n=y.length,k=cols.length,p=k+1,b=new Float64Array(p),lin_=i=>{let s=b[0];for(let j=0;j<k;j++)s+=b[j+1]*cols[j][i];return s};
+ for(let it=0;it<30;it++){const A=[];for(let i=0;i<p;i++)A.push(new Float64Array(p));const g=new Float64Array(p);
+  for(let i=0;i<n;i++){const m=lgs(lin_(i)),w=Math.max(m*(1-m),1e-8),r=y[i]-m,row=[1];for(let j=0;j<k;j++)row.push(cols[j][i]);for(let a=0;a<p;a++){g[a]+=row[a]*r;for(let c=a;c<p;c++)A[a][c]+=w*row[a]*row[c]}}
+  for(let a=0;a<p;a++){for(let c=0;c<a;c++)A[a][c]=A[c][a];A[a][a]+=1e-8}
+  const M=gj(A,Array.from(g)),d=M.map(r=>r[p]);let mx=0;for(let a=0;a<p;a++){b[a]+=d[a];mx=Math.max(mx,Math.abs(d[a]))}if(mx<1e-6)break}
+ const pr=new Float64Array(n),lo=new Float64Array(n);for(let i=0;i<n;i++){pr[i]=Math.min(.9999,Math.max(.0001,lgs(lin_(i))));lo[i]=Math.log(pr[i]/(1-pr[i]))}return{beta:b,pr,lo}}
+/* Hajek IPW estimate of the ATE; keep(i)=false drops a unit */
+function ipwATE(Y,T,e,keep){let a1=0,b1=0,a0=0,b0=0;for(let i=0;i<Y.length;i++){if(keep&&!keep(i))continue;if(T[i]){const w=1/e[i];a1+=w*Y[i];b1+=w}else{const w=1/(1-e[i]);a0+=w*Y[i];b0+=w}}return a1/b1-a0/b0}
+function smd(x,T,w){let m1=0,m0=0,w1=0,w0=0,n1=0,n0=0;for(let i=0;i<x.length;i++){const ww=w?w[i]:1;if(T[i]){m1+=ww*x[i];w1+=ww;n1++}else{m0+=ww*x[i];w0+=ww;n0++}}m1/=w1;m0/=w0;let v1=0,v0=0,a1=0,a0=0;for(let i=0;i<x.length;i++){if(T[i]){a1+=x[i]}else a0+=x[i]}a1/=n1;a0/=n0;for(let i=0;i<x.length;i++){if(T[i])v1+=(x[i]-a1)*(x[i]-a1);else v0+=(x[i]-a0)*(x[i]-a0)}v1/=n1-1;v0/=n0-1;return(m1-m0)/Math.sqrt((v1+v0)/2)}
+/* confounded data: X1,X2; treatment strength a; effect tau (function of x1 optional) */
+function confData(n,a,tauF,nl){const X1=rn(n),X2=rn(n),e=lin(n,i=>lgs(a*(.8*X1[i]+.5*X2[i]+(nl?.4*(X1[i]*X1[i]-1):0))/1.5)),T=new Uint8Array(n),Y=new Float64Array(n);
+ for(let i=0;i<n;i++){T[i]=Math.random()<e[i]?1:0;Y[i]=(T[i]?(tauF?tauF(X1[i]):1):0)+X1[i]+.8*X2[i]+(nl?.6*X1[i]*X1[i]:0)+randn()}return{X1,X2,T,Y,e}}
+/* one-to-one nearest-neighbour matching with replacement on a score; returns ATT and the matched control index per treated unit (-1 if dropped) */
+function matchATT(sc,T,Y,cal){const ctr=[];for(let i=0;i<T.length;i++)if(!T[i])ctr.push(i);ctr.sort((a,b)=>sc[a]-sc[b]);const cs=ctr.map(i=>sc[i]),m=new Int32Array(T.length).fill(-1);let sum=0,k=0;
+ for(let i=0;i<T.length;i++){if(!T[i])continue;let lo=0,hi=cs.length-1;while(lo<hi){const mid=(lo+hi)>>1;if(cs[mid]<sc[i])lo=mid+1;else hi=mid}let b=lo;if(lo>0&&Math.abs(cs[lo-1]-sc[i])<Math.abs(cs[lo]-sc[i]))b=lo-1;if(Math.abs(cs[b]-sc[i])>cal)continue;m[i]=ctr[b];sum+=Y[i]-Y[ctr[b]];k++}return{att:sum/k,m,kept:k}}
+const quant=(a,p)=>{const b=Float64Array.from(a).sort();return b[Math.min(b.length-1,Math.floor(p*b.length))]};
+/* ---------- MCMC helpers ---------- */
+function acfv(x,K){const n=x.length;let m=0;for(let i=0;i<n;i++)m+=x[i];m/=n;const c=new Float64Array(K+1);for(let k=0;k<=K;k++){let s=0;for(let i=0;i+k<n;i++)s+=(x[i]-m)*(x[i+k]-m);c[k]=s/n}const r=new Float64Array(K+1);for(let k=0;k<=K;k++)r[k]=c[0]>0?c[k]/c[0]:0;return r}
+/* effective sample size with Geyer's initial positive sequence */
+function essOf(x,K){K=Math.min(K||150,x.length-2);if(K<2)return x.length;const r=acfv(x,K);let sum=0;for(let t=0;2*t+1<=K;t++){const g=r[2*t]+r[2*t+1];if(g<=0)break;sum+=g}const tau=Math.max(2*sum-1,.2);return x.length/tau}
+/* random-walk Metropolis for a 1-d log density */
+function mhRW(logp,x0,step,n){const x=new Float64Array(n);let c=x0,lc=logp(c),acc=0;for(let i=0;i<n;i++){const y=c+step*randn(),ly=logp(y);if(Math.log(Math.random())<ly-lc){c=y;lc=ly;acc++}x[i]=c}return{x,acc:acc/n}}
+/* split R-hat of an array of chains (each an array of equal length) */
+function rhatOf(ch){const seq=[];ch.forEach(c=>{const h=Math.floor(c.length/2);if(h<2)return;seq.push(c.slice(0,h));seq.push(c.slice(h,2*h))});const m=seq.length,n=seq[0]?seq[0].length:0;if(m<2||n<2)return NaN;const mu=seq.map(s=>{let a=0;for(const v of s)a+=v;return a/n}),va=seq.map((s,i)=>{let a=0;for(const v of s)a+=(v-mu[i])*(v-mu[i]);return a/(n-1)});const W=va.reduce((a,b)=>a+b,0)/m,gm=mu.reduce((a,b)=>a+b,0)/m;let B=0;for(const v of mu)B+=(v-gm)*(v-gm);B*=n/(m-1);const vp=(n-1)/n*W+B/n;return Math.sqrt(vp/Math.max(W,1e-12))}
+/* grid posterior from an unnormalised log density */
+function gridPost(logf,lo,hi,N){N=N||900;const x=new Float64Array(N),f=new Float64Array(N);let mx=-1e300;for(let i=0;i<N;i++){x[i]=lo+(hi-lo)*i/(N-1);f[i]=logf(x[i]);if(f[i]>mx)mx=f[i]}let Z=0;const h=(hi-lo)/(N-1);for(let i=0;i<N;i++){f[i]=Math.exp(f[i]-mx);Z+=f[i]*h}const pdf=new Float64Array(N),cdf=new Float64Array(N);let c=0,m1=0,m2=0;for(let i=0;i<N;i++){pdf[i]=f[i]/Z;c+=pdf[i]*h;cdf[i]=c;m1+=x[i]*pdf[i]*h;m2+=x[i]*x[i]*pdf[i]*h}
+ const q=u=>{let a=0,b=N-1;while(b-a>1){const m=(a+b)>>1;if(cdf[m]<u)a=m;else b=m}const d=cdf[b]-cdf[a];return x[a]+(d>0?(u-cdf[a])/d:0)*(x[b]-x[a])};
+ const pd=v=>{if(v<=lo||v>=hi)return 0;const t=(v-lo)/(hi-lo)*(N-1),i=Math.floor(t);return pdf[i]+(t-i)*(pdf[Math.min(i+1,N-1)]-pdf[i])};
+ const cd=v=>{if(v<=lo)return 0;if(v>=hi)return 1;const t=(v-lo)/(hi-lo)*(N-1),i=Math.floor(t);return cdf[i]+(t-i)*(cdf[Math.min(i+1,N-1)]-cdf[i])};
+ return{x,pdf,cdf,mean:m1,sd:Math.sqrt(Math.max(m2-m1*m1,0)),q,pd,cd}}
+const tpdf=(x,v)=>Math.exp(lgamma((v+1)/2)-lgamma(v/2))/Math.sqrt(v*Math.PI)*Math.pow(1+x*x/v,-(v+1)/2);
+const rtv=v=>randn()/Math.sqrt(2*gammaS(v/2)/v);
+const expit=x=>1/(1+Math.exp(-x)),logit=p=>Math.log(p/(1-p));
+function invMat(A){const n=A.length,M=A.map((r,i)=>{const a=Array.from(r);for(let j=0;j<n;j++)a.push(i===j?1:0);return a});for(let c=0;c<n;c++){let m=c;for(let r=c+1;r<n;r++)if(Math.abs(M[r][c])>Math.abs(M[m][c]))m=r;[M[c],M[m]]=[M[m],M[c]];const d=M[c][c]||1e-12;for(let k=0;k<2*n;k++)M[c][k]/=d;for(let r=0;r<n;r++)if(r!==c){const f=M[r][c];if(f!==0)for(let k=0;k<2*n;k++)M[r][k]-=f*M[c][k]}}return M.map(r=>r.slice(n))}
+function cholL(S){const n=S.length,L=S.map(()=>new Float64Array(n));for(let i=0;i<n;i++)for(let j=0;j<=i;j++){let s=S[i][j];for(let k=0;k<j;k++)s-=L[i][k]*L[j][k];L[i][j]=i===j?Math.sqrt(Math.max(s,1e-12)):s/L[j][j]}return L}
+function logdetM(A){const n=A.length,M=A.map(r=>Array.from(r));let ld=0;for(let c=0;c<n;c++){let m=c;for(let r=c+1;r<n;r++)if(Math.abs(M[r][c])>Math.abs(M[m][c]))m=r;[M[c],M[m]]=[M[m],M[c]];ld+=Math.log(Math.abs(M[c][c])||1e-300);for(let r=c+1;r<n;r++){const f=M[r][c]/M[c][c];for(let k=c;k<n;k++)M[r][k]-=f*M[c][k]}}return ld}
+/* Gauss-Hermite nodes (21 points, probabilists' weights summing to 1) from the Golub-Welsch idea: computed numerically on a fine normal grid instead */
+const GH=(()=>{const z=[],w=[];let s=0;for(let i=0;i<41;i++){const v=-4+8*i/40,p=Math.exp(-v*v/2);z.push(v);w.push(p);s+=p}return{z,w:w.map(v=>v/s)}})();
+/* log-log tick helper for axes holding log10 values */
+const lg10=v=>Math.log10(Math.max(v,1e-12));
+const pc1=x=>(100*x).toFixed(1)+'%';
+/* density curves with optional fill: curves=[{f,col,fill,dash,lw}] ; returns P */
+function dcurves(cv,x0,x1,curves,vl,ref){let ym=0,yr=0;curves.forEach((c,k)=>{for(let i=0;i<=300;i++){const v=c.f(x0+(x1-x0)*i/300);if(isFinite(v)){ym=Math.max(ym,v);if(k===(ref==null?curves.length-1:ref))yr=Math.max(yr,v)}}});
+ const top=Math.min(ym,yr*2.5)||ym||1,P=mk(cv,x0,x1,top*1.12);clip(P,()=>curves.forEach(c=>{if(c.fill)P.area(c.f,x0,x1,c.fill,240);P.line(c.f,c.col,c.lw||2.4,x0,x1,300,c.dash)}));(vl||[]).forEach(v=>P.vline(v[0],v[1],null,v[3]));return P}
+/* solve (A + lam I) beta = b and return diag of the inverse (A symmetric p x p) */
+function ridgeSolve(A,b,lam){const p=b.length,M=[];for(let i=0;i<p;i++){const r=new Float64Array(2*p+1);for(let j=0;j<p;j++)r[j]=A[i][j]+(i===j?lam:0);r[p+i]=1;r[2*p]=b[i];M.push(r)}
+ for(let c=0;c<p;c++){let m=c;for(let r=c+1;r<p;r++)if(Math.abs(M[r][c])>Math.abs(M[m][c]))m=r;[M[c],M[m]]=[M[m],M[c]];const d=M[c][c]||1e-12;for(let k=0;k<=2*p;k++)M[c][k]/=d;for(let r=0;r<p;r++)if(r!==c){const f=M[r][c];if(f!==0)for(let k=0;k<=2*p;k++)M[r][k]-=f*M[c][k]}}
+ return{beta:M.map(r=>r[2*p]),dinv:M.map((r,i)=>r[p+i])}}
+/* ---------- Uncertainty quantification helpers ---------- */
+const uqQ=(a,al)=>{const s=Float64Array.from(a).sort(),n=s.length,k=Math.ceil((n+1)*(1-al));return k>n?Infinity:s[k-1]};
+const uqTq=(p,df)=>{let lo=-80,hi=80;for(let i=0;i<60;i++){const m=(lo+hi)/2;if(tcdf(m,df)<p)lo=m;else hi=m}return(lo+hi)/2};
+function uqOls(x,y){const n=x.length;let mx=0,my=0;for(let i=0;i<n;i++){mx+=x[i];my+=y[i]}mx/=n;my/=n;let sxx=0,sxy=0;for(let i=0;i<n;i++){sxx+=(x[i]-mx)*(x[i]-mx);sxy+=(x[i]-mx)*(y[i]-my)}const b=sxy/sxx,a=my-b*mx;let rss=0;for(let i=0;i<n;i++){const r=y[i]-a-b*x[i];rss+=r*r}return{a,b,n,mx,sxx,s:Math.sqrt(rss/Math.max(1,n-2))}}
+function uqNM(f,x0,st,it){const n=x0.length;let S=[x0.slice()];for(let i=0;i<n;i++){const v=x0.slice();v[i]+=st;S.push(v)}let F=S.map(f);for(let k=0;k<(it||200);k++){const o=F.map((_,i)=>i).sort((a,b)=>F[a]-F[b]);S=o.map(i=>S[i]);F=o.map(i=>F[i]);if(Math.abs(F[n]-F[0])<1e-9)break;const c=Array(n).fill(0);for(let i=0;i<n;i++)for(let j=0;j<n;j++)c[j]+=S[i][j]/n;const ref=c.map((v,j)=>v+(v-S[n][j])),fr=f(ref);if(fr<F[0]){const ex=c.map((v,j)=>v+2*(v-S[n][j])),fe=f(ex);if(fe<fr){S[n]=ex;F[n]=fe}else{S[n]=ref;F[n]=fr}}else if(fr<F[n-1]){S[n]=ref;F[n]=fr}else{const co=c.map((v,j)=>v+.5*(S[n][j]-v)),fc=f(co);if(fc<F[n]){S[n]=co;F[n]=fc}else{for(let i=1;i<=n;i++){S[i]=S[i].map((v,j)=>S[0][j]+.5*(v-S[0][j]));F[i]=f(S[i])}}}}const o=F.map((_,i)=>i).sort((a,b)=>F[a]-F[b]);return S[o[0]]}
+/* linear quantile regression by pinball-loss minimisation */
+function uqQR(x,y,tau){const o=uqOls(x,y),n=x.length,f=p=>{let s=0;for(let i=0;i<n;i++){const r=y[i]-p[0]-p[1]*x[i];s+=r>=0?tau*r:(tau-1)*r}return s/n},sd=Math.sqrt(Array.from(y,v=>v*v).reduce((a,b)=>a+b,0)/n)||1,r0=Array.from(y,(v,i)=>v-o.a-o.b*x[i]).sort((a,b)=>a-b);const p=uqNM(f,[o.a+r0[Math.floor(tau*(n-1))],o.b],.3*sd,160);return{a:p[0],b:p[1]}}
+function uqSolve(A,b){const n=b.length;A=A.map(r=>r.slice());b=b.slice();for(let i=0;i<n;i++){let p=i;for(let k=i+1;k<n;k++)if(Math.abs(A[k][i])>Math.abs(A[p][i]))p=k;[A[i],A[p]]=[A[p],A[i]];[b[i],b[p]]=[b[p],b[i]];for(let k=i+1;k<n;k++){const f=A[k][i]/A[i][i];for(let j=i;j<n;j++)A[k][j]-=f*A[i][j];b[k]-=f*b[i]}}const x=new Array(n).fill(0);for(let i=n-1;i>=0;i--){let s=b[i];for(let j=i+1;j<n;j++)s-=A[i][j]*x[j];x[i]=s/A[i][i]}return x}
+function uqPoly(x,y,d,lam){const n=x.length,m=d+1,A=Array.from({length:m},()=>new Array(m).fill(0)),b=new Array(m).fill(0);for(let i=0;i<n;i++){const pw=[1];for(let k=1;k<m;k++)pw.push(pw[k-1]*x[i]);for(let r=0;r<m;r++){b[r]+=pw[r]*y[i];for(let c=0;c<m;c++)A[r][c]+=pw[r]*pw[c]}}for(let r=0;r<m;r++)A[r][r]+=lam||1e-6;return uqSolve(A,b)}
+const uqEval=(c,x)=>{let s=0,p=1;for(const k of c){s+=k*p;p*=x}return s};
+function uqWq(res,w,al){const o=Array.from(res,(_,i)=>i).sort((a,b)=>res[a]-res[b]);let tot=0;for(const v of w)tot+=v;let c=0;for(const i of o){c+=w[i];if(c/(tot+tot/res.length)>=1-al)return res[i]}return Infinity}
+const uqBetaPdf=(x,a,b)=>x<=0||x>=1?0:Math.exp(lgamma(a+b)-lgamma(a)-lgamma(b)+(a-1)*Math.log(x)+(b-1)*Math.log(1-x));
+const uqPct=(a,p)=>{const s=Float64Array.from(a).sort();return s[Math.min(s.length-1,Math.max(0,Math.floor(p*s.length)))]};
+function uqHet(n,h){const x=Array.from({length:n},()=>Math.random()*2-1);return[x,x.map(v=>v+.4*Math.exp(h*v)*randn())]}
+/* ---------- Ch1 confidence interval or prediction interval ---------- */
+(function(){scl('c1n',v=>v);const NS=[10,20,50,100,300,1000];
+ function sim(n){const x=Array.from({length:n},()=>Math.random()*2-1);return[x,x.map(v=>1+2*v+randn())]}
+ function run(){const n=val('c1n'),[x,y]=sim(n),f=uqOls(x,y),t=uqTq(.975,n-2),yh=u=>f.a+f.b*u,sm=u=>f.s*Math.sqrt(1/n+(u-f.mx)*(u-f.mx)/f.sxx),sp=u=>f.s*Math.sqrt(1+1/n+(u-f.mx)*(u-f.mx)/f.sxx),P=mk($('c1cv'),-1.2,1.2,6,{y0:-4,L:40}),xs=[];for(let u=-1.2;u<=1.2001;u+=.04)xs.push(u);
+  scat(P,x,y,C.a,500,2.6,()=> 'rgba(110,168,255,.5)');poly(P,xs.map(u=>[u,yh(u)]),C.fg,2);[1,-1].forEach(sg=>{poly(P,xs.map(u=>[u,yh(u)+sg*t*sm(u)]),C.g,2.4);poly(P,xs.map(u=>[u,yh(u)+sg*t*sp(u)]),C.r,2.4)});legend(P,[['95% interval for the mean',C.g],['95% interval for a new case',C.r]],P.T+12);
+  const R=300,res=NS.map(m=>{let a=0,b=0,c=0;for(let r=0;r<R;r++){const [X,Y]=sim(m),g=uqOls(X,Y),tt=uqTq(.975,m-2),u=Math.random()*2-1,mu=1+2*u,y0=mu+randn(),h=g.a+g.b*u,s1=g.s*Math.sqrt(1/m+(u-g.mx)*(u-g.mx)/g.sxx),s2=g.s*Math.sqrt(1+1/m+(u-g.mx)*(u-g.mx)/g.sxx);if(Math.abs(mu-h)<=tt*s1)a++;if(Math.abs(y0-h)<=tt*s1)b++;if(Math.abs(y0-h)<=tt*s2)c++}return[a/R,b/R,c/R]}),Q=mk($('c1cv2'),0,NS.length-1,1.05,{noGrid:true,L:44});customGrid(Q,NS.map((m,i)=>[i,String(m)]),niceTicks(0,1,5));Q.hline(.95,C.mu,'95%',true);[[0,C.g],[1,C.y],[2,C.r]].forEach(([k,c])=>{poly(Q,res.map((v,i)=>[i,v[k]]),c,2.6);dots(Q,res.map((v,i)=>[i,v[k]]),c,3.4)});legend(Q,[['mean interval, covers the true mean',C.g],['mean interval used for a new case',C.y],['prediction interval, covers a new case',C.r]],Q.T+12);Q.text('number of training cases →',Q.w-Q.R-4,Q.h-Q.B-6,C.mu,'right');
+  const i0=Math.max(0,NS.indexOf(NS.find(m=>m>=n)||1000));
+  $('c1st').innerHTML=stat('width at x = 0: mean interval · prediction interval',fmt(2*t*sm(0))+' · '+fmt(2*t*sp(0)),'in')+stat('at '+NS[i0]+' cases: coverage of the mean · of a new case by the mean interval',pc1(res[i0][0])+' · '+pc1(res[i0][1]),res[i0][1]<.8?'hot':'ok')+stat('prediction interval covers a new case',pc1(res[i0][2]),'ok')+stat('noise standard deviation (truth 1) · estimated',fmt(1)+' · '+fmt(f.s),'');
+  $('c1rd').innerHTML=`A straight-line model fitted to ${n} cases with standard normal noise. Two intervals around the fitted line answer different questions. The green <b>confidence interval</b> says where the <em>average</em> outcome at x is: its width shrinks like 1/√n and goes to zero with more data. The red <b>prediction interval</b> says where a <em>new individual outcome</em> will fall: it contains the irreducible noise of the individual case, so its half-width cannot fall below 1.96 σ = 1.96 however much data you have (here ${fmt(t*sp(0))} at the centre against ${fmt(t*sm(0))} for the mean). The right panel shows the consequence of confusing them: used as a prediction band for individual cases, the confidence interval covers only ${pc1(res[res.length-1][1])} of new outcomes when there are 1,000 training cases, and gets worse with more data, whereas the prediction interval keeps its nominal 95%. In credit and churn models the individual outcome is the object of decision, so “uncertainty” must mean a prediction interval or set; the standard errors printed by a regression, and the confidence bands of a fitted curve, describe the model, not the case.`}
+ ['c1n'].forEach(i=>$(i).addEventListener('change',run));$('c1go').onclick=run;run();})();
+
+/* ---------- Ch2 marginal versus conditional coverage ---------- */
+(function(){scl('c2h',v=>fmt(v/10));scl('c2n',v=>v);const NB=8;
+ function run(){const h=val('c2h')/10,n=val('c2n'),[x,y]=uqHet(n,h),f=uqOls(x,y),res=x.map((u,i)=>Math.abs(y[i]-f.a-f.b*u)),q=uqQ(res,.1),z=1.645,[xt,yt]=uqHet(6000,h),
+  cc=new Array(NB).fill(0),ca=new Array(NB).fill(0),nb=new Array(NB).fill(0);for(let i=0;i<xt.length;i++){const b=Math.min(NB-1,Math.floor((xt[i]+1)/2*NB)),r=Math.abs(yt[i]-f.a-f.b*xt[i]);nb[b]++;if(r<=q)cc[b]++;if(r<=z*.4*Math.exp(h*xt[i]))ca[b]++}
+  const P=mk($('c2cv'),-1,1,4,{y0:-4,L:40}),xs=[];for(let u=-1;u<=1.001;u+=.04)xs.push(u);scat(P,x,y,C.a,1500,2.2,()=> 'rgba(110,168,255,.4)');[1,-1].forEach(sg=>{poly(P,xs.map(u=>[u,f.a+f.b*u+sg*q]),C.r,2.4);poly(P,xs.map(u=>[u,f.a+f.b*u+sg*z*.4*Math.exp(h*u)]),C.g,2.4)});legend(P,[['one width for everyone',C.r],['width follows the noise',C.g]],P.T+12);
+  const grp=cc.map((v,i)=>[v/nb[i],ca[i]/nb[i]]),Q=barG($('c2cv2'),grp,[C.r,C.g],grp.map((_,i)=>String(i+1)),0,1.1,v=>Math.round(v*100)+'%');Q.hline(.9,C.fg,'target 90%',true);Q.text('coverage in 8 slices of x, left to right',Q.L+6,Q.T+12,C.mu);
+  const mc=cc.reduce((a,b)=>a+b,0)/xt.length,ma=ca.reduce((a,b)=>a+b,0)/xt.length,lo=Math.min(...grp.map(g=>g[0])),hi=Math.max(...grp.map(g=>g[0]));
+  $('c2st').innerHTML=stat('overall coverage: one width · adaptive',pc1(mc)+' · '+pc1(ma),'ok')+stat('coverage by slice, one width: lowest · highest',pc1(lo)+' · '+pc1(hi),hi-lo>.15?'hot':'in')+stat('coverage by slice, adaptive: lowest · highest',pc1(Math.min(...grp.map(g=>g[1])))+' · '+pc1(Math.max(...grp.map(g=>g[1]))),'ok')+stat('mean width: one width · adaptive',fmt(2*q)+' · '+fmt(2*ca.length*0+2*z*.4*avg(xt.map(u=>Math.exp(h*u)))),'');
+  $('c2rd').innerHTML=`The noise grows with x (its standard deviation is 0.4·e<sup>${fmt(h)}x</sup>). An interval of one fixed width, set as the 90% quantile of the absolute residuals, has the right <b>marginal</b> coverage (${pc1(mc)}: over the whole population nine cases in ten fall inside) but not the right <b>conditional</b> coverage: it covers ${pc1(lo)} of the cases in the quietest slice of x and only ${pc1(Math.min(...grp.map(g=>g[0])))}${hi-lo>.15?'':' '} where the noise is largest, and ${pc1(hi)} at the other extreme. A person who gets a prediction at an x where the noise is large is not in the ‘average’ case, so the 90% statement is false for them. The green band, whose width follows the noise, has coverage near 90% in every slice and the same overall coverage with an average width of ${fmt(2*z*.4*avg(xt.map(u=>Math.exp(h*u))))}. Marginal coverage is the guarantee that is easy to get (chapter 3); conditional coverage on features is the property users actually want and is much harder (chapter 9). Always report coverage by segment (score band, product, region, size of exposure) as well as overall.`}
+ ['c2h','c2n'].forEach(i=>$(i).addEventListener('change',run));$('c2go').onclick=run;run();})();
+
+/* ---------- Ch3 split conformal and its guarantee ---------- */
+(function(){scl('c3n',v=>v);scl('c3a',v=>v+'%');const NG=[10,20,50,100,200,500,1000];
+ function setup(){const x=Array.from({length:300},()=>Math.random()*2-1),y=x.map(v=>1+2*v+randn()),f=uqOls(x,y),t=Float64Array.from({length:6000},()=>{const u=Math.random()*2-1;return Math.abs(1+2*u+randn()-f.a-f.b*u)}).sort();return{f,t}}
+ const cov=(t,q)=>{let lo=0,hi=t.length;while(lo<hi){const m=(lo+hi)>>1;if(t[m]<=q)lo=m+1;else hi=m}return lo/t.length};
+ function calc(S,n,al){const r=Array.from({length:n},()=>{const u=Math.random()*2-1;return Math.abs(1+2*u+randn()-S.f.a-S.f.b*u)});return cov(S.t,uqQ(r,al))}
+ function run(){const n=val('c3n'),al=val('c3a')/100,S=setup(),R=400,cs=Array.from({length:R},()=>calc(S,n,al)),l=Math.floor((n+1)*al),a=n+1-l,b=l,lo=Math.max(0,1-al-.25),P=histLines($('c3cv'),[cs],[C.a],lo,1,32,[[1-al,C.r,'target',true]]);if(l>=1)P.line(x=>uqBetaPdf(x,a,b),C.y,2.6,lo,.999,200);P.text('coverage of the conformal interval over '+R+' calibration sets · line: theory',P.L+8,P.T+12,C.mu);
+  const res=NG.map(m=>{const c=Array.from({length:150},()=>calc(S,m,al));return[uqPct(c,.05),avg(c),uqPct(c,.95)]}),Q=mk($('c3cv2'),0,NG.length-1,1.02,{y0:Math.max(0,1-al-.3),noGrid:true,L:44});customGrid(Q,NG.map((m,i)=>[i,String(m)]),niceTicks(Math.max(0,1-al-.3),1,5));Q.hline(1-al,C.fg,'target',true);poly(Q,res.map((v,i)=>[i,v[1]]),C.a,2.6);poly(Q,res.map((v,i)=>[i,v[0]]),C.mu,1.8,true);poly(Q,res.map((v,i)=>[i,v[2]]),C.mu,1.8,true);Q.text('calibration cases →',Q.w-Q.R-4,Q.h-Q.B-6,C.mu,'right');Q.text('mean and 5–95% range of coverage',Q.L+6,Q.T+12,C.mu);
+  const exp=Math.ceil((n+1)*(1-al))/(n+1),ok=cs.filter(c=>c>=1-al).length/R;
+  $('c3st').innerHTML=stat('average coverage · guaranteed at least',pc1(avg(cs))+' · '+pc1(1-al),'ok')+stat('theory: mean of the coverage',pc1(exp),'')+stat('range of coverage across calibration sets (5–95%)',pc1(uqPct(cs,.05))+' – '+pc1(uqPct(cs,.95)),n<50?'warn':'in')+stat('share of calibration sets with coverage below target',pc1(1-ok),'');
+  $('c3rd').innerHTML=`<b>Split conformal prediction</b> in four lines: fit any model on a training set; on a separate calibration set of ${n} cases compute the scores s<sub>i</sub> = |y<sub>i</sub> − ŷ<sub>i</sub>|; take q̂ as the ⌈(n + 1)(1 − α)⌉-th smallest score (here α = ${pc(al)}); give every new case the interval ŷ ± q̂. Under the single assumption that calibration and new cases are <b>exchangeable</b>, the coverage is at least 1 − α whatever the model and whatever the data distribution: the average over calibration sets is ${pc1(avg(cs))} here, against the exact value ⌈(n + 1)(1 − α)⌉/(n + 1) = ${pc1(exp)}. Two features of the guarantee matter in practice. It is <b>marginal and averaged over calibration sets</b>: the coverage of any one calibration set is random, and follows a Beta(n + 1 − l, l) distribution with l = ⌊(n + 1)α⌋ (the yellow curve), so with n = ${n} calibration cases the coverage ranges from ${pc1(uqPct(cs,.05))} to ${pc1(uqPct(cs,.95))} (right panel: the range narrows as n grows). And it says nothing about how good the interval is: a poor model gives wide intervals, still valid. So the quality of the model decides the width and the data size decides the reliability of the coverage; neither is a free choice.`}
+ ['c3n','c3a'].forEach(i=>$(i).addEventListener('change',run));$('c3go').onclick=run;run();})();
+
+/* ---------- Ch4 conformity scores ---------- */
+(function(){scl('c4h',v=>fmt(v/10));scl('c4n',v=>v);scl('c4a',v=>v+'%');const NB=5;
+ function run(){const h=val('c4h')/10,n=val('c4n'),al=val('c4a')/100,[x,y]=uqHet(n,h),k=Math.floor(n/2),m=Math.floor(n/4),xtr=x.slice(0,k),ytr=y.slice(0,k),xc=x.slice(k,k+m),yc=y.slice(k,k+m),f=uqOls(xtr,ytr),mu=u=>f.a+f.b*u,r=xtr.map((u,i)=>Math.abs(ytr[i]-mu(u))),g=uqOls(xtr,r),sg=u=>Math.max(.05,g.a+g.b*u),lo=uqQR(xtr,ytr,al/2),up=uqQR(xtr,ytr,1-al/2);
+  const qa=uqQ(xc.map((u,i)=>Math.abs(yc[i]-mu(u))),al),qn=uqQ(xc.map((u,i)=>Math.abs(yc[i]-mu(u))/sg(u)),al),qc=uqQ(xc.map((u,i)=>Math.max(lo.a+lo.b*u-yc[i],yc[i]-up.a-up.b*u)),al),
+  I=[u=>[mu(u)-qa,mu(u)+qa],u=>[mu(u)-qn*sg(u),mu(u)+qn*sg(u)],u=>[lo.a+lo.b*u-qc,up.a+up.b*u+qc]],[xt,yt]=uqHet(8000,h),cv=I.map(()=>new Array(NB).fill(0)),nb=new Array(NB).fill(0),w=[0,0,0];
+  for(let i=0;i<xt.length;i++){const b=Math.min(NB-1,Math.floor((xt[i]+1)/2*NB));nb[b]++;I.forEach((F,j)=>{const [a,c]=F(xt[i]);if(yt[i]>=a&&yt[i]<=c)cv[j][b]++;w[j]+=c-a})}
+  const P=mk($('c4cv'),-1,1,4,{y0:-4,L:40}),xs=[];for(let u=-1;u<=1.001;u+=.04)xs.push(u);scat(P,x.slice(k+m),y.slice(k+m),C.a,1000,2,()=> 'rgba(110,168,255,.35)');const cols=[C.r,C.y,C.g];I.forEach((F,j)=>{poly(P,xs.map(u=>[u,F(u)[0]]),cols[j],2.2);poly(P,xs.map(u=>[u,F(u)[1]]),cols[j],2.2)});legend(P,[['absolute residual',C.r],['residual ÷ estimated noise',C.y],['quantile regression (CQR)',C.g]],P.T+12);
+  const grp=Array.from({length:NB},(_,b)=>[0,1,2].map(j=>cv[j][b]/nb[b])),Q=barG($('c4cv2'),grp,cols,grp.map((_,i)=>String(i+1)),0,1.1,v=>Math.round(v*100)+'%');Q.hline(1-al,C.fg,'target',true);Q.text('coverage in 5 slices of x, left to right',Q.L+6,Q.T+12,C.mu);
+  const mc=[0,1,2].map(j=>cv[j].reduce((a,b)=>a+b,0)/xt.length),wc=[0,1,2].map(j=>Math.min(...grp.map(gg=>gg[j])));
+  $('c4st').innerHTML=stat('overall coverage: absolute · normalised · CQR',mc.map(pc1).join(' · '),'ok')+stat('lowest slice coverage: absolute · normalised · CQR',wc.map(pc1).join(' · '),wc[0]<1-al-.1?'hot':'ok')+stat('mean width: absolute · normalised · CQR',w.map(v=>fmt(v/xt.length)).join(' · '),'')+stat('training · calibration · test',k+' · '+m+' · '+(n-k-m),'');
+  $('c4rd').innerHTML=`The recipe of chapter 3 works for any <b>conformity score</b>, a number saying how badly a case disagrees with the model; the choice of score decides the <em>shape</em> of the interval while the guarantee stays the same. The <b>absolute residual</b> gives a constant width: overall coverage ${pc1(mc[0])}, but ${pc1(wc[0])} in the worst slice when noise varies with x. The <b>normalised residual</b> |y − ŷ|/σ̂(x) uses a second model for the noise level (here a line fitted to the training residuals) and gives intervals that widen where the noise is larger: worst slice ${pc1(wc[1])}. <b>Conformalised quantile regression</b> (CQR) fits a lower and an upper quantile model by pinball loss and conformalises the score max(q̂<sub>lo</sub>(x) − y, y − q̂<sub>hi</sub>(x)), so the width adapts without a separate noise model: worst slice ${pc1(wc[2])}. All three keep overall coverage at ${pc(1-al)}, because the calibration step corrects whatever the underlying model gets wrong; the better the model of the spread, the closer the conditional coverage and the narrower the average interval (${fmt(w[0]/xt.length)}, ${fmt(w[1]/xt.length)}, ${fmt(w[2]/xt.length)}). Spend modelling effort on the score, report coverage by slice, and remember that the calibration set must not be used to train or tune the model.`}
+ ['c4h','c4n','c4a'].forEach(i=>$(i).addEventListener('change',run));$('c4go').onclick=run;run();})();
+
+/* ---------- Ch5 conformal sets for classification ---------- */
+(function(){scl('c5a',v=>v+'%');scl('c5s',v=>fmt(v/10));scl('c5p',v=>v+'%');
+ const MU=[[0,0],[2.2,0],[1.1,1.9]];
+ function gen(n,pr){const X=[],Y=[];for(let i=0;i<n;i++){const u=Math.random(),k=u<pr[0]?0:(u<pr[0]+pr[1]?1:2);X.push([MU[k][0]+randn(),MU[k][1]+randn()]);Y.push(k)}return[X,Y]}
+ function probs(x,pr,T){const d=MU.map((m,k)=>Math.log(pr[k])-((x[0]-m[0])**2+(x[1]-m[1])**2)/(2*T)),mx=Math.max(...d),e=d.map(v=>Math.exp(v-mx)),s=e[0]+e[1]+e[2];return e.map(v=>v/s)}
+ function run(){const al=val('c5a')/100,T=val('c5s')/10,rare=val('c5p')/100,pr=[(1-rare)/2,(1-rare)/2,rare],[Xc,Yc]=gen(1500,pr),[Xt,Yt]=gen(8000,pr),Pc=Xc.map(x=>probs(x,pr,T)),Pt=Xt.map(x=>probs(x,pr,T)),sc=Pc.map((p,i)=>1-p[Yc[i]]),q=uqQ(sc,al),qk=[0,1,2].map(k=>uqQ(sc.filter((_,i)=>Yc[i]===k),al));
+  const sz=[0,0,0,0],cl=[[0,0],[0,0],[0,0]],nk=[0,0,0],cm=[0,0,0];let ca=0,ss=0;for(let i=0;i<Xt.length;i++){const p=Pt[i],set=[0,1,2].filter(k=>1-p[k]<=q),k=Yt[i];sz[set.length]++;ss+=set.length;nk[k]++;if(set.includes(k)){cl[k][0]++;ca++}if(1-p[k]<=qk[k])cl[k][1]++}
+  const P=barV($('c5cv'),sz.map(v=>v/Xt.length),[C.mu,C.g,C.y,C.r],['empty','1 class','2 classes','3 classes'],1.05,pc1);P.text('size of the prediction set (all cases)',P.L+6,P.T+12,C.mu);
+  const Q=barG($('c5cv2'),[0,1,2].map(k=>[cl[k][0]/nk[k],cl[k][1]/nk[k]]),[C.r,C.g],['class A','class B','rare class C'],0,1.1,pc1);Q.hline(1-al,C.fg,'target',true);Q.text('coverage by true class: red one threshold · green per class',Q.L+6,Q.T+12,C.mu);
+  const acc=Pt.reduce((a,p,i)=>a+(p.indexOf(Math.max(...p))===Yt[i]?1:0),0)/Xt.length;
+  $('c5st').innerHTML=stat('coverage overall (target '+pc(1-al)+')',pc1(ca/Xt.length),'ok')+stat('coverage of the rare class: one threshold · per-class',pc1(cl[2][0]/nk[2])+' · '+pc1(cl[2][1]/nk[2]),cl[2][0]/nk[2]<1-al-.08?'hot':'ok')+stat('average set size · share of single-class sets',fmt(ss/Xt.length)+' · '+pc1(sz[1]/Xt.length),'')+stat('model accuracy (top class)',pc1(acc),'');
+  $('c5rd').innerHTML=`Three classes in the plane, one of them rare (${pc(rare)} of cases). The classifier is a Bayes-type model with sharpness ${fmt(T)} (1 is correctly calibrated; below 1 it is <b>overconfident</b>). For classification the conformity score is 1 − p̂<sub>y</sub> (one minus the probability given to the true class); the prediction <b>set</b> contains every class whose probability is high enough, 1 − p̂<sub>k</sub> ≤ q̂, with q̂ calibrated on held-out cases. Coverage is ${pc1(ca/Xt.length)} overall <em>whatever the sharpness</em>: an overconfident model only changes how the sets are composed, not their validity. The sets also carry information: ${pc1(sz[1]/Xt.length)} of the cases get one class (the model can decide), the rest get two or three (ambiguous, to be reviewed), average size ${fmt(ss/Xt.length)}. The catch is in the right panel. A single threshold guarantees only <b>marginal</b> coverage, so the rare class, whose cases are few and often harder, can be covered much less (${pc1(cl[2][0]/nk[2])}) than the common ones. The <b>class-conditional (Mondrian)</b> version calibrates one threshold per class and restores it (${pc1(cl[2][1]/nk[2])}), at the cost of larger sets and noisier thresholds for the classes with few calibration cases. For default, fraud or churn problems, where the event of interest is the rare class, that is the version to use.`}
+ ['c5a','c5s','c5p'].forEach(i=>$(i).addEventListener('change',run));$('c5go').onclick=run;run();})();
+
+/* ---------- Ch6 covariate shift and weighted conformal ---------- */
+(function(){scl('c6d',v=>fmt(v/10));scl('c6a',v=>v+'%');
+ const f0=x=>Math.sin(1.6*x),gen=(n,mu)=>{const x=Array.from({length:n},()=>mu+randn());return[x,x.map(v=>f0(v)+.25*randn())]};
+ function trial(al,d){const [x,y]=gen(400,0),f=uqOls(x,y),[xc,yc]=gen(400,0),res=xc.map((u,i)=>Math.abs(yc[i]-f.a-f.b*u)),q=uqQ(res,al),w=xc.map(u=>Math.exp(d*u-d*d/2)),qw=uqWq(res,w,al),[xt,yt]=gen(3000,d);let a=0,b=0;for(let i=0;i<xt.length;i++){const r=Math.abs(yt[i]-f.a-f.b*xt[i]);if(r<=q)a++;if(r<=qw)b++}let sw=0,s2=0;for(const v of w){sw+=v;s2+=v*v}return[a/xt.length,b/xt.length,q,qw,sw*sw/s2]}
+ function run(){const d0=val('c6d')/10,al=val('c6a')/100,DG=[0,.25,.5,.75,1,1.25,1.5,1.75,2],R=10,res=DG.map(d=>{const a=[0,0,0,0,0];for(let r=0;r<R;r++)trial(al,d).forEach((v,i)=>a[i]+=v/R);return a}),one=(()=>{const o=[0,0,0,0,0];for(let r=0;r<8;r++)trial(al,d0).forEach((v,i)=>o[i]+=v/8);return o})();
+  const P=mk($('c6cv'),0,2,1.05,{y0:.4,L:44});poly(P,DG.map((d,i)=>[d,res[i][0]]),C.r,2.6);dots(P,DG.map((d,i)=>[d,res[i][0]]),C.r,3.4);poly(P,DG.map((d,i)=>[d,res[i][1]]),C.g,2.6);dots(P,DG.map((d,i)=>[d,res[i][1]]),C.g,3.4);P.hline(1-al,C.fg,'target',true);P.vline(d0,C.fg,null,true);legend(P,[['standard conformal',C.r],['weighted conformal',C.g]],P.T+12);P.text('shift in the mean of the inputs (in standard deviations) →',P.w-P.R-4,P.h-P.B-6,C.mu,'right');P.text('coverage on the new population',P.L+6,P.T+28,C.mu);
+  const Q=mk($('c6cv2'),0,2,Math.max(...res.map(r=>Math.max(r[2],r[3])))*2.2,{L:44});poly(Q,DG.map((d,i)=>[d,2*res[i][2]]),C.r,2.6);poly(Q,DG.map((d,i)=>[d,2*res[i][3]]),C.g,2.6);legend(Q,[['standard',C.r],['weighted',C.g]],Q.T+12);Q.text('shift →',Q.w-Q.R-4,Q.h-Q.B-6,C.mu,'right');Q.text('interval width',Q.L+6,Q.T+28,C.mu);
+  $('c6st').innerHTML=stat('coverage at this shift: standard · weighted',pc1(one[0])+' · '+pc1(one[1]),one[0]<1-al-.05?'hot':'ok')+stat('target',pc1(1-al),'')+stat('effective calibration size of the weighted version',fmt(one[4])+' of 400',one[4]<60?'warn':'in')+stat('interval half-width: standard · weighted',fmt(one[2])+' · '+fmt(one[3]),'');
+  $('c6rd').innerHTML=`A straight line is fitted to a wavy relationship, which makes the model’s errors depend on where x is. The conformal interval is calibrated on a population with inputs ~ N(0, 1); the model is then applied to a <b>new population</b> whose inputs have shifted by ${fmt(d0)} standard deviations (a new customer segment, a change in the portfolio mix) with the relationship between inputs and outcome unchanged. The guarantee needs the calibration and new cases to be exchangeable, which fails: coverage falls to ${pc1(one[0])} (red, left) because the new cases lie where the model’s errors are larger. If the shift is in the inputs only and the density ratio w(x) = p<sub>new</sub>(x)/p<sub>old</sub>(x) is known or can be estimated (for example with a classifier distinguishing old from new inputs), <b>weighted conformal prediction</b> moves coverage back towards the target by weighting each calibration score by w(x<sub>i</sub>): coverage ${pc1(one[1])}, with a wider interval (${fmt(2*one[3])} against ${fmt(2*one[2])}). The price is the <b>effective sample size</b> (Σw)²/Σw² = ${fmt(one[4])} of the 400 calibration cases, which collapses when the shift is large: the weighted method is honest about how little of the old data resembles the new population. It does not repair a change in the relationship itself (concept drift, item 33), which needs fresh labelled data or the adaptive methods of chapter 7.`}
+ ['c6d','c6a'].forEach(i=>$(i).addEventListener('change',run));$('c6go').onclick=run;run();})();
+/* ---------- Ch7 adaptive conformal inference under drift ---------- */
+(function(){scl('c7g',v=>fmt(v/1000));scl('c7v',v=>fmt(v/10));const T=2000,CAL=300,W=100;
+ const qlev=(s,a)=>{if(a<=0)return Infinity;if(a>=1)return 0;const n=s.length,k=Math.ceil((n+1)*(1-a));return k>n?Infinity:(k<1?0:s[k-1])};
+ function sim(g,v,al){const cal=Float64Array.from({length:CAL},()=>Math.abs(randn())).sort(),q0=qlev(cal,al);let a=al;const eF=[],eA=[],wA=[];for(let t=0;t<T;t++){const sd=1+v*t/T,r=Math.abs(sd*randn()),qa=qlev(cal,a);eF.push(r>q0?1:0);const miss=r>qa?1:0;eA.push(miss);wA.push(isFinite(qa)?qa:6*sd);a+=g*(al-miss)}return{eF,eA,wA,q0}}
+ const roll=(e)=>{const o=[];for(let t=W;t<=T;t+=20){let s=0;for(let i=t-W;i<t;i++)s+=e[i];o.push([t,1-s/W])}return o};
+ function run(){const g=val('c7g')/1000,v=val('c7v')/10,al=.1,S=sim(g,v,al),P=mk($('c7cv'),0,T,1.05,{y0:.4,L:44}),rf=roll(S.eF),ra=roll(S.eA);poly(P,rf,C.r,2.4);poly(P,ra,C.g,2.4);P.hline(1-al,C.fg,'target 90%');legend(P,[['fixed conformal threshold',C.r],['adaptive (ACI)',C.g]],P.T+12);P.text('time →',P.w-P.R-4,P.h-P.B-6,C.mu,'right');P.text('coverage over the last 100 cases',P.L+6,P.T+28,C.mu);
+  const GG=[0,.005,.01,.02,.05,.1],R=8,res=GG.map(gg=>{let c=0,w=0,dv=0;for(let r=0;r<R;r++){const s=sim(gg,v,al);const m=1-s.eA.reduce((a,b)=>a+b,0)/T;c+=m/R;const last=s.eA.slice(-500);dv+=Math.abs(1-last.reduce((a,b)=>a+b,0)/500-(1-al))/R;w+=avg(s.wA.slice(-500))/R}return[c,w,dv]}),Q=mk($('c7cv2'),0,GG.length-1,1.05,{y0:.4,noGrid:true,L:44});customGrid(Q,GG.map((x,i)=>[i,String(x)]),niceTicks(.4,1.05,5));Q.hline(1-al,C.fg,'target',true);poly(Q,res.map((r,i)=>[i,r[0]]),C.a,2.6);dots(Q,res.map((r,i)=>[i,r[0]]),C.a,3.6);Q.text('step size γ →',Q.w-Q.R-4,Q.h-Q.B-6,C.mu,'right');Q.text('long-run coverage over 2,000 cases',Q.L+6,Q.T+12,C.mu);
+  const cf=1-S.eF.reduce((a,b)=>a+b,0)/T,ca=1-S.eA.reduce((a,b)=>a+b,0)/T,lf=1-S.eF.slice(-300).reduce((a,b)=>a+b,0)/300,la=1-S.eA.slice(-300).reduce((a,b)=>a+b,0)/300;
+  $('c7st').innerHTML=stat('long-run coverage: fixed · adaptive',pc1(cf)+' · '+pc1(ca),'')+stat('coverage in the last 300 cases: fixed · adaptive',pc1(lf)+' · '+pc1(la),lf<.8?'hot':'ok')+stat('noise sd at the end (start = 1)',fmt(1+v),'')+stat('adaptive long-run coverage at γ = 0 · 0.1',pc1(res[0][0])+' · '+pc1(res[GG.length-1][0]),'');
+  $('c7rd').innerHTML=`The model’s errors have a standard deviation that drifts from 1 to ${fmt(1+v)} over ${T} cases (the world changes after the model was calibrated). A conformal threshold set on the first ${CAL} cases keeps its width while the errors grow, so coverage decays (red, last 300 cases: ${pc1(lf)} against the 90% promised): exchangeability has failed and the guarantee goes with it. <b>Adaptive conformal inference</b> (ACI) updates the working miscoverage level after each case: α<sub>t+1</sub> = α<sub>t</sub> + γ(α − err<sub>t</sub>), where err<sub>t</sub> is 1 if the case fell outside its interval. Each miss lowers α<sub>t</sub> and widens the next intervals; each hit raises it and narrows them. The result is a long-run coverage that converges to 90% <em>whatever</em> the drift, a guarantee about the frequency of misses over time rather than about each case (long-run coverage ${pc1(ca)}, last 300 cases ${pc1(la)}). The step size γ trades speed for stability: γ = 0 is the fixed method (right panel), a small γ adapts slowly, a large γ reacts quickly but makes the width jump. It gives no per-case guarantee and no conditional coverage, and it repairs coverage by widening rather than by improving the model: a model whose errors keep growing should be retrained (item 33). Use ACI as a safety net on a live model, and monitor rolling coverage as a drift signal.`}
+ ['c7g','c7v'].forEach(i=>$(i).addEventListener('change',run));$('c7go').onclick=run;run();})();
+
+/* ---------- Ch8 ensembles, epistemic uncertainty and conformal ---------- */
+(function(){scl('c8d',v=>v);scl('c8n',v=>v);const B=25,f0=x=>Math.sin(2*x),NG=[20,40,80,160,320,640],SD=.3;
+ const draw=(n)=>{const x=Array.from({length:n},()=>Math.random()*2-1);return[x,x.map(v=>f0(v)+SD*randn())]};
+ function ens(x,y,d,xs){const n=x.length,F=[];for(let b=0;b<B;b++){const xb=[],yb=[];for(let i=0;i<n;i++){const j=Math.floor(Math.random()*n);xb.push(x[j]);yb.push(y[j])}F.push(uqPoly(xb,yb,d,1e-4))}return xs.map(u=>{const p=F.map(c=>uqEval(c,u)),m=avg(p);let s=0;for(const v of p)s+=(v-m)*(v-m);return[m,Math.sqrt(s/(B-1))]})}
+ function trial(n,d){const[x,y]=draw(n),[xc,yc]=draw(300),[xt,yt]=draw(1500),E=ens(x,y,d,xc.concat(xt)),Ec=E.slice(0,300),Et=E.slice(300),q=uqQ(Ec.map((e,i)=>Math.abs(yc[i]-e[0])),.1);let r=Ec.map((e,i)=>yc[i]-e[0]);const sn=Math.sqrt(avg(r.map(v=>v*v)));let a=0,b=0,c=0,wa=0,wb=0;for(let i=0;i<1500;i++){const e=Et[i],er=Math.abs(yt[i]-e[0]);if(er<=1.645*e[1])a++;if(er<=1.645*Math.sqrt(e[1]*e[1]+sn*sn))b++;if(er<=q)c++;wa+=2*1.645*e[1];wb+=2*1.645*Math.sqrt(e[1]*e[1]+sn*sn)}return{cov:[a/1500,b/1500,c/1500],w:[wa/1500,wb/1500,2*q],x,y,Ec,q,sn}}
+ function run(){const d=val('c8d'),n=val('c8n'),S=trial(n,d),xs=[];for(let u=-1.5;u<=1.5001;u+=.05)xs.push(u);const[x,y]=[S.x,S.y],E=ens(x,y,d,xs),P=mk($('c8cv'),-1.5,1.5,2.2,{y0:-2.2,L:40});P.line(f0,C.fg,1.6,-1.5,1.5,200,true);scat(P,x,y,C.a,300,2.2,()=> 'rgba(110,168,255,.45)');poly(P,xs.map((u,i)=>[u,E[i][0]]),C.y,2.2);[1,-1].forEach(sg=>{poly(P,xs.map((u,i)=>[u,E[i][0]+sg*1.645*E[i][1]]),C.r,2.2);poly(P,xs.map((u,i)=>[u,E[i][0]+sg*S.q]),C.g,2.2)});legend(P,[['ensemble ±1.645 sd',C.r],['conformal ±q̂',C.g],['truth',C.fg]],P.T+12);
+  const res=NG.map(m=>{const a=[0,0,0],R=3;for(let r=0;r<R;r++){const t=trial(m,d);t.cov.forEach((v,i)=>a[i]+=v/R)}return a}),Q=mk($('c8cv2'),0,NG.length-1,1.05,{y0:0,noGrid:true,L:44});customGrid(Q,NG.map((m,i)=>[i,String(m)]),niceTicks(0,1,5));Q.hline(.9,C.fg,'target',true);[[0,C.r],[1,C.y],[2,C.g]].forEach(([k,c])=>{poly(Q,res.map((v,i)=>[i,v[k]]),c,2.6);dots(Q,res.map((v,i)=>[i,v[k]]),c,3.4)});legend(Q,[['ensemble spread only',C.r],['spread + noise estimate',C.y],['conformal',C.g]],Q.T+12);Q.text('training cases →',Q.w-Q.R-4,Q.h-Q.B-6,C.mu,'right');
+  $('c8st').innerHTML=stat('coverage: ensemble spread · spread + noise · conformal',S.cov.map(pc1).join(' · '),S.cov[0]<.7?'hot':'ok')+stat('mean width: ensemble spread · +noise · conformal',S.w.map(fmt).join(' · '),'')+stat('noise sd (truth '+fmt(SD)+') · estimated from residuals',fmt(S.sn),'')+stat('ensemble members · polynomial degree',B+' · '+d,'');
+  $('c8rd').innerHTML=`${B} polynomial models of degree ${d} are trained on bootstrap resamples of ${n} cases from y = sin(2x) + noise (sd ${fmt(SD)}). The spread of the ensemble members at x is a measure of <b>epistemic</b> uncertainty (what the model does not know because it saw little data there); it is largest at the edges and outside the training range (x beyond ±1 in the left panel), where the models disagree. But the ensemble knows nothing about the <b>aleatoric</b> noise of the individual outcome, so ± 1.645 sd of the members covers only ${pc1(S.cov[0])} of new cases against 90% promised, and gets worse as n grows, because the spread shrinks towards zero while the noise does not (right panel, red). Adding a noise estimate (yellow) repairs it only if the noise model is right (here a constant sd, which is true by construction). The conformal band uses the ensemble mean as the point prediction and calibrates the width on held-out residuals: ${pc1(S.cov[2])} at every n, with no assumptions about how the spread relates to the error. Ensemble disagreement is therefore useful as a <em>feature of the score</em> (it can scale the conformity score, chapter 4, to give wider bands where models disagree) but not as the interval itself. A very high degree (try 7 with few cases) inflates the epistemic part without making the intervals more honest.`}
+ ['c8d','c8n'].forEach(i=>$(i).addEventListener('change',run));$('c8go').onclick=run;run();})();
+
+/* ---------- Ch9 Mondrian groups with few calibration cases ---------- */
+(function(){scl('c9n',v=>v);scl('c9s',v=>fmt(v/10));const G=60,al=.1;
+ function run(){const n=val('c9n'),hs=val('c9s')/10,R=40,sds=[],gp=[],gm=[];for(let g=0;g<G;g++)sds.push(Math.exp(hs*randn()));
+  const gcov=(q,s)=>2*normCdf(q/s)-1;let pool=[],mon=[],gs=[];for(let r=0;r<R;r++){const sc=sds.map(s=>Array.from({length:n},()=>Math.abs(s*randn()))),qa=uqQ([].concat(...sc),al);for(let g=0;g<G;g++){const qm=uqQ(sc[g],al);pool.push(gcov(qa,sds[g]));mon.push(isFinite(qm)?gcov(qm,sds[g]):1);gs.push(sds[g])}}
+  const P=histLines($('c9cv'),[pool,mon],[C.r,C.g],.3,1.0001,28,[[1-al,C.fg,'target',true]]);P.text('group coverage: red pooled · green per-group',P.L+8,P.T+12,C.mu);
+  const NG=[10,20,40,80,160,320],res=NG.map(m=>{const pp=[],mm=[];for(let r=0;r<12;r++){const sc=sds.map(s=>Array.from({length:m},()=>Math.abs(s*randn()))),qa=uqQ([].concat(...sc),al);for(let g=0;g<G;g++){const qm=uqQ(sc[g],al);pp.push(gcov(qa,sds[g]));mm.push(isFinite(qm)?gcov(qm,sds[g]):1)}}return[uqPct(pp,.05),uqPct(mm,.05),avg(mm)]}),Q=mk($('c9cv2'),0,NG.length-1,1,{y0:.3,noGrid:true,L:44});customGrid(Q,NG.map((m,i)=>[i,String(m)]),niceTicks(.3,1,5));Q.hline(1-al,C.fg,'target',true);poly(Q,res.map((r,i)=>[i,r[0]]),C.r,2.6);poly(Q,res.map((r,i)=>[i,r[1]]),C.g,2.6);dots(Q,res.map((r,i)=>[i,r[0]]),C.r,3.4);dots(Q,res.map((r,i)=>[i,r[1]]),C.g,3.4);legend(Q,[['pooled, worst 5% of groups',C.r],['per-group, worst 5% of groups',C.g]],Q.T+12);Q.text('calibration cases per group →',Q.w-Q.R-4,Q.h-Q.B-6,C.mu,'right');
+  const l5p=uqPct(pool,.05),l5m=uqPct(mon,.05),ap=avg(pool),am=avg(mon),sdp=Math.sqrt(avg(pool.map(v=>(v-ap)**2))),sdm=Math.sqrt(avg(mon.map(v=>(v-am)**2)));
+  $('c9st').innerHTML=stat('average group coverage: pooled · per-group',pc1(ap)+' · '+pc1(am),'')+stat('worst 5% of groups: pooled · per-group',pc1(l5p)+' · '+pc1(l5m),l5p<.8?'hot':'in')+stat('spread of group coverage (sd): pooled · per-group',pc1(sdp)+' · '+pc1(sdm),'')+stat('groups · calibration cases per group',G+' · '+n,n<30?'warn':'');
+  $('c9rd').innerHTML=`${G} groups (products, branches, segments) have different noise levels (the log of the standard deviation varies with spread ${fmt(hs)}). A <b>pooled</b> threshold, calibrated on all cases together, guarantees 90% coverage only across the whole population: in a quiet group it covers almost everything and in a noisy group it falls short, with the worst 5% of groups covered ${pc1(l5p)}. <b>Per-group (Mondrian) calibration</b> gives each group its own threshold and a guaranteed 90% coverage <em>within the group</em>, on average over calibration sets. But the guarantee is again an average: with ${n} cases per group each group’s coverage is a random draw from a Beta distribution, so the actual coverage of a particular group ranges widely (worst 5% of groups ${pc1(l5m)}, green) and with fewer than 1/α = 10 calibration cases the interval is infinite. That is the practical trade-off: conditional validity on many small groups is expensive in data. Options are to merge similar groups, to use a normalised score (chapter 4) that absorbs most of the group differences so the pooled threshold works, or to accept pooled coverage and monitor group-level coverage honestly. Impossibility results show that exact coverage conditional on every x is unattainable without assumptions; groups with enough cases are the achievable form.`}
+ ['c9n','c9s'].forEach(i=>$(i).addEventListener('change',run));$('c9go').onclick=run;run();})();
+
+/* ---------- Ch10 selective prediction and abstention ---------- */
+(function(){scl('c10h',v=>fmt(v/10));scl('c10q',v=>fmt(v/10));scl('c10r',v=>v+'%');
+ function run(){const h=val('c10h')/10,qq=val('c10q')/10,rj=val('c10r')/100,N=6000,err=[],sc=[],orc=[],sig=[];for(let i=0;i<N;i++){const x=Math.random()*2-1,s=.4*Math.exp(h*x*2),e=s*randn();err.push(Math.abs(e));sig.push(s);sc.push(Math.log(s)+(1-qq)*.8*randn());orc.push(Math.abs(e))}
+  const ord=a=>Array.from(a,(_,i)=>i).sort((x,y)=>a[x]-a[y]),byS=ord(sc),byO=ord(orc),rnd=Array.from({length:N},(_,i)=>i).sort(()=>Math.random()-.5),tol=.5;
+  const metr=(idx)=>{const k=idx.length;let se=0,ok=0;for(const i of idx){se+=err[i]*err[i];if(err[i]<=tol)ok++}return[Math.sqrt(se/k),ok/k]},RJ=[0,.1,.2,.3,.4,.5,.6,.7,.8,.9],curve=(order)=>RJ.map(r=>metr(order.slice(0,Math.round(N*(1-r)))));
+  const cS=curve(byS),cO=curve(byO),cR=curve(rnd),P=mk($('c10cv'),0,.9,Math.max(cR[0][0],cS[0][0])*1.1,{y0:0,L:44});poly(P,RJ.map((r,i)=>[r,cR[i][0]]),C.mu,2.4);poly(P,RJ.map((r,i)=>[r,cS[i][0]]),C.g,2.6);poly(P,RJ.map((r,i)=>[r,cO[i][0]]),C.y,2.2);P.vline(rj,C.fg,null,true);legend(P,[['at random',C.mu],['by uncertainty score',C.g],['by true error (ideal)',C.y]],P.T+12);P.text('share of cases sent to a human →',P.w-P.R-4,P.h-P.B-6,C.mu,'right');P.text('RMSE on the cases the model decides',P.L+6,P.T+28,C.mu);
+  const Q=mk($('c10cv2'),0,.9,1.12,{y0:Math.min(cR[0][1],.3)*.8,L:44});poly(Q,RJ.map((r,i)=>[r,cR[i][1]]),C.mu,2.4);poly(Q,RJ.map((r,i)=>[r,cS[i][1]]),C.g,2.6);poly(Q,RJ.map((r,i)=>[r,cO[i][1]]),C.y,2.2);Q.vline(rj,C.fg,null,true);Q.text('share of cases sent to a human →',Q.w-Q.R-4,Q.h-Q.B-6,C.mu,'right');Q.text('share of decided cases with error ≤ '+tol,Q.L+6,Q.T+12,C.mu);
+  const k=Math.max(0,Math.min(RJ.length-1,Math.round(rj*10))),a=cS[k],b=cR[k];
+  $('c10st').innerHTML=stat('RMSE with no abstention · at this rate (uncertainty score)',fmt(cS[0][0])+' · '+fmt(a[0]),'')+stat('RMSE at this rate if abstaining at random',fmt(b[0]),'')+stat('decided cases within tolerance: now · no abstention',pc1(a[1])+' · '+pc1(cS[0][1]),a[1]>cS[0][1]+.05?'ok':'')+stat('ranking quality of the uncertainty score (rank correlation with error)',fmt(rankCor(sc,err)),'');
+  $('c10rd').innerHTML=`The model’s error at each case has a spread that depends on a feature (heterogeneity ${fmt(h)}). A <b>selective</b> system decides the cases where its uncertainty is low and sends the rest to a human analyst. Uncertainty is measured by a score that tracks the true spread with quality ${fmt(qq)} (1 = perfect, 0 = pure noise). Abstaining on the highest-uncertainty cases at the chosen rate of ${pc(rj)} cuts the RMSE on the decided cases from ${fmt(cS[0][0])} to ${fmt(a[0])} (green), whereas abstaining at random leaves it at ${fmt(b[0])} (grey): the value of the uncertainty estimate is exactly the gap between the green and grey curves. The yellow curve is the unreachable ideal where the true error is known. This is how conformal intervals or sets are used in operations: a wide interval or a multi-class set is the trigger for manual review, and the intervals’ width, not the point prediction, sets the workload. Two warnings: when the heterogeneity is small, abstention buys little because there is no cheap way to separate hard from easy cases, and the guarantee on coverage applies to the whole population, not to the self-selected decided cases, so the accuracy of the decided subset must be monitored directly. The human review capacity should set the abstention rate, not the other way round.`}
+ function rankCor(a,b){const ra=rk(a),rb=rk(b),n=a.length,ma=avg(ra),mb=avg(rb);let sxy=0,sx=0,sy=0;for(let i=0;i<n;i++){sxy+=(ra[i]-ma)*(rb[i]-mb);sx+=(ra[i]-ma)**2;sy+=(rb[i]-mb)**2}return sxy/Math.sqrt(sx*sy)}
+ function rk(a){const o=Array.from(a,(_,i)=>i).sort((x,y)=>a[x]-a[y]),r=new Float64Array(a.length);o.forEach((i,j)=>r[i]=j);return r}
+ ['c10h','c10q','c10r'].forEach(i=>$(i).addEventListener('change',run));$('c10go').onclick=run;run();})();
+
+/* ---------- Ch11 model-based versus distribution-free ---------- */
+(function(){scl('c11d',v=>v<30?String(v/2)+' df':'normal');scl('c11m',v=>fmt(v/10));scl('c11n',v=>v);
+ const LV=[.5,.7,.8,.9,.95,.99];
+ function tdraw(df){if(df>=15)return randn();const c=2*gammaS(df/2);return randn()/Math.sqrt(c/df)}
+ function sim(n,df,cu){const x=Array.from({length:n},()=>Math.random()*2-1);return[x,x.map(v=>1+2*v+cu*v*v+tdraw(df))]}
+ function trial(n,df,cu){const[x,y]=sim(n,df,cu),k=Math.floor(n/2),f=uqOls(x.slice(0,k),y.slice(0,k)),rs=x.slice(k).map((u,i)=>Math.abs(y[k+i]-f.a-f.b*u)),[xt,yt]=sim(4000,df,cu),te=xt.map((u,i)=>Math.abs(yt[i]-f.a-f.b*u)),g=LV.map(l=>{const t=uqTq((1+l)/2,k-2),sp=f.s*Math.sqrt(1+1/k),q=uqQ(rs,1-l);let a=0,b=0;for(const e of te){if(e<=t*sp)a++;if(e<=q)b++}return[a/4000,b/4000,2*t*sp,2*q]});return g}
+ function run(){const df=val('c11d')/2,cu=val('c11m')/10,n=val('c11n'),R=25,acc=LV.map(()=>[0,0,0,0]);for(let r=0;r<R;r++)trial(n,df,cu).forEach((g,i)=>g.forEach((v,j)=>acc[i][j]+=v/R));
+  const P=mk($('c11cv'),.5,1,1.02,{y0:.4,L:44});P.line(x=>x,C.fg,1.4,.5,1,2,true);poly(P,LV.map((l,i)=>[l,acc[i][0]]),C.r,2.6);dots(P,LV.map((l,i)=>[l,acc[i][0]]),C.r,3.6);poly(P,LV.map((l,i)=>[l,acc[i][1]]),C.g,2.6);dots(P,LV.map((l,i)=>[l,acc[i][1]]),C.g,3.6);legend(P,[['Gaussian regression interval',C.r],['split conformal',C.g],['ideal (diagonal)',C.fg]],P.T+12);P.text('nominal coverage →',P.w-P.R-4,P.h-P.B-6,C.mu,'right');P.text('actual coverage',P.L+6,P.T+28,C.mu);
+  const Q=barG($('c11cv2'),LV.map((l,i)=>[acc[i][2],acc[i][3]]),[C.r,C.g],LV.map(l=>pc(l)),0,Math.max(...acc.map(a=>Math.max(a[2],a[3])))*1.1,fmt);Q.text('mean interval width by nominal level: red Gaussian · green conformal',Q.L+6,Q.T+12,C.mu);
+  const i9=LV.indexOf(.9),i99=LV.indexOf(.99),bad=Math.max(...acc.map((a,i)=>Math.abs(a[0]-LV[i])));
+  $('c11st').innerHTML=stat('Gaussian interval: coverage at 90% · 99% nominal',pc1(acc[i9][0])+' · '+pc1(acc[i99][0]),Math.abs(acc[i99][0]-.99)>.015?'hot':'ok')+stat('conformal: coverage at 90% · 99% nominal',pc1(acc[i9][1])+' · '+pc1(acc[i99][1]),'ok')+stat('largest gap from nominal: Gaussian · conformal',fmt(bad)+' · '+fmt(Math.max(...acc.map((a,i)=>Math.abs(a[1]-LV[i])))),'')+stat('width at 90%: Gaussian · conformal',fmt(acc[i9][2])+' · '+fmt(acc[i9][3]),'');
+  $('c11rd').innerHTML=`A straight line is fitted to ${Math.floor(n/2)} cases (the other ${n-Math.floor(n/2)} calibrate the conformal threshold). The classical interval ŷ ± t·s·√(1 + 1/n) assumes normal noise and a correctly specified mean. Here the noise has ${df<15?df+' degrees of freedom (heavy tails)':'normal tails'} and the true mean has curvature ${fmt(cu)}, so the assumptions fail in ways the classical interval cannot see. The left panel plots the actual coverage against the nominal one: the Gaussian interval is miscalibrated (at 90% it covers ${pc1(acc[i9][0])}, at 99% ${pc1(acc[i99][0])}), with the error depending on the level: heavy tails make the standard deviation larger than the typical error, so the middle of the distribution is over-covered while the far tail is under-covered, and the width at 90% is ${fmt(acc[i9][2])} against ${fmt(acc[i9][3])} for conformal. Split conformal lies on the diagonal at every level, using only exchangeability; it pays nothing in efficiency here and often wins (narrower at 90% under heavy tails). Conformal does not protect against everything: the 99% level needs at least 100 calibration cases, coverage is marginal (curvature makes it uneven across x), and it needs exchangeability (chapters 6 and 7). In regulator-facing work, show the coverage-versus-nominal plot on held-out data for whatever interval is reported; it is the single most informative diagnostic of an uncertainty statement.`}
+ ['c11d','c11m','c11n'].forEach(i=>$(i).addEventListener('change',run));$('c11go').onclick=run;run();})();
+const QZ=[{"l":"Beginner","q":"A regression model reports a 95% confidence band for the fitted curve. A risk officer reads it as the range in which 95% of individual customers’ outcomes will fall. With a large dataset, this reading is…","o":["Right: more data makes the band cover individuals","Wrong: the band narrows with data while individual outcomes keep their noise","Wrong only for classification","Right only if the model is linear"],"a":1,"e":"The confidence band describes the mean and shrinks like 1/√n; individual outcomes scatter around the mean with the full noise, which needs a prediction interval."},{"l":"Beginner","q":"An interval of constant width has 90% coverage over the whole population but only 70% for customers with large exposures. This is a failure of…","o":["Conditional coverage, not marginal coverage","The calibration set size","Exchangeability","Marginal coverage"],"a":0,"e":"Marginal coverage is an average over the population; the interval can be right on average yet wrong in the noisy region."},{"l":"Intermediate","q":"In split conformal prediction with n = 99 calibration cases and α = 0.1, the threshold q̂ is…","o":["The 99th smallest score","The 89th smallest score","The mean score plus 1.645 standard deviations","The 90th smallest calibration score"],"a":3,"e":"The index is ⌈(n + 1)(1 − α)⌉ = ⌈100 × 0.9⌉ = 90."},{"l":"Intermediate","q":"What does the split conformal guarantee require?","o":["That the model was trained on the calibration set","That the noise is normal","That calibration and new cases are exchangeable","That the model is correctly specified"],"a":2,"e":"The finite-sample marginal guarantee needs only exchangeability of calibration and new cases; the model can be anything fitted without the calibration data."},{"l":"Intermediate","q":"A colleague tunes the model’s hyperparameters on the calibration set and then computes the conformal threshold on the same set. The consequence is…","o":["Intervals become too wide","Scores are too small, intervals too narrow and coverage below target","Coverage becomes exactly 1 − α","Nothing, since the scores are still residuals"],"a":1,"e":"Fitting or tuning on the calibration data makes the calibration residuals optimistic, so the threshold is too small and the guarantee is lost."},{"l":"Intermediate","q":"Switching from the absolute residual to the normalised residual |y − ŷ|/σ̂(x) as the conformity score mainly…","o":["Makes interval widths follow the local noise level while keeping marginal coverage","Removes the need for a calibration set","Guarantees coverage for every x","Raises the marginal coverage above 1 − α"],"a":0,"e":"The score changes the shape and efficiency of the interval; the marginal guarantee is the same, and conditional coverage improves when σ̂ is good."},{"l":"Advanced","q":"With 3 classes of which one is rare, a single conformal threshold gives 90% overall coverage but 70% for the rare class. A suitable fix is…","o":["Increase the model’s accuracy to 100%","Ignore it, since 90% overall is guaranteed","Use a normal approximation for the probabilities","Calibrate a separate threshold for each class (Mondrian)"],"a":3,"e":"Class-conditional calibration gives coverage within each class, at the cost of larger sets and noisier thresholds for rare classes."},{"l":"Advanced","q":"A classifier is overconfident (its probabilities are too extreme). What happens to the coverage of conformal prediction sets calibrated on held-out data?","o":["Sets become empty for all cases","Coverage rises to 100%","Marginal coverage is still valid; set composition and sizes are affected","Coverage falls below 1 − α"],"a":2,"e":"Validity does not depend on the model being calibrated; poor calibration affects efficiency, not marginal coverage."},{"l":"Advanced","q":"A conformal interval was calibrated on last year’s customers. The new portfolio has the same input–outcome relationship but a different mix of inputs. A principled repair is…","o":["Use the mean absolute residual instead of the quantile","Weight calibration scores by the density ratio p_new(x)/p_old(x)","Retrain on the calibration set","Raise α"],"a":1,"e":"Weighted conformal prediction restores coverage under covariate shift when the density ratio is known or estimated."},{"l":"Advanced","q":"After weighting calibration scores to correct covariate shift, the effective sample size (Σw)²/Σw² is 25 out of 1,000. This indicates…","o":["Very few calibration cases resemble the new population, so the thresholds are unstable","The weights are ideal","Coverage is guaranteed to be exact","The shift is zero"],"a":0,"e":"A small effective sample size means a few heavily weighted cases dominate; the weighted guarantee holds on paper but the threshold is very noisy."},{"l":"Advanced","q":"Why does adaptive conformal inference update α_{t+1} = α_t + γ(α − err_t)?","o":["To avoid needing any calibration set","To reduce the model’s error","To make each individual interval valid","To make the long-run frequency of misses converge to α even when the distribution drifts"],"a":3,"e":"Misses lower α_t and widen future intervals, hits do the opposite; the long-run coverage converges to 1 − α under arbitrary drift, though not per case."},{"l":"Expert","q":"Ensemble members’ disagreement (±1.645 sd) is used as a 90% prediction interval. As the training set grows, its coverage of new cases will…","o":["Stay at 90%","Fall only for linear models","Fall, because the spread shrinks while the noise does not","Rise to 100%"],"a":2,"e":"The spread measures epistemic uncertainty, which tends to zero with more data; the irreducible noise of the new outcome is not included."},{"l":"Expert","q":"Which statement about ensembles and conformal prediction is most accurate?","o":["Conformal prediction cannot be applied to ensembles","Use the ensemble mean as the prediction and calibrate the width on held-out residuals; spread can normalise the score","Ensembles estimate aleatoric noise exactly","Ensemble spread is a valid prediction interval"],"a":1,"e":"Conformal calibration wraps any predictor; the ensemble’s spread is best used as an input to the score, not as the interval."},{"l":"Expert","q":"You calibrate separately within 60 groups with 8 cases each, using α = 0.1. The main problem is…","o":["Fewer than 1/α = 10 cases per group gives infinite intervals, and group coverage is very noisy","Group coverage is exactly 90% in each","Pooled thresholds would be invalid","Nothing, since n = 8 is above 1"],"a":0,"e":"The threshold needs ⌈(n + 1)(1 − α)⌉ ≤ n, i.e. n ≥ 1/α − 1 or more; even beyond that, coverage per group varies with order 1/√n."},{"l":"Expert","q":"Which is true of distribution-free coverage conditional on every value of x?","o":["It is achieved when the model is accurate","It is achieved by CQR","It is guaranteed by split conformal prediction","It cannot be achieved in finite samples without intervals of infinite expected length"],"a":3,"e":"Impossibility results show exact conditional coverage for every x is unattainable distribution-free; approximate, group-wise or asymptotic versions are the targets."},{"l":"Expert","q":"A fraud triage system sends the cases with the widest conformal sets to analysts and decides the rest automatically. The coverage guarantee…","o":["Applies to the decided subset too","Becomes 100% on the decided cases","Applies to the whole population, not to the decided subset, whose accuracy must be monitored separately","Is destroyed by any abstention"],"a":2,"e":"Selection on width conditions on a function of x; marginal coverage is a population statement and the decided subset needs direct monitoring."},{"l":"Expert","q":"Noise has heavy tails (t with 3 degrees of freedom). A Gaussian interval ŷ ± z·s at nominal 99% is likely to…","o":["Cover exactly 99%","Undercover, while at 80% it may overcover, because s is inflated by outliers","Overcover at all levels","Be identical to the conformal interval"],"a":1,"e":"The standard deviation exceeds the typical error, so the middle is over-covered and the far tail under-covered; conformal is valid at every level."},{"l":"Expert","q":"For a regulator, which diagnostic best supports a stated 90% prediction interval?","o":["Actual against nominal coverage on held-out data, overall and by segment, with drift monitoring","The standard errors of the coefficients","The R² of the model","The width of the interval alone"],"a":0,"e":"Coverage on held-out data, by segment and over time, is the direct test of what the interval claims; the other quantities do not test it."}];
+(function(){const st=store.get('uq_quiz',{});
+ function render(){const box=$('quiz');box.innerHTML='';
+  QZ.forEach((q,i)=>{const d=document.createElement('div');d.className='q'+(st[i]!=null?' done':'');d.innerHTML=`<div class="qh">Q${i+1} · ${q.l}</div><div style="margin:4px 0 6px"><b>${q.q}</b></div>`;
+   q.o.forEach((o,j)=>{const b=document.createElement('button');b.className='opt';b.textContent=o;if(st[i]!=null){if(j===q.a)b.classList.add('good');else if(j===st[i])b.classList.add('bad')}b.onclick=()=>{if(st[i]!=null)return;st[i]=j;store.set('uq_quiz',st);render();meter()};d.appendChild(b)});
+   const e=document.createElement('div');e.className='ex';e.innerHTML=(st[i]===q.a?'✅ ':'❌ ')+q.e;d.appendChild(e);box.appendChild(d)});
+  const ans=Object.keys(st).length,ok=QZ.filter((q,i)=>st[i]===q.a).length;
+  $('qscore').innerHTML=stat('answered',ans+' / '+QZ.length,'in')+stat('correct',ok,'ok')+stat('score',ans?Math.round(100*ok/ans)+'%':'—',ok/Math.max(ans,1)>=.8?'ok':'warn')+stat('verdict',ans<QZ.length?'keep going':ok>=16?'uncertainty-quantification master':ok>=13?'strong':'review ch. 1–11','')}
+ $('qreset').onclick=()=>{Object.keys(st).forEach(k=>delete st[k]);store.set('uq_quiz',st);render();meter()};
+ window.__qst=st;render();})();
+const CHK=["Distinguish a confidence interval from a prediction interval and say which a decision needs.","Explain marginal against conditional coverage and report coverage by segment.","Build a split conformal interval and state its guarantee and what it assumes.","Explain why coverage per calibration set follows a Beta distribution and what that means for small n.","Choose among absolute, normalised and CQR scores and avoid tuning on the calibration set.","Build conformal prediction sets for classification and use class-conditional thresholds for rare classes.","Explain covariate shift, weighted conformal prediction and the effective sample size.","Explain adaptive conformal inference and what its long-run guarantee does not say.","Distinguish epistemic from aleatoric uncertainty and say why ensemble spread alone undercovers.","Explain why conditional coverage is impossible in general and how group calibration helps and fails.","Design a selective prediction system and monitor the decided subset.","Compare Gaussian and conformal intervals under heavy tails and misspecification with an actual-against-nominal plot.","Choose between retraining and adaptive widening when coverage drifts.","Document score, calibration set, exchangeability assumption, segment coverage and drift monitoring for a regulator."];
+(function(){const st=store.get('uq_chk',{}),box=$('chk');CHK.forEach((t,i)=>{const l=document.createElement('label'),c=document.createElement('input');c.type='checkbox';c.checked=!!st[i];c.onchange=()=>{st[i]=c.checked;store.set('uq_chk',st);meter()};l.appendChild(c);const s=document.createElement('span');s.textContent=t;l.appendChild(s);box.appendChild(l)});window.__cst=st;})();
+function meter(){const q=window.__qst||{},c=window.__cst||{};const ok=QZ.filter((x,i)=>q[i]===x.a).length,ck=Object.values(c).filter(Boolean).length;const p=Math.round(100*(.6*ok/QZ.length+.4*ck/CHK.length));$('mtxt').textContent='Mastery: '+p+'%  (exam + checklist)';$('mbar').style.width=p+'%';store.set('mastery_uq',p)}
+meter();
+
+/* ---------- Navigation ---------- */
+(function(){const nav=$('nav');let html='';
+ document.querySelectorAll('main .part, main section.ch').forEach(el=>{if(el.classList.contains('part'))html+=`<div class="pt">${el.textContent}</div>`;else{const h=el.querySelector('h2'),num=h.querySelector('.num').textContent,t=Array.from(h.childNodes).filter(n=>n.nodeType===3).map(n=>n.textContent).join('').trim();html+=`<a href="#${el.id}" data-id="${el.id}">${num}. ${t}</a>`}});
+ nav.innerHTML=html;const links=nav.querySelectorAll('a'),io=new IntersectionObserver(es=>{es.forEach(e=>{if(e.isIntersecting)links.forEach(a=>a.classList.toggle('on',a.dataset.id===e.target.id))})},{rootMargin:'-20% 0px -70% 0px'});
+ document.querySelectorAll('section.ch').forEach(s=>io.observe(s));
+ $('menu').onclick=()=>$('side').classList.toggle('open');nav.addEventListener('click',e=>{if(e.target.tagName==='A')$('side').classList.remove('open')});
+ window.addEventListener('scroll',()=>{const h=document.documentElement;$('prog').style.width=(100*h.scrollTop/(h.scrollHeight-h.clientHeight))+'%'},{passive:true});})();
+</script>
+</body>
+</html>

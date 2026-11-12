@@ -1,0 +1,689 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Copulas and Dependence Mastery</title>
+<style>
+:root{--bg:#0b0e17;--panel:#121726;--panel2:#171d30;--line:#232a3d;--fg:#e8ebf5;--mu:#8a93ab;--a:#6ea8ff;--r:#ff6b81;--y:#ffd166;--g:#4ade80;--p:#c084fc;--t:#5eead4}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;background:var(--bg);color:var(--fg);font:16px/1.7 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+a{color:var(--a)}
+#prog{position:fixed;top:0;left:0;height:3px;background:linear-gradient(90deg,var(--a),var(--p),var(--r));width:0;z-index:50}
+.side{position:fixed;left:0;top:0;bottom:0;width:290px;background:#0e1220;border-right:1px solid var(--line);overflow:auto;padding:18px 14px 90px;z-index:40;transition:transform .25s}
+.side h1{font-size:15px;margin:0 0 2px}
+.side small{color:var(--mu)}
+.side .pt{margin:16px 0 4px;font-size:11px;text-transform:uppercase;letter-spacing:1.3px;color:var(--p)}
+.side a{display:block;color:var(--mu);text-decoration:none;padding:5px 9px;border-radius:7px;font-size:13.5px;line-height:1.35}
+.side a:hover{background:var(--panel);color:var(--fg)}
+.side a.on{background:var(--panel2);color:var(--fg);box-shadow:inset 3px 0 var(--a)}
+.side a.back{color:var(--t);padding-left:0;margin-bottom:6px}
+.meter{position:fixed;left:0;bottom:0;width:290px;background:#0e1220;border-top:1px solid var(--line);padding:10px 16px;z-index:41;font-size:12px;color:var(--mu)}
+.meter .bar{height:7px;background:var(--line);border-radius:6px;margin-top:5px;overflow:hidden}
+.meter .bar i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--g),var(--t));transition:width .4s}
+#menu{display:none;position:fixed;top:10px;left:10px;z-index:60;background:var(--panel2);color:var(--fg);border:1px solid var(--line);border-radius:9px;padding:7px 12px;font-size:14px;cursor:pointer}
+main{margin-left:290px;padding:0 34px 120px;max-width:1090px}
+.hero{padding:70px 0 30px}
+.hero h1{font-size:clamp(32px,5vw,56px);line-height:1.08;margin:0 0 14px;background:linear-gradient(100deg,#fff,var(--y) 40%,var(--r));-webkit-background-clip:text;background-clip:text;color:transparent}
+.hero p{font-size:19px;color:#c3c9dc;max-width:780px}
+.chips{display:flex;flex-wrap:wrap;gap:8px;margin:18px 0}
+.chip{border:1px solid var(--line);background:var(--panel);padding:5px 12px;border-radius:99px;font-size:13px;color:var(--mu)}
+.chip b{color:var(--fg)}
+.part{margin:90px 0 0;padding-top:22px;border-top:1px solid var(--line);font-size:12px;letter-spacing:2px;text-transform:uppercase;color:var(--p)}
+section.ch{padding-top:30px}
+h2{font-size:30px;line-height:1.2;margin:10px 0 8px;display:flex;gap:12px;align-items:center;flex-wrap:wrap}
+h2 .num{display:inline-grid;place-items:center;width:40px;height:40px;border-radius:12px;background:var(--panel2);border:1px solid var(--line);font-size:18px;color:var(--a)}
+.lvl{font-size:11px;font-weight:600;letter-spacing:.8px;text-transform:uppercase;padding:3px 9px;border-radius:99px;border:1px solid}
+.lvl.b{color:var(--g);border-color:#1f5c3a}.lvl.i{color:var(--a);border-color:#244a85}.lvl.a{color:var(--y);border-color:#6b5420}.lvl.e{color:var(--r);border-color:#7a2c3a}
+h3{font-size:19px;margin:30px 0 6px;color:#fff}
+p{margin:10px 0}li{margin:5px 0}
+code,.f{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace}
+code{background:var(--panel2);padding:1px 6px;border-radius:5px;font-size:.9em}
+.f{display:block;white-space:pre-wrap;background:#0e1322;border:1px solid var(--line);border-left:3px solid var(--a);padding:12px 16px;border-radius:9px;margin:14px 0;overflow-x:auto;font-size:15px;color:#dbe4ff;line-height:1.8}
+.co{border-radius:12px;padding:13px 17px;margin:16px 0;border:1px solid var(--line);background:var(--panel)}
+.co>b:first-child{display:block;margin-bottom:2px;font-size:12px;letter-spacing:1px;text-transform:uppercase}
+.co.def{border-left:4px solid var(--a)}.co.def>b:first-child{color:var(--a)}
+.co.warn{border-left:4px solid var(--r)}.co.warn>b:first-child{color:var(--r)}
+.co.tip{border-left:4px solid var(--g)}.co.tip>b:first-child{color:var(--g)}
+.co.key{border-left:4px solid var(--y);background:#171608}.co.key>b:first-child{color:var(--y)}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:18px 20px;margin:22px 0;box-shadow:0 8px 30px rgba(0,0,0,.25)}
+.card>h4{margin:0 0 3px;font-size:13px;letter-spacing:1.2px;text-transform:uppercase;color:var(--t)}
+.card>p.sub{margin:0 0 12px;color:var(--mu);font-size:14.5px}
+.ctl{display:flex;flex-wrap:wrap;gap:10px 22px;align-items:center;margin:8px 0 10px}
+.ctl label{display:flex;gap:8px;align-items:center;font-size:14px;color:#c3c9dc}
+.ctl output{min-width:38px;font-family:ui-monospace,monospace;color:var(--y);font-size:13px}
+input[type=range]{accent-color:var(--a);width:150px}
+input[type=checkbox]{accent-color:var(--a)}
+select,input[type=number],input[type=text]{background:#0e1322;color:var(--fg);border:1px solid var(--line);border-radius:8px;padding:6px 9px;font:inherit;font-size:14px}
+button{background:linear-gradient(180deg,#2c4a80,#233b68);color:#fff;border:1px solid #3a5a98;border-radius:9px;padding:7px 14px;font:inherit;font-size:14px;cursor:pointer}
+button:hover{filter:brightness(1.15)}
+button.alt{background:var(--panel2);border-color:var(--line);color:var(--fg)}
+canvas{width:100%;height:270px;display:block;background:#0e1322;border:1px solid var(--line);border-radius:10px;margin-top:6px}
+canvas.sm{height:210px}canvas.tl{height:330px}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(125px,1fr));gap:9px;margin:12px 0}
+.stat{background:#0e1322;border:1px solid var(--line);border-radius:10px;padding:8px 11px}
+.stat b{display:block;font-size:17px;font-family:ui-monospace,monospace}
+.stat span{font-size:11.5px;color:var(--mu);text-transform:uppercase;letter-spacing:.7px}
+.stat.hot b{color:var(--r)}.stat.ok b{color:var(--g)}.stat.warn b{color:var(--y)}.stat.in b{color:var(--a)}
+.read{margin:8px 0 0;padding:10px 14px;background:#0e1322;border:1px dashed #33406a;border-radius:10px;font-size:14.5px;color:#d3dbf3}
+table{border-collapse:collapse;width:100%;margin:12px 0;font-size:14px}
+th,td{border:1px solid var(--line);padding:7px 10px;text-align:left;vertical-align:top}
+th{background:var(--panel2);font-size:12px;text-transform:uppercase;letter-spacing:.6px;color:var(--mu)}
+td.n{font-family:ui-monospace,monospace;text-align:right}
+.tw{overflow-x:auto}
+.pill{display:inline-block;padding:1px 9px;border-radius:99px;font-size:12px;font-weight:600}
+.pill.r{background:#3a1520;color:var(--r)}.pill.g{background:#10321f;color:var(--g)}.pill.y{background:#3a2f0e;color:var(--y)}.pill.m{background:#202637;color:var(--mu)}
+details{background:var(--panel);border:1px solid var(--line);border-radius:11px;padding:9px 15px;margin:9px 0}
+details summary{cursor:pointer;font-weight:600}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.q{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:14px 18px;margin:14px 0}
+.q .qh{font-size:12px;letter-spacing:1px;text-transform:uppercase;color:var(--mu)}
+.q .opt{display:block;width:100%;text-align:left;margin:6px 0;background:#0e1322;border:1px solid var(--line);color:var(--fg);border-radius:9px;padding:9px 12px}
+.q .opt.good{border-color:var(--g);background:#0e2418}.q .opt.bad{border-color:var(--r);background:#2a1119}
+.q .ex{display:none;margin-top:8px;font-size:14.5px;color:#c3c9dc}
+.q.done .ex{display:block}
+.chk label{display:flex;gap:10px;align-items:flex-start;padding:6px 0;cursor:pointer}
+.chk input{margin-top:6px;accent-color:var(--g);width:17px;height:17px}
+.sigrow{display:grid;grid-template-columns:minmax(170px,2fr) 1fr 1fr auto;gap:8px 14px;align-items:center;padding:6px 0;border-top:1px dashed #1b2236}
+.sigrow:first-of-type{border-top:0}
+.sigrow label{display:flex;gap:6px;align-items:center;font-size:13.5px;color:#c3c9dc}
+@media(max-width:900px){
+ .side{transform:translateX(-100%)}.side.open{transform:none}.meter{display:none}
+ #menu{display:block}main{margin-left:0;padding:0 16px 100px}.two{grid-template-columns:1fr}.hero{padding-top:60px}
+ .sigrow{grid-template-columns:1fr 1fr}
+}
+</style>
+</head>
+<body>
+<div id="prog"></div>
+<button id="menu">☰ Contents</button>
+<nav class="side" id="side"><a class="back" href="index.html">← All courses</a><h1>Copulas and Dependence</h1><small>12 chapters · 11 labs · exam</small><div id="nav"></div></nav>
+<div class="meter"><div id="mtxt">Mastery: 0%</div><div class="bar"><i id="mbar"></i></div></div>
+
+<main>
+<header class="hero">
+ <h1>Copulas: modelling how risks move together, separately from how big each one is.</h1>
+ <p>A correlation coefficient is a single number that summarises the middle of a joint distribution, yet the risks that matter (portfolio losses, defaults that cluster, fraud rings, a crisis that hits several books at once) live in the corners. A <b>copula</b> separates a joint distribution into its margins and its dependence structure, so each can be modelled and checked on its own. This page covers why linear correlation is not enough, Sklar’s theorem, rank correlations, the Gaussian, Student t and Archimedean families, tail dependence, the effect of dependence on portfolio risk, estimation and model choice, the conditional-correlation trap, and a credit-portfolio model. Every lab simulates from a known copula, so estimators and models can be judged against the truth.</p>
+ <div class="chips"><span class="chip"><b>Part I</b> Dependence beyond correlation</span><span class="chip"><b>Part II</b> Copula families</span><span class="chip"><b>Part III</b> Copulas in practice</span></div>
+ <div class="co tip"><b>How to use this</b>Sliders change the setting; heavier labs recompute when you release a slider or press the button. Prerequisites: core distributions (item 2), maximum likelihood (item 6), multivariate methods (item 30) and extreme value theory (item 31).</div>
+</header>
+
+<div class="part">Part I · Dependence beyond linear correlation</div>
+
+<section class="ch" id="c1">
+<h2><span class="num">1</span>Why correlation is not enough <span class="lvl b">Beginner</span></h2>
+<p>The Pearson correlation measures the strength of the <b>linear</b> relationship and depends on both the dependence and the shapes of the margins. It can be identical for joint distributions that behave very differently where it matters: two assets can have a correlation of 0.5 and still differ greatly in how often both lose heavily on the same day. It is also not defined when the variance is infinite, it can be changed by a monotone transformation (such as taking logs) that leaves the relationship intact, and it can be zero when variables are strongly dependent. A <b>copula</b> is the joint distribution of the variables after each has been transformed to a uniform margin, so it describes only how the variables are tied together; the standard normal margins used in the first lab are just a convenient scale for looking at it.</p>
+<div class="f">Pearson ρ = Cov(X, Y)/(σₓσᵧ)  ·  depends on the margins  ·  same ρ, different joint tails</div>
+ <div class="card"><h4>Lab 1 · Same rank correlation, five dependence structures</h4>
+ <p class="sub">Samples from five copula families tuned to the same Kendall τ, drawn on standard normal margins. Left: the family you pick. Right: how often both variables are extreme together, in each corner, for all five.</p>
+ <div class="ctl"><label>copula family <select id="c1f"><option value="gauss">Gaussian</option><option value="t">Student t (ν = 4)</option><option value="clayton">Clayton</option><option value="gumbel">Gumbel</option><option value="frank">Frank</option></select></label><label>Kendall τ <input type="range" id="c1t" min="10" max="90" step="5" value="50"><output id="c1tv"></output></label><label>observations <input type="range" id="c1n" min="500" max="4000" step="500" value="2000"><output id="c1nv"></output></label><button id="c1go">New sample</button></div>
+ <div class="two"><canvas class="sm" id="c1cv"></canvas><canvas class="sm" id="c1cv2"></canvas></div><div class="stats" id="c1st"></div><div class="read" id="c1rd"></div></div>
+</section>
+
+<section class="ch" id="c2">
+<h2><span class="num">2</span>Sklar’s theorem: margins and copula <span class="lvl i">Intermediate</span></h2>
+<p><b>Sklar’s theorem</b> says that any joint distribution function can be written H(x, y) = C(F(x), G(y)), where F and G are the margins and C is a copula (a joint distribution on the unit square with uniform margins). Conversely, any copula combined with any margins gives a valid joint distribution. This is a modelling licence: fit each margin with the distribution that suits it (a heavy-tailed severity, a skewed return), model the dependence separately, and recombine. The copula is unchanged by strictly increasing transformations of the variables, so anything computed from it is <b>invariant</b> to the margins; Pearson correlation is not, which is why it is the wrong summary of dependence for variables with skewed or heavy-tailed margins. For discrete margins the copula is not unique, a complication for default and count data.</p>
+<div class="f">H(x, y) = C(F(x), G(y))  ·  C(u, v) = P(U ≤ u, V ≤ v), U = F(X), V = G(Y)  ·  invariant to increasing transformations</div>
+ <div class="card"><h4>Lab 2 · Changing the margins, keeping the copula</h4>
+ <p class="sub">The same copula with lognormal margins of increasing skewness. Left: original units. Right: the copula (ranks). Pearson changes with the margins; Spearman and Kendall do not.</p>
+ <div class="ctl"><label>copula family <select id="c2f"><option value="gauss">Gaussian</option><option value="clayton">Clayton</option><option value="gumbel">Gumbel</option><option value="frank">Frank</option></select></label><label>Kendall τ <input type="range" id="c2t" min="10" max="90" step="5" value="50"><output id="c2tv"></output></label><label>lognormal σ of both margins <input type="range" id="c2s" min="2" max="30" step="1" value="15"><output id="c2sv"></output></label><button id="c2go">New sample</button></div>
+ <div class="two"><canvas class="sm" id="c2cv"></canvas><canvas class="sm" id="c2cv2"></canvas></div><div class="stats" id="c2st"></div><div class="read" id="c2rd"></div></div>
+</section>
+
+<section class="ch" id="c3">
+<h2><span class="num">3</span>Rank correlations: Kendall’s τ and Spearman’s ρ <span class="lvl i">Intermediate</span></h2>
+<p>Two measures depend only on the copula. <b>Kendall’s τ</b> is the probability that two randomly chosen pairs are concordant minus the probability they are discordant; <b>Spearman’s ρ</b><sub>S</sub> is the Pearson correlation of the ranks. Both lie in [−1, 1], are unchanged by increasing transformations of the margins, exist for any distribution (no moments needed), and are robust to outliers. For the Gaussian copula they map exactly to the copula parameter, ρ = sin(πτ/2) and ρ = 2 sin(πρ<sub>S</sub>/6), which gives a rank-based estimator of ρ that works when the margins are heavy-tailed. For an Archimedean copula, τ is a function of the single parameter. They are summaries of overall association and, like correlation, say little about the tails: two copulas with the same τ can have very different tail dependence.</p>
+<div class="f">τ = P(concordant) − P(discordant)  ·  Gaussian copula: ρ = sin(πτ/2) = 2 sin(πρₛ/6)  ·  Clayton θ = 2τ/(1 − τ)  ·  Gumbel θ = 1/(1 − τ)</div>
+ <div class="card"><h4>Lab 3 · Estimating a correlation parameter from heavy-tailed data</h4>
+ <p class="sub">Gaussian-copula dependence with Pareto margins. Left: one sample on log axes. Right: three estimators of the copula parameter over 200 samples.</p>
+ <div class="ctl"><label>margin tail index α <input type="range" id="c3a" min="11" max="60" step="1" value="18"><output id="c3av"></output></label><label>observations <input type="range" id="c3n" min="50" max="500" step="50" value="200"><output id="c3nv"></output></label><label>true copula ρ <input type="range" id="c3r" min="0" max="90" step="5" value="50"><output id="c3rv"></output></label><button id="c3go">New samples</button></div>
+ <div class="two"><canvas class="sm" id="c3cv"></canvas><canvas class="sm" id="c3cv2"></canvas></div><div class="stats" id="c3st"></div><div class="read" id="c3rd"></div></div>
+</section>
+
+<div class="part">Part II · Copula families and tail dependence</div>
+
+<section class="ch" id="c4">
+<h2><span class="num">4</span>The Gaussian copula and its blind spot <span class="lvl a">Advanced</span></h2>
+<p>The <b>Gaussian copula</b> takes two correlated standard normal variables and passes each through the normal cdf; it is the copula of the bivariate normal distribution and of every Gaussian factor model. It is flexible in higher dimensions (a correlation matrix), easy to simulate and to fit, and it underlies the Basel credit-risk formula. Its weakness is in the corners. The <b>coefficient of tail dependence</b> λ = lim P(Y extreme | X extreme) is zero for the Gaussian copula whenever ρ &lt; 1: however high the correlation, joint extremes become asymptotically independent. At realistic levels (99%, 99.9%) the conditional probability is not zero, but it falls with the level, so the model understates joint tail events the more extreme they are. This is the heart of the criticism of Gaussian-copula pricing of CDOs before 2008.</p>
+<div class="f">λᵤ = lim_{q→1} P(V > q | U > q)  ·  Gaussian copula: λ = 0 for ρ &lt; 1  ·  C(u, v) = Φ₂(Φ⁻¹(u), Φ⁻¹(v); ρ)</div>
+ <div class="card"><h4>Lab 4 · Gaussian against t at the joint-extreme corner</h4>
+ <p class="sub">Left: the conditional probability of a joint extreme for the Gaussian copula as the level rises, with the t copula limit. Right: the upper corner of simulated samples from both copulas with the same ρ.</p>
+ <div class="ctl"><label>correlation ρ <input type="range" id="c4r" min="0" max="95" step="5" value="70"><output id="c4rv"></output></label><label>simulated points <input type="range" id="c4n" min="5000" max="40000" step="5000" value="20000"><output id="c4nv"></output></label><button id="c4go">New samples</button></div>
+ <div class="two"><canvas class="sm" id="c4cv"></canvas><canvas class="sm" id="c4cv2"></canvas></div><div class="stats" id="c4st"></div><div class="read" id="c4rd"></div></div>
+</section>
+
+<section class="ch" id="c5">
+<h2><span class="num">5</span>Archimedean copulas: Clayton, Gumbel and Frank <span class="lvl a">Advanced</span></h2>
+<p>An <b>Archimedean copula</b> is generated by a single decreasing function φ: C(u, v) = φ⁻¹(φ(u) + φ(v)). With one parameter θ it is parsimonious and easy to simulate, and it can be asymmetric. <b>Clayton</b> has lower-tail dependence (joint small values) and none in the upper tail; <b>Gumbel</b> has upper-tail dependence (joint large values) and none in the lower; <b>Frank</b> is symmetric with no tail dependence, resembling the Gaussian. For a loss variable, joint large losses call for upper-tail dependence (Gumbel); for a quality or return variable, joint downturns call for lower-tail dependence (Clayton). Each family is a different qualitative statement about where things go wrong together, so the choice should follow the risk story rather than convenience. Their limitation is that they are exchangeable and, beyond two dimensions, restrictive: every pair gets the same dependence.</p>
+<div class="f">Clayton: C = (u⁻ᶿ + v⁻ᶿ − 1)^(−1/θ), λ_L = 2^(−1/θ)  ·  Gumbel: C = exp{−[(−ln u)ᶿ + (−ln v)ᶿ]^(1/θ)}, λ_U = 2 − 2^(1/θ)  ·  Frank: λ = 0</div>
+ <div class="card"><h4>Lab 5 · Where each family concentrates dependence</h4>
+ <p class="sub">Samples on the unit square at a common Kendall τ. Left: the chosen family, with the lower and upper corners marked. Right: the limiting tail dependence of all families.</p>
+ <div class="ctl"><label>family <select id="c5f"><option value="clayton">Clayton</option><option value="gumbel">Gumbel</option><option value="frank">Frank</option><option value="gauss">Gaussian</option><option value="t">Student t (ν = 4)</option></select></label><label>Kendall τ <input type="range" id="c5t" min="10" max="90" step="5" value="50"><output id="c5tv"></output></label><label>observations <input type="range" id="c5n" min="500" max="5000" step="500" value="2000"><output id="c5nv"></output></label><button id="c5go">New sample</button></div>
+ <div class="two"><canvas class="sm" id="c5cv"></canvas><canvas class="sm" id="c5cv2"></canvas></div><div class="stats" id="c5st"></div><div class="read" id="c5rd"></div></div>
+</section>
+
+<section class="ch" id="c6">
+<h2><span class="num">6</span>The t copula and tail dependence <span class="lvl a">Advanced</span></h2>
+<p>The <b>Student t copula</b> adds one parameter, the degrees of freedom ν, to the Gaussian: it is the copula of the multivariate t, where all margins share a common random scale that makes extreme moves arrive together. It is symmetric and has positive tail dependence in both corners, λ = 2 t<sub>ν+1</sub>(−√((ν + 1)(1 − ρ)/(1 + ρ))), which rises as ν falls and as ρ rises, and tends to the Gaussian (λ = 0) as ν → ∞. It is the standard first alternative to the Gaussian in practice and extends naturally to high dimensions, though it still has a single ν and symmetric corners. Tail dependence is easy to define and hard to estimate: it is a limit, and any sample has only a handful of points in the corner, so empirical estimates are noisy and biased, and the sample cannot tell a finite λ from a slowly vanishing conditional probability.</p>
+<div class="f">λ = 2 t_{ν+1}(−√((ν+1)(1−ρ)/(1+ρ)))  ·  λ ↑ as ν ↓ and as ρ ↑  ·  ν → ∞ gives the Gaussian</div>
+ <div class="card"><h4>Lab 6 · Tail dependence of the t copula</h4>
+ <p class="sub">Left: sample and Gaussian exceedance probabilities against the level, with the t-copula limit. Right: tail dependence as a function of ν for four correlations.</p>
+ <div class="ctl"><label>degrees of freedom ν <input type="range" id="c6v" min="2" max="30" step="1" value="4"><output id="c6vv"></output></label><label>correlation ρ <input type="range" id="c6r" min="0" max="95" step="5" value="50"><output id="c6rv"></output></label><label>simulated points <input type="range" id="c6n" min="5000" max="40000" step="5000" value="20000"><output id="c6nv"></output></label><button id="c6go">New sample</button></div>
+ <div class="two"><canvas class="sm" id="c6cv"></canvas><canvas class="sm" id="c6cv2"></canvas></div><div class="stats" id="c6st"></div><div class="read" id="c6rd"></div></div>
+</section>
+
+<div class="part">Part III · Copulas in practice</div>
+
+<section class="ch" id="c7">
+<h2><span class="num">7</span>Dependence and portfolio risk <span class="lvl e">Expert</span></h2>
+<p>For risk aggregation, what matters is the distribution of a sum (or any aggregate) of the losses, and for a given set of margins that distribution depends on the copula. With the same margins and the same rank correlation, different copulas give different VaR and ES for the sum, and the gap widens with the confidence level. The reason is the one-big-jump behaviour of heavy tails (item 31): a high quantile of the sum is reached when one loss is huge, and dependence in the upper tail adds the chance that several are huge together. In regulatory capital this appears as the <b>diversification benefit</b> claimed when aggregating risk types: it depends entirely on the assumed copula, and a Gaussian copula with a modest correlation can overstate it substantially. Reasonable practice is to test the aggregate against alternatives with tail dependence, and to present the capital figure as a range.</p>
+<div class="f">VaR_q(L₁ + L₂) depends on C, not only on ρ  ·  tail dependence raises VaR most at high q  ·  diversification benefit = Σ VaR_q(Lᵢ) − VaR_q(ΣLᵢ)</div>
+ <div class="card"><h4>Lab 7 · Same margins, four dependence structures</h4>
+ <p class="sub">Two Pareto losses and the VaR of their sum under independence, Gaussian, t and Gumbel copulas (the last three at the same Kendall τ). Left: the survival curve of the sum. Right: VaR relative to independence.</p>
+ <div class="ctl"><label>tail index α of each loss <input type="range" id="c7a" min="11" max="60" step="1" value="20"><output id="c7av"></output></label><label>Kendall τ <input type="range" id="c7t" min="0" max="90" step="5" value="50"><output id="c7tv"></output></label><label>confidence level <input type="range" id="c7q" min="950" max="999" step="1" value="990"><output id="c7qv"></output></label><button id="c7go">Re-simulate</button></div>
+ <div class="two"><canvas class="sm" id="c7cv"></canvas><canvas class="sm" id="c7cv2"></canvas></div><div class="stats" id="c7st"></div><div class="read" id="c7rd"></div></div>
+</section>
+
+<section class="ch" id="c8">
+<h2><span class="num">8</span>Estimating a copula from data <span class="lvl e">Expert</span></h2>
+<p>Estimation has two parts, the margins and the copula, and the usual routes differ in how they handle the margins. <b>Full maximum likelihood</b> fits everything jointly. <b>Inference functions for margins</b> (IFM) fits parametric margins first, converts the data with their fitted cdfs, and then fits the copula. <b>Canonical maximum likelihood</b> (pseudo-observations) replaces each value by its rank divided by n + 1, so the margins are estimated non-parametrically and cannot be misspecified; it is the default when the copula is the object of interest. A simple alternative for one-parameter families is <b>inversion of Kendall’s τ</b>. Misspecified parametric margins contaminate the copula estimate, because the transformed data are not uniform, so the copula parameter absorbs the margin error. For high dimensions the common approach is to fit pairwise or to use pair-copula constructions (vines), which combine bivariate copulas into a multivariate model.</p>
+<div class="f">Pseudo-observations: ûᵢ = rank(xᵢ)/(n + 1)  ·  CML: θ̂ = argmax Σ ln c(ûᵢ, v̂ᵢ; θ)  ·  inversion: θ̂ = g⁻¹(τ̂)</div>
+ <div class="card"><h4>Lab 8 · Four ways to estimate a Clayton parameter</h4>
+ <p class="sub">Pareto margins and a Clayton copula. Left: the sampling distribution of θ̂ for three likelihood-based routes. Right: the RMSE of each, with Kendall inversion for comparison.</p>
+ <div class="ctl"><label>margin tail index α <input type="range" id="c8a" min="11" max="60" step="1" value="25"><output id="c8av"></output></label><label>observations <input type="range" id="c8n" min="100" max="1000" step="100" value="300"><output id="c8nv"></output></label><label>true Kendall τ <input type="range" id="c8t" min="10" max="80" step="5" value="50"><output id="c8tv"></output></label><button id="c8go">New samples</button></div>
+ <div class="two"><canvas class="sm" id="c8cv"></canvas><canvas class="sm" id="c8cv2"></canvas></div><div class="stats" id="c8st"></div><div class="read" id="c8rd"></div></div>
+</section>
+
+<section class="ch" id="c9">
+<h2><span class="num">9</span>Goodness of fit and choosing a family <span class="lvl e">Expert</span></h2>
+<p>Given a sample, which copula? Formal tests compare the <b>empirical copula</b> C<sub>n</sub> (the observed joint distribution of the pseudo-observations) with the fitted one: the Cramér–von Mises statistic S<sub>n</sub> = Σ (C<sub>n</sub>(ûᵢ, v̂ᵢ) − C<sub>θ̂</sub>(ûᵢ, v̂ᵢ))², whose null distribution is obtained by a parametric bootstrap (the p-value must account for the estimation of θ). Other tools are graphical (a K-plot, Kendall’s transform), information criteria on the copula likelihood, and checks of the corners. All of them are low-powered in the tails, where the families differ most, since the data contain few joint extremes. The result is typically that several families are not rejected and the decision rests on judgment: which dependence story is credible, and how sensitive is the quantity of interest (a capital figure, a stress loss) to the choice. Report that sensitivity.</p>
+<div class="f">Sₙ = Σᵢ [Cₙ(ûᵢ, v̂ᵢ) − C_θ̂(ûᵢ, v̂ᵢ)]²  ·  p-value by parametric bootstrap  ·  low power in the tails</div>
+ <div class="card"><h4>Lab 9 · Which copula fits?</h4>
+ <p class="sub">Data from one copula, fitted with four candidates by Kendall inversion and compared with the empirical copula. Left: this sample. Right: how often each wins over 25 samples (at most 300 points each).</p>
+ <div class="ctl"><label>true family <select id="c9f"><option value="gauss">Gaussian</option><option value="t">Student t (ν = 4)</option><option value="clayton">Clayton</option><option value="gumbel">Gumbel</option><option value="frank">Frank</option></select></label><label>Kendall τ <input type="range" id="c9t" min="10" max="80" step="5" value="50"><output id="c9tv"></output></label><label>observations <input type="range" id="c9n" min="100" max="600" step="100" value="300"><output id="c9nv"></output></label><button id="c9go">New samples</button></div>
+ <div class="two"><canvas class="sm" id="c9cv"></canvas><canvas class="sm" id="c9cv2"></canvas></div><div class="stats" id="c9st"></div><div class="read" id="c9rd"></div></div>
+</section>
+
+<section class="ch" id="c10">
+<h2><span class="num">10</span>Conditional correlation and stress dependence <span class="lvl e">Expert</span></h2>
+<p>A recurring claim is that “correlations go to one in a crisis”. Evidence is often a correlation computed on the subsample of days on which one market moved a lot, and this is biased by selection. If X is restricted to a region where its variance is smaller (the upper tail above a threshold) the sample correlation with Y falls even when the true relationship is constant; if instead selection is on a high-volatility regime, the variance of the combined sample rises and so does the measured correlation, whether or not the underlying dependence changed (Forbes and Rigobon). The correct description of stress dependence uses quantities that are not distorted by selection: tail dependence coefficients, conditional exceedance probabilities, regime-switching or stochastic-correlation models, or copulas with tail dependence fitted to the whole sample. It is also useful to separate a change in volatility from a change in dependence before concluding that diversification fails when it is needed.</p>
+<div class="f">corr(X, Y | X &gt; c) = ρ s/√(ρ²s² + 1 − ρ²) for a normal, with s² the variance of the selected X  ·  s &lt; 1 so it falls</div>
+ <div class="card"><h4>Lab 10 · The conditional correlation trap</h4>
+ <p class="sub">Left: bivariate normal data with constant ρ; points in the selected region are red. Right: the correlation in the selected subsample against the selection percentile, with theory and with a true stress regime.</p>
+ <div class="ctl"><label>true correlation ρ <input type="range" id="c10r" min="0" max="90" step="5" value="50"><output id="c10rv"></output></label><label>select the first variable above this percentile <input type="range" id="c10q" min="0" max="96" step="4" value="80"><output id="c10qv"></output></label><button id="c10go">New sample</button></div>
+ <div class="two"><canvas class="sm" id="c10cv"></canvas><canvas class="sm" id="c10cv2"></canvas></div><div class="stats" id="c10st"></div><div class="read" id="c10rd"></div></div>
+</section>
+
+<section class="ch" id="c11">
+<h2><span class="num">11</span>Credit portfolios and default correlation <span class="lvl e">Expert</span></h2>
+<p>The factor model for default is a copula in disguise. Each obligor has a latent asset value X<sub>i</sub> = √ρ Z + √(1 − ρ) ε<sub>i</sub> and defaults if X<sub>i</sub> falls below a threshold set by its probability of default; the common factor Z is what makes defaults cluster. For a large portfolio the loss fraction converges to a closed form, the <b>Vasicek distribution</b>, whose quantile is the basis of the Basel IRB capital formula: the 99.9% loss is Φ((Φ⁻¹(PD) + √ρ Φ⁻¹(0.999))/√(1 − ρ)). The Gaussian factor model has no tail dependence, so the model can understate clustering of defaults in a downturn; a t factor model (a common random scale) fattens the portfolio loss tail at the same average default rate and the same ρ. Capital is highly sensitive to ρ, which is difficult to estimate from short benign histories, so the model needs sensitivity analysis and stress scenarios, not a single calibrated value.</p>
+<div class="f">Vasicek: P(loss ≤ x) = Φ[(√(1 − ρ) Φ⁻¹(x) − Φ⁻¹(PD))/√ρ]  ·  q-quantile = Φ[(Φ⁻¹(PD) + √ρ Φ⁻¹(q))/√(1 − ρ)]</div>
+ <div class="card"><h4>Lab 11 · Portfolio loss under Gaussian and t factor models</h4>
+ <p class="sub">300 equal loans with a common factor. Left: the chance that the share in default exceeds a given size, for three models (log scale; the horizontal line is the chosen quantile). Right: the loss quantile under each, with the Vasicek closed form.</p>
+ <div class="ctl"><label>probability of default <input type="range" id="c11p" min="5" max="50" step="1" value="20"><output id="c11pv"></output></label><label>asset correlation ρ <input type="range" id="c11r" min="5" max="50" step="1" value="20"><output id="c11rv"></output></label><label>degrees of freedom of the t model <input type="range" id="c11v" min="3" max="30" step="1" value="5"><output id="c11vv"></output></label><label>confidence level <input type="range" id="c11q" min="990" max="999" step="1" value="999"><output id="c11qv"></output></label><button id="c11go">Re-simulate</button></div>
+ <div class="two"><canvas class="sm" id="c11cv"></canvas><canvas class="sm" id="c11cv2"></canvas></div><div class="stats" id="c11st"></div><div class="read" id="c11rd"></div></div>
+</section>
+
+<section class="ch" id="c12">
+<h2><span class="num">12</span>Final exam, mastery checklist, cheat sheet <span class="lvl e">Expert</span></h2>
+<h3>Exam (18 questions — click an answer)</h3>
+<div id="quiz"></div>
+<div class="card"><h4>Score</h4><div class="stats" id="qscore"></div><button class="alt" id="qreset">Reset exam</button></div>
+<h3>Mastery checklist — tick when you can do it without notes</h3>
+<div class="card chk" id="chk"></div>
+<h3>Cheat sheet</h3>
+<div class="tw"><table>
+<tr><th>Idea</th><th>One line</th></tr>
+<tr><td>Why not correlation</td><td>Pearson depends on the margins and the bulk; the same ρ can hide very different joint tails; not defined without second moments</td></tr>
+<tr><td>Sklar’s theorem</td><td>H(x, y) = C(F(x), G(y)): model the margins and the copula separately; the copula is invariant to increasing transformations</td></tr>
+<tr><td>Rank correlation</td><td>Kendall τ and Spearman ρₛ belong to the copula, need no moments and resist outliers; Gaussian ρ = sin(πτ/2)</td></tr>
+<tr><td>Gaussian copula</td><td>Easy and scalable, but λ = 0 for ρ &lt; 1: joint extremes fade; understates clustering of defaults and crashes</td></tr>
+<tr><td>Archimedean</td><td>Clayton: lower-tail dependence 2^(−1/θ); Gumbel: upper-tail 2 − 2^(1/θ); Frank: none; exchangeable, one parameter</td></tr>
+<tr><td>t copula</td><td>Symmetric tail dependence rising as ν falls and ρ rises; ν → ∞ gives the Gaussian</td></tr>
+<tr><td>Tail dependence</td><td>λ = lim P(Y extreme | X extreme): a limit that is hard to estimate from few corner points</td></tr>
+<tr><td>Portfolio risk</td><td>Same margins and τ, different copula: different VaR and ES of the sum, more so at high q; diversification benefit depends on C</td></tr>
+<tr><td>Estimation</td><td>Pseudo-observations (ranks/(n + 1)) avoid margin misspecification; IFM needs correct margins; Kendall inversion is simple and robust</td></tr>
+<tr><td>Model choice</td><td>Compare with the empirical copula (Cramér–von Mises, parametric bootstrap); low power in the tails; report sensitivity</td></tr>
+<tr><td>Conditional correlation</td><td>Correlation in a subsample selected on a variable is biased (falls for a tail on X, rises for a volatile regime); use tail measures</td></tr>
+<tr><td>Credit factor model</td><td>Vasicek quantile Φ((Φ⁻¹(PD) + √ρ Φ⁻¹(q))/√(1 − ρ)); capital driven by ρ; a t factor fattens the tail</td></tr>
+</table></div>
+<div class="co tip"><b>Next in Stage 7</b>Item 33 covers anomaly and drift detection theory: what “unusual” means statistically, thresholds and false alarms, detecting change in a stream, and monitoring models in production.</div>
+</section>
+</main>
+<script>
+/*MATH*/
+function lgamma(x){const c=[76.18009172947146,-86.50532032941677,24.01409824083091,-1.231739572450155,0.1208650973866179e-2,-0.5395239384953e-5];let y=x,t=x+5.5;t-=(x+.5)*Math.log(t);let s=1.000000000190015;for(let j=0;j<6;j++)s+=c[j]/++y;return -t+Math.log(2.5066282746310005*s/x);}
+function gser(a,x){let ap=a,sum=1/a,del=sum;for(let n=0;n<1000;n++){ap++;del*=x/ap;sum+=del;if(Math.abs(del)<Math.abs(sum)*1e-15)break;}return sum*Math.exp(-x+a*Math.log(x)-lgamma(a));}
+function gcf(a,x){let b=x+1-a,c=1/1e-300,d=1/b,h=d;for(let i=1;i<1000;i++){const an=-i*(i-a);b+=2;d=an*d+b;if(Math.abs(d)<1e-300)d=1e-300;c=b+an/c;if(Math.abs(c)<1e-300)c=1e-300;d=1/d;const del=d*c;h*=del;if(Math.abs(del-1)<1e-15)break;}return Math.exp(-x+a*Math.log(x)-lgamma(a))*h;}
+function gammaQ(a,x){if(x<=0)return 1;return x<a+1?1-gser(a,x):gcf(a,x);}
+function betacf(a,b,x){const qab=a+b,qap=a+1,qam=a-1;let c=1,d=1-qab*x/qap;if(Math.abs(d)<1e-300)d=1e-300;d=1/d;let h=d;for(let m=1;m<=1000;m++){const m2=2*m;let aa=m*(b-m)*x/((qam+m2)*(a+m2));d=1+aa*d;if(Math.abs(d)<1e-300)d=1e-300;c=1+aa/c;if(Math.abs(c)<1e-300)c=1e-300;d=1/d;h*=d*c;aa=-(a+m)*(qab+m)*x/((a+m2)*(qap+m2));d=1+aa*d;if(Math.abs(d)<1e-300)d=1e-300;c=1+aa/c;if(Math.abs(c)<1e-300)c=1e-300;d=1/d;const del=d*c;h*=del;if(Math.abs(del-1)<1e-15)break;}return h;}
+function betai(a,b,x){if(x<=0)return 0;if(x>=1)return 1;const bt=Math.exp(lgamma(a+b)-lgamma(a)-lgamma(b)+a*Math.log(x)+b*Math.log(1-x));return x<(a+1)/(a+b+2)?bt*betacf(a,b,x)/a:1-bt*betacf(b,a,1-x)/b;}
+function normSf(z){const q=0.5*gammaQ(.5,z*z/2);return z>=0?q:1-q;}
+function normCdf(z){return normSf(-z);}
+function npdf(x){return Math.exp(-x*x/2)/2.5066282746310002;}
+function lbin(n,k){return lgamma(n+1)-lgamma(k+1)-lgamma(n-k+1);}
+function binom(n,k,p){return Math.exp(lbin(n,k)+k*Math.log(p)+(n-k)*Math.log(1-p));}
+function betapdf(x,a,b){return x<=0||x>=1?0:Math.exp(lgamma(a+b)-lgamma(a)-lgamma(b)+(a-1)*Math.log(x)+(b-1)*Math.log(1-x));}
+function betacdf(x,a,b){return betai(a,b,x);}
+function gampdf(x,a,r){return x<=0?0:Math.exp(a*Math.log(r)+(a-1)*Math.log(x)-r*x-lgamma(a));}
+function gamcdf(x,a,r){return x<=0?0:1-gammaQ(a,r*x);}
+function randn(){let u=0;while(!u)u=Math.random();return Math.sqrt(-2*Math.log(u))*Math.cos(2*Math.PI*Math.random());}
+function gammaS(a){if(a<1)return gammaS(a+1)*Math.pow(Math.random(),1/a);const d=a-1/3,c=1/Math.sqrt(9*d);for(;;){let x,v;do{x=randn();v=1+c*x}while(v<=0);v=v*v*v;const u=Math.random();if(Math.log(u)<.5*x*x+d-d*v+d*Math.log(v))return d*v;}}
+function betaS(a,b){const x=gammaS(a),y=gammaS(b);return x/(x+y);}
+function binS(n,p){let k=0;for(let i=0;i<n;i++)if(Math.random()<p)k++;return k;}
+function mean(a){let s=0;for(const v of a)s+=v;return s/a.length;}
+function qc(cdf,lo,hi,p,it){for(let i=0;i<(it||100);i++){const m=(lo+hi)/2;if(cdf(m)<p)lo=m;else hi=m}return(lo+hi)/2;}
+function qb(a,b,p){return qc(x=>betai(a,b,x),0,1,p,50);}
+function tcdf(x,v){const t=.5*betai(v/2,.5,v/(v+x*x));return x>0?1-t:t}
+function qn(p){return qc(normCdf,-9,9,p,70)}
+function pois(k,l){return Math.exp(-l+k*Math.log(l)-lgamma(k+1))}
+function binF(n,p){let k=0;for(;;){if(n<=0||p<=0)return k;if(p>=1)return k+n;if(n<=40){for(let i=0;i<n;i++)if(Math.random()<p)k++;return k}const a=1+(n>>1),bb=1+n-a,x=betaS(a,bb);if(x>=p){n=a-1;p=p/x}else{k+=a;n=bb-1;p=(p-x)/(1-x)}}}
+/*ENDMATH*/
+
+const $=id=>document.getElementById(id), val=id=>+$(id).value;
+const C={fg:'#e8ebf5',mu:'#8a93ab',gr:'#232a3d',a:'#6ea8ff',r:'#ff6b81',y:'#ffd166',g:'#4ade80',p:'#c084fc',t:'#5eead4'};
+const store={get(k,d){try{const v=JSON.parse(localStorage.getItem(k));return v==null?d:v}catch(e){return d}},set(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}};
+function stat(l,v,c){return `<div class="stat ${c||''}"><b>${v}</b><span>${l}</span></div>`}
+function f3(x){if(!isFinite(x))return String(x);const a=Math.abs(x);if(a!==0&&(a<1e-3||a>=1e6))return x.toExponential(2);return String(+x.toFixed(a<1?4:a<100?3:a<1000?2:0))}
+function pc(x){return f3(100*x)+'%'}
+const resizers=[];
+function reg(fn){fn();resizers.push(fn)}
+function on(ids,fn){ids.split(' ').forEach(i=>{const e=$(i);e.addEventListener('input',fn);e.addEventListener('change',fn)})}
+let rt;window.addEventListener('resize',()=>{clearTimeout(rt);rt=setTimeout(()=>resizers.forEach(f=>f()),150)});
+document.querySelectorAll('input[type=range]').forEach(i=>{const o=$(i.id+'v');if(!o)return;const f=()=>{o.textContent=i.value};i.addEventListener('input',f);f()});
+
+function nice(x){const e=Math.pow(10,Math.floor(Math.log10(x))),f=x/e;return (f<1.5?1:f<3?2:f<7?5:10)*e}
+function mk(cv,x0,x1,ymax,o){o=o||{};const y0=o.y0||0,dpr=window.devicePixelRatio||1,r=cv.getBoundingClientRect(),w=r.width||600,h=r.height||270;
+ cv.width=w*dpr;cv.height=h*dpr;const g=cv.getContext('2d');g.setTransform(dpr,0,0,dpr,0,0);g.clearRect(0,0,w,h);
+ const L=o.L||42,R=12,T=14,B=28,X=x=>L+(x-x0)/(x1-x0)*(w-L-R),Y=y=>h-B-(y-y0)/(ymax-y0)*(h-T-B);
+ g.font='11px system-ui';g.lineWidth=1;g.strokeStyle=C.gr;g.fillStyle=C.mu;
+ if(!o.noGrid){const sx=nice((x1-x0)/7);for(let x=Math.ceil(x0/sx-1e-9)*sx;!o.noX&&x<=x1+1e-9;x+=sx){g.beginPath();g.moveTo(X(x),T);g.lineTo(X(x),h-B);g.stroke();g.textAlign='center';g.fillText(String(+x.toFixed(6)),X(x),h-B+15)}
+ const sy=nice((ymax-y0)/4);for(let y=Math.ceil(y0/sy-1e-9)*sy;y<=ymax+1e-9;y+=sy){g.beginPath();g.moveTo(L,Y(y));g.lineTo(w-R,Y(y));g.stroke();g.textAlign='right';g.fillText(String(+y.toFixed(4)),L-5,Y(y)+3)}}
+ return{g,w,h,X,Y,L,R,T,B,
+  line(f,col,lw,a,b,n,dash){a=a==null?x0:a;b=b==null?x1:b;n=n||260;g.save();if(dash)g.setLineDash([5,4]);g.beginPath();g.strokeStyle=col;g.lineWidth=lw||2;let st=false;for(let i=0;i<=n;i++){const x=a+(b-a)*i/n,y=f(x);if(!isFinite(y)){st=false;continue}st?g.lineTo(X(x),Y(y)):g.moveTo(X(x),Y(y));st=true}g.stroke();g.restore()},
+  area(f,a,b,col,n){a=Math.max(a,x0);b=Math.min(b,x1);if(b<=a)return;n=n||200;g.beginPath();g.moveTo(X(a),Y(0));for(let i=0;i<=n;i++){const x=a+(b-a)*i/n;g.lineTo(X(x),Y(f(x)))}g.lineTo(X(b),Y(0));g.closePath();g.fillStyle=col;g.fill()},
+  vline(x,col,lab,dash){g.save();g.strokeStyle=col;g.lineWidth=1.6;if(dash)g.setLineDash([5,4]);g.beginPath();g.moveTo(X(x),T);g.lineTo(X(x),h-B);g.stroke();g.restore();if(lab){g.fillStyle=col;g.textAlign='center';g.fillText(lab,Math.min(Math.max(X(x),34),w-34),T+10)}},
+  hline(y,col,lab){g.save();g.strokeStyle=col;g.lineWidth=1.4;g.setLineDash([5,4]);g.beginPath();g.moveTo(L,Y(y));g.lineTo(w-R,Y(y));g.stroke();g.restore();if(lab){g.fillStyle=col;g.textAlign='right';g.fillText(lab,w-R-3,Y(y)-4)}},
+  text(s,x,y,col,al){g.fillStyle=col||C.fg;g.textAlign=al||'left';g.fillText(s,x,y)}};}
+
+/* ---------- shared helpers for this page ---------- */
+const D={
+ norm:{n:'Normal(0,1)',s:()=>randn(),mu:0,sd:1,sk:0},
+ unif:{n:'Uniform(0,1)',s:()=>Math.random(),mu:.5,sd:Math.sqrt(1/12),sk:0},
+ expo:{n:'Exponential(1)',s:()=>-Math.log(1-Math.random()),mu:1,sd:1,sk:2},
+ logn:{n:'Lognormal(0,1)',s:()=>Math.exp(randn()),mu:Math.exp(.5),sd:Math.sqrt((Math.E-1)*Math.E),sk:(Math.E+2)*Math.sqrt(Math.E-1),disc:0},
+ b05:{n:'Bernoulli(0.5)',s:()=>Math.random()<.5?1:0,mu:.5,sd:.5,sk:0,disc:1},
+ b05s:{n:'Bernoulli(0.05)',s:()=>Math.random()<.05?1:0,mu:.05,sd:Math.sqrt(.0475),sk:.9/Math.sqrt(.0475),disc:1},
+ bimo:{n:'Two humps',s:()=>(Math.random()<.5?-2:2)+.5*randn(),mu:0,sd:Math.sqrt(4.25),sk:0},
+ par5:{n:'Pareto(α=5)',s:()=>Math.pow(1-Math.random(),-.2),mu:1.25,sd:Math.sqrt(5/48),sk:6*Math.sqrt(.6)},
+ cauchy:{n:'Cauchy (no mean)',s:()=>Math.tan(Math.PI*(Math.random()-.5)),mu:NaN,sd:Infinity,sk:NaN}
+};
+function fillSel(id,keys,def){const e=$(id);e.innerHTML=keys.map(k=>`<option value="${k}">${D[k].n}</option>`).join('');e.value=def}
+const PAL=[C.a,C.r,C.y,C.g,C.p,C.t,'#ff9f43','#9aa4bf'];
+function tgrid(N,M){const T=[];let prev=0;for(let i=0;i<M;i++){let n=Math.round(Math.pow(10,Math.log10(N)*i/(M-1)));if(i===M-1)n=N;n=Math.max(prev+1,n);if(n>N)break;T.push(n);prev=n}if(T[T.length-1]!==N)T[T.length-1]=N;return T}
+function nlab(n){return n>=1e6?(n/1e6)+'M':n>=1000?(n/1000)+'k':String(n)}
+function customGrid(P,xt,yt){const g=P.g;g.save();g.strokeStyle=C.gr;g.fillStyle=C.mu;g.font='11px system-ui';g.lineWidth=1;
+ xt.forEach(([v,l])=>{g.beginPath();g.moveTo(P.X(v),P.T);g.lineTo(P.X(v),P.h-P.B);g.stroke();g.textAlign='center';g.fillText(l,P.X(v),P.h-P.B+15)});
+ yt.forEach(([v,l])=>{g.beginPath();g.moveTo(P.L,P.Y(v));g.lineTo(P.w-P.R,P.Y(v));g.stroke();g.textAlign='right';g.fillText(l,P.L-5,P.Y(v)+3)});g.restore()}
+function clip(P,fn){const g=P.g;g.save();g.beginPath();g.rect(P.L,P.T,P.w-P.L-P.R,P.h-P.T-P.B);g.clip();fn();g.restore()}
+function poly(P,pts,col,lw,dash){const g=P.g;g.save();if(dash)g.setLineDash([5,4]);g.strokeStyle=col;g.lineWidth=lw||2;g.beginPath();pts.forEach(([x,y],i)=>i?g.lineTo(P.X(x),P.Y(y)):g.moveTo(P.X(x),P.Y(y)));g.stroke();g.restore()}
+function dots(P,pts,col,r){const g=P.g;g.fillStyle=col;pts.forEach(([x,y])=>{g.beginPath();g.arc(P.X(x),P.Y(y),r||3,0,7);g.fill()})}
+function niceTicks(lo,hi,k){const st=nice((hi-lo)/(k||5)),a=[];for(let v=Math.ceil(lo/st-1e-9)*st;v<=hi+1e-9;v+=st)a.push([v,String(+v.toFixed(6))]);return a}
+function logTicks(lo,hi){const a=[];for(let e=Math.ceil(lo-1e-9);e<=hi+1e-9;e++)a.push([e,nlab(Math.pow(10,e))]);return a}
+function mom(a){const n=a.length;let m=0;for(const v of a)m+=v;m/=n;let v2=0,v3=0,v4=0;for(const v of a){const d=v-m;v2+=d*d;v3+=d*d*d;v4+=d*d*d*d}v2/=n;v3/=n;v4/=n;const sd=Math.sqrt(v2);return{n,m,sd,sk:sd>0?v3/(sd*sd*sd):0,ku:v2>0?v4/(v2*v2)-3:0}}
+function ksN(z){const a=Array.from(z).sort((x,y)=>x-y),n=a.length;let d=0;for(let i=0;i<n;i++){const F=normCdf(a[i]);d=Math.max(d,Math.abs((i+1)/n-F),Math.abs(i/n-F))}return d}
+/* histogram of data as density with optional overlay curves [{f,col,lw,dash}] */
+function hist(cv,data,lo,hi,bins,ov,col){const cnt=new Float64Array(bins),bw=(hi-lo)/bins;let n=0;for(const v of data){if(v<lo||v>=hi)continue;cnt[Math.floor((v-lo)/bw)]++;n++}
+ const N=data.length;let ym=0;for(let i=0;i<bins;i++){cnt[i]/=N*bw;ym=Math.max(ym,cnt[i])}
+ (ov||[]).forEach(o=>{for(let i=0;i<=80;i++)ym=Math.max(ym,o.f(lo+(hi-lo)*i/80)||0)});
+ const P=mk(cv,lo,hi,ym*1.12);
+ P.g.fillStyle=col||'rgba(110,168,255,.5)';for(let i=0;i<bins;i++){if(cnt[i]<=0)continue;const a=P.X(lo+i*bw),b=P.X(lo+(i+1)*bw);P.g.fillRect(a,P.Y(cnt[i]),Math.max(1,b-a-1),P.Y(0)-P.Y(cnt[i]))}
+ (ov||[]).forEach(o=>P.line(o.f,o.col,o.lw||2.4,lo,hi,200,o.dash));return P}
+const fmt=x=>f3(x);
+
+/* ---------- shared for this page ---------- */
+const POPS=['norm','unif','expo','logn','bimo','par5'];
+D.norm.med=0;D.norm.q90=1.2815516;D.unif.med=.5;D.unif.q90=.9;D.expo.med=Math.LN2;D.expo.q90=Math.log(10);D.logn.med=1;D.logn.q90=Math.exp(1.2815516);
+D.bimo.med=0;D.bimo.q90=qc(x=>.5*normCdf((x+2)/.5)+.5*normCdf((x-2)/.5),-10,10,.9,80);D.par5.med=Math.pow(2,.2);D.par5.q90=Math.pow(10,.2);
+const SF={mean:a=>mean(a),median:a=>{const b=Float64Array.from(a).sort(),n=b.length;return n%2?b[(n-1)/2]:(b[n/2-1]+b[n/2])/2},sd:a=>{const n=a.length,m=mean(a);let s=0;for(const v of a)s+=(v-m)*(v-m);return Math.sqrt(s/(n-1))},q90:a=>{const b=Float64Array.from(a).sort();return b[Math.round(.9*(b.length-1))]}};
+function truth(key,st){const d=D[key];return st==='mean'?d.mu:st==='median'?d.med:st==='sd'?d.sd:d.q90}
+const SNAME={mean:'sample mean',median:'sample median',sd:'sample SD',q90:'90th percentile'};
+const N10=[2,3,5,10,20,50,100,200,500,1000];
+function pct(a,p){const b=Float64Array.from(a).sort();return b[Math.min(b.length-1,Math.max(0,Math.floor(p*b.length)))]}
+function histLines(cv,arrs,cols,lo,hi,bins,vl){const bw=(hi-lo)/bins,dens=arrs.map(a=>{const c=new Float64Array(bins);for(const v of a){if(v<lo||v>=hi)continue;c[Math.floor((v-lo)/bw)]++}for(let i=0;i<bins;i++)c[i]/=a.length*bw;return c});let ym=0;dens.forEach(c=>c.forEach(v=>ym=Math.max(ym,v)));const P=mk(cv,lo,hi,ym*1.15||1);
+ dens.forEach((c,k)=>{const pts=[];for(let i=0;i<bins;i++){pts.push([lo+i*bw,c[i]]);pts.push([lo+(i+1)*bw,c[i]])}clip(P,()=>poly(P,pts,cols[k],2.2))});(vl||[]).forEach(v=>P.vline(v[0],v[1],v[2],v[3]));return P}
+function sdOf(a){return mom(a).sd}
+
+/* ---------- ML helpers ---------- */
+function digamma(x){let r=0;while(x<6){r-=1/x;x++}const f=1/(x*x);return r+Math.log(x)-.5/x-f*(1/12-f*(1/120-f/252))}
+function trigamma(x){let r=0;while(x<6){r+=1/(x*x);x++}const f=1/(x*x);return r+1/x+.5*f+f/x*(1/6-f*(1/30-f/42))}
+function poisS(l){if(l<=0)return 0;if(l<30){const L=Math.exp(-l);let k=0,p=1;do{k++;p*=Math.random()}while(p>L);return k-1}const m=Math.floor(.875*l),g=gammaS(m);return g<l?m+poisS(l-g):binF(m-1,l/g)}
+function llb(k,n,p){return(k?k*Math.log(p):0)+(n-k?(n-k)*Math.log(1-p):0)}
+function lrInt(k,n,cut){const ph=k/n,l0=llb(k,n,ph),g=p=>2*(l0-llb(k,n,p))-cut;let lo=0,hi=1;
+ if(k>0){let a=1e-12,b=ph;for(let i=0;i<70;i++){const m=(a+b)/2;if(g(m)>0)a=m;else b=m}lo=(a+b)/2}
+ if(k<n){let a=ph,b=1-1e-12;for(let i=0;i<70;i++){const m=(a+b)/2;if(g(m)>0)b=m;else a=m}hi=(a+b)/2}return[lo,hi]}
+function solveAlpha(s){if(!(s>1e-9))return 1e6;let a=(3-s+Math.sqrt((3-s)*(3-s)+24*s))/(12*s);for(let i=0;i<8;i++){const f=Math.log(a)-digamma(a)-s,fp=1/a-trigamma(a);let n=a-f/fp;if(!(n>0))n=a/2;a=n}return a}
+function normPdfAt(x,m,s){return Math.exp(-(x-m)*(x-m)/(2*s*s))/(s*2.5066282746)}
+/* ---------- Regression helpers ---------- */
+function idx(id,arr,ff){const e=$(id),o=$(id+'v'),f=()=>{o.textContent=ff?ff(arr[+e.value]):arr[+e.value]};e.addEventListener('input',f);f()}
+function scl(id,ff){const e=$(id),o=$(id+'v'),f=()=>{o.textContent=ff(+e.value)};e.addEventListener('input',f);f()}
+function pctTicks(a,b,st){const r=[];for(let v=a;v<=b+1e-9;v+=st)r.push([v,Math.round(v*100)+'%']);return r}
+const _tq={};function tq(v,p){const k=v+'_'+p;return _tq[k]||(_tq[k]=qc(x=>tcdf(x,v),0,500,p,80))}
+function simple(x,y){const n=x.length;let xm=0,ym=0;for(let i=0;i<n;i++){xm+=x[i];ym+=y[i]}xm/=n;ym/=n;let sxx=0,sxy=0,syy=0;for(let i=0;i<n;i++){const dx=x[i]-xm,dy=y[i]-ym;sxx+=dx*dx;sxy+=dx*dy;syy+=dy*dy}const b=sxy/sxx,a=ym-b*xm,res=new Float64Array(n);let sse=0;for(let i=0;i<n;i++){res[i]=y[i]-a-b*x[i];sse+=res[i]*res[i]}return{n,xm,ym,sxx,sxy,syy,b,a,res,sse,sst:syy,r2:1-sse/syy}}
+function gj(A,B){const p=A.length;const M=A.map((r,i)=>Array.from(r).concat(B?[B[i]]:[]));for(let c=0;c<p;c++){let m=c;for(let r=c+1;r<p;r++)if(Math.abs(M[r][c])>Math.abs(M[m][c]))m=r;[M[c],M[m]]=[M[m],M[c]];const d=M[c][c]||1e-12;for(let k=c;k<M[c].length;k++)M[c][k]/=d;for(let r=0;r<p;r++)if(r!==c){const f=M[r][c];if(f!==0)for(let k=c;k<M[c].length;k++)M[r][k]-=f*M[c][k]}}return M}
+function olsMulti(cols,y,needInv){const n=y.length,k=cols.length,p=k+1,A=[],B=new Float64Array(p);for(let i=0;i<p;i++)A.push(new Float64Array(p));
+ for(let r=0;r<n;r++){const row=[1];for(let j=0;j<k;j++)row.push(cols[j][r]);for(let i=0;i<p;i++){B[i]+=row[i]*y[r];for(let j=i;j<p;j++)A[i][j]+=row[i]*row[j]}}
+ for(let i=0;i<p;i++){for(let j=0;j<i;j++)A[i][j]=A[j][i];if(i>0)A[i][i]+=1e-9}
+ let beta,inv=null;if(needInv){const I=[];for(let i=0;i<p;i++){const e=new Float64Array(p);e[i]=1;I.push(e)}const M=gj(A,null);const aug=A.map((r,i)=>Array.from(r).concat(Array.from(I[i])));
+  const m=aug;for(let c=0;c<p;c++){let q=c;for(let r=c+1;r<p;r++)if(Math.abs(m[r][c])>Math.abs(m[q][c]))q=r;[m[c],m[q]]=[m[q],m[c]];const d=m[c][c]||1e-12;for(let kk=0;kk<2*p;kk++)m[c][kk]/=d;for(let r=0;r<p;r++)if(r!==c){const f=m[r][c];if(f!==0)for(let kk=0;kk<2*p;kk++)m[r][kk]-=f*m[c][kk]}}
+  inv=m.map(r=>r.slice(p));beta=inv.map(r=>{let s=0;for(let j=0;j<p;j++)s+=r[j]*B[j];return s})}
+ else{const M=gj(A,B);beta=M.map(r=>r[p])}
+ const res=new Float64Array(n);let sse=0;for(let r=0;r<n;r++){let f=beta[0];for(let j=0;j<k;j++)f+=beta[j+1]*cols[j][r];res[r]=y[r]-f;sse+=res[r]*res[r]}
+ const out={beta,res,sse,n,p,inv};if(inv){const s2=sse/(n-p);out.s2=s2;out.se=inv.map((r,i)=>Math.sqrt(s2*r[i]))}return out}
+function scatterAxes(cv,xs,ys,xlo,xhi,ylo,yhi,L){return mk(cv,xlo,xhi,yhi,{y0:ylo,L:L||44})}
+function range(a,pad){let lo=1e99,hi=-1e99;for(const v of a){if(v<lo)lo=v;if(v>hi)hi=v}const w=(hi-lo)||1;return[lo-(pad||.05)*w,hi+(pad||.05)*w]}
+
+
+function bars(P,groups,cols,yt){/* groups: array of arrays of values (0..1) */const g=P.g,G=groups.length,B=groups[0].length,W=(P.w-P.L-P.R)/G;groups.forEach((vals,gi)=>vals.forEach((v,bi)=>{const bw=W*.78/B,x=P.L+W*gi+W*.11+bw*bi;g.fillStyle=cols[bi];g.fillRect(x,P.Y(v),bw-2,P.Y(0)-P.Y(v));g.fillStyle=C.fg;g.textAlign='center';g.font='10px system-ui';g.fillText(Math.round(v*100)+'%',x+bw/2-1,P.Y(v)-3)}));g.font='11px system-ui'}
+function gridG(P,yt,labels){customGrid(P,[],yt);const G=labels.length,W=(P.w-P.L-P.R)/G;P.g.fillStyle=C.mu;P.g.textAlign='center';labels.forEach((l,i)=>P.g.fillText(l,P.L+W*(i+.5),P.h-P.B+15))}
+function legend(P,items,y){let x=P.L+8;items.forEach(([s,c])=>{P.text('■ '+s,x,y,c);x+=P.g.measureText('■ '+s).width+16})}
+
+/* ---------- GLM machinery ---------- */
+const LK={logit:{mu:e=>1/(1+Math.exp(-e)),d:e=>{const m=1/(1+Math.exp(-e));return m*(1-m)}},
+ probit:{mu:e=>normCdf(e),d:e=>npdf(e)},
+ cll:{mu:e=>1-Math.exp(-Math.exp(e)),d:e=>Math.exp(e-Math.exp(e))},
+ log:{mu:e=>Math.exp(e),d:e=>Math.exp(e)}};
+function minv(A){const p=A.length,m=A.map((r,i)=>{const row=Array.from(r);for(let j=0;j<p;j++)row.push(i===j?1:0);return row});
+ for(let c=0;c<p;c++){let q=c;for(let r=c+1;r<p;r++)if(Math.abs(m[r][c])>Math.abs(m[q][c]))q=r;[m[c],m[q]]=[m[q],m[c]];const d=m[c][c]||1e-12;for(let k=0;k<2*p;k++)m[c][k]/=d;for(let r=0;r<p;r++)if(r!==c){const f=m[r][c];if(f!==0)for(let k=0;k<2*p;k++)m[r][k]-=f*m[c][k]}}
+ return m.map(r=>r.slice(p))}
+function glm(cols,y,o){o=o||{};const n=y.length,k=cols.length,p=k+1,fam=o.fam||'binom',L=LK[o.link||(fam==='pois'?'log':'logit')],off=o.off,X=[new Float64Array(n).fill(1)].concat(cols),V=m=>fam==='pois'?m:m*(1-m);
+ let b=new Float64Array(p);if(o.init)b=Float64Array.from(o.init);else if(fam==='pois'){let m=0;for(const v of y)m+=v;b[0]=Math.log(Math.max(m/n,1e-3))-(off?mean(off):0)}
+ function ev(b){const eta=new Float64Array(n),mu=new Float64Array(n);let ll=0;for(let i=0;i<n;i++){let e=off?off[i]:0;for(let j=0;j<p;j++)e+=b[j]*X[j][i];e=Math.max(-30,Math.min(30,e));eta[i]=e;let m=L.mu(e);m=fam==='binom'?Math.min(1-1e-12,Math.max(1e-12,m)):Math.max(m,1e-12);mu[i]=m;ll+=fam==='pois'?y[i]*Math.log(m)-m-lgamma(y[i]+1):y[i]*Math.log(m)+(1-y[i])*Math.log(1-m)}return{eta,mu,ll}}
+ function info(c){const A=[];for(let i=0;i<p;i++)A.push(new Float64Array(p));const w=new Float64Array(n);for(let r=0;r<n;r++){const d=L.d(c.eta[r]),wi=d*d/V(c.mu[r]);w[r]=wi;for(let i=0;i<p;i++){const xi=X[i][r]*wi;for(let j=i;j<p;j++)A[i][j]+=xi*X[j][r]}}for(let i=0;i<p;i++)for(let j=0;j<i;j++)A[i][j]=A[j][i];return{A,w}}
+ let cur=ev(b),it=0,conv=false,maxit=o.maxit==null?40:o.maxit;
+ for(;it<maxit;it++){const{A,w}=info(cur),Ai=minv(A),g=new Float64Array(p);
+  for(let r=0;r<n;r++){const d=L.d(cur.eta[r]),v=V(cur.mu[r]);let s=(y[r]-cur.mu[r])*d/v;if(o.firth){let h=0;for(let i=0;i<p;i++)for(let j=0;j<p;j++)h+=X[i][r]*Ai[i][j]*X[j][r];h*=w[r];s+=h*(.5-cur.mu[r])}for(let i=0;i<p;i++)g[i]+=X[i][r]*s}
+  const st=new Float64Array(p);let mx=0;for(let i=0;i<p;i++){let s=0;for(let j=0;j<p;j++)s+=Ai[i][j]*g[j];st[i]=s}
+  if(o.firth){for(let i=0;i<p;i++){st[i]=Math.max(-1,Math.min(1,st[i]));mx=Math.max(mx,Math.abs(st[i]))}b=b.map((v,i)=>v+st[i]);cur=ev(b);if(mx<1e-8){conv=true;it++;break}}
+  else{let a=1,nb,nc;for(let h=0;h<25;h++){nb=b.map((v,i)=>v+a*st[i]);nc=ev(nb);if(nc.ll>=cur.ll-1e-10)break;a/=2}for(let i=0;i<p;i++)mx=Math.max(mx,Math.abs(a*st[i]));const dl=Math.abs(nc.ll-cur.ll);b=nb;cur=nc;if(mx<1e-8||dl<1e-11){conv=true;it++;break}}}
+ const{A,w}=info(cur),Ai=minv(A),se=Ai.map((r,i)=>Math.sqrt(Math.max(r[i],0)));let dev;
+ if(fam==='binom')dev=-2*cur.ll;else{dev=0;for(let i=0;i<n;i++){const yy=y[i],m=cur.mu[i];dev+=2*((yy>0?yy*Math.log(yy/m):0)-(yy-m))}}
+ return{beta:b,mu:cur.mu,eta:cur.eta,ll:cur.ll,dev,inv:Ai,se,iter:it,conv,X,w,p,n,A}}
+function auc(sc,y){const n=y.length,idx=Array.from({length:n},(_,i)=>i).sort((a,b)=>sc[a]-sc[b]);let rk=0,np=0,i=0;while(i<n){let j=i;while(j+1<n&&sc[idx[j+1]]===sc[idx[i]])j++;const r=(i+j)/2+1;for(let t=i;t<=j;t++)if(y[idx[t]]===1){rk+=r;np++}i=j+1}const nn=n-np;return np&&nn?(rk-np*(np+1)/2)/(np*nn):.5}
+function sepTest(x,y){let a1=1e99,b1=-1e99,a0=1e99,b0=-1e99,n1=0,n0=0;for(let i=0;i<x.length;i++){if(y[i]===1){n1++;a1=Math.min(a1,x[i]);b1=Math.max(b1,x[i])}else{n0++;a0=Math.min(a0,x[i]);b0=Math.max(b0,x[i])}}return n1>0&&n0>0&&(a1>b0||a0>b1)}
+const sig=e=>1/(1+Math.exp(-e));
+function lgt(p){return Math.log(p/(1-p))}
+function binaryData(n,a,b,sd){const x=new Float64Array(n),y=new Float64Array(n);for(let i=0;i<n;i++){x[i]=(sd||1)*randn();y[i]=Math.random()<sig(a+b*x[i])?1:0}return{x,y}}
+function heat(P,gx,gy,vals,x0,x1,y0,y1){const g=P.g,nx=gx,ny=gy;let mn=1e99,mx=-1e99;vals.forEach(v=>{if(isFinite(v)){mn=Math.min(mn,v);mx=Math.max(mx,v)}});mn=Math.max(mn,mx-30);for(let i=0;i<nx;i++)for(let j=0;j<ny;j++){const v=vals[i*ny+j],t=isFinite(v)?Math.max(0,Math.min(1,(v-mn)/(mx-mn))):0,tt=Math.pow(t,1.6),c=Math.round(40+190*tt);g.fillStyle=`rgb(${Math.round(20+60*tt)},${Math.round(30+100*tt)},${c})`;const xa=P.X(x0+(x1-x0)*i/nx),xb=P.X(x0+(x1-x0)*(i+1)/nx),ya=P.Y(y0+(y1-y0)*j/ny),yb=P.Y(y0+(y1-y0)*(j+1)/ny);g.fillRect(xa,Math.min(ya,yb),xb-xa+1,Math.abs(ya-yb)+1)}}
+/* ---------- confounding helpers ---------- */
+const U01=()=>1-Math.random();
+function sdv(a){const m=mean(a);let s=0;for(const v of a)s+=(v-m)*(v-m);return Math.sqrt(s/Math.max(a.length-1,1))}
+function barV(cv,vals,cols,labs,ymax,ff){const P=mk(cv,0,vals.length,ymax,{y0:0,noGrid:true,L:50});customGrid(P,[],niceTicks(0,ymax,5));const W=(P.w-P.L-P.R)/vals.length,g=P.g;vals.forEach((v,i)=>{const w=W*.5,x=P.L+W*i+W*.25;g.fillStyle=cols[i];g.fillRect(x,P.Y(v),w,P.Y(0)-P.Y(v));g.fillStyle=C.fg;g.textAlign='center';g.fillText((ff||fmt)(v),x+w/2,P.Y(v)-4);g.fillStyle=C.mu;g.fillText(labs[i],x+w/2,P.h-P.B+15)});return P}
+function barL(cv,vals,cols,labs,lo,hi,ff){const P=mk(cv,0,vals.length,hi,{y0:lo,noGrid:true,L:50});customGrid(P,[],niceTicks(lo,hi,5));const W=(P.w-P.L-P.R)/vals.length,g=P.g;vals.forEach((v,i)=>{const w=W*.5,x=P.L+W*i+W*.25;g.fillStyle=cols[i];g.fillRect(x,P.Y(v),w,P.Y(lo)-P.Y(v));g.fillStyle=C.fg;g.textAlign='center';g.fillText((ff||fmt)(v),x+w/2,P.Y(v)-4);g.fillStyle=C.mu;g.fillText(labs[i],x+w/2,P.h-P.B+15)});return P}
+const avg=a=>{let s=0;for(const v of a)s+=v;return s/a.length};
+function corr(a,b){const n=a.length;let ma=0,mb=0;for(let i=0;i<n;i++){ma+=a[i];mb+=b[i]}ma/=n;mb/=n;let sa=0,sb=0,sab=0;for(let i=0;i<n;i++){const x=a[i]-ma,y=b[i]-mb;sa+=x*x;sb+=y*y;sab+=x*y}return sab/Math.sqrt(sa*sb||1e-12)}
+const pcor=(x,y,z)=>corr(simple(z,x).res,simple(z,y).res);
+const lin=(n,f)=>{const a=new Float64Array(n);for(let i=0;i<n;i++)a[i]=f(i);return a};
+const rn=(n,s)=>lin(n,()=>(s||1)*randn());
+/* signed bars from zero */
+function barZ(cv,vals,cols,labs,lo,hi,ff){const P=mk(cv,0,vals.length,hi,{y0:lo,noGrid:true,L:50});customGrid(P,[],niceTicks(lo,hi,5));const W=(P.w-P.L-P.R)/vals.length,g=P.g;vals.forEach((v,i)=>{const w=W*.5,x=P.L+W*i+W*.25,y0=P.Y(0),y1=P.Y(v);g.fillStyle=cols[i];g.fillRect(x,Math.min(y0,y1),w,Math.abs(y0-y1));g.fillStyle=C.fg;g.textAlign='center';g.fillText((ff||fmt)(v),x+w/2,v>=0?y1-4:y1+13);g.fillStyle=C.mu;g.fillText(labs[i],x+w/2,P.h-P.B+15)});P.hline(0,C.mu,'');return P}
+/* grouped signed bars: groups[g][b] */
+function barG(cv,groups,cols,glabs,lo,hi,ff){const P=mk(cv,0,groups.length,hi,{y0:lo,noGrid:true,L:50});customGrid(P,[],niceTicks(lo,hi,5));const G=groups.length,B=groups[0].length,W=(P.w-P.L-P.R)/G,g=P.g;groups.forEach((vs,gi)=>vs.forEach((v,bi)=>{const bw=W*.7/B,x=P.L+W*gi+W*.15+bw*bi,y0=P.Y(0),y1=P.Y(v);g.fillStyle=cols[bi];g.fillRect(x,Math.min(y0,y1),bw-3,Math.abs(y0-y1));g.fillStyle=C.fg;g.textAlign='center';g.font='10px system-ui';g.fillText((ff||fmt)(v),x+bw/2-1,v>=0?y1-3:y1+11)}));g.font='11px system-ui';g.fillStyle=C.mu;g.textAlign='center';glabs.forEach((l,i)=>g.fillText(l,P.L+W*(i+.5),P.h-P.B+15));P.hline(0,C.mu,'');return P}
+/* scatter with optional per-point colours; draws at most nmax points */
+function scat(P,xs,ys,col,nmax,r,colf){const n=xs.length,st=Math.max(1,Math.floor(n/(nmax||500))),pts=[];clip(P,()=>{for(let i=0;i<n;i+=st){P.g.fillStyle=colf?colf(i):col;P.g.beginPath();P.g.arc(P.X(xs[i]),P.Y(ys[i]),r||2.2,0,7);P.g.fill()}})}
+function fitLine(P,s,col,lw,dash,x0,x1){clip(P,()=>P.line(x=>s.a+s.b*x,col,lw||2,x0,x1,2,dash))}
+const ordIdx=p=>Array.from({length:p.length},(_,i)=>i).sort((a,b)=>p[a]-p[b]);
+/* ---------- experiment helpers ---------- */
+const sgn=v=>(v>=0?'+':'−')+Math.abs(v).toFixed(3);
+const rng2=(a,b,pad)=>range(Array.from(a).concat(Array.from(b)),pad||.05);
+const pct0=x=>Math.round(x*100)+'%';
+const lgs=x=>1/(1+Math.exp(-x));
+function rgam(a){if(a<1)return rgam(a+1)*Math.pow(U01(),1/a);const d=a-1/3,c=1/Math.sqrt(9*d);for(;;){let x,v;do{x=randn();v=1+c*x}while(v<=0);v=v*v*v;const u=U01();if(u<1-.0331*x*x*x*x||Math.log(u)<.5*x*x+d*(1-v+Math.log(v)))return d*v}}
+const rbeta=(a,b)=>{const x=rgam(a),y=rgam(b);return x/(x+y)};
+function rbin(n,p){if(n<=30){let k=0;for(let i=0;i<n;i++)if(Math.random()<p)k++;return k}const m=n*p,s=Math.sqrt(n*p*(1-p)),k=Math.round(m+s*randn());return Math.max(0,Math.min(n,k))}
+function welch(a,b){const na=a.length,nb=b.length,ma=avg(a),mb=avg(b);let va=0,vb=0;for(const v of a)va+=(v-ma)*(v-ma);for(const v of b)vb+=(v-mb)*(v-mb);va/=na-1;vb/=nb-1;const se2=va/na+vb/nb,se=Math.sqrt(se2),t=(ma-mb)/se,df=se2*se2/((va/na)*(va/na)/(na-1)+(vb/nb)*(vb/nb)/(nb-1));return{d:ma-mb,se,t,df,p:2*(1-tcdf(Math.abs(t),df))}}
+const diffMeans=(Y,T)=>{let s1=0,s0=0,n1=0,n0=0;for(let i=0;i<Y.length;i++){if(T[i]){s1+=Y[i];n1++}else{s0+=Y[i];n0++}}return s1/n1-s0/n0};
+/* ---------- observational-causal helpers ---------- */
+function logitFit(cols,y){const n=y.length,k=cols.length,p=k+1,b=new Float64Array(p),lin_=i=>{let s=b[0];for(let j=0;j<k;j++)s+=b[j+1]*cols[j][i];return s};
+ for(let it=0;it<30;it++){const A=[];for(let i=0;i<p;i++)A.push(new Float64Array(p));const g=new Float64Array(p);
+  for(let i=0;i<n;i++){const m=lgs(lin_(i)),w=Math.max(m*(1-m),1e-8),r=y[i]-m,row=[1];for(let j=0;j<k;j++)row.push(cols[j][i]);for(let a=0;a<p;a++){g[a]+=row[a]*r;for(let c=a;c<p;c++)A[a][c]+=w*row[a]*row[c]}}
+  for(let a=0;a<p;a++){for(let c=0;c<a;c++)A[a][c]=A[c][a];A[a][a]+=1e-8}
+  const M=gj(A,Array.from(g)),d=M.map(r=>r[p]);let mx=0;for(let a=0;a<p;a++){b[a]+=d[a];mx=Math.max(mx,Math.abs(d[a]))}if(mx<1e-6)break}
+ const pr=new Float64Array(n),lo=new Float64Array(n);for(let i=0;i<n;i++){pr[i]=Math.min(.9999,Math.max(.0001,lgs(lin_(i))));lo[i]=Math.log(pr[i]/(1-pr[i]))}return{beta:b,pr,lo}}
+/* Hajek IPW estimate of the ATE; keep(i)=false drops a unit */
+function ipwATE(Y,T,e,keep){let a1=0,b1=0,a0=0,b0=0;for(let i=0;i<Y.length;i++){if(keep&&!keep(i))continue;if(T[i]){const w=1/e[i];a1+=w*Y[i];b1+=w}else{const w=1/(1-e[i]);a0+=w*Y[i];b0+=w}}return a1/b1-a0/b0}
+function smd(x,T,w){let m1=0,m0=0,w1=0,w0=0,n1=0,n0=0;for(let i=0;i<x.length;i++){const ww=w?w[i]:1;if(T[i]){m1+=ww*x[i];w1+=ww;n1++}else{m0+=ww*x[i];w0+=ww;n0++}}m1/=w1;m0/=w0;let v1=0,v0=0,a1=0,a0=0;for(let i=0;i<x.length;i++){if(T[i]){a1+=x[i]}else a0+=x[i]}a1/=n1;a0/=n0;for(let i=0;i<x.length;i++){if(T[i])v1+=(x[i]-a1)*(x[i]-a1);else v0+=(x[i]-a0)*(x[i]-a0)}v1/=n1-1;v0/=n0-1;return(m1-m0)/Math.sqrt((v1+v0)/2)}
+/* confounded data: X1,X2; treatment strength a; effect tau (function of x1 optional) */
+function confData(n,a,tauF,nl){const X1=rn(n),X2=rn(n),e=lin(n,i=>lgs(a*(.8*X1[i]+.5*X2[i]+(nl?.4*(X1[i]*X1[i]-1):0))/1.5)),T=new Uint8Array(n),Y=new Float64Array(n);
+ for(let i=0;i<n;i++){T[i]=Math.random()<e[i]?1:0;Y[i]=(T[i]?(tauF?tauF(X1[i]):1):0)+X1[i]+.8*X2[i]+(nl?.6*X1[i]*X1[i]:0)+randn()}return{X1,X2,T,Y,e}}
+/* one-to-one nearest-neighbour matching with replacement on a score; returns ATT and the matched control index per treated unit (-1 if dropped) */
+function matchATT(sc,T,Y,cal){const ctr=[];for(let i=0;i<T.length;i++)if(!T[i])ctr.push(i);ctr.sort((a,b)=>sc[a]-sc[b]);const cs=ctr.map(i=>sc[i]),m=new Int32Array(T.length).fill(-1);let sum=0,k=0;
+ for(let i=0;i<T.length;i++){if(!T[i])continue;let lo=0,hi=cs.length-1;while(lo<hi){const mid=(lo+hi)>>1;if(cs[mid]<sc[i])lo=mid+1;else hi=mid}let b=lo;if(lo>0&&Math.abs(cs[lo-1]-sc[i])<Math.abs(cs[lo]-sc[i]))b=lo-1;if(Math.abs(cs[b]-sc[i])>cal)continue;m[i]=ctr[b];sum+=Y[i]-Y[ctr[b]];k++}return{att:sum/k,m,kept:k}}
+const quant=(a,p)=>{const b=Float64Array.from(a).sort();return b[Math.min(b.length-1,Math.floor(p*b.length))]};
+/* ---------- MCMC helpers ---------- */
+function acfv(x,K){const n=x.length;let m=0;for(let i=0;i<n;i++)m+=x[i];m/=n;const c=new Float64Array(K+1);for(let k=0;k<=K;k++){let s=0;for(let i=0;i+k<n;i++)s+=(x[i]-m)*(x[i+k]-m);c[k]=s/n}const r=new Float64Array(K+1);for(let k=0;k<=K;k++)r[k]=c[0]>0?c[k]/c[0]:0;return r}
+/* effective sample size with Geyer's initial positive sequence */
+function essOf(x,K){K=Math.min(K||150,x.length-2);if(K<2)return x.length;const r=acfv(x,K);let sum=0;for(let t=0;2*t+1<=K;t++){const g=r[2*t]+r[2*t+1];if(g<=0)break;sum+=g}const tau=Math.max(2*sum-1,.2);return x.length/tau}
+/* random-walk Metropolis for a 1-d log density */
+function mhRW(logp,x0,step,n){const x=new Float64Array(n);let c=x0,lc=logp(c),acc=0;for(let i=0;i<n;i++){const y=c+step*randn(),ly=logp(y);if(Math.log(Math.random())<ly-lc){c=y;lc=ly;acc++}x[i]=c}return{x,acc:acc/n}}
+/* split R-hat of an array of chains (each an array of equal length) */
+function rhatOf(ch){const seq=[];ch.forEach(c=>{const h=Math.floor(c.length/2);if(h<2)return;seq.push(c.slice(0,h));seq.push(c.slice(h,2*h))});const m=seq.length,n=seq[0]?seq[0].length:0;if(m<2||n<2)return NaN;const mu=seq.map(s=>{let a=0;for(const v of s)a+=v;return a/n}),va=seq.map((s,i)=>{let a=0;for(const v of s)a+=(v-mu[i])*(v-mu[i]);return a/(n-1)});const W=va.reduce((a,b)=>a+b,0)/m,gm=mu.reduce((a,b)=>a+b,0)/m;let B=0;for(const v of mu)B+=(v-gm)*(v-gm);B*=n/(m-1);const vp=(n-1)/n*W+B/n;return Math.sqrt(vp/Math.max(W,1e-12))}
+/* grid posterior from an unnormalised log density */
+function gridPost(logf,lo,hi,N){N=N||900;const x=new Float64Array(N),f=new Float64Array(N);let mx=-1e300;for(let i=0;i<N;i++){x[i]=lo+(hi-lo)*i/(N-1);f[i]=logf(x[i]);if(f[i]>mx)mx=f[i]}let Z=0;const h=(hi-lo)/(N-1);for(let i=0;i<N;i++){f[i]=Math.exp(f[i]-mx);Z+=f[i]*h}const pdf=new Float64Array(N),cdf=new Float64Array(N);let c=0,m1=0,m2=0;for(let i=0;i<N;i++){pdf[i]=f[i]/Z;c+=pdf[i]*h;cdf[i]=c;m1+=x[i]*pdf[i]*h;m2+=x[i]*x[i]*pdf[i]*h}
+ const q=u=>{let a=0,b=N-1;while(b-a>1){const m=(a+b)>>1;if(cdf[m]<u)a=m;else b=m}const d=cdf[b]-cdf[a];return x[a]+(d>0?(u-cdf[a])/d:0)*(x[b]-x[a])};
+ const pd=v=>{if(v<=lo||v>=hi)return 0;const t=(v-lo)/(hi-lo)*(N-1),i=Math.floor(t);return pdf[i]+(t-i)*(pdf[Math.min(i+1,N-1)]-pdf[i])};
+ const cd=v=>{if(v<=lo)return 0;if(v>=hi)return 1;const t=(v-lo)/(hi-lo)*(N-1),i=Math.floor(t);return cdf[i]+(t-i)*(cdf[Math.min(i+1,N-1)]-cdf[i])};
+ return{x,pdf,cdf,mean:m1,sd:Math.sqrt(Math.max(m2-m1*m1,0)),q,pd,cd}}
+const tpdf=(x,v)=>Math.exp(lgamma((v+1)/2)-lgamma(v/2))/Math.sqrt(v*Math.PI)*Math.pow(1+x*x/v,-(v+1)/2);
+const rtv=v=>randn()/Math.sqrt(2*gammaS(v/2)/v);
+const expit=x=>1/(1+Math.exp(-x)),logit=p=>Math.log(p/(1-p));
+function invMat(A){const n=A.length,M=A.map((r,i)=>{const a=Array.from(r);for(let j=0;j<n;j++)a.push(i===j?1:0);return a});for(let c=0;c<n;c++){let m=c;for(let r=c+1;r<n;r++)if(Math.abs(M[r][c])>Math.abs(M[m][c]))m=r;[M[c],M[m]]=[M[m],M[c]];const d=M[c][c]||1e-12;for(let k=0;k<2*n;k++)M[c][k]/=d;for(let r=0;r<n;r++)if(r!==c){const f=M[r][c];if(f!==0)for(let k=0;k<2*n;k++)M[r][k]-=f*M[c][k]}}return M.map(r=>r.slice(n))}
+function cholL(S){const n=S.length,L=S.map(()=>new Float64Array(n));for(let i=0;i<n;i++)for(let j=0;j<=i;j++){let s=S[i][j];for(let k=0;k<j;k++)s-=L[i][k]*L[j][k];L[i][j]=i===j?Math.sqrt(Math.max(s,1e-12)):s/L[j][j]}return L}
+function logdetM(A){const n=A.length,M=A.map(r=>Array.from(r));let ld=0;for(let c=0;c<n;c++){let m=c;for(let r=c+1;r<n;r++)if(Math.abs(M[r][c])>Math.abs(M[m][c]))m=r;[M[c],M[m]]=[M[m],M[c]];ld+=Math.log(Math.abs(M[c][c])||1e-300);for(let r=c+1;r<n;r++){const f=M[r][c]/M[c][c];for(let k=c;k<n;k++)M[r][k]-=f*M[c][k]}}return ld}
+/* Gauss-Hermite nodes (21 points, probabilists' weights summing to 1) from the Golub-Welsch idea: computed numerically on a fine normal grid instead */
+const GH=(()=>{const z=[],w=[];let s=0;for(let i=0;i<41;i++){const v=-4+8*i/40,p=Math.exp(-v*v/2);z.push(v);w.push(p);s+=p}return{z,w:w.map(v=>v/s)}})();
+/* log-log tick helper for axes holding log10 values */
+const lg10=v=>Math.log10(Math.max(v,1e-12));
+const pc1=x=>(100*x).toFixed(1)+'%';
+/* density curves with optional fill: curves=[{f,col,fill,dash,lw}] ; returns P */
+function dcurves(cv,x0,x1,curves,vl,ref){let ym=0,yr=0;curves.forEach((c,k)=>{for(let i=0;i<=300;i++){const v=c.f(x0+(x1-x0)*i/300);if(isFinite(v)){ym=Math.max(ym,v);if(k===(ref==null?curves.length-1:ref))yr=Math.max(yr,v)}}});
+ const top=Math.min(ym,yr*2.5)||ym||1,P=mk(cv,x0,x1,top*1.12);clip(P,()=>curves.forEach(c=>{if(c.fill)P.area(c.f,x0,x1,c.fill,240);P.line(c.f,c.col,c.lw||2.4,x0,x1,300,c.dash)}));(vl||[]).forEach(v=>P.vline(v[0],v[1],null,v[3]));return P}
+/* solve (A + lam I) beta = b and return diag of the inverse (A symmetric p x p) */
+function ridgeSolve(A,b,lam){const p=b.length,M=[];for(let i=0;i<p;i++){const r=new Float64Array(2*p+1);for(let j=0;j<p;j++)r[j]=A[i][j]+(i===j?lam:0);r[p+i]=1;r[2*p]=b[i];M.push(r)}
+ for(let c=0;c<p;c++){let m=c;for(let r=c+1;r<p;r++)if(Math.abs(M[r][c])>Math.abs(M[m][c]))m=r;[M[c],M[m]]=[M[m],M[c]];const d=M[c][c]||1e-12;for(let k=0;k<=2*p;k++)M[c][k]/=d;for(let r=0;r<p;r++)if(r!==c){const f=M[r][c];if(f!==0)for(let k=0;k<=2*p;k++)M[r][k]-=f*M[c][k]}}
+ return{beta:M.map(r=>r[2*p]),dinv:M.map((r,i)=>r[p+i])}}
+/* ---------- Copula helpers ---------- */
+const cpU=()=>{let u=Math.random();while(u<=1e-12||u>=1-1e-12)u=Math.random();return u};
+function cpQn(p){if(p<=0)return -9;if(p>=1)return 9;const a=[-39.69683028665376,220.9460984245205,-275.9285104469687,138.357751867269,-30.66479806614716,2.506628277459239],b=[-54.47609879822406,161.5858368580409,-155.6989798598866,66.80131188771972,-13.28068155288572],c=[-.007784894002430293,-.3223964580411365,-2.400758277161838,-2.549732539343734,4.374664141464968,2.938163982698783],d=[.007784695709041462,.3224671290700398,2.445134137142996,3.754408661907416];const pl=.02425;let q,r;if(p<pl){q=Math.sqrt(-2*Math.log(p));return(((((c[0]*q+c[1])*q+c[2])*q+c[3])*q+c[4])*q+c[5])/((((d[0]*q+d[1])*q+d[2])*q+d[3])*q+1)}if(p>1-pl){q=Math.sqrt(-2*Math.log(1-p));return-(((((c[0]*q+c[1])*q+c[2])*q+c[3])*q+c[4])*q+c[5])/((((d[0]*q+d[1])*q+d[2])*q+d[3])*q+1)}q=p-.5;r=q*q;return(((((a[0]*r+a[1])*r+a[2])*r+a[3])*r+a[4])*r+a[5])*q/(((((b[0]*r+b[1])*r+b[2])*r+b[3])*r+b[4])*r+1)}
+/* bivariate normal cdf by quadrature */
+function cpBvn(a,b,rho){if(a<-8||b<-8)return 0;const lo=-8,hi=Math.min(a,8),n=160,h=(hi-lo)/n,s=Math.sqrt(1-rho*rho);let t=0;for(let i=0;i<=n;i++){const x=lo+i*h,w=(i===0||i===n)?1:(i%2?4:2);t+=w*Math.exp(-x*x/2)/2.5066282746*normCdf((b-rho*x)/s)}return t*h/3}
+/* Kendall tau to parameter */
+function cpTauFrank(th){if(Math.abs(th)<1e-6)return 0;const n=200,h=th/n;let s=0;for(let i=0;i<=n;i++){const t=i*h,f=i===0?1:t/(Math.exp(t)-1),w=(i===0||i===n)?1:(i%2?4:2);s+=w*f}const D=s*h/3/th;return 1-4/th*(1-D)}
+function cpFrankTh(tau){let lo=.01,hi=60;for(let i=0;i<50;i++){const m=(lo+hi)/2;if(cpTauFrank(m)<tau)lo=m;else hi=m}return(lo+hi)/2}
+function cpPar(fam,tau){if(fam==='gauss'||fam==='t')return Math.sin(Math.PI*tau/2);if(fam==='clayton')return 2*tau/(1-tau);if(fam==='gumbel')return 1/(1-tau);return cpFrankTh(tau)}
+/* tail dependence coefficients */
+function cpLam(fam,par,nu){if(fam==='clayton')return[Math.pow(2,-1/par),0];if(fam==='gumbel')return[0,2-Math.pow(2,1/par)];if(fam==='t'){const l=2*tcdf(-Math.sqrt((nu+1)*(1-par)/(1+par)),nu+1);return[l,l]}return[0,0]}
+/* copula cdf */
+function cpCdf(fam,u,v,par){if(fam==='clayton')return Math.pow(Math.pow(u,-par)+Math.pow(v,-par)-1,-1/par);if(fam==='gumbel')return Math.exp(-Math.pow(Math.pow(-Math.log(u),par)+Math.pow(-Math.log(v),par),1/par));if(fam==='frank')return-Math.log(1+(Math.exp(-par*u)-1)*(Math.exp(-par*v)-1)/(Math.exp(-par)-1))/par;return cpBvn(cpQn(u),cpQn(v),par)}
+/* samplers: return [U,V] Float64Arrays */
+function cpSample(fam,par,n,nu){const U=new Float64Array(n),V=new Float64Array(n);for(let i=0;i<n;i++){let u,v;if(fam==='gauss'){const a=randn(),b=par*a+Math.sqrt(1-par*par)*randn();u=normCdf(a);v=normCdf(b)}else if(fam==='t'){const a=randn(),b=par*a+Math.sqrt(1-par*par)*randn(),s=Math.sqrt(2*gammaS(nu/2)/nu);u=tcdf(a/s,nu);v=tcdf(b/s,nu)}else if(fam==='clayton'){u=cpU();const w=cpU();v=Math.pow(Math.pow(u,-par)*(Math.pow(w,-par/(1+par))-1)+1,-1/par)}else if(fam==='gumbel'){const al=1/par,T=Math.PI*Math.random(),W=-Math.log(cpU()),S=Math.sin(al*T)/Math.pow(Math.sin(T),1/al)*Math.pow(Math.sin((1-al)*T)/W,(1-al)/al);u=Math.exp(-Math.pow(-Math.log(cpU())/S,al));v=Math.exp(-Math.pow(-Math.log(cpU())/S,al))}else{u=cpU();const w=cpU();v=-Math.log(1+w*(Math.exp(-par)-1)/(w+(1-w)*Math.exp(-par*u)))/par}U[i]=Math.min(Math.max(u,1e-9),1-1e-9);V[i]=Math.min(Math.max(v,1e-9),1-1e-9)}return[U,V]}
+/* dependence measures */
+function cpPearson(x,y){const n=x.length;let mx=0,my=0;for(let i=0;i<n;i++){mx+=x[i];my+=y[i]}mx/=n;my/=n;let sxy=0,sxx=0,syy=0;for(let i=0;i<n;i++){const a=x[i]-mx,b=y[i]-my;sxy+=a*b;sxx+=a*a;syy+=b*b}return sxy/Math.sqrt(sxx*syy+1e-300)}
+function cpRanks(x){const n=x.length,o=Array.from({length:n},(_,i)=>i).sort((a,b)=>x[a]-x[b]),r=new Float64Array(n);for(let i=0;i<n;i++)r[o[i]]=i+1;return r}
+const cpSpearman=(x,y)=>cpPearson(cpRanks(x),cpRanks(y));
+function cpKendall(x,y){const n=x.length;let c=0;for(let i=0;i<n-1;i++)for(let j=i+1;j<n;j++){const s=(x[i]-x[j])*(y[i]-y[j]);if(s>0)c++;else if(s<0)c--}return 2*c/(n*(n-1))}
+/* empirical joint tail probabilities */
+function cpChi(u,v,q,upper){let a=0,b=0;const n=u.length;for(let i=0;i<n;i++){if(upper){if(u[i]>q){a++;if(v[i]>q)b++}}else{if(u[i]<1-q){a++;if(v[i]<1-q)b++}}}return a?b/a:0}
+/* pareto quantile for losses, tail index a */
+const cpPq=(u,a)=>Math.pow(1-u,-1/a);
+const cpFam={gauss:'Gaussian',t:'Student t (ν = 4)',clayton:'Clayton',gumbel:'Gumbel',frank:'Frank'};
+/* ---------- Ch1 same correlation, different dependence ---------- */
+(function(){scl('c1t',v=>fmt(v/100));scl('c1n',v=>v);
+ const FS=['gauss','t','clayton','gumbel','frank'],FN=['Gaussian','t (ν=4)','Clayton','Gumbel','Frank'];
+ function run(){const f=$('c1f').value,tau=val('c1t')/100,n=val('c1n'),par=cpPar(f,tau),[U,V]=cpSample(f,par,n,4),X=Array.from(U,cpQn),Y=Array.from(V,cpQn),
+  P=mk($('c1cv'),-4,4,4,{y0:-4,L:40}),col=i=>U[i]>.95&&V[i]>.95?C.r:(U[i]<.05&&V[i]<.05?C.y:'rgba(110,168,255,.55)');
+  scat(P,X,Y,C.a,n,2.4,col);P.text('normal margins · red: both in upper 5% · yellow: both in lower 5%',P.L+6,P.T+12,C.mu);P.text('first variable →',P.w-P.R-4,P.h-P.B-6,C.mu,'right');
+  const rows=FS.map(g=>{const [u,v]=cpSample(g,cpPar(g,tau),Math.min(n,4000),4);return[cpChi(u,v,.95,false),cpChi(u,v,.95,true)]});
+  const Q=barG($('c1cv2'),rows,[C.y,C.r],FN,0,1.05,v=>fmt(v));Q.text('P(both extreme | first extreme): lower · upper',Q.L+6,Q.T+12,C.mu);
+  const m=Math.min(n,1000),kt=cpKendall(X.slice(0,m),Y.slice(0,m)),pe=cpPearson(X,Y),sp=cpSpearman(X,Y),i=FS.indexOf(f);
+  $('c1st').innerHTML=stat('sample Pearson · Spearman · Kendall',fmt(pe)+' · '+fmt(sp)+' · '+fmt(kt),'in')+stat('chance both in the worst 5% (upper) · both in the best 5%',pc1(cpChi(U,V,.95,true))+' · '+pc1(cpChi(U,V,.95,false)),'hot')+stat('if independent',pc1(.05),'')+stat('copula parameter for τ = '+fmt(tau),fmt(par),'');
+  $('c1rd').innerHTML=`Every one of the five families on the right is tuned to the <b>same rank correlation</b> (Kendall τ = ${fmt(tau)}) and the same standard normal margins, so a table of correlations cannot tell them apart; the scatter plots can. Look at the corners. For the ${FN[i]} copula, given that the first variable is in its worst 5%, the second is also in its worst 5% with probability ${pc1(cpChi(U,V,.95,true))} (independence would give 5.0%), and the mirror-image figure for the best 5% is ${pc1(cpChi(U,V,.95,false))}. The Gaussian copula treats both corners alike and lets dependence fade in the extremes; the Student t keeps it in both corners; Clayton concentrates dependence in the lower-left (joint good outcomes here, or joint crashes if you flip the sign); Gumbel in the upper-right; Frank behaves like the Gaussian in the tails. A single correlation coefficient summarises the bulk of the joint distribution and says almost nothing about how often things go wrong <em>together</em>, which is the question that matters for portfolio, counterparty and fraud-ring risk.`}
+ ['c1f','c1t','c1n'].forEach(i=>$(i).addEventListener('change',run));$('c1go').onclick=run;run();})();
+
+/* ---------- Ch2 Sklar: margins and copula separate ---------- */
+(function(){scl('c2t',v=>fmt(v/100));scl('c2s',v=>fmt(v/10));
+ const lnx=(u,s)=>Math.exp(s*cpQn(u));
+ function run(){const f=$('c2f').value,tau=val('c2t')/100,s=val('c2s')/10,par=cpPar(f,tau),n=3000,[U,V]=cpSample(f,par,n,4),X=Array.from(U,u=>lnx(u,s)),Y=Array.from(V,u=>lnx(u,s));
+  const sx=Float64Array.from(X).sort(),cap=Math.max(sx[Math.floor(.99*n)],.5),P=mk($('c2cv'),0,cap,cap,{L:44});scat(P,X,Y,C.a,n,2.2,()=> 'rgba(110,168,255,.55)');P.text('lognormal margins, σ = '+fmt(s)+' (cut at 99th percentile)',P.L+6,P.T+12,C.mu);
+  const Q=mk($('c2cv2'),0,1,1,{L:40});scat(Q,Array.from(U),Array.from(V),C.g,n,2.2,()=> 'rgba(74,222,128,.5)');Q.text('copula: the same sample on the uniform scale',Q.L+6,Q.T+12,C.mu);
+  const R=30,pr=[];for(let r=0;r<R;r++){const [u,v]=cpSample(f,par,500,4);pr.push(cpPearson(Array.from(u,x=>lnx(x,s)),Array.from(v,x=>lnx(x,s))))}
+  const kt=cpKendall(X.slice(0,800),Y.slice(0,800)),sp=cpSpearman(X,Y),pe=cpPearson(X,Y),th=f==='gauss'?(Math.exp(s*s*par)-1)/(Math.exp(s*s)-1):null;
+  $('c2st').innerHTML=stat('Pearson of the raw values',fmt(pe),Math.abs(pe-sp)>.1?'hot':'in')+stat('Spearman · Kendall (unchanged by the margins)',fmt(sp)+' · '+fmt(kt),'ok')+stat('Pearson over 30 samples of 500: min · max',fmt(Math.min(...pr))+' · '+fmt(Math.max(...pr)),'warn')+stat('Gaussian copula: exact Pearson of lognormals',th===null?'not closed-form':fmt(th),'');
+  $('c2rd').innerHTML=`<b>Sklar’s theorem</b>: every joint distribution can be written as a copula (the dependence on the uniform scale) applied to the margins, H(x, y) = C(F(x), G(y)). The right panel is the copula alone; the left is the same points after pushing each coordinate through a lognormal quantile function with σ = ${fmt(s)}. Increasing σ skews the margins but leaves the right panel, and therefore Spearman (${fmt(sp)}) and Kendall (${fmt(kt)}), exactly as they were. Pearson, which depends on the margins, moves: it is ${fmt(pe)} here, and across 30 samples of 500 it ranges from ${fmt(Math.min(...pr))} to ${fmt(Math.max(...pr))}${th!==null?` (the exact value for a Gaussian copula is (e^{σ²ρ} − 1)/(e^{σ²} − 1) = ${fmt(th)}, far below the copula parameter ρ = ${fmt(par)})`:''}. The practical consequence is a clean division of labour: model each margin with whatever fits it (a heavy-tailed severity, a skewed return) and model the dependence separately; use rank-based measures to describe the dependence, because they belong to the copula.`}
+ ['c2f','c2t','c2s'].forEach(i=>$(i).addEventListener('change',run));$('c2go').onclick=run;run();})();
+
+/* ---------- Ch3 rank correlations and heavy-tailed margins ---------- */
+(function(){scl('c3a',v=>fmt(v/10));scl('c3n',v=>v);scl('c3r',v=>fmt(v/100));
+ function run(){const a=val('c3a')/10,n=val('c3n'),rho=val('c3r')/100,R=200,pe=[],sp=[],ke=[],cvt=e=>Math.sin(Math.PI*e/2);
+  for(let r=0;r<R;r++){const [u,v]=cpSample('gauss',rho,n),x=Array.from(u,t=>cpPq(t,a)),y=Array.from(v,t=>cpPq(t,a));pe.push(cpPearson(x,y));sp.push(2*Math.sin(Math.PI*cpSpearman(x,y)/6));ke.push(cvt(cpKendall(x,y)))}
+  const [u0,v0]=cpSample('gauss',rho,Math.min(n,800)),lg=t=>Math.log10(cpPq(t,a));
+  const xs=Array.from(u0,lg),ys=Array.from(v0,lg),mx=Math.max(...xs,...ys)*1.05;const P2=mk($('c3cv'),0,mx,mx,{L:40});scat(P2,xs,ys,C.a,800,2.4,()=> 'rgba(110,168,255,.6)');P2.text('one sample, log10 of the losses (α = '+fmt(a)+')',P2.L+6,P2.T+12,C.mu);
+  const lo=-.4,hi=1.3,Q=histLines($('c3cv2'),[pe,sp,ke],[C.r,C.y,C.g],lo,hi,34,[[rho,C.fg,'true ρ',true]]);Q.text('estimates of ρ over '+R+' samples',Q.L+8,Q.T+12,C.mu);legend(Q,[['Pearson',C.r],['Spearman',C.y],['Kendall',C.g]],Q.T+28);
+  const bias=x=>avg(x)-rho,sd=sdv(pe),sk=sdv(ke);
+  $('c3st').innerHTML=stat('standard deviation: Pearson · Spearman · Kendall',fmt(sd)+' · '+fmt(sdv(sp))+' · '+fmt(sk),'in')+stat('bias: Pearson · Spearman · Kendall',fmt(bias(pe))+' · '+fmt(bias(sp))+' · '+fmt(bias(ke)),Math.abs(bias(pe))>.1?'hot':'in')+stat('Pearson sd ÷ Kendall sd',fmt(sd/sk),sd/sk>1.5?'hot':'ok')+stat('true ρ · tail index α',fmt(rho)+' · '+fmt(a),a<2?'warn':'');
+  $('c3rd').innerHTML=`Two Pareto losses (tail index α = ${fmt(a)}) joined by a Gaussian copula with parameter ρ = ${fmt(rho)}, ${n} observations per sample, repeated ${R} times. Three ways to estimate ρ: the ordinary <b>Pearson</b> correlation, <b>Spearman’s rank correlation</b> converted with ρ = 2 sin(π ρ<sub>S</sub>/6), and <b>Kendall’s τ</b> converted with ρ = sin(π τ/2). The rank estimators depend only on the copula, so they are centred on the truth (bias ${fmt(bias(sp))} and ${fmt(bias(ke))}) with standard deviations ${fmt(sdv(sp))} and ${fmt(sk)}. Pearson depends on the margins: its standard deviation is ${fmt(sd)} (${fmt(sd/sk)} times Kendall’s) and its centre is ${fmt(avg(pe))}${a<2?', and with α < 2 the variance of the data is infinite, so the Pearson coefficient is not even a consistent measure of the dependence and a few giant observations decide its value':'; the heavier the tails, the worse it gets'}. Kendall’s τ also has a direct meaning (the probability of concordant pairs minus discordant pairs) and is robust to outliers and data errors. For heavy-tailed financial or loss data, estimate dependence from ranks.`}
+ ['c3a','c3n','c3r'].forEach(i=>$(i).addEventListener('change',run));$('c3go').onclick=run;run();})();
+
+/* ---------- Ch4 Gaussian copula: no tail dependence ---------- */
+(function(){scl('c4r',v=>fmt(v/100));scl('c4n',v=>v);
+ function run(){const rho=val('c4r')/100,n=val('c4n'),qs=[],ex=[];for(let k=10;k<=40;k++){const e=k/10,q=1-Math.pow(10,-e);qs.push(e);ex.push((1-2*q+cpBvn(cpQn(q),cpQn(q),rho))/(1-q))}
+  const lt=cpLam('t',rho,4)[1],P=mk($('c4cv'),1,4,1,{L:44});poly(P,qs.map((e,i)=>[e,ex[i]]),C.a,2.8);P.hline(lt,C.r,'t(ν=4) limit λ = '+fmt(lt));
+  P.text('Gaussian copula: P(second extreme | first extreme)',P.L+8,P.T+12,C.mu);P.text('level: −log10(1 − q), so 2 = 99%, 3 = 99.9%, 4 = 99.99% →',P.w-P.R-4,P.h-P.B-6,C.mu,'right');
+  const [ug,vg]=cpSample('gauss',rho,n),[ut,vt]=cpSample('t',rho,n,4),Q=mk($('c4cv2'),.95,1,1,{y0:.95,L:44});
+  const cx=(u,v)=>{const a=[],b=[];for(let i=0;i<u.length;i++)if(u[i]>.95&&v[i]>.95){a.push(u[i]);b.push(v[i])}return[a,b]},[gx,gy]=cx(ug,vg),[tx,ty]=cx(ut,vt);
+  scat(Q,gx,gy,C.a,2000,2.8,()=> 'rgba(110,168,255,.8)');scat(Q,tx,ty,C.r,2000,2.8,()=> 'rgba(255,107,129,.65)');Q.text('upper corner: blue Gaussian, red t (ν=4)',Q.L+6,Q.T+12,C.mu);
+  const e3=ex[20],e4=ex[30],c99=cpChi(ug,vg,.99,true),t99=cpChi(ut,vt,.99,true);
+  $('c4st').innerHTML=stat('Gaussian χ at 99% · 99.9% · 99.99%',fmt(ex[10])+' · '+fmt(e3)+' · '+fmt(e4),'ok')+stat('t copula limit λ (same ρ)',fmt(lt),'hot')+stat('simulated χ at 99%: Gaussian · t',fmt(c99)+' · '+fmt(t99),'in')+stat('points in the corner: Gaussian · t',gx.length+' · '+tx.length,'');
+  $('c4rd').innerHTML=`The <b>Gaussian copula</b> is the dependence implied by a bivariate normal distribution: two correlated normal scores pushed through the normal cdf. For ρ = ${fmt(rho)} it looks fine in the middle, but look at the blue curve: the probability that the second variable is extreme given that the first is falls steadily as the level rises (${fmt(ex[10])} at 99%, ${fmt(e3)} at 99.9%, ${fmt(e4)} at 99.99%) and tends to zero. The Gaussian copula has <b>no tail dependence</b> for any ρ &lt; 1, so at a high enough level it behaves as if the variables were independent. A t copula with the same correlation keeps a positive limit (red line, ${fmt(lt)}) and on the right visibly places more points in the joint-extreme corner. This is the technical core of the criticism of Gaussian-copula pricing of credit portfolios before 2008: it understated the probability that many names default together, and the Gaussian correlation, however carefully calibrated to the bulk, could not repair that.`}
+ ['c4r','c4n'].forEach(i=>$(i).addEventListener('change',run));$('c4go').onclick=run;run();})();
+
+/* ---------- Ch5 Archimedean copulas ---------- */
+(function(){scl('c5t',v=>fmt(v/100));scl('c5n',v=>v);
+ const FS=['clayton','gumbel','frank','gauss','t'],FN=['Clayton','Gumbel','Frank','Gaussian','t (ν=4)'];
+ function run(){const f=$('c5f').value,tau=val('c5t')/100,n=val('c5n'),par=cpPar(f,tau),[U,V]=cpSample(f,par,n,4),P=mk($('c5cv'),0,1,1,{L:40});
+  scat(P,Array.from(U),Array.from(V),C.a,n,2.2,i=>U[i]>.9&&V[i]>.9?'rgba(255,107,129,.9)':(U[i]<.1&&V[i]<.1?'rgba(255,209,102,.95)':'rgba(110,168,255,.5)'));P.text(FN[FS.indexOf(f)]+' copula, τ = '+fmt(tau)+' · yellow/red: joint corners',P.L+6,P.T+12,C.mu);
+  const lam=FS.map(g=>cpLam(g,cpPar(g,tau),4)),Q=barG($('c5cv2'),lam,[C.y,C.r],FN,0,1,fmt);Q.text('limiting tail dependence: lower (yellow) · upper (red)',Q.L+6,Q.T+12,C.mu);
+  const l=lam[FS.indexOf(f)],ll=cpChi(U,V,.9,false),lu=cpChi(U,V,.9,true);
+  $('c5st').innerHTML=stat('parameter θ (or ρ) for τ = '+fmt(tau),fmt(par),'')+stat('tail dependence: lower · upper',fmt(l[0])+' · '+fmt(l[1]),l[0]+l[1]>0?'hot':'in')+stat('sample P(both < 0.1 | first < 0.1) · P(both > 0.9 | first > 0.9)',fmt(ll)+' · '+fmt(lu),'in')+stat('sample Kendall τ (800 points)',fmt(cpKendall(Array.from(U.slice(0,800)),Array.from(V.slice(0,800)))),'ok');
+  $('c5rd').innerHTML=`<b>Archimedean copulas</b> are built from a single generator function, which makes them easy to simulate and fit with one parameter θ that maps directly to Kendall’s τ: Clayton θ = 2τ/(1 − τ), Gumbel θ = 1/(1 − τ), Frank by a numerical inverse. They differ in <b>where</b> dependence lives. <b>Clayton</b> has lower-tail dependence λ<sub>L</sub> = 2<sup>−1/θ</sup> (${fmt(Math.pow(2,-1/(2*tau/(1-tau))))} at this τ) and none in the upper tail; <b>Gumbel</b> has the reverse, λ<sub>U</sub> = 2 − 2<sup>1/θ</sup>; <b>Frank</b> is symmetric with no tail dependence at all, which is why it resembles the Gaussian in the bar chart. The scatter plot shows the family you picked at τ = ${fmt(tau)}: ${f==='clayton'?'points pile up in the lower-left corner, the pattern of joint downturns (assets that fall together, borrowers who default together when the variable is defined as quality)':f==='gumbel'?'points pile up in the upper-right corner, the pattern of joint large losses':f==='frank'?'points spread evenly with no clustering in either corner':f==='gauss'?'the dependence is symmetric and thins out in both corners':'the dependence is symmetric but persists in both corners'}. Choose the family from the <em>direction</em> of the dependence you believe in, not from convenience; a loss-side copula for a bank usually needs upper-tail dependence of losses.`}
+ ['c5f','c5t','c5n'].forEach(i=>$(i).addEventListener('change',run));$('c5go').onclick=run;run();})();
+
+/* ---------- Ch6 t copula and tail dependence ---------- */
+(function(){scl('c6v',v=>v);scl('c6r',v=>fmt(v/100));scl('c6n',v=>v);
+ function run(){const nu=val('c6v'),rho=val('c6r')/100,n=val('c6n'),[U,V]=cpSample('t',rho,n,nu),lam=cpLam('t',rho,nu)[1],es=[];for(let e=10;e<=30;e++)es.push([e/10,cpChi(U,V,1-Math.pow(10,-e/10),true)]);
+  const gx=[];for(let e=10;e<=30;e+=2){const q=1-Math.pow(10,-e/10);gx.push([e/10,(1-2*q+cpBvn(cpQn(q),cpQn(q),rho))/(1-q)])}
+  const P=mk($('c6cv'),1,3,1,{L:44});P.hline(lam,C.r,'limit λ = '+fmt(lam));poly(P,es,C.a,2.6);dots(P,es,C.a,3);poly(P,gx,C.g,2.2,true);legend(P,[['t copula (sample)',C.a],['Gaussian copula, same ρ (exact)',C.g]],P.T+12);P.text('level: −log10(1 − q), so 2 = 99%, 3 = 99.9% →',P.w-P.R-4,P.h-P.B-6,C.mu,'right');
+  const NU=[],R4=[.3,.5,.7,.9],cl=[C.a,C.g,C.y,C.r];for(let v=2;v<=30;v++)NU.push(v);const Q=mk($('c6cv2'),2,30,1,{L:44});R4.forEach((r,k)=>poly(Q,NU.map(v=>[v,cpLam('t',r,v)[1]]),cl[k],2.4));dots(Q,[[nu,lam]],C.fg,5);legend(Q,R4.map((r,k)=>['ρ = '+r,cl[k]]),Q.T+12);Q.text('degrees of freedom ν →',Q.w-Q.R-4,Q.h-Q.B-6,C.mu,'right');Q.text('tail dependence λ',Q.L+6,Q.T+28,C.mu);
+  const eh=es[es.length-1][1],eg=gx[gx.length-1][1];
+  $('c6st').innerHTML=stat('t copula tail dependence λ',fmt(lam),'hot')+stat('at 99.9%: t sample · Gaussian exact',fmt(eh)+' · '+fmt(eg),'in')+stat('number of points beyond 99.9% in the first variable',String(Math.round(n*.001)),n*.001<30?'warn':'')+stat('ν · ρ',nu+' · '+fmt(rho),'');
+  $('c6rd').innerHTML=`The <b>Student t copula</b> is the Gaussian’s fat-tailed sibling: correlated normal scores divided by one common random scale factor √(χ²<sub>ν</sub>/ν), which makes extreme moves in both variables tend to arrive together. Its tail dependence is λ = 2 t<sub>ν+1</sub>(−√((ν + 1)(1 − ρ)/(1 + ρ))), here <b>${fmt(lam)}</b> for ν = ${nu} and ρ = ${fmt(rho)}. The blue curve (simulated) settles towards the red limit while the green Gaussian curve keeps falling. Two readings of the right-hand panel: λ <em>rises as ν falls</em> (small ν means a more volatile common factor), and it is positive even for modest ρ, so the t copula can have strong joint-extreme behaviour without a large correlation. As ν grows it approaches the Gaussian and λ goes to 0. The t copula is symmetric, so it cannot represent joint crashes without joint booms; for that, use an asymmetric family (Clayton or Gumbel, or a mixture). Note also that with ${n} observations only about ${Math.round(n*.001)} lie beyond the 99.9% level, so the empirical curve is noisy exactly where the theory says it should be informative: tail dependence is hard to <em>estimate</em>.`}
+ ['c6v','c6r','c6n'].forEach(i=>$(i).addEventListener('change',run));$('c6go').onclick=run;run();})();
+/* ---------- Ch7 dependence and portfolio risk ---------- */
+(function(){scl('c7a',v=>fmt(v/10));scl('c7t',v=>fmt(v/100));scl('c7q',v=>fmt(v/10)+'%');const N=30000;
+ const M=[['independent',C.mu],['Gaussian',C.a],['t (ν=4)',C.r],['Gumbel',C.y]];
+ function sums(fam,tau,a){let par,u,v;if(fam==='ind'){u=Float64Array.from({length:N},cpU);v=Float64Array.from({length:N},cpU)}else{par=cpPar(fam,tau);[u,v]=cpSample(fam,par,N,4)}const s=new Float64Array(N);for(let i=0;i<N;i++)s[i]=cpPq(u[i],a)+cpPq(v[i],a);return s.sort()}
+ function run(){const a=val('c7a')/10,tau=val('c7t')/100,q=val('c7q')/1000,S=[sums('ind',0,a),sums('gauss',tau,a),sums('t',tau,a),sums('gumbel',tau,a)],vq=s=>s[Math.min(N-1,Math.floor(q*N))],es=s=>{const i=Math.min(N-1,Math.floor(q*N));let t=0;for(let j=i;j<N;j++)t+=s[j];return t/(N-i)};
+  const pts=S.map(s=>{const p=[];let last=0;for(let r=1;r<=N;r*=1.15){const k=Math.floor(r);if(k===last)continue;last=k;p.push([Math.log10(s[N-k]),Math.log10(k/N)])}return p});
+  const x0=Math.log10(2),x1=Math.ceil(Math.max(...pts.flat().map(p=>p[0])))+.2,yl=Math.log10(1/N)-.2,P=mk($('c7cv'),x0,x1,.1,{y0:yl,noGrid:true,L:52});
+  customGrid(P,[0,1,2,3,4,5,6].filter(v=>v>=x0&&v<=x1).map(v=>[v,Math.pow(10,v)>=1000?(Math.pow(10,v)/1000)+'k':String(Math.pow(10,v))]),[0,-1,-2,-3,-4].filter(v=>v>=yl).map(v=>[v,(Math.pow(10,v+2)>=1?Math.pow(10,v+2):Math.pow(10,v+2).toFixed(-v-2))+'%']));
+  S.forEach((s,k)=>poly(P,pts[k],M[k][1],2.4));legend(P,M.map(m=>[m[0],m[1]]),P.T+12);P.text('sum of two losses (log scale) →',P.w-P.R-4,P.h-P.B-6,C.mu,'right');P.text('chance the sum exceeds this',P.L+6,P.T+28,C.mu);
+  const v0=vq(S[0]),vs=S.map(vq),es_=S.map(es),mx=Math.max(...vs.map(v=>v/v0))*1.2;
+  const Q=barV($('c7cv2'),vs.map(v=>v/v0),M.map(m=>m[1]),M.map(m=>m[0]),Math.max(mx,1.3),v=>fmt(v));Q.text('VaR of the sum at '+fmt(q*100)+'% relative to independence',Q.L+6,Q.T+12,C.mu);
+  $('c7st').innerHTML=stat('VaR ratio to independence: Gaussian · t · Gumbel',fmt(vs[1]/v0)+' · '+fmt(vs[2]/v0)+' · '+fmt(vs[3]/v0),vs[3]/v0>1.2?'hot':'in')+stat('ES ratio to independence: Gaussian · t · Gumbel',fmt(es_[1]/es_[0])+' · '+fmt(es_[2]/es_[0])+' · '+fmt(es_[3]/es_[0]),'in')+stat('Kendall τ used · tail index α',fmt(tau)+' · '+fmt(a),'')+stat('simulated years',String(N),'');
+  $('c7rd').innerHTML=`Two Pareto losses with tail index ${fmt(a)} (identical margins in every case), joined by four different dependence structures, three of them tuned to the <b>same Kendall τ = ${fmt(tau)}</b>. The sum is what a bank cares about (two portfolios, two counterparties, two lines of business). At the ${fmt(q*100)}% level the Gaussian copula raises VaR by ${pc1(vs[1]/v0-1)} over independence, the t copula by ${pc1(vs[2]/v0-1)}, and the Gumbel copula, whose dependence is concentrated in the joint-large-loss corner, by ${pc1(vs[3]/v0-1)}. The curves on the left show the mechanism: for heavy-tailed losses the sum exceeds a high level mainly when <em>one</em> loss is huge, and extra dependence adds the chance that both are large. The differences grow with the confidence level and with tail dependence, and they are invisible to the correlation matrix: in a risk-aggregation exercise, the choice of copula (and its tail dependence) can move a 99.9% capital number by more than the choice of correlation parameter.`}
+ ['c7a','c7t','c7q'].forEach(i=>$(i).addEventListener('change',run));$('c7go').onclick=run;run();})();
+
+/* ---------- Ch8 estimating a copula ---------- */
+(function(){scl('c8a',v=>fmt(v/10));scl('c8n',v=>v);scl('c8t',v=>fmt(v/100));
+ function ll(u,v,th){let s=0;const n=u.length,lt=Math.log(1+th);for(let i=0;i<n;i++){const a=Math.pow(u[i],-th),b=Math.pow(v[i],-th);s+=lt-(1+th)*(Math.log(u[i])+Math.log(v[i]))-(2+1/th)*Math.log(a+b-1)}return s}
+ function mle(u,v){const g=(Math.sqrt(5)-1)/2;let lo=.02,hi=15,a=hi-g*(hi-lo),b=lo+g*(hi-lo),fa=ll(u,v,a),fb=ll(u,v,b);for(let i=0;i<36;i++){if(fa>fb){hi=b;b=a;fb=fa;a=hi-g*(hi-lo);fa=ll(u,v,a)}else{lo=a;a=b;fa=fb;b=lo+g*(hi-lo);fb=ll(u,v,b)}}return(lo+hi)/2}
+ const cl=x=>Math.min(Math.max(x,1e-7),1-1e-7);
+ function fitAll(x,y){const n=x.length,rk=z=>Array.from(cpRanks(z),r=>r/(n+1));let r1=rk(x),r2=rk(y);const th1=mle(r1,r2);
+  const lx=x.map(Math.log),ly=y.map(Math.log),stt=z=>{const m=avg(z),s=sdv(z);return z.map(t=>cl(normCdf((t-m)/s)))},th2=mle(stt(lx),stt(ly));
+  const ah=n/lx.reduce((p,q)=>p+q,0),bh=n/ly.reduce((p,q)=>p+q,0),th3=mle(x.map(t=>cl(1-Math.pow(t,-ah))),y.map(t=>cl(1-Math.pow(t,-bh))));
+  const k=cpKendall(x,y),th4=2*k/(1-k);return[th1,th2,th3,th4]}
+ function run(){const a=val('c8a')/10,n=val('c8n'),tau=val('c8t')/100,th=cpPar('clayton',tau),R=80,E=[[],[],[],[]];
+  for(let r=0;r<R;r++){const [u,v]=cpSample('clayton',th,n),x=Array.from(u,t=>cpPq(t,a)),y=Array.from(v,t=>cpPq(t,a));fitAll(x,y).forEach((e,i)=>E[i].push(e))}
+  const nm=['pseudo-observations (ranks)','wrong margins (lognormal)','correct margins (Pareto)','Kendall inversion'],cols=[C.a,C.r,C.g,C.y],lo=Math.max(0,th-1.6),hi=th+1.6;
+  const P=histLines($('c8cv'),E.slice(0,3),cols.slice(0,3),lo,hi,32,[[th,C.fg,'true θ',true]]);P.text('θ̂ over '+R+' samples',P.L+8,P.T+12,C.mu);legend(P,[['ranks',C.a],['wrong margins',C.r],['correct margins',C.g]],P.T+28);
+  const rm=E.map(e=>Math.sqrt(avg(e.map(t=>(t-th)*(t-th)))));barV($('c8cv2'),rm,cols,['ranks','wrong margins','right margins','Kendall'],Math.max(...rm)*1.25,fmt);
+  const bs=E.map(e=>avg(e)-th);
+  $('c8st').innerHTML=stat('bias of θ̂: ranks · wrong margins · right margins · Kendall',bs.map(fmt).join(' · '),Math.abs(bs[1])>.15?'hot':'in')+stat('RMSE: ranks · wrong · right · Kendall',rm.map(fmt).join(' · '),'')+stat('true θ (Clayton, τ = '+fmt(tau)+')',fmt(th),'')+stat('observations n',String(n),'');
+  $('c8rd').innerHTML=`Clayton-dependent Pareto losses (tail index ${fmt(a)}), with θ estimated four ways over ${R} samples. <b>Canonical maximum likelihood on pseudo-observations</b> (blue) replaces each value by its rank/(n + 1), so the margins never enter: nearly unbiased (${fmt(bs[0])}), RMSE ${fmt(rm[0])}. The <b>inference-functions-for-margins</b> route fits parametric margins first and then the copula; if the margins are right (green) it is slightly more efficient (RMSE ${fmt(rm[2])}), but if they are wrong (red: a lognormal fitted to Pareto data) the transformed values are not uniform and the copula is forced to absorb the error, giving bias ${fmt(bs[1])} and RMSE ${fmt(rm[1])}. <b>Kendall inversion</b> (yellow) is simple and robust, with RMSE ${fmt(rm[3])}. A practical recipe: use the rank-based estimator for the dependence, model the margins separately and check each, and use a parametric-margin fit only when the margins are checked. Never read a copula parameter as meaningful if the margins feeding it were misfitted.`}
+ ['c8a','c8n','c8t'].forEach(i=>$(i).addEventListener('change',run));$('c8go').onclick=run;run();})();
+
+/* ---------- Ch9 choosing a copula ---------- */
+(function(){scl('c9t',v=>fmt(v/100));scl('c9n',v=>v);
+ const CAND=['gauss','clayton','gumbel','frank'],CN=['Gaussian','Clayton','Gumbel','Frank'],CC=[C.a,C.y,C.r,C.g];
+ function emp(u,v){const n=u.length,c=new Float64Array(n);for(let i=0;i<n;i++){let k=0;for(let j=0;j<n;j++)if(u[j]<=u[i]&&v[j]<=v[i])k++;c[i]=k/n}return c}
+ function score(U,V){const n=U.length,rk=z=>Array.from(cpRanks(z),r=>r/(n+1)),u=rk(U),v=rk(V),ce=emp(u,v),tau=cpKendall(u.slice(0,Math.min(n,500)),v.slice(0,Math.min(n,500)));return CAND.map(f=>{const par=cpPar(f,Math.max(.02,Math.min(.95,tau)));let s=0;for(let i=0;i<n;i++){const c=cpCdf(f,u[i],v[i],par);s+=(ce[i]-c)*(ce[i]-c)}return s})}
+ function run(){const f=$('c9f').value,tau=val('c9t')/100,n=val('c9n'),par=cpPar(f,tau),R=25,win=[0,0,0,0];
+  for(let r=0;r<R;r++){const [u,v]=cpSample(f,par,Math.min(n,300),4),s=score(u,v);win[s.indexOf(Math.min(...s))]++}
+  const [U,V]=cpSample(f,par,n,4),sc=score(U,V),mn=Math.min(...sc),rel=sc.map(s=>s/mn);
+  const P=barV($('c9cv'),sc.map(s=>s*1000/n),CC,CN,Math.max(...sc)*1000/n*1.25,v=>fmt(v));P.text('distance to the empirical copula (lower is better)',P.L+6,P.T+12,C.mu);
+  const Q=barV($('c9cv2'),win.map(w=>w/R),CC,CN,1.1,pc1);Q.text('win frequency over '+R+' samples',Q.L+6,Q.T+12,C.mu);
+  const best=sc.indexOf(mn),tl=cpLam('t',par,4),i0=f==='t'?-1:CAND.indexOf(f);
+  $('c9st').innerHTML=stat('best-fitting candidate (this sample)',CN[best],i0===best?'ok':'warn')+stat('true family',cpFam[f],'')+stat('distance relative to the best: '+CN.join(' · '),rel.map(fmt).join(' · '),'in')+stat('win rate of the true family',i0<0?'not a candidate':pc1(win[i0]/R),i0>=0&&win[i0]/R<.6?'warn':'ok');
+  $('c9rd').innerHTML=`Data generated from the <b>${cpFam[f]}</b> copula (τ = ${fmt(tau)}), then fitted with four candidates, each calibrated to the sample’s Kendall τ. The criterion is the distance between the <b>empirical copula</b> and each fitted copula, summed over the data points (a Cramér–von Mises statistic, the basis of the standard goodness-of-fit test). On this sample the winner is <b>${CN[best]}</b>${i0>=0?(best===i0?', the true family':', not the true family'):' (the Student t is not among the candidates, so the closest one wins)'}, and over ${R} samples the true family wins ${i0>=0?pc1(win[i0]/R):'—'} of the time. Two points follow. Families with similar τ and similar bulk (Gaussian and Frank, say) are hard to tell apart with a few hundred points: the data have little information about the corners, which is exactly where the families differ. And a statistic summed over the whole square is dominated by the middle, so it is weakly sensitive to the tails. In practice combine a whole-square test with tail-focused checks (exceedance counts in the corners, tail concentration curves), compare candidate models by their implied tail risk measures, and treat the choice as a source of model uncertainty to report, not a settled fact.`}
+ ['c9f','c9t','c9n'].forEach(i=>$(i).addEventListener('change',run));$('c9go').onclick=run;run();})();
+
+/* ---------- Ch10 conditional correlation and stress ---------- */
+(function(){scl('c10r',v=>fmt(v/100));scl('c10q',v=>v+'%');const N=40000;
+ const phi=x=>Math.exp(-x*x/2)/2.5066282746;
+ function gen(rho,stress,srho){const X=new Float64Array(N),Y=new Float64Array(N);for(let i=0;i<N;i++){const s=stress&&Math.random()<.15,r=s?srho:rho,k=s?2.2:1,a=randn()*k,b=(r*a/k+Math.sqrt(1-r*r)*randn())*k;X[i]=a;Y[i]=b}return[X,Y]}
+ function ccor(X,Y,c){const a=[],b=[];for(let i=0;i<X.length;i++)if(X[i]>c){a.push(X[i]);b.push(Y[i])}return a.length>30?cpPearson(a,b):NaN}
+ function run(){const rho=val('c10r')/100,pq=val('c10q')/100,srho=Math.min(.95,rho+.35),[X,Y]=gen(rho,false),[Xs,Ys]=gen(rho,true,srho),P0=Array.from(X).sort((p,q)=>p-q),thr=P0[Math.floor(pq*N)];
+  const P=mk($('c10cv'),-4,4,4,{y0:-4,L:40});scat(P,Array.from(X),Array.from(Y),C.a,3000,2,i=>X[i]>thr?'rgba(255,107,129,.85)':'rgba(110,168,255,.35)');P.vline(thr,C.r,null,true);P.text('ρ = '+fmt(rho)+' · red: first variable above its '+val('c10q')+'th pct',P.L+6,P.T+12,C.mu);
+  const ps=[];for(let k=0;k<=18;k++)ps.push(k*5+0);const grid=[],A=[],B=[],T=[];for(let p=0;p<=96;p+=4){const c=P0[Math.floor(p/100*N)],pn=(p/100);grid.push(p);A.push(ccor(X,Y,c));B.push(ccor(Xs,Ys,Math.max(c,-9)));const z=qn(Math.max(Math.min(p/100,.9999),0)),l=phi(z)/(1-normCdf(z)),s=Math.sqrt(Math.max(1+z*l-l*l,1e-6));T.push(rho*s/Math.sqrt(rho*rho*s*s+1-rho*rho))}
+  const Q=mk($('c10cv2'),0,96,1,{y0:0,L:44});poly(Q,grid.map((p,i)=>[p,A[i]]).filter(p=>!isNaN(p[1])),C.a,2.6);poly(Q,grid.map((p,i)=>[p,T[i]]),C.g,2,true);poly(Q,grid.map((p,i)=>[p,B[i]]).filter(p=>!isNaN(p[1])),C.r,2.6);Q.hline(rho,C.fg,'true ρ');legend(Q,[['constant ρ: sample',C.a],['constant ρ: theory',C.g],['stress regime',C.r]],Q.T+12);Q.text('subsample: first variable above this percentile →',Q.w-Q.R-4,Q.h-Q.B-6,C.mu,'right');
+  const cA=ccor(X,Y,thr),cB=ccor(Xs,Ys,thr),k=Math.min(Math.floor(pq*24),23),tt=T[Math.min(Math.round(val('c10q')/4),T.length-1)];
+  $('c10st').innerHTML=stat('correlation in the selected subsample (constant ρ)',fmt(cA),cA<rho-.1?'warn':'in')+stat('theory for a normal distribution',fmt(tt),'')+stat('stress-regime data, same selection',fmt(cB),'in')+stat('full-sample correlation: constant · stress regime',fmt(cpPearson(X,Y))+' · '+fmt(cpPearson(Xs,Ys)),'');
+  $('c10rd').innerHTML=`A classic trap in stress analysis: “correlations rise in a crisis”, evidence for which is often a correlation computed on the subsample of days when the market moved a lot. The blue curve shows what that procedure gives when <b>nothing changes</b>: bivariate normal data with constant ρ = ${fmt(rho)}, selected on the first variable being above its ${val('c10q')}th percentile, show a correlation of ${fmt(cA)} (theory, green: ρ s/√(ρ²s² + 1 − ρ²), where s² is the variance of the truncated variable, which is below 1). Selecting on a variable shrinks its spread, and correlation falls with it: a mechanical artefact, not a change in the relationship. The red curve is a world in which dependence really does rise in a stress regime (${pc1(.15)} of days, volatility doubled, ρ = ${fmt(srho)}); the same procedure on that data gives ${fmt(cB)}. Two lessons: do not compare a correlation measured on a selected subsample with the full-sample one (this is the selection bias of item 22 in another guise), and describe tail dependence with quantities built for it (conditional exceedance probabilities, tail dependence coefficients, a copula fitted to all the data), which are defined without conditioning on the variable that is being measured.`}
+ ['c10r','c10q'].forEach(i=>$(i).addEventListener('change',run));$('c10go').onclick=run;run();})();
+
+/* ---------- Ch11 credit portfolio and default correlation ---------- */
+(function(){scl('c11p',v=>fmt(v/10)+'%');scl('c11r',v=>fmt(v/100));scl('c11v',v=>v);scl('c11q',v=>fmt(v/10)+'%');const S=5000,NO=300;
+ function qt(p,v){let lo=-60,hi=60;for(let i=0;i<60;i++){const m=(lo+hi)/2;if(tcdf(m,v)<p)lo=m;else hi=m}return(lo+hi)/2}
+ function sim(p,rho,nu,t){const th=t?qt(p,nu):cpQn(p),L=new Float64Array(S),sr=Math.sqrt(rho),sq=Math.sqrt(1-rho);for(let s=0;s<S;s++){const z=randn(),sc=t?Math.sqrt(nu/(2*gammaS(nu/2))):1;let d=0;for(let i=0;i<NO;i++)if((sr*z+sq*randn())*sc<th)d++;L[s]=d/NO}return L.sort()}
+ function run(){const p=val('c11p')/1000,rho=val('c11r')/100,nu=val('c11v'),q=val('c11q')/1000,G=sim(p,rho,nu,false),T=sim(p,rho,nu,true),I=sim(p,0,nu,false),vq=a=>a[Math.min(S-1,Math.floor(q*S))],vas=normCdf((cpQn(p)+Math.sqrt(rho)*cpQn(q))/Math.sqrt(1-rho));
+  const sv=(s)=>{const p=[];let last=0;for(let r=1;r<=S;r*=1.15){const k=Math.floor(r);if(k===last)continue;last=k;p.push([s[S-k]*100,Math.log10(k/S)])}return p},A=[sv(I),sv(G),sv(T)],hi=Math.max(...A.flat().map(p=>p[0]))*1.05+1,yl=Math.log10(1/S)-.1,P=mk($('c11cv'),0,hi,.05,{y0:yl,noGrid:true,L:52});customGrid(P,niceTicks(0,hi,6),[0,-1,-2,-3].filter(v=>v>=yl).map(v=>[v,(Math.pow(10,v+2)>=1?Math.pow(10,v+2):Math.pow(10,v+2).toFixed(-v-2))+'%']));P.hline(Math.log10(1-q),C.fg,'');[C.mu,C.a,C.r].forEach((c,k)=>poly(P,A[k],c,2.4));legend(P,[['no correlation',C.mu],['Gaussian',C.a],['t',C.r]],P.T+12);P.text('share of the portfolio in default (%) →',P.w-P.R-4,P.h-P.B-6,C.mu,'right');P.text('chance of a loss this large',P.L+6,P.T+28,C.mu);
+  const vals=[vq(I),vq(G),vas,vq(T)].map(v=>v*100);barV($('c11cv2'),vals,[C.mu,C.a,C.p,C.r],['no correlation','Gaussian (sim.)','Vasicek formula','t (sim.)'],Math.max(...vals)*1.2,v=>fmt(v)+'%');
+  $('c11st').innerHTML=stat('mean default rate',pc1(avg(G)),'')+stat(fmt(q*100)+'% loss: no correlation · Gaussian · t',pc1(vq(I))+' · '+pc1(vq(G))+' · '+pc1(vq(T)),vq(T)>vq(G)*1.2?'hot':'in')+stat('Vasicek closed form (infinitely many obligors)',pc1(vas),'ok')+stat('t ÷ Gaussian at this level',fmt(vq(T)/vq(G)),vq(T)/vq(G)>1.2?'warn':'in');
+  $('c11rd').innerHTML=`A portfolio of ${NO} equally sized loans, each with a ${pc1(p)} probability of default, with defaults tied together by a common factor: the <b>one-factor Gaussian copula</b>, the engine behind the Basel IRB capital formula and the credit-portfolio models that preceded 2008. With no correlation the share in default hardly moves (grey; ${fmt(q*100)}% quantile ${pc1(vq(I))}) because bad luck diversifies away. With asset correlation ${fmt(rho)} (blue) the whole portfolio moves with the factor: the same quantile becomes ${pc1(vq(G))}, which is close to the <b>Vasicek formula</b> Φ((Φ⁻¹(PD) + √ρ Φ⁻¹(q))/√(1 − ρ)) = ${pc1(vas)} for an infinitely granular portfolio. Replacing the Gaussian with a t factor model of ν = ${nu} (red) leaves the average default rate and ρ unchanged but fattens the tail: the quantile is ${pc1(vq(T))}, ${fmt(vq(T)/vq(G))} times the Gaussian figure. Three cautions that follow: the capital number rests on ρ, which is estimated from short, benign histories; it is also driven by the tail dependence that the Gaussian copula forbids; and a model calibrated to the average default rate can say nothing about the joint behaviour. Run it with a range of ρ and ν and report the spread.`}
+ ['c11p','c11r','c11v','c11q'].forEach(i=>$(i).addEventListener('change',run));$('c11go').onclick=run;run();})();
+const QZ=[{"l":"Beginner","q":"Which statement about Pearson correlation is correct?","o":["It depends only on the copula","It depends on the margins as well as on the dependence structure","It always exists for continuous variables","It is invariant to any increasing transformation of the variables"],"a":1,"e":"Pearson correlation is computed from the actual values, so it changes when the margins change; rank correlations depend only on the copula. It also needs finite variances."},{"l":"Beginner","q":"What does a copula describe?","o":["The dependence between variables after each is transformed to a uniform margin","The mean and variance of the joint distribution","The time trend of each variable","The distribution of each variable separately"],"a":0,"e":"A copula is the joint distribution of the probability-integral-transformed variables, so it contains the dependence and nothing about the margins."},{"l":"Intermediate","q":"Sklar’s theorem says that a joint distribution function H can be written as…","o":["H(x, y) = C(x, y) with no reference to the margins","H(x, y) = F(x)·G(y), always","H(x, y) = F(x) + G(y)","H(x, y) = C(F(x), G(y)) for some copula C and the margins F and G"],"a":3,"e":"Any joint distribution is a copula applied to its margins; independence (the product) is just one special copula."},{"l":"Intermediate","q":"You take logarithms of both variables in a data set. Which quantity is unchanged?","o":["The variances","Pearson correlation","Kendall’s τ","The covariance"],"a":2,"e":"Logs are strictly increasing, so ranks, and therefore Kendall’s τ and Spearman’s ρ, do not change; Pearson correlation and covariance do."},{"l":"Intermediate","q":"Why are rank-based estimators preferred for the dependence of heavy-tailed losses?","o":["They measure tail dependence directly","They need no finite moments and are not driven by a few huge values","They are always more efficient than Pearson","They remove the margins and the copula"],"a":1,"e":"Rank correlations exist for any distribution and resist outliers, so they remain stable when the variance is infinite or a few giant losses dominate the sample."},{"l":"Intermediate","q":"Which pairing of copula and tail behaviour is correct?","o":["Clayton: lower-tail dependence; Gumbel: upper-tail dependence","Frank: strong tail dependence in both corners","Clayton: upper-tail dependence; Gumbel: lower-tail dependence","Gaussian: tail dependence that increases with the level"],"a":0,"e":"Clayton concentrates dependence in the lower-left corner, Gumbel in the upper-right; Frank and the Gaussian have no tail dependence."},{"l":"Advanced","q":"A Gaussian copula with ρ = 0.9 is fitted to two loss variables. What is true of the probability that one is extreme given the other is extreme, as the level goes to 100%?","o":["It stays at the level of the correlation","It tends to 0.9","It tends to 1","It tends to zero, since the Gaussian copula has no tail dependence"],"a":3,"e":"The Gaussian copula is asymptotically tail independent for any ρ < 1, so the conditional exceedance probability falls to zero as the level rises."},{"l":"Advanced","q":"How does the tail dependence of a Student t copula change as the degrees of freedom ν increase with ρ fixed?","o":["It increases without bound","It stays the same","It decreases towards that of the Gaussian copula, which is zero","It becomes asymmetric"],"a":2,"e":"λ = 2 t_{ν+1}(−√((ν + 1)(1 − ρ)/(1 + ρ))) falls as ν rises, tending to 0, the Gaussian value."},{"l":"Advanced","q":"Two portfolios have identical margins and the same Kendall τ but different copulas: Gaussian and Gumbel. At a 99.9% level, the VaR of the combined loss is…","o":["Identical, since τ is the same","Typically higher under the Gumbel copula, because of its upper-tail dependence","Lower under both than under independence","Higher under the Gaussian copula"],"a":1,"e":"The same τ fixes the bulk of the dependence only; upper-tail dependence raises the chance of several large losses together, increasing high quantiles of the sum."},{"l":"Advanced","q":"What is canonical maximum likelihood (pseudo-observation) estimation of a copula?","o":["Replace each value by rank/(n + 1) and maximise the copula likelihood on those values","Maximise the joint likelihood of margins and copula together","Match the sample correlation matrix","Fit parametric margins and use their fitted cdfs"],"a":0,"e":"Ranks serve as non-parametric estimates of the margins, so the margins cannot be misspecified and the copula parameter is estimated from the uniform-scale data."},{"l":"Advanced","q":"Margins are fitted with a wrong parametric family and the copula is then estimated by likelihood on the fitted cdf values (IFM). What is the likely consequence?","o":["Nothing, because the copula is independent of the margins","The copula parameter is exactly right but its standard error is wrong","The estimate is the same as Kendall inversion","The copula parameter is biased, since it absorbs the error in the margins"],"a":3,"e":"The transformed values are not uniform, so the copula is fitted to a distorted sample; rank-based estimation avoids this."},{"l":"Expert","q":"Bivariate normal data with constant correlation are restricted to days when the first variable is above its 90th percentile. The sample correlation in this subsample will typically be…","o":["Higher than the true correlation","Always zero","Lower than the true correlation, because the selected variable has less spread","Equal to the true correlation"],"a":2,"e":"Truncating X reduces its variance, and corr = ρs/√(ρ²s² + 1 − ρ²) with s < 1 is below ρ: a selection artefact, not a change in dependence."},{"l":"Expert","q":"A risk team reports that correlations between two books rise from 0.3 to 0.6 in crisis periods, using only crisis days. What is the main statistical concern?","o":["The result must be due to a copula error","Selecting on high-volatility days raises measured correlation even if the dependence is unchanged","The sample is too large","Correlation cannot be computed on a subsample"],"a":1,"e":"A volatility regime inflates the covariance relative to the calm-period variances; one must separate a change in volatility from a change in dependence (Forbes and Rigobon)."},{"l":"Expert","q":"A goodness-of-fit test for a copula compares the empirical copula with the fitted one. Why is its p-value computed by a parametric bootstrap?","o":["Because the null distribution depends on the estimated parameter and has no closed form","Because a bootstrap always gives a smaller p-value","Because the empirical copula is not defined for small n","Because the data are heavy-tailed"],"a":0,"e":"The distribution of the Cramér–von Mises statistic depends on the family and the parameter estimation, so it is simulated from the fitted model and refitted each time."},{"l":"Expert","q":"In the one-factor Gaussian model for credit defaults with asset correlation ρ, what happens to the 99.9% loss quantile of a large portfolio as ρ rises, at the same PD?","o":["It equals the PD","It is unchanged, since the average default rate is unchanged","It falls, since defaults become more predictable","It rises sharply, since the factor makes defaults cluster"],"a":3,"e":"The quantile Φ((Φ⁻¹(PD) + √ρ Φ⁻¹(q))/√(1 − ρ)) increases with ρ for q above 50%; the mean is unchanged but the tail is much heavier."},{"l":"Expert","q":"A t factor model and a Gaussian factor model have the same PD and the same ρ. Which has the larger high quantile of portfolio loss, and why?","o":["The Gaussian, because it has a heavier body","They are equal, since the mean and ρ are equal","The t model, because the common scale produces joint extreme moves (tail dependence)","The Gaussian, because the t has fewer parameters"],"a":2,"e":"Equal mean and correlation do not fix the tail; the t’s common random scale gives tail dependence and a heavier loss tail."},{"l":"Expert","q":"Which sample is the best basis for estimating the tail dependence coefficient directly?","o":["A sample of ranks only, which contains no tail information","A very long sample, because only a few observations fall in the joint corner","Any sample, since tail dependence equals the correlation","A short sample, since extremes are frequent"],"a":1,"e":"Tail dependence is a limit; empirical estimates use the few points in the corner, so they are noisy and need long samples or a fitted parametric model."},{"l":"Expert","q":"A bank aggregates operational and credit losses with a Gaussian copula and reports a large diversification benefit at 99.9%. What is the best response?","o":["Test the result with copulas with tail dependence (t, Gumbel) and report the range of the diversification benefit","Report only the VaR of the largest component","Accept it, since the correlation was estimated from the data","Replace the copula by independence for conservatism"],"a":0,"e":"The benefit depends on the assumed dependence in the extremes, which the data cannot pin down; sensitivity to tail-dependent alternatives is the honest statement."}];
+(function(){const st=store.get('cp_quiz',{});
+ function render(){const box=$('quiz');box.innerHTML='';
+  QZ.forEach((q,i)=>{const d=document.createElement('div');d.className='q'+(st[i]!=null?' done':'');d.innerHTML=`<div class="qh">Q${i+1} · ${q.l}</div><div style="margin:4px 0 6px"><b>${q.q}</b></div>`;
+   q.o.forEach((o,j)=>{const b=document.createElement('button');b.className='opt';b.textContent=o;if(st[i]!=null){if(j===q.a)b.classList.add('good');else if(j===st[i])b.classList.add('bad')}b.onclick=()=>{if(st[i]!=null)return;st[i]=j;store.set('cp_quiz',st);render();meter()};d.appendChild(b)});
+   const e=document.createElement('div');e.className='ex';e.innerHTML=(st[i]===q.a?'✅ ':'❌ ')+q.e;d.appendChild(e);box.appendChild(d)});
+  const ans=Object.keys(st).length,ok=QZ.filter((q,i)=>st[i]===q.a).length;
+  $('qscore').innerHTML=stat('answered',ans+' / '+QZ.length,'in')+stat('correct',ok,'ok')+stat('score',ans?Math.round(100*ok/ans)+'%':'—',ok/Math.max(ans,1)>=.8?'ok':'warn')+stat('verdict',ans<QZ.length?'keep going':ok>=16?'copula master':ok>=13?'strong':'review ch. 1–11','')}
+ $('qreset').onclick=()=>{Object.keys(st).forEach(k=>delete st[k]);store.set('cp_quiz',st);render();meter()};
+ window.__qst=st;render();})();
+const CHK=["Explain why Pearson correlation is an incomplete summary of dependence.","State Sklar’s theorem and what it lets you do.","Compute and interpret Kendall’s τ and Spearman’s ρ, and convert them to a Gaussian-copula parameter.","Describe the Gaussian copula and why it has no tail dependence.","Describe the Clayton, Gumbel and Frank copulas and where each concentrates dependence.","Define tail dependence and compute it for the t copula.","Show how the copula changes the VaR and ES of a sum with the same margins.","Estimate a copula by pseudo-observations and explain why the margins should not be misspecified.","Test a copula with the empirical copula and a parametric bootstrap, and explain the low power in the tails.","Explain the selection bias in conditional correlations and what to use instead.","Use a factor model for default correlation and the Vasicek quantile.","Explain how a t factor model fattens the loss tail.","Report dependence uncertainty as a sensitivity range to alternative copulas.","Document the margins, copula family, estimation method, tail checks and sensitivity behind an aggregated risk figure."];
+(function(){const st=store.get('cp_chk',{}),box=$('chk');CHK.forEach((t,i)=>{const l=document.createElement('label'),c=document.createElement('input');c.type='checkbox';c.checked=!!st[i];c.onchange=()=>{st[i]=c.checked;store.set('cp_chk',st);meter()};l.appendChild(c);const s=document.createElement('span');s.textContent=t;l.appendChild(s);box.appendChild(l)});window.__cst=st;})();
+function meter(){const q=window.__qst||{},c=window.__cst||{};const ok=QZ.filter((x,i)=>q[i]===x.a).length,ck=Object.values(c).filter(Boolean).length;const p=Math.round(100*(.6*ok/QZ.length+.4*ck/CHK.length));$('mtxt').textContent='Mastery: '+p+'%  (exam + checklist)';$('mbar').style.width=p+'%';store.set('mastery_cp',p)}
+meter();
+
+/* ---------- Navigation ---------- */
+(function(){const nav=$('nav');let html='';
+ document.querySelectorAll('main .part, main section.ch').forEach(el=>{if(el.classList.contains('part'))html+=`<div class="pt">${el.textContent}</div>`;else{const h=el.querySelector('h2'),num=h.querySelector('.num').textContent,t=Array.from(h.childNodes).filter(n=>n.nodeType===3).map(n=>n.textContent).join('').trim();html+=`<a href="#${el.id}" data-id="${el.id}">${num}. ${t}</a>`}});
+ nav.innerHTML=html;const links=nav.querySelectorAll('a'),io=new IntersectionObserver(es=>{es.forEach(e=>{if(e.isIntersecting)links.forEach(a=>a.classList.toggle('on',a.dataset.id===e.target.id))})},{rootMargin:'-20% 0px -70% 0px'});
+ document.querySelectorAll('section.ch').forEach(s=>io.observe(s));
+ $('menu').onclick=()=>$('side').classList.toggle('open');nav.addEventListener('click',e=>{if(e.target.tagName==='A')$('side').classList.remove('open')});
+ window.addEventListener('scroll',()=>{const h=document.documentElement;$('prog').style.width=(100*h.scrollTop/(h.scrollHeight-h.clientHeight))+'%'},{passive:true});})();
+</script>
+</body>
+</html>

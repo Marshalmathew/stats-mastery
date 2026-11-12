@@ -1,0 +1,677 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Graph and Network Statistics Mastery</title>
+<style>
+:root{--bg:#0b0e17;--panel:#121726;--panel2:#171d30;--line:#232a3d;--fg:#e8ebf5;--mu:#8a93ab;--a:#6ea8ff;--r:#ff6b81;--y:#ffd166;--g:#4ade80;--p:#c084fc;--t:#5eead4}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;background:var(--bg);color:var(--fg);font:16px/1.7 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+a{color:var(--a)}
+#prog{position:fixed;top:0;left:0;height:3px;background:linear-gradient(90deg,var(--a),var(--p),var(--r));width:0;z-index:50}
+.side{position:fixed;left:0;top:0;bottom:0;width:290px;background:#0e1220;border-right:1px solid var(--line);overflow:auto;padding:18px 14px 90px;z-index:40;transition:transform .25s}
+.side h1{font-size:15px;margin:0 0 2px}
+.side small{color:var(--mu)}
+.side .pt{margin:16px 0 4px;font-size:11px;text-transform:uppercase;letter-spacing:1.3px;color:var(--p)}
+.side a{display:block;color:var(--mu);text-decoration:none;padding:5px 9px;border-radius:7px;font-size:13.5px;line-height:1.35}
+.side a:hover{background:var(--panel);color:var(--fg)}
+.side a.on{background:var(--panel2);color:var(--fg);box-shadow:inset 3px 0 var(--a)}
+.side a.back{color:var(--t);padding-left:0;margin-bottom:6px}
+.meter{position:fixed;left:0;bottom:0;width:290px;background:#0e1220;border-top:1px solid var(--line);padding:10px 16px;z-index:41;font-size:12px;color:var(--mu)}
+.meter .bar{height:7px;background:var(--line);border-radius:6px;margin-top:5px;overflow:hidden}
+.meter .bar i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--g),var(--t));transition:width .4s}
+#menu{display:none;position:fixed;top:10px;left:10px;z-index:60;background:var(--panel2);color:var(--fg);border:1px solid var(--line);border-radius:9px;padding:7px 12px;font-size:14px;cursor:pointer}
+main{margin-left:290px;padding:0 34px 120px;max-width:1090px}
+.hero{padding:70px 0 30px}
+.hero h1{font-size:clamp(32px,5vw,56px);line-height:1.08;margin:0 0 14px;background:linear-gradient(100deg,#fff,var(--y) 40%,var(--r));-webkit-background-clip:text;background-clip:text;color:transparent}
+.hero p{font-size:19px;color:#c3c9dc;max-width:780px}
+.chips{display:flex;flex-wrap:wrap;gap:8px;margin:18px 0}
+.chip{border:1px solid var(--line);background:var(--panel);padding:5px 12px;border-radius:99px;font-size:13px;color:var(--mu)}
+.chip b{color:var(--fg)}
+.part{margin:90px 0 0;padding-top:22px;border-top:1px solid var(--line);font-size:12px;letter-spacing:2px;text-transform:uppercase;color:var(--p)}
+section.ch{padding-top:30px}
+h2{font-size:30px;line-height:1.2;margin:10px 0 8px;display:flex;gap:12px;align-items:center;flex-wrap:wrap}
+h2 .num{display:inline-grid;place-items:center;width:40px;height:40px;border-radius:12px;background:var(--panel2);border:1px solid var(--line);font-size:18px;color:var(--a)}
+.lvl{font-size:11px;font-weight:600;letter-spacing:.8px;text-transform:uppercase;padding:3px 9px;border-radius:99px;border:1px solid}
+.lvl.b{color:var(--g);border-color:#1f5c3a}.lvl.i{color:var(--a);border-color:#244a85}.lvl.a{color:var(--y);border-color:#6b5420}.lvl.e{color:var(--r);border-color:#7a2c3a}
+h3{font-size:19px;margin:30px 0 6px;color:#fff}
+p{margin:10px 0}li{margin:5px 0}
+code,.f{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace}
+code{background:var(--panel2);padding:1px 6px;border-radius:5px;font-size:.9em}
+.f{display:block;white-space:pre-wrap;background:#0e1322;border:1px solid var(--line);border-left:3px solid var(--a);padding:12px 16px;border-radius:9px;margin:14px 0;overflow-x:auto;font-size:15px;color:#dbe4ff;line-height:1.8}
+.co{border-radius:12px;padding:13px 17px;margin:16px 0;border:1px solid var(--line);background:var(--panel)}
+.co>b:first-child{display:block;margin-bottom:2px;font-size:12px;letter-spacing:1px;text-transform:uppercase}
+.co.def{border-left:4px solid var(--a)}.co.def>b:first-child{color:var(--a)}
+.co.warn{border-left:4px solid var(--r)}.co.warn>b:first-child{color:var(--r)}
+.co.tip{border-left:4px solid var(--g)}.co.tip>b:first-child{color:var(--g)}
+.co.key{border-left:4px solid var(--y);background:#171608}.co.key>b:first-child{color:var(--y)}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:18px 20px;margin:22px 0;box-shadow:0 8px 30px rgba(0,0,0,.25)}
+.card>h4{margin:0 0 3px;font-size:13px;letter-spacing:1.2px;text-transform:uppercase;color:var(--t)}
+.card>p.sub{margin:0 0 12px;color:var(--mu);font-size:14.5px}
+.ctl{display:flex;flex-wrap:wrap;gap:10px 22px;align-items:center;margin:8px 0 10px}
+.ctl label{display:flex;gap:8px;align-items:center;font-size:14px;color:#c3c9dc}
+.ctl output{min-width:38px;font-family:ui-monospace,monospace;color:var(--y);font-size:13px}
+input[type=range]{accent-color:var(--a);width:150px}
+input[type=checkbox]{accent-color:var(--a)}
+select,input[type=number],input[type=text]{background:#0e1322;color:var(--fg);border:1px solid var(--line);border-radius:8px;padding:6px 9px;font:inherit;font-size:14px}
+button{background:linear-gradient(180deg,#2c4a80,#233b68);color:#fff;border:1px solid #3a5a98;border-radius:9px;padding:7px 14px;font:inherit;font-size:14px;cursor:pointer}
+button:hover{filter:brightness(1.15)}
+button.alt{background:var(--panel2);border-color:var(--line);color:var(--fg)}
+canvas{width:100%;height:270px;display:block;background:#0e1322;border:1px solid var(--line);border-radius:10px;margin-top:6px}
+canvas.sm{height:210px}canvas.tl{height:330px}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(125px,1fr));gap:9px;margin:12px 0}
+.stat{background:#0e1322;border:1px solid var(--line);border-radius:10px;padding:8px 11px}
+.stat b{display:block;font-size:17px;font-family:ui-monospace,monospace}
+.stat span{font-size:11.5px;color:var(--mu);text-transform:uppercase;letter-spacing:.7px}
+.stat.hot b{color:var(--r)}.stat.ok b{color:var(--g)}.stat.warn b{color:var(--y)}.stat.in b{color:var(--a)}
+.read{margin:8px 0 0;padding:10px 14px;background:#0e1322;border:1px dashed #33406a;border-radius:10px;font-size:14.5px;color:#d3dbf3}
+table{border-collapse:collapse;width:100%;margin:12px 0;font-size:14px}
+th,td{border:1px solid var(--line);padding:7px 10px;text-align:left;vertical-align:top}
+th{background:var(--panel2);font-size:12px;text-transform:uppercase;letter-spacing:.6px;color:var(--mu)}
+td.n{font-family:ui-monospace,monospace;text-align:right}
+.tw{overflow-x:auto}
+.pill{display:inline-block;padding:1px 9px;border-radius:99px;font-size:12px;font-weight:600}
+.pill.r{background:#3a1520;color:var(--r)}.pill.g{background:#10321f;color:var(--g)}.pill.y{background:#3a2f0e;color:var(--y)}.pill.m{background:#202637;color:var(--mu)}
+details{background:var(--panel);border:1px solid var(--line);border-radius:11px;padding:9px 15px;margin:9px 0}
+details summary{cursor:pointer;font-weight:600}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.q{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:14px 18px;margin:14px 0}
+.q .qh{font-size:12px;letter-spacing:1px;text-transform:uppercase;color:var(--mu)}
+.q .opt{display:block;width:100%;text-align:left;margin:6px 0;background:#0e1322;border:1px solid var(--line);color:var(--fg);border-radius:9px;padding:9px 12px}
+.q .opt.good{border-color:var(--g);background:#0e2418}.q .opt.bad{border-color:var(--r);background:#2a1119}
+.q .ex{display:none;margin-top:8px;font-size:14.5px;color:#c3c9dc}
+.q.done .ex{display:block}
+.chk label{display:flex;gap:10px;align-items:flex-start;padding:6px 0;cursor:pointer}
+.chk input{margin-top:6px;accent-color:var(--g);width:17px;height:17px}
+.sigrow{display:grid;grid-template-columns:minmax(170px,2fr) 1fr 1fr auto;gap:8px 14px;align-items:center;padding:6px 0;border-top:1px dashed #1b2236}
+.sigrow:first-of-type{border-top:0}
+.sigrow label{display:flex;gap:6px;align-items:center;font-size:13.5px;color:#c3c9dc}
+@media(max-width:900px){
+ .side{transform:translateX(-100%)}.side.open{transform:none}.meter{display:none}
+ #menu{display:block}main{margin-left:0;padding:0 16px 100px}.two{grid-template-columns:1fr}.hero{padding-top:60px}
+ .sigrow{grid-template-columns:1fr 1fr}
+}
+</style>
+</head>
+<body>
+<div id="prog"></div>
+<button id="menu">☰ Contents</button>
+<nav class="side" id="side"><a class="back" href="index.html">← All courses</a><h1>Graph and Network Statistics</h1><small>12 chapters · 11 labs · exam</small><div id="nav"></div></nav>
+<div class="meter"><div id="mtxt">Mastery: 0%</div><div class="bar"><i id="mbar"></i></div></div>
+
+<main>
+<header class="hero">
+ <h1>Graph and network statistics: reading structure in who is linked to whom, and knowing how far to trust it.</h1>
+ <p>Money moves between accounts, devices are shared, customers refer each other: much of banking risk, from mule accounts and fraud rings to contagion of defaults and churn, lives in the links rather than in the individual records. Network data break the assumptions of ordinary statistics, because the units are not independent and the observed network is usually only a biased piece of the real one. This page covers degree structure and heavy-tailed hubs, small worlds, centrality, communities and their detectability limits, null models for judging whether a pattern is surprising, sampling and measurement error, neighbour-based and propagation features for fraud detection, detecting dense rings, and the confusion of homophily with influence. Every lab simulates a network with known structure so methods can be judged against the truth.</p>
+ <div class="chips"><span class="chip"><b>Part I</b> Describing networks</span><span class="chip"><b>Part II</b> Structure and inference</span><span class="chip"><b>Part III</b> Network methods for risk</span></div>
+ <div class="co tip"><b>How to use this</b>Sliders change the setting; heavier labs recompute when you release a slider or press the button. Prerequisites: core distributions (item 2), confounding (item 22), multiple testing (item 21), extreme value theory (item 31) and anomaly detection (item 33).</div>
+</header>
+
+<div class="part">Part I · Describing networks</div>
+
+<section class="ch" id="c1">
+<h2><span class="num">1</span>Graphs, degrees and hubs <span class="lvl b">Beginner</span></h2>
+<p>A <b>graph</b> is a set of nodes (accounts, customers, devices) and links (payments, referrals, shared attributes); links can be directed (a payment has a sender and a receiver) or weighted (by amount or count). The simplest description is the <b>degree</b> of a node, the number of links it has, and the <b>degree distribution</b>. In the classical random graph every pair is linked independently, so degrees cluster around the mean (a Poisson distribution) and no node is far above the others. Real networks are different: their degrees have a heavy, roughly power-law tail, as generated by <b>preferential attachment</b> (new nodes link to nodes that already have many links). The mean degree then describes almost no node, a small number of hubs carry a large share of all links, and anything that depends on the hubs (the reach of a contagion, the effect of removing a node, how the network can be sampled) behaves very differently from the random graph.</p>
+<div class="f">mean degree = 2m/n  ·  random graph: D ~ Poisson  ·  preferential attachment: P(D ≥ d) ∝ d^(−α+1)  ·  hubs hold a disproportionate share of links</div>
+ <div class="card"><h4>Lab 1 · Random networks against networks with hubs</h4>
+ <p class="sub">Two networks with the same average degree. Left: how many nodes have at least a given number of links (log scales). Right: the share of all links held by the largest nodes.</p>
+ <div class="ctl"><label>nodes <input type="range" id="c1n" min="200" max="2000" step="100" value="1000"><output id="c1nv"></output></label><label>average degree <input type="range" id="c1k" min="2" max="12" step="1" value="6"><output id="c1kv"></output></label><button id="c1go">New networks</button></div>
+ <div class="two"><canvas class="sm" id="c1cv"></canvas><canvas class="sm" id="c1cv2"></canvas></div><div class="stats" id="c1st"></div><div class="read" id="c1rd"></div></div>
+</section>
+
+<section class="ch" id="c2">
+<h2><span class="num">2</span>Paths, clustering and small worlds <span class="lvl i">Intermediate</span></h2>
+<p>Two local and global summaries describe how a network is organised. The <b>clustering coefficient</b> is the probability that two neighbours of a node are themselves linked (a measure of triangles: “friends of friends are friends”). The <b>average path length</b> is the mean number of steps along the shortest route between two nodes. In a regular lattice clustering is high and paths are long; in a random graph clustering is low and paths are short (about ln n / ln k). Real networks combine high clustering with short paths: the <b>small-world</b> property, produced by a few long-range links in an otherwise local structure. Short paths are therefore the rule: “within 3 steps of a flagged account” covers a large share of a connected network, and means little without a reference for how many accounts one would expect within 3 steps anyway.</p>
+<div class="f">C = 3 × triangles / connected triples  ·  L = average shortest path  ·  random graph: C ≈ k/n, L ≈ ln n/ln k  ·  small world: C ≫ C_random, L ≈ L_random</div>
+ <div class="card"><h4>Lab 2 · A few shortcuts make a small world</h4>
+ <p class="sub">A ring network in which links are rewired at random. Left: clustering and path length against the share rewired (each as a fraction of the ring’s value). Right: one network.</p>
+ <div class="ctl"><label>share of links rewired <input type="range" id="c2p" min="0" max="7" step="1" value="4"><output id="c2pv"></output></label><button id="c2go">New networks</button></div>
+ <div class="two"><canvas class="sm" id="c2cv"></canvas><canvas class="sm" id="c2cv2"></canvas></div><div class="stats" id="c2st"></div><div class="read" id="c2rd"></div></div>
+</section>
+
+<section class="ch" id="c3">
+<h2><span class="num">3</span>Centrality: who matters in a network <span class="lvl i">Intermediate</span></h2>
+<p><b>Centrality</b> measures rank nodes by position. <b>Degree</b> counts links; <b>closeness</b> is the inverse of the average distance to other nodes; <b>betweenness</b> is the share of shortest paths between other pairs that pass through the node (brokerage and control of flows); <b>eigenvector centrality</b> gives credit for having well-connected neighbours; <b>PageRank</b> adds damping and a random jump, so that credit from a node is shared among its links. The measures answer different questions and can disagree a lot: in a network made of communities, the nodes that bridge them have ordinary degree and very high betweenness. The measures are descriptive statistics of a single observed network, with uncertainty that comes from how the network was observed (chapters 6 and 11); a node’s rank deep in the list is mostly noise.</p>
+<div class="f">betweenness(v) = Σ σₛₜ(v)/σₛₜ  ·  closeness(v) = (n − 1)/Σ d(v, u)  ·  PageRank: x = α·Pᵀx + (1 − α)/n</div>
+ <div class="card"><h4>Lab 3 · Do the centralities agree?</h4>
+ <p class="sub">A network of the chosen kind and four centrality measures. Left: degree against betweenness for each node. Right: rank correlation of each measure with degree.</p>
+ <div class="ctl"><label>network <select id="c3g"><option value="comm">two communities, a few bridges</option><option value="ba">hubs (preferential attachment)</option><option value="er">random</option></select></label><label>nodes <input type="range" id="c3n" min="100" max="600" step="50" value="300"><output id="c3nv"></output></label><button id="c3go">New network</button></div>
+ <div class="two"><canvas class="sm" id="c3cv"></canvas><canvas class="sm" id="c3cv2"></canvas></div><div class="stats" id="c3st"></div><div class="read" id="c3rd"></div></div>
+</section>
+
+<div class="part">Part II · Structure and inference</div>
+
+<section class="ch" id="c4">
+<h2><span class="num">4</span>Communities, modularity and detectability limits <span class="lvl a">Advanced</span></h2>
+<p>A <b>community</b> is a group of nodes more densely linked among themselves than with the rest. <b>Modularity</b>, Q = Σ<sub>c</sub> [e<sub>c</sub>/m − (d<sub>c</sub>/2m)²], scores a partition by comparing its internal links with those expected under random linking with the same degrees; algorithms (Louvain, Leiden, spectral methods) look for partitions with high Q. Two facts constrain interpretation. There is a <b>detectability threshold</b>: in the stochastic block model with two groups of average degrees a (within) and b (between), communities can be recovered above chance only if (a − b)² &gt; 2(a + b); below it they exist but no algorithm can find them. And modularity is biased: even a random graph has partitions with substantial Q, so a high value is not evidence of communities. Treat detected communities as a hypothesis, check their stability under resampling and compare them with the structure found in null models.</p>
+<div class="f">modularity Q = Σ_c [e_c/m − (d_c/2m)²]  ·  detectable only if (a − b)² &gt; 2(a + b)  ·  noise graphs also have Q &gt; 0</div>
+ <div class="card"><h4>Lab 4 · When can communities be found at all?</h4>
+ <p class="sub">Two planted communities. Left: how accurately a spectral method places nodes, against the difference between within- and between-community degree. Right: modularity found in the planted data and in a random graph.</p>
+ <div class="ctl"><label>average degree <input type="range" id="c4a" min="3" max="15" step="1" value="8"><output id="c4av"></output></label><label>within-minus-between degree <input type="range" id="c4d" min="0" max="200" step="5" value="80"><output id="c4dv"></output></label><button id="c4go">New networks</button></div>
+ <div class="two"><canvas class="sm" id="c4cv"></canvas><canvas class="sm" id="c4cv2"></canvas></div><div class="stats" id="c4st"></div><div class="read" id="c4rd"></div></div>
+</section>
+
+<section class="ch" id="c5">
+<h2><span class="num">5</span>Null models: is this pattern surprising? <span class="lvl a">Advanced</span></h2>
+<p>A network statistic means something only relative to a <b>null model</b>. The <b>Erdős–Rényi</b> null (same number of nodes and links, links placed at random) is almost always the wrong comparison: networks with hubs have many triangles, short paths and apparent communities even when linked at random given the degrees, so against the Erdős–Rényi null nearly everything looks significant. The <b>configuration model</b> keeps every node’s degree and randomises the pairing, and is generated in practice by repeated <b>double-edge swaps</b> (replace links a–b and c–d by a–d and c–b). The p-value is the share of null networks with a statistic at least as extreme, with (1 + count)/(1 + B) for B simulations. Stronger nulls (preserving also degree correlations, node attributes, time structure) answer more specific questions. State the null with every network result: “unusually clustered” is incomplete without “given the degrees”.</p>
+<div class="f">p = (1 + #{null ≥ observed})/(1 + B)  ·  configuration model: fix all degrees, randomise links  ·  double-edge swap a–b, c–d → a–d, c–b</div>
+ <div class="card"><h4>Lab 5 · Triangles against two null models</h4>
+ <p class="sub">A network with hubs and some added triadic closure. Left: triangle counts in null networks of the two kinds, with the observed count. Right: how often each null calls the network unusually clustered.</p>
+ <div class="ctl"><label>extra triadic closure <input type="range" id="c5x" min="0" max="100" step="5" value="0"><output id="c5xv"></output></label><button id="c5go">New networks</button></div>
+ <div class="two"><canvas class="sm" id="c5cv"></canvas><canvas class="sm" id="c5cv2"></canvas></div><div class="stats" id="c5st"></div><div class="read" id="c5rd"></div></div>
+</section>
+
+<section class="ch" id="c6">
+<h2><span class="num">6</span>Observing only part of the network <span class="lvl a">Advanced</span></h2>
+<p>A bank sees its own customers and the payments that pass through its system, not the whole network, and the part it sees is selected. Network statistics of a sampled network are <b>biased</b> and the bias depends on the sampling scheme. In <b>node sampling</b> (observe a random share f of the nodes and the links among them) mean degree falls to f times its value, clustering is partly kept, the tail of the degree distribution is truncated and hubs are misidentified; in <b>link sampling</b> mean degree is f times the truth and clustering falls like f² (a triangle needs all its links). Snowball and respondent-driven samples are selected towards high-degree nodes. There are corrections for particular statistics and schemes, but no general one: nodes are not independent, so the bootstrap and standard errors of ordinary statistics do not carry over. The first question for any network feature is who and what was observed.</p>
+<div class="f">node sampling: mean degree × f  ·  link sampling: triangles × f³, clustering × f²  ·  degrees of sampled nodes are not the true degrees</div>
+ <div class="card"><h4>Lab 6 · What a partial view does to the numbers</h4>
+ <p class="sub">A network with hubs, observed in part. Left: how four statistics change with the share observed (1 is the truth). Right: the degree distribution of the observed part against the truth.</p>
+ <div class="ctl"><label>sampling scheme <select id="c6s"><option value="node">nodes and the links among them</option><option value="edge">a random share of the links</option></select></label><label>share observed <input type="range" id="c6f" min="10" max="100" step="10" value="40"><output id="c6fv"></output></label><button id="c6go">New networks</button></div>
+ <div class="two"><canvas class="sm" id="c6cv"></canvas><canvas class="sm" id="c6cv2"></canvas></div><div class="stats" id="c6st"></div><div class="read" id="c6rd"></div></div>
+</section>
+
+<div class="part">Part III · Network methods for risk</div>
+
+<section class="ch" id="c7">
+<h2><span class="num">7</span>Guilt by association: neighbour-based features <span class="lvl e">Expert</span></h2>
+<p>The most used network idea in fraud and AML is that risky accounts link to risky accounts (<b>homophily</b>) so that the labels of an account’s neighbours predict its own. The simplest features are the count and the share of known-risky neighbours, extended to two hops and to counterparty types. Their value depends on three things: how strong the homophily is (with none, neighbours carry no information), how many labels are known (few known frauds make the feature sparse), and how the labels were obtained (investigations of earlier alerts, so selected). Practical care is needed with leakage (a neighbour’s label must have been known at the scoring date), with hubs (a merchant linked to many frauds is not itself fraudulent; use shares or degree-adjusted measures) and with the evaluation, which must exclude the labelled seeds and use later periods.</p>
+<div class="f">feature: #known-risky neighbours, share = # / degree  ·  needs homophily  ·  evaluate on accounts whose own label is unknown at the scoring date</div>
+ <div class="card"><h4>Lab 7 · How much do neighbours tell you?</h4>
+ <p class="sub">Accounts linked with some homophily among fraudsters; some frauds already known. Left: AUC of neighbour-based scores against homophily. Right: AUC against the share of frauds known.</p>
+ <div class="ctl"><label>homophily <input type="range" id="c7h" min="0" max="90" step="10" value="40"><output id="c7hv"></output></label><label>frauds already known <input type="range" id="c7q" min="5" max="100" step="5" value="40"><output id="c7qv"></output></label><button id="c7go">New networks</button></div>
+ <div class="two"><canvas class="sm" id="c7cv"></canvas><canvas class="sm" id="c7cv2"></canvas></div><div class="stats" id="c7st"></div><div class="read" id="c7rd"></div></div>
+</section>
+
+<section class="ch" id="c8">
+<h2><span class="num">8</span>Finding rings: dense subgraphs and scan statistics <span class="lvl e">Expert</span></h2>
+<p>Mule networks and fraud rings show up as groups of accounts with unusually many links among themselves. <b>Densest-subgraph</b> methods find the group maximising links per node, and peeling (repeatedly deleting the least-connected node) gives a fast approximate solution. The statistical issue is that the most extreme patch of a large sparse network is always denser than average: the maximum over many subsets has its own <b>null distribution</b>, so a found ring needs a p-value or limit from simulated null networks (<b>scan statistic</b>). Power depends on the ring’s size and internal density relative to the background: small or loosely linked rings cannot be told from chance, and many “rings” in a large network will be false. Combine the structural signal with behavioural evidence (timing, amounts, shared devices) and measure the false-positive rate in the null before operationalising.</p>
+<div class="f">density = links/nodes  ·  null distribution of the maximum density by simulation  ·  ring density p(k − 1)/2 versus background d/2</div>
+ <div class="card"><h4>Lab 8 · Can a ring be told from chance?</h4>
+ <p class="sub">A sparse random network with a planted ring. Left: the densest subgraph found in networks without a ring, and in the one with. Right: how well rings of different sizes are recovered and detected.</p>
+ <div class="ctl"><label>accounts <input type="range" id="c8n" min="200" max="1000" step="100" value="500"><output id="c8nv"></output></label><label>average degree <input type="range" id="c8d" min="2" max="8" step="1" value="4"><output id="c8dv"></output></label><label>ring size <input type="range" id="c8k" min="4" max="30" step="1" value="12"><output id="c8kv"></output></label><label>links among ring members <input type="range" id="c8p" min="20" max="100" step="10" value="60"><output id="c8pv"></output></label><button id="c8go">New networks</button></div>
+ <div class="two"><canvas class="sm" id="c8cv"></canvas><canvas class="sm" id="c8cv2"></canvas></div><div class="stats" id="c8st"></div><div class="read" id="c8rd"></div></div>
+</section>
+
+<section class="ch" id="c9">
+<h2><span class="num">9</span>Homophily or influence? <span class="lvl e">Expert</span></h2>
+<p>Linked accounts have similar outcomes: they churn together, default together, adopt a product together. Two stories produce this. In <b>influence</b> (contagion) one account’s behaviour changes its neighbours’; in <b>homophily</b> accounts link because they are already alike (same employer, same city, same stress) and would behave alike with no interaction. Regressing an account’s outcome on its neighbours’ outcomes confounds the two (Shalizi and Thomas): with homophily on an unobserved trait the estimate is positive even when influence is zero. Controlling for observed traits helps only as far as they capture the hidden ones. To claim influence one needs the tools of the causal items: timing (neighbours’ behaviour changes first, with pre-trends checked), instruments, natural experiments, or randomisation, with cluster-level assignment because the units interact (interference). The decision matters: targeting the neighbours of churners helps only if there is contagion.</p>
+<div class="f">naive slope = influence + confounding by shared traits  ·  homophily and contagion are generically confounded  ·  interference: SUTVA fails in networks</div>
+ <div class="card"><h4>Lab 9 · A fake contagion from similar accounts</h4>
+ <p class="sub">Accounts with a hidden trait that drives their outcome; links form between similar ones. Left: own outcome against neighbours’ average outcome. Right: the estimated “influence” against homophily, with and without a control.</p>
+ <div class="ctl"><label>homophily <input type="range" id="c9h" min="0" max="95" step="5" value="70"><output id="c9hv"></output></label><label>true influence <input type="range" id="c9b" min="0" max="50" step="5" value="0"><output id="c9bv"></output></label><label>noise in the observed trait <input type="range" id="c9s" min="1" max="20" step="1" value="5"><output id="c9sv"></output></label><button id="c9go">New networks</button></div>
+ <div class="two"><canvas class="sm" id="c9cv"></canvas><canvas class="sm" id="c9cv2"></canvas></div><div class="stats" id="c9st"></div><div class="read" id="c9rd"></div></div>
+</section>
+
+<section class="ch" id="c10">
+<h2><span class="num">10</span>Propagation and random walks: PageRank <span class="lvl e">Expert</span></h2>
+<p><b>PageRank</b> is the stationary distribution of a random walk that follows a random link with probability α (the damping) and otherwise jumps to a node drawn from a teleport distribution. With a uniform teleport it measures importance; with the teleport concentrated on known risky accounts, <b>personalised PageRank</b> (a form of risk propagation or taint analysis) scores every account by how much of the walk starting from the seeds reaches it, with distance-weighted contributions from all hops. The damping sets how far risk is allowed to travel: small values reproduce the 1-hop count, large ones spread widely and dilute the signal in networks where everything is a few hops from everything. It is a feature, not a verdict: tune α on later periods, exclude seeds from evaluation, treat hubs specially, and check whether the extra hops add anything beyond the 1-hop count.</p>
+<div class="f">x = α·Pᵀx + (1 − α)·r  ·  r = distribution on known risky nodes  ·  α → 0: 1-hop scores, α → 1: global structure</div>
+ <div class="card"><h4>Lab 10 · How far should risk travel?</h4>
+ <p class="sub">Personalised PageRank from known frauds. Left: AUC against the damping, compared with the 1-hop count. Right: AUC against homophily for both.</p>
+ <div class="ctl"><label>damping <input type="range" id="c10a" min="10" max="99" step="1" value="85"><output id="c10av"></output></label><label>homophily <input type="range" id="c10h" min="0" max="90" step="10" value="50"><output id="c10hv"></output></label><label>frauds already known <input type="range" id="c10q" min="5" max="100" step="5" value="15"><output id="c10qv"></output></label><button id="c10go">New networks</button></div>
+ <div class="two"><canvas class="sm" id="c10cv"></canvas><canvas class="sm" id="c10cv2"></canvas></div><div class="stats" id="c10st"></div><div class="read" id="c10rd"></div></div>
+</section>
+
+<section class="ch" id="c11">
+<h2><span class="num">11</span>Measurement error in networks <span class="lvl e">Expert</span></h2>
+<p>Links are measurements with error: transactions that are captured and ones that are not, other banks’ accounts that are invisible, links inferred from names, devices or time windows that may be coincidences. The effect on network statistics differs between them: every ranking degrades as noise grows, hub-based measures such as degree and PageRank usually hold up somewhat better, and betweenness, paths and clustering are the most fragile because they depend on the exact structure. The tool is a <b>perturbation analysis</b>: delete and add links at plausible rates and see how rankings, communities and flagged rings change, and report the stability rather than a single ranking. Include the process generating missingness (it is rarely random: large transactions are captured, small ones are not) in the analysis, and prefer robust features when data quality is uncertain. Treat the network analysis as an input to a case, with documentation of definitions, coverage and sensitivity.</p>
+<div class="f">robust: degree, PageRank, share of risky neighbours  ·  fragile: betweenness, path counts, clustering  ·  stability under perturbation as a result</div>
+ <div class="card"><h4>Lab 11 · How fragile are network rankings?</h4>
+ <p class="sub">A network and a noisy version of it. Left: rank correlation of three centralities with the truth against the share of links missing. Right: against the number of spurious links added.</p>
+ <div class="ctl"><label>links missing <input type="range" id="c11m" min="0" max="60" step="5" value="30"><output id="c11mv"></output></label><label>spurious links added <input type="range" id="c11s" min="0" max="60" step="5" value="30"><output id="c11sv"></output></label><button id="c11go">New networks</button></div>
+ <div class="two"><canvas class="sm" id="c11cv"></canvas><canvas class="sm" id="c11cv2"></canvas></div><div class="stats" id="c11st"></div><div class="read" id="c11rd"></div></div>
+</section>
+
+<section class="ch" id="c12">
+<h2><span class="num">12</span>Final exam, mastery checklist, cheat sheet <span class="lvl e">Expert</span></h2>
+<h3>Exam (18 questions — click an answer)</h3>
+<div id="quiz"></div>
+<div class="card"><h4>Score</h4><div class="stats" id="qscore"></div><button class="alt" id="qreset">Reset exam</button></div>
+<h3>Mastery checklist — tick when you can do it without notes</h3>
+<div class="card chk" id="chk"></div>
+<h3>Cheat sheet</h3>
+<div class="tw"><table>
+<tr><th>Idea</th><th>One line</th></tr>
+<tr><td>Degree distribution</td><td>Random graphs: Poisson, no hubs; real networks: heavy tail from preferential attachment; the mean describes almost no node</td></tr>
+<tr><td>Small world</td><td>High clustering with short paths; short paths are normal, so “within k hops” needs a reference</td></tr>
+<tr><td>Centrality</td><td>Degree, closeness, betweenness (brokerage), eigenvector and PageRank answer different questions and can disagree strongly</td></tr>
+<tr><td>Communities</td><td>Modularity is optimistic (random graphs score &gt; 0); detectable only if (a − b)² &gt; 2(a + b); check stability</td></tr>
+<tr><td>Null models</td><td>Erdős–Rényi is usually the wrong null; configuration model keeps degrees; p = (1 + #≥)/(1 + B)</td></tr>
+<tr><td>Partial observation</td><td>Sampled networks give biased statistics (mean degree × f, clustering × f² or f³); no general bootstrap</td></tr>
+<tr><td>Neighbour features</td><td>Count and share of risky neighbours work only with homophily and known labels; beware leakage and hubs</td></tr>
+<tr><td>Rings</td><td>Densest subgraph needs a null distribution of the maximum density; small loose rings cannot be told from chance</td></tr>
+<tr><td>Homophily vs influence</td><td>Neighbour outcome regressions confound the two; designs and causal tools are needed; interference breaks SUTVA</td></tr>
+<tr><td>Personalised PageRank</td><td>Risk propagation from seeds; damping sets reach; tune on later periods; exclude seeds in evaluation</td></tr>
+<tr><td>Measurement error</td><td>All rankings degrade; hub-based measures hold up better than betweenness and paths; do a perturbation analysis and report stability</td></tr>
+<tr><td>Governance</td><td>Document link definitions, coverage, null models, stability and false-positive rates of any network-based alert</td></tr>
+</table></div>
+<div class="co tip"><b>Next in Stage 7</b>Item 35 covers uncertainty quantification for machine learning: conformal prediction, prediction intervals with guarantees, coverage under distribution shift, and calibrated uncertainty for scoring models.</div>
+</section>
+</main>
+<script>
+/*MATH*/
+function lgamma(x){const c=[76.18009172947146,-86.50532032941677,24.01409824083091,-1.231739572450155,0.1208650973866179e-2,-0.5395239384953e-5];let y=x,t=x+5.5;t-=(x+.5)*Math.log(t);let s=1.000000000190015;for(let j=0;j<6;j++)s+=c[j]/++y;return -t+Math.log(2.5066282746310005*s/x);}
+function gser(a,x){let ap=a,sum=1/a,del=sum;for(let n=0;n<1000;n++){ap++;del*=x/ap;sum+=del;if(Math.abs(del)<Math.abs(sum)*1e-15)break;}return sum*Math.exp(-x+a*Math.log(x)-lgamma(a));}
+function gcf(a,x){let b=x+1-a,c=1/1e-300,d=1/b,h=d;for(let i=1;i<1000;i++){const an=-i*(i-a);b+=2;d=an*d+b;if(Math.abs(d)<1e-300)d=1e-300;c=b+an/c;if(Math.abs(c)<1e-300)c=1e-300;d=1/d;const del=d*c;h*=del;if(Math.abs(del-1)<1e-15)break;}return Math.exp(-x+a*Math.log(x)-lgamma(a))*h;}
+function gammaQ(a,x){if(x<=0)return 1;return x<a+1?1-gser(a,x):gcf(a,x);}
+function betacf(a,b,x){const qab=a+b,qap=a+1,qam=a-1;let c=1,d=1-qab*x/qap;if(Math.abs(d)<1e-300)d=1e-300;d=1/d;let h=d;for(let m=1;m<=1000;m++){const m2=2*m;let aa=m*(b-m)*x/((qam+m2)*(a+m2));d=1+aa*d;if(Math.abs(d)<1e-300)d=1e-300;c=1+aa/c;if(Math.abs(c)<1e-300)c=1e-300;d=1/d;h*=d*c;aa=-(a+m)*(qab+m)*x/((a+m2)*(qap+m2));d=1+aa*d;if(Math.abs(d)<1e-300)d=1e-300;c=1+aa/c;if(Math.abs(c)<1e-300)c=1e-300;d=1/d;const del=d*c;h*=del;if(Math.abs(del-1)<1e-15)break;}return h;}
+function betai(a,b,x){if(x<=0)return 0;if(x>=1)return 1;const bt=Math.exp(lgamma(a+b)-lgamma(a)-lgamma(b)+a*Math.log(x)+b*Math.log(1-x));return x<(a+1)/(a+b+2)?bt*betacf(a,b,x)/a:1-bt*betacf(b,a,1-x)/b;}
+function normSf(z){const q=0.5*gammaQ(.5,z*z/2);return z>=0?q:1-q;}
+function normCdf(z){return normSf(-z);}
+function npdf(x){return Math.exp(-x*x/2)/2.5066282746310002;}
+function lbin(n,k){return lgamma(n+1)-lgamma(k+1)-lgamma(n-k+1);}
+function binom(n,k,p){return Math.exp(lbin(n,k)+k*Math.log(p)+(n-k)*Math.log(1-p));}
+function betapdf(x,a,b){return x<=0||x>=1?0:Math.exp(lgamma(a+b)-lgamma(a)-lgamma(b)+(a-1)*Math.log(x)+(b-1)*Math.log(1-x));}
+function betacdf(x,a,b){return betai(a,b,x);}
+function gampdf(x,a,r){return x<=0?0:Math.exp(a*Math.log(r)+(a-1)*Math.log(x)-r*x-lgamma(a));}
+function gamcdf(x,a,r){return x<=0?0:1-gammaQ(a,r*x);}
+function randn(){let u=0;while(!u)u=Math.random();return Math.sqrt(-2*Math.log(u))*Math.cos(2*Math.PI*Math.random());}
+function gammaS(a){if(a<1)return gammaS(a+1)*Math.pow(Math.random(),1/a);const d=a-1/3,c=1/Math.sqrt(9*d);for(;;){let x,v;do{x=randn();v=1+c*x}while(v<=0);v=v*v*v;const u=Math.random();if(Math.log(u)<.5*x*x+d-d*v+d*Math.log(v))return d*v;}}
+function betaS(a,b){const x=gammaS(a),y=gammaS(b);return x/(x+y);}
+function binS(n,p){let k=0;for(let i=0;i<n;i++)if(Math.random()<p)k++;return k;}
+function mean(a){let s=0;for(const v of a)s+=v;return s/a.length;}
+function qc(cdf,lo,hi,p,it){for(let i=0;i<(it||100);i++){const m=(lo+hi)/2;if(cdf(m)<p)lo=m;else hi=m}return(lo+hi)/2;}
+function qb(a,b,p){return qc(x=>betai(a,b,x),0,1,p,50);}
+function tcdf(x,v){const t=.5*betai(v/2,.5,v/(v+x*x));return x>0?1-t:t}
+function qn(p){return qc(normCdf,-9,9,p,70)}
+function pois(k,l){return Math.exp(-l+k*Math.log(l)-lgamma(k+1))}
+function binF(n,p){let k=0;for(;;){if(n<=0||p<=0)return k;if(p>=1)return k+n;if(n<=40){for(let i=0;i<n;i++)if(Math.random()<p)k++;return k}const a=1+(n>>1),bb=1+n-a,x=betaS(a,bb);if(x>=p){n=a-1;p=p/x}else{k+=a;n=bb-1;p=(p-x)/(1-x)}}}
+/*ENDMATH*/
+
+const $=id=>document.getElementById(id), val=id=>+$(id).value;
+const C={fg:'#e8ebf5',mu:'#8a93ab',gr:'#232a3d',a:'#6ea8ff',r:'#ff6b81',y:'#ffd166',g:'#4ade80',p:'#c084fc',t:'#5eead4'};
+const store={get(k,d){try{const v=JSON.parse(localStorage.getItem(k));return v==null?d:v}catch(e){return d}},set(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}};
+function stat(l,v,c){return `<div class="stat ${c||''}"><b>${v}</b><span>${l}</span></div>`}
+function f3(x){if(!isFinite(x))return String(x);const a=Math.abs(x);if(a!==0&&(a<1e-3||a>=1e6))return x.toExponential(2);return String(+x.toFixed(a<1?4:a<100?3:a<1000?2:0))}
+function pc(x){return f3(100*x)+'%'}
+const resizers=[];
+function reg(fn){fn();resizers.push(fn)}
+function on(ids,fn){ids.split(' ').forEach(i=>{const e=$(i);e.addEventListener('input',fn);e.addEventListener('change',fn)})}
+let rt;window.addEventListener('resize',()=>{clearTimeout(rt);rt=setTimeout(()=>resizers.forEach(f=>f()),150)});
+document.querySelectorAll('input[type=range]').forEach(i=>{const o=$(i.id+'v');if(!o)return;const f=()=>{o.textContent=i.value};i.addEventListener('input',f);f()});
+
+function nice(x){const e=Math.pow(10,Math.floor(Math.log10(x))),f=x/e;return (f<1.5?1:f<3?2:f<7?5:10)*e}
+function mk(cv,x0,x1,ymax,o){o=o||{};const y0=o.y0||0,dpr=window.devicePixelRatio||1,r=cv.getBoundingClientRect(),w=r.width||600,h=r.height||270;
+ cv.width=w*dpr;cv.height=h*dpr;const g=cv.getContext('2d');g.setTransform(dpr,0,0,dpr,0,0);g.clearRect(0,0,w,h);
+ const L=o.L||42,R=12,T=14,B=28,X=x=>L+(x-x0)/(x1-x0)*(w-L-R),Y=y=>h-B-(y-y0)/(ymax-y0)*(h-T-B);
+ g.font='11px system-ui';g.lineWidth=1;g.strokeStyle=C.gr;g.fillStyle=C.mu;
+ if(!o.noGrid){const sx=nice((x1-x0)/7);for(let x=Math.ceil(x0/sx-1e-9)*sx;!o.noX&&x<=x1+1e-9;x+=sx){g.beginPath();g.moveTo(X(x),T);g.lineTo(X(x),h-B);g.stroke();g.textAlign='center';g.fillText(String(+x.toFixed(6)),X(x),h-B+15)}
+ const sy=nice((ymax-y0)/4);for(let y=Math.ceil(y0/sy-1e-9)*sy;y<=ymax+1e-9;y+=sy){g.beginPath();g.moveTo(L,Y(y));g.lineTo(w-R,Y(y));g.stroke();g.textAlign='right';g.fillText(String(+y.toFixed(4)),L-5,Y(y)+3)}}
+ return{g,w,h,X,Y,L,R,T,B,
+  line(f,col,lw,a,b,n,dash){a=a==null?x0:a;b=b==null?x1:b;n=n||260;g.save();if(dash)g.setLineDash([5,4]);g.beginPath();g.strokeStyle=col;g.lineWidth=lw||2;let st=false;for(let i=0;i<=n;i++){const x=a+(b-a)*i/n,y=f(x);if(!isFinite(y)){st=false;continue}st?g.lineTo(X(x),Y(y)):g.moveTo(X(x),Y(y));st=true}g.stroke();g.restore()},
+  area(f,a,b,col,n){a=Math.max(a,x0);b=Math.min(b,x1);if(b<=a)return;n=n||200;g.beginPath();g.moveTo(X(a),Y(0));for(let i=0;i<=n;i++){const x=a+(b-a)*i/n;g.lineTo(X(x),Y(f(x)))}g.lineTo(X(b),Y(0));g.closePath();g.fillStyle=col;g.fill()},
+  vline(x,col,lab,dash){g.save();g.strokeStyle=col;g.lineWidth=1.6;if(dash)g.setLineDash([5,4]);g.beginPath();g.moveTo(X(x),T);g.lineTo(X(x),h-B);g.stroke();g.restore();if(lab){g.fillStyle=col;g.textAlign='center';g.fillText(lab,Math.min(Math.max(X(x),34),w-34),T+10)}},
+  hline(y,col,lab){g.save();g.strokeStyle=col;g.lineWidth=1.4;g.setLineDash([5,4]);g.beginPath();g.moveTo(L,Y(y));g.lineTo(w-R,Y(y));g.stroke();g.restore();if(lab){g.fillStyle=col;g.textAlign='right';g.fillText(lab,w-R-3,Y(y)-4)}},
+  text(s,x,y,col,al){g.fillStyle=col||C.fg;g.textAlign=al||'left';g.fillText(s,x,y)}};}
+
+/* ---------- shared helpers for this page ---------- */
+const D={
+ norm:{n:'Normal(0,1)',s:()=>randn(),mu:0,sd:1,sk:0},
+ unif:{n:'Uniform(0,1)',s:()=>Math.random(),mu:.5,sd:Math.sqrt(1/12),sk:0},
+ expo:{n:'Exponential(1)',s:()=>-Math.log(1-Math.random()),mu:1,sd:1,sk:2},
+ logn:{n:'Lognormal(0,1)',s:()=>Math.exp(randn()),mu:Math.exp(.5),sd:Math.sqrt((Math.E-1)*Math.E),sk:(Math.E+2)*Math.sqrt(Math.E-1),disc:0},
+ b05:{n:'Bernoulli(0.5)',s:()=>Math.random()<.5?1:0,mu:.5,sd:.5,sk:0,disc:1},
+ b05s:{n:'Bernoulli(0.05)',s:()=>Math.random()<.05?1:0,mu:.05,sd:Math.sqrt(.0475),sk:.9/Math.sqrt(.0475),disc:1},
+ bimo:{n:'Two humps',s:()=>(Math.random()<.5?-2:2)+.5*randn(),mu:0,sd:Math.sqrt(4.25),sk:0},
+ par5:{n:'Pareto(α=5)',s:()=>Math.pow(1-Math.random(),-.2),mu:1.25,sd:Math.sqrt(5/48),sk:6*Math.sqrt(.6)},
+ cauchy:{n:'Cauchy (no mean)',s:()=>Math.tan(Math.PI*(Math.random()-.5)),mu:NaN,sd:Infinity,sk:NaN}
+};
+function fillSel(id,keys,def){const e=$(id);e.innerHTML=keys.map(k=>`<option value="${k}">${D[k].n}</option>`).join('');e.value=def}
+const PAL=[C.a,C.r,C.y,C.g,C.p,C.t,'#ff9f43','#9aa4bf'];
+function tgrid(N,M){const T=[];let prev=0;for(let i=0;i<M;i++){let n=Math.round(Math.pow(10,Math.log10(N)*i/(M-1)));if(i===M-1)n=N;n=Math.max(prev+1,n);if(n>N)break;T.push(n);prev=n}if(T[T.length-1]!==N)T[T.length-1]=N;return T}
+function nlab(n){return n>=1e6?(n/1e6)+'M':n>=1000?(n/1000)+'k':String(n)}
+function customGrid(P,xt,yt){const g=P.g;g.save();g.strokeStyle=C.gr;g.fillStyle=C.mu;g.font='11px system-ui';g.lineWidth=1;
+ xt.forEach(([v,l])=>{g.beginPath();g.moveTo(P.X(v),P.T);g.lineTo(P.X(v),P.h-P.B);g.stroke();g.textAlign='center';g.fillText(l,P.X(v),P.h-P.B+15)});
+ yt.forEach(([v,l])=>{g.beginPath();g.moveTo(P.L,P.Y(v));g.lineTo(P.w-P.R,P.Y(v));g.stroke();g.textAlign='right';g.fillText(l,P.L-5,P.Y(v)+3)});g.restore()}
+function clip(P,fn){const g=P.g;g.save();g.beginPath();g.rect(P.L,P.T,P.w-P.L-P.R,P.h-P.T-P.B);g.clip();fn();g.restore()}
+function poly(P,pts,col,lw,dash){const g=P.g;g.save();if(dash)g.setLineDash([5,4]);g.strokeStyle=col;g.lineWidth=lw||2;g.beginPath();pts.forEach(([x,y],i)=>i?g.lineTo(P.X(x),P.Y(y)):g.moveTo(P.X(x),P.Y(y)));g.stroke();g.restore()}
+function dots(P,pts,col,r){const g=P.g;g.fillStyle=col;pts.forEach(([x,y])=>{g.beginPath();g.arc(P.X(x),P.Y(y),r||3,0,7);g.fill()})}
+function niceTicks(lo,hi,k){const st=nice((hi-lo)/(k||5)),a=[];for(let v=Math.ceil(lo/st-1e-9)*st;v<=hi+1e-9;v+=st)a.push([v,String(+v.toFixed(6))]);return a}
+function logTicks(lo,hi){const a=[];for(let e=Math.ceil(lo-1e-9);e<=hi+1e-9;e++)a.push([e,nlab(Math.pow(10,e))]);return a}
+function mom(a){const n=a.length;let m=0;for(const v of a)m+=v;m/=n;let v2=0,v3=0,v4=0;for(const v of a){const d=v-m;v2+=d*d;v3+=d*d*d;v4+=d*d*d*d}v2/=n;v3/=n;v4/=n;const sd=Math.sqrt(v2);return{n,m,sd,sk:sd>0?v3/(sd*sd*sd):0,ku:v2>0?v4/(v2*v2)-3:0}}
+function ksN(z){const a=Array.from(z).sort((x,y)=>x-y),n=a.length;let d=0;for(let i=0;i<n;i++){const F=normCdf(a[i]);d=Math.max(d,Math.abs((i+1)/n-F),Math.abs(i/n-F))}return d}
+/* histogram of data as density with optional overlay curves [{f,col,lw,dash}] */
+function hist(cv,data,lo,hi,bins,ov,col){const cnt=new Float64Array(bins),bw=(hi-lo)/bins;let n=0;for(const v of data){if(v<lo||v>=hi)continue;cnt[Math.floor((v-lo)/bw)]++;n++}
+ const N=data.length;let ym=0;for(let i=0;i<bins;i++){cnt[i]/=N*bw;ym=Math.max(ym,cnt[i])}
+ (ov||[]).forEach(o=>{for(let i=0;i<=80;i++)ym=Math.max(ym,o.f(lo+(hi-lo)*i/80)||0)});
+ const P=mk(cv,lo,hi,ym*1.12);
+ P.g.fillStyle=col||'rgba(110,168,255,.5)';for(let i=0;i<bins;i++){if(cnt[i]<=0)continue;const a=P.X(lo+i*bw),b=P.X(lo+(i+1)*bw);P.g.fillRect(a,P.Y(cnt[i]),Math.max(1,b-a-1),P.Y(0)-P.Y(cnt[i]))}
+ (ov||[]).forEach(o=>P.line(o.f,o.col,o.lw||2.4,lo,hi,200,o.dash));return P}
+const fmt=x=>f3(x);
+
+/* ---------- shared for this page ---------- */
+const POPS=['norm','unif','expo','logn','bimo','par5'];
+D.norm.med=0;D.norm.q90=1.2815516;D.unif.med=.5;D.unif.q90=.9;D.expo.med=Math.LN2;D.expo.q90=Math.log(10);D.logn.med=1;D.logn.q90=Math.exp(1.2815516);
+D.bimo.med=0;D.bimo.q90=qc(x=>.5*normCdf((x+2)/.5)+.5*normCdf((x-2)/.5),-10,10,.9,80);D.par5.med=Math.pow(2,.2);D.par5.q90=Math.pow(10,.2);
+const SF={mean:a=>mean(a),median:a=>{const b=Float64Array.from(a).sort(),n=b.length;return n%2?b[(n-1)/2]:(b[n/2-1]+b[n/2])/2},sd:a=>{const n=a.length,m=mean(a);let s=0;for(const v of a)s+=(v-m)*(v-m);return Math.sqrt(s/(n-1))},q90:a=>{const b=Float64Array.from(a).sort();return b[Math.round(.9*(b.length-1))]}};
+function truth(key,st){const d=D[key];return st==='mean'?d.mu:st==='median'?d.med:st==='sd'?d.sd:d.q90}
+const SNAME={mean:'sample mean',median:'sample median',sd:'sample SD',q90:'90th percentile'};
+const N10=[2,3,5,10,20,50,100,200,500,1000];
+function pct(a,p){const b=Float64Array.from(a).sort();return b[Math.min(b.length-1,Math.max(0,Math.floor(p*b.length)))]}
+function histLines(cv,arrs,cols,lo,hi,bins,vl){const bw=(hi-lo)/bins,dens=arrs.map(a=>{const c=new Float64Array(bins);for(const v of a){if(v<lo||v>=hi)continue;c[Math.floor((v-lo)/bw)]++}for(let i=0;i<bins;i++)c[i]/=a.length*bw;return c});let ym=0;dens.forEach(c=>c.forEach(v=>ym=Math.max(ym,v)));const P=mk(cv,lo,hi,ym*1.15||1);
+ dens.forEach((c,k)=>{const pts=[];for(let i=0;i<bins;i++){pts.push([lo+i*bw,c[i]]);pts.push([lo+(i+1)*bw,c[i]])}clip(P,()=>poly(P,pts,cols[k],2.2))});(vl||[]).forEach(v=>P.vline(v[0],v[1],v[2],v[3]));return P}
+function sdOf(a){return mom(a).sd}
+
+/* ---------- ML helpers ---------- */
+function digamma(x){let r=0;while(x<6){r-=1/x;x++}const f=1/(x*x);return r+Math.log(x)-.5/x-f*(1/12-f*(1/120-f/252))}
+function trigamma(x){let r=0;while(x<6){r+=1/(x*x);x++}const f=1/(x*x);return r+1/x+.5*f+f/x*(1/6-f*(1/30-f/42))}
+function poisS(l){if(l<=0)return 0;if(l<30){const L=Math.exp(-l);let k=0,p=1;do{k++;p*=Math.random()}while(p>L);return k-1}const m=Math.floor(.875*l),g=gammaS(m);return g<l?m+poisS(l-g):binF(m-1,l/g)}
+function llb(k,n,p){return(k?k*Math.log(p):0)+(n-k?(n-k)*Math.log(1-p):0)}
+function lrInt(k,n,cut){const ph=k/n,l0=llb(k,n,ph),g=p=>2*(l0-llb(k,n,p))-cut;let lo=0,hi=1;
+ if(k>0){let a=1e-12,b=ph;for(let i=0;i<70;i++){const m=(a+b)/2;if(g(m)>0)a=m;else b=m}lo=(a+b)/2}
+ if(k<n){let a=ph,b=1-1e-12;for(let i=0;i<70;i++){const m=(a+b)/2;if(g(m)>0)b=m;else a=m}hi=(a+b)/2}return[lo,hi]}
+function solveAlpha(s){if(!(s>1e-9))return 1e6;let a=(3-s+Math.sqrt((3-s)*(3-s)+24*s))/(12*s);for(let i=0;i<8;i++){const f=Math.log(a)-digamma(a)-s,fp=1/a-trigamma(a);let n=a-f/fp;if(!(n>0))n=a/2;a=n}return a}
+function normPdfAt(x,m,s){return Math.exp(-(x-m)*(x-m)/(2*s*s))/(s*2.5066282746)}
+/* ---------- Regression helpers ---------- */
+function idx(id,arr,ff){const e=$(id),o=$(id+'v'),f=()=>{o.textContent=ff?ff(arr[+e.value]):arr[+e.value]};e.addEventListener('input',f);f()}
+function scl(id,ff){const e=$(id),o=$(id+'v'),f=()=>{o.textContent=ff(+e.value)};e.addEventListener('input',f);f()}
+function pctTicks(a,b,st){const r=[];for(let v=a;v<=b+1e-9;v+=st)r.push([v,Math.round(v*100)+'%']);return r}
+const _tq={};function tq(v,p){const k=v+'_'+p;return _tq[k]||(_tq[k]=qc(x=>tcdf(x,v),0,500,p,80))}
+function simple(x,y){const n=x.length;let xm=0,ym=0;for(let i=0;i<n;i++){xm+=x[i];ym+=y[i]}xm/=n;ym/=n;let sxx=0,sxy=0,syy=0;for(let i=0;i<n;i++){const dx=x[i]-xm,dy=y[i]-ym;sxx+=dx*dx;sxy+=dx*dy;syy+=dy*dy}const b=sxy/sxx,a=ym-b*xm,res=new Float64Array(n);let sse=0;for(let i=0;i<n;i++){res[i]=y[i]-a-b*x[i];sse+=res[i]*res[i]}return{n,xm,ym,sxx,sxy,syy,b,a,res,sse,sst:syy,r2:1-sse/syy}}
+function gj(A,B){const p=A.length;const M=A.map((r,i)=>Array.from(r).concat(B?[B[i]]:[]));for(let c=0;c<p;c++){let m=c;for(let r=c+1;r<p;r++)if(Math.abs(M[r][c])>Math.abs(M[m][c]))m=r;[M[c],M[m]]=[M[m],M[c]];const d=M[c][c]||1e-12;for(let k=c;k<M[c].length;k++)M[c][k]/=d;for(let r=0;r<p;r++)if(r!==c){const f=M[r][c];if(f!==0)for(let k=c;k<M[c].length;k++)M[r][k]-=f*M[c][k]}}return M}
+function olsMulti(cols,y,needInv){const n=y.length,k=cols.length,p=k+1,A=[],B=new Float64Array(p);for(let i=0;i<p;i++)A.push(new Float64Array(p));
+ for(let r=0;r<n;r++){const row=[1];for(let j=0;j<k;j++)row.push(cols[j][r]);for(let i=0;i<p;i++){B[i]+=row[i]*y[r];for(let j=i;j<p;j++)A[i][j]+=row[i]*row[j]}}
+ for(let i=0;i<p;i++){for(let j=0;j<i;j++)A[i][j]=A[j][i];if(i>0)A[i][i]+=1e-9}
+ let beta,inv=null;if(needInv){const I=[];for(let i=0;i<p;i++){const e=new Float64Array(p);e[i]=1;I.push(e)}const M=gj(A,null);const aug=A.map((r,i)=>Array.from(r).concat(Array.from(I[i])));
+  const m=aug;for(let c=0;c<p;c++){let q=c;for(let r=c+1;r<p;r++)if(Math.abs(m[r][c])>Math.abs(m[q][c]))q=r;[m[c],m[q]]=[m[q],m[c]];const d=m[c][c]||1e-12;for(let kk=0;kk<2*p;kk++)m[c][kk]/=d;for(let r=0;r<p;r++)if(r!==c){const f=m[r][c];if(f!==0)for(let kk=0;kk<2*p;kk++)m[r][kk]-=f*m[c][kk]}}
+  inv=m.map(r=>r.slice(p));beta=inv.map(r=>{let s=0;for(let j=0;j<p;j++)s+=r[j]*B[j];return s})}
+ else{const M=gj(A,B);beta=M.map(r=>r[p])}
+ const res=new Float64Array(n);let sse=0;for(let r=0;r<n;r++){let f=beta[0];for(let j=0;j<k;j++)f+=beta[j+1]*cols[j][r];res[r]=y[r]-f;sse+=res[r]*res[r]}
+ const out={beta,res,sse,n,p,inv};if(inv){const s2=sse/(n-p);out.s2=s2;out.se=inv.map((r,i)=>Math.sqrt(s2*r[i]))}return out}
+function scatterAxes(cv,xs,ys,xlo,xhi,ylo,yhi,L){return mk(cv,xlo,xhi,yhi,{y0:ylo,L:L||44})}
+function range(a,pad){let lo=1e99,hi=-1e99;for(const v of a){if(v<lo)lo=v;if(v>hi)hi=v}const w=(hi-lo)||1;return[lo-(pad||.05)*w,hi+(pad||.05)*w]}
+
+
+function bars(P,groups,cols,yt){/* groups: array of arrays of values (0..1) */const g=P.g,G=groups.length,B=groups[0].length,W=(P.w-P.L-P.R)/G;groups.forEach((vals,gi)=>vals.forEach((v,bi)=>{const bw=W*.78/B,x=P.L+W*gi+W*.11+bw*bi;g.fillStyle=cols[bi];g.fillRect(x,P.Y(v),bw-2,P.Y(0)-P.Y(v));g.fillStyle=C.fg;g.textAlign='center';g.font='10px system-ui';g.fillText(Math.round(v*100)+'%',x+bw/2-1,P.Y(v)-3)}));g.font='11px system-ui'}
+function gridG(P,yt,labels){customGrid(P,[],yt);const G=labels.length,W=(P.w-P.L-P.R)/G;P.g.fillStyle=C.mu;P.g.textAlign='center';labels.forEach((l,i)=>P.g.fillText(l,P.L+W*(i+.5),P.h-P.B+15))}
+function legend(P,items,y){let x=P.L+8;items.forEach(([s,c])=>{P.text('■ '+s,x,y,c);x+=P.g.measureText('■ '+s).width+16})}
+
+/* ---------- GLM machinery ---------- */
+const LK={logit:{mu:e=>1/(1+Math.exp(-e)),d:e=>{const m=1/(1+Math.exp(-e));return m*(1-m)}},
+ probit:{mu:e=>normCdf(e),d:e=>npdf(e)},
+ cll:{mu:e=>1-Math.exp(-Math.exp(e)),d:e=>Math.exp(e-Math.exp(e))},
+ log:{mu:e=>Math.exp(e),d:e=>Math.exp(e)}};
+function minv(A){const p=A.length,m=A.map((r,i)=>{const row=Array.from(r);for(let j=0;j<p;j++)row.push(i===j?1:0);return row});
+ for(let c=0;c<p;c++){let q=c;for(let r=c+1;r<p;r++)if(Math.abs(m[r][c])>Math.abs(m[q][c]))q=r;[m[c],m[q]]=[m[q],m[c]];const d=m[c][c]||1e-12;for(let k=0;k<2*p;k++)m[c][k]/=d;for(let r=0;r<p;r++)if(r!==c){const f=m[r][c];if(f!==0)for(let k=0;k<2*p;k++)m[r][k]-=f*m[c][k]}}
+ return m.map(r=>r.slice(p))}
+function glm(cols,y,o){o=o||{};const n=y.length,k=cols.length,p=k+1,fam=o.fam||'binom',L=LK[o.link||(fam==='pois'?'log':'logit')],off=o.off,X=[new Float64Array(n).fill(1)].concat(cols),V=m=>fam==='pois'?m:m*(1-m);
+ let b=new Float64Array(p);if(o.init)b=Float64Array.from(o.init);else if(fam==='pois'){let m=0;for(const v of y)m+=v;b[0]=Math.log(Math.max(m/n,1e-3))-(off?mean(off):0)}
+ function ev(b){const eta=new Float64Array(n),mu=new Float64Array(n);let ll=0;for(let i=0;i<n;i++){let e=off?off[i]:0;for(let j=0;j<p;j++)e+=b[j]*X[j][i];e=Math.max(-30,Math.min(30,e));eta[i]=e;let m=L.mu(e);m=fam==='binom'?Math.min(1-1e-12,Math.max(1e-12,m)):Math.max(m,1e-12);mu[i]=m;ll+=fam==='pois'?y[i]*Math.log(m)-m-lgamma(y[i]+1):y[i]*Math.log(m)+(1-y[i])*Math.log(1-m)}return{eta,mu,ll}}
+ function info(c){const A=[];for(let i=0;i<p;i++)A.push(new Float64Array(p));const w=new Float64Array(n);for(let r=0;r<n;r++){const d=L.d(c.eta[r]),wi=d*d/V(c.mu[r]);w[r]=wi;for(let i=0;i<p;i++){const xi=X[i][r]*wi;for(let j=i;j<p;j++)A[i][j]+=xi*X[j][r]}}for(let i=0;i<p;i++)for(let j=0;j<i;j++)A[i][j]=A[j][i];return{A,w}}
+ let cur=ev(b),it=0,conv=false,maxit=o.maxit==null?40:o.maxit;
+ for(;it<maxit;it++){const{A,w}=info(cur),Ai=minv(A),g=new Float64Array(p);
+  for(let r=0;r<n;r++){const d=L.d(cur.eta[r]),v=V(cur.mu[r]);let s=(y[r]-cur.mu[r])*d/v;if(o.firth){let h=0;for(let i=0;i<p;i++)for(let j=0;j<p;j++)h+=X[i][r]*Ai[i][j]*X[j][r];h*=w[r];s+=h*(.5-cur.mu[r])}for(let i=0;i<p;i++)g[i]+=X[i][r]*s}
+  const st=new Float64Array(p);let mx=0;for(let i=0;i<p;i++){let s=0;for(let j=0;j<p;j++)s+=Ai[i][j]*g[j];st[i]=s}
+  if(o.firth){for(let i=0;i<p;i++){st[i]=Math.max(-1,Math.min(1,st[i]));mx=Math.max(mx,Math.abs(st[i]))}b=b.map((v,i)=>v+st[i]);cur=ev(b);if(mx<1e-8){conv=true;it++;break}}
+  else{let a=1,nb,nc;for(let h=0;h<25;h++){nb=b.map((v,i)=>v+a*st[i]);nc=ev(nb);if(nc.ll>=cur.ll-1e-10)break;a/=2}for(let i=0;i<p;i++)mx=Math.max(mx,Math.abs(a*st[i]));const dl=Math.abs(nc.ll-cur.ll);b=nb;cur=nc;if(mx<1e-8||dl<1e-11){conv=true;it++;break}}}
+ const{A,w}=info(cur),Ai=minv(A),se=Ai.map((r,i)=>Math.sqrt(Math.max(r[i],0)));let dev;
+ if(fam==='binom')dev=-2*cur.ll;else{dev=0;for(let i=0;i<n;i++){const yy=y[i],m=cur.mu[i];dev+=2*((yy>0?yy*Math.log(yy/m):0)-(yy-m))}}
+ return{beta:b,mu:cur.mu,eta:cur.eta,ll:cur.ll,dev,inv:Ai,se,iter:it,conv,X,w,p,n,A}}
+function auc(sc,y){const n=y.length,idx=Array.from({length:n},(_,i)=>i).sort((a,b)=>sc[a]-sc[b]);let rk=0,np=0,i=0;while(i<n){let j=i;while(j+1<n&&sc[idx[j+1]]===sc[idx[i]])j++;const r=(i+j)/2+1;for(let t=i;t<=j;t++)if(y[idx[t]]===1){rk+=r;np++}i=j+1}const nn=n-np;return np&&nn?(rk-np*(np+1)/2)/(np*nn):.5}
+function sepTest(x,y){let a1=1e99,b1=-1e99,a0=1e99,b0=-1e99,n1=0,n0=0;for(let i=0;i<x.length;i++){if(y[i]===1){n1++;a1=Math.min(a1,x[i]);b1=Math.max(b1,x[i])}else{n0++;a0=Math.min(a0,x[i]);b0=Math.max(b0,x[i])}}return n1>0&&n0>0&&(a1>b0||a0>b1)}
+const sig=e=>1/(1+Math.exp(-e));
+function lgt(p){return Math.log(p/(1-p))}
+function binaryData(n,a,b,sd){const x=new Float64Array(n),y=new Float64Array(n);for(let i=0;i<n;i++){x[i]=(sd||1)*randn();y[i]=Math.random()<sig(a+b*x[i])?1:0}return{x,y}}
+function heat(P,gx,gy,vals,x0,x1,y0,y1){const g=P.g,nx=gx,ny=gy;let mn=1e99,mx=-1e99;vals.forEach(v=>{if(isFinite(v)){mn=Math.min(mn,v);mx=Math.max(mx,v)}});mn=Math.max(mn,mx-30);for(let i=0;i<nx;i++)for(let j=0;j<ny;j++){const v=vals[i*ny+j],t=isFinite(v)?Math.max(0,Math.min(1,(v-mn)/(mx-mn))):0,tt=Math.pow(t,1.6),c=Math.round(40+190*tt);g.fillStyle=`rgb(${Math.round(20+60*tt)},${Math.round(30+100*tt)},${c})`;const xa=P.X(x0+(x1-x0)*i/nx),xb=P.X(x0+(x1-x0)*(i+1)/nx),ya=P.Y(y0+(y1-y0)*j/ny),yb=P.Y(y0+(y1-y0)*(j+1)/ny);g.fillRect(xa,Math.min(ya,yb),xb-xa+1,Math.abs(ya-yb)+1)}}
+/* ---------- confounding helpers ---------- */
+const U01=()=>1-Math.random();
+function sdv(a){const m=mean(a);let s=0;for(const v of a)s+=(v-m)*(v-m);return Math.sqrt(s/Math.max(a.length-1,1))}
+function barV(cv,vals,cols,labs,ymax,ff){const P=mk(cv,0,vals.length,ymax,{y0:0,noGrid:true,L:50});customGrid(P,[],niceTicks(0,ymax,5));const W=(P.w-P.L-P.R)/vals.length,g=P.g;vals.forEach((v,i)=>{const w=W*.5,x=P.L+W*i+W*.25;g.fillStyle=cols[i];g.fillRect(x,P.Y(v),w,P.Y(0)-P.Y(v));g.fillStyle=C.fg;g.textAlign='center';g.fillText((ff||fmt)(v),x+w/2,P.Y(v)-4);g.fillStyle=C.mu;g.fillText(labs[i],x+w/2,P.h-P.B+15)});return P}
+function barL(cv,vals,cols,labs,lo,hi,ff){const P=mk(cv,0,vals.length,hi,{y0:lo,noGrid:true,L:50});customGrid(P,[],niceTicks(lo,hi,5));const W=(P.w-P.L-P.R)/vals.length,g=P.g;vals.forEach((v,i)=>{const w=W*.5,x=P.L+W*i+W*.25;g.fillStyle=cols[i];g.fillRect(x,P.Y(v),w,P.Y(lo)-P.Y(v));g.fillStyle=C.fg;g.textAlign='center';g.fillText((ff||fmt)(v),x+w/2,P.Y(v)-4);g.fillStyle=C.mu;g.fillText(labs[i],x+w/2,P.h-P.B+15)});return P}
+const avg=a=>{let s=0;for(const v of a)s+=v;return s/a.length};
+function corr(a,b){const n=a.length;let ma=0,mb=0;for(let i=0;i<n;i++){ma+=a[i];mb+=b[i]}ma/=n;mb/=n;let sa=0,sb=0,sab=0;for(let i=0;i<n;i++){const x=a[i]-ma,y=b[i]-mb;sa+=x*x;sb+=y*y;sab+=x*y}return sab/Math.sqrt(sa*sb||1e-12)}
+const pcor=(x,y,z)=>corr(simple(z,x).res,simple(z,y).res);
+const lin=(n,f)=>{const a=new Float64Array(n);for(let i=0;i<n;i++)a[i]=f(i);return a};
+const rn=(n,s)=>lin(n,()=>(s||1)*randn());
+/* signed bars from zero */
+function barZ(cv,vals,cols,labs,lo,hi,ff){const P=mk(cv,0,vals.length,hi,{y0:lo,noGrid:true,L:50});customGrid(P,[],niceTicks(lo,hi,5));const W=(P.w-P.L-P.R)/vals.length,g=P.g;vals.forEach((v,i)=>{const w=W*.5,x=P.L+W*i+W*.25,y0=P.Y(0),y1=P.Y(v);g.fillStyle=cols[i];g.fillRect(x,Math.min(y0,y1),w,Math.abs(y0-y1));g.fillStyle=C.fg;g.textAlign='center';g.fillText((ff||fmt)(v),x+w/2,v>=0?y1-4:y1+13);g.fillStyle=C.mu;g.fillText(labs[i],x+w/2,P.h-P.B+15)});P.hline(0,C.mu,'');return P}
+/* grouped signed bars: groups[g][b] */
+function barG(cv,groups,cols,glabs,lo,hi,ff){const P=mk(cv,0,groups.length,hi,{y0:lo,noGrid:true,L:50});customGrid(P,[],niceTicks(lo,hi,5));const G=groups.length,B=groups[0].length,W=(P.w-P.L-P.R)/G,g=P.g;groups.forEach((vs,gi)=>vs.forEach((v,bi)=>{const bw=W*.7/B,x=P.L+W*gi+W*.15+bw*bi,y0=P.Y(0),y1=P.Y(v);g.fillStyle=cols[bi];g.fillRect(x,Math.min(y0,y1),bw-3,Math.abs(y0-y1));g.fillStyle=C.fg;g.textAlign='center';g.font='10px system-ui';g.fillText((ff||fmt)(v),x+bw/2-1,v>=0?y1-3:y1+11)}));g.font='11px system-ui';g.fillStyle=C.mu;g.textAlign='center';glabs.forEach((l,i)=>g.fillText(l,P.L+W*(i+.5),P.h-P.B+15));P.hline(0,C.mu,'');return P}
+/* scatter with optional per-point colours; draws at most nmax points */
+function scat(P,xs,ys,col,nmax,r,colf){const n=xs.length,st=Math.max(1,Math.floor(n/(nmax||500))),pts=[];clip(P,()=>{for(let i=0;i<n;i+=st){P.g.fillStyle=colf?colf(i):col;P.g.beginPath();P.g.arc(P.X(xs[i]),P.Y(ys[i]),r||2.2,0,7);P.g.fill()}})}
+function fitLine(P,s,col,lw,dash,x0,x1){clip(P,()=>P.line(x=>s.a+s.b*x,col,lw||2,x0,x1,2,dash))}
+const ordIdx=p=>Array.from({length:p.length},(_,i)=>i).sort((a,b)=>p[a]-p[b]);
+/* ---------- experiment helpers ---------- */
+const sgn=v=>(v>=0?'+':'−')+Math.abs(v).toFixed(3);
+const rng2=(a,b,pad)=>range(Array.from(a).concat(Array.from(b)),pad||.05);
+const pct0=x=>Math.round(x*100)+'%';
+const lgs=x=>1/(1+Math.exp(-x));
+function rgam(a){if(a<1)return rgam(a+1)*Math.pow(U01(),1/a);const d=a-1/3,c=1/Math.sqrt(9*d);for(;;){let x,v;do{x=randn();v=1+c*x}while(v<=0);v=v*v*v;const u=U01();if(u<1-.0331*x*x*x*x||Math.log(u)<.5*x*x+d*(1-v+Math.log(v)))return d*v}}
+const rbeta=(a,b)=>{const x=rgam(a),y=rgam(b);return x/(x+y)};
+function rbin(n,p){if(n<=30){let k=0;for(let i=0;i<n;i++)if(Math.random()<p)k++;return k}const m=n*p,s=Math.sqrt(n*p*(1-p)),k=Math.round(m+s*randn());return Math.max(0,Math.min(n,k))}
+function welch(a,b){const na=a.length,nb=b.length,ma=avg(a),mb=avg(b);let va=0,vb=0;for(const v of a)va+=(v-ma)*(v-ma);for(const v of b)vb+=(v-mb)*(v-mb);va/=na-1;vb/=nb-1;const se2=va/na+vb/nb,se=Math.sqrt(se2),t=(ma-mb)/se,df=se2*se2/((va/na)*(va/na)/(na-1)+(vb/nb)*(vb/nb)/(nb-1));return{d:ma-mb,se,t,df,p:2*(1-tcdf(Math.abs(t),df))}}
+const diffMeans=(Y,T)=>{let s1=0,s0=0,n1=0,n0=0;for(let i=0;i<Y.length;i++){if(T[i]){s1+=Y[i];n1++}else{s0+=Y[i];n0++}}return s1/n1-s0/n0};
+/* ---------- observational-causal helpers ---------- */
+function logitFit(cols,y){const n=y.length,k=cols.length,p=k+1,b=new Float64Array(p),lin_=i=>{let s=b[0];for(let j=0;j<k;j++)s+=b[j+1]*cols[j][i];return s};
+ for(let it=0;it<30;it++){const A=[];for(let i=0;i<p;i++)A.push(new Float64Array(p));const g=new Float64Array(p);
+  for(let i=0;i<n;i++){const m=lgs(lin_(i)),w=Math.max(m*(1-m),1e-8),r=y[i]-m,row=[1];for(let j=0;j<k;j++)row.push(cols[j][i]);for(let a=0;a<p;a++){g[a]+=row[a]*r;for(let c=a;c<p;c++)A[a][c]+=w*row[a]*row[c]}}
+  for(let a=0;a<p;a++){for(let c=0;c<a;c++)A[a][c]=A[c][a];A[a][a]+=1e-8}
+  const M=gj(A,Array.from(g)),d=M.map(r=>r[p]);let mx=0;for(let a=0;a<p;a++){b[a]+=d[a];mx=Math.max(mx,Math.abs(d[a]))}if(mx<1e-6)break}
+ const pr=new Float64Array(n),lo=new Float64Array(n);for(let i=0;i<n;i++){pr[i]=Math.min(.9999,Math.max(.0001,lgs(lin_(i))));lo[i]=Math.log(pr[i]/(1-pr[i]))}return{beta:b,pr,lo}}
+/* Hajek IPW estimate of the ATE; keep(i)=false drops a unit */
+function ipwATE(Y,T,e,keep){let a1=0,b1=0,a0=0,b0=0;for(let i=0;i<Y.length;i++){if(keep&&!keep(i))continue;if(T[i]){const w=1/e[i];a1+=w*Y[i];b1+=w}else{const w=1/(1-e[i]);a0+=w*Y[i];b0+=w}}return a1/b1-a0/b0}
+function smd(x,T,w){let m1=0,m0=0,w1=0,w0=0,n1=0,n0=0;for(let i=0;i<x.length;i++){const ww=w?w[i]:1;if(T[i]){m1+=ww*x[i];w1+=ww;n1++}else{m0+=ww*x[i];w0+=ww;n0++}}m1/=w1;m0/=w0;let v1=0,v0=0,a1=0,a0=0;for(let i=0;i<x.length;i++){if(T[i]){a1+=x[i]}else a0+=x[i]}a1/=n1;a0/=n0;for(let i=0;i<x.length;i++){if(T[i])v1+=(x[i]-a1)*(x[i]-a1);else v0+=(x[i]-a0)*(x[i]-a0)}v1/=n1-1;v0/=n0-1;return(m1-m0)/Math.sqrt((v1+v0)/2)}
+/* confounded data: X1,X2; treatment strength a; effect tau (function of x1 optional) */
+function confData(n,a,tauF,nl){const X1=rn(n),X2=rn(n),e=lin(n,i=>lgs(a*(.8*X1[i]+.5*X2[i]+(nl?.4*(X1[i]*X1[i]-1):0))/1.5)),T=new Uint8Array(n),Y=new Float64Array(n);
+ for(let i=0;i<n;i++){T[i]=Math.random()<e[i]?1:0;Y[i]=(T[i]?(tauF?tauF(X1[i]):1):0)+X1[i]+.8*X2[i]+(nl?.6*X1[i]*X1[i]:0)+randn()}return{X1,X2,T,Y,e}}
+/* one-to-one nearest-neighbour matching with replacement on a score; returns ATT and the matched control index per treated unit (-1 if dropped) */
+function matchATT(sc,T,Y,cal){const ctr=[];for(let i=0;i<T.length;i++)if(!T[i])ctr.push(i);ctr.sort((a,b)=>sc[a]-sc[b]);const cs=ctr.map(i=>sc[i]),m=new Int32Array(T.length).fill(-1);let sum=0,k=0;
+ for(let i=0;i<T.length;i++){if(!T[i])continue;let lo=0,hi=cs.length-1;while(lo<hi){const mid=(lo+hi)>>1;if(cs[mid]<sc[i])lo=mid+1;else hi=mid}let b=lo;if(lo>0&&Math.abs(cs[lo-1]-sc[i])<Math.abs(cs[lo]-sc[i]))b=lo-1;if(Math.abs(cs[b]-sc[i])>cal)continue;m[i]=ctr[b];sum+=Y[i]-Y[ctr[b]];k++}return{att:sum/k,m,kept:k}}
+const quant=(a,p)=>{const b=Float64Array.from(a).sort();return b[Math.min(b.length-1,Math.floor(p*b.length))]};
+/* ---------- MCMC helpers ---------- */
+function acfv(x,K){const n=x.length;let m=0;for(let i=0;i<n;i++)m+=x[i];m/=n;const c=new Float64Array(K+1);for(let k=0;k<=K;k++){let s=0;for(let i=0;i+k<n;i++)s+=(x[i]-m)*(x[i+k]-m);c[k]=s/n}const r=new Float64Array(K+1);for(let k=0;k<=K;k++)r[k]=c[0]>0?c[k]/c[0]:0;return r}
+/* effective sample size with Geyer's initial positive sequence */
+function essOf(x,K){K=Math.min(K||150,x.length-2);if(K<2)return x.length;const r=acfv(x,K);let sum=0;for(let t=0;2*t+1<=K;t++){const g=r[2*t]+r[2*t+1];if(g<=0)break;sum+=g}const tau=Math.max(2*sum-1,.2);return x.length/tau}
+/* random-walk Metropolis for a 1-d log density */
+function mhRW(logp,x0,step,n){const x=new Float64Array(n);let c=x0,lc=logp(c),acc=0;for(let i=0;i<n;i++){const y=c+step*randn(),ly=logp(y);if(Math.log(Math.random())<ly-lc){c=y;lc=ly;acc++}x[i]=c}return{x,acc:acc/n}}
+/* split R-hat of an array of chains (each an array of equal length) */
+function rhatOf(ch){const seq=[];ch.forEach(c=>{const h=Math.floor(c.length/2);if(h<2)return;seq.push(c.slice(0,h));seq.push(c.slice(h,2*h))});const m=seq.length,n=seq[0]?seq[0].length:0;if(m<2||n<2)return NaN;const mu=seq.map(s=>{let a=0;for(const v of s)a+=v;return a/n}),va=seq.map((s,i)=>{let a=0;for(const v of s)a+=(v-mu[i])*(v-mu[i]);return a/(n-1)});const W=va.reduce((a,b)=>a+b,0)/m,gm=mu.reduce((a,b)=>a+b,0)/m;let B=0;for(const v of mu)B+=(v-gm)*(v-gm);B*=n/(m-1);const vp=(n-1)/n*W+B/n;return Math.sqrt(vp/Math.max(W,1e-12))}
+/* grid posterior from an unnormalised log density */
+function gridPost(logf,lo,hi,N){N=N||900;const x=new Float64Array(N),f=new Float64Array(N);let mx=-1e300;for(let i=0;i<N;i++){x[i]=lo+(hi-lo)*i/(N-1);f[i]=logf(x[i]);if(f[i]>mx)mx=f[i]}let Z=0;const h=(hi-lo)/(N-1);for(let i=0;i<N;i++){f[i]=Math.exp(f[i]-mx);Z+=f[i]*h}const pdf=new Float64Array(N),cdf=new Float64Array(N);let c=0,m1=0,m2=0;for(let i=0;i<N;i++){pdf[i]=f[i]/Z;c+=pdf[i]*h;cdf[i]=c;m1+=x[i]*pdf[i]*h;m2+=x[i]*x[i]*pdf[i]*h}
+ const q=u=>{let a=0,b=N-1;while(b-a>1){const m=(a+b)>>1;if(cdf[m]<u)a=m;else b=m}const d=cdf[b]-cdf[a];return x[a]+(d>0?(u-cdf[a])/d:0)*(x[b]-x[a])};
+ const pd=v=>{if(v<=lo||v>=hi)return 0;const t=(v-lo)/(hi-lo)*(N-1),i=Math.floor(t);return pdf[i]+(t-i)*(pdf[Math.min(i+1,N-1)]-pdf[i])};
+ const cd=v=>{if(v<=lo)return 0;if(v>=hi)return 1;const t=(v-lo)/(hi-lo)*(N-1),i=Math.floor(t);return cdf[i]+(t-i)*(cdf[Math.min(i+1,N-1)]-cdf[i])};
+ return{x,pdf,cdf,mean:m1,sd:Math.sqrt(Math.max(m2-m1*m1,0)),q,pd,cd}}
+const tpdf=(x,v)=>Math.exp(lgamma((v+1)/2)-lgamma(v/2))/Math.sqrt(v*Math.PI)*Math.pow(1+x*x/v,-(v+1)/2);
+const rtv=v=>randn()/Math.sqrt(2*gammaS(v/2)/v);
+const expit=x=>1/(1+Math.exp(-x)),logit=p=>Math.log(p/(1-p));
+function invMat(A){const n=A.length,M=A.map((r,i)=>{const a=Array.from(r);for(let j=0;j<n;j++)a.push(i===j?1:0);return a});for(let c=0;c<n;c++){let m=c;for(let r=c+1;r<n;r++)if(Math.abs(M[r][c])>Math.abs(M[m][c]))m=r;[M[c],M[m]]=[M[m],M[c]];const d=M[c][c]||1e-12;for(let k=0;k<2*n;k++)M[c][k]/=d;for(let r=0;r<n;r++)if(r!==c){const f=M[r][c];if(f!==0)for(let k=0;k<2*n;k++)M[r][k]-=f*M[c][k]}}return M.map(r=>r.slice(n))}
+function cholL(S){const n=S.length,L=S.map(()=>new Float64Array(n));for(let i=0;i<n;i++)for(let j=0;j<=i;j++){let s=S[i][j];for(let k=0;k<j;k++)s-=L[i][k]*L[j][k];L[i][j]=i===j?Math.sqrt(Math.max(s,1e-12)):s/L[j][j]}return L}
+function logdetM(A){const n=A.length,M=A.map(r=>Array.from(r));let ld=0;for(let c=0;c<n;c++){let m=c;for(let r=c+1;r<n;r++)if(Math.abs(M[r][c])>Math.abs(M[m][c]))m=r;[M[c],M[m]]=[M[m],M[c]];ld+=Math.log(Math.abs(M[c][c])||1e-300);for(let r=c+1;r<n;r++){const f=M[r][c]/M[c][c];for(let k=c;k<n;k++)M[r][k]-=f*M[c][k]}}return ld}
+/* Gauss-Hermite nodes (21 points, probabilists' weights summing to 1) from the Golub-Welsch idea: computed numerically on a fine normal grid instead */
+const GH=(()=>{const z=[],w=[];let s=0;for(let i=0;i<41;i++){const v=-4+8*i/40,p=Math.exp(-v*v/2);z.push(v);w.push(p);s+=p}return{z,w:w.map(v=>v/s)}})();
+/* log-log tick helper for axes holding log10 values */
+const lg10=v=>Math.log10(Math.max(v,1e-12));
+const pc1=x=>(100*x).toFixed(1)+'%';
+/* density curves with optional fill: curves=[{f,col,fill,dash,lw}] ; returns P */
+function dcurves(cv,x0,x1,curves,vl,ref){let ym=0,yr=0;curves.forEach((c,k)=>{for(let i=0;i<=300;i++){const v=c.f(x0+(x1-x0)*i/300);if(isFinite(v)){ym=Math.max(ym,v);if(k===(ref==null?curves.length-1:ref))yr=Math.max(yr,v)}}});
+ const top=Math.min(ym,yr*2.5)||ym||1,P=mk(cv,x0,x1,top*1.12);clip(P,()=>curves.forEach(c=>{if(c.fill)P.area(c.f,x0,x1,c.fill,240);P.line(c.f,c.col,c.lw||2.4,x0,x1,300,c.dash)}));(vl||[]).forEach(v=>P.vline(v[0],v[1],null,v[3]));return P}
+/* solve (A + lam I) beta = b and return diag of the inverse (A symmetric p x p) */
+function ridgeSolve(A,b,lam){const p=b.length,M=[];for(let i=0;i<p;i++){const r=new Float64Array(2*p+1);for(let j=0;j<p;j++)r[j]=A[i][j]+(i===j?lam:0);r[p+i]=1;r[2*p]=b[i];M.push(r)}
+ for(let c=0;c<p;c++){let m=c;for(let r=c+1;r<p;r++)if(Math.abs(M[r][c])>Math.abs(M[m][c]))m=r;[M[c],M[m]]=[M[m],M[c]];const d=M[c][c]||1e-12;for(let k=0;k<=2*p;k++)M[c][k]/=d;for(let r=0;r<p;r++)if(r!==c){const f=M[r][c];if(f!==0)for(let k=0;k<=2*p;k++)M[r][k]-=f*M[c][k]}}
+ return{beta:M.map(r=>r[2*p]),dinv:M.map((r,i)=>r[p+i])}}
+/* ---------- Graph and network helpers ---------- */
+const gnRnd=n=>Math.floor(Math.random()*n);
+function gnGraph(n,edges){const adj=Array.from({length:n},()=>[]);for(const e of edges){adj[e[0]].push(e[1]);adj[e[1]].push(e[0])}return{n,adj,edges}}
+function gnER(n,p){const E=[];if(p<=0)return gnGraph(n,E);if(p>=1){for(let i=0;i<n;i++)for(let j=i+1;j<n;j++)E.push([i,j]);return gnGraph(n,E)}const lq=Math.log(1-p);let v=1,w=-1;while(v<n){w+=1+Math.floor(Math.log(1-Math.random())/lq);while(w>=v&&v<n){w-=v;v++}if(v<n)E.push([w,v])}return gnGraph(n,E)}
+function gnBA(n,m){const E=[],rep=[];for(let i=0;i<=m;i++)for(let j=i+1;j<=m;j++){E.push([i,j]);rep.push(i,j)}for(let v=m+1;v<n;v++){const t=new Set();while(t.size<m)t.add(rep[gnRnd(rep.length)]);for(const u of t){E.push([v,u]);rep.push(v,u)}}return gnGraph(n,E)}
+function gnWS(n,k,p){const key=(a,b)=>a<b?a*n+b:b*n+a,S=new Set(),E=[];for(let i=0;i<n;i++)for(let j=1;j<=k/2;j++){const b=(i+j)%n;E.push([i,b]);S.add(key(i,b))}for(let e=0;e<E.length;e++){if(Math.random()<p){const a=E[e][0];let w,t=0;do{w=gnRnd(n);t++}while((w===a||S.has(key(a,w)))&&t<50);if(t<50){S.delete(key(a,E[e][1]));S.add(key(a,w));E[e]=[a,w]}}}return gnGraph(n,E)}
+function gnSets(g){return g.S||(g.S=g.adj.map(a=>new Set(a)))}
+function gnTri(g){const S=gnSets(g);let t=0;for(const e of g.edges){const x=g.adj[e[0]].length<g.adj[e[1]].length?e[0]:e[1],y=x===e[0]?e[1]:e[0];for(const w of g.adj[x])if(S[y].has(w))t++}return t/3}
+function gnClust(g){const S=gnSets(g);let s=0,c=0;for(let i=0;i<g.n;i++){const a=g.adj[i],k=a.length;if(k<2)continue;let t=0;for(const u of a)for(const w of g.adj[u])if(S[i].has(w))t++;s+=t/(k*(k-1));c++}return c?s/c:0}
+function gnBfs(g,s){const d=new Int32Array(g.n).fill(-1),q=[s];d[s]=0;let h=0;while(h<q.length){const v=q[h++];for(const w of g.adj[v])if(d[w]<0){d[w]=d[v]+1;q.push(w)}}return d}
+function gnPath(g,ns){let s=0,c=0;for(let t=0;t<ns;t++){const d=gnBfs(g,gnRnd(g.n));for(let i=0;i<g.n;i++)if(d[i]>0){s+=d[i];c++}}return c?s/c:0}
+function gnBetw(g,srcs){const n=g.n,B=new Float64Array(n),S=srcs||Array.from({length:n},(_,i)=>i);for(const s of S){const st=[],P=Array.from({length:n},()=>[]),sg=new Float64Array(n),d=new Int32Array(n).fill(-1);sg[s]=1;d[s]=0;const q=[s];let h=0;while(h<q.length){const v=q[h++];st.push(v);for(const w of g.adj[v]){if(d[w]<0){d[w]=d[v]+1;q.push(w)}if(d[w]===d[v]+1){sg[w]+=sg[v];P[w].push(v)}}}const dl=new Float64Array(n);while(st.length){const w=st.pop();for(const v of P[w])dl[v]+=sg[v]/sg[w]*(1+dl[w]);if(w!==s)B[w]+=dl[w]}}return B}
+function gnClose(g){const n=g.n,c=new Float64Array(n);for(let s=0;s<n;s++){const d=gnBfs(g,s);let sum=0,r=0;for(let i=0;i<n;i++)if(d[i]>0){sum+=d[i];r++}c[s]=sum?r/sum*(r/(n-1)):0}return c}
+function gnEigen(g){const n=g.n;let x=new Float64Array(n).fill(1);for(let it=0;it<120;it++){const y=Float64Array.from(x);for(let v=0;v<n;v++)for(const w of g.adj[v])y[v]+=x[w];let nm=0;for(const v of y)nm+=v*v;nm=Math.sqrt(nm)||1;for(let i=0;i<n;i++)y[i]/=nm;x=y}return x}
+function gnPR(g,al,tele,it){const n=g.n;let x=Float64Array.from(tele);for(let k=0;k<(it||50);k++){const y=new Float64Array(n);let dang=0;for(let v=0;v<n;v++){const d=g.adj[v].length;if(d===0){dang+=x[v];continue}const s=al*x[v]/d;for(const w of g.adj[v])y[w]+=s}const f=1-al+al*dang;for(let v=0;v<n;v++)y[v]+=f*tele[v];x=y}return x}
+function gnDeg(g){return Float64Array.from(g.adj,a=>a.length)}
+function gnRanks(x){const n=x.length,o=Array.from({length:n},(_,i)=>i).sort((a,b)=>x[a]-x[b]),r=new Float64Array(n);let i=0;while(i<n){let j=i;while(j+1<n&&x[o[j+1]]===x[o[i]])j++;const m=(i+j)/2+1;for(let k=i;k<=j;k++)r[o[k]]=m;i=j+1}return r}
+function gnPear(x,y){const n=x.length;let mx=0,my=0;for(let i=0;i<n;i++){mx+=x[i];my+=y[i]}mx/=n;my/=n;let a=0,b=0,c=0;for(let i=0;i<n;i++){const u=x[i]-mx,v=y[i]-my;a+=u*v;b+=u*u;c+=v*v}return a/Math.sqrt(b*c+1e-300)}
+const gnSpear=(x,y)=>gnPear(gnRanks(x),gnRanks(y));
+function gnAuc(sc,lab){const r=gnRanks(sc);let np=0,sr=0;for(let i=0;i<sc.length;i++)if(lab[i]){np++;sr+=r[i]}const nn=sc.length-np;return np&&nn?(sr-np*(np+1)/2)/(np*nn):.5}
+function gnMod(g,lab){const m=g.edges.length,dc=new Map(),ec=new Map();for(let i=0;i<g.n;i++)dc.set(lab[i],(dc.get(lab[i])||0)+g.adj[i].length);for(const e of g.edges)if(lab[e[0]]===lab[e[1]])ec.set(lab[e[0]],(ec.get(lab[e[0]])||0)+1);let q=0;for(const [c,d] of dc)q+=(ec.get(c)||0)/m-Math.pow(d/(2*m),2);return q}
+function gnSpectral(g){const n=g.n,k=gnDeg(g),m2=2*g.edges.length,c=Math.max(...k)+1;let x=Float64Array.from({length:n},()=>randn());for(let it=0;it<150;it++){let kx=0;for(let i=0;i<n;i++)kx+=k[i]*x[i];const y=new Float64Array(n);for(let v=0;v<n;v++){let s=0;for(const w of g.adj[v])s+=x[w];y[v]=s-k[v]*kx/m2+c*x[v]}let nm=0;for(const v of y)nm+=v*v;nm=Math.sqrt(nm)||1;for(let i=0;i<n;i++)x[i]=y[i]/nm}return Array.from(x,v=>v>0?1:0)}
+function gnSBM(n,a,b){const lab=Array.from({length:n},(_,i)=>i<n/2?0:1),h=n/2,E=[],pi=Math.min(1,a/h),po=Math.min(1,b/h);for(let i=0;i<n;i++)for(let j=i+1;j<n;j++){if(Math.random()<(lab[i]===lab[j]?pi:po))E.push([i,j])}return{g:gnGraph(n,E),lab}}
+function gnRewire(g,swaps){const n=g.n,key=(a,b)=>a<b?a*n+b:b*n+a,E=g.edges.map(e=>e.slice()),S=new Set(E.map(e=>key(e[0],e[1]))),m=E.length;for(let t=0;t<swaps;t++){const i=gnRnd(m),j=gnRnd(m);if(i===j)continue;let a=E[i][0],b=E[i][1],c=E[j][0],d=E[j][1];if(Math.random()<.5){const tmp=c;c=d;d=tmp}if(a===d||c===b||a===c||b===d)continue;if(S.has(key(a,d))||S.has(key(c,b)))continue;S.delete(key(a,b));S.delete(key(c,d));S.add(key(a,d));S.add(key(c,b));E[i]=[a,d];E[j]=[c,b]}return gnGraph(n,E)}
+function gnDensest(g){const n=g.n,deg=Int32Array.from(g.adj,a=>a.length),gone=new Uint8Array(n),order=[];let m=g.edges.length,alive=n,best=m/n,bestAt=0;for(let t=0;t<n-1;t++){let v=-1,dm=1e9;for(let i=0;i<n;i++)if(!gone[i]&&deg[i]<dm){dm=deg[i];v=i}gone[v]=1;order.push(v);m-=deg[v];for(const w of g.adj[v])if(!gone[w])deg[w]--;alive--;const d=m/alive;if(d>best){best=d;bestAt=t+1}}const rem=new Set(order.slice(0,bestAt)),set=[];for(let i=0;i<n;i++)if(!rem.has(i))set.push(i);return{density:best,set}}
+function gnPlant(g,k,pc){const n=g.n,ids=new Set();while(ids.size<k)ids.add(gnRnd(n));const S=[...ids],ex=new Set(g.edges.map(e=>e[0]<e[1]?e[0]*n+e[1]:e[1]*n+e[0])),E=g.edges.slice();for(let i=0;i<k;i++)for(let j=i+1;j<k;j++){const a=Math.min(S[i],S[j]),b=Math.max(S[i],S[j]);if(Math.random()<pc&&!ex.has(a*n+b)){E.push([a,b]);ex.add(a*n+b)}}return{g:gnGraph(n,E),ring:S}}
+/* labelled graph with homophily: every node draws d edges; fraudsters pick fraudsters with probability h */
+function gnLabelled(n,prev,d,h){const lab=new Uint8Array(n),fr=[];for(let i=0;i<n;i++)if(Math.random()<prev){lab[i]=1;fr.push(i)}if(fr.length<3){lab[0]=lab[1]=lab[2]=1;fr.push(0,1,2)}const S=new Set(),E=[];for(let i=0;i<n;i++)for(let t=0;t<d;t++){let j=(lab[i]&&Math.random()<h)?fr[gnRnd(fr.length)]:gnRnd(n);if(j===i)continue;const a=Math.min(i,j),b=Math.max(i,j),k=a*n+b;if(!S.has(k)){S.add(k);E.push([a,b])}}return{g:gnGraph(n,E),lab}}
+const gnCcdf=deg=>{const n=deg.length,mx=Math.max(...deg),pts=[];for(let d=1;d<=mx;d=Math.max(d+1,Math.round(d*1.15))){let c=0;for(const x of deg)if(x>=d)c++;if(c>0)pts.push([Math.log10(d),Math.log10(c/n)])}return pts};
+const gnTop=(a,k)=>Array.from(a,(v,i)=>[v,i]).sort((x,y)=>y[0]-x[0]).slice(0,k).map(p=>p[1]);
+/* ---------- Ch1 degree distributions ---------- */
+(function(){scl('c1n',v=>v);scl('c1k',v=>v);
+ const conc=deg=>{const s=Array.from(deg).sort((a,b)=>b-a),tot=s.reduce((a,b)=>a+b,0),pts=[[0,0]];let c=0;for(let i=0;i<s.length;i++){c+=s[i];if(i%Math.max(1,Math.floor(s.length/60))===0)pts.push([(i+1)/s.length,c/tot])}pts.push([1,1]);return pts};
+ function run(){const n=val('c1n'),k=val('c1k'),ge=gnER(n,k/(n-1)),gb=gnBA(n,Math.max(1,Math.round(k/2))),de=gnDeg(ge),db=gnDeg(gb),ce=gnCcdf(de),cb=gnCcdf(db),mx=Math.max(Math.log10(Math.max(...db)),Math.log10(Math.max(...de)))*1.05;
+  const P=mk($('c1cv'),0,mx,0,{y0:-Math.log10(n)-.1,noGrid:true,L:48});customGrid(P,[0,1,2,3].filter(v=>v<=mx).map(v=>[v,String(Math.pow(10,v))]),[0,-1,-2,-3].filter(v=>v>=-Math.log10(n)-.1).map(v=>[v,pc(Math.pow(10,v))]));poly(P,ce,C.a,2.6);dots(P,ce,C.a,2.6);poly(P,cb,C.y,2.6);dots(P,cb,C.y,2.6);legend(P,[['random graph (Erdős–Rényi)',C.a],['preferential attachment',C.y]],P.T+12);P.text('degree (number of links) →',P.w-P.R-4,P.h-P.B-6,C.mu,'right');P.text('share of nodes with at least this degree',P.L+6,P.T+28,C.mu);
+  const Q=mk($('c1cv2'),0,1,1,{L:44});Q.line(x=>x,C.mu,1.2,0,1,2,true);poly(Q,conc(de),C.a,2.6);poly(Q,conc(db),C.y,2.6);legend(Q,[['random graph',C.a],['preferential attachment',C.y]],Q.T+12);Q.text('share of nodes, largest first →',Q.w-Q.R-4,Q.h-Q.B-6,C.mu,'right');Q.text('share of all link endpoints',Q.L+6,Q.T+28,C.mu);
+  const top=d=>{const s=Array.from(d).sort((a,b)=>b-a),t=s.reduce((a,b)=>a+b,0),m=Math.max(1,Math.ceil(n*.01));let c=0;for(let i=0;i<m;i++)c+=s[i];return c/t};
+  $('c1st').innerHTML=stat('largest degree: random · preferential',Math.max(...de)+' · '+Math.max(...db),'')+stat('mean degree: random · preferential',fmt(avg(de))+' · '+fmt(avg(db)),'in')+stat('links held by the top 1% of nodes',pc1(top(de))+' · '+pc1(top(db)),'hot')+stat('largest degree ÷ mean (preferential)',fmt(Math.max(...db)/avg(db)),'warn');
+  $('c1rd').innerHTML=`Two networks of ${n} nodes with the same average degree (${fmt(avg(db))}). In the <b>random graph</b> every pair is linked independently with the same probability, so degrees are Poisson around the mean: the largest degree is only ${Math.max(...de)}, about ${fmt(Math.max(...de)/avg(de))} times the mean, and the top 1% of nodes hold ${pc1(top(de))} of the link endpoints. In the <b>preferential-attachment</b> network new nodes link to existing nodes in proportion to their degree (“the rich get richer”): the degree distribution has a power-law tail (a straight line on the log-log plot on the left, P(D ≥ d) ∝ d<sup>−2</sup> for this model), the largest degree is ${Math.max(...db)} (${fmt(Math.max(...db)/avg(db))} times the mean) and the top 1% hold ${pc1(top(db))}. Real transaction networks look like the second: a few merchants, exchanges, payroll accounts and mules touch a large share of all links. Two consequences. The mean degree describes almost nobody, and quantities that depend on hubs (the spread of a contagion, the effect of removing a node, the sampling of the network) behave quite differently in the two worlds. And, as with loss severities (item 31), a heavy tail means a single node can dominate any summary, so degree statistics should be reported as distributions, with the largest values shown.`}
+ ['c1n','c1k'].forEach(i=>$(i).addEventListener('change',run));$('c1go').onclick=run;run();})();
+
+/* ---------- Ch2 small worlds ---------- */
+(function(){const PL=[0,.001,.003,.01,.03,.1,.3,1],N=300,K=6;idx('c2p',PL,v=>(v*100)+'%');
+ function run(){const pi=val('c2p'),p=PL[pi],c0=.6,L0=gnPath(gnWS(N,K,0),40),cs=[],ls=[];PL.forEach(q=>{let c=0,l=0;const R=3;for(let r=0;r<R;r++){const g=gnWS(N,K,q);c+=gnClust(g);l+=gnPath(g,30)}cs.push(c/R/c0);ls.push(l/R/L0)});
+  const P=mk($('c2cv'),0,PL.length-1,1.05,{noGrid:true,L:44});customGrid(P,PL.map((v,i)=>[i,(v*100)+'%']),niceTicks(0,1,5));poly(P,cs.map((v,i)=>[i,v]),C.a,2.6);dots(P,cs.map((v,i)=>[i,v]),C.a,3.4);poly(P,ls.map((v,i)=>[i,v]),C.y,2.6);dots(P,ls.map((v,i)=>[i,v]),C.y,3.4);P.vline(pi,C.fg,null,true);legend(P,[['clustering ÷ lattice value',C.a],['average path length ÷ lattice value',C.y]],P.T+12);P.text('share of links rewired at random →',P.w-P.R-4,P.h-P.B-6,C.mu,'right');
+  const g=gnWS(N,K,p),Q=mk($('c2cv2'),-1.1,1.1,1.1,{y0:-1.1,noGrid:true,L:10}),pos=i=>[Math.cos(2*Math.PI*i/N),Math.sin(2*Math.PI*i/N)];for(const e of g.edges)poly(Q,[pos(e[0]),pos(e[1])],'rgba(110,168,255,.28)',.8);dots(Q,Array.from({length:N},(_,i)=>pos(i)),C.fg,1.6);Q.text('one network, nodes on a circle',Q.L+6,Q.T+12,C.mu);
+  const C_=gnClust(g),L_=gnPath(g,60),Cr=K/N,Lr=Math.log(N)/Math.log(K),sg=(C_/Cr)/(L_/Lr);
+  $('c2st').innerHTML=stat('clustering coefficient · average path length',fmt(C_)+' · '+fmt(L_),'in')+stat('lattice (no rewiring)',fmt(c0)+' · '+fmt(L0),'')+stat('random graph of the same density',fmt(Cr)+' · '+fmt(Lr),'')+stat('small-world index',fmt(sg),sg>3?'hot':'in');
+  $('c2rd').innerHTML=`A ring of ${N} nodes, each linked to its ${K} nearest neighbours, with a share ${p*100}% of links rewired to random nodes (Watts and Strogatz). With no rewiring, <b>clustering</b> (the chance that two neighbours of a node are themselves linked) is high, ${fmt(c0)}, but <b>path lengths</b> are long (${fmt(L0)} steps on average) because information has to creep around the ring. A few random shortcuts collapse the path length at almost no cost to clustering (right of the curves: about 1–3% rewiring), giving a <b>small world</b>: neighbourhoods are tight and the whole network is a few hops across. At ${p*100}% rewiring here the average path is ${fmt(L_)} and clustering ${fmt(C_)}; the random graph with the same density has clustering ${fmt(Cr)} and path length ${fmt(Lr)}, so the small-world index (relative clustering divided by relative path length) is ${fmt(sg)}. Two cautions. Short paths are the norm, not an anomaly: in most real networks everyone is within a handful of steps, so “connected within 3 hops of a known fraudster” is a weak statement on its own, and its weight depends on the network’s degree structure. And clustering must be judged against a null model that has the same degrees (chapter 5), not against the random graph.`}
+ ['c2p'].forEach(i=>$(i).addEventListener('change',run));$('c2go').onclick=run;run();})();
+
+/* ---------- Ch3 centrality ---------- */
+(function(){scl('c3n',v=>v);
+ function build(kind,n){if(kind==='ba')return gnBA(n,2);if(kind==='er')return gnER(n,4/(n-1));const s=gnSBM(n,5,0.1);return s.g}
+ function run(){const kind=$('c3g').value,n=val('c3n'),g=build(kind,n),deg=gnDeg(g),bt=gnBetw(g),cl=gnClose(g),ev=gnEigen(g),pr=gnPR(g,.85,new Float64Array(n).fill(1/n)),lg=v=>Math.log10(v+1),
+  tb=new Set(gnTop(bt,5)),mxd=Math.max(...deg)+1,mxb=Math.max(...Array.from(bt,lg))*1.05,P=mk($('c3cv'),0,mxd,mxb,{L:44});scat(P,Array.from(deg),Array.from(bt,lg),C.a,n,3,i=>tb.has(i)?'rgba(255,107,129,1)':'rgba(110,168,255,.55)');P.text('red: the 5 highest betweenness',P.L+6,P.T+12,C.mu);P.text('degree →',P.w-P.R-4,P.h-P.B-6,C.mu,'right');P.text('betweenness (log scale)',P.L+6,P.T+28,C.mu);
+  const sp=[gnSpear(deg,cl),gnSpear(deg,bt),gnSpear(deg,ev),gnSpear(deg,pr)],Q=barV($('c3cv2'),sp.map(v=>Math.max(v,0)),[C.a,C.r,C.g,C.p],['closeness','betweenness','eigenvector','PageRank'],1.1,fmt);Q.text('rank correlation of each centrality with degree',Q.L+6,Q.T+12,C.mu);
+  const td=new Set(gnTop(deg,5)),ov=gnTop(bt,5).filter(i=>td.has(i)).length;
+  $('c3st').innerHTML=stat('rank correlation with degree: closeness · betweenness',fmt(sp[0])+' · '+fmt(sp[1]),'in')+stat('eigenvector · PageRank',fmt(sp[2])+' · '+fmt(sp[3]),'')+stat('of the top 5 by betweenness, how many are also top 5 by degree',ov+' of 5',ov<3?'hot':'ok')+stat('nodes · links',n+' · '+g.edges.length,'');
+  $('c3rd').innerHTML=`${kind==='ba'?'A preferential-attachment network':kind==='er'?'A random network':'Two dense communities joined by a handful of links'} of ${n} nodes, with four centrality measures compared with plain <b>degree</b>. <b>Closeness</b> is the inverse of the average distance to all other nodes; <b>betweenness</b> is the share of shortest paths between other pairs that run through the node (a measure of brokerage); <b>eigenvector centrality</b> gives a node credit for having important neighbours; <b>PageRank</b> adds a random-teleport damping to that idea. The right-hand bars show how much each tells you beyond degree. ${kind==='comm'?'Here betweenness and degree come apart: the nodes that sit on the few links between the two communities have ordinary degree but carry most of the shortest paths, so only ' +ov+' of the top 5 by betweenness are also top 5 by degree. These are the brokers or “bridge” accounts that a degree-based screen cannot see.':kind==='ba'?'In a heavy-tailed network the measures mostly agree on the hubs (rank correlations above), but the ordering among ordinary nodes, which is most of the network, differs a lot, and the top 5 by betweenness share '+ov+' members with the top 5 by degree.':'With no structure to separate them the measures are all driven by degree and agree closely (correlations near 1): centrality only adds information when the network has structure.'} Choose the measure by the question: degree for exposure, betweenness for control of flows, eigenvector or PageRank for influence through important neighbours. Each is a descriptive statistic of one observed network, with sampling error that is hard to quantify (chapters 6 and 11), so rankings deep in the list should not be read literally.`}
+ ['c3g','c3n'].forEach(i=>$(i).addEventListener('change',run));$('c3go').onclick=run;run();})();
+
+/* ---------- Ch4 communities: detectability ---------- */
+(function(){scl('c4a',v=>v);scl('c4d',v=>fmt(v/10));const n=600;
+ function acc(g,lab){const l=gnSpectral(g);let a=0;for(let i=0;i<g.n;i++)if(l[i]===lab[i])a++;return[Math.max(a,g.n-a)/g.n,l]}
+ function mkab(c,d){return[c+d/2,c-d/2]}
+ function run(){const c=val('c4a'),d=val('c4d')/10,thr=2*Math.sqrt(c),grid=[];for(let x=0;x<=Math.min(2*c-.5,thr*2.2);x+=Math.min(2*c-.5,thr*2.2)/14)grid.push(x);
+  const ac=grid.map(x=>{let s=0;const R=4;for(let r=0;r<R;r++){const [a,b]=mkab(c,x),S=gnSBM(n,a,b);s+=acc(S.g,S.lab)[0]}return s/R}),P=mk($('c4cv'),0,grid[grid.length-1],1.02,{y0:.45,L:44});poly(P,grid.map((x,i)=>[x,ac[i]]),C.a,2.6);dots(P,grid.map((x,i)=>[x,ac[i]]),C.a,3.4);P.vline(thr,C.r,'threshold',true);P.vline(Math.min(d,2*c-.5),C.fg,null,true);P.hline(.5,C.mu,'chance');P.text('in-community minus between-community degree →',P.w-P.R-4,P.h-P.B-6,C.mu,'right');P.text('share of nodes placed in the right community',P.L+6,P.T+12,C.mu);
+  const dd=Math.min(d,2*c-.5),[a,b]=mkab(c,dd),S=gnSBM(n,a,b),[ac1,l1]=acc(S.g,S.lab),E=gnER(n,c/(n-1)),le=gnSpectral(E),qs=[gnMod(S.g,S.lab),gnMod(S.g,l1),gnMod(E,le)];
+  const Q=barV($('c4cv2'),qs.map(v=>Math.max(v,0)),[C.g,C.a,C.r],['true partition','found: planted data','found: pure noise'],Math.max(.6,...qs)*1.15,fmt);Q.text('modularity Q',Q.L+6,Q.T+12,C.mu);
+  $('c4st').innerHTML=stat('correct placement at this setting',pc1(ac1),ac1<.6?'hot':'ok')+stat('detectability threshold (difference in degrees)',fmt(thr),dd<thr?'warn':'ok')+stat('modularity of the partition found in a random graph',fmt(qs[2]),'hot')+stat('modularity found in the planted data',fmt(qs[1]),'');
+  $('c4rd').innerHTML=`Two communities of ${n/2} nodes. Each node has about ${fmt(a)} links inside its community and ${fmt(b)} outside (average degree ${fmt(c)}). A <b>spectral method</b> (the leading eigenvector of the modularity matrix) assigns nodes to communities. Two facts about community detection that every practitioner needs. First, there is a <b>detectability threshold</b>: for two equal groups, communities can be recovered by any method only when (a − b)² &gt; 2(a + b), a difference of ${fmt(thr)} here (red line). Below it the placement is no better than chance (left panel, near 0.5) even though the communities are really there, and above it accuracy rises quickly. Second, <b>modularity</b>, Q = Σ [e<sub>c</sub>/m − (d<sub>c</sub>/2m)²], the standard score of a partition, is optimistic: the best partition found in a purely random graph of the same density has Q = ${fmt(qs[2])} (right, red), which looks like genuine structure. So a high modularity alone is not evidence of communities; compare it with the modularity found in degree-preserving random graphs (chapter 5), and treat the communities of a sparse network as a hypothesis whose stability should be checked by re-running on resampled or perturbed networks.`}
+ ['c4a','c4d'].forEach(i=>$(i).addEventListener('change',run));$('c4go').onclick=run;run();})();
+
+/* ---------- Ch5 null models and triangles ---------- */
+(function(){scl('c5x',v=>v+'%');const N=200,B=39;
+ function observed(cl){const g=gnBA(N,3),m=g.edges.length,S=new Set(g.edges.map(e=>e[0]*N+e[1])),E=g.edges.slice(),t=Math.round(cl/100*m*.7);let adj=g.adj.map(a=>a.slice());for(let i=0;i<t;i++){const v=gnRnd(N);if(adj[v].length<2)continue;const a=adj[v][gnRnd(adj[v].length)],b=adj[v][gnRnd(adj[v].length)];if(a===b)continue;const x=Math.min(a,b),y=Math.max(a,b);if(!S.has(x*N+y)){S.add(x*N+y);E.push([x,y]);adj[a].push(b);adj[b].push(a)}}return gnGraph(N,E)}
+ function pvals(g){const t=gnTri(g),m=g.edges.length,p=2*m/(N*(N-1));let e=0,c=0;const te=[],tc=[];for(let i=0;i<B;i++){const a=gnTri(gnER(N,p)),b=gnTri(gnRewire(g,6*m));te.push(a);tc.push(b);if(a>=t)e++;if(b>=t)c++}return{t,pe:(1+e)/(B+1),pc:(1+c)/(B+1),te,tc}}
+ function run(){const cl=val('c5x'),g=observed(cl),r=pvals(g),mx=Math.max(r.t,...r.te,...r.tc)*1.1,mn=Math.min(r.t,...r.te,...r.tc)*.9;
+  const P=histLines($('c5cv'),[r.te,r.tc],[C.a,C.y],mn,mx,24,[[r.t,C.r,'observed',false]]);P.text('triangles in random graphs of two kinds',P.L+8,P.T+12,C.mu);legend(P,[['same density, random links',C.a],['same degrees (rewired)',C.y]],P.T+28);
+  const R=20;let fe=0,fc=0;for(let i=0;i<R;i++){const q=pvals(observed(cl));if(q.pe<=.05)fe++;if(q.pc<=.05)fc++}
+  const Q=barV($('c5cv2'),[fe/R,fc/R],[C.a,C.y],['density-only null','degree-preserving null'],1.1,pc1);Q.text('share of 20 networks declared "excess triangles"',Q.L+6,Q.T+12,C.mu);
+  $('c5st').innerHTML=stat('triangles observed',String(r.t),'')+stat('mean under: density-only · degree-preserving null',fmt(avg(r.te))+' · '+fmt(avg(r.tc)),'in')+stat('p-value: density-only · degree-preserving',fmt(r.pe)+' · '+fmt(r.pc),r.pc<.05?'hot':'ok')+stat('networks flagged out of 20: density-only · degree-preserving',pc1(fe/R)+' · '+pc1(fc/R),fe/R>.5&&cl<10?'warn':'in');
+  $('c5rd').innerHTML=`A preferential-attachment network (${N} nodes) in which ${cl}% extra “triadic closure” has been added: ${cl===0?'none, so there is no tendency to form triangles beyond what the degrees imply':'friends of friends are linked with some probability'}. To say whether the triangle count (${r.t}) is surprising, it must be compared with a <b>null model</b>. A <b>random graph with the same density</b> (blue) expects only ${fmt(avg(r.te))} triangles, so almost any real network, whose hubs create many triangles by themselves, looks highly clustered against it: ${pc1(fe/R)} of the 20 networks are flagged here even when ${cl===0?'there is no extra closure at all':'closure is '+cl+'%'}. The <b>configuration model</b> (yellow) keeps every node’s degree and randomises who is linked to whom, using repeated double-edge swaps; against it the false-alarm rate with no extra closure is ${cl===0?pc1(fc/R)+', close to the nominal 5%':'not meaningful at this setting, but power is '+pc1(fc/R)}. The general rule: a network statistic is only meaningful relative to a null model that holds fixed what you do not want to explain (here the degrees); results such as “this ring is unusually clustered”, “this community structure is significant” or “this subgraph is a statistically unusual motif” all depend on that choice, which should be stated with the result.`}
+ ['c5x'].forEach(i=>$(i).addEventListener('change',run));$('c5go').onclick=run;run();})();
+
+/* ---------- Ch6 sampling a network ---------- */
+(function(){scl('c6f',v=>v+'%');const N=800,FG=[10,20,30,40,50,60,70,80,90,100];
+ function samp(g,f,mode){if(mode==='node'){const keep=new Int32Array(g.n).fill(-1);let c=0;for(let i=0;i<g.n;i++)if(Math.random()<f)keep[i]=c++;const E=[];for(const e of g.edges)if(keep[e[0]]>=0&&keep[e[1]]>=0)E.push([keep[e[0]],keep[e[1]]]);const orig=[];for(let i=0;i<g.n;i++)if(keep[i]>=0)orig.push(i);return{g:gnGraph(c,E),orig}}const E=g.edges.filter(()=>Math.random()<f);return{g:gnGraph(g.n,E),orig:Array.from({length:g.n},(_,i)=>i)}}
+ function meas(g,tr,f,mode){const s=samp(g,f,mode),sd=gnDeg(s.g),td=s.orig.map(i=>tr.d[i]),ok=s.g.n>20;const mean=avg(sd)/tr.m,cl=gnClust(s.g)/tr.c;let rho=ok?gnSpear(sd,td):0;const topT=new Set(gnTop(tr.dd,10)),sorted=gnTop(sd,Math.min(10,s.g.n)).map(i=>s.orig[i]);let cap=0;for(const i of sorted)if(topT.has(i))cap++;return[mean,cl,rho,cap/10]}
+ function run(){const mode=$('c6s').value,f0=val('c6f')/100,g=gnBA(N,3),tr={d:gnDeg(g),dd:gnDeg(g)},m0=avg(tr.d),c0=gnClust(g);tr.m=m0;tr.c=c0;
+  const M=FG.map(f=>{let a=[0,0,0,0];const R=4;for(let r=0;r<R;r++)meas(g,tr,f/100,mode).forEach((v,i)=>a[i]+=v/R);return a});
+  const P=mk($('c6cv'),10,100,1.3,{L:44});poly(P,M.map((m,i)=>[FG[i],m[0]]),C.a,2.6);poly(P,M.map((m,i)=>[FG[i],m[1]]),C.y,2.6);poly(P,M.map((m,i)=>[FG[i],m[2]]),C.g,2.6);poly(P,M.map((m,i)=>[FG[i],m[3]]),C.p,2.6);P.hline(1,C.mu,'truth',true);P.vline(f0*100,C.fg,null,true);legend(P,[['mean degree ÷ truth',C.a],['clustering ÷ truth',C.y],['rank correlation of degree',C.g],['true top-10 hubs found',C.p]],P.T+12);P.text('share of the network observed (%) →',P.w-P.R-4,P.h-P.B-6,C.mu,'right');
+  const s=samp(g,f0,mode),ct=gnCcdf(tr.d),cs=gnCcdf(gnDeg(s.g)),mxx=Math.log10(Math.max(...tr.d))*1.05,Q=mk($('c6cv2'),0,mxx,0,{y0:-Math.log10(N)-.1,noGrid:true,L:48});customGrid(Q,[0,1,2].filter(v=>v<=mxx).map(v=>[v,String(Math.pow(10,v))]),[0,-1,-2].map(v=>[v,pc(Math.pow(10,v))]));poly(Q,ct,C.fg,2.4);poly(Q,cs,C.r,2.4);legend(Q,[['true network',C.fg],['observed part',C.r]],Q.T+12);Q.text('degree →',Q.w-Q.R-4,Q.h-Q.B-6,C.mu,'right');
+  const k=FG.indexOf(Math.round(f0*100/10)*10),m=M[Math.max(0,k)];
+  $('c6st').innerHTML=stat('mean degree seen ÷ true',fmt(m[0]),Math.abs(m[0]-1)>.2?'hot':'ok')+stat('clustering seen ÷ true',fmt(m[1]),Math.abs(m[1]-1)>.2?'warn':'ok')+stat('rank correlation of degree with the truth',fmt(m[2]),m[2]<.7?'warn':'ok')+stat('true top-10 hubs found in the observed top 10',pc1(m[3]),'');
+  $('c6rd').innerHTML=`A preferential-attachment network of ${N} nodes of which only ${val('c6f')}% is observed, by ${mode==='node'?'<b>node sampling</b>: a random share of the nodes is observed together with the links among them (like a bank that sees only its own customers)':'<b>link sampling</b>: a random share of the links is observed (like a bank that sees only some of the payments)'}. The network statistics of the observed part are <b>biased estimates</b> of the network’s: ${mode==='node'?'the mean degree is the true one times the sampling fraction (links to unobserved nodes are lost, the “boundary problem”), clustering is partly preserved but the heavy tail is truncated (right panel), and the hubs are identified much less reliably':'mean degree falls in proportion, clustering falls faster (a triangle survives only if all three links are sampled, a probability of f³), and rank correlations deteriorate gently'}. For ${val('c6f')}% sampling the mean degree is ${fmt(m[0])} of the truth, clustering ${fmt(m[1])} and the rank correlation of degree ${fmt(m[2])}. Unlike in ordinary surveys, there is no simple fix: network statistics are not averages of independent observations, so standard errors, bootstrap and the usual weighting do not apply directly, and the correction depends on the statistic and on the sampling scheme. Always ask who is observed (your customers, one bank’s payments, one channel) before interpreting any network feature as a property of the world.`}
+ ['c6s','c6f'].forEach(i=>$(i).addEventListener('change',run));$('c6go').onclick=run;run();})();
+/* ---------- Ch7 guilt by association ---------- */
+(function(){scl('c7h',v=>v+'%');scl('c7q',v=>v+'%');const N=1500;
+ function auc2(h,q){const {g,lab}=gnLabelled(N,.04,8,h),known=new Uint8Array(N);for(let i=0;i<N;i++)if(lab[i]&&Math.random()<q)known[i]=1;const cnt=new Float64Array(N),fr=new Float64Array(N),dg=gnDeg(g);for(let i=0;i<N;i++){let c=0;for(const w of g.adj[i])if(known[w])c++;cnt[i]=c;fr[i]=dg[i]?c/dg[i]:0}const ids=[];for(let i=0;i<N;i++)if(!known[i])ids.push(i);const L=ids.map(i=>lab[i]);return[gnAuc(ids.map(i=>cnt[i]),L),gnAuc(ids.map(i=>fr[i]),L),gnAuc(ids.map(i=>dg[i]),L)]}
+ function avgAuc(h,q,R){const a=[0,0,0];for(let r=0;r<R;r++)auc2(h,q).forEach((v,i)=>a[i]+=v/R);return a}
+ function run(){const h0=val('c7h')/100,q0=val('c7q')/100,HG=[0,.1,.2,.3,.4,.5,.6,.7,.8,.9],QG=[.05,.1,.2,.4,.6,.8],A=HG.map(h=>avgAuc(h,q0,2)),B=QG.map(q=>avgAuc(h0,q,2)),cols=[C.a,C.g,C.mu];
+  const P=mk($('c7cv'),0,.9,1,{y0:.4,L:44});[0,1,2].forEach(k=>poly(P,A.map((a,i)=>[HG[i],a[k]]),cols[k],2.6));P.hline(.5,C.mu,'chance',true);P.vline(h0,C.fg,null,true);legend(P,[['known fraud neighbours (count)',C.a],['known fraud neighbours (share)',C.g],['number of links only',C.mu]],P.T+12);P.text('homophily: share of a fraudster’s links that go to fraudsters →',P.w-P.R-4,P.h-P.B-6,C.mu,'right');P.text('AUC on accounts not yet known',P.L+6,P.T+28,C.mu);
+  const Q=mk($('c7cv2'),.05,.8,1,{y0:.4,L:44});[0,1,2].forEach(k=>poly(Q,B.map((a,i)=>[QG[i],a[k]]),cols[k],2.6));Q.hline(.5,C.mu,'chance',true);Q.vline(q0,C.fg,null,true);Q.text('share of the frauds already identified →',Q.w-Q.R-4,Q.h-Q.B-6,C.mu,'right');Q.text('AUC at homophily '+val('c7h')+'%',Q.L+6,Q.T+12,C.mu);
+  const k0=HG.findIndex(v=>v>=h0-1e-9);const a=A[Math.max(0,k0)];
+  $('c7st').innerHTML=stat('AUC at this setting: count · share · number of links',a.map(fmt).join(' · '),a[0]>.7?'ok':'warn')+stat('AUC with no homophily (count)',fmt(A[0][0]),'')+stat('AUC at 90% homophily (count)',fmt(A[HG.length-1][0]),'hot')+stat('AUC with 80% of frauds known · 5% known',fmt(B[QG.length-1][0])+' · '+fmt(B[0][0]),'');
+  $('c7rd').innerHTML=`A network of ${N} accounts, 4% of them fraudulent, each opening 8 links. Fraudsters link to other fraudsters with probability <b>homophily</b> h (the rest of their links are random). The score of an account is built only from its neighbours: how many of them are <b>known</b> frauds (${val('c7q')}% of all frauds have already been identified). With no homophily neighbours carry no information (AUC ${fmt(A[0][0])}, chance is 0.5; the number of links alone is also uninformative); as homophily grows the score reaches ${fmt(A[HG.length-1][0])} at 90%. The right panel shows the dependence on the number of labels available: with few known frauds the neighbour signal is sparse, and with more of them known it improves. This is the logic of <b>guilt by association</b> and of graph features in AML and fraud models: neighbour-based features (counts and shares of risky neighbours, 2-hop exposure, ring membership) add information only if the process really links similar accounts, and their strength must be measured, not assumed. Two cautions: the neighbours’ labels are themselves partially observed and selected (investigations follow earlier alerts), and a feature built from neighbours’ outcomes needs care in time-splitting, since the neighbour’s label may be learned after the account’s own score date (leakage).`}
+ ['c7h','c7q'].forEach(i=>$(i).addEventListener('change',run));$('c7go').onclick=run;run();})();
+
+/* ---------- Ch8 detecting a dense ring ---------- */
+(function(){scl('c8n',v=>v);scl('c8d',v=>v);scl('c8k',v=>v);scl('c8p',v=>v+'%');
+ function f1(found,ring){const s=new Set(ring);let tp=0;for(const i of found)if(s.has(i))tp++;const p=found.length?tp/found.length:0,r=tp/ring.length;return p+r?2*p*r/(p+r):0}
+ function run(){const n=val('c8n'),d=val('c8d'),k=val('c8k'),pc_=val('c8p')/100,p0=d/(n-1),NN=100,nul=[];for(let i=0;i<NN;i++)nul.push(gnDensest(gnER(n,p0)).density);const q95=Array.from(nul).sort((a,b)=>a-b)[Math.floor(.95*NN)];
+  const pl=gnPlant(gnER(n,p0),k,pc_),fd=gnDensest(pl.g),f=f1(fd.set,pl.ring),lo=Math.min(...nul)*.9,hi=Math.max(fd.density,...nul)*1.15;
+  const P=histLines($('c8cv'),[nul],[C.a],lo,hi,24,[[fd.density,C.r,'with the ring',false],[q95,C.y,'95th percentile',true]]);P.text('densest subgraph found in '+NN+' networks with no ring',P.L+8,P.T+12,C.mu);
+  const KG=[4,6,8,10,12,16,20,25,30],res=KG.map(kk=>{let a=0,b=0;const R=6;for(let r=0;r<R;r++){const x=gnPlant(gnER(n,p0),kk,pc_),y=gnDensest(x.g);a+=f1(y.set,x.ring)/R;if(y.density>q95)b+=1/R}return[a,b]});
+  const Q=mk($('c8cv2'),4,30,1.05,{L:44});poly(Q,KG.map((v,i)=>[v,res[i][0]]),C.a,2.6);dots(Q,KG.map((v,i)=>[v,res[i][0]]),C.a,3.4);poly(Q,KG.map((v,i)=>[v,res[i][1]]),C.g,2.6);dots(Q,KG.map((v,i)=>[v,res[i][1]]),C.g,3.4);Q.vline(k,C.fg,null,true);legend(Q,[['members correctly recovered (F1)',C.a],['ring detected above the 95th percentile',C.g]],Q.T+12);Q.text('number of accounts in the ring →',Q.w-Q.R-4,Q.h-Q.B-6,C.mu,'right');
+  const ed=pc_*(k-1)/2;
+  $('c8st').innerHTML=stat('density (links per node) found: with ring · null 95th pct.',fmt(fd.density)+' · '+fmt(q95),fd.density>q95?'ok':'warn')+stat('ring members recovered (F1) · size of the set found',fmt(f)+' · '+fd.set.length,'')+stat('density the ring alone adds (links per member)',fmt(ed),'')+stat('background density (links per node)',fmt(d/2),'');
+  $('c8rd').innerHTML=`A sparse transaction network of ${n} accounts (about ${d} links each) in which a ring of <b>${k}</b> accounts has been given extra links among themselves, each present with probability ${pc_*100}%. <b>Densest-subgraph peeling</b> (repeatedly delete the account with the fewest links and remember the densest remainder) is a standard way to look for such rings. The statistical question is whether what it finds is unusual, and the answer needs the <b>null distribution</b>: even in a network with no ring, peeling finds a subgraph of density about ${fmt(avg(nul))} (blue), because the maximum over many subsets is always larger than the typical value; the 95th percentile is ${fmt(q95)}. Here the ring gives ${fmt(fd.density)}, ${fd.density>q95?'above':'not above'} that limit, and the set found overlaps the ring with F1 = ${fmt(f)}. The right panel is the power curve: small or loosely connected rings (low ring density ${fmt(ed)} links per member against the background ${fmt(d/2)}) can neither be found nor distinguished from chance, while large dense ones are found nearly perfectly. This is a <b>scan statistic</b> problem: report a ring alert with the null it was measured against, expect many false rings in large networks (every sparse region produces a “dense” patch), and combine the structural signal with transaction behaviour before acting.`}
+ ['c8n','c8d','c8k','c8p'].forEach(i=>$(i).addEventListener('change',run));$('c8go').onclick=run;run();})();
+
+/* ---------- Ch9 homophily versus influence ---------- */
+(function(){scl('c9h',v=>v+'%');scl('c9b',v=>fmt(v/100));scl('c9s',v=>fmt(v/10));const N=1500;
+ function gen(h,beta,sd){const z=Array.from({length:N},randn),ord=Array.from({length:N},(_,i)=>i).sort((a,b)=>z[a]-z[b]),rk=new Int32Array(N);ord.forEach((i,r)=>rk[i]=r);const nb=Array.from({length:N},()=>new Set());for(let i=0;i<N;i++)for(let t=0;t<6;t++){let j;if(Math.random()<h){j=ord[Math.min(N-1,Math.max(0,rk[i]+gnRnd(61)-30))]}else j=gnRnd(N);if(j!==i){nb[i].add(j);nb[j].add(i)}}
+  const y0=z.map(v=>v+randn()),m0=nb.map(s=>{let t=0;for(const j of s)t+=y0[j];return s.size?t/s.size:0}),y=y0.map((v,i)=>v+beta*m0[i]),my=nb.map(s=>{let t=0;for(const j of s)t+=y[j];return s.size?t/s.size:0}),px=z.map(v=>v+sd*randn());return{y,my,px}}
+ function ols(d){const n=d.y.length,m=a=>a.reduce((x,y)=>x+y,0)/n,my=m(d.y),mx=m(d.my),mp=m(d.px);let sxx=0,sxy=0,spp=0,sxp=0,spy=0;for(let i=0;i<n;i++){const x=d.my[i]-mx,p=d.px[i]-mp,y=d.y[i]-my;sxx+=x*x;sxy+=x*y;spp+=p*p;sxp+=x*p;spy+=p*y}const naive=sxy/sxx,det=sxx*spp-sxp*sxp;return[naive,(sxy*spp-sxp*spy)/det]}
+ function run(){const h0=val('c9h')/100,b=val('c9b')/100,sd=val('c9s')/10,HG=[0,.2,.4,.6,.8,.95],E=HG.map(h=>{let a=[0,0];const R=3;for(let r=0;r<R;r++)ols(gen(h,b,sd)).forEach((v,i)=>a[i]+=v/R);return a}),d=gen(h0,b,sd),[nv,adj]=ols(d);
+  const P=mk($('c9cv'),-3,3,6,{y0:-6,L:40});scat(P,d.my.slice(0,700).map(v=>Math.max(-3,Math.min(3,v*1.5))),d.y.slice(0,700),C.a,700,2.4,()=> 'rgba(110,168,255,.45)');const mxm=avg(d.my),myy=avg(d.y);P.line(x=>myy+nv*(x/1.5-mxm),C.r,2.6,-3,3,2);P.text('own outcome against the average of the neighbours’ outcomes (fitted slope '+fmt(nv)+')',P.L+6,P.T+12,C.mu);
+  const Q=mk($('c9cv2'),0,.95,1.3,{y0:-.1,L:44});poly(Q,HG.map((h,i)=>[h,E[i][0]]),C.r,2.6);dots(Q,HG.map((h,i)=>[h,E[i][0]]),C.r,3.4);poly(Q,HG.map((h,i)=>[h,E[i][1]]),C.g,2.6);dots(Q,HG.map((h,i)=>[h,E[i][1]]),C.g,3.4);Q.hline(b,C.fg,'true influence',true);Q.hline(0,C.mu,'');legend(Q,[['naive estimate',C.r],['controlling for the trait (noisy proxy)',C.g]],Q.T+12);Q.text('homophily →',Q.w-Q.R-4,Q.h-Q.B-6,C.mu,'right');Q.text('estimated “influence” of neighbours',Q.L+6,Q.T+28,C.mu);
+  $('c9st').innerHTML=stat('naive estimate of neighbour influence',fmt(nv),nv>b+.15?'hot':'in')+stat('after controlling for the proxy',fmt(adj),Math.abs(adj-b)<Math.abs(nv-b)?'ok':'warn')+stat('true influence built into the data',fmt(b),'')+stat('naive estimate with no homophily',fmt(E[0][0]),'');
+  $('c9rd').innerHTML=`Each account has a hidden trait z (say, financial stress) that affects its own outcome, and links form between accounts with similar traits (homophily ${val('c9h')}%). The data contain a true causal influence of neighbours of only <b>${fmt(b)}</b>. Regressing an account’s outcome on the average outcome of its neighbours, the way “social influence” or “contagion” is usually measured, returns <b>${fmt(nv)}</b>: with ${val('c9h')}% homophily neighbours resemble each other because they are alike to begin with, not because they affect each other (Shalizi and Thomas, <em>homophily and contagion are generically confounded</em>). When there is no homophily the same regression is close to the truth (${fmt(E[0][0])}, right panel). Controlling for an observed trait helps only as far as the proxy captures the hidden one (here a proxy with noise ${fmt(sd)} gets to ${fmt(adj)}); a poor proxy leaves most of the bias, which is why the estimates stay too high. For churn, default contagion or fraud spreading through referrals this is the confounding of items 22–24 in network form: the correlation between linked accounts is evidence of similarity, and to claim influence one needs a design (timing, an instrument, a randomised nudge, a network experiment with cluster randomisation), not a regression on neighbour outcomes.`}
+ ['c9h','c9b','c9s'].forEach(i=>$(i).addEventListener('change',run));$('c9go').onclick=run;run();})();
+
+/* ---------- Ch10 propagation with PageRank ---------- */
+(function(){scl('c10a',v=>fmt(v/100));scl('c10h',v=>v+'%');scl('c10q',v=>v+'%');const N=1500;
+ function auc(h,q,al){const {g,lab}=gnLabelled(N,.04,8,h),known=new Uint8Array(N);let kc=0;for(let i=0;i<N;i++)if(lab[i]&&Math.random()<q){known[i]=1;kc++}if(!kc){known[lab.indexOf(1)]=1;kc=1}const tele=Float64Array.from(known,v=>v/kc),cnt=new Float64Array(N);for(let i=0;i<N;i++){let c=0;for(const w of g.adj[i])if(known[w])c++;cnt[i]=c}const ids=[];for(let i=0;i<N;i++)if(!known[i])ids.push(i);const L=ids.map(i=>lab[i]);const r=[gnAuc(ids.map(i=>cnt[i]),L)];al.forEach(a=>{const p=gnPR(g,a,tele,40);r.push(gnAuc(ids.map(i=>p[i]),L))});return r}
+ function run(){const a0=val('c10a')/100,h0=val('c10h')/100,q0=val('c10q')/100,AG=[.1,.3,.5,.7,.85,.95,.99],R=2;let A=new Float64Array(AG.length+1);for(let r=0;r<R;r++)auc(h0,q0,AG).forEach((v,i)=>A[i]+=v/R);
+  const P=mk($('c10cv'),.1,.99,1,{y0:.4,L:44});poly(P,AG.map((a,i)=>[a,A[i+1]]),C.a,2.6);dots(P,AG.map((a,i)=>[a,A[i+1]]),C.a,3.4);P.hline(A[0],C.y,'1-hop count',true);P.hline(.5,C.mu,'chance',true);P.vline(a0,C.fg,null,true);P.text('damping (probability of continuing the walk) →',P.w-P.R-4,P.h-P.B-6,C.mu,'right');P.text('AUC of personalised PageRank',P.L+6,P.T+12,C.mu);
+  const HG=[0,.2,.4,.6,.8,.9],B=HG.map(h=>{let a=[0,0];for(let r=0;r<R;r++)auc(h,q0,[a0]).forEach((v,i)=>a[i]+=v/R);return a}),Q=mk($('c10cv2'),0,.9,1,{y0:.4,L:44});poly(Q,HG.map((h,i)=>[h,B[i][0]]),C.y,2.6);dots(Q,HG.map((h,i)=>[h,B[i][0]]),C.y,3.4);poly(Q,HG.map((h,i)=>[h,B[i][1]]),C.a,2.6);dots(Q,HG.map((h,i)=>[h,B[i][1]]),C.a,3.4);legend(Q,[['1-hop count',C.y],['personalised PageRank',C.a]],Q.T+12);Q.hline(.5,C.mu,'',true);Q.text('homophily →',Q.w-Q.R-4,Q.h-Q.B-6,C.mu,'right');Q.text('AUC at damping '+fmt(a0),Q.L+6,Q.T+28,C.mu);
+  const ib=A.slice(1).indexOf(Math.max(...A.slice(1)));
+  $('c10st').innerHTML=stat('AUC: 1-hop count · PageRank at the chosen damping',fmt(A[0])+' · '+fmt(A[1+AG.findIndex(v=>v>=a0-.005)]||A[1]),'in')+stat('best damping on the grid · its AUC',AG[ib]+' · '+fmt(A[ib+1]),'ok')+stat('known frauds used as seeds',pc1(q0),'')+stat('homophily',pc1(h0),'');
+  $('c10rd').innerHTML=`The same network model as chapter 7, now scored with <b>personalised PageRank</b>: a random walker repeatedly follows a random link, but with probability 1 − damping jumps back to one of the known fraudulent accounts; the long-run share of time spent on an account is its risk score. It extends the 1-hop count to all hops with a weight that decays with distance, controlled by the damping (0.85 is the common default; a larger value spreads further). With ${val('c10q')}% of frauds known and homophily ${val('c10h')}%, the 1-hop count achieves AUC ${fmt(A[0])} and PageRank between ${fmt(Math.min(...A.slice(1)))} and ${fmt(Math.max(...A.slice(1)))} depending on the damping (left; the best is at ${AG[ib]}). Whether propagation helps is an empirical question: with strong homophily and few known frauds it can add the second-hop signal, but each extra hop also dilutes the signal in a network with high-degree nodes, where almost everything is within a few steps of everything else, so a large damping is not always better, and the answer changes with homophily (right). The practical points: tune damping by validation on later periods, exclude the labelled seeds from the evaluation (their own scores are trivially high), correct for hubs (a merchant linked to many frauds is not itself fraudulent: normalise by degree or use the share), and keep the graph score as one feature in a model rather than as a verdict.`}
+ ['c10a','c10h','c10q'].forEach(i=>$(i).addEventListener('change',run));$('c10go').onclick=run;run();})();
+
+/* ---------- Ch11 measurement error in networks ---------- */
+(function(){scl('c11m',v=>v+'%');scl('c11s',v=>v+'%');const N=200,M=3;
+ function observe(g,miss,spur){const E=g.edges.filter(()=>Math.random()>=miss),S=new Set(E.map(e=>e[0]*N+e[1])),ex=Math.round(spur*g.edges.length);let t=0;while(t<ex){const a=gnRnd(N),b=gnRnd(N);if(a===b)continue;const x=Math.min(a,b),y=Math.max(a,b);if(S.has(x*N+y))continue;S.add(x*N+y);E.push([x,y]);t++}return gnGraph(N,E)}
+ function meas(tr,o){const d=gnDeg(o),pr=gnPR(o,.85,new Float64Array(N).fill(1/N)),bt=gnBetw(o),top=new Set(gnTop(tr.d,10));let cap=0;for(const i of gnTop(d,10))if(top.has(i))cap++;return[gnSpear(tr.d,d),gnSpear(tr.p,pr),gnSpear(tr.b,bt),cap/10]}
+ function run(){const m0=val('c11m')/100,s0=val('c11s')/100,g=gnBA(N,M),tr={d:gnDeg(g),p:gnPR(g,.85,new Float64Array(N).fill(1/N)),b:gnBetw(g)},GR=[0,.1,.2,.3,.4,.5,.6],R=2;
+  const cv=(f)=>GR.map(x=>{const a=[0,0,0,0];for(let r=0;r<R;r++)meas(tr,f(x)).forEach((v,i)=>a[i]+=v/R);return a}),A=cv(x=>observe(g,x,0)),B=cv(x=>observe(g,0,x)),cols=[C.a,C.g,C.y];
+  const draw=(id,D,at,lab)=>{const P=mk($(id),0,.6,1,{y0:0,L:44});[0,1,2].forEach(k=>{poly(P,D.map((a,i)=>[GR[i],a[k]]),cols[k],2.6);dots(P,D.map((a,i)=>[GR[i],a[k]]),cols[k],3.2)});P.vline(at,C.fg,null,true);legend(P,[['degree',C.a],['PageRank',C.g],['betweenness',C.y]],P.T+12);P.text(lab,P.w-P.R-4,P.h-P.B-6,C.mu,'right');P.text('rank correlation with the true network',P.L+6,P.T+28,C.mu)};draw('c11cv',A,m0,'share of links missing from the data →');draw('c11cv2',B,s0,'spurious links added (share of true links) →');
+  const x=meas(tr,observe(g,m0,0)),y=meas(tr,observe(g,0,s0)),z=meas(tr,observe(g,m0,s0));
+  $('c11st').innerHTML=stat('missing links only: degree · PageRank · betweenness',x.slice(0,3).map(fmt).join(' · '),x[2]<.7?'warn':'ok')+stat('spurious links only',y.slice(0,3).map(fmt).join(' · '),y[2]<.7?'warn':'ok')+stat('both: rank correlations',z.slice(0,3).map(fmt).join(' · '),'in')+stat('true top-10 hubs recovered: missing · spurious · both',pc1(x[3])+' · '+pc1(y[3])+' · '+pc1(z[3]),'');
+  $('c11rd').innerHTML=`A preferential-attachment network of ${N} nodes is the truth; what is observed has had ${val('c11m')}% of its links deleted (transactions not captured, other banks’ accounts) and/or spurious links added equal to ${val('c11s')}% of the true links (a link inferred from a shared device, a counterparty name match, or a payment in a single time window). The three curves show how well each <b>centrality ranking</b> survives. All three rankings degrade steadily as links go missing: with ${val('c11m')}% missing the rank correlation with the truth is ${fmt(x[0])} for degree, ${fmt(x[1])} for PageRank and ${fmt(x[2])} for betweenness. Measures that depend on exact shortest paths (betweenness) are usually the most fragile, and hub-based ones (degree, PageRank) hold up somewhat better, but at this small size the differences are modest and noisy: removing or inventing a few links changes who sits on the paths. Spurious links, which connect unrelated nodes, shorten paths and wash out structure. In practice the links of a financial network are always measured with error, so (1) state how links were defined and what is missing, (2) test any ranking or flagged community for stability by perturbing the network (random deletion and addition at plausible rates) and see whether the conclusion survives, and (3) prefer features that are robust to such noise (degree, share of risky neighbours) over delicate ones (betweenness, exact path counts) unless the data quality is high. The share of the true top-10 hubs still found in the observed top 10 is ${pc1(x[3])} with the missing links alone and ${pc1(z[3])} with both errors.`}
+ ['c11m','c11s'].forEach(i=>$(i).addEventListener('change',run));$('c11go').onclick=run;run();})();
+const QZ=[{"l":"Beginner","q":"In a network with preferential attachment, compared with a random graph of the same average degree, the largest degree is…","o":["About the same","Much larger, because hubs form","Exactly equal to the mean","Smaller"],"a":1,"e":"Preferential attachment gives a heavy-tailed degree distribution with hubs; in a random graph degrees are Poisson around the mean."},{"l":"Beginner","q":"What does the clustering coefficient of a node measure?","o":["The share of pairs of its neighbours that are linked to each other","The number of links it has","The share of shortest paths through it","The distance to the farthest node"],"a":0,"e":"It is the probability that two neighbours of a node are themselves connected, i.e. the density of triangles around it."},{"l":"Intermediate","q":"A small-world network is characterised by…","o":["No hubs and no triangles","Low clustering and long paths","High clustering and long paths","High clustering and short average path length"],"a":3,"e":"A few long-range shortcuts shorten paths dramatically while local clustering remains high."},{"l":"Intermediate","q":"In a network made of two dense communities joined by a few links, the nodes on those few links typically have…","o":["The highest clustering coefficient","Very high degree and low betweenness","Ordinary degree but very high betweenness","Low closeness and low betweenness"],"a":2,"e":"Bridge nodes lie on most shortest paths between the communities, so betweenness is high while degree can be modest."},{"l":"Intermediate","q":"Why is a high modularity score on its own weak evidence of real communities?","o":["Modularity ignores the number of links","Random graphs also have partitions with sizeable modularity","Modularity cannot exceed zero for real networks","It is only defined for directed networks"],"a":1,"e":"Optimising over many partitions finds positive modularity even in noise, so it must be compared with a null model."},{"l":"Intermediate","q":"With two equal communities of average within-degree a and between-degree b, community recovery above chance is possible only if…","o":["(a − b)² > 2(a + b)","a > b","a + b > 10","a = 2b"],"a":0,"e":"This is the Kesten–Stigum detectability threshold: below it the communities exist but cannot be recovered by any method."},{"l":"Advanced","q":"You test whether a transaction network has more triangles than expected, using an Erdős–Rényi null with the same density. The network has strong hubs. What is likely?","o":["The test has no power","The test is too conservative","The test is exact","The test rejects far too often, since hubs alone create many triangles"],"a":3,"e":"Heavy-tailed degrees generate many triangles without any triadic closure; the null must preserve the degrees (configuration model)."},{"l":"Advanced","q":"How is a configuration-model null network commonly generated from an observed network?","o":["By deleting random nodes","By shuffling node labels only","By repeated double-edge swaps that preserve every node’s degree","By adding random links until the density doubles"],"a":2,"e":"Swapping a–b, c–d into a–d, c–b keeps all degrees while randomising who is linked with whom."},{"l":"Advanced","q":"A bank observes a random 40% of nodes and the links among them. What happens to the mean degree it measures?","o":["It is unbiased","It is about 40% of the true mean degree","It is higher than the truth","It is exactly the true value times 0.16 for every graph"],"a":1,"e":"Links to unobserved nodes are lost, so mean degree falls in proportion to the sampling fraction (the boundary problem)."},{"l":"Advanced","q":"Under random link sampling with probability f, the expected number of observed triangles is proportional to…","o":["f³","f","f²","1 − f"],"a":0,"e":"A triangle is observed only if all three of its links are sampled, a probability of f³."},{"l":"Advanced","q":"You compare a score built from the number of known fraudulent neighbours across accounts. Which situation makes it uninformative?","o":["The network is large","Fraudsters have many links","Many frauds are known","Fraudsters link to others at random, with no homophily"],"a":3,"e":"Neighbour labels carry information only if linking is related to the label (homophily)."},{"l":"Expert","q":"The densest subgraph found by peeling in a large sparse network with no planted ring is…","o":["Always empty","Exactly as dense as the average","Still much denser than average, so a null distribution of the maximum is needed","Dense only if the network has hubs"],"a":2,"e":"The maximum over many subsets is larger than a typical value; a detected ring must be compared with the null distribution of that maximum."},{"l":"Expert","q":"Linked accounts have similar churn behaviour. Which statement is correct?","o":["It proves that churn spreads by contagion","Homophily alone can produce this, so the neighbour-outcome regression does not identify influence","It proves there is no influence","Influence can be ignored when accounts share a branch"],"a":1,"e":"Similar people link and behave alike without influencing each other; identifying influence needs timing, instruments or experiments."},{"l":"Expert","q":"Why does randomising the treatment of individual customers in a referral network need care?","o":["Treated customers can affect their linked neighbours (interference), breaking the independence assumption","Networks always have too few nodes","Randomisation is impossible in networks","Neighbours are always in the control group"],"a":0,"e":"Spillovers violate SUTVA; designs randomise at the cluster (community) level or model the exposure explicitly."},{"l":"Expert","q":"In personalised PageRank for risk propagation, what does a damping close to 1 do?","o":["Makes all accounts score equally by design","Restricts the score to 1-hop neighbours","Removes the effect of hubs","Lets risk spread far across the network, diluting the signal near the seeds"],"a":3,"e":"A high damping lets the walk continue for many steps; scores reflect global structure and in hub-rich networks the local signal is diluted."},{"l":"Expert","q":"Which network statistic is the most fragile to missing and spurious links?","o":["Number of links","Degree","Betweenness","PageRank of the hubs"],"a":2,"e":"Betweenness depends on the exact shortest paths, so small changes in the links change who lies on them; hub-based measures are more stable."},{"l":"Expert","q":"A graph feature (count of fraudulent neighbours) is built with labels learned after the scoring date of the account. What is the problem?","o":["Too few features","Leakage of future information, which inflates the apparent performance","The feature is not linear","Nothing, since labels are labels"],"a":1,"e":"At scoring time those neighbour labels were not known, so the model’s test performance overstates what can be achieved in production."},{"l":"Expert","q":"A team reports that betweenness rankings changed a lot after adding 20% noise links. What is the appropriate conclusion?","o":["The ranking is unstable; report stability and prefer robust features","Betweenness is the best measure for noisy data","Centralities cannot be computed on real networks","The noise links are the true structure"],"a":0,"e":"A perturbation analysis shows how much a conclusion depends on measurement error; fragile statistics should be reported with that sensitivity."}];
+(function(){const st=store.get('gn_quiz',{});
+ function render(){const box=$('quiz');box.innerHTML='';
+  QZ.forEach((q,i)=>{const d=document.createElement('div');d.className='q'+(st[i]!=null?' done':'');d.innerHTML=`<div class="qh">Q${i+1} · ${q.l}</div><div style="margin:4px 0 6px"><b>${q.q}</b></div>`;
+   q.o.forEach((o,j)=>{const b=document.createElement('button');b.className='opt';b.textContent=o;if(st[i]!=null){if(j===q.a)b.classList.add('good');else if(j===st[i])b.classList.add('bad')}b.onclick=()=>{if(st[i]!=null)return;st[i]=j;store.set('gn_quiz',st);render();meter()};d.appendChild(b)});
+   const e=document.createElement('div');e.className='ex';e.innerHTML=(st[i]===q.a?'✅ ':'❌ ')+q.e;d.appendChild(e);box.appendChild(d)});
+  const ans=Object.keys(st).length,ok=QZ.filter((q,i)=>st[i]===q.a).length;
+  $('qscore').innerHTML=stat('answered',ans+' / '+QZ.length,'in')+stat('correct',ok,'ok')+stat('score',ans?Math.round(100*ok/ans)+'%':'—',ok/Math.max(ans,1)>=.8?'ok':'warn')+stat('verdict',ans<QZ.length?'keep going':ok>=16?'network-statistics master':ok>=13?'strong':'review ch. 1–11','')}
+ $('qreset').onclick=()=>{Object.keys(st).forEach(k=>delete st[k]);store.set('gn_quiz',st);render();meter()};
+ window.__qst=st;render();})();
+const CHK=["Describe the degree distribution of a network and why hubs change what the mean means.","Compute and interpret clustering and average path length, and the small-world property.","Choose among degree, closeness, betweenness, eigenvector and PageRank for a given question.","Explain modularity, its optimism, and the detectability threshold for communities.","Explain why Erdős–Rényi is usually the wrong null and build a configuration-model null by edge swaps.","Compute a simulation p-value for a network statistic.","Describe the biases from observing only part of a network, by node and by link sampling.","Build and evaluate neighbour-based fraud features without leakage and with hubs handled.","Explain densest-subgraph ring detection and why a null distribution of the maximum is needed.","Explain why homophily and influence are confounded and what designs separate them.","Explain interference when randomising treatments in a network.","Describe personalised PageRank, the role of damping and how to evaluate it.","Run a perturbation analysis for missing and spurious links and report stability.","Document link definitions, coverage, null models, stability and false-positive rates for a network-based alert."];
+(function(){const st=store.get('gn_chk',{}),box=$('chk');CHK.forEach((t,i)=>{const l=document.createElement('label'),c=document.createElement('input');c.type='checkbox';c.checked=!!st[i];c.onchange=()=>{st[i]=c.checked;store.set('gn_chk',st);meter()};l.appendChild(c);const s=document.createElement('span');s.textContent=t;l.appendChild(s);box.appendChild(l)});window.__cst=st;})();
+function meter(){const q=window.__qst||{},c=window.__cst||{};const ok=QZ.filter((x,i)=>q[i]===x.a).length,ck=Object.values(c).filter(Boolean).length;const p=Math.round(100*(.6*ok/QZ.length+.4*ck/CHK.length));$('mtxt').textContent='Mastery: '+p+'%  (exam + checklist)';$('mbar').style.width=p+'%';store.set('mastery_gn',p)}
+meter();
+
+/* ---------- Navigation ---------- */
+(function(){const nav=$('nav');let html='';
+ document.querySelectorAll('main .part, main section.ch').forEach(el=>{if(el.classList.contains('part'))html+=`<div class="pt">${el.textContent}</div>`;else{const h=el.querySelector('h2'),num=h.querySelector('.num').textContent,t=Array.from(h.childNodes).filter(n=>n.nodeType===3).map(n=>n.textContent).join('').trim();html+=`<a href="#${el.id}" data-id="${el.id}">${num}. ${t}</a>`}});
+ nav.innerHTML=html;const links=nav.querySelectorAll('a'),io=new IntersectionObserver(es=>{es.forEach(e=>{if(e.isIntersecting)links.forEach(a=>a.classList.toggle('on',a.dataset.id===e.target.id))})},{rootMargin:'-20% 0px -70% 0px'});
+ document.querySelectorAll('section.ch').forEach(s=>io.observe(s));
+ $('menu').onclick=()=>$('side').classList.toggle('open');nav.addEventListener('click',e=>{if(e.target.tagName==='A')$('side').classList.remove('open')});
+ window.addEventListener('scroll',()=>{const h=document.documentElement;$('prog').style.width=(100*h.scrollTop/(h.scrollHeight-h.clientHeight))+'%'},{passive:true});})();
+</script>
+</body>
+</html>
