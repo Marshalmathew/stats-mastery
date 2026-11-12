@@ -6,6 +6,9 @@
 
 ---
 
+[![Live Demo](https://img.shields.io/badge/Live%20Demo-GitHub%20Pages-blue?logo=github)](https://marshalmathew.github.io/stats-mastery/)
+
+
 ## 🚀 Quick Start
 
 **No build tools, bundlers, or server runtimes required.**
