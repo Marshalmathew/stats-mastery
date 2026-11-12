@@ -98,7 +98,7 @@ When a new snapshot ZIP arrives (e.g. `stats-mastery (20).zip`):
    ```
 The tool will automatically:
 - Detect and extract all new module files.
-- Re-order and align [`index.html`](index.html) in strict sequential order (Stage 1 to 7 / Items 1 to 31).
+- Re-order and align [`index.html`](index.html) in strict sequential order (Stage 1 to 7 / Items 1 to 36).
 - Instate runtime sorting guards so future snapshots never cause visual reordering.
 - Update curriculum chapter/lab/question counts in [`README.md`](README.md).
 - Safely archive the ZIP file into `.snapshots/`.
