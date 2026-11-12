@@ -2,7 +2,7 @@
 
 > **The complete interactive visual curriculum for statistical mastery.**
 >
-> 35 comprehensive, self-contained interactive modules covering probability, classical inference, regression, causal inference, Bayesian modeling, and specialist depth — with interactive simulations, formula proofs, and self-assessment exams.
+> 36 comprehensive, self-contained interactive modules covering probability, classical inference, regression, causal inference, Bayesian modeling, and specialist depth — with interactive simulations, formula proofs, and self-assessment exams.
 
 ---
 
@@ -34,7 +34,7 @@ Then navigate to `http://localhost:8000`.
 
 ## 📊 Curriculum Overview
 
-The curriculum is structured across 7 progressive stages comprising **35 modules**, **434 chapters**, **408 interactive simulation labs**, and **624 exam questions**.
+The curriculum is structured across 7 progressive stages comprising **36 modules**, **446 chapters**, **419 interactive simulation labs**, and **642 exam questions**.
 
 ### Stage 1 · Foundations & Probability Theory
 1. [`random-variables-mastery.html`](random-variables-mastery.html) — **Random Variables, Expectation, Variance & Covariance** (15 chapters, 14 labs, 16 exam questions)
@@ -84,6 +84,7 @@ The curriculum is structured across 7 progressive stages comprising **35 modules
 33. [`anomaly-drift-detection-mastery.html`](anomaly-drift-detection-mastery.html) — **Anomaly and drift detection theory** (12 chapters,11 labs,18-question exam)
 34. [`network-statistics-mastery.html`](network-statistics-mastery.html) — **Graph and network statistics** (12 chapters,11 labs,18-question exam)
 35. [`uncertainty-quantification-mastery.html`](uncertainty-quantification-mastery.html) — **Uncertainty quantification for ML** (12 chapters,11 labs,18-question exam)
+36. [`interpretability-limits-mastery.html`](interpretability-limits-mastery.html) — **Interpretability and its statistical limits** (12 chapters,11 labs,18-question exam)
 
 
 ---

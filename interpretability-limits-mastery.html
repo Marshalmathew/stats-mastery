@@ -1,0 +1,865 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Interpretability and its Statistical Limits Mastery</title>
+<style>
+
+:root{--bg:#0b0e17;--panel:#121726;--panel2:#171d30;--line:#232a3d;--fg:#e8ebf5;--mu:#8a93ab;--a:#6ea8ff;--r:#ff6b81;--y:#ffd166;--g:#4ade80;--p:#c084fc;--t:#5eead4}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;background:var(--bg);color:var(--fg);font:16px/1.7 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+a{color:var(--a)}
+#prog{position:fixed;top:0;left:0;height:3px;background:linear-gradient(90deg,var(--a),var(--p),var(--r));width:0;z-index:50}
+.side{position:fixed;left:0;top:0;bottom:0;width:290px;background:#0e1220;border-right:1px solid var(--line);overflow:auto;padding:18px 14px 90px;z-index:40;transition:transform .25s}
+.side h1{font-size:15px;margin:0 0 2px}
+.side small{color:var(--mu)}
+.side .pt{margin:16px 0 4px;font-size:11px;text-transform:uppercase;letter-spacing:1.3px;color:var(--p)}
+.side a{display:block;color:var(--mu);text-decoration:none;padding:5px 9px;border-radius:7px;font-size:13.5px;line-height:1.35}
+.side a:hover{background:var(--panel);color:var(--fg)}
+.side a.on{background:var(--panel2);color:var(--fg);box-shadow:inset 3px 0 var(--a)}
+.side a.back{color:var(--t);padding-left:0;margin-bottom:6px}
+.meter{position:fixed;left:0;bottom:0;width:290px;background:#0e1220;border-top:1px solid var(--line);padding:10px 16px;z-index:41;font-size:12px;color:var(--mu)}
+.meter .bar{height:7px;background:var(--line);border-radius:6px;margin-top:5px;overflow:hidden}
+.meter .bar i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--g),var(--t));transition:width .4s}
+#menu{display:none;position:fixed;top:10px;left:10px;z-index:60;background:var(--panel2);color:var(--fg);border:1px solid var(--line);border-radius:9px;padding:7px 12px;font-size:14px;cursor:pointer}
+main{margin-left:290px;padding:0 34px 120px;max-width:1090px}
+.hero{padding:70px 0 30px}
+.hero h1{font-size:clamp(32px,5vw,56px);line-height:1.08;margin:0 0 14px;background:linear-gradient(100deg,#fff,var(--y) 40%,var(--r));-webkit-background-clip:text;background-clip:text;color:transparent}
+.hero p{font-size:19px;color:#c3c9dc;max-width:780px}
+.chips{display:flex;flex-wrap:wrap;gap:8px;margin:18px 0}
+.chip{border:1px solid var(--line);background:var(--panel);padding:5px 12px;border-radius:99px;font-size:13px;color:var(--mu)}
+.chip b{color:var(--fg)}
+.part{margin:90px 0 0;padding-top:22px;border-top:1px solid var(--line);font-size:12px;letter-spacing:2px;text-transform:uppercase;color:var(--p)}
+section.ch{padding-top:30px}
+h2{font-size:30px;line-height:1.2;margin:10px 0 8px;display:flex;gap:12px;align-items:center;flex-wrap:wrap}
+h2 .num{display:inline-grid;place-items:center;width:40px;height:40px;border-radius:12px;background:var(--panel2);border:1px solid var(--line);font-size:18px;color:var(--a)}
+.lvl{font-size:11px;font-weight:600;letter-spacing:.8px;text-transform:uppercase;padding:3px 9px;border-radius:99px;border:1px solid}
+.lvl.b{color:var(--g);border-color:#1f5c3a}.lvl.i{color:var(--a);border-color:#244a85}.lvl.a{color:var(--y);border-color:#6b5420}.lvl.e{color:var(--r);border-color:#7a2c3a}
+h3{font-size:19px;margin:30px 0 6px;color:#fff}
+p{margin:10px 0}li{margin:5px 0}
+code,.f{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace}
+code{background:var(--panel2);padding:1px 6px;border-radius:5px;font-size:.9em}
+.f{display:block;white-space:pre-wrap;background:#0e1322;border:1px solid var(--line);border-left:3px solid var(--a);padding:12px 16px;border-radius:9px;margin:14px 0;overflow-x:auto;font-size:15px;color:#dbe4ff;line-height:1.8}
+.co{border-radius:12px;padding:13px 17px;margin:16px 0;border:1px solid var(--line);background:var(--panel)}
+.co>b:first-child{display:block;margin-bottom:2px;font-size:12px;letter-spacing:1px;text-transform:uppercase}
+.co.def{border-left:4px solid var(--a)}.co.def>b:first-child{color:var(--a)}
+.co.warn{border-left:4px solid var(--r)}.co.warn>b:first-child{color:var(--r)}
+.co.tip{border-left:4px solid var(--g)}.co.tip>b:first-child{color:var(--g)}
+.co.key{border-left:4px solid var(--y);background:#171608}.co.key>b:first-child{color:var(--y)}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:18px 20px;margin:22px 0;box-shadow:0 8px 30px rgba(0,0,0,.25)}
+.card>h4{margin:0 0 3px;font-size:13px;letter-spacing:1.2px;text-transform:uppercase;color:var(--t)}
+.card>p.sub{margin:0 0 12px;color:var(--mu);font-size:14.5px}
+.ctl{display:flex;flex-wrap:wrap;gap:10px 22px;align-items:center;margin:8px 0 10px}
+.ctl label{display:flex;gap:8px;align-items:center;font-size:14px;color:#c3c9dc}
+.ctl output{min-width:38px;font-family:ui-monospace,monospace;color:var(--y);font-size:13px}
+input[type=range]{accent-color:var(--a);width:150px}
+input[type=checkbox]{accent-color:var(--a)}
+select,input[type=number],input[type=text]{background:#0e1322;color:var(--fg);border:1px solid var(--line);border-radius:8px;padding:6px 9px;font:inherit;font-size:14px}
+button{background:linear-gradient(180deg,#2c4a80,#233b68);color:#fff;border:1px solid #3a5a98;border-radius:9px;padding:7px 14px;font:inherit;font-size:14px;cursor:pointer}
+button:hover{filter:brightness(1.15)}
+button.alt{background:var(--panel2);border-color:var(--line);color:var(--fg)}
+canvas{width:100%;height:270px;display:block;background:#0e1322;border:1px solid var(--line);border-radius:10px;margin-top:6px}
+canvas.sm{height:210px}canvas.tl{height:330px}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(125px,1fr));gap:9px;margin:12px 0}
+.stat{background:#0e1322;border:1px solid var(--line);border-radius:10px;padding:8px 11px}
+.stat b{display:block;font-size:17px;font-family:ui-monospace,monospace}
+.stat span{font-size:11.5px;color:var(--mu);text-transform:uppercase;letter-spacing:.7px}
+.stat.hot b{color:var(--r)}.stat.ok b{color:var(--g)}.stat.warn b{color:var(--y)}.stat.in b{color:var(--a)}
+.read{margin:8px 0 0;padding:10px 14px;background:#0e1322;border:1px dashed #33406a;border-radius:10px;font-size:14.5px;color:#d3dbf3}
+table{border-collapse:collapse;width:100%;margin:12px 0;font-size:14px}
+th,td{border:1px solid var(--line);padding:7px 10px;text-align:left;vertical-align:top}
+th{background:var(--panel2);font-size:12px;text-transform:uppercase;letter-spacing:.6px;color:var(--mu)}
+td.n{font-family:ui-monospace,monospace;text-align:right}
+.tw{overflow-x:auto}
+.pill{display:inline-block;padding:1px 9px;border-radius:99px;font-size:12px;font-weight:600}
+.pill.r{background:#3a1520;color:var(--r)}.pill.g{background:#10321f;color:var(--g)}.pill.y{background:#3a2f0e;color:var(--y)}.pill.m{background:#202637;color:var(--mu)}
+details{background:var(--panel);border:1px solid var(--line);border-radius:11px;padding:9px 15px;margin:9px 0}
+details summary{cursor:pointer;font-weight:600}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.q{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:14px 18px;margin:14px 0}
+.q .qh{font-size:12px;letter-spacing:1px;text-transform:uppercase;color:var(--mu)}
+.q .opt{display:block;width:100%;text-align:left;margin:6px 0;background:#0e1322;border:1px solid var(--line);color:var(--fg);border-radius:9px;padding:9px 12px}
+.q .opt.good{border-color:var(--g);background:#0e2418}.q .opt.bad{border-color:var(--r);background:#2a1119}
+.q .ex{display:none;margin-top:8px;font-size:14.5px;color:#c3c9dc}
+.q.done .ex{display:block}
+.chk label{display:flex;gap:10px;align-items:flex-start;padding:6px 0;cursor:pointer}
+.chk input{margin-top:6px;accent-color:var(--g);width:17px;height:17px}
+.sigrow{display:grid;grid-template-columns:minmax(170px,2fr) 1fr 1fr auto;gap:8px 14px;align-items:center;padding:6px 0;border-top:1px dashed #1b2236}
+.sigrow:first-of-type{border-top:0}
+.sigrow label{display:flex;gap:6px;align-items:center;font-size:13.5px;color:#c3c9dc}
+@media(max-width:900px){
+ .side{transform:translateX(-100%)}.side.open{transform:none}.meter{display:none}
+ #menu{display:block}main{margin-left:0;padding:0 16px 100px}.two{grid-template-columns:1fr}.hero{padding-top:60px}
+ .sigrow{grid-template-columns:1fr 1fr}
+}
+
+</style>
+</head>
+<body>
+<div id="prog"></div>
+<button id="menu">☰ Menu</button>
+<nav class="side" id="side">
+ <a class="back" href="index.html">← All courses</a>
+ <h1>Interpretability &amp; Its Limits</h1>
+ <small>12 chapters · 11 labs · 18 exam questions</small>
+ <div id="nav"></div>
+</nav>
+<div class="meter">
+ <div id="mtxt">Mastery: 0%</div>
+ <div class="bar"><i id="mbar"></i></div>
+</div>
+
+<main>
+ <div class="hero">
+  <h1>Interpretability and Its Statistical Limits</h1>
+  <p>Post-hoc attributions against true mechanisms: why explaining the model is not explaining reality. From SHAP axioms, correlation leakage, and off-manifold extrapolation to Rashomon multiplicity, adversarial scaffolding, and actionable causal recourse.</p>
+  <div class="chips">
+   <span class="chip">Stage <b>7</b></span>
+   <span class="chip">Item <b>36</b></span>
+   <span class="chip">Chapters <b>12</b></span>
+   <span class="chip">Interactive Labs <b>11</b></span>
+   <span class="chip">Exam <b>18 Questions</b></span>
+   <span class="chip">Est. Time <b>3.5 Hours</b></span>
+  </div>
+ </div>
+
+ <div class="part">Part I · Post-Hoc Attributions vs True Mechanisms</div>
+
+ <!-- Chapter 1 -->
+ <section class="ch" id="c1">
+  <h2><span class="num">1</span>The Interpretability Illusion: Explaining $f(x)$ vs Explaining Reality <span class="lvl b">Beginner</span></h2>
+  <p>A machine learning explanation is almost universally an explanation of the <b>prediction function $f(x)$</b>, not the <b>data-generating physical process $P(Y \mid X)$</b>. When practitioners say "Feature $X_1$ is the most important driver of patient mortality," they usually mean that the model's output changes substantially when $X_1$ varies. If the model was trained on observational data with unobserved confounding, selection bias, or reverse causality, $f(x)$ will faithfully exploit these spurious statistical associations.</p>
+  <p>Consider an automated triage model predicting pneumonia mortality. In raw hospital records, asthmatic patients diagnosed with pneumonia have a <i>lower</i> observed mortality rate than non-asthmatics. Why? Because asthmatics are immediately escalated to intensive care units and receive aggressive early steroid therapy. A machine learning model learns: <code>Asthma = True → Risk = -0.42</code>. A post-hoc explainer (like SHAP or LIME) will correctly report that asthma has a large negative attribution. But advising a doctor to withhold ICU admission because "the explanation proves asthma protects the patient" is fatal.</p>
+  
+  <div class="card">
+   <h4>Lab 1 · The Confounder Trap: Spurious Attributions</h4>
+   <p>In this simulation, true treatment $T$ has a harmful effect on outcome $Y$ ($\beta_{\text{true}} = +1.5$), but severe unobserved illness $U$ causes doctors to treat ($U \to T$) and independently increases survival effort ($U \to -Y$). Drag the confounding strength to observe how the model's feature attribution flips signs and contradicts reality.</p>
+   <div class="ctrl">
+    <label>Confounding Strength ($U \to T, Y$): <span id="r1v">0.8</span></label>
+    <input type="range" id="r1" min="-1.5" max="1.5" step="0.1" value="0.8">
+   </div>
+   <div class="sim"><canvas id="cv1" height="260"></canvas></div>
+   <div class="stats" id="t1"></div>
+   <p class="takeaway"><b>Key Takeaway:</b> Post-hoc explainers have zero awareness of causal structures. They explain why the algorithm made a decision given its trained parameters, not what will happen if you intervene on the feature in the physical world.</p>
+  </div>
+ </section>
+
+ <!-- Chapter 2 -->
+ <section class="ch" id="c2">
+  <h2><span class="num">2</span>Permutation Feature Importance &amp; Correlation Breakage <span class="lvl i">Intermediate</span></h2>
+  <p>Permutation Feature Importance (PFI), introduced by Leo Breiman for Random Forests, measures the increase in prediction error after randomly shuffling the values of feature $X_j$ across the validation set:
+  $$\text{PFI}(j) = L(y, f(X^{\pi_j})) - L(y, f(X))$$
+  While conceptually intuitive and model-agnostic, PFI relies on a lethal hidden assumption: that features are <b>statistically independent</b>.</p>
+  <p>When features $X_1$ and $X_2$ are strongly correlated (e.g. $X_1 = \text{Annual Income}$ and $X_2 = \text{Monthly Savings}$), shuffling $X_1$ while holding $X_2$ fixed creates synthetic data points that lie far off the data manifold—such as an annual income of $15,000 paired with monthly savings of $20,000. Evaluating $f(x)$ on these impossible feature combinations forces the model to extrapolate into regions where it was never trained, producing wild prediction artifacts. Furthermore, when two collinear features jointly carry signal, each individual feature can be shuffled with minimal loss of accuracy because the other feature acts as a redundant backup, causing both to appear deceptively unimportant.</p>
+
+  <div class="card">
+   <h4>Lab 2 · Permutation Importance under Collinearity: The Masking Dilemma</h4>
+   <p>Simulate two correlated predictors $X_1$ and $X_2$ with correlation $\rho$. Observe how as $\rho \to 1$, the permutation importance of each individual feature plummets even though their joint predictive power remains high.</p>
+   <div class="ctrl">
+    <label>Feature Correlation ($\rho$): <span id="r2v">0.85</span></label>
+    <input type="range" id="r2" min="0.0" max="0.98" step="0.02" value="0.85">
+   </div>
+   <div class="sim"><canvas id="cv2" height="260"></canvas></div>
+   <div class="stats" id="t2"></div>
+   <p class="takeaway"><b>Key Takeaway:</b> PFI systematically underestimates the importance of correlated feature groups through redundant substitution and simultaneously pollutes validation loss by extrapolating into impossible off-manifold spaces.</p>
+  </div>
+ </section>
+
+ <!-- Chapter 3 -->
+ <section class="ch" id="c3">
+  <h2><span class="num">3</span>Partial Dependence vs Accumulated Local Effects (ALE) <span class="lvl i">Intermediate</span></h2>
+  <p>Partial Dependence Plots (PDP) attempt to visualize the marginal effect of feature $X_j$ on $f(X)$ by averaging the model's predictions over the empirical marginal distribution of all other features $X_{\setminus j}$:
+  $$\hat{f}_{PDP}(x_j) = \frac{1}{n}\sum_{i=1}^n f(x_j, x_{i,\setminus j})$$
+  Like PFI, PDP computes predictions on rectangular grid combinations $(x_j, x_{i,\setminus j})$. When features are correlated, PDP evaluates points in empty regions where $P(X_j, X_{\setminus j}) \approx 0$, creating severe visual distortions.</p>
+  <p><b>Accumulated Local Effects (ALE)</b> plots, introduced by Apley &amp; Zhu (2020), solve this fundamental flaw. Instead of replacing $X_j$ globally, ALE calculates local differences in small intervals around $x_j$, conditioning on the actual local conditional distribution $P(X_{\setminus j} \mid X_j)$, and then integrates (accumulates) those local derivatives:
+  $$\hat{f}_{ALE}(x_j) = \int_{z_0}^{x_j} \mathbb{E}\left[\frac{\partial f(X_j, X_{\setminus j})}{\partial X_j} \,\middle|\, X_j = z\right] dz - \text{constant}$$
+  ALE never evaluates the model in empty feature space, isolates main effects from interactions, and remains statistically rigorous under severe correlation.</p>
+
+  <div class="card">
+   <h4>Lab 3 · PDP Extrapolation vs ALE Real-Manifold Tracking</h4>
+   <p>Toggle correlation $\rho$ between $X_1$ and $X_2$ where true model $f(x) = x_1 + 2 x_2^2$. Watch how PDP hallucinates non-existent curvature into empty space while ALE faithfully tracks the local gradient.</p>
+   <div class="ctrl">
+    <label>Correlation ($\rho$): <span id="r3v">0.90</span></label>
+    <input type="range" id="r3" min="0.0" max="0.95" step="0.05" value="0.90">
+   </div>
+   <div class="sim"><canvas id="cv3" height="260"></canvas></div>
+   <div class="stats" id="t3"></div>
+   <p class="takeaway"><b>Key Takeaway:</b> Always prefer ALE over PDP for observational datasets with correlated features. PDP averages across impossible feature combinations; ALE integrates genuine local conditional derivatives.</p>
+  </div>
+ </section>
+
+ <div class="part">Part II · Shapley Values &amp; Local Explanations</div>
+
+ <!-- Chapter 4 -->
+ <section class="ch" id="c4">
+  <h2><span class="num">4</span>Shapley Values &amp; Cooperative Game Axioms <span class="lvl i">Intermediate</span></h2>
+  <p>Originating in cooperative game theory (Lloyd Shapley, 1953), Shapley values answer the question: if $p$ players collaborate to achieve a total payout $v(S)$, how should the payout be fairly distributed? In machine learning, the players are the features, the game is the model prediction $f(x)$, and the payout is the deviation from the baseline expectation $\mathbb{E}[f(X)]$.</p>
+  <p>The Shapley value $\phi_j$ is the unique attribution method that simultaneously satisfies four essential axioms:
+  <ol>
+   <li><b>Efficiency:</b> $\sum_{j=1}^p \phi_j = f(x) - \mathbb{E}[f(X)]$ (all attribution sums to the prediction difference).</li>
+   <li><b>Symmetry:</b> If $v(S \cup \{j\}) = v(S \cup \{k\})$ for all subsets $S$, then $\phi_j = \phi_k$.</li>
+   <li><b>Dummy (Null Player):</b> If feature $j$ contributes nothing to any subset ($v(S \cup \{j\}) = v(S)$), then $\phi_j = 0$.</li>
+   <li><b>Additivity:</b> For combined games $u + v$, $\phi_j(u + v) = \phi_j(u) + \phi_j(v)$.</li>
+  </ol>
+  The exact formula weights the marginal contribution over all $2^p$ possible coalitions:
+  $$\phi_j = \sum_{S \subseteq \{1,\dots,p\}\setminus\{j\}} \frac{|S|!(p - |S| - 1)!}{p!} \Big( v(S \cup \{j\}) - v(S) \Big)$$</p>
+
+  <div class="card">
+   <h4>Lab 4 · Interactive 3-Feature Shapley Decomposition</h4>
+   <p>Explore an interactive 3-player cooperative credit model. Adjust the synergy parameter $\gamma$ to see how non-linear feature interactions are split equally across all contributing coalitions.</p>
+   <div class="ctrl">
+    <label>Interaction Synergy ($\gamma$): <span id="r4v">1.5</span></label>
+    <input type="range" id="r4" min="-2.0" max="3.0" step="0.2" value="1.5">
+   </div>
+   <div class="sim"><canvas id="cv4" height="260"></canvas></div>
+   <div class="stats" id="t4"></div>
+   <p class="takeaway"><b>Key Takeaway:</b> Shapley values provide the only mathematically unique attribution that satisfies the 4 fairness axioms. However, calculating exact values requires evaluating all $2^p$ subsets, necessitating approximations (TreeSHAP, KernelSHAP) in practice.</p>
+  </div>
+ </section>
+
+ <!-- Chapter 5 -->
+ <section class="ch" id="c5">
+  <h2><span class="num">5</span>Marginal vs Conditional SHAP: The Off-Manifold Dilemma <span class="lvl a">Advanced</span></h2>
+  <p>To evaluate a feature subset $S$, what is the value function $v(S)$? How do we "remove" features $\bar{S}$ from a trained model that expects a complete vector $x \in \mathbb{R}^p$? There are two fundamentally conflicting philosophies:
+  <ul>
+   <li><b>Interventional / Marginal SHAP:</b> Replaces absent features with random samples from their marginal distribution: $v_{\text{int}}(S) = \int f(x_S, x_{\bar{S}}) dP(X_{\bar{S}})$. This enforces <i>true to the model</i>. A feature with zero weight in $f(x)$ receives exactly $\phi_j = 0$ (Dummy axiom holds). But like PFI and PDP, it synthesizes off-manifold points by pairing $x_S$ with unrealistic $x_{\bar{S}}$.</li>
+   <li><b>Observational / Conditional SHAP:</b> Conditions on the present features: $v_{\text{obs}}(S) = \mathbb{E}[f(X) \mid X_S = x_S]$. This enforces <i>true to the data</i>. It never evaluates off-manifold points. But it violates the Dummy axiom: if $X_1$ has true model weight 0, but is correlated with $X_2$, $X_1$ will receive non-zero attribution because observing $X_1$ updates our expectation of $X_2$!</li>
+  </ul></p>
+
+  <div class="card">
+   <h4>Lab 5 · Marginal vs Conditional SHAP under Correlation</h4>
+   <p>Set true model $f(x) = 2.0 X_1 + 0.0 X_2$. $X_2$ has zero weight in the model! Adjust correlation $\rho(X_1, X_2)$ and observe how Conditional SHAP falsely attributes credit to the dummy variable $X_2$ while Marginal SHAP keeps $X_2 = 0$ but hallucinates off-manifold.</p>
+   <div class="ctrl">
+    <label>Correlation $\rho(X_1, X_2)$: <span id="r5v">0.80</span></label>
+    <input type="range" id="r5" min="-0.95" max="0.95" step="0.05" value="0.80">
+   </div>
+   <div class="sim"><canvas id="cv5" height="260"></canvas></div>
+   <div class="stats" id="t5"></div>
+   <p class="takeaway"><b>Key Takeaway:</b> There is no free lunch in feature attribution: you must choose between evaluating the model on impossible data points (Marginal SHAP) or attributing importance to features the model never actually used (Conditional SHAP).</p>
+  </div>
+ </section>
+
+ <!-- Chapter 6 -->
+ <section class="ch" id="c6">
+  <h2><span class="num">6</span>LIME: Local Surrogates &amp; Sampling Radius Instabilities <span class="lvl a">Advanced</span></h2>
+  <p>LIME (Local Interpretable Model-agnostic Explanations, Ribeiro et al. 2016) builds a local linear surrogate model $g(z) = w^T z$ to approximate complex black-box $f(x)$ around an instance $x$:
+  $$\xi(x) = \arg\min_{g \in G} \sum_{z \in Z} \pi_x(z) \big(f(z) - g(z)\big)^2 + \Omega(g)$$
+  where $\pi_x(z) = \exp\left(-\frac{D(x, z)^2}{\sigma^2}\right)$ is an exponential proximity kernel with kernel bandwidth $\sigma$.</p>
+  <p>LIME suffers from two acute statistical vulnerabilities:
+  <ol>
+   <li><b>Sampling Variance:</b> Perturbations $z$ are drawn randomly from Gaussian noise. Different random seeds on the same instance can produce completely conflicting explanation weights.</li>
+   <li><b>Hyperparameter Sensitivity ($\sigma$):</b> If $\sigma$ is too small, the sample contains virtually no variance and the fit is ill-conditioned. If $\sigma$ is too large, the surrogate spans multiple non-linear curvature regions, causing local feature weights to flip signs.</li>
+  </ol></p>
+
+  <div class="card">
+   <h4>Lab 6 · LIME Kernel Bandwidth &amp; Surrogate Instability</h4>
+   <p>Drag the kernel width $\sigma$ on a non-linear decision boundary. Observe how changing the arbitrary neighborhood radius flips the local surrogate slope from positive to negative.</p>
+   <div class="ctrl">
+    <label>Kernel Bandwidth ($\sigma$): <span id="r6v">0.45</span></label>
+    <input type="range" id="r6" min="0.1" max="1.5" step="0.05" value="0.45">
+   </div>
+   <div class="sim"><canvas id="cv6" height="260"></canvas></div>
+   <div class="stats" id="t6"></div>
+   <p class="takeaway"><b>Key Takeaway:</b> LIME explanations are highly sensitive to user-chosen sampling radii and random seeds. A model explanation that changes when you re-run the script with seed 43 instead of seed 42 cannot be used for high-stakes regulatory decisions.</p>
+  </div>
+ </section>
+
+ <!-- Chapter 7 -->
+ <section class="ch" id="c7">
+  <h2><span class="num">7</span>The Rashomon Effect &amp; Model Multiplicity <span class="lvl a">Advanced</span></h2>
+  <p>Named after Akira Kurosawa’s film where witnesses describe the same event in contradictory ways, Leo Breiman (2001) coined the <b>Rashomon Effect</b> for machine learning: in almost any empirical dataset, there exists a vast <b>Rashomon set</b> $\mathcal{R}(\epsilon)$ of models that achieve virtually identical predictive loss:
+  $$\mathcal{R}(\epsilon) = \left\{ f \in \mathcal{F} \;\middle|\; L(f) \le L(f^*) + \epsilon \right\}$$
+  While these models predict equally well (e.g. all within 0.1% test AUC), their internal mechanisms, coefficient signs, and top-ranked feature importances can be diametrically opposed.</p>
+  <p>When an organization trains a single model (say, gradient boosted trees with seed 101) and presents its SHAP plot as "the ground truth explanation of our data," they are ignoring thousands of equally accurate models that would assign zero importance to their top feature and high importance to an omitted variable. This phenomenon is known as <b>Predictive Multiplicity</b> (Marx et al., 2020).</p>
+
+  <div class="card">
+   <h4>Lab 7 · The Rashomon Multiplicity Explorer</h4>
+   <p>Inspect 5 distinct models from the Rashomon set of a collinear dataset ($\Delta \text{Loss} < 0.2\%$). Compare how their top feature rankings flip and contradict each other despite identical test performance.</p>
+   <div class="ctrl">
+    <label>Loss Tolerance ($\epsilon$): <span id="r7v">0.02</span></label>
+    <input type="range" id="r7" min="0.005" max="0.08" step="0.005" value="0.02">
+   </div>
+   <div class="sim"><canvas id="cv7" height="260"></canvas></div>
+   <div class="stats" id="t7"></div>
+   <p class="takeaway"><b>Key Takeaway:</b> Never confuse model explanation with domain truth. If two models achieve the same empirical risk with contradictory feature attributions, the explanation is a property of the model's arbitrary inductive bias, not nature.</p>
+  </div>
+ </section>
+
+ <div class="part">Part III · Causal Limits &amp; Adversarial Vulnerabilities</div>
+
+ <!-- Chapter 8 -->
+ <section class="ch" id="c8">
+  <h2><span class="num">8</span>Feature Attribution Is Not Causal Effect <span class="lvl a">Advanced</span></h2>
+  <p>Perhaps the most dangerous misuse of explainable AI is treating feature attribution $\phi_j$ as an estimate of causal intervention $\frac{\partial \mathbb{E}[Y \mid do(X)]}{\partial X_j}$. In business and policy settings, leaders routinely ask: <i>"SHAP says Marketing Spend has attribution +0.8 and Customer Age has +0.1; therefore, increasing marketing spend by \$10k will generate 8x more return than targeting older customers."</i></p>
+  <p>This inference is completely unjustified. Feature attributions measure associative model dependencies:
+  $$\text{Attribution} \approx \frac{\partial f(x)}{\partial x_j} \ne \frac{d \mathbb{E}[Y \mid do(X_j = x_j)]}{d x_j}$$
+  If $X_j$ is a mediator, a collider, or an effect of an unobserved common cause (e.g., website visits before buying), the attribution will be enormous while the true interventional effect of artificially forcing website visits is exactly zero. Valid causal effects require identification via DAGs, the backdoor criterion, and exogenous variation—things statistical explainers are mathematically incapable of providing.</p>
+
+  <div class="card">
+   <h4>Lab 8 · Attribution vs Causal DAG Interventions</h4>
+   <p>Compare the SHAP attribution of feature $X_1$ with its true causal effect $\frac{d\mathbb{E}[Y \mid do(X_1)]}{dX_1}$ across different causal structures (Confounder, Mediator, Collider).</p>
+   <div class="ctrl">
+    <label>Collider Correlation / Bias: <span id="r8v">0.75</span></label>
+    <input type="range" id="r8" min="-1.0" max="1.0" step="0.1" value="0.75">
+   </div>
+   <div class="sim"><canvas id="cv8" height="260"></canvas></div>
+   <div class="stats" id="t8"></div>
+   <p class="takeaway"><b>Key Takeaway:</b> Feature attribution tells you how the model processes information; causal inference tells you how the world responds to action. Never prescribe real-world interventions based solely on SHAP or LIME attributions.</p>
+  </div>
+ </section>
+
+ <!-- Chapter 9 -->
+ <section class="ch" id="c9">
+  <h2><span class="num">9</span>Adversarial Fooling of Post-Hoc Explainers <span class="lvl e">Expert</span></h2>
+  <p>Can a model lie about its own internal reasoning? In landmark work, Slack et al. (2020) demonstrated that post-hoc explainers like LIME and SHAP can be systematically fooled using <b>adversarial scaffolding</b>.</p>
+  <p>Explainers draw perturbation samples $z$ from synthetic distributions (e.g. isotropic Gaussians or marginal permutations). Because real data lies on a lower-dimensional manifold, off-manifold synthetic perturbations are easily distinguishable from real on-manifold instances by a simple binary classifier:
+  $$f_{\text{adv}}(x) = \begin{cases} 
+  f_{\text{biased}}(x) & \text{if } x \text{ is on-manifold (Real Customer: discriminate on Protected Attribute)} \\ 
+  f_{\text{innocuous}}(x) & \text{if } x \text{ is off-manifold (Explainer Perturbation: predict using benign features)}
+  \end{cases}$$
+  When queried by an auditor or regulator using LIME or SHAP, the model detects the perturbation distribution and switches to a harmless explanation! The auditor concludes the model is 100% fair and blind to protected attributes, while in production it actively discriminates.</p>
+
+  <div class="card">
+   <h4>Lab 9 · The Scaffolding Exploit Simulator</h4>
+   <p>Test an adversarial model that discriminates on protected feature $Z$ on real data, but detects perturbation points generated by SHAP/LIME and feigns neutrality.</p>
+   <div class="ctrl">
+    <label>Manifold Detector Sensitivity: <span id="r9v">0.90</span></label>
+    <input type="range" id="r9" min="0.5" max="0.99" step="0.01" value="0.90">
+   </div>
+   <div class="sim"><canvas id="cv9" height="260"></canvas></div>
+   <div class="stats" id="t9"></div>
+   <p class="takeaway"><b>Key Takeaway:</b> Post-hoc explainers are not security or audit guarantees. Because they sample off-manifold, any adversary can construct a dual-personality model that hides biased decisions from explainers.</p>
+  </div>
+ </section>
+
+ <!-- Chapter 10 -->
+ <section class="ch" id="c10">
+  <h2><span class="num">10</span>High Dimensions, Non-Linearities &amp; Feature Dilution <span class="lvl e">Expert</span></h2>
+  <p>In high dimensions ($p \gg 100$), explainability encounters the geometric curse of dimensionality:
+  <ul>
+   <li><b>Feature Dilution:</b> If a credit bureau includes 50 correlated credit inquiries instead of 1 aggregate score, tree models split across all 50 features arbitrarily. The individual attribution of each inquiry drops by a factor of 50, disguising an overwhelming risk factor as negligible background noise.</li>
+   <li><b>Distance Dilution in LIME:</b> In high dimensions, all pairwise Euclidean distances converge to the same value ($D_{\max} / D_{\min} \to 1$). Exponential kernels $\pi_x(z)$ lose discriminative power, assigning nearly equal weights to all perturbed points.</li>
+   <li><b>High-Order Interactions:</b> When models contain complex multi-way interactions (e.g. $X_1 \cdot X_2 \cdot X_3 \cdot X_4$), splitting the interaction evenly across main-effect attributions hides the non-linear trigger conditions.</li>
+  </ul></p>
+
+  <div class="card">
+   <h4>Lab 10 · Collinear Dilution &amp; Importance Dispersal</h4>
+   <p>Add redundant collinear copies of a primary risk signal. Watch how individual feature importances vanish below the significance floor while the true total group importance remains invariant.</p>
+   <div class="ctrl">
+    <label>Number of Collinear Copies ($k$): <span id="r10v">8</span></label>
+    <input type="range" id="r10" min="1" max="20" step="1" value="8">
+   </div>
+   <div class="sim"><canvas id="cv10" height="260"></canvas></div>
+   <div class="stats" id="t10"></div>
+   <p class="takeaway"><b>Key Takeaway:</b> Always group correlated features before computing attributions. Group-SHAP and hierarchical clustering prevent signal dilution from blinding stakeholders to critical risk factors.</p>
+  </div>
+ </section>
+
+ <!-- Chapter 11 -->
+ <section class="ch" id="c11">
+  <h2><span class="num">11</span>Regulator-Grade Explanations &amp; Statistical Standards <span class="lvl e">Expert</span></h2>
+  <p>Regulatory frameworks such as the **EU AI Act (Article 13)**, **US Equal Credit Opportunity Act (ECOA - Adverse Action Notices)**, and **Federal Reserve SR 11-7 (Model Risk Management)** require explanations that are:
+  <ol>
+   <li><b>Faithful:</b> Reflective of actual model mechanics rather than post-hoc rationalization.</li>
+   <li><b>Actionable (Recourse):</b> Guiding individuals on what realistic, feasible changes will alter the decision.</li>
+   <li><b>Robust:</b> Stable under minor input perturbations and sample re-runs.</li>
+  </ol></p>
+  <p><b>Counterfactual Explanations &amp; Actionable Recourse:</b> A counterfactual explanation finds the minimum cost change $\delta$ such that $f(x + \delta) = y^*$:
+  $$\delta^* = \arg\min_{\delta} \text{dist}(x, x+\delta) + \lambda \ell(f(x+\delta), y^*) + \text{Plausibility}(x+\delta)$$
+  Crucially, mathematical nearest-counterfactuals often prescribe absurd actions (e.g., "reduce your age by 5 years" or "decrease debt while keeping income at zero"). Actionable recourse requires causal constraints and immutable feature protections.</p>
+
+  <div class="card">
+   <h4>Lab 11 · Nearest Counterfactual vs Feasible Causal Recourse</h4>
+   <p>Compare unconstrained mathematical counterfactuals (which extrapolate off the data manifold) with feasible causal recourse that respects feature correlations and immutable constraints.</p>
+   <div class="ctrl">
+    <label>Manifold Constraint Weight ($\lambda$): <span id="r11v">1.2</span></label>
+    <input type="range" id="r11" min="0.0" max="3.0" step="0.2" value="1.2">
+   </div>
+   <div class="sim"><canvas id="cv11" height="260"></canvas></div>
+   <div class="stats" id="t11"></div>
+   <p class="takeaway"><b>Key Takeaway:</b> Adverse action notices and counterfactual explanations must restrict recourse recommendations to realistic paths along the data manifold that respect causal constraints.</p>
+  </div>
+ </section>
+
+ <div class="part">Part IV · Synthesis, Checklist &amp; Exam</div>
+
+ <!-- Chapter 12 -->
+ <section class="ch" id="c12">
+  <h2><span class="num">12</span>Final Exam, Mastery Checklist, Cheat Sheet <span class="lvl e">Expert</span></h2>
+  <p>Verify your mastery of interpretability theory, Shapley axioms, off-manifold dilemmas, Rashomon sets, and causal limits across 18 comprehensive exam questions.</p>
+
+  <h3>Exam (18 questions — click an answer)</h3>
+  <div id="quiz"></div>
+  <div class="card">
+   <h4>Exam Score &amp; Verification</h4>
+   <div class="stats" id="qscore"></div>
+   <button class="alt" id="qreset">Reset exam</button>
+  </div>
+
+  <h3>Mastery Checklist</h3>
+  <div class="card">
+   <div id="chk" class="chk-grid"></div>
+  </div>
+
+  <h3>Interpretability Methods Comparison Cheat Sheet</h3>
+  <div class="card">
+   <table style="width:100%;border-collapse:collapse;font-size:13px;text-align:left">
+    <thead>
+     <tr style="border-bottom:1px solid var(--line);color:var(--mu)">
+      <th style="padding:8px">Method</th>
+      <th style="padding:8px">Scope</th>
+      <th style="padding:8px">Axiomatic Guarantee</th>
+      <th style="padding:8px">Collinearity Behavior</th>
+      <th style="padding:8px">Off-Manifold Risk</th>
+      <th style="padding:8px">Causal Meaning</th>
+     </tr>
+    </thead>
+    <tbody>
+     <tr style="border-bottom:1px solid var(--line)">
+      <td style="padding:8px"><b>PFI</b></td>
+      <td style="padding:8px">Global</td>
+      <td style="padding:8px">None (heuristic)</td>
+      <td style="padding:8px">Masks redundant features; inflates variance</td>
+      <td style="padding:8px"><span style="color:var(--r)">High</span> (pairs broken)</td>
+      <td style="padding:8px">Associative only</td>
+     </tr>
+     <tr style="border-bottom:1px solid var(--line)">
+      <td style="padding:8px"><b>PDP</b></td>
+      <td style="padding:8px">Global</td>
+      <td style="padding:8px">None</td>
+      <td style="padding:8px">Extrapolates into zero-density rectangular grid</td>
+      <td style="padding:8px"><span style="color:var(--r)">Very High</span></td>
+      <td style="padding:8px">Associative only</td>
+     </tr>
+     <tr style="border-bottom:1px solid var(--line)">
+      <td style="padding:8px"><b>ALE</b></td>
+      <td style="padding:8px">Global</td>
+      <td style="padding:8px">Integrates local gradients</td>
+      <td style="padding:8px">Robust; tracks conditional distribution</td>
+      <td style="padding:8px"><span style="color:var(--g)">Zero</span> (on-manifold)</td>
+      <td style="padding:8px">Local model sensitivity</td>
+     </tr>
+     <tr style="border-bottom:1px solid var(--line)">
+      <td style="padding:8px"><b>Marginal SHAP</b></td>
+      <td style="padding:8px">Local</td>
+      <td style="padding:8px">Efficiency, Symmetry, Dummy, Additivity</td>
+      <td style="padding:8px">Dummy features stay zero; off-manifold sampling</td>
+      <td style="padding:8px"><span style="color:var(--r)">High</span></td>
+      <td style="padding:8px">Feature attribution $\ne$ do-calculus</td>
+     </tr>
+     <tr style="border-bottom:1px solid var(--line)">
+      <td style="padding:8px"><b>Conditional SHAP</b></td>
+      <td style="padding:8px">Local</td>
+      <td style="padding:8px">Efficiency, Symmetry, Additivity (violates Dummy)</td>
+      <td style="padding:8px">Leaks attribution to correlated zero-weight variables</td>
+      <td style="padding:8px"><span style="color:var(--g)">Zero</span> (on-manifold)</td>
+      <td style="padding:8px">Observational expectation</td>
+     </tr>
+     <tr style="border-bottom:1px solid var(--line)">
+      <td style="padding:8px"><b>LIME</b></td>
+      <td style="padding:8px">Local</td>
+      <td style="padding:8px">None (local surrogate fit)</td>
+      <td style="padding:8px">Sensitive to kernel width $\sigma$ and random seed</td>
+      <td style="padding:8px"><span style="color:var(--y)">Medium</span> (Gaussian)</td>
+      <td style="padding:8px">Linear surrogate gradient</td>
+     </tr>
+     <tr>
+      <td style="padding:8px"><b>Causal Recourse</b></td>
+      <td style="padding:8px">Instance</td>
+      <td style="padding:8px">Bounded cost along structural causal equations</td>
+      <td style="padding:8px">Propagates downstream shifts via DAG</td>
+      <td style="padding:8px"><span style="color:var(--g)">Zero</span> (feasible path)</td>
+      <td style="padding:8px"><span style="color:var(--g)">True interventional effect</span></td>
+     </tr>
+    </tbody>
+   </table>
+  </div>
+ </section>
+</main>
+
+<script>
+/*MATH*/
+function randn(){let u=0;while(!u)u=Math.random();return Math.sqrt(-2*Math.log(u))*Math.cos(2*Math.PI*Math.random());}
+function normCdf(z){let t=1/(1+0.2316419*Math.abs(z));let d=0.3989423*Math.exp(-z*z/2);let p=d*t*(0.3193815+t*(-0.3565638+t*(1.781478+t*(-1.821256+t*1.330274))));return z>0?1-p:p;}
+function mean(a){let s=0;for(const v of a)s+=v;return s/a.length;}
+/*ENDMATH*/
+
+const $=id=>document.getElementById(id), val=id=>+$(id).value;
+const C={fg:'#e8ebf5',mu:'#8a93ab',gr:'#232a3d',a:'#6ea8ff',r:'#ff6b81',y:'#ffd166',g:'#4ade80',p:'#c084fc',t:'#5eead4'};
+const store={get(k,d){try{const v=JSON.parse(localStorage.getItem(k));return v==null?d:v}catch(e){return d}},set(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}};
+function stat(l,v,c){return `<div class="stat ${c||''}"><b>${v}</b><span>${l}</span></div>`}
+function f3(x){if(!isFinite(x))return String(x);const a=Math.abs(x);if(a!==0&&(a<1e-3||a>=1e6))return x.toExponential(2);return String(+x.toFixed(a<1?4:a<100?3:a<1000?2:0))}
+
+const resizers=[];
+function reg(fn){fn();resizers.push(fn)}
+function on(ids,fn){ids.split(' ').forEach(i=>{const e=$(i);if(e){e.addEventListener('input',fn);e.addEventListener('change',fn)}})}
+let rt;window.addEventListener('resize',()=>{clearTimeout(rt);rt=setTimeout(()=>resizers.forEach(f=>f()),150)});
+document.querySelectorAll('input[type=range]').forEach(i=>{const o=$(i.id+'v');if(!o)return;const f=()=>{o.textContent=i.value};i.addEventListener('input',f);f()});
+
+function nice(x){const e=Math.pow(10,Math.floor(Math.log10(x))),f=x/e;return (f<1.5?1:f<3?2:f<7?5:10)*e}
+function mk(cv,x0,x1,ymax,o){o=o||{};const y0=o.y0||0,dpr=window.devicePixelRatio||1,r=cv.getBoundingClientRect(),w=r.width||600,h=r.height||260;
+ cv.width=w*dpr;cv.height=h*dpr;const g=cv.getContext('2d');g.setTransform(dpr,0,0,dpr,0,0);g.clearRect(0,0,w,h);
+ const L=o.L||42,R=12,T=14,B=28,X=x=>L+(x-x0)/(x1-x0)*(w-L-R),Y=y=>h-B-(y-y0)/(ymax-y0)*(h-T-B);
+ g.font='11px system-ui';g.lineWidth=1;g.strokeStyle=C.gr;g.fillStyle=C.mu;
+ if(!o.noGrid){const sx=nice((x1-x0)/7);for(let x=Math.ceil(x0/sx-1e-9)*sx;!o.noX&&x<=x1+1e-9;x+=sx){g.beginPath();g.moveTo(X(x),T);g.lineTo(X(x),h-B);g.stroke();g.textAlign='center';g.fillText(String(+x.toFixed(4)),X(x),h-B+15)}
+ const sy=nice((ymax-y0)/4);for(let y=Math.ceil(y0/sy-1e-9)*sy;y<=ymax+1e-9;y+=sy){g.beginPath();g.moveTo(L,Y(y));g.lineTo(w-R,Y(y));g.stroke();g.textAlign='right';g.fillText(String(+y.toFixed(4)),L-5,Y(y)+3)}}
+ return{g,w,h,X,Y,L,R,T,B,
+  line(f,col,lw,a,b,n,dash){a=a==null?x0:a;b=b==null?x1:b;n=n||260;g.save();if(dash)g.setLineDash([5,4]);g.beginPath();g.strokeStyle=col;g.lineWidth=lw||2;let st=false;for(let i=0;i<=n;i++){const x=a+(b-a)*i/n,y=f(x);if(!isFinite(y)){st=false;continue}st?g.lineTo(X(x),Y(y)):g.moveTo(X(x),Y(y));st=true}g.stroke();g.restore()},
+  bar(x,y,wBar,col){g.fillStyle=col;g.fillRect(X(x)-wBar/2,Y(Math.max(0,y)),wBar,Math.abs(Y(y)-Y(0)))},
+  circle(x,y,r,col){g.beginPath();g.arc(X(x),Y(y),r,0,Math.PI*2);g.fillStyle=col;g.fill()},
+  vline(x,col,lab,dash){g.save();g.strokeStyle=col;g.lineWidth=1.6;if(dash)g.setLineDash([5,4]);g.beginPath();g.moveTo(X(x),T);g.lineTo(X(x),h-B);g.stroke();g.restore();if(lab){g.fillStyle=col;g.textAlign='center';g.fillText(lab,Math.min(Math.max(X(x),34),w-34),T+10)}},
+  hline(y,col,lab){g.save();g.strokeStyle=col;g.lineWidth=1.4;g.setLineDash([5,4]);g.beginPath();g.moveTo(L,Y(y));g.lineTo(w-R,Y(y));g.stroke();g.restore();if(lab){g.fillStyle=col;g.textAlign='right';g.fillText(lab,w-R-3,Y(y)-4)}},
+  text(s,x,y,col,al){g.fillStyle=col||C.fg;g.textAlign=al||'left';g.fillText(s,x,y)}};}
+
+/* ---------- LAB 1: Confounder Trap ---------- */
+reg(()=>{
+ function run(){
+  const conf=val('r1');
+  const cv=$('cv1'), m=mk(cv,-3,3,4,{y0:-4});
+  m.hline(0,C.gr);
+  // Plot simulated data points and true vs estimated model line
+  // True effect: beta_true = +1.5, Observed regression slope: beta_obs = 1.5 - 2.5 * conf
+  const beta_true = 1.5;
+  const beta_obs = 1.5 - 2.8 * conf;
+  m.line(x=>beta_true*x, C.g, 2.5, -3, 3, 100, true);
+  m.line(x=>beta_obs*x, C.r, 2.5, -3, 3, 100);
+  m.text('True Causal Effect (+1.5)', m.X(1.5), m.Y(3.2), C.g);
+  m.text(`Model / Attribution Slope (${f3(beta_obs)})`, m.X(1.5), m.Y(beta_obs*1.5 - 0.4), C.r);
+
+  $('t1').innerHTML = stat('True Causal Effect','+1.50','ok')+
+                      stat('Model Attribution',f3(beta_obs),beta_obs<0?'err':'in')+
+                      stat('Confounding Bias',f3(beta_obs - beta_true),'warn')+
+                      stat('Status',beta_obs<0?'FATAL INVERSION: Model rewards harmful action!':'Biased but aligned sign','');
+ }
+ on('r1', run); run();
+});
+
+/* ---------- LAB 2: PFI under Collinearity ---------- */
+reg(()=>{
+ function run(){
+  const rho=val('r2');
+  const cv=$('cv2'), m=mk(cv,-0.5,2.5,1.2,{y0:0,noX:true});
+  m.hline(0,C.gr);
+  // As rho -> 1, PFI of X1 and X2 drops from 0.5 to (1-rho^2)*0.5
+  const true_joint = 1.0;
+  const pfi_x1 = Math.max(0.04, 0.5 * (1 - rho*rho));
+  const pfi_x2 = Math.max(0.04, 0.5 * (1 - rho*rho));
+  m.bar(0.2, true_joint, 36, C.g);
+  m.bar(1.0, pfi_x1, 36, C.a);
+  m.bar(1.8, pfi_x2, 36, C.y);
+
+  m.text('Joint Signal (1.0)', m.X(0.2), m.Y(true_joint)+15, C.fg, 'center');
+  m.text(`PFI(X1): ${f3(pfi_x1)}`, m.X(1.0), m.Y(pfi_x1)+15, C.a, 'center');
+  m.text(`PFI(X2): ${f3(pfi_x2)}`, m.X(1.8), m.Y(pfi_x2)+15, C.y, 'center');
+
+  $('t2').innerHTML = stat('Correlation (ρ)',f3(rho),'in')+
+                      stat('PFI(X1)',f3(pfi_x1),pfi_x1<0.15?'err':'ok')+
+                      stat('PFI(X2)',f3(pfi_x2),pfi_x2<0.15?'err':'ok')+
+                      stat('Dilution Factor',f3(true_joint/(pfi_x1+pfi_x2)),'warn');
+ }
+ on('r2', run); run();
+});
+
+/* ---------- LAB 3: PDP vs ALE ---------- */
+reg(()=>{
+ function run(){
+  const rho=val('r3');
+  const cv=$('cv3'), m=mk(cv,-2.5,2.5,4,{y0:-1});
+  m.hline(0,C.gr);
+  // f(x1, x2) = x1 + 2 x2^2.
+  // When correlated x2 = rho*x1 + noise
+  // True ALE tracks isolated x1 effect: ALE(x1) = x1
+  // PDP averages over marginal x2: PDP(x1) = x1 + 2*E[x2^2] + extrapolation error
+  m.line(x=>x, C.t, 2.5, -2.5, 2.5); // ALE
+  m.line(x=>x + 2.0*rho*rho*(x*x - 1), C.r, 2.5, -2.5, 2.5, 100, true); // PDP with off-manifold curvature
+  m.text('ALE: True isolated effect f(x1)=x1', m.X(-2.0), m.Y(-0.5), C.t);
+  m.text(`PDP: Extrapolated Curvature (ρ=${f3(rho)})`, m.X(-2.0), m.Y(3.2), C.r);
+
+  $('t3').innerHTML = stat('Correlation (ρ)',f3(rho),'in')+
+                      stat('ALE Error','0.00 (Pure)','ok')+
+                      stat('PDP Extrapolation Bias',f3(2.0*rho*rho),'err')+
+                      stat('Verdict',rho>0.7?'PDP completely distorts curve':'Mild distortion','warn');
+ }
+ on('r3', run); run();
+});
+
+/* ---------- LAB 4: Shapley Values 3-Player ---------- */
+reg(()=>{
+ function run(){
+  const g=val('r4');
+  const cv=$('cv4'), m=mk(cv,-0.5,3.5,4.5,{y0:0,noX:true});
+  m.hline(0,C.gr);
+  // Base players v1=1.0, v2=1.5, v3=0.8, interaction between 1 & 2 adds gamma
+  const phi1 = 1.0 + g/2;
+  const phi2 = 1.5 + g/2;
+  const phi3 = 0.8;
+  const total = phi1 + phi2 + phi3;
+  m.bar(0.4, phi1, 40, C.a);
+  m.bar(1.4, phi2, 40, C.p);
+  m.bar(2.4, phi3, 40, C.y);
+
+  m.text(`φ1: ${f3(phi1)}`, m.X(0.4), m.Y(phi1)+15, C.a, 'center');
+  m.text(`φ2: ${f3(phi2)}`, m.X(1.4), m.Y(phi2)+15, C.p, 'center');
+  m.text(`φ3: ${f3(phi3)}`, m.X(2.4), m.Y(phi3)+15, C.y, 'center');
+
+  $('t4').innerHTML = stat('Synergy (γ)',f3(g),'in')+
+                      stat('Total Payout v(1,2,3)',f3(total),'ok')+
+                      stat('Efficiency Check',`${f3(phi1+phi2+phi3)} = ${f3(total)}`,'ok')+
+                      stat('Interaction Split',`γ/2 = +${f3(g/2)} to P1 & P2`,'warn');
+ }
+ on('r4', run); run();
+});
+
+/* ---------- LAB 5: Marginal vs Conditional SHAP ---------- */
+reg(()=>{
+ function run(){
+  const rho=val('r5');
+  const cv=$('cv5'), m=mk(cv,-0.5,2.5,2.5,{y0:-0.5,noX:true});
+  m.hline(0,C.gr);
+  // Model f(x) = 2.0*x1 + 0*x2.
+  // Marginal SHAP: phi1 = 2.0, phi2 = 0.0 (exact dummy)
+  // Conditional SHAP: phi1 = 2.0 - 2.0*rho^2/2, phi2 = 2.0*rho / 2
+  const m_phi1 = 2.0, m_phi2 = 0.0;
+  const c_phi1 = 2.0 * (1 - 0.5 * rho * rho);
+  const c_phi2 = 2.0 * 0.5 * rho;
+
+  m.bar(0.3, m_phi1, 30, C.g);
+  m.bar(0.7, m_phi2, 30, C.g);
+  m.bar(1.5, c_phi1, 30, C.r);
+  m.bar(1.9, c_phi2, 30, C.r);
+
+  m.text('Marginal SHAP', m.X(0.5), m.Y(2.2), C.g, 'center');
+  m.text('Conditional SHAP', m.X(1.7), m.Y(2.2), C.r, 'center');
+  m.text(`φ2=0`, m.X(0.7), m.Y(0.2), C.g, 'center');
+  m.text(`Leak φ2=${f3(c_phi2)}`, m.X(1.9), m.Y(Math.max(0.2, c_phi2+0.15)), C.r, 'center');
+
+  $('t5').innerHTML = stat('Correlation (ρ)',f3(rho),'in')+
+                      stat('Marginal φ2 (True Dummy)',f3(m_phi2),'ok')+
+                      stat('Conditional φ2 (Leaked)',f3(c_phi2),Math.abs(c_phi2)>0.2?'err':'ok')+
+                      stat('Dilemma',Math.abs(rho)>0.5?'Conditional SHAP credits zero-weight variable!':'Low correlation','warn');
+ }
+ on('r5', run); run();
+});
+
+/* ---------- LAB 6: LIME Kernel Bandwidth ---------- */
+reg(()=>{
+ function run(){
+  const s=val('r6');
+  const cv=$('cv6'), m=mk(cv,-2,2,3,{y0:-3});
+  m.hline(0,C.gr);
+  // True non-linear boundary: f(x) = x^3 - x
+  // Local tangent at x=0.5 with kernel radius s
+  // Slope changes from negative to positive as s expands
+  const local_slope = -0.25 + 1.8 * (s - 0.45);
+  m.line(x=>x*x*x - x, C.p, 2.5, -2, 2);
+  m.line(x=>(0.125 - 0.5) + local_slope*(x - 0.5), C.y, 2, -2, 2, 100, true);
+  m.circle(0.5, 0.125-0.5, 5, C.a);
+  m.text('True Model f(x)=x³-x', m.X(-1.5), m.Y(2.2), C.p);
+  m.text(`LIME Local Surrogate Slope: ${f3(local_slope)}`, m.X(-1.5), m.Y(-2.5), C.y);
+
+  $('t6').innerHTML = stat('Bandwidth (σ)',f3(s),'in')+
+                      stat('LIME Surrogate Slope',f3(local_slope),local_slope*(-0.25)<0?'err':'ok')+
+                      stat('Instability Warning',s>0.8?'Surrogate spans opposite curvature!':'Local enough','warn');
+ }
+ on('r6', run); run();
+});
+
+/* ---------- LAB 7: Rashomon Effect ---------- */
+reg(()=>{
+ function run(){
+  const eps=val('r7');
+  const cv=$('cv7'), m=mk(cv,-0.5,4.5,2.5,{y0:-0.5,noX:true});
+  m.hline(0,C.gr);
+  // 5 models with loss within eps, having wildly different feature weights w1 vs w2
+  const w1_base = 1.5, w2_base = 0.2;
+  const spread = eps * 25;
+  const models = [
+   {name:'M1 (GBCD)', w1: w1_base + spread*0.8, w2: w2_base - spread*0.8},
+   {name:'M2 (RF)', w1: w1_base - spread*0.5, w2: w2_base + spread*0.5},
+   {name:'M3 (NN)', w1: w1_base - spread*1.2, w2: w2_base + spread*1.2},
+   {name:'M4 (Ridge)', w1: w1_base * 0.5, w2: w1_base * 0.5},
+   {name:'M5 (Lasso)', w1: w1_base + spread*1.5, w2: 0.0}
+  ];
+  models.forEach((mod, idx)=>{
+   m.bar(idx, mod.w1, 24, C.a);
+   m.bar(idx+0.28, mod.w2, 24, C.r);
+   m.text(mod.name, m.X(idx+0.14), m.Y(-0.35), C.fg, 'center');
+  });
+  m.text('Blue = Weight X1, Red = Weight X2 (All models have loss < L* + ε)', m.X(2.0), m.Y(2.3), C.mu, 'center');
+
+  $('t7').innerHTML = stat('Rashomon Tolerance (ε)',f3(eps),'in')+
+                      stat('Models in Set','5 Evaluated','ok')+
+                      stat('Weight Spread Δw1',f3(spread*2.7),'warn')+
+                      stat('Takeaway','Identical loss, completely conflicting explanations!','err');
+ }
+ on('r7', run); run();
+});
+
+/* ---------- LAB 8: Attribution vs Causal Effect ---------- */
+reg(()=>{
+ function run(){
+  const collider_bias=val('r8');
+  const cv=$('cv8'), m=mk(cv,-0.5,2.5,2.5,{y0:-0.5,noX:true});
+  m.hline(0,C.gr);
+  const causal_effect = 0.0; // True effect is 0
+  const shap_attribution = collider_bias * 1.6;
+
+  m.bar(0.5, causal_effect + 0.04, 50, C.g);
+  m.bar(1.5, shap_attribution, 50, C.r);
+
+  m.text(`Causal Effect do(X1): ${f3(causal_effect)}`, m.X(0.5), m.Y(0.3), C.g, 'center');
+  m.text(`SHAP Attribution: ${f3(shap_attribution)}`, m.X(1.5), m.Y(Math.max(0.3, shap_attribution+0.15)), C.r, 'center');
+
+  $('t8').innerHTML = stat('True Causal Effect do(X)','0.00 (Zero Effect)','ok')+
+                      stat('SHAP Attribution',f3(shap_attribution),Math.abs(shap_attribution)>0.2?'err':'ok')+
+                      stat('Collider Distortion',f3(shap_attribution - causal_effect),'warn')+
+                      stat('Danger',Math.abs(collider_bias)>0.4?'Management will invest in a zero-impact feature!':'Low bias','');
+ }
+ on('r8', run); run();
+});
+
+/* ---------- LAB 9: Adversarial Scaffolding ---------- */
+reg(()=>{
+ function run(){
+  const sens=val('r9');
+  const cv=$('cv9'), m=mk(cv,-0.5,2.5,2.5,{y0:0,noX:true});
+  m.hline(0,C.gr);
+  // Production behavior vs Auditor SHAP view
+  const prod_protected_use = 1.8;
+  const audited_shap_view = Math.max(0.02, 1.8 * (1 - sens));
+
+  m.bar(0.5, prod_protected_use, 50, C.r);
+  m.bar(1.5, audited_shap_view, 50, C.g);
+
+  m.text(`Production Model: Uses Race/Gender (${f3(prod_protected_use)})`, m.X(0.5), m.Y(prod_protected_use)+15, C.r, 'center');
+  m.text(`Auditor SHAP Report: (${f3(audited_shap_view)})`, m.X(1.5), m.Y(audited_shap_view)+15, C.g, 'center');
+
+  $('t9').innerHTML = stat('Adversarial Detection',pc(sens),'warn')+
+                      stat('Real Discrimination',f3(prod_protected_use),'err')+
+                      stat('Reported to Auditor',f3(audited_shap_view),'ok')+
+                      stat('Audit Bypass',sens>0.8?'EXPLOITED: Auditor completely fooled!':'Partial detection','err');
+ }
+ on('r9', run); run();
+});
+
+/* ---------- LAB 10: Collinear Feature Dilution ---------- */
+reg(()=>{
+ function run(){
+  const k=val('r10');
+  const cv=$('cv10'), m=mk(cv,0,k+1,1.2,{y0:0});
+  m.hline(0,C.gr);
+  const total_signal = 1.0;
+  const per_feature = total_signal / k;
+
+  for(let i=1;i<=k;i++){
+   m.bar(i, per_feature, Math.max(6, 240/k), C.a);
+  }
+  m.hline(0.1, C.r, 'Significance Threshold (0.10)');
+
+  $('t10').innerHTML = stat('Copies (k)',k,'in')+
+                       stat('Group Importance',f3(total_signal),'ok')+
+                       stat('Single Feature PFI',f3(per_feature),per_feature<0.1?'err':'ok')+
+                       stat('Status',per_feature<0.1?'DILUTED: Individual features appear insignificant!':'Detectable','warn');
+ }
+ on('r10', run); run();
+});
+
+/* ---------- LAB 11: Counterfactual Recourse ---------- */
+reg(()=>{
+ function run(){
+  const lam=val('r11');
+  const cv=$('cv11'), m=mk(cv,-2,2,3,{y0:-1});
+  m.hline(0,C.gr);
+  // Ellipse data manifold
+  m.line(x=>-Math.sqrt(Math.max(0, 1 - x*x/4)), C.gr, 1, -2, 2);
+  m.line(x=>Math.sqrt(Math.max(0, 1 - x*x/4)), C.gr, 1, -2, 2);
+
+  // Unconstrained counterfactual (jumps off manifold) vs Feasible recourse
+  const off_x = 0.2, off_y = 2.4;
+  const feas_x = 1.5, feas_y = 0.6;
+
+  m.circle(-1.2, -0.4, 6, C.r); // Applicant
+  m.circle(off_x, off_y, 6, C.y); // Unconstrained
+  m.circle(feas_x, feas_y, 6, C.g); // Feasible Recourse
+
+  m.line(x=>-0.4 + (off_y+0.4)/(off_x+1.2)*(x+1.2), C.y, 1.5, -1.2, off_x, 50, true);
+  m.line(x=>-0.4 + (feas_y+0.4)/(feas_x+1.2)*(x+1.2), C.g, 2, -1.2, feas_x);
+
+  m.text('Applicant', m.X(-1.2), m.Y(-0.7), C.r);
+  m.text('Unconstrained Jump (Impossible)', m.X(off_x), m.Y(off_y+0.2), C.y);
+  m.text('Feasible Causal Recourse', m.X(feas_x), m.Y(feas_y+0.2), C.g);
+
+  $('t11').innerHTML = stat('Constraint Weight (λ)',f3(lam),'in')+
+                       stat('Unconstrained Off-Manifold Distance','High (Plausibility = 0%)','err')+
+                       stat('Causal Feasibility','High (On Data Manifold)','ok')+
+                       stat('Regulatory Status','Compliant with ECOA / EU AI Act','ok');
+ }
+ on('r11', run); run();
+});
+
+/* ---------- EXAM QUESTIONS (18 Qs) ---------- */
+const QZ=[
+ {"l":"Beginner","q":"What is the fundamental difference between explaining a machine learning model $f(x)$ and explaining the real-world system $P(Y \\mid X)$?","o":["Explaining $f(x)$ describes how the algorithm combines inputs; it reflects real-world causality only if all causal assumptions hold","There is no difference; high accuracy guarantees causal explanations","Explaining $f(x)$ is always parametric, while explaining nature is non-parametric","Explaining $f(x)$ accounts for unobserved confounders automatically"],"a":0,"e":"A post-hoc explanation describes the mathematical mapping learned by the model. If the model learned confounded, selected, or reverse-causal correlations, the explanation reflects those flaws."},
+ {"l":"Beginner","q":"Why did an ML model trained on pneumonia records predict that asthmatics have lower risk of death?","o":["Asthma biologically cures pneumonia complications","Asthmatic patients were immediately escalated to intensive care, introducing confounding by treatment indication","Asthmatics were filtered out of the test set","The model suffered from severe overfitting"],"a":1,"e":"Confounding by indication: patients with high-risk pre-existing conditions receive aggressive treatment, creating a negative observational correlation between the risk factor and mortality."},
+ {"l":"Intermediate","q":"Why does Permutation Feature Importance (PFI) produce misleading results when predictors are highly correlated?","o":["It increases computational complexity exponentially","Shuffling one feature pairs it with improbable values of correlated features, forcing the model to extrapolate into empty off-manifold space","PFI violates the Efficiency axiom of game theory","PFI can only be computed on linear models"],"a":1,"e":"Permuting feature j independently breaks the joint correlation structure, evaluating the model on impossible combinations (e.g. 5-year-old with 30 years of credit history)."},
+ {"l":"Intermediate","q":"How does Accumulated Local Effects (ALE) solve the extrapolation flaw of Partial Dependence Plots (PDP)?","o":["ALE uses cross-validation instead of held-out data","ALE calculates local differences within conditional slices and accumulates them, avoiding off-manifold evaluation","ALE converts the model into a linear surrogate","ALE evaluates all $2^p$ feature coalitions"],"a":1,"e":"ALE computes expected local derivatives conditional on the present feature values, accumulating them without ever querying points far from the data manifold."},
+ {"l":"Intermediate","q":"Which set of axioms uniquely characterizes the Shapley value in cooperative game theory?","o":["Completeness, Transitivity, Reflexivity, Homogeneity","Efficiency, Symmetry, Dummy (Null Player), Additivity","Convexity, Monotonicity, Continuity, Duality","Consistency, Unbiasedness, Sufficiency, Efficiency"],"a":1,"e":"Lloyd Shapley (1953) proved that Efficiency, Symmetry, Dummy, and Additivity uniquely determine the Shapley attribution formula."},
+ {"l":"Advanced","q":"What happens when you apply Marginal (Interventional) SHAP to a model where features $X_1$ and $X_2$ are strongly correlated?","o":["It violates the Efficiency axiom","It evaluates the model on off-manifold, impossible feature combinations","It assigns non-zero credit to dummy features","It produces negative variances"],"a":1,"e":"Marginal SHAP integrates absent features over their marginal empirical distribution, breaking the dependency structure and querying the model in empty regions."},
+ {"l":"Advanced","q":"What is the primary drawback of Conditional (Observational) SHAP?","o":["It cannot be computed for tree models","It violates the Dummy axiom by attributing importance to features with zero weight in the model if they correlate with active features","It violates the Efficiency axiom","It produces infinite Shapley values"],"a":1,"e":"Conditional SHAP computes E[f(X) | X_S]. If X_dummy has weight 0 but correlates with X_active, conditioning on X_dummy updates the expectation, giving X_dummy non-zero attribution."},
+ {"l":"Advanced","q":"Why is LIME notoriously unstable across repeated runs on the same data point?","o":["It relies on random Gaussian perturbations and is highly sensitive to the chosen kernel bandwidth $\\sigma$","It requires solving a non-convex NP-hard matrix inversion","It does not support classification problems","It requires identical training and test distributions"],"a":0,"e":"LIME draws random local perturbations and weights them by an exponential distance kernel. Small changes in kernel width or random seed can drastically shift surrogate weights."},
+ {"l":"Advanced","q":"What is the Rashomon Effect in machine learning?","o":["The tendency of neural networks to memorize training labels","The existence of many distinct models that achieve virtually identical predictive accuracy but have conflicting internal mechanisms and feature rankings","The phenomenon where models perform worse on minority demographics","The failure of cross-validation under covariate shift"],"a":1,"e":"Named by Leo Breiman, the Rashomon effect demonstrates that many models achieve near-optimal loss with completely different, equally plausible feature attributions."},
+ {"l":"Advanced","q":"If feature $X_1$ has the highest positive SHAP value in a churn model, what can an executive soundly conclude?","o":["Increasing $X_1$ by 1 unit will directly reduce churn by the SHAP amount","Feature $X_1$ is the model's strongest statistical discriminator; causal impact requires an experiment or causal identification","The model has proven that $X_1$ causes customer retention","Features with lower SHAP values have zero business value"],"a":1,"e":"Attributions reflect internal model reliance, not causal effect. Acting on attributions without causal identification frequently leads to wasted investment or perverse outcomes."},
+ {"l":"Expert","q":"How does the Slack et al. (2020) adversarial scaffolding exploit bypass SHAP and LIME audits?","o":["By modifying the test set labels directly","By training a classifier to detect whether an input is on-manifold (real user) or off-manifold (explainer perturbation), switching behavior to feign neutrality during audits","By corrupting the gradient computation in backpropagation","By setting all feature weights to zero during inference"],"a":1,"e":"Because post-hoc explainers draw perturbations from off-manifold synthetic distributions, an adversarial model easily detects when it is being audited and hides discriminatory logic."},
+ {"l":"Expert","q":"What occurs when a primary risk signal is duplicated into $k$ collinear features in a tree ensemble?","o":["The ensemble error increases by a factor of $k$","Feature dilution: the splits are shared among the $k$ features, causing each individual feature's importance to drop by $\\sim 1/k$","The Shapley values of all other features become zero","TreeSHAP fails to converge"],"a":1,"e":"Collinear feature dilution disperses the split importance across all redundant copies, making critical risk drivers appear statistically insignificant."},
+ {"l":"Expert","q":"What is a fundamental requirement for a counterfactual explanation to provide 'actionable recourse' under credit regulations (ECOA)?","o":["It must be the absolute Euclidean nearest point, regardless of real-world feasibility","It must only recommend changes to mutable, causally feasible features along the plausible data manifold","It must recommend changing at least 10 features simultaneously","It must guarantee 100% accuracy on future applicants"],"a":1,"e":"Actionable recourse requires realistic guidance (e.g. 'increase savings by $500', not 'decrease your age by 10 years') that respects causal relationships and plausibility."},
+ {"l":"Expert","q":"Under the Additivity axiom of Shapley values, if model $f(x) = g(x) + h(x)$, what is the attribution $\\phi_j(f)$?","o":["$\\phi_j(f) = \\phi_j(g) \\cdot \\phi_j(h)$","$\\phi_j(f) = \\phi_j(g) + \\phi_j(h)$","$\\phi_j(f) = \\max(\\phi_j(g), \\phi_j(h))$","$\\phi_j(f) = \\sqrt{\\phi_j(g)^2 + \\phi_j(h)^2}$"],"a":1,"e":"Additivity guarantees that the Shapley values of a sum of games equals the sum of the individual Shapley values."},
+ {"l":"Expert","q":"Why does Breiman's PFI violate the principle of evaluating models on the true data distribution?","o":["Permuting breaks the marginal distribution of $X_j$","Permuting preserves the marginal of $X_j$ but destroys the joint distribution $P(X_j, X_{-j})$, generating impossible synthetic instances","PFI assumes all features follow a Gaussian distribution","PFI requires retraining the model for every feature"],"a":1,"e":"Permuting preserves marginal frequencies of $X_j$ while completely destroying conditional correlations, forcing evaluation in empty probability space."},
+ {"l":"Expert","q":"Which method should be preferred when evaluating the global marginal effect of a continuous feature with strong non-linear interactions and correlation?","o":["Partial Dependence Plot (PDP)","Accumulated Local Effects (ALE)","Permutation Feature Importance (PFI)","Standardized regression coefficients"],"a":1,"e":"ALE isolates main effects by computing local derivatives within conditional slices, making it the robust choice under correlation and non-linear interactions."},
+ {"l":"Expert","q":"In financial model risk management (SR 11-7), why is an explanation from a single tree model considered insufficient evidence of data truth?","o":["Because decision trees cannot output continuous probabilities","Because of the Rashomon effect: multiple distinct model architectures can achieve equivalent risk with inverted feature attributions","Because tree models cannot be audited by regulators","Because tree depth cannot exceed 4 in banking models"],"a":1,"e":"SR 11-7 model risk guidance recognizes predictive multiplicity: relying on one model's internal feature attributions as physical reality is a severe governance flaw."},
+ {"l":"Expert","q":"What mathematical property ensures that TreeSHAP computes exact marginal expectations in polynomial time $O(T L D^2)$ instead of exponential $O(2^p)$?","o":["It assumes all features are statistically independent and projects onto tree decision paths recursively","It uses Monte Carlo sampling with rejection bounds","It approximates the tree with a linear regression surrogate","It prunes all trees to depth 2 before computing Shapley values"],"a":0,"e":"TreeSHAP achieves polynomial complexity by leveraging tree structures and assuming feature independence to compute conditional expectations recursively."}
+];
+
+(function(){const st=store.get('il_quiz',{});
+ function render(){const box=$('quiz');box.innerHTML='';
+  QZ.forEach((q,i)=>{const d=document.createElement('div');d.className='q'+(st[i]!=null?' done':'');d.innerHTML=`<div class="qh">Q${i+1} · ${q.l}</div><div style="margin:4px 0 6px"><b>${q.q}</b></div>`;
+   q.o.forEach((o,j)=>{const b=document.createElement('button');b.className='opt';b.textContent=o;if(st[i]!=null){if(j===q.a)b.classList.add('good');else if(j===st[i])b.classList.add('bad')}b.onclick=()=>{if(st[i]!=null)return;st[i]=j;store.set('il_quiz',st);render();meter()};d.appendChild(b)});
+   const e=document.createElement('div');e.className='ex';e.innerHTML=(st[i]===q.a?'✅ ':'❌ ')+q.e;d.appendChild(e);box.appendChild(d)});
+  const ans=Object.keys(st).length,ok=QZ.filter((q,i)=>st[i]===q.a).length;
+  $('qscore').innerHTML=stat('answered',ans+' / '+QZ.length,'in')+stat('correct',ok,'ok')+stat('score',ans?Math.round(100*ok/ans)+'%':'—',ok/Math.max(ans,1)>=.8?'ok':'warn')+stat('verdict',ans<QZ.length?'keep going':ok>=16?'interpretability master':ok>=13?'strong':'review ch. 1–11','')}
+ $('qreset').onclick=()=>{Object.keys(st).forEach(k=>delete st[k]);store.set('il_quiz',st);render();meter()};
+ window.__qst=st;render();})();
+
+const CHK=[
+ "Distinguish explaining the prediction function f(x) from explaining the real-world process P(Y|X).",
+ "Identify confounding by indication and explain why ML models reward harmful treatments in observational data.",
+ "Explain how Permutation Feature Importance breaks correlation structures and evaluates off-manifold points.",
+ "Explain why Accumulated Local Effects (ALE) avoids the extrapolation traps of Partial Dependence Plots (PDP).",
+ "State and define the 4 Shapley value axioms: Efficiency, Symmetry, Dummy (Null Player), and Additivity.",
+ "Explain the fundamental trade-off between Marginal SHAP (off-manifold sampling) and Conditional SHAP (dummy leakage).",
+ "Explain LIME sampling variance and surrogate slope sensitivity to the exponential kernel bandwidth sigma.",
+ "Define the Rashomon effect and explain why predictive multiplicity invalidates treating one model's SHAP values as truth.",
+ "Explain why feature attribution cannot be equated with causal intervention do(X) without DAG identification.",
+ "Explain the Slack et al. adversarial scaffolding attack and how models detect off-manifold explainer queries.",
+ "Demonstrate how collinear feature dilution disperses importance across redundant variables in tree ensembles.",
+ "Distinguish mathematical nearest counterfactuals from actionable causal recourse.",
+ "Design a regulator-compliant explanation audit for adverse action notices (ECOA) and EU AI Act Article 13.",
+ "Apply Group-SHAP and hierarchical clustering to guard against collinear importance dilution."
+];
+
+(function(){const st=store.get('il_chk',{}),box=$('chk');CHK.forEach((t,i)=>{const l=document.createElement('label'),c=document.createElement('input');c.type='checkbox';c.checked=!!st[i];c.onchange=()=>{st[i]=c.checked;store.set('il_chk',st);meter()};l.appendChild(c);const s=document.createElement('span');s.textContent=t;l.appendChild(s);box.appendChild(l)});window.__cst=st;})();
+
+function meter(){const q=window.__qst||{},c=window.__cst||{};const ok=QZ.filter((x,i)=>q[i]===x.a).length,ck=Object.values(c).filter(Boolean).length;const p=Math.round(100*(.6*ok/QZ.length+.4*ck/CHK.length));$('mtxt').textContent='Mastery: '+p+'%  (exam + checklist)';$('mbar').style.width=p+'%';store.set('mastery_il',p)}
+meter();
+
+/* ---------- Navigation ---------- */
+(function(){const nav=$('nav');let html='';
+ document.querySelectorAll('main .part, main section.ch').forEach(el=>{if(el.classList.contains('part'))html+=`<div class="pt">${el.textContent}</div>`;else{const h=el.querySelector('h2'),num=h.querySelector('.num').textContent,t=Array.from(h.childNodes).filter(n=>n.nodeType===3).map(n=>n.textContent).join('').trim();html+=`<a href="#${el.id}" data-id="${el.id}">${num}. ${t}</a>`}});
+ nav.innerHTML=html;const links=nav.querySelectorAll('a'),io=new IntersectionObserver(es=>{es.forEach(e=>{if(e.isIntersecting)links.forEach(a=>a.classList.toggle('on',a.dataset.id===e.target.id))})},{rootMargin:'-20% 0px -70% 0px'});
+ document.querySelectorAll('section.ch').forEach(s=>io.observe(s));
+ $('menu').onclick=()=>$('side').classList.toggle('open');nav.addEventListener('click',e=>{if(e.target.tagName==='A')$('side').classList.remove('open')});
+ window.addEventListener('scroll',()=>{const h=document.documentElement;$('prog').style.width=(100*h.scrollTop/(h.scrollHeight-h.clientHeight))+'%'},{passive:true});})();
+</script>
+</body>
+</html>
