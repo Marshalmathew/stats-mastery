@@ -136,6 +136,13 @@ def update_readme(workspace):
                     stage7_lines.append(f"{inum}. [`{fname}`]({fname}) — **{title}** ({meta})")
 
         stage7_block = "\n".join(stage7_lines)
+        if os.path.exists(os.path.join(workspace, "cheat-sheet-pack.html")):
+            stage7_block += (
+                "\n\n### Quick Navigation & Bonus Resources\n\n"
+                "- **Main Dashboard**: [`index.html`](index.html)\n"
+                "- **Cheat-Sheet Pack (HTML)**: [`cheat-sheet-pack.html`](cheat-sheet-pack.html) — One comprehensive reference table per course page across all 36 topics.\n"
+                "- **Cheat-Sheet Pack (PDF)**: [`cheat-sheet-pack.pdf`](cheat-sheet-pack.pdf) — Ready-to-print 2-column A4 reference cheat sheets."
+            )
         readme = re.sub(r"### Stage 7 · Specialist Depth.*?(?=\n---\n|\n## )", stage7_block + "\n\n", readme, flags=re.DOTALL)
 
         with open(readme_path, 'w', encoding='utf-8') as f:
